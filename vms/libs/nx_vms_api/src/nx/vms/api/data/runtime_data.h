@@ -28,6 +28,8 @@ struct NX_VMS_API RuntimeData
     QString brand;
     QString customization;
     QString publicIP;
+
+    /**%apidoc Perpetual license expiration time in milliseconds. */
     qint64 prematureLicenseExperationDate = 0;
 
     /**%apidoc Guid of the videowall instance for the running videowall clients. */
@@ -51,10 +53,14 @@ struct NX_VMS_API RuntimeData
     /**%apidoc:uuidArray */
     QSet<nx::Uuid> activeAnalyticsEngines;
 
+    /**%apidoc Video Wall license expiration time in milliseconds. */
     qint64 prematureVideoWallLicenseExpirationDate = 0;
 
     /**%apidoc Used for client peers. Their parent is VMS server. */
     nx::Uuid parentServerId;
+
+    /**%apidoc Time point in milliseconds since epoch when the tiers violation grace period ends. */
+    std::chrono::milliseconds tierGracePeriodExpirationDateMs{0};
 
     /**
     * This operator must not be replaced with reflection implementation as it skips brand and
@@ -83,7 +89,8 @@ struct NX_VMS_API RuntimeData
     (customization) \
     (activeAnalyticsEngines) \
     (prematureVideoWallLicenseExpirationDate) \
-    (parentServerId)
+    (parentServerId) \
+    (tierGracePeriodExpirationDateMs)
 NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
 NX_REFLECTION_INSTRUMENT(RuntimeData, RuntimeData_Fields)
 

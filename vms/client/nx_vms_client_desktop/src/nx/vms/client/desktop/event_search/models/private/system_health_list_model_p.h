@@ -66,8 +66,8 @@ private:
     QSet<QnResourcePtr> getResourceSet(MessageType message) const;
     QnResourceList getSortedResourceList(MessageType message) const;
 
-    static int priority(MessageType message);
-    static QString decorationPath(MessageType message);
+    static int priority(SystemContext* systemContext,MessageType message);
+    static QString decorationPath(SystemContext* systemContext, MessageType message);
 
 private:
     struct Item

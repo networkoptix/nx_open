@@ -26,13 +26,7 @@ void QnResourceNotificationManager::triggerNotification(
 }
 
 void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<vms::api::LicenseOverflowData>& /*tran*/,
-    NotificationSource /*source*/)
-{
-}
-
-void QnResourceNotificationManager::triggerNotification(
-    const QnTransaction<vms::api::VideoWallLicenseOverflowData>& /*tran*/,
+    const QnTransaction<vms::api::GracePeriodExpirationData>& /*tran*/,
     NotificationSource /*source*/)
 {
 }

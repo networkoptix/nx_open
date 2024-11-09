@@ -4,6 +4,8 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 
 using namespace nx::vms::client::core;
 
@@ -23,6 +25,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::Ev
 }
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(
+    nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType)
 {
     using nx::vms::common::system_health::MessageType;
@@ -60,6 +63,15 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::saasInShutdownState:
         case MessageType::notificationLanguageDiffers:
             return QnNotificationLevel::Value::ImportantNotification;
+
+        case MessageType::saasTierIssue:
+        {
+            auto saas = systemContext->saasServiceManager();
+            std::optional<int> daysLeft = saas->tierGracePeriodDaysLeft();
+            if (daysLeft.has_value() && *daysLeft <= 10)
+                return QnNotificationLevel::Value::CriticalNotification;
+            return QnNotificationLevel::Value::ImportantNotification;
+        }
 
         // Red notifications.
         case MessageType::emailSendError:

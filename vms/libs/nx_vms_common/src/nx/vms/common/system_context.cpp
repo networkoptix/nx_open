@@ -23,12 +23,12 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->resourceDataPool = std::make_unique<QnResourceDataPool>();
     d->resourceStatusDictionary = std::make_unique<QnResourceStatusDictionary>();
     d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(this);
-    d->saasServiceManager = std::make_unique<saas::ServiceManager>(this);
     d->cameraHistoryPool = std::make_unique<QnCameraHistoryPool>(this);
 
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
     d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>();
+    d->saasServiceManager = std::make_unique<saas::ServiceManager>(this);
     d->globalSettings = std::make_unique<SystemSettings>(this);
 
     d->userGroupManager = std::make_unique<UserGroupManager>();

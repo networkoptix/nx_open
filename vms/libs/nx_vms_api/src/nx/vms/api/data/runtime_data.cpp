@@ -25,6 +25,7 @@ bool RuntimeData::operator==(const RuntimeData& other) const
         && userId == other.userId
         && flags == other.flags
         && activeAnalyticsEngines == other.activeAnalyticsEngines
+        && tierGracePeriodExpirationDateMs == other.tierGracePeriodExpirationDateMs
         ;
 }
 

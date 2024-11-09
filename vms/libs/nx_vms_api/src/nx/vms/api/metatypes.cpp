@@ -50,7 +50,6 @@
 #include "data/user_data_ex.h"
 #include "data/user_group_data.h"
 #include "data/videowall_data.h"
-#include "data/videowall_license_overflow_data.h"
 #include "data/webpage_data.h"
 #include "rules/event_info.h"
 #include "rules/rule.h"
@@ -108,7 +107,7 @@ void Metatypes::initialize()
     qRegisterMetaType<LayoutItemData>();
     qRegisterMetaType<ShowreelData>();
     qRegisterMetaType<LicenseData>();
-    qRegisterMetaType<LicenseOverflowData>();
+    qRegisterMetaType<GracePeriodExpirationData>();
     qRegisterMetaType<LockData>();
     qRegisterMetaType<MediaServerData>();
     qRegisterMetaType<MediaServerDataList>();
@@ -160,7 +159,6 @@ void Metatypes::initialize()
     qRegisterMetaType<UpdateUploadResponseData>();
     qRegisterMetaType<VideowallData>();
     qRegisterMetaType<VideowallControlMessageData>();
-    qRegisterMetaType<VideoWallLicenseOverflowData>();
     qRegisterMetaType<WebPageData>();
     qRegisterMetaType<rules::EventInfo>();
 

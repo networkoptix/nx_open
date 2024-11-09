@@ -5,7 +5,6 @@
 #include <nx/vms/api/data/cleanup_db_data.h>
 #include <nx/vms/api/data/license_overflow_data.h>
 #include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
 #include <transaction/transaction.h>
 
@@ -20,10 +19,7 @@ public:
         const QnTransaction<nx::vms::api::ResourceStatusData>& tran,
         NotificationSource source);
     void triggerNotification(
-        const QnTransaction<nx::vms::api::LicenseOverflowData>& /*tran*/,
-        NotificationSource /*source*/);
-    void triggerNotification(
-        const QnTransaction<nx::vms::api::VideoWallLicenseOverflowData>& /*tran*/,
+        const QnTransaction<nx::vms::api::GracePeriodExpirationData>& /*tran*/,
         NotificationSource /*source*/);
     void triggerNotification(
         const QnTransaction<nx::vms::api::CleanupDatabaseData>& /*tran*/,

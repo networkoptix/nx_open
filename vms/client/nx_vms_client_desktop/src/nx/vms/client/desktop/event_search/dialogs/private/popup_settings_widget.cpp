@@ -25,14 +25,14 @@
 namespace nx::vms::client::desktop {
 
 PopupSettingsWidget::PopupSettingsWidget(
-    UserNotificationSettingsManager* userNotificationSettingsManager,
+    SystemContext* systemContext,
     QWidget* parent)
     :
     base_type(parent),
     ui(new Ui::PopupSettingsWidget),
     m_updating(false),
-    m_userNotificationSettingsManager{userNotificationSettingsManager},
-    m_stringsHelper(new event::StringsHelper(userNotificationSettingsManager->systemContext()))
+    m_userNotificationSettingsManager{systemContext->userNotificationSettingsManager()},
+    m_stringsHelper(new event::StringsHelper(systemContext))
 {
     ui->setupUi(this);
 
@@ -55,7 +55,8 @@ PopupSettingsWidget::PopupSettingsWidget(
     for (auto messageType: m_userNotificationSettingsManager->allMessages())
     {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnSystemHealthStringsHelper::messageShortTitle(messageType));
+        checkbox->setText(QnSystemHealthStringsHelper::messageShortTitle(
+            systemContext, messageType));
         ui->systemHealthLayout->addWidget(checkbox);
         m_systemHealthCheckBoxes[messageType] = checkbox;
 

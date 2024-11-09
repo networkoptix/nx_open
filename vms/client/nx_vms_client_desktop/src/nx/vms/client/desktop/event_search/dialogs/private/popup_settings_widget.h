@@ -29,7 +29,7 @@ class PopupSettingsWidget: public QnAbstractPreferencesWidget
 
 public:
     explicit PopupSettingsWidget(
-        UserNotificationSettingsManager* userNotificationSettingsManager,
+        SystemContext* systemContext,
         QWidget* parent = nullptr);
     ~PopupSettingsWidget();
 

@@ -44,6 +44,7 @@
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/synctime.h>
 
 // TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
 #include <nx/vms/client/desktop/system_administration/dialogs/user_settings_dialog.h>
@@ -248,7 +249,7 @@ QString SystemHealthListModel::Private::title(int index) const
 
         default:
             return QnSystemHealthStringsHelper::messageNotificationTitle(
-                item.message, getResourceSet(item.message));
+                system(), item.message, getResourceSet(item.message));
     }
 }
 
@@ -353,18 +354,25 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return tooltipLines.join("<br>");
     }
 
-    return QnSystemHealthStringsHelper::messageTooltip(item.message, getResourceSet(item.message));
+    if (item.message == MessageType::saasTierIssue)
+    {
+        return (tr("The Site exceeds its Organization's limits and may become "
+            "non-functional soon. Please adjust your usage to avoid service disruption."));
+    }
+
+    return QnSystemHealthStringsHelper::messageTooltip(
+        system(), item.message, getResourceSet(item.message));
 }
 
 QString SystemHealthListModel::Private::decorationPath(int index) const
 {
-    return decorationPath(m_items[index].message);
+    return decorationPath(system(), m_items[index].message);
 }
 
 QColor SystemHealthListModel::Private::color(int index) const
 {
     return QnNotificationLevel::notificationTextColor(
-        QnNotificationLevel::valueOf(m_items[index].message));
+        QnNotificationLevel::valueOf(system(), m_items[index].message));
 }
 
 QVariant SystemHealthListModel::Private::timestamp(int index) const
@@ -388,7 +396,7 @@ int SystemHealthListModel::Private::helpId(int index) const
 
 int SystemHealthListModel::Private::priority(int index) const
 {
-    return priority(m_items[index].message);
+    return priority(system(), m_items[index].message);
 }
 
 bool SystemHealthListModel::Private::locked(int index) const
@@ -459,6 +467,20 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
                     {
                         menu()->trigger(menu::UserSettingsAction, {user});
                     }
+                });
+
+            return action;
+        }
+
+        case MessageType::saasTierIssue:
+        {
+            const auto action = CommandActionPtr(new CommandAction(tr("Open Services")));
+            connect(action.data(),
+                &CommandAction::triggered,
+                this,
+                [this]
+                {
+                    menu()->trigger(menu::PreferencesServicesTabAction);
                 });
 
             return action;
@@ -745,7 +767,7 @@ void SystemHealthListModel::Private::remove(int first, int count)
     m_items.erase(m_items.begin() + first, m_items.begin() + (first + count));
 }
 
-int SystemHealthListModel::Private::priority(MessageType message)
+int SystemHealthListModel::Private::priority(SystemContext* systemContext, MessageType message)
 {
     // Custom priorities from higher to lower.
     enum CustomPriority
@@ -770,11 +792,13 @@ int SystemHealthListModel::Private::priority(MessageType message)
             return priorityValue(kInvalidRecordingSchedulePriority);
 
         default:
-            return int(QnNotificationLevel::valueOf(message));
+            return int(QnNotificationLevel::valueOf(systemContext, message));
     }
 }
 
-QString SystemHealthListModel::Private::decorationPath(MessageType message)
+QString SystemHealthListModel::Private::decorationPath(
+    SystemContext* systemContext,
+    MessageType message)
 {
     switch (message)
     {
@@ -814,7 +838,7 @@ QString SystemHealthListModel::Private::decorationPath(MessageType message)
             break;
     }
 
-    switch (QnNotificationLevel::valueOf(message))
+    switch (QnNotificationLevel::valueOf(systemContext, message))
     {
         case QnNotificationLevel::Value::CriticalNotification:
             return "20x20/Outline/error.svg";

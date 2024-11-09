@@ -61,6 +61,8 @@ public:
         QWidget* parent,
         bool hasVirtualCameras,
         bool hasUsbCameras);
+
+    static void warnCamerasCannotBeMovedDueTierLimit(QWidget* parent);
 };
 
 } // namespace messages

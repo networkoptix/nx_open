@@ -4,18 +4,23 @@
 
 #include "data_macros.h"
 
-namespace nx {
-namespace vms {
-namespace api {
+#include <nx/reflect/enum_instrument.h>
 
-struct NX_VMS_API LicenseOverflowData
+namespace nx::vms::api {
+
+
+NX_REFLECTION_ENUM(GracePeriodType,
+    perpetualLicense,
+    videoWallLicense,
+    tier);
+
+struct NX_VMS_API GracePeriodExpirationData
 {
-    bool value = false;
-    qint64 time = 0;
-};
-#define LicenseOverflowData_Fields (value)(time)
-NX_VMS_API_DECLARE_STRUCT(LicenseOverflowData)
+    std::chrono::milliseconds expirationTimeMs{0};
+    GracePeriodType type{perpetualLicense};
 
-} // namespace api
-} // namespace vms
-} // namespace nx
+};
+#define GracePeriodExpirationData_Fields (expirationTimeMs)(type)
+NX_VMS_API_DECLARE_STRUCT(GracePeriodExpirationData)
+
+} // namespace nx::vms::api

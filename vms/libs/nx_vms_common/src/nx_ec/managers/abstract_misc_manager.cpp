@@ -26,21 +26,14 @@ ErrorCode AbstractMiscManager::cleanupDatabaseSync(
         });
 }
 
-ErrorCode AbstractMiscManager::markLicenseOverflowSync(bool value, qint64 time)
+ErrorCode AbstractMiscManager::markLicenseOverflowSync(
+    std::chrono::milliseconds expirationTimeMs,
+    nx::vms::api::GracePeriodType type)
 {
     return detail::callSync(
         [&](auto handler)
         {
-            markLicenseOverflow(value, time, std::move(handler));
-        });
-}
-
-ErrorCode AbstractMiscManager::markVideoWallLicenseOverflowSync(bool value, qint64 time)
-{
-    return detail::callSync(
-        [&](auto handler)
-        {
-            markVideoWallLicenseOverflow(value, time, std::move(handler));
+            markLicenseOverflow(expirationTimeMs, type, std::move(handler));
         });
 }
 

@@ -7,15 +7,16 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <utils/common/synctime.h>
 
 using namespace nx::vms::client;
-using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -37,7 +38,9 @@ QStringList getCameraList(const QSet<QnResourcePtr>& resources)
 
 } // namespace
 
-QString QnSystemHealthStringsHelper::messageShortTitle(MessageType messageType)
+QString QnSystemHealthStringsHelper::messageShortTitle(
+    nx::vms::client::core::SystemContext* systemContext,
+    MessageType messageType)
 {
     switch (messageType)
     {
@@ -79,6 +82,26 @@ QString QnSystemHealthStringsHelper::messageShortTitle(MessageType messageType)
             return tr("Site suspended");
         case MessageType::saasInShutdownState:
             return tr("Site shut down");
+        case MessageType::saasTierIssue:
+        {
+            const QString kDefaultMessage = tr("Site will stop functioning soon");
+            if (!systemContext)
+                return kDefaultMessage;
+            auto saas = systemContext->saasServiceManager();
+            auto daysLeft = saas->tierGracePeriodDaysLeft();
+
+            if (!daysLeft.has_value())
+                return kDefaultMessage;
+            if (daysLeft == 0)
+            {
+                if (saas->isTierGracePeriodExpired())
+                    return tr("Site has stopped functioning");
+                return tr("Site will stop functioning today");
+            }
+            if (daysLeft == 1)
+                return tr("Site will stop functioning tomorrow");
+            return tr("Site will stop functioning in %n days", "", *daysLeft);
+        }
         case MessageType::showIntercomInformer:
             return tr("Intercom call");
         case MessageType::showMissedCallInformer:
@@ -95,7 +118,9 @@ QString QnSystemHealthStringsHelper::messageShortTitle(MessageType messageType)
     return QString();
 }
 
-QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messageType,
+QString QnSystemHealthStringsHelper::messageNotificationTitle(
+    nx::vms::client::core::SystemContext* systemContext,
+    MessageType messageType,
    const QSet<QnResourcePtr>& resources)
 {
     namespace html = nx::vms::common::html;
@@ -167,7 +192,7 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(MessageType messag
         default:
             break;
     }
-    return messageShortTitle(messageType);
+    return messageShortTitle(systemContext, messageType);
 }
 
 QString QnSystemHealthStringsHelper::messageDescription(MessageType messageType)
@@ -201,7 +226,9 @@ QString QnSystemHealthStringsHelper::messageDescription(MessageType messageType)
 }
 
 QString QnSystemHealthStringsHelper::messageTooltip(
-    MessageType messageType, const QSet<QnResourcePtr>& resources)
+    nx::vms::client::core::SystemContext* systemContext,
+    MessageType messageType,
+    const QSet<QnResourcePtr>& resources)
 {
     QStringList messageParts;
 
@@ -265,7 +292,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
         return messageParts.join('\n');
 
     /* Description is ended with a dot, title is not. */
-    return messageNotificationTitle(messageType, resources) + '.';
+    return messageNotificationTitle(systemContext, messageType, resources) + '.';
 }
 
 QString QnSystemHealthStringsHelper::resourceText(

@@ -11,6 +11,9 @@
 #include <nx/vms/client/desktop/saas/services_sort_model.h>
 #include <nx/vms/client/desktop/saas/services_usage_item_delegate.h>
 #include <nx/vms/client/desktop/saas/services_usage_model.h>
+#include <nx/vms/client/desktop/saas/tier_usage_item_delegate.h>
+#include <nx/vms/client/desktop/saas/tier_usage_model.h>
+#include <nx/vms/client/desktop/saas/tier_usage_sort_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
@@ -88,12 +91,21 @@ struct SaasInfoWidget::Private
     std::unique_ptr<saas::ServicesUsageModel> servicesUsageModel =
         std::make_unique<saas::ServicesUsageModel>(q->systemContext()->saasServiceManager());
 
+    std::unique_ptr<saas::TierUsageModel> tierUsageModel =
+        std::make_unique<saas::TierUsageModel>(q->systemContext()->saasServiceManager());
+
     std::unique_ptr<saas::ServicesSortModel> servicesSortModel =
         std::make_unique<saas::ServicesSortModel>();
+
+    std::unique_ptr<saas::TierUsageSortModel> tierUsageSortModel =
+        std::make_unique<saas::TierUsageSortModel>();
 
     void setupHeaderUi();
     void setupPlaceholderPageUi();
     void setupServicesUsagePageUi();
+    void setupServicesViewHeader();
+    void setupTiersViewHeader();
+
     void updateUi();
 };
 
@@ -138,18 +150,46 @@ void SaasInfoWidget::Private::setupServicesUsagePageUi()
     ui->servicesUsageItemView->setItemDelegate(
         new saas::ServicesUsageItemDelegate(ui->servicesUsageItemView));
 
-    const auto itemViewHeader = ui->servicesUsageItemView->header();
-    itemViewHeader->setSectionsMovable(false);
-    itemViewHeader->setSectionResizeMode(
+    tierUsageSortModel->setSourceModel(tierUsageModel.get());
+    tierUsageSortModel->sort(saas::TierUsageModel::LimitTypeColumn);
+    ui->tierUsageItemView->setModel(tierUsageSortModel.get());
+    ui->tierUsageItemView->setItemDelegate(
+        new saas::TierUsageItemDelegate(ui->tierUsageItemView));
+    ui->tierUsageItemView->expandAll();
+
+    setupServicesViewHeader();
+    setupTiersViewHeader();
+}
+
+void SaasInfoWidget::Private::setupServicesViewHeader()
+{
+    const auto servicesViewHeader = ui->servicesUsageItemView->header();
+    servicesViewHeader->setSectionsMovable(false);
+    servicesViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceNameColumn, QHeaderView::Stretch);
-    itemViewHeader->setSectionResizeMode(
+    servicesViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceTypeColumn, QHeaderView::Stretch);
-    itemViewHeader->setSectionResizeMode(
+    servicesViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::ServiceOveruseWarningIconColumn, QHeaderView::ResizeToContents);
-    itemViewHeader->setSectionResizeMode(
+    servicesViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::TotalQantityColumn, QHeaderView::ResizeToContents);
-    itemViewHeader->setSectionResizeMode(
+    servicesViewHeader->setSectionResizeMode(
         saas::ServicesUsageModel::UsedQantityColumn, QHeaderView::ResizeToContents);
+}
+
+void SaasInfoWidget::Private::setupTiersViewHeader()
+{
+    const auto tiersViewHeader = ui->tierUsageItemView->header();
+    if (tiersViewHeader->count() == 0)
+        return;
+
+    tiersViewHeader->setSectionsMovable(false);
+    tiersViewHeader->setSectionResizeMode(
+        saas::TierUsageModel::LimitTypeColumn, QHeaderView::Stretch);
+    tiersViewHeader->setSectionResizeMode(
+        saas::TierUsageModel::AllowedLimitColumn, QHeaderView::ResizeToContents);
+    tiersViewHeader->setSectionResizeMode(
+        saas::TierUsageModel::UsedLimitColumn, QHeaderView::ResizeToContents);
 }
 
 void SaasInfoWidget::Private::updateUi()
@@ -157,9 +197,13 @@ void SaasInfoWidget::Private::updateUi()
     const auto serviceManager = q->systemContext()->saasServiceManager();
 
     ui->channelPartnerContactButton->setHidden(!channelPartnerUrl(serviceManager).isValid());
-    ui->stackedWidget->setCurrentWidget(hasServices(serviceManager)
-        ? ui->servicesUsagePage
-        : ui->placeholderPage);
+    ui->stackedWidget->setCurrentWidget(
+        hasServices(serviceManager) || serviceManager->hasTierOveruse()
+            ? ui->servicesUsagePage
+            : ui->placeholderPage);
+
+    ui->servicesUsageGroupBox->setVisible(hasServices(serviceManager));
+    ui->tierUsageGroupBox->setVisible(serviceManager->hasTierOveruse());
 
     QString saasStateLabelText;
     if (serviceManager->saasActive())
@@ -189,6 +233,15 @@ SaasInfoWidget::SaasInfoWidget(SystemContext* systemContext, QWidget* parent):
         &nx::vms::common::saas::ServiceManager::dataChanged,
         this,
         &SaasInfoWidget::loadDataToUi);
+
+    connect(d->tierUsageModel.get(), &saas::TierUsageModel::modelDataUpdated, this,
+        [this]
+        {
+            d->setupTiersViewHeader();
+            d->ui->tierUsageItemView->expandAll();
+            const auto serviceManager = this->systemContext()->saasServiceManager();
+            d->ui->tierUsageGroupBox->setVisible(serviceManager->hasTierOveruse());
+        });
 }
 
 SaasInfoWidget::~SaasInfoWidget()
@@ -203,11 +256,13 @@ void SaasInfoWidget::loadDataToUi()
 void SaasInfoWidget::showEvent(QShowEvent*)
 {
     d->servicesUsageModel->setCamerasChangesTracking(systemContext(), true);
+    d->tierUsageModel->setResourcesChangesTracking(systemContext(), true);
 }
 
 void SaasInfoWidget::hideEvent(QHideEvent*)
 {
     d->servicesUsageModel->setCamerasChangesTracking(systemContext(), false);
+    d->tierUsageModel->setResourcesChangesTracking(systemContext(), false);
 }
 
 } // namespace nx::vms::client::desktop

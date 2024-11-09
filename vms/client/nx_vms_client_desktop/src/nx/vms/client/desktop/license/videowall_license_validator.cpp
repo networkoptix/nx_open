@@ -38,8 +38,8 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     // Video Wall license should remain valid before prematureVideoWallLicenseExpirationDate, so
     // we need to override runtime info from missing server with runtime info from common module.
     // If we reached the expiration date then just report that runtime info is missing.
-    const bool stillValid =
-        qnSyncTime->currentMSecsSinceEpoch() < commonInfo.data.prematureVideoWallLicenseExpirationDate;
+    const bool stillValid = qnSyncTime->currentMSecsSinceEpoch()
+        < commonInfo.data.prematureVideoWallLicenseExpirationDate;
 
     if (stillValid)
         info = commonInfo;

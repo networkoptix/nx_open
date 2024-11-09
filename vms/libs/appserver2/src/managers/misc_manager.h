@@ -5,7 +5,6 @@
 #include <nx/vms/api/data/cleanup_db_data.h>
 #include <nx/vms/api/data/license_overflow_data.h>
 #include <nx/vms/api/data/system_id_data.h>
-#include <nx/vms/api/data/videowall_license_overflow_data.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
 #include <transaction/transaction.h>
 
@@ -31,14 +30,8 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
     virtual int markLicenseOverflow(
-        bool value,
-        qint64 time,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
-
-    virtual int markVideoWallLicenseOverflow(
-        bool value,
-        qint64 time,
+        std::chrono::milliseconds expirationTimeMs,
+        nx::vms::api::GracePeriodType type,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -136,40 +129,17 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
 
 template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
-    bool value,
-    qint64 time,
+    std::chrono::milliseconds expirationTimeMs,
+    nx::vms::api::GracePeriodType type,
     Handler<> handler,
     nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    nx::vms::api::LicenseOverflowData params;
-    params.value = value;
-    params.time = time;
-
+    nx::vms::api::GracePeriodExpirationData params{
+        .expirationTimeMs = expirationTimeMs,
+        .type = type};
     const int requestId = generateRequestID();
     processor().processUpdateAsync(
         ApiCommand::markLicenseOverflow,
-        params,
-        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
-        {
-            handler(requestId, std::move(args)...);
-        });
-    return requestId;
-}
-
-template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::markVideoWallLicenseOverflow(
-    bool value,
-    qint64 time,
-    Handler<> handler,
-    nx::utils::AsyncHandlerExecutor handlerExecutor)
-{
-    nx::vms::api::VideoWallLicenseOverflowData params;
-    params.value = value;
-    params.time = time;
-
-    const int requestId = generateRequestID();
-    processor().processUpdateAsync(
-        ApiCommand::markVideoWallLicenseOverflow,
         params,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {

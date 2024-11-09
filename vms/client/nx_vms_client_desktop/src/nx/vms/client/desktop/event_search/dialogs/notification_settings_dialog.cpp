@@ -11,8 +11,7 @@ namespace nx::vms::client::desktop {
 
 NotificationSettingsDialog::NotificationSettingsDialog(QWidget* parent):
     base_type{parent},
-    m_settingsWidget{new PopupSettingsWidget{
-        systemContext()->userNotificationSettingsManager(), this}}
+    m_settingsWidget{new PopupSettingsWidget{systemContext(), this}}
 {
     resize(400, 600);
     setMinimumSize(QSize(400, 600));

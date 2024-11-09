@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_property_key.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
@@ -1542,12 +1543,14 @@ struct ModifyCameraDataAccess
                         expectedId, param.id, param.physicalId));
                 }
             }
-            if (!systemContext->resourcePool()->getResourceById(param.id))
+
+            const auto existingCamera = systemContext->resourcePool()->getResourceById(param.id);
+            if (!existingCamera || existingCamera->getParentId() != param.parentId)
             {
                 // New device
                 using namespace nx::vms::api;
                 const auto saasManager = systemContext->saasServiceManager();
-                std::optional<int> left = saasManager->tierLimitLeft(SaasTierLimitName::maxDevicesPerServer);
+                std::optional<int> left = saasManager->camerasTierLimitLeft(param.parentId);
                 if (left.has_value() && *left < 1)
                 {
                     const std::optional<int> available =
@@ -1555,6 +1558,38 @@ struct ModifyCameraDataAccess
                     return Result(ErrorCode::forbidden,
                         nx::format(ServerApiErrors::tr("Maximum number of Cameras for the Site "
                         "is reached. Available %1."), *available));
+                }
+            }
+        }
+
+        return ModifyResourceAccess()(systemContext, accessData, param);
+    }
+};
+
+struct ModifyLayoutDataAccess
+{
+    Result operator()(SystemContext* systemContext,
+        const nx::network::rest::UserAccessData& accessData,
+        const nx::vms::api::LayoutData& param)
+    {
+        if (!hasSystemAccess(accessData))
+        {
+            const auto existingLayout = systemContext->resourcePool()->getResourceById<QnLayoutResource>(param.id);
+            const int existingItems = existingLayout ? existingLayout->getItems().size() : 0;
+            const int itemsDelta = param.items.size() - existingItems;
+            if (itemsDelta > 0)
+            {
+                using namespace nx::vms::api;
+                const auto saasManager = systemContext->saasServiceManager();
+                auto left = saasManager->tierLimitLeft(SaasTierLimitName::maxDevicesPerLayout);
+                if (left.has_value() && *left < itemsDelta)
+                {
+                    const std::optional<int> available =
+                        saasManager->tierLimit(SaasTierLimitName::maxDevicesPerLayout);
+                    return Result(ErrorCode::forbidden,
+                        nx::format(ServerApiErrors::tr("Maximum number of Layout items for the Site "
+                                                       "is reached. Available %1."),
+                            *available));
                 }
             }
         }

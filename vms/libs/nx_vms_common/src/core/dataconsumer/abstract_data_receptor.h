@@ -44,6 +44,11 @@ public:
      * DataReceptor is required that provider should be fully configured.
      */
     virtual bool needConfigureProvider() const { return true; }
+
+    /**
+     * Allow to replace video data if Tier limit overused.
+     */
+    virtual bool canReplaceData() const { return true; }
 };
 
 using QnAbstractMediaDataReceptorPtr = QSharedPointer<QnAbstractMediaDataReceptor>;

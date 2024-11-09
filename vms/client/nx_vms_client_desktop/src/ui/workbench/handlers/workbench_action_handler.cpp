@@ -129,6 +129,8 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/utils/camera_hotspots_support.h>
@@ -1583,6 +1585,20 @@ void ActionHandler::moveResourcesToServer(
                 resultCallback({});
                 return;
             }
+        }
+    }
+
+    if (nx::vms::common::saas::saasInitialized(systemContext()))
+    {
+        const auto serviceManager = systemContext()->saasServiceManager();
+        if (auto limitLeft = serviceManager->camerasTierLimitLeft(server->getId()))
+        {
+            if (limitLeft.value() < camerasToMove.size())
+            {
+                messages::Resources::warnCamerasCannotBeMovedDueTierLimit(mainWindowWidget());
+                return;
+            }
+
         }
     }
 

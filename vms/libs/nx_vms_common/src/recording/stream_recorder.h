@@ -54,6 +54,7 @@ public:
     void resetPacketCount();
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
+    virtual bool canReplaceData() const override { return false; }
 
 signals:
     void recordingStarted();

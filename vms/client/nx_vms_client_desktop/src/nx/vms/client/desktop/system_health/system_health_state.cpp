@@ -122,6 +122,11 @@ SystemHealthState::Private::Private(SystemHealthState* q):
             update(SystemHealthIndex::notificationLanguageDiffers);
         });
 
+    connect(systemContext()->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
+        q, [this]() { update(SystemHealthIndex::saasTierIssue);});
+    connect(systemContext()->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged,
+        q, [this]() { update(SystemHealthIndex::saasTierIssue);});
+
     // NoLicenses.
 
     connect(systemContext()->licensePool(),
@@ -349,6 +354,7 @@ void SystemHealthState::Private::updateSaasIssues()
     update(SystemHealthIndex::saasIntegrationServicesOverused);
     update(SystemHealthIndex::saasInSuspendedState);
     update(SystemHealthIndex::saasInShutdownState);
+    update(SystemHealthIndex::saasTierIssue);
 }
 
 bool SystemHealthState::Private::state(SystemHealthIndex index) const
@@ -448,6 +454,10 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::saasInShutdownState:
             return hasPowerUserPermissions()
                 && systemContext()->saasServiceManager()->saasShutDown();
+
+        case SystemHealthIndex::saasTierIssue:
+            return hasPowerUserPermissions()
+                && systemContext()->saasServiceManager()->isTierGracePeriodStarted();
 
         case SystemHealthIndex::notificationLanguageDiffers:
         {

@@ -71,6 +71,8 @@ public:
 
     QnPeerRuntimeInfo localInfo() const;
     bool hasItem(const nx::Uuid& id);
+    bool hasItem(nx::utils::MoveOnlyFunc<bool(const QnPeerRuntimeInfo& item)> predicate);
+
     QnPeerRuntimeInfo item(const nx::Uuid& id) const;
 
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);

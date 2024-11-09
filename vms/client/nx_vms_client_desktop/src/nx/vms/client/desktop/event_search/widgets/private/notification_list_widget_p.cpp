@@ -387,7 +387,8 @@ void NotificationListWidget::Private::updateFilterNotificationsButtonAppearance(
         else
         {
             m_filterNotificationsButton->setText(
-                QnSystemHealthStringsHelper::messageShortTitle(*watchedMessages.cbegin()));
+                QnSystemHealthStringsHelper::messageShortTitle(
+                    system(), *watchedMessages.cbegin()));
         }
     }
     else

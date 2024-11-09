@@ -1163,16 +1163,6 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem* item)
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
 {
-    int maxItems = qnRuntime->maxSceneItems();
-
-    if (m_widgets.size() >= maxItems)
-    {
-        NX_DEBUG(this, lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
-            .arg(maxItems));
-        qnDeleteLater(item);
-        return false;
-    }
-
     auto widget = ResourceWidgetFactory::createWidget(item);
     if (!widget)
     {

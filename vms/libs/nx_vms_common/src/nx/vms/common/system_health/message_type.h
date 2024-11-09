@@ -89,6 +89,11 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
      */
     notificationLanguageDiffers = 37,
 
+    /**
+     * Show a warning that current Saas Tier is overused.
+     */
+    saasTierIssue = 38,
+
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
 

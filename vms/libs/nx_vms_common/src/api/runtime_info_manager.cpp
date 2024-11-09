@@ -112,6 +112,12 @@ bool QnRuntimeInfoManager::hasItem(const nx::Uuid& id)
     return m_items->hasItem(id);
 }
 
+bool QnRuntimeInfoManager::hasItem(
+    nx::utils::MoveOnlyFunc<bool(const QnPeerRuntimeInfo& item)> predicate)
+{
+    return m_items->hasItemWithCondition(std::move(predicate));
+}
+
 void QnRuntimeInfoManager::updateRemoteItem(const QnPeerRuntimeInfo& value)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);

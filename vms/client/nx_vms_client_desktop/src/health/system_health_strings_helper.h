@@ -7,6 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/common/system_health/message_type.h>
 
+namespace nx::vms::client::core { class SystemContext; }
+
 class NX_VMS_CLIENT_DESKTOP_API QnSystemHealthStringsHelper: public QObject
 {
     Q_OBJECT
@@ -14,13 +16,21 @@ public:
     using MessageType = nx::vms::common::system_health::MessageType;
 
     /** Text that is used where the most short common title is required, e.g. in settings. */
-    static QString messageShortTitle(MessageType messageType);
+    static QString messageShortTitle(
+        nx::vms::client::core::SystemContext* systemContext,
+        MessageType messageType);
 
     /** Text that is in notifications. */
-    static QString messageNotificationTitle(MessageType messageType, const QSet<QnResourcePtr>& resources);
+    static QString messageNotificationTitle(
+        nx::vms::client::core::SystemContext* systemContext,
+        MessageType messageType,
+        const QSet<QnResourcePtr>& resources);
 
     /** Text that is used where the full description is required, e.g. in notification hints. */
-    static QString messageTooltip(MessageType messageType, const QSet<QnResourcePtr>& resources);
+    static QString messageTooltip(
+        nx::vms::client::core::SystemContext* systemContext,
+        MessageType messageType,
+        const QSet<QnResourcePtr>& resources);
 
     /** Text that used in description of notifications. */
     static QString messageDescription(MessageType messageType);

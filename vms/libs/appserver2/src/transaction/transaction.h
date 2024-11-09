@@ -789,7 +789,7 @@ APPLY(601, saveLayout, nx::vms::api::LayoutData, \
     false, /*< isRemoveOperation */ \
     CreateHashByIdHelper(), /*< getHash */ \
     LayoutNotificationManagerHelper(), /*< trigger notification */ \
-    ModifyResourceAccess(), /*< save permission checker */ \
+    ModifyLayoutDataAccess(), /*< save permission checker */ \
     ReadResourceAccess(), /*< read permission checker */ \
     InvalidFilterFunc(), /*< filter read func */ \
     ReadResourceAccessOut(), /*< check remote peer rights for outgoing transaction */ \
@@ -1298,7 +1298,7 @@ APPLY(2004, changeSystemId, nx::vms::api::SystemIdData, \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
 /**%apidoc */ \
-APPLY(2006, markLicenseOverflow, nx::vms::api::LicenseOverflowData, \
+APPLY(2006, markLicenseOverflow, nx::vms::api::GracePeriodExpirationData, \
     true, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \
@@ -1343,18 +1343,7 @@ APPLY(2009, broadcastPeerSyncTime, nx::vms::api::PeerSyncTimeData, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
-APPLY(2010, markVideoWallLicenseOverflow, nx::vms::api::VideoWallLicenseOverflowData, \
-    true, /*< isPersistent */ \
-    false, /*< isSystem */ \
-    false, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), \
-    ResourceNotificationManagerHelper(), \
-    PowerUserAccess(), /*< save permission checker */ \
-    AllowForAllAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
-    LocalTransactionType()) /*< local transaction type */ \
+/* Transaction 2010 (markVideoWallLicenseOverflow) removed, the code is forbidden. */ \
 /* Transaction 4001 (getClientInfoList) removed, the code is forbidden. */ \
 /* Transaction 4002 (saveClientInfo) removed, the code is forbidden. */ \
 /* Transaction 5001 (getStatisticsReport) removed, the code is forbidden. */ \

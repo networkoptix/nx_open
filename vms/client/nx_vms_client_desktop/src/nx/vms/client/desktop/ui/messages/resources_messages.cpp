@@ -615,6 +615,13 @@ void Resources::warnCamerasCannotBeMoved(
     QnMessageBox::warning(parent, warning);
 }
 
+void Resources::warnCamerasCannotBeMovedDueTierLimit(QWidget* parent)
+{
+    QnMessageBox::warning(parent,
+        tr("Unable to move device"),
+        tr("Maximum number of devices for this server is reached"));
+}
+
 } // namespace messages
 } // namespace ui
 } // namespace nx::vms::client::desktop

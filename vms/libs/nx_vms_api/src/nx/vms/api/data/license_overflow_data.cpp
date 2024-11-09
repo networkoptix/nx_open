@@ -8,8 +8,8 @@ namespace nx {
 namespace vms {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseOverflowData,
-    (ubjson)(xml)(json)(sql_record)(csv_record), LicenseOverflowData_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(GracePeriodExpirationData,
+    (ubjson) (xml) (json) (sql_record) (csv_record), GracePeriodExpirationData_Fields)
 
 } // namespace api
 } // namespace vms

@@ -4,31 +4,58 @@
 
 #include <optional>
 
+#include <api/runtime_info_manager.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
+#include <core/resource/videowall_resource.h>
 #include <licensing/license.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/ldap.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
+#include <nx/utils/qt_direct_connect.h>
+#include <utils/common/synctime.h>
 
 static const QString kAdditionTierLimitsPropertyKey("additionTierLimits");
 static const QString kSaasDataPropertyKey("saasData");
 static const QString kSaasServicesPropertyKey("saasServices");
 
+using namespace nx::vms::api;
+
 namespace {
 
-void setJsonToDictionary(
+constexpr std::array<SaasTierLimitName, 5> checkedTiers =
+{
+    SaasTierLimitName::maxServers,
+    SaasTierLimitName::maxDevicesPerServer,
+    SaasTierLimitName::maxDevicesPerLayout,
+    SaasTierLimitName::ldapEnabled,
+    SaasTierLimitName::videowallEnabled
+};
+
+void setJsonToDictionaryAsync(
     QnResourcePropertyDictionary* dictionary,
     const QString& propertyKey,
     const std::string_view& json)
 {
     if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
         dictionary->saveParamsAsync(nx::Uuid());
+}
+
+void setJsonToDictionarySync(QnResourcePropertyDictionary* dictionary,
+    const QString& propertyKey,
+    const std::string_view& json)
+{
+    if (dictionary->setValue(nx::Uuid(), propertyKey, QString::fromUtf8(json)))
+        dictionary->saveParams(nx::Uuid());
 }
 
 template <typename T>
@@ -52,28 +79,23 @@ namespace nx::vms::common::saas {
 
 ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     QObject(parent),
-    SystemContextAware(context)
+    SystemContextAware(context),
+    m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); })
 {
-    using namespace nx::vms::api;
-
-    connect(resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
+    connect(
+        resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
         [this](const nx::Uuid& resourceId, const QString& key)
         {
             if (!resourceId.isNull())
                 return;
 
             const auto dictionary = resourcePropertyDictionary();
-            if (key == kAdditionTierLimitsPropertyKey)
+            if (key == kAdditionTierLimitsPropertyKey || key == kSaasDataPropertyKey)
             {
-                if (auto limits = getObjectFromDictionary<LocalTierLimits>(dictionary, key))
-                    updateTiers(*limits);
-            }
-            else if (key == kSaasDataPropertyKey)
-            {
-                if (const auto saasData = getObjectFromDictionary<api::SaasData>(dictionary, key))
-                    setData(saasData.value());
-                else
-                    NX_ASSERT(false, "Could not deserialize nx::vms::api::SaasData structure");
+                auto saasData = getObjectFromDictionary<SaasData>(
+                    dictionary, kSaasDataPropertyKey);
+                if (saasData)
+                    setData(saasData.value_or(SaasData()), localTierLimits());
             }
             else if (key == kSaasServicesPropertyKey)
             {
@@ -90,22 +112,47 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
             }
         });
 
-    connect(resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
+    connect(
+        resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
         [this](const nx::Uuid& resourceId, const QString& key)
         {
             if (!resourceId.isNull())
                 return;
 
             if (key == kSaasDataPropertyKey)
-                setData({});
+                setData({}, {});
             else if (key == kSaasServicesPropertyKey)
                 setServices({});
         });
+
+    m_qtSignalGuards.push_back(nx::qtDirectConnect(
+        runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
+        [this](const QnPeerRuntimeInfo&)
+        {
+            resetGracePeriodCache();
+        }));
+    m_qtSignalGuards.push_back(nx::qtDirectConnect(
+        runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged,
+        [this](const QnPeerRuntimeInfo&)
+        {
+            resetGracePeriodCache();
+        }));
+    m_qtSignalGuards.push_back(nx::qtDirectConnect(
+        runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved,
+        [this](const QnPeerRuntimeInfo&)
+        {
+            resetGracePeriodCache();
+        }));
+}
+
+void ServiceManager::resetGracePeriodCache()
+{
+    m_tierGracePeriodExpirationTime.reset();
 }
 
 void ServiceManager::loadSaasData(const std::string_view& saasDataJson)
 {
-    setJsonToDictionary(
+    setJsonToDictionaryAsync(
         resourcePropertyDictionary(),
         kSaasDataPropertyKey,
         saasDataJson);
@@ -119,19 +166,19 @@ QByteArray ServiceManager::rawData() const
 
 void ServiceManager::loadServiceData(const std::string_view& servicesJson)
 {
-    setJsonToDictionary(
+    setJsonToDictionaryAsync(
         resourcePropertyDictionary(),
         kSaasServicesPropertyKey,
         servicesJson);
 }
 
-nx::vms::api::SaasData ServiceManager::data() const
+SaasData ServiceManager::data() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
     return m_data;
 }
 
-std::map<nx::Uuid, nx::vms::api::SaasService> ServiceManager::services() const
+std::map<nx::Uuid, SaasService> ServiceManager::services() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
     return m_services;
@@ -164,11 +211,11 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
         if (waitForDone)
             promise = std::make_unique<std::promise<void>>();
 
-        nx::vms::api::ResourceParamWithRefData data(
+        ResourceParamWithRefData data(
             nx::Uuid(),
             kSaasDataPropertyKey,
             QString::fromStdString(nx::reflect::json::serialize(d)));
-        nx::vms::api::ResourceParamWithRefDataList dataList;
+        ResourceParamWithRefDataList dataList;
         dataList.push_back(data);
         connection->getResourceManager(nx::network::rest::kSystemSession)->save(
             dataList,
@@ -182,34 +229,31 @@ void ServiceManager::setSaasStateInternal(api::SaasState saasState, bool waitFor
     }
 }
 
-std::map<nx::Uuid, nx::vms::api::SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
+std::map<nx::Uuid, SaasAnalyticsParameters> ServiceManager::analyticsIntegrations() const
 {
-    using namespace nx::vms::api;
     return purchasedServices<SaasAnalyticsParameters>(SaasService::kAnalyticsIntegrationServiceType);
 }
 
-std::map<nx::Uuid, nx::vms::api::SaasLocalRecordingParameters> ServiceManager::localRecording() const
+std::map<nx::Uuid, SaasLocalRecordingParameters> ServiceManager::localRecording() const
 {
-    using namespace nx::vms::api;
     return purchasedServices<SaasLocalRecordingParameters>(SaasService::kLocalRecordingServiceType);
 }
 
-std::map<nx::Uuid, nx::vms::api::SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
+std::map<nx::Uuid, SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
 {
-    using namespace nx::vms::api;
     return purchasedServices<SaasCloudStorageParameters>(SaasService::kCloudRecordingType);
 }
 
 bool ServiceManager::saasActive() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_data.state == nx::vms::api::SaasState::active;
+    return m_data.state == SaasState::active;
 }
 
 bool ServiceManager::saasSuspended() const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-    return m_data.state == nx::vms::api::SaasState::suspended;
+    return m_data.state == SaasState::suspended;
 }
 
 bool ServiceManager::saasSuspendedOrShutDown() const
@@ -218,9 +262,8 @@ bool ServiceManager::saasSuspendedOrShutDown() const
     return saasSuspendedOrShutDown(m_data.state);
 }
 
-bool ServiceManager::saasSuspendedOrShutDown(nx::vms::api::SaasState state)
+bool ServiceManager::saasSuspendedOrShutDown(SaasState state)
 {
-    using namespace nx::vms::api;
     return state == SaasState::suspended || saasShutDown(state);
 }
 
@@ -230,9 +273,8 @@ bool ServiceManager::saasShutDown() const
     return saasShutDown(m_data.state);
 }
 
-bool ServiceManager::saasShutDown(nx::vms::api::SaasState state)
+bool ServiceManager::saasShutDown(SaasState state)
 {
-    using namespace nx::vms::api;
     return state == SaasState::shutdown || state == SaasState::autoShutdown;
 }
 
@@ -242,25 +284,21 @@ void ServiceManager::updateLocalRecordingLicenseV1()
     updateLocalRecordingLicenseV1Unsafe();
 }
 
-nx::vms::api::ServiceTypeStatus ServiceManager::serviceStatus(const QString& serviceType) const
+ServiceTypeStatus ServiceManager::serviceStatus(const QString& serviceType) const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
     return m_data.security.status.contains(serviceType)
         ? m_data.security.status.at(serviceType)
-        : nx::vms::api::ServiceTypeStatus();
+        : ServiceTypeStatus();
 }
 
-void ServiceManager::updateTiers(const LocalTierLimits& tiers)
+void ServiceManager::setData(
+    SaasData data,
+    LocalTierLimits localTierLimits)
 {
-    m_localTierLimits = tiers;
-    setData(data());
-}
-
-void ServiceManager::setData(nx::vms::api::SaasData data)
-{
-    for (const auto& [tierName, value]: m_localTierLimits)
+    for (const auto& [tierName, value]: localTierLimits)
     {
-        if (m_allowOverwriteTier || !data.tierLimits.contains(tierName))
+        if (!data.tierLimits.contains(tierName))
         {
             if (value.has_value())
                 data.tierLimits[tierName] = *value;
@@ -272,6 +310,7 @@ void ServiceManager::setData(nx::vms::api::SaasData data)
     bool stateChanged = false;
     {
         NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+
         if (m_data == data)
             return;
 
@@ -286,11 +325,11 @@ void ServiceManager::setData(nx::vms::api::SaasData data)
         emit saasStateChanged();
 }
 
-void ServiceManager::setServices(const std::vector<nx::vms::api::SaasService>& services)
+void ServiceManager::setServices(const std::vector<SaasService>& services)
 {
     {
         NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-        std::map<nx::Uuid, nx::vms::api::SaasService> servicesMap;
+        std::map<nx::Uuid, SaasService> servicesMap;
         for (const auto& service: services)
             servicesMap.emplace(service.id, service);
 
@@ -316,8 +355,6 @@ bool ServiceManager::isEnabled() const
 
 QnLicensePtr ServiceManager::localRecordingLicenseV1Unsafe() const
 {
-    using namespace nx::vms::api;
-
     QnLicensePtr license = QnLicense::createSaasLocalRecordingLicense();
     if (m_data.state == SaasState::uninitialized || saasShutDown(m_data.state))
     {
@@ -347,8 +384,6 @@ QnLicensePtr ServiceManager::localRecordingLicenseV1Unsafe() const
 
 void ServiceManager::updateLocalRecordingLicenseV1Unsafe()
 {
-    using namespace nx::vms::api;
-
     const auto license = localRecordingLicenseV1Unsafe();
     if (m_data.state != SaasState::uninitialized)
         systemContext()->licensePool()->addLicense(license);
@@ -385,66 +420,236 @@ std::map<nx::Uuid, ServiceParamsType> ServiceManager::purchasedServices(
     return result;
 }
 
-std::optional<int> ServiceManager::tierLimit(nx::vms::api::SaasTierLimitName value) const
+std::optional<int> ServiceManager::tierLimit(SaasTierLimitName value) const
 {
     NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return tierLimitUnsafe(value);
+}
 
+std::optional<int> ServiceManager::tierLimitUnsafe(SaasTierLimitName value) const
+{
     auto it = m_data.tierLimits.find(value);
     if (it != m_data.tierLimits.end())
         return it->second;
     return std::nullopt;
 }
 
-std::optional<int> ServiceManager::tierLimitLeft(nx::vms::api::SaasTierLimitName value) const
+std::optional<int> ServiceManager::camerasTierLimitLeft(const nx::Uuid& serverId)
 {
-    using namespace nx::vms::api;
-    std::optional<int> limit = tierLimit(value);
+    const std::optional<int> limit = tierLimit(SaasTierLimitName::maxDevicesPerServer);
     if (!limit.has_value())
         return std::nullopt; // there is no limit
 
+    const int cameraCount = resourcePool()->getAllCameras(
+        serverId, /*ignoreDesktopCameras*/ true).size();
+    return *limit - cameraCount;
+}
+
+int ServiceManager::tierLimitUsed(SaasTierLimitName value) const
+{
     switch (value)
     {
         case SaasTierLimitName::maxDevicesPerServer:
         {
-            int existing = 0;
-            const int totalServers = systemContext()->resourcePool()->servers().size();
-            const int totalCameras = systemContext()->resourcePool()->getAllCameras(
-                QnResourcePtr(), /*ignoreDesktopCameras*/ true).size();
-            existing = totalServers * totalCameras;
-            return *limit - existing;
+            int result = 0;
+            for (const auto& server: resourcePool()->servers())
+            {
+                int cameraCount = resourcePool()->getAllCameras(
+                    server, /*ignoreDesktopCameras*/ true).size();
+                result = std::max(result, cameraCount);
+            }
+            return result;
         }
-        case SaasTierLimitName::crossSiteFeaturesEnabled:
-            [[fallthrough]];
+        case SaasTierLimitName::maxServers:
+        {
+            return resourcePool()->servers().size();
+        }
+
+        case SaasTierLimitName::maxDevicesPerLayout:
+        {
+            const auto layouts = resourcePool()->getResources<QnLayoutResource>();
+            int existing = 0;
+            for (const auto& layout: layouts)
+                existing = std::max(existing, (int) layout->getItems().size());
+            return existing;
+        }
+
         case SaasTierLimitName::videowallEnabled:
-            [[fallthrough]];
+            return resourcePool()->getResources<QnVideoWallResource>().isEmpty() ? 0 : 1;
+
         case SaasTierLimitName::ldapEnabled:
-            return *limit;
-        default:
-            NX_ASSERT(0, "Not implemented");
-            return 0;
+            return globalSettings()->ldap().isValid(/*checkPassword*/ false) ? 1 : 0;
+
     }
+    NX_ASSERT(0, "Not implemented %1", static_cast<int>(value));
+    return 0;
 }
 
-bool ServiceManager::tierLimitReached(nx::vms::api::SaasTierLimitName value) const
+std::optional<int> ServiceManager::tierLimitLeft(SaasTierLimitName value) const
 {
-    const auto limit = tierLimitLeft(value);
-    return limit && *limit <= 0;
+    const std::optional<int> limit = tierLimit(value);
+    if (!limit.has_value())
+        return std::nullopt; // There is no limit.
+    return *limit - tierLimitUsed(value);
 }
 
-bool ServiceManager::hasFeature(nx::vms::api::SaasTierLimitName value) const
+bool ServiceManager::tierLimitReached(SaasTierLimitName value) const
+{
+    const auto limit = tierLimit(value);
+    return limit && tierLimitUsed(value) > *limit;
+}
+
+bool ServiceManager::hasFeature(SaasTierLimitName value) const
 {
     const auto limit = tierLimitLeft(value);
     return limit.value_or(1) > 0; //< Features are enabled by default.
 }
 
-void ServiceManager::setTierLimits(
-    const std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>& tierLimits,
-    bool allowOverwriteTier)
+void ServiceManager::setLocalTierLimits(
+    const ServiceManager::LocalTierLimits& tierLimits)
 {
-    m_allowOverwriteTier = allowOverwriteTier;
-    setJsonToDictionary(resourcePropertyDictionary(),
+    setJsonToDictionarySync(resourcePropertyDictionary(),
         kAdditionTierLimitsPropertyKey,
         nx::reflect::json::serialize(tierLimits));
+}
+
+ServiceManager::LocalTierLimits ServiceManager::localTierLimits() const
+{
+    return getObjectFromDictionary<LocalTierLimits>(resourcePropertyDictionary(),
+        kAdditionTierLimitsPropertyKey).value_or(LocalTierLimits());
+}
+
+std::chrono::milliseconds ServiceManager::tierGracePeriodExpirationTime() const
+{
+    return m_tierGracePeriodExpirationTime.get();
+}
+
+std::chrono::milliseconds ServiceManager::calculateGracePeriodTime() const
+{
+    std::optional<qint64> resultMs;
+    systemContext()->runtimeInfoManager()->hasItem(
+        [&resultMs](const auto& item)
+        {
+            if (item.data.tierGracePeriodExpirationDateMs.count() == 0)
+                return false;
+            if (resultMs.has_value())
+            {
+                resultMs = std::min(*resultMs,
+                    (qint64) item.data.tierGracePeriodExpirationDateMs.count());
+            }
+            else
+            {
+                resultMs = item.data.tierGracePeriodExpirationDateMs.count();
+            }
+            return false;
+        });
+    return std::chrono::milliseconds(resultMs.value_or(0));
+}
+
+bool ServiceManager::isTierGracePeriodStarted() const
+{
+    return tierGracePeriodExpirationTime().count() > 0;
+}
+
+bool ServiceManager::isTierGracePeriodExpired() const
+{
+    const qint64 expiredMs = tierGracePeriodExpirationTime().count();
+    return expiredMs > 0 && qnSyncTime->currentMSecsSinceEpoch() > expiredMs;
+}
+
+std::optional<int> ServiceManager::tierGracePeriodDaysLeft() const
+{
+    const qint64 expiredMs = tierGracePeriodExpirationTime().count();
+    if (expiredMs == 0)
+        return std::nullopt;
+
+    const QDate expiredDate = QDateTime::fromMSecsSinceEpoch(expiredMs).date();
+    const QDate currentDate = qnSyncTime->currentDateTime().date();
+    return (int) std::max(0LL, expiredDate.toJulianDay() - currentDate.toJulianDay());
+}
+
+bool ServiceManager::hasTierOveruse() const
+{
+    const auto saas = systemContext()->saasServiceManager();
+    return std::any_of(checkedTiers.begin(),
+        checkedTiers.end(),
+        [saas](const auto limit) { return saas->tierLimitReached(limit); });
+}
+
+std::map<nx::Uuid, int> ServiceManager::overusedResourcesUnsafe(SaasTierLimitName feature) const
+{
+    std::map<nx::Uuid, int> result;
+    const std::optional<int> limit = tierLimitUnsafe(feature);
+    if (!limit.has_value())
+        return result;
+
+    switch (feature)
+    {
+        case SaasTierLimitName::maxDevicesPerServer:
+        {
+            for (const auto& server: systemContext()->resourcePool()->servers())
+            {
+                auto cameras = resourcePool()->getAllCameras(
+                    server, /*ignoreDesktopCameras*/ true);
+                if (cameras.size() > *limit)
+                    result.emplace(server->getId(), cameras.size());
+            }
+            break;
+        }
+        case SaasTierLimitName::maxDevicesPerLayout:
+        {
+            const auto layouts = resourcePool()->getResources<QnLayoutResource>();
+            for (const auto& layout: layouts)
+            {
+                if (layout->getItems().size() > *limit)
+                    result.emplace(layout->getId(), layout->getItems().size());
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    return result;
+}
+
+TierOveruseMap ServiceManager::tierOveruseDetails() const
+{
+    TierOveruseMap result;
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (const auto& feature: checkedTiers)
+    {
+        const std::optional<int> limit = tierLimitUnsafe(feature);
+        if (!limit.has_value())
+            continue;
+
+        TierOveruseData data;
+        data.used = tierLimitUsed(feature);
+        if (data.used > *limit)
+        {
+            data.allowed = *limit;
+            data.details = overusedResourcesUnsafe(feature);
+            result.emplace(feature, std::move(data));
+        }
+    }
+    return result;
+}
+
+TierUsageMap ServiceManager::tiersUsageDetails() const
+{
+    TierUsageMap result;
+
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    for (const auto& feature: checkedTiers)
+    {
+        if (auto limit = tierLimitUnsafe(feature))
+        {
+            TierUsageData data;
+            data.allowed = *limit;
+            data.used = tierLimitUsed(feature);
+            result.emplace(feature, std::move(data));
+        }
+    }
+    return result;
 }
 
 } // nx::vms::common::saas

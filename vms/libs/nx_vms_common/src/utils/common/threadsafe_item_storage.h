@@ -4,6 +4,7 @@
 
 #include <QtCore/QHash>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <utils/common/functional.h>
@@ -87,6 +88,18 @@ public:
     {
         NX_MUTEX_LOCKER locker(m_mutex);
         return m_itemByUuid.contains(uuid);
+    }
+
+    bool hasItemWithCondition(nx::utils::MoveOnlyFunc<bool(const T& item)> predicate)
+    {
+        NX_MUTEX_LOCKER locker(m_mutex);
+        for (auto it = m_itemByUuid.begin(); it != m_itemByUuid.end(); ++it)
+        {
+            if (predicate(it.value()))
+                return true;
+        }
+        return false;
+
     }
 
     void addItem(const T& item)

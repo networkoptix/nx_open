@@ -7,6 +7,7 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/misc_data.h>
+#include <nx/vms/api/data/license_overflow_data.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
@@ -51,20 +52,14 @@ public:
     ErrorCode cleanupDatabaseSync(bool cleanupDbObjects, bool cleanupTransactionLog);
 
     virtual int markLicenseOverflow(
-        bool value,
-        qint64 time,
+        std::chrono::milliseconds expirationTimeMs,
+        nx::vms::api::GracePeriodType type,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
-    ErrorCode markLicenseOverflowSync(bool value, qint64 time);
-
-    virtual int markVideoWallLicenseOverflow(
-        bool value,
-        qint64 time,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
-
-    ErrorCode markVideoWallLicenseOverflowSync(bool value, qint64 time);
+    ErrorCode markLicenseOverflowSync(
+        std::chrono::milliseconds expirationTimeMs,
+        nx::vms::api::GracePeriodType type);
 
     virtual int saveMiscParam(
         const nx::vms::api::MiscData& param,

@@ -112,7 +112,7 @@ void CallNotificationsListModel::Private::addNotification(
     EventData eventData;
     eventData.toolTip = tooltip(action);
     eventData.helpId = rules::eventHelpId(runtimeParameters.eventType);
-    eventData.level = QnNotificationLevel::valueOf(message);
+    eventData.level = QnNotificationLevel::valueOf(system(), message);
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.timestamp = (std::chrono::microseconds) runtimeParameters.eventTimestampUsec;
     eventData.ruleId = runtimeParameters.eventResourceId;

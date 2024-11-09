@@ -5,7 +5,10 @@
 #include <QtCore/QObject>
 
 #include <licensing/license_fwd.h>
+#include <nx/utils/qt_direct_connect.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/value_cache.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
@@ -122,17 +125,83 @@ public:
     QByteArray rawData() const;
 
     /**
-     * @return Tier limitation by provided name.
+     * @return true if any of tiers has overuse
+     */
+    bool hasTierOveruse() const;
+
+    /**
+     * @return Tier limitation by provided feature.
      */
     std::optional<int> tierLimit(nx::vms::api::SaasTierLimitName value) const;
 
-    void setTierLimits(
-        const std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>& value,
-        bool allowOverwriteTier = true);
+    /**
+     * @return How many resource by specific tier limit are currently in use.
+     */
+    int tierLimitUsed(nx::vms::api::SaasTierLimitName value) const;
 
+    /**
+     * @return std::nullopt if there is not limit. Otherwise returns delta between tierLimit and
+     * used resource.
+     */
     std::optional<int> tierLimitLeft(nx::vms::api::SaasTierLimitName value) const;
+
+    std::optional<int> camerasTierLimitLeft(const nx::Uuid& serverId);
+
+    /*
+     * @return Whether tier is overused for the requested feature.
+     */
     bool tierLimitReached(nx::vms::api::SaasTierLimitName value) const;
+
+    /*
+     * @return Whether tier allows the requested feature.
+     */
     bool hasFeature(nx::vms::api::SaasTierLimitName value) const;
+
+    /*
+     * @return UTC time in milliseconds when grace period is expired.
+     * Return 0 if grace period is not started.
+     */
+    std::chrono::milliseconds tierGracePeriodExpirationTime() const;
+
+    /*
+     * @return Whether grace period was started and expired already.
+     */
+    bool isTierGracePeriodExpired() const;
+
+    /*
+     * @return true if grace period was started.
+     */
+    bool isTierGracePeriodStarted() const;
+
+    /*
+     * @return std::null_opt if grace period is not started otherwise returns days left to the end of the grace period.
+     * return 0 if grace period is already expired.
+    */
+    std::optional<int> tierGracePeriodDaysLeft() const;
+
+    /*
+     * @return List of overused Tier features. For boolean features fields 'allowed' and 'used'
+     * contains only values 1 or 0.
+     */
+    nx::vms::api::TierOveruseMap tierOveruseDetails() const;
+
+    /*
+     * @return statistic for all Tier features. For boolean features fields 'allowed' and 'used'
+     * contains only values 1 or 0.
+     */
+    nx::vms::api::TierUsageMap tiersUsageDetails() const;
+
+    using LocalTierLimits = std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>;
+
+    /*
+     * Used for test purpose only.
+     */
+    void setLocalTierLimits(const LocalTierLimits& value);
+
+    /*
+     * Used for test purpose only.
+     */
+    LocalTierLimits localTierLimits() const;
 
 signals:
     void saasStateChanged();
@@ -144,7 +213,9 @@ private:
     QnLicensePtr localRecordingLicenseV1Unsafe() const;
     void updateLocalRecordingLicenseV1Unsafe();
 
-    void setData(nx::vms::api::SaasData data);
+    void setData(
+        nx::vms::api::SaasData data,
+        LocalTierLimits localTierLimits);
     void setServices(const std::vector<nx::vms::api::SaasService>& services);
 
     /*
@@ -154,19 +225,20 @@ private:
     std::map<nx::Uuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
     void setSaasStateInternal(api::SaasState saasState, bool waitForDone);
 
-    using LocalTierLimits = std::map<nx::vms::api::SaasTierLimitName, std::optional<int>>;
-
-    void updateTiers(const LocalTierLimits& tiers);
+    std::map<nx::Uuid, int> overusedResourcesUnsafe(
+        nx::vms::api::SaasTierLimitName feature) const;
+    std::chrono::milliseconds calculateGracePeriodTime() const;
+    void resetGracePeriodCache();
+    std::optional<int> tierLimitUnsafe(nx::vms::api::SaasTierLimitName value) const;
 
 private:
     mutable nx::Mutex m_mutex;
     nx::vms::api::SaasData m_data;
     std::map<nx::Uuid, nx::vms::api::SaasService> m_services;
     std::atomic<bool> m_enabled{false};
+    std::vector<nx::utils::SharedGuardPtr> m_qtSignalGuards;
 
-    // Local tier limits can be loaded from json file in addition to CPS data
-    LocalTierLimits m_localTierLimits;
-    bool m_allowOverwriteTier = false;
+    nx::utils::CachedValue<std::chrono::milliseconds> m_tierGracePeriodExpirationTime;
 };
 
 } // nx::vms::common::saas
