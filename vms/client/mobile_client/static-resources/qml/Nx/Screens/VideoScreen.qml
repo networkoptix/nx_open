@@ -249,7 +249,7 @@ PageBase
 
             text: qsTr("Objects")
             height: visible ? implicitHeight : 0
-            onTriggered: Workflow.openEventSearchScreen(controller.resourceId, camerasModel, true)
+            onTriggered: Workflow.openEventSearchScreen(controller.resource.id, camerasModel, true)
         }
 
         onAboutToShow:
