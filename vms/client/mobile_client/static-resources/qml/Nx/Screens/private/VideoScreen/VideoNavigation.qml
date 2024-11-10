@@ -528,7 +528,9 @@ Item
 
                     enabled: !controller.mediaPlayer.liveMode && hasArchive
                         && !controller.cannotDecryptMedia
-                    resourceId: controller.mediaPlayer.resource && controller.mediaPlayer.resource.id
+                    resourceId: controller.mediaPlayer.resource
+                        ? controller.mediaPlayer.resource.id
+                        : NxGlobals.uuid("");
                     positionMs: controller.mediaPlayer.position
 
                     anchors.left:  motionSearchModeButton.right

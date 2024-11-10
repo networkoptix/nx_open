@@ -86,6 +86,7 @@ BaseOption
 
             Binding
             {
+                restoreMode: Binding.RestoreNone
                 target: visualDelegateLoader.item
                 when: visualDelegateLoader.status === Loader.Ready
                     && visualDelegateLoader.item.hasOwnProperty("textValueItem") && textValueItem
