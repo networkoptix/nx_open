@@ -100,6 +100,7 @@ Column
 
         Binding
         {
+            restoreMode: Binding.RestoreNone
             target: control.selector
             property: "value"
             value: ValueHelpers.getValue(
@@ -111,6 +112,7 @@ Column
 
         Binding
         {
+            restoreMode: Binding.RestoreNone
             target: control.selector
             property: "textValue"
             value: d.getTextValue(d.selectedIndex)
@@ -118,6 +120,7 @@ Column
 
         Binding
         {
+            restoreMode: Binding.RestoreNone
             target: control.selector
             property: "isDefaultValue"
             value: d.selectedIndex === -1

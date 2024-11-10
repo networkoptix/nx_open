@@ -532,7 +532,7 @@ PageBase
         {
             if (!eventSearchModel || currentEventIndex < 0)
             {
-                preview.resource = undefined
+                preview.resource = null
                 preview.startTimeMs = 0
                 preview.durationMs = 0
                 preview.setPosition(0)
