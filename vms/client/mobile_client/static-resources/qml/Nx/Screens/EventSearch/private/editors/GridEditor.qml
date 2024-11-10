@@ -169,6 +169,7 @@ Grid
 
         Binding
         {
+            restoreMode: Binding.RestoreNone
             target: selector
             property: "value"
             value: ValueHelpers.getValue(
@@ -180,6 +181,7 @@ Grid
 
         Binding
         {
+            restoreMode: Binding.RestoreNone
             target: control.selector
             property: "textValue"
             value: d.getTextValue(d.selectedIndex)
@@ -187,6 +189,7 @@ Grid
 
         Binding
         {
+            restoreMode: Binding.RestoreNone
             target: control.selector
             property: "isDefaultValue"
             value: d.selectedIndex === -1
