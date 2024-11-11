@@ -86,8 +86,8 @@ private:
 };
 
 /*
-  *  Helper class to calculate integration licenses usages.
-  */
+ *  Helper class to calculate integration licenses usages.
+ */
 class NX_VMS_COMMON_API CloudStorageServiceUsageHelper: public CloudServiceUsageHelper
 {
 public:
@@ -160,6 +160,20 @@ private:
     //Summary by megapixels and serviceId.
     mutable std::optional<std::map<ServiceInfo, nx::vms::api::LicenseSummaryData>> m_cache;
     mutable nx::Mutex m_mutex;
+};
+
+/*
+ *  Helper class to calculate integration licenses usages.
+ */
+class NX_VMS_COMMON_API LiveViewUsageHelper: public CloudServiceUsageHelper
+{
+public:
+    LiveViewUsageHelper(SystemContext* context, QObject* parent = nullptr);
+
+    /*
+     * @return Information how many Live View service is available and used.
+     */
+    nx::vms::api::LicenseSummaryData info() const;
 };
 
 /*

@@ -76,6 +76,11 @@ public:
     std::map<nx::Uuid, nx::vms::api::SaasLocalRecordingParameters> localRecording() const;
 
     /**
+     * @return Parameters of purchased live view services, indexed by service ID.
+     */
+    std::map<nx::Uuid, nx::vms::api::SaasLiveViewParameters> liveView() const;
+
+    /**
      * @return Parameters of purchased cloud storage services, indexed by service ID.
      */
     std::map<nx::Uuid, nx::vms::api::SaasCloudStorageParameters> cloudStorageData() const;
@@ -123,6 +128,17 @@ public:
     bool isEnabled() const;
 
     QByteArray rawData() const;
+
+
+    /**
+     * @return true if live service overused
+     */
+    bool hasLiveServiceOveruse() const;
+
+    /**
+     * @return true if live service overused. The value is cached and updated every 5 seconds.
+     */
+    bool hasLiveServiceOveruseCached() const;
 
     /**
      * @return true if any of tiers has overuse
@@ -239,6 +255,7 @@ private:
     std::vector<nx::utils::SharedGuardPtr> m_qtSignalGuards;
 
     nx::utils::CachedValue<std::chrono::milliseconds> m_tierGracePeriodExpirationTime;
+    nx::utils::CachedValueWithTimeout<bool> m_liveOveruse;
 };
 
 } // nx::vms::common::saas

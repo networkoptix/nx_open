@@ -24,6 +24,7 @@ QString SaasDateTime::toString() const
 const QString SaasService::kLocalRecordingServiceType("local_recording");
 const QString SaasService::kAnalyticsIntegrationServiceType("analytics");
 const QString SaasService::kCloudRecordingType("cloud_storage");
+const QString SaasService::kLiveViewServiceType("live_view");
 
 template <typename T>
 struct Field
@@ -62,6 +63,14 @@ SaasLocalRecordingParameters SaasLocalRecordingParameters::fromParams(const Saas
     return result;
 }
 
+SaasLiveViewParameters SaasLiveViewParameters::fromParams(
+    const SaasServiceParameters& parameters)
+{
+    SaasLiveViewParameters result;
+    fieldFromMap(result, parameters, totalChannelNumber);
+    return result;
+}
+
 SaasAnalyticsParameters SaasAnalyticsParameters::fromParams(const SaasServiceParameters& parameters)
 {
     SaasAnalyticsParameters result;
@@ -84,6 +93,7 @@ SaasCloudStorageParameters SaasCloudStorageParameters::fromParams(const SaasServ
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasLocalRecordingParameters, (json), SaasLocalRecordingParameters_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasCloudStorageParameters, (json), SaasCloudStorageParameters_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasAnalyticsParameters, (json), SaasAnalyticsParameters_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasLiveViewParameters, (json), SaasLiveViewParameters_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasService, (json), SaasService_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SaasPurchase, (json), SaasPurchase_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ServiceTypeStatus, (json), ServiceTypeStatus_Fields)

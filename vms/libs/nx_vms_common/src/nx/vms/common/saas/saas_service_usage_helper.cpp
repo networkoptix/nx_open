@@ -544,4 +544,30 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::cameraGroupsByS
     return result;
 }
 
+LiveViewUsageHelper::LiveViewUsageHelper(SystemContext* context, QObject* parent):
+    CloudServiceUsageHelper(context, parent)
+{
+}
+
+LicenseSummaryData LiveViewUsageHelper::info() const
+{
+    LicenseSummaryData result;
+
+    for (const auto& [serviceId, parameters]: m_context->saasServiceManager()->liveView())
+        result.available += parameters.totalChannelNumber;
+
+    systemContext()->resourcePool()->getResources(
+        [&result](const QnResourcePtr& resource)
+        {
+            auto camera = resource.dynamicCast<QnSecurityCamResource>();
+            if (camera && !camera->hasFlags(Qn::desktop_camera)
+                && !camera->isScheduleEnabled() && camera->isOnline())
+            {
+                ++result.inUse;
+            }
+            return false;
+        });
+    return result;
+}
+
 } // nx::vms::common::saas

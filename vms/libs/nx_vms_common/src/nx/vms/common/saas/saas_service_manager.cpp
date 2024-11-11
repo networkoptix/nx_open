@@ -24,6 +24,8 @@
 #include <nx/utils/qt_direct_connect.h>
 #include <utils/common/synctime.h>
 
+#include "saas_service_usage_helper.h"
+
 static const QString kAdditionTierLimitsPropertyKey("additionTierLimits");
 static const QString kSaasDataPropertyKey("saasData");
 static const QString kSaasServicesPropertyKey("saasServices");
@@ -32,6 +34,7 @@ using namespace nx::vms::api;
 
 namespace {
 
+constexpr std::chrono::seconds kUpdateLiveOveruseTimeout(5);
 constexpr std::array<SaasTierLimitName, 5> checkedTiers =
 {
     SaasTierLimitName::maxServers,
@@ -80,7 +83,18 @@ namespace nx::vms::common::saas {
 ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     QObject(parent),
     SystemContextAware(context),
-    m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); })
+    m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); }),
+    m_liveOveruse(
+        [this]()
+        {
+            {
+                NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+                if (m_data.state != SaasState::active)
+                    return true;
+            }
+            const auto info = LiveViewUsageHelper(systemContext()).info();
+            return info.inUse > info.available;
+        }, kUpdateLiveOveruseTimeout)
 {
     connect(
         resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
@@ -95,7 +109,7 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
                 auto saasData = getObjectFromDictionary<SaasData>(
                     dictionary, kSaasDataPropertyKey);
                 if (saasData)
-                    setData(saasData.value_or(SaasData()), localTierLimits());
+                    setData(*saasData, localTierLimits());
             }
             else if (key == kSaasServicesPropertyKey)
             {
@@ -237,6 +251,11 @@ std::map<nx::Uuid, SaasAnalyticsParameters> ServiceManager::analyticsIntegration
 std::map<nx::Uuid, SaasLocalRecordingParameters> ServiceManager::localRecording() const
 {
     return purchasedServices<SaasLocalRecordingParameters>(SaasService::kLocalRecordingServiceType);
+}
+
+std::map<nx::Uuid, SaasLiveViewParameters> ServiceManager::liveView() const
+{
+    return purchasedServices<SaasLiveViewParameters>(SaasService::kLiveViewServiceType);
 }
 
 std::map<nx::Uuid, SaasCloudStorageParameters> ServiceManager::cloudStorageData() const
@@ -555,6 +574,16 @@ bool ServiceManager::isTierGracePeriodExpired() const
 {
     const qint64 expiredMs = tierGracePeriodExpirationTime().count();
     return expiredMs > 0 && qnSyncTime->currentMSecsSinceEpoch() > expiredMs;
+}
+
+bool ServiceManager::hasLiveServiceOveruse() const
+{
+    return m_liveOveruse.updated();
+}
+
+bool ServiceManager::hasLiveServiceOveruseCached() const
+{
+    return m_liveOveruse.get();
 }
 
 std::optional<int> ServiceManager::tierGracePeriodDaysLeft() const

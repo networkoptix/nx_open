@@ -53,6 +53,18 @@ struct NX_VMS_API SaasLocalRecordingParameters
 NX_REFLECTION_INSTRUMENT(SaasLocalRecordingParameters, SaasLocalRecordingParameters_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasLocalRecordingParameters, (json), NX_VMS_API)
 
+/**%apidoc SaaS service parameters for 'liveView' service type. */
+struct NX_VMS_API SaasLiveViewParameters
+{
+    /**%apidoc Amount of channels. */
+    int totalChannelNumber = 1;
+
+    static SaasLiveViewParameters fromParams(const SaasServiceParameters& parameters);
+};
+#define SaasLiveViewParameters_Fields (totalChannelNumber)
+NX_REFLECTION_INSTRUMENT(SaasLiveViewParameters, SaasLiveViewParameters_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(SaasLiveViewParameters, (json), NX_VMS_API)
+
 /**%apidoc Saas service parameters for 'cloudStorage' service type. */
 struct NX_VMS_API SaasCloudStorageParameters
 {
@@ -92,6 +104,7 @@ struct NX_VMS_API SaasService
     static const QString kLocalRecordingServiceType;
     static const QString kAnalyticsIntegrationServiceType;
     static const QString kCloudRecordingType;
+    static const QString kLiveViewServiceType;
 
     /**%apidoc Internal service identifier. */
     nx::Uuid id;

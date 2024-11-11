@@ -20,6 +20,8 @@ QString ServiceTypeDisplayHelper::serviceTypeDisplayString(const QString& servic
     if (serviceType == SaasService::kCloudRecordingType)
         return tr("Cloud storage");
 
+    if (serviceType == SaasService::kLiveViewServiceType)
+        return tr("Live view");
     NX_ASSERT(false, "No localized display name for unexpected SaaS service type");
     return serviceType;
 }

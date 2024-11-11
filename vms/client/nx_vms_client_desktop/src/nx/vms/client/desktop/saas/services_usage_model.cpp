@@ -164,6 +164,11 @@ int ServicesUsageModel::Private::usedServiceQuantity(const nx::Uuid& serviceId) 
             ? usageHelper.cameraGroupsByService().at(serviceId).size()
             : 0;
     }
+    else if (service.type == nx::vms::api::SaasService::kLiveViewServiceType)
+    {
+        LiveViewUsageHelper usageHelper(systemContext);
+        return usageHelper.info().inUse;
+    }
     else if (service.type == nx::vms::api::SaasService::kCloudRecordingType)
     {
         CloudStorageServiceUsageHelper usageHelper(systemContext);
@@ -225,7 +230,10 @@ QVariant ServicesUsageModel::data(const QModelIndex& index, int role) const
 {
     const auto serviceId = d->purchasedServicesIds().at(index.row());
     const auto serviceType = d->serviceType(serviceId);
-    const auto serviceTypeStatus = d->saasData.security.status.at(serviceType);
+    nx::vms::api::ServiceTypeStatus serviceTypeStatus{};
+    auto it = d->saasData.security.status.find(serviceType);
+    if (it != d->saasData.security.status.end())
+        serviceTypeStatus = it->second;
 
     // Service overuse status is deduced from the actual number of services used rather than taken
     // from SaasSecurity structure which is updated in a long intervals. It's done this way to make
