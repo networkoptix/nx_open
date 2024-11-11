@@ -26,7 +26,7 @@
  *         white = red | green | blue,
  *     };
  *     NX_KIT_ENABLE_FLAGS(Color);
- *     
+ *
  *     // Class member enumerations are supported.
  *     struct Border
  *     {

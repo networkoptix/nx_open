@@ -703,7 +703,7 @@ bool parseNameValueFile(
         static constexpr char kBom[] = "\xEF\xBB\xBF";
         if (line == 1 && stringStartsWith(lineStr, kBom))
             lineStr.erase(0, sizeof(kBom) - /* Terminating NUL */ 1);
-        
+
         const ParsedNameValue parsed = parseNameValue(lineStr);
         if (!parsed.error.empty())
         {

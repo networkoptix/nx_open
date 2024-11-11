@@ -228,8 +228,8 @@ TEST(debug, disabledTime)
 
 TEST(debug, srcFileBaseNameWithoutExt)
 {
-    static const std::string s(1, nx::kit::utils::kPathSeparator);    
-    
+    static const std::string s(1, nx::kit::utils::kPathSeparator);
+
     ASSERT_EQ("", srcFileBaseNameWithoutExt(""));
     ASSERT_EQ("", srcFileBaseNameWithoutExt(s));
     ASSERT_EQ("", srcFileBaseNameWithoutExt("path" + s));
@@ -262,7 +262,7 @@ TEST(debug, srcFileRelativePath)
     // __FILE__:  <commonPrefix>unit_tests/src/debug_ut.cpp
 
     const std::string thisFile = __FILE__;
-    
+
     static const std::string suffix = "unit_tests" + s + "src" + s + "debug_ut.cpp";
     ASSERT_EQ(suffix, thisFile.substr(thisFile.size() - suffix.size(), suffix.size()));
 

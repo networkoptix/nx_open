@@ -256,7 +256,7 @@ public:
         (*this) << m_newline;
         *m_outputStream << (*this).str(); //< Perform the actual output.
     }
-    
+
 private:
     std::ostream* m_outputStream;
     const char* const m_newline;

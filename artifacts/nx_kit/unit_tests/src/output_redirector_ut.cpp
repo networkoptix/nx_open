@@ -75,7 +75,7 @@ public:
     const std::string processName = nx::kit::utils::getProcessName();
     const std::string stdoutFilePath = testDir + processName + std::string("_stdout.log");
     const std::string stderrFilePath = testDir + processName + std::string("_stderr.log");
-    
+
     std::unique_ptr<const OutputRedirectorAdapter> outputRedirectorAdapter;
 };
 
@@ -93,7 +93,7 @@ TEST(outputRedirector, check)
 
     // Test output already performed during the static initialization in the constructor of
     // OutputRedirectorTest, so we need only to check its consequences.
-    
+
     std::ifstream stdoutLogStream(outputRedirectorTest.stdoutFilePath);
     std::ifstream stderrLogStream(outputRedirectorTest.stderrFilePath);
 

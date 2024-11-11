@@ -118,7 +118,7 @@ static bool redirectOutput(FILE* stream, const char* streamName, const std::stri
         streamName,
         nx::kit::utils::toString(processName).c_str(),
         nx::kit::utils::toString(filename).c_str());
-        
+
     return true;
 }
 
