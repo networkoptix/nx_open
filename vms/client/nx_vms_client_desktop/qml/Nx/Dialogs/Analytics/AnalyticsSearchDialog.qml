@@ -649,7 +649,7 @@ Window
                             id: tableModel
                             sourceModel: eventModel
                             attributeManager: d.tableViewAttributeManager
-                            objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
+                            objectTypeIds: analyticsFilters.selectedObjectTypeIds
                         }
 
                         Connections
@@ -844,7 +844,7 @@ Window
                         const engineId = analyticsSetup.engine
                         tabBar.selectEngine(engineId)
 
-                        analyticsFilters.setSelectedAnalyticsObjectTypeIds(
+                        analyticsFilters.setSelectedObjectTypeIds(
                             analyticsSetup.objectTypes)
 
                         analyticsFilters.setSelectedAttributeFilters(
@@ -986,7 +986,7 @@ Window
         readonly property bool pluginTabsShown: filterModel.engines.length > 1
 
         readonly property bool objectTypeSelected:
-            analyticsFilters.selectedAnalyticsObjectTypeIds.length > 0
+            analyticsFilters.selectedObjectTypeIds.length > 0
 
         Analytics.FilterModel { id: emptyFilterModel }
 
@@ -1040,17 +1040,18 @@ Window
         {
             target: analyticsFilters
             enabled: eventModel.analyticsSetup
-            function onSelectedAnalyticsObjectTypeIdsChanged()
+
+            function onSelectedObjectTypeIdsChanged()
             {
                 eventModel.analyticsSetup.objectTypes =
-                    analyticsFilters.selectedAnalyticsObjectTypeIds
+                    analyticsFilters.selectedObjectTypeIds
             }
         }
 
         function storeCurrentEngineFilterState()
         {
             analyticsFiltersByEngine[analyticsFilters.engine] = {
-                objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds,
+                objectTypeIds: analyticsFilters.selectedObjectTypeIds,
                 attributeFilters: analyticsFilters.selectedAttributeFilters
             }
         }
@@ -1071,7 +1072,7 @@ Window
 
             function onObjectTypesChanged()
             {
-                analyticsFilters.setSelectedAnalyticsObjectTypeIds(
+                analyticsFilters.setSelectedObjectTypeIds(
                     eventModel.analyticsSetup.objectTypes)
             }
 
@@ -1109,7 +1110,7 @@ Window
 
         title: qsTr("Tile Settings")
         attributeManager: d.tileViewAttributeManager
-        objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
+        objectTypeIds: analyticsFilters.selectedObjectTypeIds
     }
 
     FilterSettingsDialog
@@ -1118,6 +1119,6 @@ Window
 
         title: qsTr("Table Settings")
         attributeManager: d.tableViewAttributeManager
-        objectTypeIds: analyticsFilters.selectedAnalyticsObjectTypeIds
+        objectTypeIds: analyticsFilters.selectedObjectTypeIds
     }
 }

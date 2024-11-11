@@ -43,7 +43,6 @@ public:
 
     QStringList objectTypes() const;
     void setObjectTypes(const QStringList& value);
-    const std::set<QString>& relevantObjectTypes() const;
 
     QStringList attributeFilters() const;
     void setAttributeFilters(const QStringList& value);
@@ -69,7 +68,6 @@ public:
 
 signals:
     void objectTypesChanged();
-    void relevantObjectTypesChanged();
     void combinedTextFilterChanged();
     void areaChanged();
     void areaEnabledChanged();

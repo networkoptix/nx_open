@@ -175,9 +175,6 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::combinedTextFilterChanged,
         this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
-    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::relevantObjectTypesChanged,
-        this, &AnalyticsSearchSynchronizer::updateWorkbench);
-
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged,
         this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
@@ -245,27 +242,26 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         {
             const QScopedValueRollback updateGuard(m_updating, true);
             updateAction();
+            system()->userSettings()->cameraSelection = this->commonSetup()->cameraSelection();
         });
 
-    connect(&system()->userSettings()->cameraSelection,
-        &utils::property_storage::BaseProperty::changed,
-        this,
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged, this,
         [this]()
         {
-            updateCameraSelection(system()->userSettings()->cameraSelection());
+            const QScopedValueRollback updateGuard(m_updating, true);
+            system()->userSettings()->objectTypeIds = m_analyticsSetup->objectTypes();
         });
+
+    using utils::property_storage::BaseProperty;
+
+    connect(&system()->userSettings()->cameraSelection, &BaseProperty::changed, this,
+        [this]() { updateCameraSelection(system()->userSettings()->cameraSelection()); });
+
+    connect(&system()->userSettings()->objectTypeIds, &BaseProperty::changed, this,
+        [this]() { updateObjectTypes(system()->userSettings()->objectTypeIds()); });
+
     updateCameraSelection(system()->userSettings()->cameraSelection());
-
-    connect(&system()->userSettings()->objectTypeIds,
-        &utils::property_storage::BaseProperty::changed,
-        this,
-        [this]()
-        {
-            updateObjectType(system()->userSettings()->objectTypeIds());
-        });
-    updateObjectType(system()->userSettings()->objectTypeIds());
-
-    m_filterModel = context->system()->taxonomyManager()->createFilterModel(this);
+    updateObjectTypes(system()->userSettings()->objectTypeIds());
 }
 
 AnalyticsSearchSynchronizer::~AnalyticsSearchSynchronizer()
@@ -326,7 +322,6 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
         return;
     }
 
-    updateObjectType(system()->userSettings()->objectTypeIds());
     m_filter = {};
 
     const auto cameraSetType = commonSetup()->cameraSelection();
@@ -343,8 +338,10 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
         m_filter.boundingBox = filterRect;
 
     m_filter.analyticsEngineId = m_analyticsSetup->engine();
-    m_filter.objectTypeId = m_analyticsSetup->relevantObjectTypes();
     m_filter.freeText = m_analyticsSetup->combinedTextFilter();
+
+    const auto objectTypes = m_analyticsSetup->objectTypes();
+    m_filter.objectTypeId = {objectTypes.cbegin(), objectTypes.cend()};
 
     for (const auto widget: display()->widgets())
     {
@@ -401,58 +398,27 @@ void AnalyticsSearchSynchronizer::updateAllMediaResourceWidgetsAnalyticsMode()
     }
 }
 
-void AnalyticsSearchSynchronizer::updateObjectType(const QStringList& objectTypeIds)
+void AnalyticsSearchSynchronizer::updateObjectTypes(const QStringList& objectTypeIds)
 {
-    const auto cameras = commonSetup()->currentLayoutCameras();
-    if (cameras.empty())
+    if (m_updating || m_analyticsSetup->objectTypes() == objectTypeIds)
         return;
 
-    if (!objectTypeIds.empty())
-    {
-        const auto storedOjectTypeIds = QSet(objectTypeIds.cbegin(), objectTypeIds.cend());
+    const std::unique_ptr<core::analytics::taxonomy::AnalyticsFilterModel> filterModel{
+        system()->taxonomyManager()->createFilterModel()};
 
-        QSet<QString> objectTypes;
-        QSet<QString> subTypes;
-        bool firstCameraInSet = true;
-        for (const auto& camera: cameras)
-        {
-            m_filterModel->setSelectedDevices({camera});
-            QSet<QString> cameraObjectTypes;
-            QSet<QString> cameraSubTypes;
-            for (const auto& objectType: m_filterModel->objectTypes())
-            {
-                cameraObjectTypes.insert(objectType->id());
-                for (const auto& subtype: objectType->derivedObjectTypes())
-                    cameraSubTypes.insert(subtype->id());
-            }
+    filterModel->setSelectedEngine(filterModel->findEngine(m_analyticsSetup->engine()));
+    filterModel->setSelectedDevices(commonSetup()->selectedCameras());
 
-            if (firstCameraInSet)
-            {
-                objectTypes = cameraObjectTypes;
-                subTypes = cameraSubTypes;
-                firstCameraInSet = false;
-            }
-            else
-            {
-                objectTypes = objectTypes.intersect(cameraObjectTypes);
-                subTypes = subTypes.intersect(cameraSubTypes);
-            }
-        }
-
-        if (objectTypes.intersects(storedOjectTypeIds)
-            || subTypes.intersects(storedOjectTypeIds))
-        {
-            m_analyticsSetup->setObjectTypes(objectTypeIds);
-            return;
-        }
-    }
-    m_analyticsSetup->setObjectTypes({});
+    if (filterModel->findFilterObjectType(objectTypeIds))
+        m_analyticsSetup->setObjectTypes(objectTypeIds);
+    else
+        m_analyticsSetup->setObjectTypes({});
 }
 
 void AnalyticsSearchSynchronizer::updateCameraSelection(
     core::EventSearch::CameraSelection cameraSelection)
 {
-    if (commonSetup()->cameraSelection() == cameraSelection)
+    if (m_updating || commonSetup()->cameraSelection() == cameraSelection)
         return;
 
     if (QSet({
@@ -528,8 +494,6 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
             const auto cameraSelection = commonSetup()->cameraSelection();
             for (auto instance: instancesToNotify())
                 instance->commonSetup()->setCameraSelection(cameraSelection);
-
-            system()->userSettings()->cameraSelection = cameraSelection;
         });
 
     connect(commonSetup(), &CommonObjectSearchSetup::selectedCamerasChanged, this,
@@ -553,10 +517,8 @@ void AnalyticsSearchSynchronizer::setupInstanceSynchronization()
         [this]()
         {
             const auto objectTypes = m_analyticsSetup->objectTypes();
-            for (auto instance : instancesToNotify())
+            for (auto instance: instancesToNotify())
                 instance->m_analyticsSetup->setObjectTypes(m_analyticsSetup->objectTypes());
-
-            system()->userSettings()->objectTypeIds = objectTypes;
         });
 
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::attributeFiltersChanged, this,

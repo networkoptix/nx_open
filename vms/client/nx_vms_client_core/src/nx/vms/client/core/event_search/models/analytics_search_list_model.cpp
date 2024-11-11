@@ -96,8 +96,8 @@ public:
 
     QRectF filterRect;
     QStringList attributeFilters;
-    QStringList selectedObjectTypes;
-    std::set<QString> relevantObjectTypes;
+    QStringList selectedObjectTypeList;
+    std::set<QString> selectedObjectTypes;
     mutable QHash<QString, bool> objectTypeAcceptanceCache;
 
     const QScopedPointer<nx::utils::PendingOperation> emitDataChanged;
@@ -148,8 +148,6 @@ public:
 
     void updateAttributes(nx::analytics::db::ObjectTrack& track,
         const nx::common::metadata::Attributes attributes);
-
-    void updateRelevantObjectTypes();
 
     const nx::analytics::taxonomy::AbstractObjectType*
         objectTypeById(const QString& objectTypeId) const;
@@ -333,17 +331,6 @@ void AnalyticsSearchListModel::Private::updateAttributes(nx::analytics::db::Obje
     }
 }
 
-void AnalyticsSearchListModel::Private::updateRelevantObjectTypes()
-{
-    const std::set<QString> value(selectedObjectTypes.begin(), selectedObjectTypes.end());
-
-    if (value == relevantObjectTypes)
-        return;
-
-    relevantObjectTypes = value;
-    emit q->relevantObjectTypesChanged();
-}
-
 const nx::analytics::taxonomy::AbstractObjectType*
     AnalyticsSearchListModel::Private::objectTypeById(const QString& objectTypeId) const
 {
@@ -444,9 +431,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(
     filter.analyticsEngineId = selectedEngine;
     filter.sortOrder = EventSearch::sortOrderFromDirection(request.direction);
     filter.timePeriod = request.period(q->interestTimePeriod());
-
-    if (!selectedObjectTypes.isEmpty())
-        filter.objectTypeId = std::set(selectedObjectTypes.begin(), selectedObjectTypes.end());
+    filter.objectTypeId = selectedObjectTypes;
 
     if (q->cameraSet().type() == ManagedCameraSet::Type::single && filterRect.isValid())
         filter.boundingBox = filterRect;
@@ -768,7 +753,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     nx::analytics::db::Filter filter;
     filter.freeText = q->combinedTextFilter();
-    filter.objectTypeId = relevantObjectTypes;
+    filter.objectTypeId = selectedObjectTypes;
     filter.analyticsEngineId = selectedEngine;
 
     if (filterRect.isValid())
@@ -1083,11 +1068,7 @@ void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
     {
         d->stateChangedConnection.reset(
             connect(stateWatcher, &nx::analytics::taxonomy::AbstractStateWatcher::stateChanged, this,
-                [this]()
-                {
-                    d->objectTypeAcceptanceCache.clear();
-                    d->updateRelevantObjectTypes();
-                }));
+                [this]() { d->objectTypeAcceptanceCache.clear(); }));
     }
 }
 
@@ -1130,25 +1111,20 @@ void AnalyticsSearchListModel::setSelectedEngine(const nx::Uuid& value)
 
 QStringList AnalyticsSearchListModel::selectedObjectTypes() const
 {
-    return d->selectedObjectTypes;
+    return d->selectedObjectTypeList;
 }
 
 void AnalyticsSearchListModel::setSelectedObjectTypes(const QStringList& value)
 {
-    if (d->selectedObjectTypes == value)
+    std::set<QString> newObjectTypes{value.cbegin(), value.cend()};
+    if (d->selectedObjectTypes == newObjectTypes)
         return;
 
     clear();
-    d->selectedObjectTypes = value;
-    NX_VERBOSE(this, "Set selected object type to \"%1\"", d->selectedObjectTypes);
+    d->selectedObjectTypes = std::move(newObjectTypes);
+    d->selectedObjectTypeList = {d->selectedObjectTypes.cbegin(), d->selectedObjectTypes.cend()};
+    NX_VERBOSE(this, "Set selected object type to \"%1\"", d->selectedObjectTypeList);
     emit selectedObjectTypesChanged();
-
-    d->updateRelevantObjectTypes();
-}
-
-const std::set<QString>& AnalyticsSearchListModel::relevantObjectTypes() const
-{
-    return d->relevantObjectTypes;
 }
 
 QStringList AnalyticsSearchListModel::attributeFilters() const
@@ -1187,7 +1163,7 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid()
         || !d->textFilter->text().isEmpty()
         || !selectedEngine().isNull()
-        || !selectedObjectTypes().isEmpty()
+        || !selectedObjectTypes().empty()
         || !attributeFilters().empty()
         || base_type::isConstrained();
 }

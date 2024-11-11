@@ -21,14 +21,37 @@ Column
 
     property var engine: null
 
-    readonly property var selectedAnalyticsObjectTypeIds:
+    readonly property var selectedObjectTypeIds:
         model.getAnalyticsObjectTypeIds(impl.selectedObjectType)
 
     readonly property var selectedAttributeFilters: objectTypeSelector.selectedObjectType
         ? impl.selectedAttributeFilters
         : []
 
-    onModelChanged: impl.setup(engine, selectedAnalyticsObjectTypeIds, /*attributeValues*/ {})
+    // Interface functions.
+
+    function clear()
+    {
+        objectTypeSelector.clear()
+    }
+
+    function setSelectedObjectTypeIds(ids)
+    {
+        impl.setSelectedObjectTypeIds(ids)
+    }
+
+    function setSelectedAttributeFilters(filters)
+    {
+        impl.setSelectedAttributeFilters(filters)
+    }
+
+    function setSelected(engine, objectTypeIds, attributeFilters)
+    {
+        impl.setup(engine, objectTypeIds,
+            EventSearchHelpers.attributeValuesFromFilters(attributeFilters))
+    }
+
+    // Implementation.
 
     NxObject
     {
@@ -38,9 +61,11 @@ Column
         property var selectedAttributeFilters: []
         property var selectedObjectType: null
 
-        function setup(engine, analyticsObjectTypeIds, attributeValues)
+        // Update UI from data.
+
+        function setup(engine, objectTypeIds, attributeValues)
         {
-            let focusState = objectAttributes.getFocusState()
+            const focusState = objectAttributes.getFocusState()
 
             updating = true
 
@@ -48,11 +73,13 @@ Column
             analyticsFilters.engine = engine
 
             objectTypeSelector.objectTypes = model.objectTypes
-            let filterType = findFilterObjectType(analyticsObjectTypeIds)
+            const filterType = findFilterObjectType(objectTypeIds)
             objectTypeSelector.setSelectedObjectType(filterType)
+
             objectAttributes.attributes = objectTypeSelector.selectedObjectType
                 ? objectTypeSelector.selectedObjectType.attributes
                 : null
+
             objectAttributes.selectedAttributeValues = attributeValues
 
             updating = false
@@ -62,6 +89,57 @@ Column
             updateAttributeFilters()
             updateSelectedObjectType()
         }
+
+        function setSelectedObjectType(filterObjectType)
+        {
+            if (!filterObjectType)
+            {
+                objectTypeSelector.clear()
+                return
+            }
+
+            if (filterObjectType.id !== objectTypeSelector.selectedObjectTypeId)
+            {
+                objectTypeSelector.setSelectedObjectType(filterObjectType)
+            }
+        }
+
+        function findFilterObjectType(ids)
+        {
+            return ids && ids.length
+                ? model.findFilterObjectType(ids)
+                : null
+        }
+
+        function setSelectedObjectTypeIds(ids)
+        {
+            if (!updating)
+                setSelectedObjectType(findFilterObjectType(ids))
+        }
+
+        function setSelectedAttributeFilters(filters)
+        {
+            if (JSON.stringify(selectedAttributeFilters) === JSON.stringify(filters))
+                return
+
+            setup(engine, selectedObjectTypeIds,
+                EventSearchHelpers.attributeValuesFromFilters(filters))
+        }
+
+        Connections
+        {
+            target: model
+            enabled: !impl.updating
+            function onObjectTypesChanged()
+            {
+                impl.setup(
+                    analyticsFilters.engine,
+                    analyticsFilters.selectedObjectTypeIds,
+                    /*attributeValues*/ {})
+            }
+        }
+
+        // Update data from UI.
 
         function updateAttributeFilters()
         {
@@ -88,7 +166,7 @@ Column
             {
                 impl.setup(
                     analyticsFilters.engine,
-                    analyticsFilters.selectedAnalyticsObjectTypeIds,
+                    analyticsFilters.selectedObjectTypeIds,
                     objectAttributes.selectedAttributeValues)
             }
         }
@@ -105,66 +183,10 @@ Column
                     /*attributeValues*/ {})
             }
         }
-
-        Connections
-        {
-            target: model
-            enabled: !impl.updating
-            function onObjectTypesChanged()
-            {
-                impl.setup(
-                    analyticsFilters.engine,
-                    analyticsFilters.selectedAnalyticsObjectTypeIds,
-                    /*attributeValues*/ {})
-            }
-        }
     }
 
-    function clear()
-    {
-        objectTypeSelector.clear()
-    }
-
-    function setSelectedObjectType(filterObjectType)
-    {
-        if (!filterObjectType)
-        {
-            objectTypeSelector.clear()
-            return
-        }
-
-        if (filterObjectType.id !== objectTypeSelector.selectedObjectTypeId)
-        {
-            objectTypeSelector.setSelectedObjectType(filterObjectType)
-        }
-    }
-
-    function findFilterObjectType(ids)
-    {
-        return ids && ids.length
-            ? model.findFilterObjectType(ids)
-            : null
-    }
-
-    function setSelectedAnalyticsObjectTypeIds(ids)
-    {
-        setSelectedObjectType(findFilterObjectType(ids))
-    }
-
-    function setSelectedAttributeFilters(filters)
-    {
-        if (JSON.stringify(selectedAttributeFilters) === JSON.stringify(filters))
-            return
-
-        impl.setup(engine, selectedAnalyticsObjectTypeIds,
-            EventSearchHelpers.attributeValuesFromFilters(filters))
-    }
-
-    function setSelected(engine, analyticsObjectTypeIds, attributeFilters)
-    {
-        impl.setup(engine, analyticsObjectTypeIds,
-            EventSearchHelpers.attributeValuesFromFilters(attributeFilters))
-    }
+    onModelChanged:
+        impl.setup(engine, selectedObjectTypeIds, /*attributeValues*/ {})
 
     onVisibleChanged:
     {

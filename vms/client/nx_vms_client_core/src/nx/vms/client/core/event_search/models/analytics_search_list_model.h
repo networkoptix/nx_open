@@ -41,7 +41,6 @@ public:
 
     QStringList selectedObjectTypes() const;
     void setSelectedObjectTypes(const QStringList& value);
-    const std::set<QString>& relevantObjectTypes() const;
 
     QStringList attributeFilters() const;
     void setAttributeFilters(const QStringList& value);
@@ -101,7 +100,6 @@ signals:
     void filterRectChanged();
     void selectedEngineChanged();
     void selectedObjectTypesChanged();
-    void relevantObjectTypesChanged();
     void availableNewTracksChanged();
     void attributeFiltersChanged();
     void combinedTextFilterChanged();

@@ -47,7 +47,7 @@ private:
     void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
-    void updateObjectType(const QStringList& objectTypeIds);
+    void updateObjectTypes(const QStringList& objectTypeIds);
     void updateCameraSelection(core::EventSearch::CameraSelection cameraSelection);
 
     void handleWidgetAnalyticsFilterRectChanged();
@@ -65,7 +65,6 @@ private:
     bool m_areaSelectionActive = false;
     bool m_updating = false;
     nx::analytics::db::Filter m_filter;
-    core::analytics::taxonomy::AnalyticsFilterModel* m_filterModel = nullptr;
 };
 
 } // namespace nx::vms::client::desktop
