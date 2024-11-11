@@ -520,7 +520,7 @@ void QnServerStorageManager::at_archiveRebuildReply(
             [this, requestKey]() { requestStorageSpace(requestKey.server); };
     }
 
-    executeDelayedParented(delayedCallback, kUpdateRebuildStatusDelay, this);
+    executeDelayedParented(std::move(delayedCallback), kUpdateRebuildStatusDelay, this);
 
     if (!success)
         return;
