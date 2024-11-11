@@ -17,7 +17,7 @@ import "private/VideoScreen"
 import "private/VideoScreen/utils.js" as VideoScreenUtils
 import "private/VideoScreen/Ptz"
 
-PageBase
+Page
 {
     id: videoScreen
     objectName: "videoScreen"
@@ -31,6 +31,8 @@ PageBase
     property real targetTimestamp: -1
 
     backgroundColor: "black"
+
+    clip: false
 
     VideoScreenController
     {
@@ -153,30 +155,13 @@ PageBase
     }
 
     sideNavigationEnabled: false
+    onLeftButtonClicked: Workflow.popCurrentScreen()
 
-    header: ToolBar
-    {
-        id: toolBar
-
-        contentItem.y: deviceStatusBarHeight
-        opacity: d.uiOpacity
-        visible: opacity > 0
-
-        title: controller.resourceHelper.resourceName
-        leftButtonIcon.source: lp("/images/arrow_back.png")
-        onLeftButtonClicked: Workflow.popCurrentScreen()
-        background: Image
-        {
-            y: -toolBar.statusBarHeight
-            x: -mainWindow.leftPadding
-            width: mainWindow.width
-            height: 96
-            source: lp("/images/toolbar_gradient.png")
-        }
-
-        titleOpacity: d.cameraUiOpacity
-
-        controls:
+    title: controller.resourceHelper.resourceName
+    toolBar.opacity: d.uiOpacity
+    toolBar.visible: opacity > 0
+    titleLabelOpacity: d.cameraUiOpacity
+    titleControls:
         [
             MotionAreaButton
             {
@@ -201,20 +186,21 @@ PageBase
             }
         ]
 
-        contentItem.clip: false
+    toolBar.contentItem.clip: false
+    gradientToolbarBackground: true
 
-        Banner
-        {
-            id: banner
+    Banner
+    {
+        id: banner
 
-            property bool portraitOrientation:
-                Screen.orientation === Qt.PortraitOrientation
-                || Screen.orientation === Qt.InvertedPortraitOrientation
+        property bool portraitOrientation:
+            Screen.orientation === Qt.PortraitOrientation
+            || Screen.orientation === Qt.InvertedPortraitOrientation
 
-            y: portraitOrientation ? parent.height : 8
-            x: (parent.width - width) / 2
-            maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
-        }
+        parent: toolBar
+        y: portraitOrientation ? parent.height : 8
+        x: (parent.width - width) / 2
+        maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
     }
 
     Menu
@@ -411,8 +397,8 @@ PageBase
         id: content
 
         width: mainWindow.availableWidth
-        height: mainWindow.availableHeight - header.height - toolBar.statusBarHeight
-        y: toolBar.statusBarHeight + (header.visible ? 0 : header.height)
+        height: mainWindow.availableHeight - header.height
+        y: header.visible ? 0 : header.height
 
         Loader
         {
@@ -436,7 +422,7 @@ PageBase
             y: needOffset ? -header.height : 0
             x: -mainWindow.leftPadding
             width: mainWindow.width
-            height: mainWindow.height - toolBar.statusBarHeight - (needOffset ? 0 : header.height)
+            height: mainWindow.height - (needOffset ? 0 : header.height)
 
             visible: active
             active: d.cameraWarningVisible

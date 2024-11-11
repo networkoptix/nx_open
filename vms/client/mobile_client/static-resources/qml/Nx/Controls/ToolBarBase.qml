@@ -8,7 +8,9 @@ ToolBar
 {
     id: toolBar
 
+    property bool useGradientBackground: false
     property real statusBarHeight: deviceStatusBarHeight
+
     signal clicked()
 
     implicitHeight: 56
@@ -18,30 +20,56 @@ ToolBar
         ? parent.width
         : 200
 
-    background: Rectangle
+    background: Loader
     {
-        color: ColorTheme.colors.windowBackground
+        sourceComponent: useGradientBackground
+            ? gradientBackground
+            : standardBackground
+        y: -toolBar.statusBarHeight
+        x: -mainWindow.leftPadding
+        width: mainWindow.width + mainWindow.leftPadding
+        height: parent.height + toolBar.statusBarHeight
+    }
+
+    Component
+    {
+        id: standardBackground
 
         Rectangle
         {
-            width: parent.width
-            height: statusBarHeight
-            anchors.bottom: parent.top
-            color: parent.color
-        }
+            color: ColorTheme.colors.windowBackground
 
-        Rectangle
-        {
-            width: parent.width
-            height: 1
-            anchors.top: parent.bottom
-            color: ColorTheme.colors.dark4
-        }
+            Rectangle
+            {
+                width: parent.width
+                height: statusBarHeight
+                anchors.bottom: parent.top
+                color: parent.color
+            }
 
-        MouseArea
+            Rectangle
+            {
+                width: parent.width
+                height: 1
+                anchors.top: parent.bottom
+                color: ColorTheme.colors.dark4
+            }
+
+            MouseArea
+            {
+                anchors.fill: parent
+                onClicked: toolBar.clicked()
+            }
+        }
+    }
+
+    Component
+    {
+        id: gradientBackground
+
+        Image
         {
-            anchors.fill: parent
-            onClicked: toolBar.clicked()
+            source: lp("/images/toolbar_gradient.png")
         }
     }
 }
