@@ -10,13 +10,15 @@
 #include <nx/branding.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/jose/jwt.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
-#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/mobile/controllers/web_view_controller.h>
 #include <nx/vms/client/mobile/current_system_context_aware.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
@@ -58,6 +60,22 @@ nx::utils::Url connectionUrl(const SystemUri& uri)
     return result;
 }
 
+static constexpr std::string_view kTokenPrefix = "nxcdb-";
+
+std::string decodeUsername(const QString& authCode)
+{
+    const std::string code = authCode.toStdString();
+    std::string_view token = code;
+
+    if (token.starts_with(kTokenPrefix))
+        token.remove_prefix(kTokenPrefix.size());
+
+    if (auto result = nx::network::jws::decodeToken<nx::network::jwt::ClaimSet>(token))
+        return result->payload.sub().value_or("");
+
+    return {};
+}
+
 } // namespace
 
 class QnMobileClientUriHandler::Private: public QObject,
@@ -78,6 +96,7 @@ public:
     const QPointer<CloudStatusWatcher> cloudStatusWatcher;
     const QPointer<nx::vms::client::mobile::SessionManager> sessionManager;
     const QPointer<nx::vms::client::mobile::WebViewController> webViewController;
+    std::atomic<bool> m_isHandlingClientCommand = false;
 
 private:
     void connectToServerDirectly(const SystemUri& uri);
@@ -104,6 +123,9 @@ QnMobileClientUriHandler::Private::Private(QnContext* context):
 
 bool QnMobileClientUriHandler::Private::waitForCloudLogIn()
 {
+    if (cloudStatusWatcher->status() == CloudStatusWatcher::Online)
+        return true;
+
     bool result = false;
     QEventLoop loop;
     const auto handleCloudStatusChanged =
@@ -170,8 +192,16 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
     if (!NX_ASSERT(uiController, "UI controller is not ready"))
         return false;
 
+    std::string username = uri.credentials.username;
+
+    if (username.empty())
+    {
+        username = decodeUsername(uri.authCode);
+        NX_DEBUG(this, "loginToCloud(): uri username is empty, decoded from token: %1", username);
+    }
+
     const bool loggedInWithSameCredentials =
-        uri.credentials.username == cloudStatusWatcher->cloudLogin().toStdString()
+        username == cloudStatusWatcher->cloudLogin().toStdString()
         && cloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut;
 
     if (loggedInWithSameCredentials)
@@ -186,8 +216,7 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
         return true;
     }
 
-    if (uri.credentials.username.empty()
-        && cloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut)
+    if (username.empty() && cloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut)
     {
         NX_DEBUG(this,
             "loginToCloud(): user is empty, trying to use current cloud connection (if any)");
@@ -197,7 +226,7 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
     sessionManager->stopSession();
 
     QVariantMap properties;
-    properties["user"] = QString::fromStdString(uri.credentials.username);
+    properties["user"] = QString::fromStdString(username);
     const bool authorized = nx::vms::client::mobile::QmlWrapperHelper::showScreen(
         QUrl("qrc:qml/Nx/Screens/Cloud/Login.qml"), properties) == "success";
 
@@ -455,11 +484,24 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& nativeUrl)
         case SystemUri::ClientCommand::None:
             break;
         case SystemUri::ClientCommand::Client:
+        {
             NX_DEBUG(this, "handleUrl(): trying to handle client command");
+
+            bool expected = false;
+            if (!d->m_isHandlingClientCommand.compare_exchange_strong(expected, true))
+            {
+                NX_WARNING(this, "handleUrl(): already handling client command");
+                return;
+            }
+
+            nx::utils::ScopeGuard rollback(
+                nx::utils::guarded(this, [this] { d->m_isHandlingClientCommand = false; }));
+
             executeLaterInThread(
-                [this, uri]() { d->handleClientCommand(uri); },
+                [this, uri, r=std::move(rollback)]() { d->handleClientCommand(uri); },
                 qApp->thread());
             break;
+        }
         case SystemUri::ClientCommand::LoginToCloud:
             NX_DEBUG(this, "handleUrl(): trying to log in to the cloud");
             executeLaterInThread(
