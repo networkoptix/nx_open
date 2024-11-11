@@ -7,12 +7,14 @@
 
 #include <QtCore/QThread>
 
+#include <nx/utils/move_only_func.h>
+
 class QObject;
 class QTimer;
 
 enum { kDefaultDelay = 1 };
 
-typedef std::function<void ()> Callback;
+using Callback = nx::utils::MoveOnlyFunc<void()>;
 
 /// @brief Executes specified functor in the specified <targetThread>
 /// after <delay> has expired
