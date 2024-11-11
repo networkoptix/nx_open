@@ -1,11 +1,22 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
-import Nx.Controls 1.0
+import QtQuick
+import QtQuick.Controls as QuickControls
+import Nx.Controls
+import Nx.Core
+import Nx.Ui
 
-PageBase
+import nx.vms.client.mobile
+
+QuickControls.Page
 {
     id: control
+
+    property bool activePage: StackView.status === StackView.Active
+    property int pageStatus: StackView.status
+    property bool sideNavigationEnabled: true
+    property var customBackHandler
+    property string result
 
     property alias leftButtonIcon: toolBar.leftButtonIcon
     property alias titleControls: toolBar.controls
@@ -14,6 +25,8 @@ PageBase
     property alias toolBar: toolBar
     property alias warningPanel: warningPanel
     property alias titleLabelOpacity: toolBar.titleOpacity
+    property alias backgroundColor: backgroundRectangle.color
+    property alias gradientToolbarBackground: toolBar.useGradientBackground
 
     signal leftButtonClicked()
     signal headerClicked()
@@ -45,5 +58,71 @@ PageBase
                 id: warningPanel
             }
         }
+    }
+
+    background: Rectangle
+    {
+        id: backgroundRectangle
+
+        color: ColorTheme.colors.windowBackground
+    }
+
+    onSideNavigationEnabledChanged: updateSideNavigation()
+    onActivePageChanged:
+    {
+        if (activePage)
+            updateSideNavigation()
+    }
+
+    Keys.onPressed: (event) =>
+    {
+        if (CoreUtils.keyIsBack(event.key))
+        {
+            if (page.customBackHandler)
+            {
+                page.customBackHandler()
+            }
+            else
+            {
+                if (sideNavigation.opened)
+                {
+                    sideNavigation.close()
+                }
+                else if (sessionManager.hasConnectingSession
+                    || sessionManager.hasAwaitingResourcesSession)
+                {
+                    sessionManager.stopSession();
+                }
+                else if (stackView.depth > 1)
+                {
+                    Workflow.popCurrentScreen()
+                }
+                else if (event.key != Qt.Key_Escape)
+                {
+                    quitApplication()
+                }
+                else
+                {
+                    return
+                }
+            }
+
+            event.accepted = true
+        }
+        else if (event.key == Qt.Key_F2)
+        {
+            if (sideNavigationEnabled)
+                sideNavigation.open()
+
+            event.accepted = true
+        }
+    }
+
+    function updateSideNavigation()
+    {
+        if (!sideNavigationEnabled)
+            sideNavigation.close()
+
+        sideNavigation.enabled = sideNavigationEnabled
     }
 }

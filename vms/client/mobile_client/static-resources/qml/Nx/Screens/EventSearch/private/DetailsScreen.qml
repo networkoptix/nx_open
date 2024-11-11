@@ -18,7 +18,7 @@ import nx.vms.client.core
 
 import "items"
 
-PageBase
+Page
 {
     id: eventDetailsScreen
 
@@ -30,43 +30,32 @@ PageBase
     property int currentEventIndex: -1
 
     sideNavigationEnabled: false
-    header: ToolBar
-    {
-        id: toolBar
+    onLeftButtonClicked: Workflow.popCurrentScreen()
 
-        visible: opacity > 0
-        opacity: d.hasControls ? 1 : 0
+    title: qsTr("Preview")
 
-        contentItem.y: deviceStatusBarHeight
+    toolBar.visible: opacity > 0
+    toolBar.opacity: d.hasControls ? 1 : 0
 
-        title: qsTr("Preview")
-        contentItem.clip: false
-        leftButtonIcon.source: lp("/images/arrow_back.png")
-        onLeftButtonClicked: Workflow.popCurrentScreen()
+    clip: false
 
-        background: Image
+    titleControls:
+    [
+        DownloadMediaButton
         {
-            y: -toolBar.statusBarHeight
-            x: -mainWindow.leftPadding
-            width: mainWindow.width
-            height: parent.height
-            source: lp("/images/toolbar_gradient.png")
-            opacity: d.isPortraitLayout ? 0 : 1
+            id: downloadButton
+
+            enabled: preview.player && !preview.player.cannotDecryptMediaError
+            resourceId: preview.resource && preview.resource.id
+            positionMs: preview.startTimeMs
+            durationMs: preview.durationMs
         }
+    ]
 
-        controls:
-        [
-            DownloadMediaButton
-            {
-                id: downloadButton
+    toolBar.contentItem.clip: false
+    gradientToolbarBackground: true
 
-                enabled: preview.player && !preview.player.cannotDecryptMediaError
-                resourceId: preview.resource && preview.resource.id
-                positionMs: preview.startTimeMs
-                durationMs: preview.durationMs
-            }
-        ]
-    }
+    toolBar.background.opacity: d.isPortraitLayout ? 0 : 1
 
     Rectangle
     {
@@ -94,9 +83,9 @@ PageBase
 
         audioEnabled: audioController.audioEnabled && eventDetailsScreen.activePage
 
-        y: d.isPortraitLayout
-           ? deviceStatusBarHeight
-           : header.visible ? -header.height : 0
+        y: !d.isPortraitLayout && header.visible
+           ? -header.height
+           : 0
         x: -mainWindow.leftPadding
 
         width:
