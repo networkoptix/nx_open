@@ -6,7 +6,7 @@ import Nx.Controls 1.0
 import Nx.Settings 1.0
 import Nx.Ui 1.0
 
-PageBase
+Page
 {
     id: pushExpertModeScreen
 
@@ -21,41 +21,34 @@ PageBase
             d.handleBackClicked()
         }
 
-    header: ToolBar
+    title: !simpleModeRadioButton.checked && d.selectionModel
+        ? "%1: %2".arg(qsTr("Sites")).arg(d.selectionModel.selectedSystems.length)
+        : qsTr("Notifications")
+
+    toolBar.visible: opacity > 0
+    toolBar.opacity: enabled ? 1.0 : 0.3
+
+    Button
     {
-        id: toolBar
+        id: doneButton
 
-        contentItem.y: deviceStatusBarHeight
-        visible: opacity > 0
+        parent: toolBar
+        visible: d.hasChanges
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        enabled: !pushManager.userUpdateInProgress
 
-        title: !simpleModeRadioButton.checked && d.selectionModel
-            ? "%1: %2".arg(qsTr("Sites")).arg(d.selectionModel.selectedSystems.length)
-            : qsTr("Notifications")
-        opacity: enabled ? 1.0 : 0.3
-        leftButtonIcon.source: lp("/images/arrow_back.png")
-        onLeftButtonClicked: d.handleBackClicked()
+        text: qsTr("Done")
+        color: "transparent"
+        hoveredColor: color
+        highlightColor: color
+        textColor: ColorTheme.colors.brand_core
+        pressedTextColor: ColorTheme.colors.brand_d1
+        padding: 0
+        leftPadding: 0
+        rightPadding: 0
 
-        Button
-        {
-            id: doneButton
-
-            visible: d.hasChanges
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            enabled: !pushManager.userUpdateInProgress
-
-            text: qsTr("Done")
-            color: "transparent"
-            hoveredColor: color
-            highlightColor: color
-            textColor: ColorTheme.colors.brand_core
-            pressedTextColor: ColorTheme.colors.brand_d1
-            padding: 0
-            leftPadding: 0
-            rightPadding: 0
-
-            onClicked: d.tryApplyAndReturn()
-        }
+        onClicked: d.tryApplyAndReturn()
     }
 
     Item
