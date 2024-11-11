@@ -59,6 +59,7 @@ Item
                 {
                     target: d.relevantChildren[index] ?? null
                     property: "x"
+                    restoreMode: Binding.RestoreNone
                     value: column.leftPadding
                 }
 
@@ -66,6 +67,7 @@ Item
                 {
                     target: d.relevantChildren[index] ?? null
                     property: "y"
+                    restoreMode: Binding.RestoreNone
 
                     value:
                     {
