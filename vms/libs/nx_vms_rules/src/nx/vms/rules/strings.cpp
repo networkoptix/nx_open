@@ -427,6 +427,11 @@ TranslatableString Strings::to()
     return NX_DYNAMIC_TRANSLATABLE(tr("To"));
 }
 
+TranslatableString Strings::toUsers()
+{
+    return NX_DYNAMIC_TRANSLATABLE(tr("To Users"));
+}
+
 TranslatableString Strings::for_()
 {
     return NX_DYNAMIC_TRANSLATABLE(tr("For"));

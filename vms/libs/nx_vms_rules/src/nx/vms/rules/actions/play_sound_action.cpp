@@ -35,7 +35,7 @@ const ItemDescriptor& PlaySoundAction::manifest()
                 }.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("To Users")),
+                Strings::toUsers(),
                 {},
                 ResourceFilterFieldProperties{
                     .allowEmptySelection = true,

@@ -99,6 +99,7 @@ public:
 
     static TranslatableString at();
     static TranslatableString to();
+    static TranslatableString toUsers();
     static TranslatableString for_();
     static TranslatableString occursAt();
     static TranslatableString beginWhen();

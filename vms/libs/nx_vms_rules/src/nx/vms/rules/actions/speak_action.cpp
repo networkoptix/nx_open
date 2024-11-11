@@ -39,7 +39,7 @@ const ItemDescriptor& SpeakAction::manifest()
                 }.toVariantMap()),
             makeFieldDescriptor<TargetUsersField>(
                 utils::kUsersFieldName,
-                NX_DYNAMIC_TRANSLATABLE(tr("To users")),
+                Strings::toUsers(),
                 "By default, all power user group IDs are used as the value.",
                 ResourceFilterFieldProperties{
                     .ids = nx::utils::toQSet(vms::api::kAllPowerUserGroupIds),
