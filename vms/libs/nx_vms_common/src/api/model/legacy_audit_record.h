@@ -5,7 +5,7 @@
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/rest/auth_session.h>
-#include <nx/utils/qnbytearrayref.h>
+#include <nx/utils/latin1_array.h>
 #include <nx/vms/api/data/audit.h>
 
 struct NX_VMS_COMMON_API QnLegacyAuditRecord

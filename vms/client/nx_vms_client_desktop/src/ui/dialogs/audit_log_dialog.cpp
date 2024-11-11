@@ -267,7 +267,8 @@ void QnAuditLogDialog::setupDetailsGrid()
         << QnAuditLogModel::UserNameColumn
         << QnAuditLogModel::UserHostColumn
         << QnAuditLogModel::EventTypeColumn
-        << QnAuditLogModel::DescriptionColumn;
+        << QnAuditLogModel::DescriptionColumn
+        << QnAuditLogModel::SourceServerColumn;
 
     m_detailModel = new QnAuditLogDetailModel(this);
     m_detailModel->setColumns(columns);
@@ -909,23 +910,24 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     if (!api)
         return;
 
-    auto callback = nx::utils::guarded(this,
-        [this](bool success, rest::Handle handle, UbjsonResult result)
-        {
-            success &= (result.error == UbjsonResult::Result::Error::NoError);
-            if (!success)
-                NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
-            at_gotdata(success, handle, result.deserialized<QnLegacyAuditRecordList>());
-        });
-
     const auto onlineServers = system()->resourcePool()->getAllServers(
         nx::vms::api::ResourceStatus::online);
     for (const QnMediaServerResourcePtr& server: onlineServers)
     {
+        auto callback = nx::utils::guarded(this,
+            [this, id = server->getId()](bool success, rest::Handle handle, UbjsonResult result)
+            {
+                success &= (result.error == UbjsonResult::Result::Error::NoError);
+                if (!success)
+                    NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
+                at_gotdata(success, handle, id, result.deserialized<QnLegacyAuditRecordList>());
+            });
+
+
         auto handle = api->getAuditLogRecords(
             std::chrono::milliseconds(fromMsec),
             std::chrono::milliseconds(toMsec),
-            callback,
+            std::move(callback),
             thread(),
             server->getId());
 
@@ -934,13 +936,21 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     }
 }
 
-void QnAuditLogDialog::at_gotdata(bool success, int requestNum, const QnLegacyAuditRecordList& records)
+void QnAuditLogDialog::at_gotdata(
+    bool success, rest::Handle requestNum, nx::Uuid serverId, QnLegacyAuditRecordList records)
 {
-    if (!m_requests.contains(requestNum))
+    if (!m_requests.remove(requestNum))
         return;
-    m_requests.remove(requestNum);
+
     if (success)
-        m_allData << records;
+    {
+        for (auto& rec: records)
+        {
+            rec.addParam(QnAuditLogModel::kSourceServerParamName, serverId.toByteArray());
+            m_allData.push_back(std::move(rec));
+        }
+    }
+
     if (m_requests.isEmpty())
         requestFinished();
 }

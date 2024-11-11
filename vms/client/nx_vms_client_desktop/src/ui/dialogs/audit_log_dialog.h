@@ -2,12 +2,10 @@
 
 #pragma once
 
-#include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
-#include <QtGui/QStandardItem>
-#include <QtWidgets/QDialog>
 
 #include <api/model/legacy_audit_record.h>
+#include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -51,7 +49,8 @@ protected:
 private slots:
     void reset();
     void updateData();
-    void at_gotdata(bool success, int requestNum, const QnLegacyAuditRecordList& data);
+    void at_gotdata(
+        bool success, rest::Handle requestNum, nx::Uuid serverId, QnLegacyAuditRecordList data);
     void at_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
@@ -106,7 +105,7 @@ private:
     QnAuditLogMasterModel* m_sessionModel;
     QnAuditLogModel* m_camerasModel;
     QnAuditLogDetailModel* m_detailModel;
-    QSet<int> m_requests;
+    QSet<rest::Handle> m_requests;
 
     QnLegacyAuditRecordList m_allData;
     QnLegacyAuditRecordList m_cameraData;

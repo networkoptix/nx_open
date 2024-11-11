@@ -33,11 +33,14 @@ public:
         CameraNameColumn,
         CameraIpColumn,
 
-        ColumnCount
+        SourceServerColumn,
+
+        ColumnCount,
     };
 
     static const QByteArray ChildCntParamName;
     static const QByteArray CheckedParamName;
+    static const QByteArray kSourceServerParamName;
 
     QnAuditLogModel(QObject *parent = nullptr);
     virtual ~QnAuditLogModel();

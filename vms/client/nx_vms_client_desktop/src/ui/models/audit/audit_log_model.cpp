@@ -8,6 +8,7 @@
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
@@ -33,9 +34,11 @@
 
 using namespace nx::vms::client;
 using namespace nx::vms::client::desktop;
+using namespace std::placeholders;
 
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");
+const QByteArray QnAuditLogModel::kSourceServerParamName("srcSrv");
 
 namespace
 {
@@ -63,6 +66,14 @@ namespace
             return QString();
     }
 
+QString sourceServerName(const QnResourcePool* resourcePool, const QnLegacyAuditRecord *rec)
+{
+    const auto server = resourcePool->getResourceById<QnMediaServerResource>(nx::Uuid(
+        rec->extractParam(QnAuditLogModel::kSourceServerParamName)));
+
+    return server ? server->getName() : QString();
+}
+
 NX_DECLARE_COLORIZED_ICON(kServerIcon, "20x20/Solid/server.svg",\
     core::kEmptySubstitutions)
 NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
@@ -70,7 +81,7 @@ NX_DECLARE_COLORIZED_ICON(kUserIcon, "20x20/Solid/user.svg",\
 NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg", \
     core::kEmptySubstitutions)
 
-}
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
@@ -78,7 +89,10 @@ NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg", \
 class QnAuditLogModel::DataIndex
 {
 public:
-    DataIndex() : m_sortCol(TimestampColumn), m_sortOrder(Qt::DescendingOrder)
+    DataIndex(const QnResourcePool* resourcePool):
+        m_sortCol(TimestampColumn),
+        m_sortOrder(Qt::DescendingOrder),
+        m_resourcePool(resourcePool)
     {
     }
 
@@ -123,7 +137,8 @@ public:
 
     // comparators
 
-    typedef bool(*LessFunc)(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2);
+    using LessFunc =
+        std::function<bool(const QnLegacyAuditRecord *l, const QnLegacyAuditRecord *r)>;
 
     static bool lessThanTimestamp(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
@@ -177,7 +192,13 @@ public:
 
     static bool lessThanActivity(const QnLegacyAuditRecord *d1, const QnLegacyAuditRecord *d2)
     {
-        return d1->extractParam(ChildCntParamName).toUInt() < d2->extractParam("childCnt").toUInt();
+        return d1->extractParam(ChildCntParamName).toUInt()
+            < d2->extractParam(ChildCntParamName).toUInt();
+    }
+
+    bool lessThanSourceServer(const QnLegacyAuditRecord* l, const QnLegacyAuditRecord* r) const
+    {
+        return sourceServerName(m_resourcePool, l) < sourceServerName(m_resourcePool, r);
     }
 
     void updateIndex()
@@ -214,6 +235,11 @@ public:
             case UserActivityColumn:
                 lessThan = &lessThanActivity;
                 break;
+
+            case SourceServerColumn:
+                lessThan = std::bind(&DataIndex::lessThanSourceServer, this, _1, _2);
+                break;
+
             default:
                 break;
         }
@@ -225,6 +251,7 @@ private:
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
     QnLegacyAuditRecordRefList m_data;
+    const QnResourcePool* m_resourcePool;
 };
 
 
@@ -245,7 +272,7 @@ void QnAuditLogModel::setDetail(QnLegacyAuditRecord* record, bool showDetail)
 QnAuditLogModel::QnAuditLogModel(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
-    , m_index(new DataIndex())
+    , m_index(new DataIndex(resourcePool()))
 {
 
 }
@@ -587,18 +614,19 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnLegacyAuditRecor
 
 bool QnAuditLogModel::matches(const QnLegacyAuditRecord* record, const QStringList& keywords) const
 {
-    static constexpr std::array<Column, 4> kColumnsToFilter =
+    static constexpr auto kColumnsToFilter =
         {
             UserNameColumn,
             UserHostColumn,
             EventTypeColumn,
-            DescriptionColumn
+            DescriptionColumn,
+            SourceServerColumn,
         };
 
     // Every keyword must be present at least in one of the columns.
     for (const auto& keyword: keywords)
     {
-        if (!std::any_of(kColumnsToFilter.cbegin(), kColumnsToFilter.cend(),
+        if (!std::any_of(kColumnsToFilter.begin(), kColumnsToFilter.end(),
             [&] (auto column) { return matches(column, record, keyword); }))
         {
             return false;
@@ -676,6 +704,9 @@ QString QnAuditLogModel::textData(const Column& column, const QnLegacyAuditRecor
         case UserActivityColumn:
             return tr("%n actions", "", data->extractParam(ChildCntParamName).toUInt());
 
+        case SourceServerColumn:
+            return sourceServerName(resourcePool(), data);
+
         default:
             break;
     }
@@ -722,7 +753,7 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             case UserNameColumn:
                 return tr("User");
             case UserHostColumn:
-                return tr("IP");
+                return tr("User IP");
             case UserActivityColumn:
                 return tr("Activity");
             case EventTypeColumn:
@@ -730,16 +761,21 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             case CameraNameColumn:
                 return QnDeviceDependentStrings::getDefaultNameFromSet(
                     resourcePool(),
-                    tr("Device name"),
-                    tr("Camera name"));
+                    tr("Device"),
+                    tr("Camera"));
             case CameraIpColumn:
-                return tr("IP");
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    resourcePool(),
+                    tr("Device IP"),
+                    tr("Camera IP"));
             case DateColumn:
                 return tr("Date");
             case TimeColumn:
                 return tr("Time");
             case DescriptionColumn:
                 return tr("Description");
+            case SourceServerColumn:
+                return tr("Server");
             default:
                 break;
         }
