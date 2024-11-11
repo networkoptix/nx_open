@@ -88,18 +88,18 @@ void executeDelayed(Callback callback, int delayMs, QThread* targetThread)
 
 QTimer* executeDelayedParented(Callback callback, int delayMs, QObject *parent)
 {
-    return executeDelayedImpl(callback, delayMs, nullptr, parent);
+    return executeDelayedImpl(std::move(callback), delayMs, nullptr, parent);
 }
 
 QTimer* executeDelayedParented(Callback callback, std::chrono::milliseconds delay, QObject *parent)
 {
-    return executeDelayedImpl(callback, delay.count(), nullptr, parent);
+    return executeDelayedImpl(std::move(callback), delay.count(), nullptr, parent);
 }
 
 
 QTimer* executeDelayedParented(Callback callback, QObject* parent)
 {
-    return executeDelayedImpl(callback, kDefaultDelay, nullptr, parent);
+    return executeDelayedImpl(std::move(callback), kDefaultDelay, nullptr, parent);
 }
 
 void executeInThread(QThread* thread, Callback callback)
