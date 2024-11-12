@@ -2977,7 +2977,7 @@ a %1</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Esta conta non está activada. Consulta o teu correo electrónico, por favor.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2985,25 +2985,25 @@ a %1</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Erro de rede. Comproba a túa conexión a Internet e téntao de novo.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Inicio de sesión non válido.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>%1 non está dispoñible temporalmente. Por favor, téntao de novo máis tarde.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>As credenciais xa non son válidas.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Erro interno %1. Por favor, ponte en contacto co equipo de asistencia.</translation>
     </message>
   </context>
   <context>
