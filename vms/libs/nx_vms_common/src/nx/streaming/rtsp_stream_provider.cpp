@@ -26,6 +26,7 @@
 #include <nx/rtp/parsers/rtp_parser.h>
 #include <nx/rtp/parsers/simpleaudio_rtp_parser.h>
 #include <nx/rtp/rtp.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_metadata_parser.h>
 #include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
@@ -477,6 +478,11 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataTCP()
         }
 
         auto trackIndexIter = m_trackIndices.find(rtpChannelNum);
+        if (trackIndexIter == m_trackIndices.end() && m_RtpSession.isPlayNowMode())
+        {
+            registerPredefinedTrack(rtpChannelNum);
+            trackIndexIter = m_trackIndices.find(rtpChannelNum);
+        }
 
         if (bytesRead < 1)
         {
@@ -615,8 +621,12 @@ nx::rtp::StreamParserPtr RtspStreamProvider::createParser(const QString& codecNa
     if (codecName.isEmpty())
         return nullptr;
 
-    if (codecName == QLatin1String("FFMPEG"))
+    using namespace nx::rtp;
+    if (codecName.compare(QString::fromUtf8(kFfmpegCodecName), Qt::CaseInsensitive) == 0)
         return std::make_unique<nx::rtp::QnNxRtpParser>();
+
+    if (codecName.compare(QString::fromUtf8(kFfmpegMetadataCodecName), Qt::CaseInsensitive) == 0)
+        return std::make_unique<nx::rtp::NxRtpMetadataParser>();
 
     if (codecName == QLatin1String("H264"))
         return std::make_unique<nx::rtp::H264Parser>();
@@ -835,7 +845,7 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
         m_RtpSession.setAdditionalSupportedCodecs(std::move(additionalSupportedCodecs));
     }
 
-    if (!m_RtpSession.sendSetup())
+    if (!m_RtpSession.isPlayNowMode() && !m_RtpSession.sendSetup())
     {
         NX_WARNING(this, "Can't open RTSP stream [%1], SETUP request has been failed",
             m_url);
@@ -873,6 +883,26 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
     NX_DEBUG(this, "Successfully open RTSP stream %1", m_url);
 
     return m_openStreamResult;
+}
+
+void RtspStreamProvider::registerPredefinedTrack(int rtpChannelNumber)
+{
+    const int channelNumber = rtpChannelNumber / 2;
+    auto codecParser = channelNumber == nx::rtp::kMetadataChannelNumber
+        ? createParser("FFMPEG-METADATA")
+        : createParser("FFMPEG");
+
+    TrackInfo trackInfo;
+    trackInfo.rtpParsers.emplace(
+        nx::rtp::kNxPayloadType,
+        std::make_unique<nx::rtp::RtpParser>(nx::rtp::kNxPayloadType, std::move(codecParser)));
+
+        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
+            m_trackIndices[channelNumber] = rtpChannelNumber;
+
+        NX_MUTEX_LOCKER lock(&m_tracksMutex);
+        m_tracks.resize(std::max(m_tracks.size(), size_t(channelNumber + 1)));
+        m_tracks[channelNumber] = std::move(trackInfo);
 }
 
 void RtspStreamProvider::createTrackParsers()
@@ -1021,8 +1051,13 @@ nx::utils::Url RtspStreamProvider::getCurrentStreamUrl() const
 
 void RtspStreamProvider::setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec)
 {
+    return setPlaybackRange(PlaybackRange(startTimeUsec, endTimeUsec));
+}
+
+void RtspStreamProvider::setPlaybackRange(const PlaybackRange& playbackRange)
+{
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_playbackRange = PlaybackRange(startTimeUsec, endTimeUsec);
+    m_playbackRange = playbackRange;
     NX_VERBOSE(this, "%1: Playback range set to %2", __func__, m_playbackRange);
 }
 

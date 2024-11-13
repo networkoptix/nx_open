@@ -34,6 +34,35 @@ class IRtpParserFactory;
 
 namespace nx::streaming {
 
+struct PlaybackRange
+{
+    PlaybackRange() {};
+
+    PlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec):
+        startTimeUsec(startTimeUsec),
+        endTimeUsec(endTimeUsec)
+    {
+    }
+
+    int64_t startTimeUsec = AV_NOPTS_VALUE;
+    int64_t endTimeUsec = AV_NOPTS_VALUE;
+
+    bool isValid() const
+    {
+        if (startTimeUsec == AV_NOPTS_VALUE)
+            return false;
+
+        if (endTimeUsec == AV_NOPTS_VALUE)
+            return true;
+
+        return endTimeUsec >= startTimeUsec;
+    }
+
+    QString toString() const
+    {
+        return nx::format("(%1us, %2us)", startTimeUsec, endTimeUsec);
+    }
+};
 
 class NX_VMS_COMMON_API RtspStreamProvider:
     public QnAbstractMediaStreamProvider,
@@ -81,6 +110,7 @@ public:
     nx::utils::Url getCurrentStreamUrl() const;
 
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec = AV_NOPTS_VALUE);
+    void setPlaybackRange(const PlaybackRange& playbackRange);
 
     void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
 
@@ -151,6 +181,7 @@ private:
 
         TrackInfo() = default;
         TrackInfo(TrackInfo&&) = default;
+        TrackInfo& operator=(TrackInfo&&) = default;
     };
 
     nx::rtp::StreamParserPtr createParser(const QString& codecName);
@@ -174,6 +205,7 @@ private:
     bool isDataTimerExpired() const;
 
     void createTrackParsers();
+    void registerPredefinedTrack(int rtpChannelNumber);
 
 protected:
     static nx::Mutex& defaultTransportMutex();
@@ -208,36 +240,6 @@ protected:
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
     bool m_forceCameraTime = false;
-
-    struct PlaybackRange
-    {
-        PlaybackRange() {};
-
-        PlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec):
-            startTimeUsec(startTimeUsec),
-            endTimeUsec(endTimeUsec)
-        {
-        }
-
-        int64_t startTimeUsec = AV_NOPTS_VALUE;
-        int64_t endTimeUsec = AV_NOPTS_VALUE;
-
-        bool isValid() const
-        {
-            if (startTimeUsec == AV_NOPTS_VALUE)
-                return false;
-
-            if (endTimeUsec == AV_NOPTS_VALUE)
-                return true;
-
-            return endTimeUsec >= startTimeUsec;
-        }
-
-        QString toString() const
-        {
-            return nx::format("(%1us, %2us)", startTimeUsec, endTimeUsec);
-        }
-    };
 
     PlaybackRange m_playbackRange;
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;

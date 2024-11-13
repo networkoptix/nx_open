@@ -42,7 +42,8 @@ namespace Qn {
         CR_Default,         /// In client this flag is sufficient to receive both archive and live video
         CR_LiveVideo,
         CR_SecondaryLiveVideo,
-        CR_Archive
+        CR_Archive,
+        CR_SeamlessArchive
     )
 
     NX_VMS_COMMON_API nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role);
@@ -52,6 +53,7 @@ namespace Qn {
     // TODO: #sivanov Split to server-only and client-only flags as they are always local.
     enum ResourceFlag
     {
+        none = 0, /**< No flags. */
         network = 1 << 0, /**< Has ip and mac. */
         url = 1 << 1, /**< Has url, e.g. file name. */
         media = 1 << 2,

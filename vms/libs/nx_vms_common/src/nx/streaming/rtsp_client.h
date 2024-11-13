@@ -291,6 +291,7 @@ public:
 
     void sendBynaryResponse(const quint8* buffer, int size);
     void setPlayNowModeAllowed(bool value);
+    bool isPlayNowMode() const;
     static quint8* prepareDemuxedData(std::vector<nx::utils::ByteArray*>& demuxedData, int channel, int reserve);
 
     QString getVideoLayout() const;

@@ -35,10 +35,11 @@ class NX_VMS_COMMON_API QnRtspClientArchiveDelegate: public QnAbstractArchiveDel
     Q_OBJECT
 public:
     QnRtspClientArchiveDelegate(
-        QnArchiveStreamReader* reader,
-        nx::network::http::Credentials credentials,
+        QnArchiveStreamReader* reader = nullptr,
+        nx::network::http::Credentials credentials = nx::network::http::Credentials(),
         const QString& rtpLogTag = QString(),
         bool sleepIfEmptySocket = false);
+
     virtual ~QnRtspClientArchiveDelegate();
 
     // TODO: #sivanov Pass credentials to constructor or using separate setter.

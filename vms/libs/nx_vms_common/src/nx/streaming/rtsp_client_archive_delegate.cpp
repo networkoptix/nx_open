@@ -43,9 +43,6 @@ static const QByteArray kNoFindIframeParamName = "x-no-find-iframe";
 static const QByteArray kMotionRegionParamName = "x-motion-region";
 static const QByteArray kMediaStepParamName = "x-media-step";
 
-static const QString kFfmpegCodecName = "ffmpeg";
-static const QString kFfmpegMetadataCodecName = "ffmpeg-metadata";
-
 QString resolutionToString(const QSize& size)
 {
     if (size.width() > 0)
@@ -670,20 +667,20 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
 
-        QString codecName;
+        QByteArray codecName;
         if (m_playNowModeAllowed)
         {
             codecName = rtpChannelNum < (m_channelCount + 1) * 2
-                ? kFfmpegCodecName
-                : kFfmpegMetadataCodecName;
+                ? nx::rtp::kFfmpegCodecName
+                : nx::rtp::kFfmpegMetadataCodecName;
         }
         else
         {
-            codecName = m_rtspSession->getTrackCodec(rtpChannelNum).toLower();
+            codecName = m_rtspSession->getTrackCodec(rtpChannelNum).toLower().toUtf8();
         }
 
         qint64 parserPosition = DATETIME_INVALID;
-        if (codecName == kFfmpegCodecName)
+        if (codecName == nx::rtp::kFfmpegCodecName)
         {
             auto [packet, success] =
                 processFFmpegRtpPayload(data, blockSize, rtpChannelNum / 2, &parserPosition);
@@ -696,7 +693,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             if (!success)
                 return result;
         }
-        else if (codecName == kFfmpegMetadataCodecName)
+        else if (codecName == nx::rtp::kFfmpegMetadataCodecName)
         {
             processMetadata(data, blockSize);
         }

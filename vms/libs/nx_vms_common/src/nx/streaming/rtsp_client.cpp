@@ -13,6 +13,7 @@
 #include <nx/network/nettools.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/rtp/rtp.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
@@ -33,7 +34,6 @@ using namespace std::chrono;
 namespace {
 
 const float kKeepAliveGuardInterval = 0.8f;
-const QString METADATA_STR(lit("ffmpeg-metadata"));
 
 auto splitKeyValue(const QString& nameAndValue, QChar delimiter)
 {
@@ -803,7 +803,7 @@ bool QnRtspClient::sendSetup()
         auto& track = m_sdpTracks[i];
         const QString codecName = track.sdpMedia.rtpmap.codecName;
 
-        const bool isAdditionalSupportedCodec = codecName == METADATA_STR
+        const bool isAdditionalSupportedCodec = codecName == nx::rtp::kFfmpegMetadataCodecName
             || m_additionalSupportedCodecs.find(codecName) != m_additionalSupportedCodecs.cend();
 
         if (!isMediaTypeEnabled(track.sdpMedia.mediaType))
@@ -1618,6 +1618,11 @@ void QnRtspClient::resetProxyAddr()
 void QnRtspClient::setPlayNowModeAllowed(bool value)
 {
     m_playNowMode = value;
+}
+
+bool QnRtspClient::isPlayNowMode() const
+{
+    return m_playNowMode;
 }
 
 void QnRtspClient::setUserAgent(const QString& value)
