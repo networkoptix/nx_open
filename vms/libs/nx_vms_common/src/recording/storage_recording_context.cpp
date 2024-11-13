@@ -400,14 +400,14 @@ void StorageRecordingContext::closeRecordingContext(std::chrono::milliseconds du
         }
         else
         {
-            NX_VERBOSE(
+            NX_WARNING(
                 this, "Won't call fileFinished() for '%1' because we failed to create file previously",
                 nx::utils::url::hidePassword(m_recordingContext.fileName));
         }
     }
     else if (!m_lastError)
     {
-        NX_VERBOSE(
+        NX_WARNING(
             this, "Won't call fileFinished() for '%1' because of invalid start time and no last error set",
             nx::utils::url::hidePassword(m_recordingContext.fileName));
 
@@ -415,7 +415,7 @@ void StorageRecordingContext::closeRecordingContext(std::chrono::milliseconds du
     }
     else
     {
-        NX_VERBOSE(
+        NX_WARNING(
             this, "Won't call fileFinished() for '%1' because of invalid start time. Last error is: %2",
             nx::utils::url::hidePassword(m_recordingContext.fileName), *m_lastError);
     }
