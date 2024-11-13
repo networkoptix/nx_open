@@ -226,10 +226,18 @@ bool HwVideoDecoder::decode(
     }
 
     auto avPacket = av_packet_alloc();
-    avPacket->data = (uint8_t*)(data->data());
-    avPacket->size = data->dataSize();
-    avPacket->dts = data->timestamp;
-    avPacket->pts = data->timestamp;
+    if (data)
+    {
+        avPacket->data = (uint8_t*)(data->data());
+        avPacket->size = data->dataSize();
+        avPacket->dts = data->timestamp;
+        avPacket->pts = data->timestamp;
+    }
+    else
+    {
+        avPacket->dts = m_lastPts;
+        avPacket->pts = m_lastPts;
+    }
 
     int status = avcodec_send_packet(m_decoderContext, avPacket);
     av_packet_free(&avPacket);
@@ -257,10 +265,17 @@ bool HwVideoDecoder::decode(
     if (frame->format == m_targetPixelFormat)
         frame->setMemoryType(MemoryType::VideoMemory);
 
-    frame->channel = data->channelNumber;
+    frame->channel = data ? data->channelNumber : m_lastChannel;
     m_lastDecodeResult = 0;
     if (m_metrics)
         m_metrics->decodedPixels() += frame->width * frame->height;
+
+    if (data)
+    {
+        m_lastPts = data->timestamp;
+        m_lastChannel = data->channelNumber;
+    }
+
     return true;
 }
 
