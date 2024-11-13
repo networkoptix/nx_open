@@ -2,29 +2,26 @@
 
 #include "decoder_registrar.h"
 
-#include "video_decoder_registry.h"
+#include <nx/media/supported_decoders.h>
+#include <nx/utils/log/assert.h>
+
 #include "audio_decoder_registry.h"
+#include "video_decoder_registry.h"
 
-#include "ffmpeg_video_decoder.h"
 #include "ffmpeg_audio_decoder.h"
+#include "ffmpeg_video_decoder.h"
 
-#include "android_video_decoder.h"
 #include "android_audio_decoder.h"
+#include "android_video_decoder.h"
 #include "ios_video_decoder.h"
 
-#include <nx/media/quick_sync/qsv_supported.h>
-#ifdef __QSV_SUPPORTED__
-#include "quick_sync/quick_sync_video_decoder.h"
-#endif // __QSV_SUPPORTED__
-
-
+#if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+    #include "quick_sync/quick_sync_video_decoder.h"
+#endif
 
 #include "jpeg_decoder.h"
 
-#include <nx/utils/log/assert.h>
-
-namespace nx {
-namespace media {
+namespace nx::media {
 
 void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions)
 {
@@ -59,10 +56,11 @@ void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolut
     {
         FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
-#if defined(__QSV_SUPPORTED__)
-        //VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>(
-        //    "QuickSyncVideoDecoder");
-#endif // __QSV_SUPPORTED__
+        #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+            //VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>(
+            //    "QuickSyncVideoDecoder");
+        #endif
+
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>("FfmpegVideoDecoder");
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
     }
@@ -70,5 +68,4 @@ void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolut
     VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>("JpegDecoder");
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media
