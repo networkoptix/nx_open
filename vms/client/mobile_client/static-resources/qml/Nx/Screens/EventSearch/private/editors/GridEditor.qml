@@ -35,7 +35,7 @@ Grid
         d.selectedIndex = -1
     }
 
-    columns: Math.floor((width - 16 * 2) / d.kItemWidth)
+    columns: Math.floor((width + spacing - 16 * 2) / (d.kItemWidth + spacing))
     spacing: 8
     leftPadding: (width - (columns * d.kItemWidth + (columns - 1) * spacing)) / 2
 
