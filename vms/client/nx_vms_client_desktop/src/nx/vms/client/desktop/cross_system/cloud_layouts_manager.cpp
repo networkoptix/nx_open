@@ -301,14 +301,17 @@ struct CloudLayoutsManager::Private
             tr("%1 (Copy %2)", "Original name will be substituted as %1, counter as %2")
                 .arg(cloudLayout->getName())));
 
-        // Convert resource paths to cloud.
-        auto items = cloudLayout->getItems();
-        for (auto& item: items)
+        common::LayoutItemDataMap items;
+        for (auto [id, item]: cloudLayout->getItems().asKeyValueRange()) //< Copy is intended.
         {
-            item.resource = descriptor(
-                getResourceByDescriptor(item.resource),
-                /*forceCloud*/ true);
+            const auto resource = getResourceByDescriptor(item.resource);
+            if (!resource)
+                continue;
+
+            item.resource = descriptor(resource, /*forceCloud*/ true);
+            items[id] = item;
         }
+
         cloudLayout->setItems(items);
         systemContext->resourcePool()->addResource(cloudLayout);
 
