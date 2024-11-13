@@ -44,6 +44,8 @@ public:
 
     AVPixelFormat getPixelFormat() { return m_targetPixelFormat; }
 
+    int64_t frameNum() const;
+
 private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
     bool initializeHardware(const QnConstCompressedVideoDataPtr& frame);

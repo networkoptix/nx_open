@@ -190,7 +190,6 @@ public:
     CLVideoDecoderOutputPtr outFramePtr;
     qint64 lastPts;
     bool isHardwareAccelerated = false;
-    int frameNum = 0;
 };
 
 void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -211,7 +210,6 @@ void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     decoder = std::make_unique<nx::media::ffmpeg::HwVideoDecoder>(
         AV_HWDEVICE_TYPE_VIDEOTOOLBOX,
         nullptr);
-    frameNum = 0;
 }
 
 void MacVideoDecoderPrivate::closeCodecContext()
@@ -312,7 +310,6 @@ int MacVideoDecoder::decode(
     d->isHardwareAccelerated = (bool) d->outFramePtr->hw_frames_ctx;
 
     const qint64 startTimeMs = d->outFramePtr->pkt_dts / 1000;
-    ++d->frameNum;
 
     if (qtPixelFormatForFrame(d->outFramePtr.get()) == QVideoFrameFormat::Format_Invalid)
     {
@@ -328,7 +325,7 @@ int MacVideoDecoder::decode(
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
-    return d->frameNum;
+    return d->decoder->frameNum();
 }
 
 AbstractVideoDecoder::Capabilities MacVideoDecoder::capabilities() const
