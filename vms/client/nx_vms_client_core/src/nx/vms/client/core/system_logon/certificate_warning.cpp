@@ -13,7 +13,7 @@ namespace {
 
 const QString kCertificateLink = "#certificate";
 const QString kHelpLink = "#help";
-constexpr auto kMaxDisplayNameLength = 20;
+constexpr auto kMaxDisplayNameLength = 40;
 
 } // namespace
 
