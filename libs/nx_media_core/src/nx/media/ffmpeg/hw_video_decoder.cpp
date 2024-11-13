@@ -225,24 +225,24 @@ bool HwVideoDecoder::decode(
         return false;
     }
 
-    auto avPacket = av_packet_alloc();
+    AVPacket* avPacket = nullptr;
     if (data)
     {
+        avPacket = av_packet_alloc();
         avPacket->data = (uint8_t*)(data->data());
         avPacket->size = data->dataSize();
         avPacket->dts = data->timestamp;
         avPacket->pts = data->timestamp;
     }
-    else
-    {
-        avPacket->dts = m_lastPts;
-        avPacket->pts = m_lastPts;
-    }
 
     int status = avcodec_send_packet(m_decoderContext, avPacket);
     av_packet_free(&avPacket);
 
-    if (status < 0)
+    // We use a null packet to flush the decoder. Subsequent calls to avcodec_receive_frame() with
+    // the null packet will return AVERROR_EOF, but we still need to receive the remaining frames.
+    const bool allowFailure = !data && status == AVERROR_EOF;
+
+    if (status < 0 && !allowFailure)
     {
         NX_DEBUG(this, "Decoding error: %1", avErrorToString(status));
         m_lastDecodeResult = status;
@@ -271,10 +271,7 @@ bool HwVideoDecoder::decode(
         m_metrics->decodedPixels() += frame->width * frame->height;
 
     if (data)
-    {
-        m_lastPts = data->timestamp;
         m_lastChannel = data->channelNumber;
-    }
 
     return true;
 }
