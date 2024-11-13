@@ -58,6 +58,8 @@ private:
     int m_lastDecodeResult = 0;
     std::unique_ptr<AvOptions> m_options = nullptr;
     nx::metric::Storage* m_metrics = nullptr;
+    qint64 m_lastPts = AV_NOPTS_VALUE;
+    quint32 m_lastChannel = 0;
 };
 
 } // namespace nx::media::ffmpeg
