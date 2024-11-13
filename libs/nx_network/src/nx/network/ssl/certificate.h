@@ -257,7 +257,10 @@ public:
     Pem(const Pem& pem);
     Pem& operator=(const Pem& pem);
 
-    bool parse(const std::string& str, std::string* errorMessage = nullptr);
+    bool parse(
+        const std::string& str,
+        std::string* errorMessage = nullptr,
+        bool allowEcdsaCertificates = false);
 
     bool bindToContext(SSL_CTX* sslContext, std::string* errorMessage = nullptr) const;
 
@@ -269,7 +272,10 @@ public:
     const PKeyPtr& privateKey() const { return m_pkey; }
 
 private:
-    bool loadPrivateKey(const std::string& pem, std::string* errorMessage = nullptr);
+    bool loadPrivateKey(
+        const std::string& pem,
+        std::string* errorMessage = nullptr,
+        bool allowEcdsaCertificates = false);
 
 private:
     X509Certificate m_certificate;

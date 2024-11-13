@@ -94,11 +94,11 @@ void setErrorAndLog(std::string* errorMessage, std::string_view message)
     NX_ERROR(typeid(nx::network::ssl::Certificate), message);
 }
 
-bool validateKey(EVP_PKEY* pkey, std::string* errorMessage)
+bool validateKey(EVP_PKEY* pkey, std::string* errorMessage, bool allowEcdsaCertificates)
 {
     // Fail on invalid key ciphers.
     auto keyType = EVP_PKEY_id(pkey);
-    if (keyType == EVP_PKEY_EC)
+    if (keyType == EVP_PKEY_EC && !allowEcdsaCertificates)
     {
         setErrorAndLog(errorMessage, "Invalid key cipher (ECDSA). Failing load.");
         return false;
@@ -751,10 +751,10 @@ Pem& Pem::operator=(const Pem& pem)
     return *this;
 }
 
-bool Pem::parse(const std::string& str, std::string* errorMessage)
+bool Pem::parse(const std::string& str, std::string* errorMessage, bool allowEcdsaCertificates)
 {
     return m_certificate.parsePem(str, /*maxChainLength*/ std::nullopt, errorMessage)
-        && loadPrivateKey(str, errorMessage);
+        && loadPrivateKey(str, errorMessage, allowEcdsaCertificates);
 }
 
 bool Pem::bindToContext(SSL_CTX* sslContext, std::string* errorMessage) const
@@ -791,7 +791,7 @@ const X509Certificate& Pem::certificate() const
     return m_certificate;
 }
 
-bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage)
+bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage, bool allowEcdsaCertificates)
 {
     auto bio = utils::wrapUnique(
         BIO_new_mem_buf(pem.data(), (int) pem.size()),
@@ -811,7 +811,7 @@ bool Pem::loadPrivateKey(const std::string& pem, std::string* errorMessage)
         return false;
     }
 
-    if (!validateKey(pkey.get(), errorMessage))
+    if (!validateKey(pkey.get(), errorMessage, allowEcdsaCertificates))
         return false;
 
     m_pkey = std::move(pkey);

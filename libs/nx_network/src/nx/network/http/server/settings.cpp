@@ -22,6 +22,7 @@ static constexpr char kLegacySslEndpointsToListen[] = "sslEndpoints";
 static constexpr char kSslCertificatePath[] = "certificatePath";
 static constexpr char kSslCertificateMonitorTimeout[] = "certificateMonitorTimeout";
 static constexpr char kSslAllowedSslVersions[] = "allowedSslVersions";
+static constexpr char kSslAllowEcdsaCertificates[] = "allowEcdsaCertificates";
 
 void Settings::load(const SettingsReader& settings0, const char * groupName)
 {
@@ -87,6 +88,10 @@ void Settings::loadSsl(const SettingsReader& settings0)
     ssl.allowedSslVersions = settings.value(
         kSslAllowedSslVersions,
         ssl.allowedSslVersions.c_str()).toString().toStdString();
+
+    ssl.allowEcdsaCertificates = settings.value(
+        kSslAllowEcdsaCertificates,
+        ssl.allowEcdsaCertificates).toBool();
 }
 
 void Settings::loadHeaders(const SettingsReader& settings)

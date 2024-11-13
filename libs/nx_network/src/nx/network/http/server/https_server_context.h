@@ -28,11 +28,11 @@ public:
 
 private:
     void loadCertificate(bool isMonitoringEnabled);
-    void initializeCertificateFileMonitoring(const Settings& settings);
+    void initializeCertificateFileMonitoring();
 
 private:
+    Settings::Ssl m_settings;
     std::unique_ptr<ssl::Context> m_sslContext;
-    std::string m_certificatePath;
     nx::utils::SubscriptionId m_subscriptionId = nx::utils::kInvalidSubscriptionId;
     std::unique_ptr<nx::utils::file_system::FileWatcher> m_fileWatcher;
 };

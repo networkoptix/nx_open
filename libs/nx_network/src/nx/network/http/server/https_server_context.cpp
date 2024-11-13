@@ -9,27 +9,26 @@
 namespace nx::network::http::server {
 
 HttpsServerContext::HttpsServerContext(const Settings& settings):
+    m_settings(settings.ssl),
     m_sslContext(std::make_unique<ssl::Context>())
 {
-    if (!settings.ssl.allowedSslVersions.empty())
+    if (!m_settings.allowedSslVersions.empty())
     {
-        if (!m_sslContext->setAllowedServerVersions(settings.ssl.allowedSslVersions))
+        if (!m_sslContext->setAllowedServerVersions(m_settings.allowedSslVersions))
         {
             const auto error = nx::format("Failed to apply SSL versions %1")
-                .args(settings.ssl.allowedSslVersions).toStdString();
+                .args(m_settings.allowedSslVersions).toStdString();
             NX_INFO(this, error);
             throw std::runtime_error(error);
         }
     }
 
-    if (!settings.ssl.certificatePath.empty())
+    if (!m_settings.certificatePath.empty())
     {
-        m_certificatePath = settings.ssl.certificatePath;
-
-        const bool isMonitoringEnabled = settings.ssl.certificateMonitorTimeout.has_value();
+        const bool isMonitoringEnabled = m_settings.certificateMonitorTimeout.has_value();
         loadCertificate(isMonitoringEnabled);
         if (isMonitoringEnabled)
-            initializeCertificateFileMonitoring(settings);
+            initializeCertificateFileMonitoring();
     }
 }
 
@@ -40,11 +39,11 @@ ssl::Context& HttpsServerContext::context()
 
 void HttpsServerContext::loadCertificate(bool isMonitoringEnabled)
 {
-    QFile file(QString::fromStdString(m_certificatePath));
+    QFile file(QString::fromStdString(m_settings.certificatePath));
     if (!file.open(QIODevice::ReadOnly))
     {
         const auto error = nx::format("Failed to open certificate file '%1': %2")
-            .args(m_certificatePath, file.errorString()).toStdString();
+            .args(m_settings.certificatePath, file.errorString()).toStdString();
         NX_INFO(this, error);
         if (isMonitoringEnabled)
             return; // Certificate may appear later.
@@ -52,22 +51,22 @@ void HttpsServerContext::loadCertificate(bool isMonitoringEnabled)
     }
     auto certData = file.readAll().toStdString();
 
-    if (!m_sslContext->setDefaultCertificate(certData))
+    if (!m_sslContext->setDefaultCertificate(certData, m_settings.allowEcdsaCertificates))
     {
         const auto error = nx::format("Failed to load certificate from '%1'")
-            .args(m_certificatePath).toStdString();
+            .args(m_settings.certificatePath).toStdString();
         NX_INFO(this, error);
         throw std::runtime_error(error);
     }
 }
 
-void HttpsServerContext::initializeCertificateFileMonitoring(const Settings& settings)
+void HttpsServerContext::initializeCertificateFileMonitoring()
 {
     m_fileWatcher = std::make_unique<nx::utils::file_system::FileWatcher>(
-        *settings.ssl.certificateMonitorTimeout);
+        *m_settings.certificateMonitorTimeout);
 
     const auto systemError = m_fileWatcher->subscribe(
-        m_certificatePath,
+        m_settings.certificatePath,
         [this](
             const auto& /*filePath*/,
             SystemError::ErrorCode resultCode,
@@ -76,18 +75,18 @@ void HttpsServerContext::initializeCertificateFileMonitoring(const Settings& set
             if (resultCode != SystemError::noError)
             {
                 NX_WARNING(this, "Error %1 occurred while watching SSL certificate file %2",
-                    SystemError::toString(resultCode), m_certificatePath);
+                    SystemError::toString(resultCode), m_settings.certificatePath);
                 return;
             }
 
-            NX_INFO(this, "SSL certificate file %1 changed. Reloading...", m_certificatePath);
+            NX_INFO(this, "SSL certificate file %1 changed. Reloading...", m_settings.certificatePath);
             try
             {
                 loadCertificate(true);
             }
             catch (const std::runtime_error& e)
             {
-                NX_WARNING(this, "Failed to reload certificate %1. %2", m_certificatePath, e.what());
+                NX_WARNING(this, "Failed to reload certificate %1. %2", m_settings.certificatePath, e.what());
             }
         },
         &m_subscriptionId,

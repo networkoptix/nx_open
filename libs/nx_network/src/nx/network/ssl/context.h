@@ -55,7 +55,7 @@ public:
      * NOTE: Default certificate may be changed. Connections accepted after this call will use the new
      * certificate.
      */
-    bool setDefaultCertificate(const std::string& pem);
+    bool setDefaultCertificate(const std::string& pem, bool allowEcdsaCertificates = false);
 
     bool setDefaultCertificate(Pem pem, std::string* errorMessage = nullptr);
 
