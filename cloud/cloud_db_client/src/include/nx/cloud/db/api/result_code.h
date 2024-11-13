@@ -17,6 +17,8 @@ NX_REFLECTION_ENUM_CLASS(ResultCode,
      * (e.g., due to memory usage restrictions).
      * Caller should continue fetching data supplying data offset.
      */
+    created,
+    /** Operation succeeded, object was created */
     partialContent,
     /** Operation succeeded, but no content can be returned. */
     noContent,

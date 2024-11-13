@@ -22,6 +22,8 @@ static constexpr char kAccountOrganizationAttrsPath[] =
     "/cdb/internal/v0/account/{accountEmail}/organization-attrs";
 static constexpr char kInternalGetAccountsInfo[] =
     "/cdb/internal/accounts/info";
+static constexpr char kInternalInviteNewOrganizationUserPath[] =
+    "/cdb/internal/v0/organizations/users/{accountEmail}";
 
 static constexpr char kAccountEmailParam[] = "accountEmail";
 

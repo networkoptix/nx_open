@@ -16,6 +16,9 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
         case ResultCode::partialContent: //< Mapping to "200 OK" because request is not Partial Content from Http point of view.
             return nx::network::http::StatusCode::ok;
 
+        case ResultCode::created:
+            return nx::network::http::StatusCode::created;
+
         case ResultCode::noContent:
             return nx::network::http::StatusCode::noContent;
 
@@ -74,6 +77,8 @@ ResultCode httpStatusCodeToResultCode(nx::network::http::StatusCode::Value statu
     {
         case nx::network::http::StatusCode::ok:
             return ResultCode::ok;
+        case nx::network::http::StatusCode::created:
+            return ResultCode::created;
         case nx::network::http::StatusCode::noContent:
             return ResultCode::noContent;
         case nx::network::http::StatusCode::unauthorized:
