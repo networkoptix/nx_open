@@ -1306,14 +1306,14 @@
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>フェイルオーバー優先順位</translation>
+      <translation>フェイルオーバー優先度</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation>優先順位設定:</translation>
+      <translation>優先度:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1329,7 +1329,7 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation>デバイスを選択してフェイルオーバーの優先順位を設定してください</translation>
+      <translation>デバイスを選択してフェイルオーバーの優先度を設定してください。</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -2876,7 +2876,7 @@
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation>フェイルオーバー優先順位...</translation>
+      <translation>フェイルオーバー優先度...</translation>
     </message>
     <message>
       <source>Name</source>
