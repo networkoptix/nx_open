@@ -375,7 +375,7 @@ if(IOS)
             DEPENDENCIES mobile_client push_notification_extension)
     endif()
 
-    prepare_signing(mobile_client "production" ${customization.mobile.ios.bundleIdentifier})
+    nx_prepare_ios_signing(mobile_client "production" ${customization.mobile.ios.bundleIdentifier})
 
     list(GET ffmpeg_LIB_DIRS 0 ffmpeg_lib_dir)
 
