@@ -293,4 +293,9 @@ NX_UTILS_API void truncateToNul(QString* s);
 NX_UTILS_API std::string toHex(
     const void* buffer, const int size, const std::string& delimeter = " ");
 
+/**
+ * Hides the second half of the string
+ */
+NX_UTILS_API std::string half(const std::string& str);
+
 } // namespace nx::utils

@@ -257,7 +257,7 @@ public:
     std::optional<std::chrono::seconds> passwordTime() const;
     void setPasswordTime(const std::chrono::seconds& val);
 
-    // Oauth token type. MUST be one of accessToken, refreshToken, authCode
+    // Oauth token type. MUST be one of accessToken, refreshToken, authCode, pwdReset
     std::optional<std::string> typ() const;
     void setTyp(const std::string& val);
 

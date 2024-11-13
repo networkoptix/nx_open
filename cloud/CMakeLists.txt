@@ -7,3 +7,4 @@ endif()
 
 add_subdirectory(cloud_db_client)
 add_subdirectory(channel_partner_service)
+add_subdirectory(oauth2_client)

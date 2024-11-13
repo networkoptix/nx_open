@@ -708,4 +708,9 @@ std::string toHex(const void* buffer, const int size, const std::string& delimet
     return stream.str();
 }
 
+NX_UTILS_API std::string half(const std::string& str)
+{
+    return str.substr(0, str.size() / 2) + "...";
+}
+
 } // namespace nx::utils
