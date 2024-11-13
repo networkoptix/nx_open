@@ -1,42 +1,41 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# Isolate C/CXX compile options specified on the top level via `add_compile_options` from CUDA
-# compile options. CUDA compiler tries to process unknown warning/error options itself and fails.
-get_directory_property(compile_options COMPILE_OPTIONS)
-list(JOIN compile_options " " compile_options)
-string(APPEND CMAKE_C_FLAGS " ${compile_options}")
-string(APPEND CMAKE_CXX_FLAGS " ${compile_options}")
-set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
-
 find_package(Qt6 COMPONENTS Multimedia OpenGL REQUIRED)
 
 set(additional_sources)
 set(additional_sources_include_dirs)
-set(additional_private_libraries)
 set(artifacts_dir ${open_source_root}/artifacts)
 
-# QuickSync/Nvidia: Add additional sources for the supported platforms (Windows x64 and Linux x64).
 if(NOT APPLE AND arch STREQUAL "x64")
-    set(hardware_decoders_x64 ON)
+    set(windows_or_linux_x64 TRUE)
+else()
+    set(windows_or_linux_x64 FALSE)
 endif()
 
-if(hardware_decoders_x64)
+nx_option(withQuickSyncDecoder "Enable QuickSync hardware decoder" ${windows_or_linux_x64})
+nx_option(withNvidiaDecoder "Enable Nvidia hardware decoder" ${windows_or_linux_x64})
+
+nx_configure_file(supported_decoders.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/include/nx/media/supported_decoders.h)
+
+if(withNvidiaDecoder)
+    # Isolate C/CXX compile options specified on the top level via `add_compile_options` from CUDA
+    # compile options. CUDA compiler tries to process unknown warning/error options itself and
+    # fails.
+    get_directory_property(compile_options COMPILE_OPTIONS)
+    list(JOIN compile_options " " compile_options)
+    string(APPEND CMAKE_C_FLAGS " ${compile_options}")
+    string(APPEND CMAKE_CXX_FLAGS " ${compile_options}")
+    set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
+
     enable_language(CUDA)
     find_package(CUDAToolkit)
-    find_package(libvpl REQUIRED)
 
-    # Add allocators from artifacts/intel_media_sdk/.
-    set(intel_media_sdk_dir ${artifacts_dir}/intel_media_sdk/samples/sample_common)
-    list(APPEND additional_sources_include_dirs ${intel_media_sdk_dir}/include)
-    list(APPEND additional_sources
-        ${intel_media_sdk_dir}/include/base_allocator.h
-        ${intel_media_sdk_dir}/include/sysmem_allocator.h
-        ${intel_media_sdk_dir}/src/base_allocator.cpp
-        ${intel_media_sdk_dir}/src/sysmem_allocator.cpp
-    )
     # Add Nvidia decoder sources.
-    list(APPEND additional_sources_include_dirs ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Interface)
-    list(APPEND additional_sources_include_dirs ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples)
+    list(APPEND additional_sources_include_dirs
+        ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Interface)
+    list(APPEND additional_sources_include_dirs
+        ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples)
     list(APPEND additional_sources
         ${artifacts_dir}/nvidia/Video_Codec_SDK_11.1.5/Samples/NvCodec/NvDecoder.cpp
     )
@@ -46,7 +45,18 @@ if(hardware_decoders_x64)
         ${color_conversion_src_path}/ColorSpace.cu
         ${color_conversion_src_path}/Resize.cu
     )
-    list(APPEND additional_private_libraries CUDA::cudart)
+endif()
+
+if(withQuickSyncDecoder)
+    # Add allocators from artifacts/intel_media_sdk/.
+    set(intel_media_sdk_dir ${artifacts_dir}/intel_media_sdk/samples/sample_common)
+    list(APPEND additional_sources_include_dirs ${intel_media_sdk_dir}/include)
+    list(APPEND additional_sources
+        ${intel_media_sdk_dir}/include/base_allocator.h
+        ${intel_media_sdk_dir}/include/sysmem_allocator.h
+        ${intel_media_sdk_dir}/src/base_allocator.cpp
+        ${intel_media_sdk_dir}/src/sysmem_allocator.cpp
+    )
 
     if(LINUX)
         list(APPEND additional_sources
@@ -94,7 +104,6 @@ nx_add_target(nx_media
     PRIVATE_LIBS
         Qt6::Multimedia
         Qt6::OpenGL
-        ${additional_private_libraries}
     ADDITIONAL_SOURCES
         ${additional_sources}
     FOLDER client/libs
@@ -106,6 +115,8 @@ target_compile_definitions(nx_media
 )
 
 target_include_directories(nx_media
+    PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}/include
     PRIVATE
         ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
         ${Qt6Multimedia_PRIVATE_INCLUDE_DIRS}
@@ -136,25 +147,31 @@ if((LINUX AND NOT ANDROID AND arch MATCHES "x64|arm64") OR WINDOWS)
     target_link_libraries(nx_media PRIVATE Vulkan::Headers)
 endif()
 
-if(hardware_decoders_x64)
-    if(LINUX)
-        find_package(libva REQUIRED)
-        find_package(intel-onevpl REQUIRED)
-        find_package(intel-media-sdk REQUIRED)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(DRM REQUIRED IMPORTED_TARGET libdrm)
-        target_link_libraries(nx_media
-            PUBLIC
-            X11 dl GL libegl_stub PkgConfig::DRM libva::libva libvpl::vpl intel-onevpl::mfx-gen
-        )
-    endif()
+if(targetDevice STREQUAL "linux_x64")
+    find_package(PkgConfig REQUIRED)
+    find_package(libva REQUIRED)
+    pkg_check_modules(DRM REQUIRED IMPORTED_TARGET libdrm)
+    target_link_libraries(nx_media PRIVATE libva::libva X11 dl GL libegl_stub PkgConfig::DRM)
+endif()
 
-    if(WINDOWS)
-        include("${CONAN_INTEL-MEDIA-SDK-BIN_ROOT}/intel_media_sdk.cmake")
-        target_link_libraries(nx_media PUBLIC opengl32 dxva2 d3d9 intel-media-sdk libvpl::vpl)
-    endif()
+if(withNvidiaDecoder)
+    target_link_libraries(nx_media PRIVATE CUDA::cudart)
 else()
     nx_exclude_sources_from_target(nx_media src/nx/media/nvidia)
+endif()
+
+if(withQuickSyncDecoder)
+    find_package(libvpl REQUIRED)
+    target_link_libraries(nx_media PRIVATE libvpl::vpl)
+
+    if(LINUX)
+        find_package(intel-onevpl REQUIRED)
+        target_link_libraries(nx_media PRIVATE intel-onevpl::mfx-gen)
+    elseif(WINDOWS)
+        include("${CONAN_INTEL-MEDIA-SDK-BIN_ROOT}/intel_media_sdk.cmake")
+        target_link_libraries(nx_media PRIVATE opengl32 dxva2 d3d9 intel-media-sdk)
+    endif()
+else()
     nx_exclude_sources_from_target(nx_media src/nx/media/quick_sync)
 endif()
 
