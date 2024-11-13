@@ -31,6 +31,36 @@
 using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 
+namespace {
+
+class NumericSortModel: public QSortFilterProxyModel
+{
+public:
+    NumericSortModel(QObject* parent):
+        QSortFilterProxyModel(parent)
+    {
+        m_collator.setNumericMode(true);
+        m_collator.setCaseSensitivity(sortCaseSensitivity());
+    }
+
+    virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override
+    {
+        if (sortColumn() == QnCameraListModel::IpColumn)
+        {
+            return m_collator.compare(
+                left.data(sortColumn()).toString(),
+                right.data(sortColumn()).toString()) < 0;
+        }
+
+        return QSortFilterProxyModel::lessThan(left, right);
+    }
+
+private:
+    QCollator m_collator;
+};
+
+} // namespace
+
 struct QnCameraListDialog::Private
 {
     QnCameraListModel* const model;
@@ -43,7 +73,7 @@ struct QnCameraListDialog::Private
 
     Private(QnCameraListDialog* q):
         model(new QnCameraListModel(q)),
-        resourceSort(new QSortFilterProxyModel(q)),
+        resourceSort(new NumericSortModel(q)),
         resourceSearch(new QnResourceSearchProxyModel(q)),
         updateTitle(new nx::utils::PendingOperation()),
         clipboardAction(new QAction(tr("Copy Selection to Clipboard"), q)),
