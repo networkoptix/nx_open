@@ -44,6 +44,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         OUTPUT_DIR "${CMAKE_BINARY_DIR}")
 endif()
 
-prepare_signing(push_notification_extension
+nx_prepare_ios_signing(push_notification_extension
     "extension"
     ${customization.mobile.ios.bundleIdentifier}.extension)
