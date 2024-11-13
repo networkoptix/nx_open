@@ -337,8 +337,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true; // skip data
     }
 
-    if ((((md->flags & AV_PKT_FLAG_KEY) && md->dataType == QnAbstractMediaData::VIDEO)
-        || !m_hasVideo) && needToTruncate(md))
+    bool canStartNewFile = m_hasVideo ?
+        md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY) :
+        md->dataType == QnAbstractMediaData::AUDIO;
+
+    if (canStartNewFile && needToTruncate(md))
     {
         m_endDateTimeUs = md->timestamp;
         NX_VERBOSE(this, "Truncating file %1", startTimeUs());
@@ -348,13 +351,15 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (m_firstTime)
     {
-        if (vd == 0 && m_hasVideo)
+        if (!canStartNewFile)
         {
-            NX_VERBOSE(
-                this, "saveData(): AUDIO; skip audio packets before first video packet. Timestamp: %1 (%2ms)",
-                QDateTime::fromMSecsSinceEpoch(md->timestamp / 1000), md->timestamp / 1000);
-
-            return true; // skip audio packets before first video packet
+            NX_DEBUG(this, "Skip packet before first video(or audio in case audio only) packet: %1"
+                "(%2ms), data type: %3, has video: %4",
+                QDateTime::fromMSecsSinceEpoch(md->timestamp / 1000),
+                md->timestamp / 1000,
+                md->dataType,
+                m_hasVideo);
+            return true; // skip audio/meta packets before first video packet
         }
 
         if (!prepareToStart(md))
