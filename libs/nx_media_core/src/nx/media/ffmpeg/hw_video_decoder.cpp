@@ -279,6 +279,14 @@ bool HwVideoDecoder::decode(
     return true;
 }
 
+int64_t HwVideoDecoder::frameNum() const
+{
+    if (!m_decoderContext)
+        return 0;
+
+    return std::max<int64_t>(0, m_decoderContext->frame_num - 1);
+}
+
 bool HwVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     if (m_decoderContext)
