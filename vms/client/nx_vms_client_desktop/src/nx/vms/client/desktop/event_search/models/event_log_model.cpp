@@ -6,6 +6,7 @@
 
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -46,6 +47,19 @@ using namespace std::chrono;
 using namespace nx::vms::rules;
 
 namespace {
+
+int helpTopicIdData(EventLogModel::Column column, const EventLogModelData& data)
+{
+    switch (column)
+    {
+        case EventLogModel::EventColumn:
+            return eventHelpId(data.eventType());
+        case EventLogModel::ActionColumn:
+            return actionHelpId(data.actionType());
+        default:
+            return -1;
+    }
+}
 
 QString resourceName(const QnResourcePtr& resource)
 {
@@ -157,6 +171,32 @@ nx::Uuid eventSourceId(SystemContext* context, const EventLogModelData& data)
 QnResourcePtr eventSource(SystemContext* context, const EventLogModelData& data)
 {
     return context->resourcePool()->getResourceById(eventSourceId(context, data));
+}
+
+bool hasAccessToCamera(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!NX_ASSERT(camera, "Resource is not a camera"))
+        return false;
+
+    return SystemContext::fromResource(camera)->accessController()
+        ->hasPermissions(camera, Qn::ViewContentPermission);
+}
+
+bool hasAccessToArchive(const QnResourcePtr& resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!NX_ASSERT(camera, "Resource is not a camera"))
+        return false;
+
+    return SystemContext::fromResource(camera)->accessController()
+        ->hasPermissions(camera, Qn::ViewFootagePermission);
+}
+
+bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
+{
+    return (data.record().flags.testFlag(nx::vms::api::rules::EventLogFlag::videoLinkExists)
+        && hasAccessToCamera(eventSource(context, data)));
 }
 
 } // namespace
@@ -368,18 +408,9 @@ QModelIndex EventLogModel::parent(const QModelIndex& /*parent*/) const
     return QModelIndex();
 }
 
-bool EventLogModel::hasVideoLink(const EventLogModelData& data) const
-{
-    return !rules::utils::getDeviceIds(AggregatedEventPtr::create(data.event(systemContext())))
-        .empty();
-
-    // TODO: #amalov Calculate presence of camera archive for the event date on the
-    // server side. See old event log model and API for the details.
-}
-
 QVariant EventLogModel::foregroundData(Column column, const EventLogModelData& data) const
 {
-    if (column == DescriptionColumn && hasVideoLink(data))
+    if (column == DescriptionColumn && hasVideoLink(systemContext(), data))
         return m_linkBrush;
     return QVariant();
 }
@@ -387,7 +418,7 @@ QVariant EventLogModel::foregroundData(Column column, const EventLogModelData& d
 QVariant EventLogModel::mouseCursorData(
     Column column, const EventLogModelData& data) const
 {
-    if (column == DescriptionColumn && hasVideoLink(data))
+    if (column == DescriptionColumn && hasVideoLink(systemContext(), data))
         return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
 }
@@ -465,35 +496,39 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
     }
 }
 
+QString EventLogModel::htmlData(Column column, const EventLogModelData& data) const
+{
+    QString text = textData(column, data);
+    QString url = motionUrl(column, data);
+    if (url.isEmpty())
+        return text;
+
+    if (text.isEmpty())
+    {
+        const auto device = eventSource(systemContext(), data).dynamicCast<QnVirtualCameraResource>();
+
+        if (hasAccessToArchive(device))
+        {
+            text = tr("Open event video");
+        }
+        else
+        {
+            text = QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
+                {tr("Open event device"), tr("Open event camera")},
+                device);
+        }
+    }
+
+    return nx::vms::common::html::customLink(text, url);
+}
+
 QString EventLogModel::tooltip(Column column, const EventLogModelData& data) const
 {
     if (column != DescriptionColumn)
         return QString();
 
     return textData(column, data);
-}
-
-bool EventLogModel::hasAccessToArchive(const nx::Uuid& cameraId) const
-{
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
-    NX_ASSERT(camera, "Resource is not a camera");
-    if (!camera)
-        return false;
-
-    return systemContext()->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
-}
-
-int EventLogModel::helpTopicIdData(Column column, const EventLogModelData& data)
-{
-    switch (column)
-    {
-        case EventColumn:
-            return eventHelpId(data.eventType());
-        case ActionColumn:
-            return actionHelpId(data.actionType());
-        default:
-            return -1;
-    }
 }
 
 void EventLogModel::sort(int column, Qt::SortOrder order)
@@ -505,7 +540,7 @@ void EventLogModel::sort(int column, Qt::SortOrder order)
 
 QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) const
 {
-    if (column != DescriptionColumn || !hasVideoLink(data))
+    if (column != DescriptionColumn || !hasVideoLink(systemContext(), data))
         return {};
 
     const auto device = getResource(EventCameraColumn, data)
@@ -531,7 +566,7 @@ QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) con
         return {};
 
     const auto& data = m_index->at(index.row());
-    if (!hasVideoLink(data))
+    if (!hasVideoLink(systemContext(), data))
         return {};
 
     return resourcePool()->getResourcesByIds(rules::utils::getDeviceIds(
@@ -607,15 +642,7 @@ QVariant EventLogModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue<QnResourcePtr>(getResource(column, data));
 
         case Qn::DisplayHtmlRole:
-        {
-            QString text = textData(column, data);
-            QString url = motionUrl(column, data);
-            if (url.isEmpty())
-                return text;
-
-            // Non-standard url is passed.
-            return nx::vms::common::html::customLink(text, url);
-        }
+            return htmlData(column, data);
 
         case Qn::HelpTopicIdRole:
             return helpTopicIdData(column, data);

@@ -3,8 +3,6 @@
 #ifndef QN_SERIALIZATION_SQL_H
 #define QN_SERIALIZATION_SQL_H
 
-#include <cassert>
-
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
@@ -72,7 +70,6 @@ namespace QnSql {
     void fetch_many_if(QSqlQuery &query, List *target, const Predicate &predicate) {
         typedef typename List::value_type value_type;
 
-        QSqlRecord record = query.record();
         QnSqlIndexMapping mapping = QnSql::mapping<value_type>(query);
 
         while(query.next()) {

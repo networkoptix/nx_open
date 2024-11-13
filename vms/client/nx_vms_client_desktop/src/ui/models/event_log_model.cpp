@@ -598,7 +598,6 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
     return result;
 }
 
-
 bool QnEventLogModel::hasAccessToCamera(const nx::Uuid& cameraId) const
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
@@ -606,7 +605,7 @@ bool QnEventLogModel::hasAccessToCamera(const nx::Uuid& cameraId) const
     if (!camera)
         return false;
 
-    return systemContext()->accessController()->hasPermissions(camera, Qn::ReadPermission);
+    return systemContext()->accessController()->hasPermissions(camera, Qn::ViewContentPermission);
 }
 
 bool QnEventLogModel::hasAccessToArchive(const nx::Uuid& cameraId) const

@@ -17,7 +17,9 @@ NX_REFLECTION_ENUM_CLASS(EventLogFlag,
     noFlags = 0,
 
     /**%apidoc The notification requires user acknowledge. */
-    acknowledge = 1 << 0
+    acknowledge = 1 << 0,
+
+    videoLinkExists = 1 << 1
 )
 Q_DECLARE_FLAGS(EventLogFlags, EventLogFlag)
 

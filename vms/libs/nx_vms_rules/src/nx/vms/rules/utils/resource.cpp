@@ -79,6 +79,17 @@ QnVirtualCameraResourceList cameras(
         : context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selection.ids);
 }
 
+std::string resourceField(const ItemDescriptor& manifest, ResourceType type)
+{
+    for (const auto& [name, desc] : manifest.resources)
+    {
+        if (desc.type == type)
+            return name;
+    }
+
+    return {};
+}
+
 template <typename T>
 UuidList deviceIds(const T& entity)
 {

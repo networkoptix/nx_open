@@ -12,6 +12,7 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules {
 
+enum class ResourceType;
 struct UuidSelection;
 
 namespace utils {
@@ -56,6 +57,8 @@ UuidList fieldResourceIds(const T& entity, std::string_view fieldName)
 
     return result;
 }
+
+NX_VMS_RULES_API std::string resourceField(const ItemDescriptor& manifest, ResourceType type);
 
 NX_VMS_RULES_API UuidList getDeviceIds(const AggregatedEventPtr& event);
 NX_VMS_RULES_API UuidList getDeviceIds(const ActionPtr& action);

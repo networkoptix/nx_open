@@ -63,18 +63,14 @@ private:
     class DataIndex;
 
     QnResourcePtr getResource(Column column, const EventLogModelData& data) const;
+    QString motionUrl(Column column, const EventLogModelData& data) const;
+
     QVariant foregroundData(Column column, const EventLogModelData& data) const;
     QVariant iconData(Column column, const EventLogModelData& data) const;
     QVariant mouseCursorData(Column column, const EventLogModelData& data) const;
     QString textData(Column column, const EventLogModelData& data) const;
+    QString htmlData(Column column, const EventLogModelData& data) const;
     QString tooltip(Column column, const EventLogModelData& data) const;
-
-    static int helpTopicIdData(Column column, const EventLogModelData& data);
-
-    QString motionUrl(Column column, const EventLogModelData& data) const;
-
-    bool hasVideoLink(const EventLogModelData& data) const;
-    bool hasAccessToArchive(const nx::Uuid& cameraId) const;
 
 private:
     QList<Column> m_columns;
