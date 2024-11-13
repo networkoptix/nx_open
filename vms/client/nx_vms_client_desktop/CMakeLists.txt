@@ -225,7 +225,7 @@ if(LINUX)
 endif()
 
 if(WINDOWS)
-    target_link_libraries(nx_vms_client_desktop PRIVATE d3d9 Winmm Dinput8 dxguid)
+    target_link_libraries(nx_vms_client_desktop PRIVATE opengl32 d3d9 Winmm Dinput8 dxguid)
 endif()
 
 if(MACOSX)

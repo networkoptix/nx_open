@@ -17,7 +17,7 @@ extern "C"
 #include <core/resource/security_cam_resource.h>
 #include <decoders/video/abstract_video_decoder.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
-#include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/media/supported_decoders.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
@@ -31,10 +31,13 @@ extern "C"
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/adaptive_sleep.h>
 
-#ifdef __QSV_SUPPORTED__
-#include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
-#include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
-#endif // __QSV_SUPPORTED__
+#if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
+    #include <nx/media/nvidia/nvidia_video_decoder_old_player.h>
+#endif
+
+#if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+    #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
+#endif
 
 #include "buffered_frame_displayer.h"
 #include "gl_renderer.h"
@@ -399,30 +402,41 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
     return MultiThreadDecodePolicy::autoDetect;
 }
 
-#ifdef __QSV_SUPPORTED__
-
-bool canAddIntel(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+bool canAddIntel(
+    [[maybe_unused]] const QnConstCompressedVideoDataPtr& data,
+    [[maybe_unused]] bool reverseMode)
 {
-    return isIntel()
-        && appContext()->localSettings()->hardwareDecodingEnabled()
-        && !reverseMode
-        && QuickSyncVideoDecoderOldPlayer::instanceCount()
-            < appContext()->localSettings()->maxIntelHardwareDecoders()
-        && QuickSyncVideoDecoderOldPlayer::isSupported(data);
+    #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+        return isIntel()
+            && appContext()->localSettings()->hardwareDecodingEnabled()
+            && !reverseMode
+            && QuickSyncVideoDecoderOldPlayer::instanceCount()
+                < appContext()->localSettings()->maxIntelHardwareDecoders()
+            && QuickSyncVideoDecoderOldPlayer::isSupported(data);
+    #else
+        return false;
+    #endif
 }
 
-bool canAddNvidia(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+bool canAddNvidia(
+    [[maybe_unused]] const QnConstCompressedVideoDataPtr& data,
+    [[maybe_unused]] bool reverseMode)
 {
-    return isNvidia()
-        && appContext()->localSettings()->hardwareDecodingEnabled()
-        && !reverseMode
-        && NvidiaVideoDecoderOldPlayer::instanceCount()
-            < appContext()->localSettings()->maxNVidiaHardwareDecoders()
-        && NvidiaVideoDecoderOldPlayer::isSupported(data);
+    #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
+        return isNvidia()
+            && appContext()->localSettings()->hardwareDecodingEnabled()
+            && !reverseMode
+            && NvidiaVideoDecoderOldPlayer::instanceCount()
+                < appContext()->localSettings()->maxNVidiaHardwareDecoders()
+            && NvidiaVideoDecoderOldPlayer::isSupported(data);
+    #else
+        return false;
+    #endif
 }
 
 bool QnVideoStreamDisplay::shouldUpdateDecoder(
-    const QnConstCompressedVideoDataPtr& data, bool reverseMode)
+    const QnConstCompressedVideoDataPtr& data,
+    bool reverseMode)
 {
     if (!m_decoderData.decoder)
         return false;
@@ -441,29 +455,23 @@ bool QnVideoStreamDisplay::shouldUpdateDecoder(
     return false;
 }
 
-#else // __QSV_SUPPORTED__
-
-bool canAddIntel(QnConstCompressedVideoDataPtr&, bool) { return false; }
-bool canAddNvidia(QnConstCompressedVideoDataPtr&, bool) { return false; }
-bool QnVideoStreamDisplay::shouldUpdateDecoder(const QnConstCompressedVideoDataPtr&, bool) { return false; }
-
-#endif // __QSV_SUPPORTED__
-
 QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     const QnConstCompressedVideoDataPtr& data, bool mtDecoding) const
 {
     QnAbstractVideoDecoder* decoder = nullptr;
 
-#ifdef __QSV_SUPPORTED__
     if (canAddIntel(data, m_reverseMode))
     {
-        decoder = new QuickSyncVideoDecoderOldPlayer();
+        #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+            decoder = new QuickSyncVideoDecoderOldPlayer();
+        #endif
     }
     else if (canAddNvidia(data, m_reverseMode))
     {
-        decoder = new NvidiaVideoDecoderOldPlayer();
+        #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
+            decoder = new NvidiaVideoDecoderOldPlayer();
+        #endif
     }
-#endif // __QSV_SUPPORTED__
     if (!decoder)
     {
         DecoderConfig config;

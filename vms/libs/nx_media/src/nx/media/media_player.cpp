@@ -22,7 +22,7 @@
 #include <nx/kit/debug.h>
 #include <nx/media/image_video_buffer.h>
 #include <nx/media/ini.h>
-#include <nx/media/quick_sync/qsv_supported.h>
+#include <nx/media/supported_decoders.h>
 #include <nx/media/video_frame.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
@@ -40,9 +40,9 @@
 #include "player_data_consumer.h"
 #include "video_decoder_registry.h"
 
-#ifdef __QSV_SUPPORTED__
-#include <nx/media/quick_sync/quick_sync_surface.h>
-#endif // __QSV_SUPPORTED__
+#if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+    #include <nx/media/quick_sync/quick_sync_surface.h>
+#endif
 
 static size_t qHash(const MetadataType& value)
 {
