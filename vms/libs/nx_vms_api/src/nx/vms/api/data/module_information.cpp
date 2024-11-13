@@ -82,6 +82,7 @@ ModuleInformation ServerInformationV1::getModuleInformation() const
     info.systemName = systemName;
     info.localSystemId = localSystemId;
     info.cloudSystemId = cloudSystemId;
+    info.ecDbReadOnly = ecDbReadOnly;
     return info;
 }
 
@@ -128,7 +129,8 @@ ServerInformationV1::ServerInformationV1(const ModuleInformationWithAddresses& r
     serverFlags(rhs.serverFlags),
     systemName(rhs.systemName),
     cloudSystemId(rhs.cloudSystemId),
-    localSystemId(rhs.localSystemId)
+    localSystemId(rhs.localSystemId),
+    ecDbReadOnly(rhs.ecDbReadOnly)
 {}
 
 } // namespace api

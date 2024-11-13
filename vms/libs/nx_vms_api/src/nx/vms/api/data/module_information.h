@@ -51,7 +51,6 @@ struct NX_VMS_API ModuleInformationBase: ServerPortInformation
     int protoVersion = 0;
     nx::Uuid runtimeId;
     QString realm;
-    bool ecDbReadOnly = false;
     QString cloudPortalUrl;
     QString cloudHost;
     HwPlatform hwPlatform;
@@ -73,6 +72,8 @@ struct NX_VMS_API ModuleInformation: ModuleInformationBase
     QString systemName;
     QString cloudSystemId;
     nx::Uuid localSystemId;
+    // The field is unused in the code, only for api compatibility.
+    bool ecDbReadOnly = false;
 
     void fixRuntimeId();
     QString cloudId() const;
@@ -190,7 +191,6 @@ struct NX_VMS_API ServerInformationBase: ModuleInformationBase
     (protoVersion) \
     (runtimeId) \
     (realm) \
-    (ecDbReadOnly) \
     (cloudHost) \
     (brand) \
     (hwPlatform) \
@@ -245,6 +245,8 @@ struct NX_VMS_API ServerInformationV1: ServerInformationBase
     QString cloudSystemId;
     nx::Uuid localSystemId;
     std::chrono::milliseconds systemIdentityTimeMs{0};
+    // The field is unused in the code, only for api compatibility for v{1-2}.
+    bool ecDbReadOnly = false;
 
     ServerInformationV1() = default;
     ServerInformationV1(const ServerInformationV1& rhs) = default;
@@ -266,7 +268,8 @@ struct NX_VMS_API ServerInformationV1: ServerInformationBase
     (systemName) \
     (cloudSystemId) \
     (localSystemId) \
-    (systemIdentityTimeMs)
+    (systemIdentityTimeMs) \
+    (ecDbReadOnly)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(ServerInformationV1, (json))
 NX_REFLECTION_INSTRUMENT(ServerInformationV1, ServerInformationV1_Fields);
