@@ -359,7 +359,11 @@ struct RadassController::Private
         return consumers.end();
     }
 
-    void gotoLowQuality(Consumer consumer, LqReason reason, double speed = kAutomaticSpeed)
+    void gotoLowQuality(
+        Consumer consumer,
+        LqReason reason,
+        double speed = kAutomaticSpeed,
+        nx::MutexLocker* lock = nullptr)
     {
         const bool isInHiQuality = consumer->display->getQuality() == MEDIA_Quality_High;
         const auto consumerSpeed = speed != kAutomaticSpeed ? speed : consumer->display->getSpeed();
@@ -413,10 +417,13 @@ struct RadassController::Private
             lastModeChangeTimer->restart();
         }
 
-        consumer->display->setQuality(MEDIA_Quality_Low, true);
         consumer->lqReason = reason;
         consumer->toLqSpeed = consumerSpeed;
         consumer->awaitingLqTime->invalidate();
+        auto display = consumer->display;
+        if (lock)
+            lock->unlock();
+        display->setQuality(MEDIA_Quality_Low, true);
     }
 
     void gotoHighQuality(Consumer consumer)
@@ -570,7 +577,7 @@ struct RadassController::Private
         }
     }
 
-    void onSlowStream(Consumer consumer)
+    void onSlowStream(Consumer consumer, nx::MutexLocker* lock)
     {
         NX_VERBOSE(this, "Slow stream on %1 detected", *consumer);
         lastSystemRtspDrop->start();
@@ -597,7 +604,7 @@ struct RadassController::Private
         if (isFastForwardOrRevMode(speed))
         {
             NX_VERBOSE(this, "%1 is in FF/Rew, swithing to LQ immediately.", *consumer);
-            gotoLowQuality(consumer, LqReason::performanceInFf, speed);
+            gotoLowQuality(consumer, LqReason::performanceInFf, speed, lock);
             return;
         }
 
@@ -621,8 +628,8 @@ struct RadassController::Private
             smallestConsumer = consumer;
         }
         NX_VERBOSE(this, "Finding smallest HQ camera %1 and switching it to LQ.", *smallestConsumer);
-        gotoLowQuality(smallestConsumer, LqReason::performance);
         lastAutoSwitchTimer->restart();
+        gotoLowQuality(smallestConsumer, LqReason::performance, kAutomaticSpeed, lock);
     }
 
     void streamBackToNormal(Consumer consumer)
@@ -862,7 +869,7 @@ void RadassController::onSlowStream(AbstractVideoDisplay* display)
     if (!d->isValid(consumer))
         return;
 
-    d->onSlowStream(consumer);
+    d->onSlowStream(consumer, &lock);
 }
 
 void RadassController::streamBackToNormal(AbstractVideoDisplay* display)
