@@ -17,7 +17,8 @@ namespace {
 
 void removeTimezone(QString& source)
 {
-    source.remove(" t");
+    source.remove("t");
+    source = source.trimmed();
 }
 
 QString getShortFormatWithSeconds(const QLocale& locale)
