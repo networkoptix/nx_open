@@ -8,6 +8,7 @@ constexpr auto kAcknowledgeFieldName = "acknowledge";
 constexpr auto kAttributesFieldName = "attributes";
 constexpr auto kCameraIdFieldName = "cameraId";
 constexpr auto kCaptionFieldName = "caption";
+constexpr auto kContentFieldName = "content";
 constexpr auto kDescriptionFieldName = "description";
 constexpr auto kDetailingFieldName = "detailing";
 constexpr auto kDeviceIdsFieldName = "deviceIds";

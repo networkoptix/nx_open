@@ -29,8 +29,9 @@ struct TextWithFieldsPicker::Private: public QObject
         bool operator==(const EventTrackableData&) const = default;
     };
 
-    EventParameterCompleter* completer{nullptr};
     TextWithFieldsPicker* const q;
+    EventParameterCompleter* completer{nullptr};
+    bool highlightErrors{true};
     EventTrackableData currentEventData;
 
     Private(TextWithFieldsPicker* parent): q(parent){};
@@ -134,6 +135,7 @@ TextWithFieldsPicker::TextWithFieldsPicker(
     base(field, context, parent),
     d(new Private(this))
 {
+    d->highlightErrors = field->properties().highlightErrors;
     d->completer = new EventParameterCompleter{new EventParametersModel({}), m_textEdit, this};
 }
 
@@ -161,8 +163,11 @@ void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& valid
         return;
     }
 
-    d->addFormattingToText(
-        validationResult.additionalData.value<vms::rules::TextWithFields::ParsedValues>());
+    if (d->highlightErrors)
+    {
+        d->addFormattingToText(
+            validationResult.additionalData.value<vms::rules::TextWithFields::ParsedValues>());
+    }
 
     if (validationResult.isValid())
         resetErrorStyle(m_textEdit);

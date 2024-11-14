@@ -35,8 +35,15 @@ const ItemDescriptor& HttpAction::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("Method")),
                 {},
                 {{"value", QString(network::http::Method::get.data())}}),
-            makeFieldDescriptor<TextWithFields>("content",
-                NX_DYNAMIC_TRANSLATABLE(tr("Content"))),
+            makeFieldDescriptor<TextWithFields>(utils::kContentFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("Content")),
+                {},
+                TextWithFieldsFieldProperties{
+                    .base = FieldProperties{.optional = false},
+                    // Json strings are often used in this field, but the substitution syntax - `{}`
+                    // conflicts with the JSON syntax. To avoid highlighting all the text as
+                    // invalid, we decided to disable highlighting for this field altogether.
+                    .highlightErrors = false}.toVariantMap()),
             makeFieldDescriptor<ContentTypeField>("contentType",
                 NX_DYNAMIC_TRANSLATABLE(tr("Content type")),
                 "If not set, it will be calculated based on the content value."),

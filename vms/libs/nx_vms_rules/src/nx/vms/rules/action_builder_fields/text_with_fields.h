@@ -17,11 +17,15 @@ struct TextWithFieldsFieldProperties
 
     QString validationPolicy;
 
+    /** Whether incorrect substitutions must be highlighted. */
+    bool highlightErrors{true};
+
     QVariantMap toVariantMap() const
     {
         QVariantMap result = base.toVariantMap();
 
         result.insert("validationPolicy", validationPolicy);
+        result.insert("highlightErrors", highlightErrors);
 
         return result;
     }
@@ -32,6 +36,7 @@ struct TextWithFieldsFieldProperties
 
         result.base = FieldProperties::fromVariantMap(properties);
         result.validationPolicy = properties.value("validationPolicy").toString();
+        result.highlightErrors = properties.value("highlightErrors").toBool();
 
         return result;
     }
