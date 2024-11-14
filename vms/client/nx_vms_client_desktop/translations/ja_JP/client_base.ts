@@ -13007,7 +13007,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
-        <numerusform>各ライセンスキーの無効化は最大%n回までとなりますのでご注意ください</numerusform>
+        <numerusform>各ライセンスキーの無効化は最大%n回までとなりますのでご注意ください。</numerusform>
       </translation>
     </message>
   </context>
