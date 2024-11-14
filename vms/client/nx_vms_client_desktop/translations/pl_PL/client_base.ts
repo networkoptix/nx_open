@@ -1399,7 +1399,7 @@
     <name>IntercomManager::Private</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Układów</translation>
     </message>
   </context>
   <context>
@@ -1771,15 +1771,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Użytkownicy zaczną otrzymywać e-maile zaraz po zastosowaniu ustawień</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Nie można przetestować serwera SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Wymagane dodatkowe informacje</translation>
     </message>
   </context>
   <context>
@@ -7038,7 +7038,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Nie udało się usunąć %n użytkowników.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
@@ -7744,7 +7744,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Materiał filmowy z tych kamer jest kopiowany do %1 %2</translation>
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
@@ -7939,11 +7939,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Spiczasty</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
-      <translation type="unfinished">Place Hotspot</translation>
+      <translation>Umieść hotspot</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -7958,7 +7958,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
     <message>
       <source>Camera does not exist</source>
-      <translation type="unfinished">Camera does not exist</translation>
+      <translation>Kamera nie istnieje</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -7970,11 +7970,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Kolor</translation>
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Spiczasty</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -8018,7 +8018,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Use Service</source>
       <translation type="unfinished">
-        <numerusform>Use Service</numerusform>
+        <numerusform>Użyj usługi</numerusform>
         <numerusform>Use Service</numerusform>
         <numerusform>Use Service</numerusform>
         <numerusform>Use Service</numerusform>
@@ -8623,11 +8623,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Wprowadź link dostępowy, aby kontynuować sesję</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>Sesja wygasła. Prosimy zalogować się ponownie, aby kontynuować.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
@@ -8774,11 +8774,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CustomAccessSummaryModel</name>
     <message>
       <source>View video archive</source>
-      <translation type="unfinished">View video archive</translation>
+      <translation>Zobacz archiwum wideo</translation>
     </message>
     <message>
       <source>Export video archive</source>
-      <translation type="unfinished">Export video archive</translation>
+      <translation>Eksportuj archiwum wideo</translation>
     </message>
     <message>
       <source>View bookmarks</source>
@@ -8802,7 +8802,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View live</source>
-      <translation type="unfinished">View live</translation>
+      <translation>Podgląd na żywo</translation>
     </message>
   </context>
   <context>
@@ -8821,7 +8821,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your system administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your system administrator to do it.</translation>
+      <translation>Ta kamera wymaga hasła do skonfigurowania. Poproś administratora systemu, aby to zrobił.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your system administrator to do it.</source>
@@ -9450,11 +9450,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GroupSettingsDialog</name>
     <message>
       <source>Delete failed</source>
-      <translation type="unfinished">Delete failed</translation>
+      <translation>Usunięcie nie powiodło się</translation>
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Zastosować zmiany?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -9486,7 +9486,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete groups</source>
-      <translation type="unfinished">Delete groups</translation>
+      <translation>Usuń grupy</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -9494,15 +9494,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Group name cannot be empty</source>
-      <translation type="unfinished">Group name cannot be empty</translation>
+      <translation>Nazwa grupy nie może być pusta</translation>
     </message>
     <message>
       <source>Group with the same name already exists</source>
-      <translation type="unfinished">Group with the same name already exists</translation>
+      <translation>Grupa o tej nazwie już istnieje</translation>
     </message>
     <message>
       <source>Failed to apply changes to %1 group</source>
-      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+      <translation>Nie udało się zastosować zmian do grupy %1</translation>
     </message>
     <message>
       <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
@@ -10980,19 +10980,19 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Edytuj integrację</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Nowa integracja proxy</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Edytuj integrację proxy</translation>
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>Aby zezwolić na korzystanie z API klienta, utwórz integrację internetową. %1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -11140,14 +11140,14 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>%1 układów</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
       <comment>%1 will be substituted with a layout name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more layouts</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 i %n więcej układów</numerusform>
+        <numerusform>%1 i %n więcej układów</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
       </translation>
@@ -11155,13 +11155,13 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 ściana wideo</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
       <comment>%1 will be substituted with a video wall name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 i %n więcej ścian wideo</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
@@ -11607,11 +11607,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Aby rozwiązać ten problem, skontaktuj się z użytkownikiem z uprawnieniami administratora.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Nie jest częścią certyfikatu</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
@@ -12002,7 +12002,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>Niektóre funkcje mogą być niedostępne.</translation>
     </message>
   </context>
   <context>
@@ -12279,23 +12279,23 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>System Error</source>
-      <translation type="unfinished">System Error</translation>
+      <translation>Błąd Systemu</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Błąd transmisji</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Kod błędu serwera %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Zarezerwowany kod błędu %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Nieznany kod błędu %1</translation>
     </message>
   </context>
   <context>
@@ -12331,15 +12331,15 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>Serwer LDAP jest offline. Użytkownicy nie mogą się zalogować.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>Użytkownik nie został znaleziony w bazie danych LDAP.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Użytkownik tymczasowy</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -12347,7 +12347,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is already a user with the same login in the system. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>W systemie jest już użytkownik z tym samym loginem. Aby uniknąć problemów, wymagane jest, aby wszyscy użytkownicy mieli unikalny login.</translation>
     </message>
   </context>
   <context>
@@ -12378,7 +12378,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Zapisz użytkownika</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -12394,7 +12394,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Zastosować zmiany?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -12402,7 +12402,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Skopiuj link dostępu</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -12426,23 +12426,23 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>Czy na pewno chcesz zakończyć dostęp?</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the system for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the system for this user</translation>
+      <translation>Spowoduje to natychmiastowe usunięcie dostępu do systemu dla tego użytkownika</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Przerwij</translation>
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>Zakończ łącze dostępu</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>Utwórz link dostępu</translation>
     </message>
     <message>
       <source>Create</source>
@@ -12450,11 +12450,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nowy link - %1</translation>
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>Link dostępowy został pomyślnie utworzony!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
@@ -12471,11 +12471,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nowy użytkownik</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>Użytkownik %1 został pomyślnie utworzony!</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
@@ -13496,7 +13496,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Toolbar</source>
-      <translation type="unfinished">Toolbar</translation>
+      <translation>Pasek narzędzi</translation>
     </message>
   </context>
   <context>
@@ -13834,15 +13834,15 @@ Możesz zmienić lokalizację przechowywania danych w ustawieniach serwera.</tra
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Za mało praw dostępu</translation>
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>Nie masz uprawnień do otwarcia tej kamery w układzie</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>Nie masz uprawnień do otwierania niektórych wybranych kamer w układzie</translation>
     </message>
   </context>
   <context>
@@ -14051,7 +14051,7 @@ to view more bookmarks</source>
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>Czy chcesz spróbować przełączyć się na DirectX?</translation>
     </message>
   </context>
 </TS>
