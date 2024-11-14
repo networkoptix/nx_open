@@ -3157,7 +3157,7 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Đăng nhập với tên %1</translation>
     </message>
   </context>
   <context>
