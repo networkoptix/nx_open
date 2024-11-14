@@ -1602,15 +1602,15 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>Użytkownicy zaczną otrzymywać e-maile zaraz po zastosowaniu ustawień</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>Nie można przetestować serwera SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>Wymagane dodatkowe informacje</translation>
     </message>
   </context>
   <context>
@@ -7635,7 +7635,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Materiał filmowy z tych kamer jest kopiowany do %1 %2</translation>
     </message>
     <message>
       <source>The progress will be displayed once the backup process starts</source>
@@ -9122,7 +9122,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 Układów</translation>
     </message>
   </context>
   <context>
@@ -11050,7 +11050,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
+      <translation>Znaleziono nagrania na urządzeniu</translation>
     </message>
     <message>
       <source>Import in progress...</source>
@@ -11824,7 +11824,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Cannot add resources from other Systems.</source>
-      <translation type="unfinished">Cannot add resources from other Systems.</translation>
+      <translation>Nie można dodać zasobów z innych systemów.</translation>
     </message>
   </context>
   <context>
