@@ -26,7 +26,7 @@ class VirtualCameraWorker:
 
 public:
     VirtualCameraWorker(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnUserResourcePtr& user,
         QObject* parent = nullptr);
     virtual ~VirtualCameraWorker() override;

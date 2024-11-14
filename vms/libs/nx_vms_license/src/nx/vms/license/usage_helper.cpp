@@ -513,14 +513,14 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
     std::fill(basicUsedLicenses.begin(), basicUsedLicenses.end(), 0);
     std::fill(proposedToUse.begin(), proposedToUse.end(), 0);
 
-    auto groupId = [](const QnSecurityCamResourcePtr& camera)
+    auto groupId = [](const QnVirtualCameraResourcePtr& camera)
     {
         return camera->isSharingLicenseInGroup()
             ? camera->getGroupId()
             : camera->getId().toString();
     };
 
-    QMap<QString, QSet<QnSecurityCamResourcePtr>> oldCameras;
+    QMap<QString, QSet<QnVirtualCameraResourcePtr>> oldCameras;
     for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         if (camera->isScheduleEnabled())

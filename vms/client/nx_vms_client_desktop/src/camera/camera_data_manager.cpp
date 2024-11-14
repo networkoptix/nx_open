@@ -61,7 +61,7 @@ QnCameraDataManager::QnCameraDataManager(SystemContext* systemContext, QObject* 
     connect(cameraHistoryPool(),
         &QnCameraHistoryPool::cameraFootageChanged,
         this,
-        [this](const QnSecurityCamResourcePtr& camera)
+        [this](const QnVirtualCameraResourcePtr& camera)
         {
             if (const auto loader = this->loader(camera, /*createIfNotExists*/ false))
                 loader->discardCachedData();

@@ -74,7 +74,7 @@ QnCameraBookmark bookmarkFromParams(
     bookmark.durationMs = QnLexical::deserialized<milliseconds>(
         params.value(kDurationMsParam, params.value(kDurationParam)));
 
-    QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
+    QnVirtualCameraResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
         /*outNotFoundCameraId*/ nullptr,
         params,

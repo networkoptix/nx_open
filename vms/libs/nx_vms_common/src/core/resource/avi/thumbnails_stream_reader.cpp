@@ -4,7 +4,7 @@
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/thumbnails_archive_delegate.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>

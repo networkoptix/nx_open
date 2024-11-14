@@ -10,7 +10,6 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/utils/server_request_storage.h>
 #include <recording/time_period_list.h>
@@ -51,12 +50,12 @@ QnTimePeriod shrinkPeriod(const QnTimePeriod& local, const QnTimePeriodList& rem
 
 struct VirtualCameraPreparer::Private
 {
-    Private(const QnSecurityCamResourcePtr& camera):
+    Private(const QnVirtualCameraResourcePtr& camera):
         camera(camera)
     {
     }
 
-    QnSecurityCamResourcePtr camera;
+    QnVirtualCameraResourcePtr camera;
     QnTimePeriodList queuePeriods;
     VirtualCameraUpload upload;
     QVector<int> localByRemoteIndex;
@@ -64,7 +63,7 @@ struct VirtualCameraPreparer::Private
     ServerRequestStorage requests;
 };
 
-VirtualCameraPreparer::VirtualCameraPreparer(const QnSecurityCamResourcePtr& camera, QObject* parent):
+VirtualCameraPreparer::VirtualCameraPreparer(const QnVirtualCameraResourcePtr& camera, QObject* parent):
     base_type(parent),
     d(new Private(camera))
 {

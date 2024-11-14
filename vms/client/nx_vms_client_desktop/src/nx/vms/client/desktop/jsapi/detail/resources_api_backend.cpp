@@ -3,7 +3,6 @@
 #include "resources_api_backend.h"
 
 #include <core/resource/resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/reflect/json.h>

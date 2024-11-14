@@ -65,7 +65,7 @@ struct IOModuleMonitor::Private
     IOModuleMonitor * const q;
 
     mutable nx::Mutex mutex;
-    QnSecurityCamResourcePtr camera;
+    QnVirtualCameraResourcePtr camera;
     AsyncHttpClientPtr httpClient;
     std::shared_ptr<MultipartContentParser> multipartContentParser;
     std::atomic_bool connectionIsOpened = false;
@@ -136,7 +136,7 @@ void IOModuleMonitor::Private::handleConnectionClosed(const AsyncHttpClientPtr& 
 
 //-------------------------------------------------------------------------------------------------
 
-IOModuleMonitor::IOModuleMonitor(const QnSecurityCamResourcePtr &camera, QObject* parent):
+IOModuleMonitor::IOModuleMonitor(const QnVirtualCameraResourcePtr &camera, QObject* parent):
     base_type(parent),
     d(new Private{.q = this, .camera = camera})
 {

@@ -384,7 +384,7 @@ QnVirtualCameraResourcePtr ResourceTreeModelTest::addIntercomCamera(
         camera->setHostAddress(hostAddress);
 
     QnIOPortData intercomFeaturePort;
-    intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
+    intercomFeaturePort.outputName = QnVirtualCameraResource::intercomSpecificPortName();
 
     camera->setIoPortDescriptions({intercomFeaturePort}, false);
 

@@ -50,7 +50,7 @@ const int kFileOperationRetryDelayMs = 500;
 QString fileNameForResource(const QnResourcePtr& resource)
 {
     QString uniqId;
-    if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
+    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
         uniqId = camera->getPhysicalId();
     else
         uniqId = resource->getUrl();

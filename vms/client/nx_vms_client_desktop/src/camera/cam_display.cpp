@@ -193,14 +193,14 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     if (desktopResource && desktopResource->isRendererSlow())
         m_useMtDecoding = m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
 #endif
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera && camera->getMaxFps() >= 50)
         m_useMtDecoding = m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
 
     if (camera && camera->hasFlags(Qn::virtual_camera))
     {
         auto handler = [this] { playAudio(m_shouldPlayAudio); };
-        connect(camera.data(), &QnSecurityCamResource::audioEnabledChanged, this, handler);
+        connect(camera.data(), &QnVirtualCameraResource::audioEnabledChanged, this, handler);
     }
 
     if (camera)
@@ -218,7 +218,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
                 }
             });
 
-        connect(camera.get(), &QnSecurityCamResource::disableDualStreamingChanged, this,
+        connect(camera.get(), &QnVirtualCameraResource::disableDualStreamingChanged, this,
             [this] { if (m_streamsChangedCallback) m_streamsChangedCallback(); });
 
     }
@@ -1795,8 +1795,8 @@ void QnCamDisplay::playAudio(bool play)
     if (m_resource->toResourcePtr()->hasFlags(Qn::virtual_camera))
     {
         m_shouldPlayAudio = play;
-        QnSecurityCamResourcePtr camera =
-            m_resource->toResourcePtr().dynamicCast<QnSecurityCamResource>();
+        QnVirtualCameraResourcePtr camera =
+            m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         if (camera && !camera->isAudioEnabled())
             play = false; //< Ignore audio for virtual cameras if it is disabled in UI.
     }

@@ -5,8 +5,8 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -264,7 +264,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
     connect(reader, &QnLongRunnable::paused, this,
         [reader]
         {
-            auto camera = reader->getResource().dynamicCast<QnSecurityCamResource>();
+            auto camera = reader->getResource().dynamicCast<QnVirtualCameraResource>();
             if (camera
                 && camera->hasCameraCapabilities(
                     nx::vms::api::DeviceCapability::synchronousChannel))

@@ -43,7 +43,7 @@ public:
     virtual ~QnRtspClientArchiveDelegate();
 
     // TODO: #sivanov Pass credentials to constructor or using separate setter.
-    void setCamera(const QnSecurityCamResourcePtr& camera);
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
     void updateCredentials(const nx::network::http::Credentials& credentials);
 
     virtual bool open(
@@ -147,15 +147,15 @@ private:
     // determine camera's video server on specified time
     QnMediaServerResourcePtr getServerOnTime(qint64 time);
     QnMediaServerResourcePtr getNextMediaServerFromTime(
-        const QnSecurityCamResourcePtr& camera, qint64 time);
+        const QnVirtualCameraResourcePtr& camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     void checkGlobalTimeAsync(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
         qint64* result);
-    void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr& camera);
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr& camera);
     void setupRtspSession(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
         QnRtspClient* session) const;
     void parseAudioSDP(const QStringList& audioSDP);
@@ -172,7 +172,7 @@ private:
     QMap<quint32, quint16> m_prevTimestamp;
     int64_t m_position = DATETIME_NOW;
     int64_t m_reopenPosition = 0; //< Skip data to this position after reopen.
-    QnSecurityCamResourcePtr m_camera;
+    QnVirtualCameraResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
     int m_lastMediaFlags = -1;
     bool m_closing = false;

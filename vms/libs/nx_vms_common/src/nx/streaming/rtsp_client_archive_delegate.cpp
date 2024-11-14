@@ -56,7 +56,7 @@ bool isSpecialTimeValue(qint64 value)
     return value == DATETIME_NOW || value == DATETIME_INVALID;
 }
 
-QString getUrl(const QnSecurityCamResourcePtr& camera, const QnMediaServerResourcePtr& _server)
+QString getUrl(const QnVirtualCameraResourcePtr& camera, const QnMediaServerResourcePtr& _server)
 {
     // If camera is null we can't get its parent in any case.
     auto server = (_server || !camera) ? _server : camera->getParentServer();
@@ -86,14 +86,14 @@ nx::utils::SoftwareVersion extractServerVersion(const nx::String& serverString)
 struct ArchiveTimeCheckInfo
 {
     ArchiveTimeCheckInfo(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnMediaServerResourcePtr& server,
         qint64* result):
         camera(camera), server(server), result(result)
     {
     }
 
-    QnSecurityCamResourcePtr camera;
+    QnVirtualCameraResourcePtr camera;
     QnMediaServerResourcePtr server;
     qint64* result = nullptr;
 };
@@ -147,7 +147,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
     }
 }
 
-void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& camera)
+void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
     if (m_camera == camera)
         return;
@@ -171,7 +171,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     m_cameraConnections << connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraHistoryChanged,
         this,
-        [this](const QnSecurityCamResourcePtr& camera)
+        [this](const QnVirtualCameraResourcePtr& camera)
         {
             /* Ignore other cameras changes. */
             if (camera != m_camera)
@@ -184,7 +184,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     m_cameraConnections << connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraFootageChanged,
         this,
-        [this](const QnSecurityCamResourcePtr& camera)
+        [this](const QnVirtualCameraResourcePtr& camera)
         {
             /* Ignore other cameras changes. */
             if (camera != m_camera)
@@ -226,7 +226,7 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 }
 
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(
-    const QnSecurityCamResourcePtr& camera, qint64 time)
+    const QnVirtualCameraResourcePtr& camera, qint64 time)
 {
     if (!camera)
         return QnMediaServerResourcePtr();
@@ -239,7 +239,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
 }
 
 void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
-    const QnSecurityCamResourcePtr& camera, const QnMediaServerResourcePtr& server, qint64* result)
+    const QnVirtualCameraResourcePtr& camera, const QnMediaServerResourcePtr& server, qint64* result)
 {
     QnRtspClient client(
         QnRtspClient::Config{
@@ -270,7 +270,7 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
 }
 
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(
-    const QnSecurityCamResourcePtr& camera)
+    const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera || !camera->resourcePool())
     {
@@ -349,7 +349,7 @@ bool QnRtspClientArchiveDelegate::open(
     AbstractArchiveIntegrityWatcher* /*archiveIntegrityWatcher*/)
 {
     m_reopenPosition = 0;
-    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!NX_ASSERT(camera))
         return false;
 
@@ -1085,7 +1085,7 @@ void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
 }
 
 void QnRtspClientArchiveDelegate::setupRtspSession(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QnMediaServerResourcePtr& server,
     QnRtspClient* session) const
 {

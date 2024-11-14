@@ -51,7 +51,7 @@ namespace test {
 
 namespace {
 
-using MotionStreamIndex = QnSecurityCamResource::MotionStreamIndex;
+using MotionStreamIndex = QnVirtualCameraResource::MotionStreamIndex;
 using StreamIndex = nx::vms::api::StreamIndex;
 
 MotionStreamIndex makeStreamIndex(StreamIndex index, bool isForced)

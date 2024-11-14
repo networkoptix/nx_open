@@ -27,15 +27,15 @@ public:
 private:
     void maybeOpenCurrentSettings();
     bool fixFileUpload(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         nx::vms::client::desktop::VirtualCameraUpload *upload);
     bool fixFolderUpload(
         const QString& path,
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         nx::vms::client::desktop::VirtualCameraUpload* upload);
     bool fixStorageCleanupUpload(nx::vms::client::desktop::VirtualCameraUpload* upload);
     void uploadValidFiles(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const nx::vms::client::desktop::VirtualCameraPayloadList& payloads);
 
 private slots:
@@ -48,7 +48,7 @@ private slots:
 
 private:
     QString calculateExtendedErrorMessage(const nx::vms::client::desktop::VirtualCameraPayload& upload);
-    QnSecurityCamResourcePtr cameraByProgressId(const nx::Uuid& progressId) const;
+    QnVirtualCameraResourcePtr cameraByProgressId(const nx::Uuid& progressId) const;
     nx::Uuid ensureProgress(const nx::Uuid& cameraId);
     void removeProgress(const nx::Uuid& cameraId);
 

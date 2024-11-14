@@ -8,8 +8,8 @@
 #include <api/model/virtual_camera_reply.h>
 #include <api/server_rest_connection.h>
 #include <camera/camera_data_manager.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/string.h>
@@ -131,7 +131,7 @@ void VirtualCameraActionHandler::maybeOpenCurrentSettings()
     if (m_currentCameraUuid.isNull())
         return;
 
-    auto camera = system()->resourcePool()->getResourceById<QnSecurityCamResource>(
+    auto camera = system()->resourcePool()->getResourceById<QnVirtualCameraResource>(
         m_currentCameraUuid);
     if (!camera)
         return;
@@ -180,7 +180,7 @@ void VirtualCameraActionHandler::at_newVirtualCameraAction_triggered()
 void VirtualCameraActionHandler::at_uploadVirtualCameraFileAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if (!camera || !camera->getParentServer())
         return;
 
@@ -215,7 +215,7 @@ void VirtualCameraActionHandler::at_uploadVirtualCameraFileAction_triggered()
 void VirtualCameraActionHandler::at_uploadVirtualCameraFolderAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if (!camera || !camera->getParentServer())
         return;
 
@@ -258,7 +258,7 @@ void VirtualCameraActionHandler::at_uploadVirtualCameraFolderAction_triggered()
 void VirtualCameraActionHandler::at_cancelVirtualCameraUploadsAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
-    QnSecurityCamResourcePtr camera = parameters.resource().dynamicCast<QnSecurityCamResource>();
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if (!camera || !camera->getParentServer())
         return;
 
@@ -279,7 +279,7 @@ void VirtualCameraActionHandler::at_cancelVirtualCameraUploadsAction_triggered()
 }
 
 bool VirtualCameraActionHandler::fixFileUpload(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     VirtualCameraUpload* upload)
 {
     int count = upload->elements.size();
@@ -411,7 +411,7 @@ bool VirtualCameraActionHandler::fixFileUpload(
     return true;
 }
 
-bool VirtualCameraActionHandler::fixFolderUpload(const QString& path, const QnSecurityCamResourcePtr& camera, VirtualCameraUpload* upload)
+bool VirtualCameraActionHandler::fixFolderUpload(const QString& path, const QnVirtualCameraResourcePtr& camera, VirtualCameraUpload* upload)
 {
     NX_ASSERT(upload);
 
@@ -474,7 +474,7 @@ bool VirtualCameraActionHandler::fixStorageCleanupUpload(VirtualCameraUpload* up
 }
 
 void VirtualCameraActionHandler::uploadValidFiles(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const VirtualCameraPayloadList& payloads)
 {
     VirtualCameraPayloadList validPayloads;
@@ -507,8 +507,8 @@ void VirtualCameraActionHandler::at_resourcePool_resourceAdded(const QnResourceP
 
 void VirtualCameraActionHandler::at_virtualCameraManager_stateChanged(const VirtualCameraState& state)
 {
-    QnSecurityCamResourcePtr camera =
-        system()->resourcePool()->getResourceById<QnSecurityCamResource>(state.cameraId);
+    QnVirtualCameraResourcePtr camera =
+        system()->resourcePool()->getResourceById<QnVirtualCameraResource>(state.cameraId);
 
     if (!camera)
     {
@@ -585,13 +585,13 @@ void VirtualCameraActionHandler::removeProgress(const nx::Uuid& cameraId)
     m_currentProgresses.erase(iter);
 }
 
-QnSecurityCamResourcePtr VirtualCameraActionHandler::cameraByProgressId(
+QnVirtualCameraResourcePtr VirtualCameraActionHandler::cameraByProgressId(
     const nx::Uuid& progressId) const
 {
     const auto cameraId = m_currentProgresses.key(progressId); //< No need of extra performance here.
     return cameraId.isNull()
-        ? QnSecurityCamResourcePtr()
-        : system()->resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
+        ? QnVirtualCameraResourcePtr()
+        : system()->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
 }
 
 QString VirtualCameraActionHandler::calculateExtendedErrorMessage(const VirtualCameraPayload& upload)

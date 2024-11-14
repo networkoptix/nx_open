@@ -38,8 +38,8 @@ QString RecorderItemDataHelper::groupedDeviceName(const QString& recorderGroupId
         {
             for (const auto& camera: camerasSet)
             {
-                // Avoid QnSecurityCamResource::getUserDefinedGroupName() fallback to
-                // QnSecurityCamResource::getDefaultGroupName().
+                // Avoid QnVirtualCameraResource::getUserDefinedGroupName() fallback to
+                // QnVirtualCameraResource::getDefaultGroupName().
                 const auto groupName = camera->getUserDefinedGroupName();
                 if (!groupName.isEmpty() && groupName != camera->getDefaultGroupName())
                     return groupName;

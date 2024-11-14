@@ -2,7 +2,7 @@
 
 #include "virtual_camera_manager.h"
 
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -46,7 +46,7 @@ const QnUserResourcePtr& VirtualCameraManager::currentUser() const
     return d->currentUser;
 }
 
-VirtualCameraState VirtualCameraManager::state(const QnSecurityCamResourcePtr& camera)
+VirtualCameraState VirtualCameraManager::state(const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera)
         return VirtualCameraState();
@@ -68,7 +68,7 @@ QList<VirtualCameraState> VirtualCameraManager::runningUploads()
 }
 
 void VirtualCameraManager::prepareUploads(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QStringList& filePaths,
     QObject* target,
     std::function<void(const VirtualCameraUpload&)> callback)
@@ -84,20 +84,20 @@ void VirtualCameraManager::prepareUploads(
     checker->prepareUploads(filePaths, state(camera).periods());
 }
 
-void VirtualCameraManager::updateState(const QnSecurityCamResourcePtr& camera)
+void VirtualCameraManager::updateState(const QnVirtualCameraResourcePtr& camera)
 {
     if(VirtualCameraWorker* worker = cameraWorker(camera))
         worker->updateState();
 }
 
-bool VirtualCameraManager::addUpload(const QnSecurityCamResourcePtr& camera, const VirtualCameraPayloadList& payloads)
+bool VirtualCameraManager::addUpload(const QnVirtualCameraResourcePtr& camera, const VirtualCameraPayloadList& payloads)
 {
     if (VirtualCameraWorker* worker = cameraWorker(camera))
         return worker->addUpload(payloads);
     return true; //< Just ignore it silently.
 }
 
-void VirtualCameraManager::cancelUploads(const QnSecurityCamResourcePtr& camera)
+void VirtualCameraManager::cancelUploads(const QnVirtualCameraResourcePtr& camera)
 {
     nx::Uuid cameraId = camera->getId();
 
@@ -112,7 +112,7 @@ void VirtualCameraManager::cancelAllUploads()
     dropAllWorkers();
 }
 
-VirtualCameraWorker* VirtualCameraManager::cameraWorker(const QnSecurityCamResourcePtr& camera)
+VirtualCameraWorker* VirtualCameraManager::cameraWorker(const QnVirtualCameraResourcePtr& camera)
 {
     NX_ASSERT(d->currentUser);
 

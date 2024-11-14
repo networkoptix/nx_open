@@ -744,7 +744,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
         status = Unknown;
     }
-    else if (const auto camera = resource.dynamicCast<QnSecurityCamResource>())
+    else if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         const auto isBuggy = getResourceExtraStatus(camera).testFlag(ResourceExtraStatusFlag::buggy);
         if (status == Online && (camera->needsToChangeDefaultPassword() || isBuggy))

@@ -33,7 +33,7 @@ using Cameras = QnVirtualCameraResourceList;
 using Rotation = core::Rotation;
 
 using StreamIndex = nx::vms::api::StreamIndex;
-using MotionStreamIndex = QnSecurityCamResource::MotionStreamIndex;
+using MotionStreamIndex = QnVirtualCameraResource::MotionStreamIndex;
 
 enum class PeriodType
 {
@@ -664,7 +664,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             {
                 int maxFps = camera->getMaxFps();
                 if (camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
-                    maxFps = QnSecurityCamResource::kDefaultMaxFps;
+                    maxFps = QnVirtualCameraResource::kDefaultMaxFps;
 
                 setSchedule(nx::vms::common::defaultSchedule(maxFps), {camera});
             }

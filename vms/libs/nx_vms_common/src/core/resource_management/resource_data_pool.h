@@ -15,8 +15,6 @@ class NX_VMS_COMMON_API QnResourceDataPool: public QObject
 {
     Q_OBJECT;
 public:
-    using QnConstSecurityCamResourcePtr = QnSharedResourcePointer<const QnSecurityCamResource>;
-
     QnResourceDataPool(QObject *parent = NULL);
     virtual ~QnResourceDataPool();
 
@@ -24,7 +22,18 @@ public:
      * \param camera                    resource to get data for.
      * \returns                         Resource data for the given camera.
      */
-    QnResourceData data(const QnConstSecurityCamResourcePtr& camera) const;
+    template<typename DeviceType>
+    QnResourceData data(const QnSharedResourcePointer<DeviceType>& camera) const
+    {
+        if (!camera)
+            return QnResourceData();
+
+        if (m_externalSource)
+            return m_externalSource->data(camera);
+
+        return data(camera->getVendor(), camera->getModel(), camera->getFirmware());
+    }
+
     QnResourceData data(
         const QString& _vendor,
         const QString& model,

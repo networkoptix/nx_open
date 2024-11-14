@@ -288,9 +288,9 @@ private:
         const QnMediaResourceWidget* widget,
         bool createIfNotExists = true) const;
 
-    bool hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const;
-    bool hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const;
-    void updateHistoryForCamera(QnSecurityCamResourcePtr camera);
+    bool hasArchiveForCamera(const QnVirtualCameraResourcePtr& camera) const;
+    bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr& camera) const;
+    void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
 
     void updateFootageState();
@@ -372,7 +372,7 @@ private:
     int m_chunkMergingProcessHandle = 0;
     std::array<std::unique_ptr<QnThreadedChunksMergeTool>, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
-    QSet<QnSecurityCamResourcePtr> m_updateHistoryQueue;
+    QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 
     /** Sync is forced for the current set of widgets. */
     bool m_syncIsForced = false;

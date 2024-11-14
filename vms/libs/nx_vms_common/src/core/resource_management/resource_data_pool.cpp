@@ -88,16 +88,6 @@ QnResourceDataPool::~QnResourceDataPool()
 {
 }
 
-QnResourceData QnResourceDataPool::data(const QnConstSecurityCamResourcePtr& camera) const
-{
-    if (m_externalSource)
-        return m_externalSource->data(camera);
-
-    if (!camera)
-        return QnResourceData();
-    return data(camera->getVendor(), camera->getModel(), camera->getFirmware());
-}
-
 QnResourceData QnResourceDataPool::data(
     const QString& vendor,
     const QString& model,

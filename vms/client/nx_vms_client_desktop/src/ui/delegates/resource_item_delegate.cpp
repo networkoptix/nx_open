@@ -717,7 +717,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
         if (resource->hasFlags(Qn::virtual_camera))
         {
-            QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+            QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
             auto systemContext = SystemContext::fromResource(camera);
 
             VirtualCameraState state = systemContext->virtualCameraManager()->state(camera);

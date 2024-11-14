@@ -999,7 +999,7 @@ ActionVisibility PreviewCondition::check(const Parameters& parameters, WindowCon
     if (resource->hasFlags(Qn::still_image))
         return InvisibleAction;
 
-    if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
+    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         if (camera->isDtsBased())
             return InvisibleAction;

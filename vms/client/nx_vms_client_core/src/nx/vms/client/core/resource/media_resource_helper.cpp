@@ -71,11 +71,11 @@ MediaPlayer::VideoQuality MediaResourceHelper::livePreviewVideoQuality() const
                 && size.height() < kMaximalSize.height();
         };
 
-    if (isLowNativeStream(d->camera->streamInfo(QnSecurityCamResource::StreamIndex::secondary)))
+    if (isLowNativeStream(d->camera->streamInfo(QnVirtualCameraResource::StreamIndex::secondary)))
         return nx::media::Player::LowVideoQuality;
 
     // Checks if primary stream is low quality one.
-    return isLowNativeStream(d->camera->streamInfo(QnSecurityCamResource::StreamIndex::primary))
+    return isLowNativeStream(d->camera->streamInfo(QnVirtualCameraResource::StreamIndex::primary))
         ? nx::media::Player::HighVideoQuality
         : nx::media::Player::LowIframesOnlyVideoQuality;
 }

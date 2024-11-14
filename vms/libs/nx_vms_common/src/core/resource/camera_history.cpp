@@ -76,7 +76,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(
                     .arg(resource->getName())
                     .arg(nx::utils::url::hidePassword(resource->getUrl())));
 
-            QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
+            QnVirtualCameraResourcePtr cam = resource.dynamicCast<QnVirtualCameraResource>();
             if (cam)
                 checkCameraHistoryDelayed(cam);
 
@@ -94,7 +94,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(
             }
 
             for (const auto &cameraId: cameras)
-                if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+                if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
                     emit cameraFootageChanged(camera);
         });
 }
@@ -104,7 +104,7 @@ void QnCameraHistoryPool::setHistoryCheckDelay(int value)
     m_historyCheckDelay = value;
 }
 
-void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam)
+void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam)
 {
     /*
     * When camera goes to a recording state it's expected that current history server is the same as parentID.
@@ -135,7 +135,7 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
 
             m_camerasToCheck.remove(id);
 
-            auto cam = resourcePool()->getResourceById<QnSecurityCamResource>(id);
+            auto cam = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
             if (!cam)
                 return;
 
@@ -204,7 +204,7 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
 
 QnCameraHistoryPool::~QnCameraHistoryPool() {}
 
-bool QnCameraHistoryPool::isCameraHistoryValid(const QnSecurityCamResourcePtr& camera) const
+bool QnCameraHistoryPool::isCameraHistoryValid(const QnVirtualCameraResourcePtr& camera) const
 {
     if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
         return false;
@@ -243,12 +243,12 @@ void QnCameraHistoryPool::invalidateCameraHistory(const nx::Uuid &cameraId) {
     }
 
     if (notify)
-        if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryInvalidated(camera);
 }
 
 QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     callbackFunction callback)
 {
     if (!NX_ASSERT(camera))
@@ -373,7 +373,7 @@ void QnCameraHistoryPool::at_cameraPrepared(
         callback(success);
 
     for (const nx::Uuid &cameraId: loadedCamerasIds)
-        if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryChanged(camera);
 }
 
@@ -402,7 +402,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageDataUnsafe(const 
     return result;
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnSecurityCamResourcePtr &camera
+QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnVirtualCameraResourcePtr &camera
     , bool filterOnlineServers) const
 {
     NX_ASSERT(!camera.isNull(), "Camera resource is null!");
@@ -416,7 +416,7 @@ QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnSecurit
     return result;
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnSecurityCamResourcePtr &camera, bool filterOnlineServers) const
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, bool filterOnlineServers) const
 {
     NX_ASSERT(!camera.isNull(), "Camera resource is null!");
     if (camera.isNull())
@@ -428,7 +428,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnSecu
         return getCameraFootageData(camera->getId(), filterOnlineServers);
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnSecurityCamResourcePtr &camera, const QnTimePeriod& timePeriod) const
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const
 {
     NX_ASSERT(!camera.isNull(), "Camera resource is null!");
     if (camera.isNull())
@@ -476,9 +476,9 @@ nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers
     return result;
 }
 
-QnSecurityCamResourcePtr QnCameraHistoryPool::toCamera(const nx::Uuid& guid) const
+QnVirtualCameraResourcePtr QnCameraHistoryPool::toCamera(const nx::Uuid& guid) const
 {
-    return resourcePool()->getResourceById<QnSecurityCamResource>(guid);
+    return resourcePool()->getResourceById<QnVirtualCameraResource>(guid);
 }
 
 QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const nx::Uuid& guid) const
@@ -486,7 +486,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const nx::Uuid& guid
     return resourcePool()->getResourceById<QnMediaServerResource>(guid);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnSecurityCamResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const
 {
     NX_ASSERT(!camera.isNull(), "Camera resource is null!");
     if (camera.isNull())
@@ -515,7 +515,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnSecur
     return result;
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTimeSync(const QnSecurityCamResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTimeSync(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
 {
     NX_ASSERT(!camera.isNull(), "Camera resource is null!");
     if (camera.isNull())
@@ -525,7 +525,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTimeSync(const QnS
     return getMediaServerOnTime(camera, timestampMs, foundPeriod);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(const QnSecurityCamResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const
+QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const
 {
     NX_ASSERT(!camera.isNull(), "Camera resource is null!");
     if (camera.isNull())
@@ -582,7 +582,7 @@ bool QnCameraHistoryPool::isValidHistoryDetails(
     const nx::Uuid& cameraId,
     const nx::vms::api::CameraHistoryItemDataList& historyDetails) const
 {
-    QnSecurityCamResourcePtr camera = toCamera(cameraId);
+    QnVirtualCameraResourcePtr camera = toCamera(cameraId);
     if (!camera || camera->getStatus() != nx::vms::api::ResourceStatus::recording)
         return true; //< nothing to check if no camera or not int recording state
 
@@ -618,7 +618,7 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
     m_historyValidCameras.insert(cameraId);
 
     lock.unlock();
-    if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+    if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
         emit cameraHistoryChanged(camera);
     return true;
 }
@@ -671,7 +671,7 @@ void QnCameraHistoryPool::setServerFootageData(
     for (const auto& cameraId: cameras)
     {
         invalidateCameraHistory(cameraId);
-        if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
             emit cameraFootageChanged(camera);
     }
 }
@@ -688,10 +688,10 @@ QSet<nx::Uuid> QnCameraHistoryPool::getServerFootageData(const nx::Uuid& serverG
     return m_archivedCamerasByServer.value(serverGuid);
 }
 
-QnSecurityCamResourceList QnCameraHistoryPool::getServerFootageCameras(
+QnVirtualCameraResourceList QnCameraHistoryPool::getServerFootageCameras(
     const QnMediaServerResourcePtr& server) const
 {
-    QnSecurityCamResourceList result;
+    QnVirtualCameraResourceList result;
     if (!server)
         return result;
 
@@ -704,7 +704,7 @@ QnSecurityCamResourceList QnCameraHistoryPool::getServerFootageCameras(
     return result;
 }
 
-bool QnCameraHistoryPool::updateCameraHistorySync(const QnSecurityCamResourcePtr& camera)
+bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera)
         return true;

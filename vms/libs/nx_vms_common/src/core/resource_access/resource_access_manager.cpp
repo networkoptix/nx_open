@@ -746,7 +746,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 [&]()
                 {
                     const auto camera =
-                        resourcePool()->getResourceById<QnSecurityCamResource>(ownerId);
+                        resourcePool()->getResourceById<QnVirtualCameraResource>(ownerId);
                     return camera && camera->isIntercom();
                 }();
 

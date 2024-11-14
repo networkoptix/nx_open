@@ -293,7 +293,7 @@ QVariant ResourceItem::resourceExtraStatusData() const
                 const auto historyPool = context->cameraHistoryPool();
                 m_connectionsGuard.add(
                     QObject::connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged,
-                        [this, cameraId = camera->getId()](const QnSecurityCamResourcePtr& securityCamera)
+                        [this, cameraId = camera->getId()](const QnVirtualCameraResourcePtr& securityCamera)
                         {
                             if (securityCamera->getId() == cameraId)
                                 discardCache(m_resourceExtraStatusCache, {Qn::ResourceExtraStatusRole});

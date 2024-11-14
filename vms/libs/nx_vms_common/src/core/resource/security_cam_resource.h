@@ -35,6 +35,10 @@ protected:
     using MotionType = nx::vms::api::MotionType;
     using MotionTypes = nx::vms::api::MotionTypes;
 
+    // Use QnVirtualCameraResource instead.
+    QnSecurityCamResource();
+    virtual ~QnSecurityCamResource();
+
 public:
     static constexpr int kDefaultMaxFps = 15;
     static constexpr bool kRemoteArchiveSynchronizationEnabledByDefault = true;
@@ -71,8 +75,6 @@ public:
     };
 
 public:
-    QnSecurityCamResource();
-    virtual ~QnSecurityCamResource();
 
     QnMediaServerResourcePtr getParentServer() const;
 

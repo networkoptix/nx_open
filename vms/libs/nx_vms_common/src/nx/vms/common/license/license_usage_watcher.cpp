@@ -49,9 +49,9 @@ DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(SystemContext* context, QOb
                 &LicenseUsageWatcher::licenseUsageChanged);
             connect(camera.get(), &QnVirtualCameraResource::groupIdChanged, this,
                 &LicenseUsageWatcher::licenseUsageChanged);
-            connect(camera.get(), &QnSecurityCamResource::licenseTypeChanged, this,
+            connect(camera.get(), &QnVirtualCameraResource::licenseTypeChanged, this,
                 &LicenseUsageWatcher::licenseUsageChanged);
-            connect(camera.get(), &QnSecurityCamResource::parentIdChanged, this,
+            connect(camera.get(), &QnVirtualCameraResource::parentIdChanged, this,
                 &LicenseUsageWatcher::licenseUsageChanged);
     };
 

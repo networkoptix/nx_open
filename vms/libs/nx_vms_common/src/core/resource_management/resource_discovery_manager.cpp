@@ -15,7 +15,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_management_ini.h>
@@ -363,7 +362,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             // server does not care about flags
             for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
-                const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
+                const QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(it->data());
                 if (camRes && !isCameraAllowed(searcher->manufacturer(), camRes))
                 {
                     it = lst.erase( it );
@@ -429,7 +428,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     //searching and ignoring auto-discovered cameras already manually added to the resource pool
     for( QnResourceList::iterator it = resources.begin(); it != resources.end(); )
     {
-        const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
+        const QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(it->data());
         if( !camRes || camRes->isManuallyAdded() )
         {
             ++it;
@@ -443,7 +442,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
             // Existing camera resource could has empty url in case of Undo camera replacement. At this case allow
             // to find new camera and change 'manual' flag from true to false.
-            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
+            const QnVirtualCameraResource* existingCamRes = dynamic_cast<QnVirtualCameraResource*>(existingRes.data());
             if( existingCamRes && existingCamRes->isManuallyAdded()
                 && !existingCamRes->getUrl().isEmpty()
                 && camRes->getHostAddress() == existingCamRes->getHostAddress())
@@ -533,14 +532,14 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 }
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(
-    const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
+    const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
 {
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
     return manualCameraInfoUnsafe(camera, auditRecord);
 }
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(
-    const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
+    const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
 {
     const auto resourceTypeId = camera->getTypeId();
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -598,7 +597,7 @@ QSet<QString> QnResourceDiscoveryManager::registerManualCameras(
     return registeredUniqueIds;
 }
 
-bool QnResourceDiscoveryManager::isManuallyAdded(const QnSecurityCamResourcePtr& camera) const
+bool QnResourceDiscoveryManager::isManuallyAdded(const QnVirtualCameraResourcePtr& camera) const
 {
     if (!camera->isManuallyAdded())
         return false;
@@ -699,7 +698,7 @@ QnResourceList QnResourceDiscoveryManager::remapPhysicalIdIfNeed(const QnResourc
 
 bool QnResourceDiscoveryManager::isCameraAllowed(
     const QString& /*driverName*/,
-    const QnSecurityCamResource* /*securityCamResource*/) const
+    const QnVirtualCameraResource* /*securityCamResource*/) const
 {
     return true;
 }

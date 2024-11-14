@@ -4,8 +4,8 @@
 
 #include <stdint.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/utils/log/log.h>
@@ -19,7 +19,7 @@ namespace {
 
 bool isGroupPlayOnly(const QnResourcePtr& resource)
 {
-    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     return camera && camera->isGroupPlayOnly();
 }
 

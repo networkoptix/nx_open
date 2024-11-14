@@ -356,7 +356,7 @@ QnScheduleTaskList calculateRecordingSchedule(const Camera& camera)
     if (schedule.empty())
     {
         if (camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
-            maxFps = QnSecurityCamResource::kDefaultMaxFps;
+            maxFps = QnVirtualCameraResource::kDefaultMaxFps;
 
         schedule = nx::vms::common::defaultSchedule(maxFps);
     }
@@ -517,7 +517,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
 
     {
-        const bool expected = QnSecurityCamResource::kRemoteArchiveSynchronizationEnabledByDefault;
+        const bool expected = QnVirtualCameraResource::kRemoteArchiveSynchronizationEnabledByDefault;
         if (state.expert.remoteArchiveSynchronizationEnabled.valueOr(expected) != expected)
             return false;
     }

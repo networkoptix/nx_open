@@ -125,7 +125,7 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::addDesktopCamera(
 void QnResourcePoolTestHelper::toIntercom(nx::CameraResourceStubPtr camera)
 {
     QnIOPortData intercomFeaturePort;
-    intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
+    intercomFeaturePort.outputName = QnVirtualCameraResource::intercomSpecificPortName();
 
     camera->setProperty(
         ResourcePropertyKey::kIoSettings,

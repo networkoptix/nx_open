@@ -8,8 +8,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource_data.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
@@ -162,7 +162,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
     }
     q->connect(baseController.get(), &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
     QnResourceData resourceData = controller->resource()->systemContext()->resourceDataPool()
-        ->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
+        ->data(baseController->resource().dynamicCast<QnVirtualCameraResource>());
     tourGetPosWorkaround = resourceData.value<bool>("tourGetPosWorkaround", false);
 }
 

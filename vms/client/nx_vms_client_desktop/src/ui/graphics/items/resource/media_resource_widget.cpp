@@ -306,7 +306,7 @@ T* findPtzController(QnPtzControllerPtr controller)
     return nullptr;
 }
 
-bool hasArchive(const QnSecurityCamResourcePtr& camera)
+bool hasArchive(const QnVirtualCameraResourcePtr& camera)
 {
     auto systemContext = SystemContext::fromResource(camera);
     if (!NX_ASSERT(systemContext))
@@ -619,7 +619,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     if (d->camera)
     {
         connect(d->camera.get(),
-            &QnSecurityCamResource::audioEnabledChanged,
+            &QnVirtualCameraResource::audioEnabledChanged,
             this,
             updateButtonsAndAudioPlaybackState);
     }
@@ -2647,7 +2647,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (!NX_ASSERT(d->camera) || !d->camera->isScheduleEnabled())
             return Qn::IoModuleDisabledOverlay;
 
-        const auto hasArchive = [this](const QnSecurityCamResourcePtr& camera)
+        const auto hasArchive = [this](const QnVirtualCameraResourcePtr& camera)
         {
             auto systemContext = SystemContext::fromResource(camera);
             if (!NX_ASSERT(systemContext))

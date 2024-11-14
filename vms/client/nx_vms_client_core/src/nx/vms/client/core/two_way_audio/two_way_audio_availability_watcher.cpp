@@ -153,7 +153,7 @@ void TwoWayAudioAvailabilityWatcher::setCamera(const QnVirtualCameraResourcePtr&
             connect(d->sourceCamera.get(), &QnVirtualCameraResource::statusChanged,
                 this, updateAvailability));
         d->sourceConnections.add(
-            connect(d->sourceCamera.get(), &QnSecurityCamResource::twoWayAudioEnabledChanged,
+            connect(d->sourceCamera.get(), &QnVirtualCameraResource::twoWayAudioEnabledChanged,
                 this, updateAvailability));
         d->sourceConnections.add(
             connect(d->sourceCamera.get(), &QnVirtualCameraResource::audioOutputDeviceIdChanged,

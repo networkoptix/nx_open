@@ -1667,7 +1667,7 @@ void PtzInstrument::updateExternalPtzSpeed()
     const auto rotation = target()->item()->rotation()
         + (target()->item()->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
 
-    const auto camera = target()->resource().dynamicCast<QnSecurityCamResource>();
+    const auto camera = target()->resource().dynamicCast<QnVirtualCameraResource>();
     const QPointF cameraSensitivity = camera ? camera->ptzPanTiltSensitivity() : QPointF();
     const QVector3D sensitivityVector(cameraSensitivity.x(), cameraSensitivity.y(), 1);
     const auto speed = applyRotation(

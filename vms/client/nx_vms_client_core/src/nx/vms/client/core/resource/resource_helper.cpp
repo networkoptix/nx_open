@@ -52,16 +52,16 @@ void ResourceHelper::setResource(const QnResourcePtr& value)
         }
     }
 
-    if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+    if (const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
     {
-        m_connections << connect(camera.get(), &QnSecurityCamResource::capabilitiesChanged, this,
+        m_connections << connect(camera.get(), &QnVirtualCameraResource::capabilitiesChanged, this,
             [this]()
             {
                 emit defaultCameraPasswordChanged();
                 emit oldCameraFirmwareChanged();
             });
 
-        m_connections << connect(camera.get(), &QnSecurityCamResource::propertyChanged, this,
+        m_connections << connect(camera.get(), &QnVirtualCameraResource::propertyChanged, this,
             [this](
                 const QnResourcePtr& /*resource*/,
                 const QString& key,
@@ -117,7 +117,7 @@ QnResourcePtr ResourceHelper::resource() const
 static bool hasCameraCapability(
     const QnResourcePtr& resource, nx::vms::api::DeviceCapability capability)
 {
-    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     return camera && camera->hasCameraCapabilities(capability);
 }
 
@@ -133,19 +133,19 @@ bool ResourceHelper::hasOldCameraFirmware() const
 
 bool ResourceHelper::audioSupported() const
 {
-    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
     return camera && (camera->isAudioSupported() || !camera->audioInputDeviceId().isNull());
 }
 
 bool ResourceHelper::isIoModule() const
 {
-    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
     return camera && camera->isIOModule();
 }
 
 bool ResourceHelper::isVideoCamera() const
 {
-    const auto camera = m_resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
     return camera && camera->hasVideo();
 }
 

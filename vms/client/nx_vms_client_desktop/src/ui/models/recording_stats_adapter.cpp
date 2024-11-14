@@ -18,13 +18,13 @@ class Translate
 };
 
 // Only own cameras are included in storage analytics. Others are summed to foreign.
-bool isOwnCamera(const QnSecurityCamResourcePtr& resource, const QnMediaServerResourcePtr& server)
+bool isOwnCamera(const QnVirtualCameraResourcePtr& resource, const QnMediaServerResourcePtr& server)
 {
     return resource && resource->getParentId() == server->getId();
 }
 
 // Only active cameras are included in forecast.
-bool isActive(const QnSecurityCamResourcePtr& resource, const QnCamRecordingStatsData& stats)
+bool isActive(const QnVirtualCameraResourcePtr& resource, const QnCamRecordingStatsData& stats)
 {
     return resource && resource->isScheduleEnabled() && resource->isOnline()
         && stats.archiveDurationSecs > 0 && stats.recordedBytes > 0;
@@ -138,7 +138,7 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
     for (const auto& cameraStats: stats)
     {
         const auto& cameraResource =
-            resourcePool->getResourceByPhysicalId<QnSecurityCamResource>(cameraStats.physicalId);
+            resourcePool->getResourceByPhysicalId<QnVirtualCameraResource>(cameraStats.physicalId);
 
         if (isActive(cameraResource, cameraStats) && isOwnCamera(cameraResource, server))
         {

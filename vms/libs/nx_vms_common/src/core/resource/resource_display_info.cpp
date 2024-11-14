@@ -119,7 +119,7 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
         m_name = m_resource->getName();
         if (m_resource->hasFlags(Qn::live_cam)) /* Quick check */
         {
-            if (const auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+            if (const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
                 m_name = camera->getUserDefinedName();
         }
 

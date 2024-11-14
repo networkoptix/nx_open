@@ -387,7 +387,7 @@ QVariant ResourceTreeModelAdapter::data(const QModelIndex& index, int role) cons
 
             if (resourceFlags.testFlag(Qn::virtual_camera))
             {
-                const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+                const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
                 auto systemContext = SystemContext::fromResource(camera);
                 const auto state = systemContext->virtualCameraManager()->state(camera);
                 if (state.isRunning())

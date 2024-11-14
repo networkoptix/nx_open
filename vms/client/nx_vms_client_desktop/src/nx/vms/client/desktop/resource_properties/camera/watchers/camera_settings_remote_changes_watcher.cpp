@@ -36,17 +36,17 @@ public:
                 this, &Private::handleStatusChanged);
 
             connections << connect(camera.get(),
-                &QnSecurityCamResource::disableDualStreamingChanged,
+                &QnVirtualCameraResource::disableDualStreamingChanged,
                 this,
                 &Private::handleDualStreamingChanged);
 
             connections << connect(camera.get(),
-                &QnSecurityCamResource::motionTypeChanged,
+                &QnVirtualCameraResource::motionTypeChanged,
                 this,
                 &Private::handleMotionTypeChanged);
 
             connections << connect(camera.get(),
-                &QnSecurityCamResource::motionRegionChanged,
+                &QnVirtualCameraResource::motionRegionChanged,
                 this,
                 &Private::handleMotionRegionsChanged);
 
@@ -56,7 +56,7 @@ public:
                 &Private::handleCompatibleObjectTypesMaybeChanged);
 
             connections << connect(camera.get(),
-                &QnSecurityCamResource::audioEnabledChanged,
+                &QnVirtualCameraResource::audioEnabledChanged,
                 this,
                 &Private::handleAudioEnabledChanged);
         }

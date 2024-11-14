@@ -4,9 +4,9 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/authutil.h>
 #include <network/router.h>
@@ -74,7 +74,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     QnMediaServerResourcePtr server;
-    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera)
     {
         QnResourcePtr parent = resource->getParentResource();

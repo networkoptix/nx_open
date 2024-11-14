@@ -109,9 +109,9 @@ public:
 
     /** Returns number of cameras that were successfully added. */
     QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
-    bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
+    bool isManuallyAdded(const QnVirtualCameraResourcePtr& camera) const;
     QnManualCameraInfo manualCameraInfo(
-        const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
+        const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
 
     ResourceSearcherList plugins() const;
 
@@ -132,7 +132,7 @@ public slots:
 protected:
     virtual void run() override;
     QnManualCameraInfo manualCameraInfoUnsafe(
-        const QnSecurityCamResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
+        const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
 
 signals:
     void localSearchDone();
@@ -181,7 +181,7 @@ protected:
      */
     virtual bool isCameraAllowed(
         const QString& driverName,
-        const QnSecurityCamResource* securityCamResource) const;
+        const QnVirtualCameraResource* securityCamResource) const;
 
 protected:
     QThreadPool m_threadPool;

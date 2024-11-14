@@ -5,7 +5,7 @@
 #include <chrono>
 
 #include <core/resource/camera_bookmark.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -33,7 +33,7 @@ namespace nx::vms::common {
 
 QnCameraBookmark bookmarkFromAction(
     const vms::event::AbstractActionPtr& action,
-    const QnSecurityCamResourcePtr& camera)
+    const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera || !camera->systemContext())
     {

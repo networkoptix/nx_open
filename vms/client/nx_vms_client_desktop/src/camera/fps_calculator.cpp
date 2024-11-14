@@ -20,7 +20,7 @@ void calculateMaxFps(
     {
         int cameraFps = camera->getStatus() != nx::vms::api::ResourceStatus::unauthorized
             ? camera->getMaxFps()
-            : QnSecurityCamResource::kDefaultMaxFps;
+            : QnVirtualCameraResource::kDefaultMaxFps;
 
         if (camera->hasDualStreaming())
             cameraFps -= camera->reservedSecondStreamFps();

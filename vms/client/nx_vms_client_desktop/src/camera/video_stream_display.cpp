@@ -14,8 +14,8 @@ extern "C" {
 
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
+#include <core/resource/media_resource.h>
 #include <core/resource/resource_property_key.h>
-#include <core/resource/security_cam_resource.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/media/ffmpeg/hw_video_decoder_old_player.h>

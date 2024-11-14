@@ -52,7 +52,7 @@ static const int kInterleavedRtpOverTcpPrefixLength = 4;
 QString getConfiguredVideoLayout(const QnResourcePtr& resource)
 {
     QString configuredLayout;
-    auto secResource = resource.dynamicCast<QnSecurityCamResource>();
+    auto secResource = resource.dynamicCast<QnVirtualCameraResource>();
     if (secResource)
     {
         configuredLayout = secResource->resourceData().value<QString>(
@@ -69,7 +69,7 @@ QString getConfiguredVideoLayout(const QnResourcePtr& resource)
 
 bool isEmptyMediaAllowed(const QnResourcePtr& res)
 {
-    if (const auto camera = res.dynamicCast<QnSecurityCamResource>())
+    if (const auto camera = res.dynamicCast<QnVirtualCameraResource>())
     {
         using namespace nx::vms::api;
         const auto deviceType = camera->deviceType();

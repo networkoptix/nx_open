@@ -301,7 +301,7 @@ public:
     QnResourcePtr getResourceById(const nx::Uuid& id) const;
 
     // Shared id is groupId for multichannel resources and physicalId for single channel resources.
-    QnSecurityCamResourceList getResourcesBySharedId(const QString& sharedId) const;
+    QnVirtualCameraResourceList getResourcesBySharedId(const QString& sharedId) const;
 
     /**
      * Returns resource list by logicalId. logicaId is a some camera tag used for integration

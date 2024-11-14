@@ -13,7 +13,7 @@ namespace nx::vms::common {
 
 NX_VMS_COMMON_API QnCameraBookmark bookmarkFromAction(
     const nx::vms::event::AbstractActionPtr& action,
-    const QnSecurityCamResourcePtr& camera);
+    const QnVirtualCameraResourcePtr& camera);
 
 NX_VMS_COMMON_API QnCameraBookmarkList bookmarksAtPosition(
     const QnCameraBookmarkList& bookmarks,

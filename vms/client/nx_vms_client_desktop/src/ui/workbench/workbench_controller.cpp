@@ -20,7 +20,6 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_directory_browser.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>

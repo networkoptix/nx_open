@@ -87,7 +87,7 @@ protected:
         bool asOnServerSide = true) const
     {
         QnIOPortData intercomFeaturePort;
-        intercomFeaturePort.outputName = QnSecurityCamResource::intercomSpecificPortName();
+        intercomFeaturePort.outputName = QnVirtualCameraResource::intercomSpecificPortName();
 
         if (asOnServerSide)
         {

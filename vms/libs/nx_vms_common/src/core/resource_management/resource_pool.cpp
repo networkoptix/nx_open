@@ -298,10 +298,10 @@ QnResourcePtr QnResourcePool::getResourceById(const nx::Uuid& id) const
     return m_resources.value(id, QnResourcePtr());
 }
 
-QnSecurityCamResourceList QnResourcePool::getResourcesBySharedId(const QString& sharedId) const
+QnVirtualCameraResourceList QnResourcePool::getResourcesBySharedId(const QString& sharedId) const
 {
-    return getResources<QnSecurityCamResource>(
-        [&sharedId](const QnSecurityCamResourcePtr& camera)
+    return getResources<QnVirtualCameraResource>(
+        [&sharedId](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->getSharedId() == sharedId;
         });

@@ -27,19 +27,19 @@ public:
     void setCurrentUser(const QnUserResourcePtr& user);
     const QnUserResourcePtr& currentUser() const;
 
-    VirtualCameraState state(const QnSecurityCamResourcePtr& camera);
+    VirtualCameraState state(const QnVirtualCameraResourcePtr& camera);
     QList<VirtualCameraState> runningUploads();
 
     void prepareUploads(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QStringList& filePaths,
         QObject* target,
         std::function<void(const VirtualCameraUpload&)> callback);
 
-    void updateState(const QnSecurityCamResourcePtr& camera);
+    void updateState(const QnVirtualCameraResourcePtr& camera);
 
-    bool addUpload(const QnSecurityCamResourcePtr& camera, const VirtualCameraPayloadList& payloads);
-    void cancelUploads(const QnSecurityCamResourcePtr& camera);
+    bool addUpload(const QnVirtualCameraResourcePtr& camera, const VirtualCameraPayloadList& payloads);
+    void cancelUploads(const QnVirtualCameraResourcePtr& camera);
     void cancelAllUploads();
 
 signals:
@@ -47,7 +47,7 @@ signals:
     void error(const VirtualCameraState& state, const QString& errorMessage);
 
 private:
-    VirtualCameraWorker* cameraWorker(const QnSecurityCamResourcePtr& camera);
+    VirtualCameraWorker* cameraWorker(const QnVirtualCameraResourcePtr& camera);
     void dropWorker(const QnResourcePtr& resource);
     void dropAllWorkers();
 

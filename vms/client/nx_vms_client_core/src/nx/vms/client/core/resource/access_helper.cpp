@@ -5,8 +5,8 @@
 #include <QtQml/QtQml>
 
 #include <common/common_globals.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/access/access_controller.h>
@@ -155,7 +155,7 @@ bool AccessHelper::canUseDeviceIO() const
 
 bool AccessHelper::passwordRequired() const
 {
-    const auto camera = d->resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = d->resource.dynamicCast<QnVirtualCameraResource>();
     return camera && camera->needsToChangeDefaultPassword();
 }
 

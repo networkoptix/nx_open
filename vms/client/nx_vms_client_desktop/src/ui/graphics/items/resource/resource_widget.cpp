@@ -16,8 +16,8 @@
 #include <api/runtime_info_manager.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
+#include <core/resource/media_resource.h>
 #include <core/resource/resource_media_layout.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>

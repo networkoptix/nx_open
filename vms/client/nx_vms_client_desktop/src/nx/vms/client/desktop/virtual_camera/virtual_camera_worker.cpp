@@ -6,8 +6,8 @@
 
 #include <api/model/virtual_camera_status_reply.h>
 #include <api/server_rest_connection.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
@@ -37,13 +37,13 @@ const qint64 kConsumePollPeriodMSec = 1000;
 
 struct VirtualCameraWorker::Private
 {
-    Private(const QnSecurityCamResourcePtr& camera):
+    Private(const QnVirtualCameraResourcePtr& camera):
         camera(camera)
     {
         state.cameraId = camera->getId();
     }
 
-    QnSecurityCamResourcePtr camera;
+    QnVirtualCameraResourcePtr camera;
     QnUserResourcePtr user;
 
     VirtualCameraState state;
@@ -54,7 +54,7 @@ struct VirtualCameraWorker::Private
 };
 
 VirtualCameraWorker::VirtualCameraWorker(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QnUserResourcePtr& user,
     QObject* parent)
     :

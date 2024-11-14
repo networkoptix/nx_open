@@ -34,7 +34,7 @@ NX_DECLARE_COLORIZED_ICON(kArchiveIcon, "16x16/Solid/archive.svg", kArchiveTheme
 NX_DECLARE_COLORIZED_ICON(kNotRecordingIcon, "16x16/Solid/notrecordingnow.svg", kRecordingTheme)
 NX_DECLARE_COLORIZED_ICON(kRecordingIcon, "16x16/Solid/recordingnow.svg", kRecordingTheme)
 
-bool hasArchive(const QnSecurityCamResourcePtr& camera)
+bool hasArchive(const QnVirtualCameraResourcePtr& camera)
 {
     auto systemContext = SystemContext::fromResource(camera);
     if (!NX_ASSERT(systemContext))

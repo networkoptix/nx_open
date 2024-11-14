@@ -8,7 +8,6 @@
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <media/filters/h264_mp4_to_annexb.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>

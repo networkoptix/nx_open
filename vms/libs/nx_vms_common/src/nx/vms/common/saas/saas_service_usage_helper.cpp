@@ -559,7 +559,7 @@ LicenseSummaryData LiveViewUsageHelper::info() const
     systemContext()->resourcePool()->getResources(
         [&result](const QnResourcePtr& resource)
         {
-            auto camera = resource.dynamicCast<QnSecurityCamResource>();
+            auto camera = resource.dynamicCast<QnVirtualCameraResource>();
             if (camera && !camera->hasFlags(Qn::desktop_camera)
                 && !camera->isScheduleEnabled() && camera->isOnline())
             {

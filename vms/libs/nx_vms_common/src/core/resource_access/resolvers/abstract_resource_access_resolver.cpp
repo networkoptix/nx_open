@@ -60,7 +60,7 @@ AccessRights AbstractResourceAccessResolver::accessRights(
     if (resource->hasFlags(Qn::desktop_camera))
         return accessMap.value(resource->getId());
 
-    if (const auto camera = resource.objectCast<QnSecurityCamResource>())
+    if (const auto camera = resource.objectCast<QnVirtualCameraResource>())
         return accessMap.value(camera->getId()) | accessMap.value(kAllDevicesGroupId);
 
     if (const auto layout = resource.objectCast<QnLayoutResource>())

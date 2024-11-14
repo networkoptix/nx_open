@@ -250,10 +250,11 @@ void IntercomLayoutAccessResolver::Private::handleResourcesAdded(const QnResourc
         }
         else
         {
-            connect(camera.get(), &QnSecurityCamResource::ioPortDescriptionsChanged, this,
-                [this](const QnSecurityCamResourcePtr& securityCamera)
+            connect(camera.get(), &QnVirtualCameraResource::ioPortDescriptionsChanged, this,
+                [this](const auto& securityCamera)
                 {
-                    const auto camera = securityCamera.objectCast<QnVirtualCameraResource>();
+                    // TODO: #skolesnik Remove objectCast when `QnVirtualCameraResource` is used.
+                    const auto camera = securityCamera.template objectCast<QnVirtualCameraResource>();
                     if (camera->isIntercom() && !allIntercoms.contains(camera))
                     {
                         handleIntercomsAdded({camera});

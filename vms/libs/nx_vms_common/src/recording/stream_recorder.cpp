@@ -5,9 +5,9 @@
 #include <analytics/common/object_metadata.h>
 #include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <export/sign_helper.h>
 #include <nx/media/abstract_data_packet.h>
 #include <nx/media/config.h>
@@ -218,7 +218,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
 bool QnStreamRecorder::isAudioRecorded() const
 {
-    if (auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
+    if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
         return camera->isAudioRecorded();
     return true;
 }

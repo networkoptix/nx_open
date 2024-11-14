@@ -122,7 +122,7 @@ QnArchiveStreamReader* getReader(QnResourceWidget* widget)
 
 bool resourceIsVmax(const QnMediaResourcePtr& resource)
 {
-    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     return camera && camera->isDtsBased() && camera->licenseType() == Qn::LC_VMAX;
 }
 
@@ -176,7 +176,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(WindowContext* context):
     connect(system()->resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource)
         {
-            auto cam = resource.dynamicCast<QnSecurityCamResource>();
+            auto cam = resource.dynamicCast<QnVirtualCameraResource>();
             if (!m_syncedResources.contains(cam))
                 return;
 
@@ -187,7 +187,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(WindowContext* context):
         });
 
     connect(system()->cameraHistoryPool(), &QnCameraHistoryPool::cameraHistoryInvalidated, this,
-        [this](const QnSecurityCamResourcePtr &camera)
+        [this](const QnVirtualCameraResourcePtr &camera)
         {
             if (hasWidgetWithCamera(camera))
                 updateHistoryForCamera(camera);
@@ -229,8 +229,8 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(WindowContext* context):
     updateCameraHistoryTimer->setSingleShot(false);
     connect(updateCameraHistoryTimer, &QTimer::timeout, this, [this]
     {
-        QSet<QnSecurityCamResourcePtr> localQueue = m_updateHistoryQueue;
-        for (const QnSecurityCamResourcePtr &camera : localQueue)
+        QSet<QnVirtualCameraResourcePtr> localQueue = m_updateHistoryQueue;
+        for (const QnVirtualCameraResourcePtr &camera : localQueue)
             if (hasWidgetWithCamera(camera))
                 updateHistoryForCamera(camera);
         m_updateHistoryQueue.clear();
@@ -389,7 +389,7 @@ void QnWorkbenchNavigator::initialize()
         this, &QnWorkbenchNavigator::updateSliderOptions);
 
     connect(system()->cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this,
-        [this](const QnSecurityCamResourcePtr & /* camera */)
+        [this](const QnVirtualCameraResourcePtr & /* camera */)
         {
             updateFootageState();
         });
@@ -710,7 +710,7 @@ void QnWorkbenchNavigator::updateHasArchive()
     const bool newValue = std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
         [this](const QnMediaResourcePtr& resource)
         {
-            return hasArchiveForCamera(resource.dynamicCast<QnSecurityCamResource>());
+            return hasArchiveForCamera(resource.dynamicCast<QnVirtualCameraResource>());
         });
 
     if (m_hasArchive == newValue)
@@ -726,7 +726,7 @@ void QnWorkbenchNavigator::updateIsRecording(bool forceOn)
         std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
             [](const QnMediaResourcePtr& resource)
             {
-                auto camera = resource.dynamicCast<QnSecurityCamResource>();
+                auto camera = resource.dynamicCast<QnVirtualCameraResource>();
                 if (!camera)
                     return false;
 
@@ -835,7 +835,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         updateSyncedPeriods();
 
     if (!widget->isZoomWindow())
-        updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
+        updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
 
     updateLines();
     updateSyncIsForced();
@@ -1460,7 +1460,7 @@ QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::calculateResourceWidgetF
 {
     WidgetFlags result;
 
-    if (resource.dynamicCast<QnSecurityCamResource>())
+    if (resource.dynamicCast<QnVirtualCameraResource>())
         result |= WidgetSupportsLive | WidgetSupportsPeriods;
 
     if (resource->hasFlags(Qn::periods))
@@ -2345,7 +2345,7 @@ void QnWorkbenchNavigator::updateSyncIsForced()
     const auto syncIsForced = std::count_if(widgets.cbegin(), widgets.cend(),
         [](QnMediaResourceWidget* w)
         {
-            const auto camera = w->resource().dynamicCast<QnSecurityCamResource>();
+            const auto camera = w->resource().dynamicCast<QnVirtualCameraResource>();
             return camera && camera->isDtsBased();
         }) > 1;
 
@@ -2589,7 +2589,7 @@ core::CachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(
     return systemContext->cameraDataManager()->loader(widget->resource(), createIfNotExists);
 }
 
-bool QnWorkbenchNavigator::hasArchiveForCamera(const QnSecurityCamResourcePtr& camera) const
+bool QnWorkbenchNavigator::hasArchiveForCamera(const QnVirtualCameraResourcePtr& camera) const
 {
     if (!camera)
         return false;
@@ -2965,7 +2965,7 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased()
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, m_lastAdjustTimelineToPosition);
 }
 
-bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr& camera) const
+bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr& camera) const
 {
     return std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
         [cameraId = camera->getId()](const QnMediaResourcePtr& resource)
@@ -2974,7 +2974,7 @@ bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnSecurityCamResourcePtr& c
         });
 }
 
-void QnWorkbenchNavigator::updateHistoryForCamera(QnSecurityCamResourcePtr camera)
+void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr camera)
 {
     // Silently retry loading for cameras which context is not ready yet.
     if (!camera || (camera->hasFlags(Qn::cross_system) && camera->hasFlags(Qn::fake)))

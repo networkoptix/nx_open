@@ -23,7 +23,7 @@ class VirtualCameraPreparer:
     using base_type = QObject;
 
 public:
-    VirtualCameraPreparer(const QnSecurityCamResourcePtr& camera, QObject* parent = nullptr);
+    VirtualCameraPreparer(const QnVirtualCameraResourcePtr& camera, QObject* parent = nullptr);
     virtual ~VirtualCameraPreparer() override;
 
     void prepareUploads(const QStringList& filePaths, const QnTimePeriodList& queue);

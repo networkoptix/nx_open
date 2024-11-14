@@ -16,7 +16,7 @@ class NX_VMS_CLIENT_CORE_API IOModuleMonitor: public QObject
     using base_type = QObject;
 
 public:
-    IOModuleMonitor(const QnSecurityCamResourcePtr &camera, QObject* parent = nullptr);
+    IOModuleMonitor(const QnVirtualCameraResourcePtr &camera, QObject* parent = nullptr);
     virtual ~IOModuleMonitor() override;
 
     bool open();
