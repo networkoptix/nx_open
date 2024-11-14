@@ -1786,7 +1786,7 @@
     </message>
     <message>
       <source>Language</source>
-      <translation>言語</translation>
+      <translation>言語 / Language</translation>
     </message>
     <message>
       <source>Time Mode</source>
