@@ -187,7 +187,7 @@ Page
 
                     return pushManager.hasOsPermission
                         ? ""
-                        : qsTr("Push notifications are turned off in site settings")
+                        : qsTr("Notifications are turned off in the device settings")
                 }
 
                 extraTextColor:
