@@ -183,7 +183,7 @@ Item
             width: 6 + icon.width + 6
             height: 32
 
-            backgroundColor: down
+            backgroundColor: checked || down
                 ? ColorTheme.colors.dark5
                 : (hovered ? ColorTheme.colors.dark9 : ColorTheme.colors.dark8)
 
