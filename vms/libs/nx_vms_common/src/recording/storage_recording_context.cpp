@@ -291,21 +291,25 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     int64_t timestamp = getPacketTimeUsec(md);
     int64_t timestampOffsetUsec = md->timestamp - timestamp;
     qint64 dts = av_rescale_q(timestamp, srcRate, stream->time_base);
+    avPkt.dts = dts;
 
-    if (m_streamIndexToLastDts[streamIndex] > dts)
+    if (auto it = m_streamIndexToLastDts.find(streamIndex);
+        it != m_streamIndexToLastDts.end())
     {
-        avPkt.dts = m_streamIndexToLastDts[streamIndex] + 1;
-        NX_DEBUG(this,
-            "Packet with stream index %1 has inconsistent dts %2. "
-            "Last saved dts for this stream: %3. Fixing dts to: %4",
-            streamIndex, dts, m_streamIndexToLastDts[streamIndex], avPkt.dts);
-    }
-    else
-    {
-        avPkt.dts = dts;
+        bool timeViolation = md->dataType == QnAbstractMediaData::GENERIC_METADATA
+            ? (avPkt.dts < it->second)
+            : (avPkt.dts <= it->second);
+        if (timeViolation)
+        {
+            avPkt.dts = m_streamIndexToLastDts[streamIndex] + 1;
+            NX_VERBOSE(this,
+                "Packet with stream index %1 has inconsistent dts %2. "
+                "Last saved dts for this stream: %3. Fixing dts to: %4",
+                streamIndex, dts, m_streamIndexToLastDts[streamIndex], avPkt.dts);
+        }
     }
 
-    m_streamIndexToLastDts[streamIndex] = dts;
+    m_streamIndexToLastDts[streamIndex] = avPkt.dts;
 
     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
     if (video && video->pts != AV_NOPTS_VALUE
