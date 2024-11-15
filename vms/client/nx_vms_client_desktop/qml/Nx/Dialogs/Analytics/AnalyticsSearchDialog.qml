@@ -644,7 +644,7 @@ Window
                         selectionBehavior: TableView.SelectRows
                         headerBackgroundColor: ColorTheme.colors.dark2
 
-                        model: AnalyticsDialogTableModel
+                        sourceModel: AnalyticsDialogTableModel
                         {
                             id: tableModel
                             sourceModel: eventModel
