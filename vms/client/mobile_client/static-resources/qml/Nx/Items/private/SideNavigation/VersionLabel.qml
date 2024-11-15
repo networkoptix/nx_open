@@ -23,6 +23,7 @@ AbstractButton
 
     onPressed: developerSettingsTimer.restart()
     onReleased: developerSettingsTimer.stop()
+    onCanceled: developerSettingsTimer.stop()
 
     contentItem: Text
     {
@@ -41,7 +42,15 @@ AbstractButton
     Timer
     {
         id: developerSettingsTimer
+
+        readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
         interval: 10000
         onTriggered: Workflow.openDeveloperSettingsScreen()
+
+        onApplicationActiveChanged:
+        {
+            if (!applicationActive)
+                stop()
+        }
     }
 }
