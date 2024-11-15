@@ -5,14 +5,15 @@
 #include <chrono>
 #include <vector>
 
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/rect_as_string.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/json/value_or_array.h>
 #include <nx/vms/api/types/motion_types.h>
 
 namespace nx::vms::api {
@@ -510,17 +511,17 @@ NX_REFLECTION_ENUM_CLASS(ObjectTrackSortField,
 
 struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
 {
-    /**%apidoc
-     * If not empty, only Object Tracks originating from those Devices will be considered for
-     * search. Each item can be a Device id (can be obtained from "id", "physicalId" or "logicalId"
-     * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+    /**%apidoc[opt]:stringArray
+     * If present, only Object Tracks originating from the specified Device(s) will be considered
+     * for search. Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    std::vector<QString> deviceIds;
+    json::ValueOrArray<QString> deviceId;
 
-    /**%apidoc
-     * If not empty, only Objects of these Object Types will be considered for search.
+    /**%apidoc[opt]:stringArray
+     * If present, only Object Tracks of the specified type(s) will be considered for search.
      */
-    std::vector<QString> objectTypeIds;
+    json::ValueOrArray<QString> objectTypeId;
 
     /**%apidoc
      * Start of the time period to search within, in milliseconds since epoch (1970-01-01 00:00, UTC).
@@ -565,7 +566,7 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
     bool isLocal = false;
 };
 #define ObjectTrackFilter_Fields IdData_Fields ObjectTrackFilterFreeText_Fields \
-    (deviceIds)(objectTypeIds)(startTimeMs)(endTimeMs)(boundingBox)(limit) \
+    (deviceId)(objectTypeId)(startTimeMs)(endTimeMs)(boundingBox)(limit) \
     (_orderBy)(sortOrder)(analyticsEngineId)(isLocal)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
