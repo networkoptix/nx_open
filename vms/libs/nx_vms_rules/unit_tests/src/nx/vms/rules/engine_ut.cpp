@@ -34,8 +34,8 @@ using namespace std::chrono;
 
 namespace {
 
-const QString kTestEventId = "nx.events.testEvent";
-const QString kTestActionId = "nx.actions.testAction";
+const QString kTestEventId = "testEvent";
+const QString kTestActionId = "testAction";
 const QString kTestEventFieldId = fieldMetatype<TestEventField>();
 const QString kTestActionFieldId = fieldMetatype<TestActionField>();
 
@@ -243,9 +243,8 @@ TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
         fieldId,
         [](const FieldDescriptor* descriptor){ return new TestEventField{descriptor}; }));
 
-    const QString eventId = "nx.events.test";
     ItemDescriptor eventDescriptor{
-        .id = eventId,
+        .id = kTestEventId,
         .displayName = kDisplayName,
         .fields = {
             makeFieldDescriptor<TestEventField>("testField", kDisplayName),
@@ -390,9 +389,8 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
         eventFieldType,
         [](const FieldDescriptor* descriptor) { return new TestEventField{descriptor}; });
 
-    const QString eventType = "nx.events.test";
     ItemDescriptor eventDescriptor{
-        .id = eventType,
+        .id = kTestEventId,
         .displayName = kDisplayName,
         .fields = {
             makeFieldDescriptor<TestEventField>("testField1", kDisplayName),
@@ -404,9 +402,8 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     const QString actionFieldType = fieldMetatype<TestActionField>();
     Plugin::registerActionField<TestActionField>(engine.get());
 
-    const QString actionType = "nx.actions.test";
     ItemDescriptor actionDescriptor{
-        .id = actionType,
+        .id = kTestActionId,
         .displayName = kDisplayName,
         .fields = {
             makeFieldDescriptor<TestActionField>("testField1", kDisplayName),
@@ -419,7 +416,7 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
 
     vms::api::rules::EventFilter serializedEventFilter {
         .id = nx::Uuid::createUuid(),
-        .type = eventType,
+        .type = kTestEventId,
         .fields = {
             { "testField1", {.type = eventFieldType} }
         }
@@ -427,7 +424,7 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
 
     vms::api::rules::ActionBuilder serializedActionBuilder {
         .id = nx::Uuid::createUuid(),
-        .type = actionType,
+        .type = kTestActionId,
         .fields = {
             { "testField1", {.type = actionFieldType} }
         }
@@ -455,14 +452,14 @@ TEST_F(EngineTest, onlyValidProlongedActionRegistered)
     ASSERT_TRUE(Plugin::registerActionField<OptionalTimeField>(engine.get()));
 
     ItemDescriptor withoutFields{
-        .id = "nx.actions.withoutFields",
+        .id = "withoutFields",
         .displayName = kDisplayName,
         .flags = ItemFlag::prolonged,
     };
     ASSERT_TRUE(engine->registerAction(withoutFields, testActionConstructor));
 
     ItemDescriptor withIntervalField{
-        .id = "nx.actions.withIntervalField",
+        .id = "withIntervalField",
         .displayName = kDisplayName,
         .flags = ItemFlag::prolonged,
         .fields = {
@@ -475,7 +472,7 @@ TEST_F(EngineTest, onlyValidProlongedActionRegistered)
     ASSERT_FALSE(engine->registerAction(withIntervalField, testActionConstructor));
 
     ItemDescriptor withIntervalAndDurationFields{
-        .id = "nx.actions.withIntervalAndDurationFields",
+        .id = "withIntervalAndDurationFields",
         .displayName = kDisplayName,
         .flags = ItemFlag::prolonged,
         .fields = {

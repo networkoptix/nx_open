@@ -10,7 +10,7 @@ class NX_VMS_RULES_API AnalyticsObjectAttributesField:
     public SimpleTypeEventField<QString, AnalyticsObjectAttributesField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.analyticsObjectAttributes")
+    Q_CLASSINFO("metatype", "analyticsObjectAttributes")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

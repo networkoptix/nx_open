@@ -4,8 +4,10 @@
 
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_field.h>
 
 #include "plain_picker_widget.h"
 #include "titled_picker_widget.h"
@@ -17,6 +19,8 @@ class FieldPickerWidget: public P
 {
     static_assert(std::is_base_of<vms::rules::Field, F>());
     static_assert(std::is_base_of<PickerWidget, P>());
+    static_assert(std::is_base_of<vms::rules::EventFilterField, F>()
+        || std::is_base_of<vms::rules::ActionBuilderField, F>());
 
 public:
     using field_type = F;
@@ -78,7 +82,19 @@ protected:
 
     vms::rules::FieldValidator* fieldValidator() const
     {
-        return P::systemContext()->vmsRulesEngine()->fieldValidator(m_field->metatype());
+        if constexpr (std::is_base_of<nx::vms::rules::ActionBuilderField, field_type>())
+        {
+            return P::systemContext()->vmsRulesEngine()->actionFieldValidator(m_field->metatype());
+        }
+        else if constexpr (std::is_base_of<nx::vms::rules::EventFilterField, field_type>())
+        {
+            return P::systemContext()->vmsRulesEngine()->eventFieldValidator(m_field->metatype());
+        }
+        else
+        {
+            static_assert("Unexpected field type");
+            return nullptr;
+        }
     }
 
     vms::rules::ValidationResult fieldValidity() const

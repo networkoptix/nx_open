@@ -250,7 +250,7 @@ ValidationResult Rule::validity(
             if (eventFieldFilter && !eventFieldFilter(field))
                 continue;
 
-            auto validator = m_engine->fieldValidator(field->metatype());
+            auto validator = m_engine->eventFieldValidator(field->metatype());
             if (!validator)
                 continue;
 
@@ -285,7 +285,7 @@ ValidationResult Rule::validity(
             if (actionFieldFilter && !actionFieldFilter(field))
                 continue;
 
-            auto validator = m_engine->fieldValidator(field->metatype());
+            auto validator = m_engine->actionFieldValidator(field->metatype());
             if (!validator)
                 continue;
 

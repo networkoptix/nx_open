@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API IntField: public SimpleTypeEventField<int, IntField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.int")
+    Q_CLASSINFO("metatype", "int")
 
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 

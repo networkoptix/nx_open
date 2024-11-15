@@ -13,15 +13,15 @@ struct NX_VMS_API ActionBuilder
 
     /**%apidoc
      * String description of this action filter type.
-     * %example nx.actions.deviceRecording
+     * %example deviceRecording
      */
     QString type;
 
     /**%apidoc[opt]
      * String Field Name to Field Description map. Fields are additional parameters that can be
      * passed to actions. For example you may have an event that starts a recording. One possible
-     * field you could set would be "nx.actions.fields.streamQuality" which would allow you to set
-     * the quality of the video that is recorded. Fields are specific to an action.
+     * field you could set would be "streamQuality" which would allow you to set the quality of the
+     * video that is recorded. Fields are specific to an action.
      */
     std::map<QString, Field> fields;
 };

@@ -9,7 +9,7 @@ const QSet<QString>& encryptedActionBuilderProperties(const QString& type)
     static const auto kAuthProps = QSet<QString>{"password", "token"};
     static const QSet<QString> kEmpty;
 
-    return (type == "nx.actions.fields.httpAuth") ? kAuthProps : kEmpty;
+    return (type == "httpAuth") ? kAuthProps : kEmpty;
 }
 
 } // namespace nx::vms::rules

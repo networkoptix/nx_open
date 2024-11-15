@@ -166,8 +166,11 @@ public:
 
 // Field validator registration and access methods.
 
-    bool registerValidator(const QString& fieldType, FieldValidator* validator);
-    FieldValidator* fieldValidator(const QString& fieldType) const;
+    bool registerEventFieldValidator(const QString& fieldType, FieldValidatorPtr validator);
+    FieldValidator* eventFieldValidator(const QString& fieldType) const;
+
+    bool registerActionFieldValidator(const QString& fieldType, FieldValidatorPtr validator);
+    FieldValidator* actionFieldValidator(const QString& fieldType) const;
 
 // Runtime event processing methods.
     /** Processes incoming event and returns matched rule count. */
@@ -259,7 +262,8 @@ private:
     QHash<QString, EventFieldConstructor> m_eventFields;
     QHash<QString, ActionFieldRecord> m_actionFields;
 
-    QHash<QString, FieldValidator*> m_fieldValidators;
+    std::unordered_map<QString, FieldValidatorPtr> m_eventFieldValidators;
+    std::unordered_map<QString, FieldValidatorPtr> m_actionFieldValidators;
 
     QHash<QString, EventConstructor> m_eventTypes;
     QHash<QString, ActionConstructor> m_actionTypes;

@@ -19,7 +19,7 @@ class NX_VMS_RULES_API TimeField:
     public SimpleTypeActionField<std::chrono::microseconds, TimeField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.time")
+    Q_CLASSINFO("metatype", "time")
 
     Q_PROPERTY(std::chrono::microseconds value READ value WRITE setValue NOTIFY valueChanged)
 

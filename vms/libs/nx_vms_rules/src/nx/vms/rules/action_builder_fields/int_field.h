@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API ActionIntField: public SimpleTypeActionField<int, ActionIntField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.int")
+    Q_CLASSINFO("metatype", "int")
 
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
     FIELD(int, min, setMin)

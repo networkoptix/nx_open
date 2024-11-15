@@ -40,4 +40,6 @@ public:
         const Field* field, const Rule* rule, common::SystemContext* context) const = 0;
 };
 
+using FieldValidatorPtr = std::unique_ptr<FieldValidator>;
+
 } // namespace nx::vms::rules

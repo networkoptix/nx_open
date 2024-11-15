@@ -174,29 +174,29 @@ void Initializer::registerFields() const
 void Initializer::registerFieldValidators() const
 {
     // Event field validators.
-    registerFieldValidator<AnalyticsEventTypeField>(new AnalyticsEventTypeFieldValidator);
-    registerFieldValidator<AnalyticsObjectTypeField>(new AnalyticsObjectTypeFieldValidator);
-    registerFieldValidator<ObjectLookupField>(new ObjectLookupFieldValidator);
-    registerFieldValidator<SourceCameraField>(new SourceCameraFieldValidator);
-    registerFieldValidator<SourceServerField>(new SourceServerFieldValidator);
-    registerFieldValidator<SourceUserField>(new SourceUserFieldValidator);
-    registerFieldValidator<StateField>(new StateFieldValidator);
-    registerFieldValidator<TextLookupField>(new TextLookupFieldValidator);
+    registerEventFieldValidator<AnalyticsEventTypeField, AnalyticsEventTypeFieldValidator>();
+    registerEventFieldValidator<AnalyticsObjectTypeField, AnalyticsObjectTypeFieldValidator>();
+    registerEventFieldValidator<ObjectLookupField, ObjectLookupFieldValidator>();
+    registerEventFieldValidator<SourceCameraField, SourceCameraFieldValidator>();
+    registerEventFieldValidator<SourceServerField, SourceServerFieldValidator>();
+    registerEventFieldValidator<SourceUserField, SourceUserFieldValidator>();
+    registerEventFieldValidator<StateField, StateFieldValidator>();
+    registerEventFieldValidator<TextLookupField, TextLookupFieldValidator>();
 
     // Action field validators.
-    registerFieldValidator<ActionTextField>(new ActionTextFieldValidator);
-    registerFieldValidator<HttpAuthField>(new HttpAuthFieldValidator);
-    registerFieldValidator<HttpMethodField>(new HttpMethodFieldValidator);
-    registerFieldValidator<TargetLayoutField>(new LayoutFieldValidator);
-    registerFieldValidator<OptionalTimeField>(new OptionalTimeFieldValidator);
-    registerFieldValidator<SoundField>(new SoundFieldValidator);
-    registerFieldValidator<TargetDevicesField>(new TargetDeviceFieldValidator);
-    registerFieldValidator<TargetLayoutsField>(new TargetLayoutFieldValidator);
-    registerFieldValidator<TargetServersField>(new TargetServerFieldValidator);
-    registerFieldValidator<TargetDeviceField>(new TargetSingleDeviceFieldValidator);
-    registerFieldValidator<TargetUsersField>(new TargetUserFieldValidator);
-    registerFieldValidator<TextWithFields>(new TextWithFieldsValidator);
-    registerFieldValidator<TimeField>(new TimeFieldValidator);
+    registerActionFieldValidator<ActionTextField, ActionTextFieldValidator>();
+    registerActionFieldValidator<HttpAuthField, HttpAuthFieldValidator>();
+    registerActionFieldValidator<HttpMethodField, HttpMethodFieldValidator>();
+    registerActionFieldValidator<TargetLayoutField, LayoutFieldValidator>();
+    registerActionFieldValidator<OptionalTimeField, OptionalTimeFieldValidator>();
+    registerActionFieldValidator<SoundField, SoundFieldValidator>();
+    registerActionFieldValidator<TargetDevicesField, TargetDeviceFieldValidator>();
+    registerActionFieldValidator<TargetLayoutsField, TargetLayoutFieldValidator>();
+    registerActionFieldValidator<TargetServersField, TargetServerFieldValidator>();
+    registerActionFieldValidator<TargetDeviceField, TargetSingleDeviceFieldValidator>();
+    registerActionFieldValidator<TargetUsersField, TargetUserFieldValidator>();
+    registerActionFieldValidator<TextWithFields, TextWithFieldsValidator>();
+    registerActionFieldValidator<TimeField, TimeFieldValidator>();
 }
 
 } // namespace nx::vms::rules

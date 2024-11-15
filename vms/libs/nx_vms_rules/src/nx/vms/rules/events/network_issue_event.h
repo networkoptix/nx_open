@@ -15,7 +15,7 @@ struct NetworkIssueInfo;
 class NX_VMS_RULES_API NetworkIssueEvent: public BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.networkIssue")
+    Q_CLASSINFO("type", "networkIssue")
 
     FIELD(nx::Uuid, cameraId, setCameraId)
     FIELD(nx::vms::api::EventReason, reason, setReason)

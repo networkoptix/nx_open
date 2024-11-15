@@ -62,16 +62,26 @@ protected:
         return false;
     }
 
+    template<class Field, class Validator>
+    bool registerEventFieldValidator() const
+    {
+        return m_engine->registerEventFieldValidator(
+            fieldMetatype<Field>(),
+            std::make_unique<Validator>());
+    }
+
     template<class F>
     bool registerActionField(auto... args) const
     {
         return registerActionField<F>(m_engine, args...);
     }
 
-    template<class F>
-    bool registerFieldValidator(FieldValidator* validator) const
+    template<class Field, class Validator>
+    bool registerActionFieldValidator() const
     {
-        return m_engine->registerValidator(fieldMetatype<F>(), validator);
+        return m_engine->registerActionFieldValidator(
+            fieldMetatype<Field>(),
+            std::make_unique<Validator>());
     }
 
     template<class E>

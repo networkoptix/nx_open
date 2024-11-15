@@ -9,7 +9,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API ShowOnAlarmLayoutAction: public NotificationActionBase
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.showOnAlarmLayout")
+    Q_CLASSINFO("type", "showOnAlarmLayout")
 
     FIELD(UuidList, eventDeviceIds, setEventDeviceIds)
     FIELD(std::chrono::microseconds, interval, setInterval)

@@ -10,7 +10,7 @@ class NX_VMS_RULES_API CustomizableTextField:
     public SimpleTypeEventField<QString, CustomizableTextField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.customizableText")
+    Q_CLASSINFO("metatype", "customizableText")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

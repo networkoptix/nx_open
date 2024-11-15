@@ -13,7 +13,7 @@ class NX_VMS_RULES_API GenericEvent: public DescribedEvent
 {
     using base_type = DescribedEvent;
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.generic")
+    Q_CLASSINFO("type", "generic")
 
     FIELD(QString, source, setSource)
     FIELD(nx::Uuid, serverId, setServerId)

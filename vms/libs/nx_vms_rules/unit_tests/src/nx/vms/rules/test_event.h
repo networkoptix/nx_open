@@ -18,7 +18,7 @@ namespace nx::vms::rules::test {
 class TestEventInstant: public nx::vms::rules::BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test.instant")
+    Q_CLASSINFO("type", "testInstant")
 
     Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
 public:
@@ -64,7 +64,7 @@ class TestEvent: public nx::vms::rules::BasicEvent
 {
     using base_type = BasicEvent;
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test.permissions")
+    Q_CLASSINFO("type", "testPermissions")
 
     Q_PROPERTY(nx::Uuid serverId MEMBER m_serverId)
     Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
@@ -139,7 +139,7 @@ public:
 class TestEventProlonged : public nx::vms::rules::BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test.prolonged")
+    Q_CLASSINFO("type", "testProlonged")
 
     Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
 

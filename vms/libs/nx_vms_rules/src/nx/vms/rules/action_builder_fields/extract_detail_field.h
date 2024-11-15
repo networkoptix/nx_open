@@ -15,7 +15,7 @@ class NX_VMS_RULES_API ExtractDetailField:
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.extractDetail")
+    Q_CLASSINFO("metatype", "extractDetail")
 
     FIELD(QString, detailName, setDetailName);
 

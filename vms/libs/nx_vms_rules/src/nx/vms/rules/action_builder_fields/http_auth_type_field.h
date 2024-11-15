@@ -13,7 +13,7 @@ class NX_VMS_RULES_API HttpAuthTypeField:
     public SimpleTypeActionField<nx::network::http::AuthType, HttpAuthTypeField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.httpAuthType")
+    Q_CLASSINFO("metatype", "httpAuthType")
 
     Q_PROPERTY(nx::network::http::AuthType value READ value WRITE setValue NOTIFY valueChanged)
 

@@ -12,7 +12,7 @@ constexpr auto kHasBuzzerValidationPolicy = "hasBuzzer";
 class NX_VMS_RULES_API TargetServersField: public ResourceFilterActionField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.servers")
+    Q_CLASSINFO("metatype", "servers")
 
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 

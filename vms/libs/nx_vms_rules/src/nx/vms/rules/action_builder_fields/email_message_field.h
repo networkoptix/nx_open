@@ -14,7 +14,7 @@ class NX_VMS_RULES_API EmailMessageField:
 {
     Q_OBJECT
 
-    Q_CLASSINFO("metatype", "nx.actions.fields.emailMessage")
+    Q_CLASSINFO("metatype", "emailMessage")
 
 public:
     EmailMessageField(common::SystemContext* context, const FieldDescriptor* descriptor);

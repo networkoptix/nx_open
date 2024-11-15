@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API EventDevicesField: public ActionBuilderField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.eventDevices")
+    Q_CLASSINFO("metatype", "eventDevices")
 
 public:
     using ActionBuilderField::ActionBuilderField;

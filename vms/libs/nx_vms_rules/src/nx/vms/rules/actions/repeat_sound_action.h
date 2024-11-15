@@ -9,7 +9,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API RepeatSoundAction: public NotificationActionBase
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.repeatSound")
+    Q_CLASSINFO("type", "repeatSound")
 
     // TODO: #amalov Consider adding duration field or merging with PlaySound.
     FIELD(QString, sound, setSound)

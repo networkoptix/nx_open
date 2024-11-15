@@ -11,8 +11,8 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules {
 
-constexpr auto kDeviceIssueEventGroup = "nx.events.group.deviceIssue";
-constexpr auto kServerIssueEventGroup = "nx.events.group.serverIssue";
+constexpr auto kDeviceIssueEventGroup = "deviceIssueGroup";
+constexpr auto kServerIssueEventGroup = "serverIssueGroup";
 
 struct NX_VMS_RULES_API Group
 {

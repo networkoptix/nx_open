@@ -15,8 +15,8 @@ namespace nx::vms::client::desktop::rules {
 /**
  * Used for data types that could be represented as a multiline text. The actual
  * implementation is depends on the field descriptor set.
- * Has implementations for:
- * - nx.actions.fields.textWithFields
+ * Has implementations for action fields:
+ * - textWithFields
  */
 template<typename F>
 class MultilineTextPickerWidget: public PlainFieldPickerWidget<F>

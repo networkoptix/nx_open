@@ -39,7 +39,7 @@ constexpr auto kEmailsValidationPolicy = "emails";
 class NX_VMS_RULES_API ActionTextField: public SimpleTypeActionField<QString, ActionTextField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.text")
+    Q_CLASSINFO("metatype", "text")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

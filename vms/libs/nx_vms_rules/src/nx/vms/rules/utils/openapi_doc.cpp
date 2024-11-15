@@ -286,14 +286,9 @@ void collectOpenApiInfo(
     }
 }
 
-
 QString VmsRulesOpenApiDocHelper::schemaName(const QString& id)
 {
-    const auto parts = id.split('.');
-    if (!NX_ASSERT(parts.size() >= 2,"Incorrect id: %1", id))
-        return id;
-
-    return formatIdPart(parts.last()) + formatIdPart(parts[parts.size() - 2]);
+    return formatIdPart(id);
 }
 
 QJsonObject addAdditionalDocFromFieldProperties(

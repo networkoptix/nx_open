@@ -700,21 +700,38 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const QString& actionT
     return buildActionBuilder(m_actionDescriptors.value(actionType));
 }
 
-bool Engine::registerValidator(const QString& fieldType, FieldValidator* validator)
+bool Engine::registerEventFieldValidator(const QString& fieldType, FieldValidatorPtr validator)
 {
     if (!NX_ASSERT(!fieldType.isEmpty()) || !NX_ASSERT(validator))
         return false;
 
-    validator->setParent(this); //< TODO: #mmalofeev use unique_ptr instead?
-    m_fieldValidators.insert(fieldType, validator);
-
+    m_eventFieldValidators.emplace(fieldType, std::move(validator));
     return true;
 }
 
-FieldValidator* Engine::fieldValidator(const QString& fieldType) const
+FieldValidator* Engine::eventFieldValidator(const QString& fieldType) const
 {
-    auto fieldValidatorIt = m_fieldValidators.find(fieldType);
-    return fieldValidatorIt == m_fieldValidators.cend() ? nullptr : fieldValidatorIt.value();
+    auto fieldValidatorIt = m_eventFieldValidators.find(fieldType);
+    return fieldValidatorIt == m_eventFieldValidators.cend()
+        ? nullptr
+        : fieldValidatorIt->second.get();
+}
+
+bool Engine::registerActionFieldValidator(const QString& fieldType, FieldValidatorPtr validator)
+{
+    if (!NX_ASSERT(!fieldType.isEmpty()) || !NX_ASSERT(validator))
+        return false;
+
+    m_actionFieldValidators.emplace(fieldType, std::move(validator));
+    return true;
+}
+
+FieldValidator* Engine::actionFieldValidator(const QString& fieldType) const
+{
+    auto fieldValidatorIt = m_actionFieldValidators.find(fieldType);
+    return fieldValidatorIt == m_actionFieldValidators.cend()
+        ? nullptr
+        : fieldValidatorIt->second.get();
 }
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& descriptor) const

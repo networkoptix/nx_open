@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API SoftTriggerEvent: public BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.softTrigger")
+    Q_CLASSINFO("type", "softTrigger")
 
     FIELD(nx::Uuid, triggerId, setTriggerId)
     FIELD(nx::Uuid, cameraId, setCameraId)

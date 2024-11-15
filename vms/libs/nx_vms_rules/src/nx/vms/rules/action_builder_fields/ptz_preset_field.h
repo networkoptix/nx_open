@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API PtzPresetField: public SimpleTypeActionField<QString, PtzPresetField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.ptzPreset")
+    Q_CLASSINFO("metatype", "ptzPreset")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

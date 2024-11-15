@@ -20,7 +20,7 @@ using namespace std::chrono_literals;
 class PlainEvent: public nx::vms::rules::BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.test.plain")
+    Q_CLASSINFO("type", "testPlain")
 
 public:
     static ItemDescriptor manifest()

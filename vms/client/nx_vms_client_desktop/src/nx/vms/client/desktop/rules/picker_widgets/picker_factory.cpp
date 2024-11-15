@@ -2,8 +2,10 @@
 
 #include "picker_factory.h"
 
+#include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/camera_validation_policy.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/event_filter_fields/builtin_fields.h>
 #include <nx/vms/rules/server_validation_policy.h>
 #include <nx/vms/rules/user_validation_policy.h>
@@ -42,6 +44,8 @@
 namespace nx::vms::client::desktop::rules {
 
 namespace {
+
+using nx::vms::rules::fieldMetatype;
 
 template<class Picker>
 PickerWidget* createPickerImpl(
@@ -177,18 +181,13 @@ PickerWidget* createOptionalDurationPicker(
     return createPickerImpl<OptionalDurationPicker>(field, context, parent);
 }
 
-} // namespace
-
-using nx::vms::rules::fieldMetatype;
-
-PickerWidget* PickerFactory::createWidget(
+PickerWidget* createEventFieldWidget(
     vms::rules::Field* field,
     SystemContext* context,
     ParamsWidget* parent)
 {
     const auto fieldId = field->descriptor()->id;
 
-    // Event field based pickers.
     if (fieldId == fieldMetatype<vms::rules::AnalyticsEventLevelField>())
     {
         return createPickerImpl<FlagsPicker<vms::rules::AnalyticsEventLevelField>>(
@@ -249,7 +248,16 @@ PickerWidget* PickerFactory::createWidget(
     if (fieldId == fieldMetatype<nx::vms::rules::TextLookupField>())
         return createPickerImpl<TextLookupPicker>(field, context, parent);
 
-    // Action field based pickers.
+    return {};
+}
+
+PickerWidget* createActionFieldWidget(
+    vms::rules::Field* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+{
+    const auto fieldId = field->descriptor()->id;
+
     if (fieldId == fieldMetatype<nx::vms::rules::ActionFlagField>())
         return createPickerImpl<FlagPicker<nx::vms::rules::ActionFlagField>>(field, context, parent);
 
@@ -314,6 +322,24 @@ PickerWidget* PickerFactory::createWidget(
         return createPickerImpl<VolumePicker>(field, context, parent);
 
     return {};
+}
+
+} // namespace
+
+PickerWidget* PickerFactory::createWidget(
+    vms::rules::Field* field,
+    SystemContext* context,
+    ParamsWidget* parent)
+{
+    const auto fieldId = field->descriptor()->id;
+
+    if (dynamic_cast<nx::vms::rules::ActionBuilderField*>(field))
+        return createActionFieldWidget(field, context, parent);
+
+    if (dynamic_cast<nx::vms::rules::EventFilterField*>(field))
+        return createEventFieldWidget(field, context, parent);
+
+    return nullptr;
 }
 
 } // namespace nx::vms::client::desktop::rules

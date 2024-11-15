@@ -18,7 +18,7 @@ class NX_VMS_RULES_API OptionalTimeField:
     public SimpleTypeActionField<std::chrono::microseconds, OptionalTimeField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.optionalTime")
+    Q_CLASSINFO("metatype", "optionalTime")
 
     Q_PROPERTY(std::chrono::microseconds value READ value WRITE setValue NOTIFY valueChanged)
 

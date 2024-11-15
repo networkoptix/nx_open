@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API PoeOverBudgetEvent: public BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.poeOverBudget")
+    Q_CLASSINFO("type", "poeOverBudget")
 
     FIELD(nx::Uuid, serverId, setServerId)
     FIELD(double, currentConsumptionW, setCurrentConsumptionW)

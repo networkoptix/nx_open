@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API OpenLayoutAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.openLayout")
+    Q_CLASSINFO("type", "openLayout")
 
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(std::chrono::microseconds, playbackTime, setPlaybackTime)

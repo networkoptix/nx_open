@@ -12,7 +12,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API DeviceRecordingAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.deviceRecording")
+    Q_CLASSINFO("type", "deviceRecording")
 
     FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(std::chrono::microseconds, interval, setInterval)

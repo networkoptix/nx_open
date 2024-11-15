@@ -13,7 +13,7 @@ class NX_VMS_RULES_API StreamQualityField:
     public SimpleTypeActionField<nx::vms::api::StreamQuality, StreamQualityField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.streamQuality")
+    Q_CLASSINFO("metatype", "streamQuality")
 
     Q_PROPERTY(nx::vms::api::StreamQuality value READ value WRITE setValue NOTIFY valueChanged)
 

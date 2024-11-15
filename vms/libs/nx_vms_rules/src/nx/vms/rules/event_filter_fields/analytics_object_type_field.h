@@ -13,7 +13,7 @@ class NX_VMS_RULES_API AnalyticsObjectTypeField:
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.analyticsObjectType")
+    Q_CLASSINFO("metatype", "analyticsObjectType")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

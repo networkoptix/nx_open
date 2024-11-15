@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API PasswordField: public SimpleTypeActionField<QString, PasswordField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.password")
+    Q_CLASSINFO("metatype", "password")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

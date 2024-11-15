@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API SoundField: public SimpleTypeActionField<QString, SoundField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.sound")
+    Q_CLASSINFO("metatype", "sound")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

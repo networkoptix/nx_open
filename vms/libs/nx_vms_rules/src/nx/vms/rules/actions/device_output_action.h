@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API DeviceOutputAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.deviceOutput")
+    Q_CLASSINFO("type", "deviceOutput")
 
     FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(std::chrono::microseconds, duration, setDuration)

@@ -12,18 +12,17 @@ struct NX_VMS_API EventFilter
     nx::Uuid id;
 
     /**%apidoc String description of this event filter type.
-     * %example nx.events.motion
+     * %example motion
      */
     QString type;
 
     /**%apidoc[opt] String Field Name to Field Description map.
-     * Fields are additional parameters that can be passed to events. For example,
-     * you may have an event that detects motion on a camera. One possible field you
-     * could set for this event would be "nx.events.fields.device" which would allow you to specify
-     * the camera quality of the video that is recorded. Fields are specific to an action.
+     * Fields are additional parameters that can be passed to events. For example, you may have an
+     * event that detects motion on a camera. One possible field you could set for this event would
+     * be "device" which would allow you to specify the camera quality of the video that is
+     * recorded. Fields are specific to an action.
      */
     std::map<QString, Field> fields;
-    // TODO: #spanasenko Custom Field blocks.
 };
 
 #define nx_vms_api_rules_EventFilter_Fields (id)(type)(fields)

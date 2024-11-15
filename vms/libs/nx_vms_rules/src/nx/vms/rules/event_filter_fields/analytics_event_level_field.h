@@ -12,7 +12,7 @@ class NX_VMS_RULES_API AnalyticsEventLevelField:
     public SimpleTypeEventField<nx::vms::api::EventLevels, AnalyticsEventLevelField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.analyticsEventLevel")
+    Q_CLASSINFO("metatype", "analyticsEventLevel")
 
     Q_PROPERTY(nx::vms::api::EventLevels value READ value WRITE setValue NOTIFY valueChanged)
 

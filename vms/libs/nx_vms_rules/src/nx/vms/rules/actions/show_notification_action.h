@@ -12,7 +12,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API NotificationAction: public NotificationActionBase
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.desktopNotification")
+    Q_CLASSINFO("type", "desktopNotification")
 
     // Data fields.
     FIELD(std::chrono::microseconds, interval, setInterval)

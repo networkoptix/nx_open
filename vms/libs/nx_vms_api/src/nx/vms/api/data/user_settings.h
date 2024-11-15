@@ -16,7 +16,7 @@ struct NX_VMS_API UserSettings
 {
     /**%apidoc[opt]:stringArray
      * Ban list of events, contains events that are disabled.
-     * %example ["nx.events.motion", "nx.events.deviceDisconnected"]
+     * %example ["motion", "deviceDisconnected"]
      */
     std::set<std::string> eventFilter;
 

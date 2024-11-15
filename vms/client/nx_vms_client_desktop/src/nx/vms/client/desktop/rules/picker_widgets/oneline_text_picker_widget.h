@@ -19,12 +19,13 @@ namespace nx::vms::client::desktop::rules {
 /**
  * Used for data types that could be represented as a one line text. The actual
  * implementation is depends on the field descriptor set.
- * Has implementations for:
- * - nx.events.fields.customizableText
- * - nx.events.fields.expectedString
+ * Has implementations for event fields:
+ * - customizableText
+ * - expectedString
  *
- * - nx.actions.fields.text
- * - nx.actions.fields.password
+ * Has implementations for action fields:
+ * - text
+ * - password
  */
 
 template<typename F>

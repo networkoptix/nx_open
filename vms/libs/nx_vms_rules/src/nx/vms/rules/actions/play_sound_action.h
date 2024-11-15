@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API PlaySoundAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.playSound")
+    Q_CLASSINFO("type", "playSound")
 
     FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(std::chrono::microseconds, interval, setInterval)

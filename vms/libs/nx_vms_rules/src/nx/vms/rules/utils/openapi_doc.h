@@ -91,8 +91,8 @@ public:
 
     /**
      * Changes the input string to the appropriate schema name format.
-     * Input example : "nx.events.analyticsObject"
-     * Result example: "AnalyticsObjectEvent"
+     * Input example : "analyticsObject"
+     * Result example: "AnalyticsObject"
      */
     static QString schemaName(const QString& id);
     static QJsonObject generateOpenApiDoc(nx::vms::common::SystemContext* context);

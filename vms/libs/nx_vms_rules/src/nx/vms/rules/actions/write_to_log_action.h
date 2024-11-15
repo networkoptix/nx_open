@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API WriteToLogAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.writeToLog")
+    Q_CLASSINFO("type", "writeToLog")
 
     FIELD(std::chrono::microseconds, interval, setInterval)
 

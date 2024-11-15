@@ -15,7 +15,7 @@ class NX_VMS_RULES_API SourceUserField:
     public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.user")
+    Q_CLASSINFO("metatype", "user")
 
 public:
     SourceUserField(common::SystemContext* context, const FieldDescriptor* descriptor);

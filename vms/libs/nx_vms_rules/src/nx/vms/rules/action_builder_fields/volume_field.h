@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API VolumeField: public SimpleTypeActionField<float, VolumeField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.volume")
+    Q_CLASSINFO("metatype", "volume")
 
     Q_PROPERTY(float value READ value WRITE setValue NOTIFY valueChanged)
 

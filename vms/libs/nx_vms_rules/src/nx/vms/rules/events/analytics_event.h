@@ -12,7 +12,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API AnalyticsEvent: public AnalyticsEngineEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.analytics")
+    Q_CLASSINFO("type", "analytics")
 
     FIELD(QString, eventTypeId, setEventTypeId)
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)

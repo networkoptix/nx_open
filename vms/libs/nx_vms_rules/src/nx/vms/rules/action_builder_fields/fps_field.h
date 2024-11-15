@@ -14,7 +14,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API FpsField: public SimpleTypeActionField<int, FpsField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.fps")
+    Q_CLASSINFO("metatype", "fps")
 
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 

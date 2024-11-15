@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API PtzPresetAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.ptzPreset")
+    Q_CLASSINFO("type", "ptzPreset")
 
     FIELD(nx::Uuid, cameraId, setCameraId)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)

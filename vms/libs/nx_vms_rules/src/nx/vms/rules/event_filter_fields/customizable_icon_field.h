@@ -10,7 +10,7 @@ class NX_VMS_RULES_API CustomizableIconField:
     public SimpleTypeEventField<QString, CustomizableIconField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.customizableIcon")
+    Q_CLASSINFO("metatype", "customizableIcon")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

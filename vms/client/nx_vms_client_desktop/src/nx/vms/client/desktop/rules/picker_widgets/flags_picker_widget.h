@@ -17,8 +17,8 @@ namespace nx::vms::client::desktop::rules {
 /**
  * Used for types represented by QFlags and displayed as a row of checkboxes.
  * Implementation depends on the Field parameter.
- * Has implementation for:
- * - nx.events.fields.analyticsEventLevel
+ * Has implementation for event fields:
+ * - analyticsEventLevel
  */
 template<typename F>
 class FlagsPicker: public PlainFieldPickerWidget<F>

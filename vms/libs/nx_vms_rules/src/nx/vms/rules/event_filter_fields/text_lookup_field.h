@@ -15,7 +15,7 @@ class NX_VMS_RULES_API TextLookupField:
     public common::SystemContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.textLookup")
+    Q_CLASSINFO("metatype", "textLookup")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
     Q_PROPERTY(TextLookupCheckType checkType READ checkType WRITE setCheckType NOTIFY checkTypeChanged)

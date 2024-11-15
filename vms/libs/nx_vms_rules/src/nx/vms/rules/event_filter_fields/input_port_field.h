@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API InputPortField: public SimpleTypeEventField<QString, InputPortField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.inputPort")
+    Q_CLASSINFO("metatype", "inputPort")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

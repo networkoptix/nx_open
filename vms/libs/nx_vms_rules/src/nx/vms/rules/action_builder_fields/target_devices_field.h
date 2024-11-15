@@ -15,7 +15,7 @@ constexpr auto kCameraRecordingValidationPolicy = "cameraRecording";
 class NX_VMS_RULES_API TargetDevicesField: public ResourceFilterActionField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.devices")
+    Q_CLASSINFO("metatype", "devices")
 
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)
 

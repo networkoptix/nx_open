@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API LicenseIssueEvent: public BasicEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.events.licenseIssue")
+    Q_CLASSINFO("type", "licenseIssue")
 
     FIELD(nx::Uuid, serverId, setServerId)
     FIELD(UuidList, deviceIds, deviceIds)

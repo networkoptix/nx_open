@@ -15,7 +15,7 @@ namespace nx::vms::api::rules {
 struct NX_VMS_API Field
 {
     /**%apidoc String description of this event or action field type.
-     * %example nx.action.fields.streamQuality
+     * %example streamQuality
      */
     QString type;
 

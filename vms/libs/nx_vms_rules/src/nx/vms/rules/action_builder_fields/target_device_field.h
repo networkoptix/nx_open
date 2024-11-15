@@ -54,7 +54,7 @@ struct TargetSingleDeviceFieldProperties
 class NX_VMS_RULES_API TargetDeviceField: public ActionBuilderField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.device")
+    Q_CLASSINFO("metatype", "device")
 
     Q_PROPERTY(nx::Uuid id READ id WRITE setId NOTIFY idChanged)
     Q_PROPERTY(bool useSource READ useSource WRITE setUseSource NOTIFY useSourceChanged)

@@ -14,7 +14,7 @@ class NX_VMS_RULES_API AnalyticsEventTypeField:
 {
     Q_OBJECT
 
-    Q_CLASSINFO("metatype", "nx.events.fields.analyticsEventType")
+    Q_CLASSINFO("metatype", "analyticsEventType")
 
     Q_PROPERTY(QString typeId READ typeId WRITE setTypeId NOTIFY typeIdChanged)
 

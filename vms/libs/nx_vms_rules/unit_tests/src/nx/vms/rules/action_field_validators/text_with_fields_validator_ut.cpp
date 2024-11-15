@@ -19,7 +19,7 @@ namespace nx::vms::rules::test {
 class TestActionWithUrl: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.withUrl")
+    Q_CLASSINFO("type", "testWithUrl")
 
     Q_PROPERTY(QString text MEMBER m_text)
 

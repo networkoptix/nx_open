@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API UniqueIdField: public EventFilterField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.uniqueId")
+    Q_CLASSINFO("metatype", "uniqueId")
 
     Q_PROPERTY(nx::Uuid id READ id WRITE setId)
 

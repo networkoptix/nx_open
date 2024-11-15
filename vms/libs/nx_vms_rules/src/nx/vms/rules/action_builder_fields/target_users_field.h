@@ -20,7 +20,7 @@ class NX_VMS_RULES_API TargetUsersField:
     public common::SystemContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.users")
+    Q_CLASSINFO("metatype", "users")
 
     Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll NOTIFY acceptAllChanged)
 

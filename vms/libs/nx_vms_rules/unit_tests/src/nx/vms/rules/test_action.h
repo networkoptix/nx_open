@@ -17,7 +17,7 @@ namespace nx::vms::rules::test {
 class TestAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.instant")
+    Q_CLASSINFO("type", "testInstant")
 
 public:
     static ItemDescriptor manifest()
@@ -32,7 +32,7 @@ public:
 class TestProlongedOnlyAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.pureProlonged")
+    Q_CLASSINFO("type", "testPureProlonged")
 
 public:
     static ItemDescriptor manifest()
@@ -48,7 +48,7 @@ public:
 class TestProlongedAction: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.prolonged")
+    Q_CLASSINFO("type", "testProlonged")
 
     Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
     Q_PROPERTY(std::chrono::microseconds duration MEMBER m_duration)
@@ -78,7 +78,7 @@ public:
 class TestActionWithInterval: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.withInterval")
+    Q_CLASSINFO("type", "testWithInterval")
 
     Q_PROPERTY(std::chrono::microseconds interval MEMBER m_interval)
     Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
@@ -104,7 +104,7 @@ public:
 class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.withTargetUsers")
+    Q_CLASSINFO("type", "testWithTargetUsers")
 
     Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
     Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
@@ -135,7 +135,7 @@ public:
 class TestActionWithPermissions: public TestActionWithTargetUsers
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.withPermissions")
+    Q_CLASSINFO("type", "testWithPermissions")
 
 public:
     static ItemDescriptor manifest()
@@ -166,7 +166,7 @@ public:
 class TestActionForUserAndServer: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.user&server")
+    Q_CLASSINFO("type", "testUserAndServer")
 
     Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
 
@@ -193,7 +193,7 @@ public:
 class TestActionForServerWithTargetUser: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.serverWithTargetUser")
+    Q_CLASSINFO("type", "testServerWithTargetUser")
 
     Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
 
@@ -220,7 +220,7 @@ public:
 class TestActionWithTextWithFields: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.withTextWithFields")
+    Q_CLASSINFO("type", "testWithTextWithFields")
 
     Q_PROPERTY(QString text MEMBER m_text)
 
@@ -246,7 +246,7 @@ public:
 class TestActionWithEmail: public nx::vms::rules::BasicAction
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "nx.actions.test.withEmailMessage")
+    Q_CLASSINFO("type", "testWithEmailMessage")
 
     Q_PROPERTY(nx::email::Message message MEMBER m_message)
 
