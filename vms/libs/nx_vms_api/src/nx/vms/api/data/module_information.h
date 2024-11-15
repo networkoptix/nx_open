@@ -288,15 +288,17 @@ struct NX_VMS_API ServerRuntimeInformation: ServerPortInformation, ServerTimeZon
 
     RuntimeData runtimeData;
 
+    std::vector<std::string> storageProtocols;
+
     ServerRuntimeInformation() = default;
-    virtual ~ServerRuntimeInformation() = default;
+    ~ServerRuntimeInformation() = default;
     ServerRuntimeInformation(const ServerRuntimeInformation& rhs) = default;
 };
 
 #define ServerRuntimeInformation_Fields \
     ServerPortInformation_Fields \
     ServerTimeZoneInformation_Fields \
-    (osInfo)(osTimeMs)(synchronizedTimeMs)(runtimeData)
+    (osInfo)(osTimeMs)(synchronizedTimeMs)(runtimeData)(storageProtocols)
 
 NX_VMS_API_DECLARE_STRUCT_EX(ServerRuntimeInformation, (json))
 NX_REFLECTION_INSTRUMENT(ServerRuntimeInformation, ServerRuntimeInformation_Fields);
