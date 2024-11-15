@@ -17,33 +17,6 @@
 
 struct PasswordHashes;
 
-namespace nx::network::aio { class Timer; }
-
-namespace nx::vms::api {
-
-struct ResourceParamWithRefData;
-using ResourceParamWithRefDataList = std::vector<ResourceParamWithRefData>;
-
-} // namespace nx::vms::api
-
-namespace nx::vms::common {
-
-struct NX_VMS_COMMON_API UserSettingsEx: nx::vms::api::UserSettings
-{
-    UserSettingsEx() = default;
-    UserSettingsEx(nx::vms::api::UserSettings&& rhs);
-
-    bool operator==(const UserSettingsEx& /*other*/) const = default;
-
-    bool isEventWatched(nx::vms::api::EventType eventType) const;
-    bool isEventWatched(const QString& eventType) const;
-
-    bool isMessageWatched(system_health::MessageType messageType) const;
-    bool isMessageWatched(const QString& messageType) const;
-};
-
-} // namespace nx::vms::common
-
 struct NX_VMS_COMMON_API QnUserHash
 {
     enum class Type
@@ -212,7 +185,7 @@ public:
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
-    nx::vms::common::UserSettingsEx settings() const;
+    nx::vms::api::UserSettings settings() const;
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);

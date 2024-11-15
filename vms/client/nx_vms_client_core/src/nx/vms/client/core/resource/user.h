@@ -6,25 +6,8 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/vms/api/data/user_model.h>
-#include <nx/vms/client/core/event_search/event_search_globals.h>
-
-namespace nx::vms::common {
-
-class AbstractSessionTokenHelper;
-using SessionTokenHelperPtr = std::shared_ptr<AbstractSessionTokenHelper>;
-
-} // namespace nx::vms::common
 
 namespace nx::vms::client::core {
-
-struct UserSettings: public common::UserSettingsEx
-{
-    EventSearch::CameraSelection cameraSelection = EventSearch::CameraSelection::layout;
-    EventSearch::TimeSelection timeSelection = EventSearch::TimeSelection::anytime;
-    QStringList objectTypeIds;
-};
-#define CoreUserSettings_Fields UserSettings_Fields(cameraSelection)(timeSelection)(objectTypeIds)
-NX_REFLECTION_INSTRUMENT(UserSettings, CoreUserSettings_Fields)
 
 class NX_VMS_CLIENT_CORE_API UserResource: public QnUserResource
 {
@@ -42,13 +25,12 @@ public:
 
     /** Send request to the currently connected server to save user settings. */
     rest::Handle saveSettings(
-        const UserSettings& value,
-        common::SessionTokenHelperPtr sessionTokenHelper,
+        const nx::vms::api::UserSettings& value,
         std::function<void(bool /*success*/, rest::Handle /*handle*/)> callback = {},
         nx::utils::AsyncHandlerExecutor executor = {});
 
-        void setSettings(const UserSettings& settings);
-        UserSettings settings() const;
+    void setSettings(const nx::vms::api::UserSettings& settings);
+    nx::vms::api::UserSettings settings() const;
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;

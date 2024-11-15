@@ -64,7 +64,6 @@ void UserResource::updateInternal(const QnResourcePtr& source, NotifierList& not
 
 rest::Handle UserResource::saveSettings(
     const UserSettings& value,
-    common::SessionTokenHelperPtr sessionTokenHelper,
     std::function<void(bool /*success*/, rest::Handle /*handle*/)> callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
@@ -95,7 +94,6 @@ rest::Handle UserResource::saveSettings(
     return api->patchUserSettings(
         getId(),
         value,
-        std::move(sessionTokenHelper),
         internalCallback,
         thread());
 }

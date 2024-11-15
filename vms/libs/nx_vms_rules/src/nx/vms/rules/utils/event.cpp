@@ -3,7 +3,9 @@
 #include "event.h"
 
 #include <nx/analytics/taxonomy/abstract_state.h>
+#include <nx/vms/api/data/user_settings.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/event/migration_utils.h>
 
 #include "../engine.h"
 #include "../event_filter.h"
@@ -164,6 +166,16 @@ QSet<State> getPossibleFilterStatesForEventFilter(
     const Engine* engine, const EventFilter* eventFilter)
 {
     return getPossibleFilterStates(getEventDurationType(engine, eventFilter));
+}
+
+bool isEventWatched(const nx::vms::api::UserSettings& settings, nx::vms::api::EventType eventType)
+{
+    return isEventWatched(settings, event::convertToNewEvent(eventType));
+}
+
+bool isEventWatched(const nx::vms::api::UserSettings& settings, const QString& eventType)
+{
+    return !settings.eventFilter.contains(eventType.toStdString());
 }
 
 } // namespace nx::vms::rules

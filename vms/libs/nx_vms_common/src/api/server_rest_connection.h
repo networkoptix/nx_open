@@ -802,7 +802,6 @@ public:
     Handle patchUserSettings(
         nx::Uuid id,
         const nx::vms::api::UserSettings& settings,
-        nx::vms::common::SessionTokenHelperPtr helper,
         Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
         QThread* targetThread);
 

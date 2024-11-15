@@ -26,7 +26,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/migration_utils.h>
+
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 
@@ -36,34 +36,6 @@ const QString QnUserResource::kIntegrationRequestDataProperty("integrationReques
 using nx::vms::api::analytics::IntegrationRequestData;
 using namespace nx::vms::api;
 using namespace nx::vms::event;
-
-namespace nx::vms::common {
-
-UserSettingsEx::UserSettingsEx(nx::vms::api::UserSettings&& rhs):
-    nx::vms::api::UserSettings(std::move(rhs))
-{}
-
-bool UserSettingsEx::isEventWatched(EventType eventType) const
-{
-    return isEventWatched(convertToNewEvent(eventType));
-}
-
-bool UserSettingsEx::isEventWatched(const QString& eventType) const
-{
-    return !eventFilter.contains(eventType.toStdString());
-}
-
-bool UserSettingsEx::isMessageWatched(system_health::MessageType messageType) const
-{
-    return isMessageWatched(QString::fromStdString(reflect::toString(messageType)));
-}
-
-bool UserSettingsEx::isMessageWatched(const QString& messageType) const
-{
-    return !messageFilter.contains(messageType.toStdString());
-}
-
-} // namespace nx::vms::common
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -855,7 +827,7 @@ QString QnUserResource::idForToStringFromPtr() const
     return NX_FMT("%1: %2, %3", m_userType, m_name, getId());
 }
 
-nx::vms::common::UserSettingsEx QnUserResource::settings() const
+nx::vms::api::UserSettings QnUserResource::settings() const
 {
     const auto value = getProperty(ResourcePropertyKey::User::kUserSettings);
     UserSettings result;

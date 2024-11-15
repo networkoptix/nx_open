@@ -2305,7 +2305,6 @@ Handle ServerConnection::saveUserAsync(
  Handle ServerConnection::patchUserSettings(
     nx::Uuid id,
     const nx::vms::api::UserSettings& settings,
-    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::UserModelV3>>::type&& callback,
     QThread* targetThread)
 {
@@ -2320,10 +2319,8 @@ Handle ServerConnection::saveUserAsync(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(QJsonObject{{"settings", serializedSettings}}));
 
-    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
-
     auto handle = request.isValid()
-        ? executeRequest(request, std::move(wrapper), targetThread)
+        ? executeRequest(request, std::move(callback), targetThread)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);

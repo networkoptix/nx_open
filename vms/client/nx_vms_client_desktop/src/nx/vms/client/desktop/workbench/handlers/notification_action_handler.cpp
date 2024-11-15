@@ -32,6 +32,7 @@
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
+#include <nx/vms/rules/utils/event.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -67,6 +68,17 @@ QString toString(AbstractActionPtr action)
         nx::reflect::json::serialize(action->getRuntimeParams()),
         action->getRuleId().toSimpleString(),
         action->getAggregationCount());
+}
+
+bool isMessageWatched(const nx::vms::api::UserSettings& settings, const QString& messageType)
+{
+    return !settings.messageFilter.contains(messageType.toStdString());
+}
+
+bool isMessageWatched(const nx::vms::api::UserSettings& settings,
+    nx::vms::common::system_health::MessageType messageType)
+{
+    return isMessageWatched(settings, QString::fromStdString(reflect::toString(messageType)));
 }
 
 } // namespace
@@ -273,7 +285,7 @@ void NotificationActionHandler::addNotification(const vms::event::AbstractAction
             break;
     }
 
-    if (!alwaysNotify && !system()->user()->settings().isEventWatched(eventType))
+    if (!alwaysNotify && !rules::isEventWatched(system()->user()->settings(), eventType))
         return;
 
     emit notificationAdded(action);
@@ -348,7 +360,7 @@ void NotificationActionHandler::setSystemHealthEventVisibleInternal(
     {
         bool isAllowedByFilter = false;
         if (auto user = system()->user())
-            isAllowedByFilter = user->settings().isMessageWatched(message);
+            isAllowedByFilter = isMessageWatched(user->settings(), message);
 
         canShow &= isAllowedByFilter;
     }

@@ -494,7 +494,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     // appropriate rights to see the event details.
     for (const auto& user: targetUsersField->users())
     {
-        if (userFiltered && !user->settings().isEventWatched(aggregatedEvent->type()))
+        if (userFiltered && !isEventWatched(user->settings(), aggregatedEvent->type()))
         {
             NX_VERBOSE(this, "Event %1 is filtered by user %2",
                 aggregatedEvent->type(), user->getName());

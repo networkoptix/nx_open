@@ -126,16 +126,8 @@ void UserNotificationSettingsManager::setSettings(
         userSettings.messageFilter = std::move(banListOfMessages);
     }
 
-    // TODO: #mmalofeev remove sessionTokenHelper when https://networkoptix.atlassian.net/browse/VMS-52731 will be fixed.
-    auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
-        appContext()->mainWindowContext()->mainWindowWidget(),
-        tr("Save user"),
-        tr("Enter your account password"),
-        tr("Save"),
-        FreshSessionTokenHelper::ActionType::updateSettings);
-
     // settingsChanged signal will be emitted automatically if stored events/messages changed.
-    m_currentUser->saveSettings(userSettings, sessionTokenHelper);
+    m_currentUser->saveSettings(userSettings);
 }
 
 void UserNotificationSettingsManager::onCurrentUserChanged(const QnUserResourcePtr& user)
