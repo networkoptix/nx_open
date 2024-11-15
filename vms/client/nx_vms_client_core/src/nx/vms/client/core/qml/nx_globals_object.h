@@ -119,11 +119,6 @@ public:
     /** Returns driver information (see QRhiDriverInfo) for RHI of the specified window. */
     Q_INVOKABLE QVariantMap getDriverInfo(QQuickWindow* window) const;
 
-    /**
-     * Ensures that the mouse button is still pressed and sends MouseButtonRelease if necessary.
-     */
-    Q_INVOKABLE void ensureMousePressed(QQuickItem* item, Qt::MouseButton button);
-
     static void registerQmlType();
 };
 
