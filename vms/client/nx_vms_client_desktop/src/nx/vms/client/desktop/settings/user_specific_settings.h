@@ -46,6 +46,10 @@ public:
     Property<QStringList> objectSearchAttributeFilters{this, "objectSearchAttributeFilters"};
     Property<nx::Uuid> objectSearchEngineId{this, "objectSearchEngineId"};
 
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(ObjectSearchDisplayMode, tiles, table)
+    Property<ObjectSearchDisplayMode> objectSearchDisplayMode{this, "objectSearchDisplayMode",
+        ObjectSearchDisplayMode::tiles};
+
 signals:
     void loaded();
 

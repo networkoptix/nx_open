@@ -13,10 +13,13 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/user_specific_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/event_processors.h>
+
 #if defined(Q_OS_MACOS)
     #include <ui/workaround/mac_utils.h>
 #endif
@@ -77,6 +80,11 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
 
             state->windowSize = quickWindow->size();
             state->windowPosition = quickWindow->position();
+
+            systemContext()->userSettings()->objectSearchDisplayMode =
+                quickWindow->property("tileView").toBool()
+                    ? UserSpecificSettings::ObjectSearchDisplayMode::tiles
+                    : UserSpecificSettings::ObjectSearchDisplayMode::table;
         };
 
     const auto restoreState =
@@ -122,6 +130,10 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
                     }
                 }
             }
+
+            window()->setProperty("tileView",
+                (systemContext()->userSettings()->objectSearchDisplayMode()
+                    == UserSpecificSettings::ObjectSearchDisplayMode::tiles));
         };
 
     installEventHandler(window(), QEvent::Hide, this, saveState);
