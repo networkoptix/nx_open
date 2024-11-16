@@ -6,6 +6,7 @@ os=Windows
 compiler=Visual Studio
 compiler.version=16
 compiler.cppstd=20
+qt/*:compiler.version=17
 
 [options]
 libpq/*:shared=True

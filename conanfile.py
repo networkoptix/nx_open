@@ -184,7 +184,7 @@ class NxOpenConan(ConanFile):
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
-        self.requires("qt/6.8.0" "#8e36855d51a96537f4423f657da99c96")
+        self.requires("qt/6.8.0" "#6920d91dc615ce740855be0dadc7fd22")
         self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
         self.requires("boost/1.83.0" "#e0be85c6f8107d7e960246e31cbbf7ab")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
@@ -215,7 +215,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#65cbc18a5eaa4fb69cd926eb0561ca0c")
+                    "#7292f614da00d0e4e8551e16b7a27113")
 
         if self.haveDesktopClient:
             self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
