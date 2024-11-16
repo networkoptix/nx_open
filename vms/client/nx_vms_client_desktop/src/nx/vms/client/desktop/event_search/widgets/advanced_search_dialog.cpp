@@ -107,7 +107,15 @@ AdvancedSearchDialog::AdvancedSearchDialog(QObject* parent):
             setMaximized(state->isMaximized);
 
             if (!state->windowSize.isEmpty())
+            {
                 window()->resize(state->windowSize);
+
+                // If platform window is not created, the window won't receive a resize event and
+                // the content item won't be resized automatically. We must do it explicitly.
+                // TODO: Remove when https://bugreports.qt.io/browse/QTBUG-131320 is fixed.
+                if (window()->contentItem() && !window()->handle())
+                    window()->contentItem()->setSize(state->windowSize);
+            }
 
             // Change default position only if saved position is valid (visible on a screen).
             if (state->windowPosition)
