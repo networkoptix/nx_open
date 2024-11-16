@@ -844,7 +844,7 @@
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>Na poziomie systemu użytkownik ma uprawnienia do:</translation>
     </message>
   </context>
   <context>
@@ -956,19 +956,19 @@
     </message>
     <message>
       <source>Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists in the system. It is recommended to assign unique names to the groups.</translation>
+      <translation>W systemie istnieje inna grupa o tej samej nazwie. Zaleca się przypisanie grupom unikalnych nazw.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Grupa jest zarówno jako element nadrzędny, jak i element podrzędny lub jest częścią takiego powiązanego odniesienia. Rozwiąż te powiązania, aby zapobiec nieprawidłowemu obliczaniu uprawnień.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Gdy ciągła synchronizacja z serwerem LDAP jest wyłączona, grupy nie synchronizują się automatycznie. Aby zaktualizować tę grupę, zainicjuj ręczną synchronizację.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Ta grupa nie została znaleziona w bazie danych LDAP.</translation>
     </message>
   </context>
   <context>
@@ -987,15 +987,15 @@
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Użyj przycisków z lewej strony, aby dodać członków</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Podsumowanie członków</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Dziedziczy członkostwo w bieżącej grupie</translation>
     </message>
   </context>
   <context>
@@ -1064,20 +1064,20 @@
     <name>InsecureWarning</name>
     <message>
       <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation type="unfinished">Account security is important. Do not enable this setting unless you have good reasons to do so.</translation>
+      <translation>Bezpieczeństwo konta jest ważne. Nie włączaj tego ustawienia, chyba że masz ku temu dobre powody.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Niewystarczające usługi</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
       <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+        <numerusform>%n wymagane są odpowiednie usługi integracyjne, aby włączyć integrację</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
@@ -1085,7 +1085,7 @@
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 odpowiednich usług jest dostępne</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1533,7 +1533,7 @@
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Zatwierdź</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1595,7 +1595,7 @@
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Zmień hasło - %1</translation>
     </message>
     <message>
       <source>Login</source>
