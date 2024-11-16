@@ -73,6 +73,12 @@ public:
         return add(std::move(connection));
     }
 
+    std::vector<ScopedConnection>::iterator begin() { return m_connections.begin(); }
+    std::vector<ScopedConnection>::const_iterator begin() const { return m_connections.begin(); }
+
+    std::vector<ScopedConnection>::iterator end() { return m_connections.begin(); }
+    std::vector<ScopedConnection>::const_iterator end() const { return m_connections.begin(); }
+
     void reset() { m_connections.clear(); }
 
     void release()
