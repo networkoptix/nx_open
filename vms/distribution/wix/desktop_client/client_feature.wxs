@@ -203,7 +203,6 @@
             <ComponentGroupRef Id="client_nx_libraries"/>
             <ComponentGroupRef Id="client_translations"/>
             <ComponentGroupRef Id="openal_libraries"/>
-            <ComponentGroupRef Id="hidapi_libraries"/>
             <ComponentGroupRef Id="client_qt_libraries"/>
             <ComponentGroupRef Id="client_qt_imageformats"/>
             <ComponentGroupRef Id="client_qt_tls"/>

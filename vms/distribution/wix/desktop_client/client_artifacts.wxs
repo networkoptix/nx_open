@@ -7,12 +7,6 @@
                 Directory="InstallDirRoot">
             <Component><File Name="OpenAL32.dll" KeyPath="yes" DiskId="3"/></Component>
         </ComponentGroup>
-        <ComponentGroup
-                Id="hidapi_libraries"
-                Source="${bin_source_dir}"
-                Directory="InstallDirRoot">
-            <Component><File Name="hidapi.dll" KeyPath="yes" DiskId="3"/></Component>
-        </ComponentGroup>
 
         <ComponentGroup
                 Id="client_qt_libraries"

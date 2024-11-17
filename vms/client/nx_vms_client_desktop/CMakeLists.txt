@@ -14,7 +14,9 @@ find_package(Qt6
         ShaderTools
     REQUIRED)
 
-find_package(hidapi REQUIRED)
+if(MACOSX)
+    find_package(hidapi REQUIRED)
+endif()
 
 find_package(range-v3 REQUIRED)
 
@@ -85,6 +87,11 @@ set(update_verification_keys ${open_source_root}/vms/static-resources/update_ver
 nx_set_qrc_source_files_properties(${update_verification_keys}
     ALIAS_PREFIX update_verification_keys/)
 
+set(nx_vms_client_desktop_conditional_dependencies)
+if(MACOSX)
+    list(APPEND nx_vms_client_desktop_conditional_dependencies hidapi::hidapi)
+endif()
+
 nx_add_target(nx_vms_client_desktop LIBRARY
     ADDITIONAL_SOURCES
         ${uic_files}
@@ -130,8 +137,8 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         nx_kit
         nx_monitoring
         nx_pathkit
-        hidapi::hidapi
         range-v3::range-v3
+        ${nx_vms_client_desktop_conditional_dependencies}
     FOLDER client/libs
     GDI
     MACOS_ARG_MAX_WORKAROUND

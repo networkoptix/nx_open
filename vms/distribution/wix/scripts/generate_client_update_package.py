@@ -125,7 +125,6 @@ def create_client_update_file(config, output_file):
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         tools.zip_files_to(zip, tools.ffmpeg_files(binaries_dir), binaries_dir)
         tools.zip_files_to(zip, tools.openssl_files(binaries_dir), binaries_dir)
-        tools.zip_files_to(zip, tools.hidapi_files(binaries_dir), binaries_dir)
         tools.zip_files_to(zip, tools.openal_files(binaries_dir), binaries_dir)
         tools.zip_files_to(zip, tools.quazip_files_to(binaries_dir), binaries_dir)
         tools.zip_files_to(zip, tools.nx_files(binaries_dir, nx_libraries), binaries_dir)

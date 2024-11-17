@@ -194,11 +194,6 @@ copyLibs()
     )
     distrib_copyLibs "${BUILD_DIR}/lib" "$STAGE_LIB" "${THIRD_PARTY_LIBS[@]}"
 
-    if [ "$ARCH" != "arm" ]
-    then
-        distrib_copyLibs "${BUILD_DIR}/lib" "$STAGE_LIB" libhidapi-hidraw.so.0
-    fi
-
     if [[ ${#CPP_RUNTIME_LIBS[@]} != 0 ]]
     then
         echo "  Copying system libs: ${CPP_RUNTIME_LIBS[@]}"

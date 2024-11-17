@@ -218,7 +218,8 @@ class NxOpenConan(ConanFile):
                     "#7292f614da00d0e4e8551e16b7a27113")
 
         if self.haveDesktopClient:
-            self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
+            if self.isMacos:
+                self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
             self.requires("pathkit/78de037" "#22007955c2c497d518f7efa9b3a45766")
 
         if self.haveDesktopClient or self.haveMobileClient:
@@ -306,7 +307,6 @@ class NxOpenConan(ConanFile):
 
         self.import_package("openssl")
         self.import_package("icu")
-        self.import_package("hidapi")
         self.import_package("cuda-toolkit")
 
         if self.isLinux:
@@ -330,6 +330,8 @@ class NxOpenConan(ConanFile):
                 self.import_package("intel-media-sdk-bin")
                 self.import_package("libvpl")
                 self.import_package("directx/JUN2010")
+            elif self.isMacos:
+                self.import_package("hidapi")
 
             self.import_package("ffmpeg")
 
