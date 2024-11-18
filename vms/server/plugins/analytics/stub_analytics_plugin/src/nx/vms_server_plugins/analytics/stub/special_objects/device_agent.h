@@ -13,6 +13,7 @@
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "engine.h"
 #include "stub_analytics_plugin_special_objects_ini.h"
@@ -120,6 +121,10 @@ private:
 
     std::mutex m_objectGenerationMutex;
     int m_counterObjectAttributeValue = 0;
+
+    const sdk::Uuid m_blinkingObjectTrackId = sdk::UuidHelper::randomUuid();
+    const sdk::Uuid m_fixedObjectTrackId = sdk::UuidHelper::randomUuid();
+    const sdk::Uuid m_counterObjectTrackId = sdk::UuidHelper::randomUuid();
 };
 
 } // namespace special_objects

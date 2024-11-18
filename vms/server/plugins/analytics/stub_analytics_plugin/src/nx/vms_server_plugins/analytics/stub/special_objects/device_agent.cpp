@@ -17,7 +17,6 @@
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/string_map.h>
-#include <nx/sdk/helpers/uuid_helper.h>
 
 #include "../utils.h"
 
@@ -245,9 +244,8 @@ Ptr<IObjectMetadata> DeviceAgent::cookBlinkingObjectIfNeeded(int64_t metadataTim
     m_lastBlinkingObjectTimestampUs = metadataTimestampUs;
 
     auto objectMetadata = makePtr<ObjectMetadata>();
-    static const Uuid trackId = UuidHelper::randomUuid();
     objectMetadata->setTypeId(kBlinkingObjectType);
-    objectMetadata->setTrackId(trackId);
+    objectMetadata->setTrackId(m_blinkingObjectTrackId);
     objectMetadata->setBoundingBox(Rect(0.25, 0.25, 0.5, 0.5));
 
     return objectMetadata;
@@ -291,9 +289,8 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
         return;
 
     auto objectMetadata = makePtr<ObjectMetadata>();
-    static const Uuid trackId = UuidHelper::randomUuid();
     objectMetadata->setTypeId(kFixedObjectType);
-    objectMetadata->setTrackId(trackId);
+    objectMetadata->setTrackId(m_fixedObjectTrackId);
     objectMetadata->setBoundingBox(Rect(0.1F, 0.1F, 0.25F, 0.25F));
 
     std::string fixedObjectColor;
@@ -317,9 +314,8 @@ void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPac
         return;
 
     auto objectMetadata = makePtr<ObjectMetadata>();
-    static const Uuid trackId = UuidHelper::randomUuid();
     objectMetadata->setTypeId(kCounterObjectType);
-    objectMetadata->setTrackId(trackId);
+    objectMetadata->setTrackId(m_counterObjectTrackId);
 
     const float realXOffset =
         clamp(m_deviceAgentSettings.counterBoundingBoxXOffset.load(), 0.0F, 1.0F);
