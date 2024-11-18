@@ -58,6 +58,12 @@ function(nx_prepare_ios_signing target profile_name app_id)
             ${provisioning_profiles_dir}/${profile_name}.mobileprovision
             provisioning_profile_id)
 
+        add_custom_command(TARGET ${target} PRE_LINK
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${provisioning_profiles_dir}/${profile_name}.mobileprovision"
+            "${app_dir}/embedded.mobileprovision"
+        )
+
         set_target_properties(${target} PROPERTIES
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${codeSigningIdentity}"
             XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codeSigningKeychainName}"
