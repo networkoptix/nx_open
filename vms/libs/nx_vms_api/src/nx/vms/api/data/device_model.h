@@ -287,7 +287,14 @@ NX_REFLECTION_ENUM_CLASS(DeviceCapability,
 )
 Q_DECLARE_FLAGS(DeviceCapabilities, DeviceCapability)
 
-struct NX_VMS_API DeviceModelV1: DeviceModelGeneral
+struct NX_VMS_API DeviceModelDeprecated
+{
+    /**%apidoc[opt] */
+    CameraBackupQuality backupQuality = CameraBackupDefault;
+};
+#define DeviceModelDeprecated_Fields (backupQuality)
+
+struct NX_VMS_API DeviceModelV1Base: DeviceModelGeneral
 {
     /**%apidoc[opt] */
     QString logicalId;
@@ -307,9 +314,6 @@ struct NX_VMS_API DeviceModelV1: DeviceModelGeneral
     /**%apidoc[opt] */
     bool isLicenseUsed = false;
 
-    /**%apidoc[opt] */
-    CameraBackupQuality backupQuality = CameraBackupDefault;
-
     /**%apidoc[immutable] */
     std::optional<DeviceCapabilities> capabilities;
 
@@ -317,17 +321,21 @@ struct NX_VMS_API DeviceModelV1: DeviceModelGeneral
      * %// Appeared starting from /rest/v2/devices.
      */
     std::optional<DeviceType> deviceType;
+};
+#define DeviceModelV1Base_Fields DeviceModelGeneral_Fields \
+    (logicalId)(options)(schedule) (motion) (status) (isLicenseUsed) \
+    (capabilities) (deviceType)
 
+struct NX_VMS_API DeviceModelV1: DeviceModelV1Base, DeviceModelDeprecated
+{
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV1> fromDbTypes(DbListTypes data);
 };
-#define DeviceModelV1_Fields DeviceModelGeneral_Fields \
-    (logicalId)(options)(schedule) (motion) (status) (isLicenseUsed) \
-    (backupQuality) (capabilities) (deviceType)
+#define DeviceModelV1_Fields DeviceModelV1Base_Fields DeviceModelDeprecated_Fields
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV1, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV1, DeviceModelV1_Fields);
 
-struct NX_VMS_API DeviceModelV3: DeviceModelV1
+struct NX_VMS_API DeviceModelV3Base: DeviceModelV1Base
 {
     /**%apidoc[readonly] */
     std::vector<nx::Uuid> compatibleAnalyticsEngineIds;
@@ -347,15 +355,28 @@ struct NX_VMS_API DeviceModelV3: DeviceModelV1
     //     (empty or not) in `parameters` via `v{1-2}`.
     //     PATCH (or PUT with existing) works fine.
     std::optional<std::vector<nx::Uuid>> userEnabledAnalyticsEngineIds;
+};
+#define DeviceModelV3Base_Fields DeviceModelV1Base_Fields \
+    (compatibleAnalyticsEngineIds)(mediaCapabilities)(mediaStreams) \
+    (streamUrls)(userEnabledAnalyticsEngineIds)
 
+struct NX_VMS_API DeviceModelV3: DeviceModelV3Base, DeviceModelDeprecated
+{
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV3> fromDbTypes(DbListTypes data);
 };
-#define DeviceModelV3_Fields DeviceModelV1_Fields \
-    (compatibleAnalyticsEngineIds)(mediaCapabilities)(mediaStreams) \
-    (streamUrls)(userEnabledAnalyticsEngineIds)
+#define DeviceModelV3_Fields DeviceModelV3Base_Fields DeviceModelDeprecated_Fields
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV3, DeviceModelV3_Fields);
+
+struct NX_VMS_API DeviceModelV4: DeviceModelV3Base
+{
+    DbUpdateTypes toDbTypes() &&;
+    static std::vector<DeviceModelV4> fromDbTypes(DbListTypes data);
+};
+#define DeviceModelV4_Fields DeviceModelV3Base_Fields
+QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV4, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DeviceModelV4, DeviceModelV4_Fields);
 
 struct NX_VMS_API DeviceTypeModel
 {
@@ -368,6 +389,6 @@ struct NX_VMS_API DeviceTypeModel
 QN_FUSION_DECLARE_FUNCTIONS(DeviceTypeModel, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceTypeModel, DeviceTypeModel_Fields);
 
-using DeviceModel = DeviceModelV3;
+using DeviceModel = DeviceModelV4;
 
 } // namespace nx::vms::api

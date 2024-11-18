@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/crud_model.h>
+#include <nx/utils/member_detector.h>
 #include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::api {
@@ -19,10 +20,14 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceScheduleSettings, (json), DeviceScheduleS
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceMotionSettings, (json), DeviceMotionSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV1, (json), DeviceModelV1_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV3, (json), DeviceModelV3_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV4, (json), DeviceModelV4_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelForSearch, (json), DeviceModelForSearch_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceTypeModel, (json), DeviceTypeModel_Fields)
 
 namespace {
+
+NX_UTILS_DECLARE_FIELD_DETECTOR_SIMPLE(hasBackupQuality, backupQuality);
+
 // TODO: #skolesnik Solve duplication of constant's definitions.
 const QString kCompatibleAnalyticsEnginesProperty = "compatibleAnalyticsEngines";
 const QString kMediaCapabilities = "mediaCapabilities";
@@ -34,7 +39,7 @@ const QString kCredentials("credentials");
 const QString kDefaultCredentials("defaultCredentials");
 const QString kCameraCapabilities("cameraCapabilities");
 
-void extractParametersToFields(DeviceModelV1* m)
+void extractParametersToFields(DeviceModelV1Base* m)
 {
     if (const auto it = m->parameters.find(kCredentials); it != m->parameters.end())
     {
@@ -64,9 +69,9 @@ void extractParametersToFields(DeviceModelV1* m)
     }
 }
 
-void extractParametersToFields(DeviceModelV3* m)
+void extractParametersToFields(DeviceModelV3Base* m)
 {
-    extractParametersToFields(static_cast<DeviceModelV1*>(m));
+    extractParametersToFields(static_cast<DeviceModelV1Base*>(m));
 
     if (const auto it = m->parameters.find(kCompatibleAnalyticsEnginesProperty); it != m->parameters.end())
     {
@@ -136,7 +141,7 @@ void extractParametersToFields(DeviceModelV3* m)
 // by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
 // list will result in creating the corresponding `parameters["field_name"]` with default emtpy
 // value.
-void moveFieldsToParameters(DeviceModelV1* m)
+void moveFieldsToParameters(DeviceModelV1Base* m)
 {
     // This code has been copied as is. It didn't invalidate the `credentials` field.
     if (m->credentials)
@@ -147,9 +152,9 @@ void moveFieldsToParameters(DeviceModelV1* m)
 // by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
 // list will result in creating the corresponding `parameters["field_name"]` with default emtpy
 // value.
-void moveFieldsToParameters(DeviceModelV3* m)
+void moveFieldsToParameters(DeviceModelV3Base* m)
 {
-    moveFieldsToParameters(static_cast<DeviceModelV1*>(m));
+    moveFieldsToParameters(static_cast<DeviceModelV1Base*>(m));
 
     if (m->userEnabledAnalyticsEngineIds)
     {
@@ -195,7 +200,6 @@ typename Model::DbUpdateTypes toDbTypes(Model model)
     attributes.cameraId = model.id;
     attributes.cameraName = model.name;
     attributes.logicalId = model.logicalId;
-    attributes.backupQuality = model.backupQuality;
     if (model.group)
         attributes.userDefinedGroupName = model.group->name;
 
@@ -274,7 +278,10 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
                 m.name = a->cameraName;
 
             m.logicalId = a->logicalId;
-            m.backupQuality = a->backupQuality;
+            if constexpr (hasBackupQuality<Model>::value)
+            {
+                m.backupQuality = a->backupQuality;
+            }
             m.isLicenseUsed = a->scheduleEnabled;
             if (!a->userDefinedGroupName.isEmpty())
             {
@@ -395,6 +402,16 @@ DeviceModelV3::DbUpdateTypes DeviceModelV3::toDbTypes() &&
 std::vector<DeviceModelV3> DeviceModelV3::fromDbTypes(DbListTypes data)
 {
     return api::fromDbTypes<DeviceModelV3>(std::move(data));
+}
+
+DeviceModelV4::DbUpdateTypes DeviceModelV4::toDbTypes() &&
+{
+    return api::toDbTypes(std::move(*this));
+}
+
+std::vector<DeviceModelV4> DeviceModelV4::fromDbTypes(DbListTypes data)
+{
+    return api::fromDbTypes<DeviceModelV4>(std::move(data));
 }
 
 } // namespace nx::vms::api
