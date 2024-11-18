@@ -310,6 +310,15 @@ void setGraphicsSettings()
         }
     }
 
+    if (graphicsApi == GraphicsApi::vulkan && nx::build_info::isLinux())
+    {
+        // Workaround for QTBUG-123607.
+        static const char* kDisableNativePixmaps = "QTWEBENGINE_DISABLE_NATIVE_PIXMAPS";
+
+        if (qgetenv(kDisableNativePixmaps).isEmpty())
+            qputenv(kDisableNativePixmaps, "1");
+    }
+
     const auto selectedApi = nameToApi.value(graphicsApi, QSGRendererInterface::OpenGL);
     gpu::selectDevice(selectedApi, ini().gpuName);
     QQuickWindow::setGraphicsApi(selectedApi);
