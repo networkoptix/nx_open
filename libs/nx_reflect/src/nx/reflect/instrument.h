@@ -38,7 +38,7 @@ public:
     }
 
     // Get the wrapped member-variable value from the object obj.
-    auto get(const Class& obj) const { return obj.*m_fieldPtr; }
+    decltype(auto) get(const Class& obj) const { return obj.*m_fieldPtr; }
 
     Type& ref(Class* obj) const { return obj->*m_fieldPtr; }
 

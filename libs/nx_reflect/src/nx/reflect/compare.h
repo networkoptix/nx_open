@@ -49,7 +49,7 @@ public:
     template<typename WrappedField>
     void visitField(const WrappedField& field)
     {
-        if constexpr (std::is_floating_point_v<decltype(field.get(m_left))>)
+        if constexpr (std::is_floating_point_v<typename WrappedField::Type>)
         {
             m_equals &= fuzzyEquals(field.get(m_left), field.get(m_right));
         }
