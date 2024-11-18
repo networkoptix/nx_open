@@ -39,6 +39,7 @@
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/core/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/thumbnails/abstract_caching_resource_thumbnail.h>
 #include <nx/vms/client/core/utils/geometry.h>
@@ -239,6 +240,7 @@ public:
 
 private:
     void recreateSourceModel();
+    void initCslSupport(AnalyticsSearchListModel* analyticsModel, AnalyticsFilterModel* analyticsFilterModel);
     int calculateItemCount() const;
     void updateItemCount();
     void updateIsConstrained();
@@ -1131,64 +1133,11 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 analyticsModel, &AnalyticsSearchListModel::pluginActionRequested,
                 q, &RightPanelModelsAdapter::pluginActionRequested);
 
-            auto updateModels =
-                [this, analyticsModel, analyticsFilterModel](SystemContext* cameraContext)
-                {
-                    if (cameraContext == q->commonSetup()->systemContext())
-                        return;
-
-                    const auto taxonomyManager = cameraContext->taxonomyManager();
-                    analyticsFilterModel->setTaxonomyManager(taxonomyManager);
-
-                    if (NX_ASSERT(taxonomyManager) && !cameraContext->messageProcessor())
-                    {
-                        // It is cross-system context case.
-                        cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
-                            taxonomyManager);
-                    }
-
-                    analyticsModel->setSystemContext(cameraContext);
-                    q->commonSetup()->setSystemContext(cameraContext);
-                };
-
-            m_modelConnections << connect(
-                m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-                this,
-                [this, updateModels]
-                {
-                    const auto selectedCamera = m_context->navigator()->currentResource()
-                        .dynamicCast<QnVirtualCameraResource>();
-                    if (!selectedCamera)
-                        return;
-
-                    updateModels(selectedCamera->systemContext()->as<SystemContext>());
-
-                    emit q->crossSiteModeChanged();
-                });
-
-            m_modelConnections << connect(
-                m_context->workbench(),
-                &Workbench::currentLayoutChanged,
-                this,
-                [this, updateModels]
-                {
-                    const auto selectedCamera = m_context->navigator()->currentResource()
-                        .dynamicCast<QnVirtualCameraResource>();
-                    if (!selectedCamera)
-                        return;
-
-                    updateModels(selectedCamera->systemContext()->as<SystemContext>());
-
-                    emit q->crossSiteModeChanged();
-                });
-
-            if (const auto selectedCamera = m_context->navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>())
+            if (nx::vms::client::core::ini().cslObjectsTabVisible)
             {
-                updateModels(selectedCamera->systemContext()->as<SystemContext>());
+                initCslSupport(analyticsModel, analyticsFilterModel);
+                emit q->crossSiteModeChanged();
             }
-
-            emit q->crossSiteModeChanged();
 
             break;
         }
@@ -1270,6 +1219,68 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
 
     updateIsConstrained();
     updateItemCount();
+}
+
+void RightPanelModelsAdapter::Private::initCslSupport(
+    AnalyticsSearchListModel* analyticsModel,
+    AnalyticsFilterModel*analyticsFilterModel)
+{
+    auto updateModels =
+        [this, analyticsModel, analyticsFilterModel](SystemContext* cameraContext)
+        {
+            if (cameraContext == q->commonSetup()->systemContext())
+                return;
+
+            const auto taxonomyManager = cameraContext->taxonomyManager();
+            analyticsFilterModel->setTaxonomyManager(taxonomyManager);
+
+            if (NX_ASSERT(taxonomyManager) && !cameraContext->messageProcessor())
+            {
+                // It is cross-system context case.
+                cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                    taxonomyManager);
+            }
+
+            analyticsModel->setSystemContext(cameraContext);
+            q->commonSetup()->setSystemContext(cameraContext);
+        };
+
+    m_modelConnections << connect(
+        m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this,
+        [this, updateModels]
+        {
+            const auto selectedCamera = m_context->navigator()->currentResource()
+                .dynamicCast<QnVirtualCameraResource>();
+            if (!selectedCamera)
+                return;
+
+            updateModels(selectedCamera->systemContext()->as<SystemContext>());
+
+            emit q->crossSiteModeChanged();
+        });
+
+    m_modelConnections << connect(
+        m_context->workbench(),
+        &Workbench::currentLayoutChanged,
+        this,
+        [this, updateModels]
+        {
+            const auto selectedCamera = m_context->navigator()->currentResource()
+                .dynamicCast<QnVirtualCameraResource>();
+            if (!selectedCamera)
+                return;
+
+            updateModels(selectedCamera->systemContext()->as<SystemContext>());
+
+            emit q->crossSiteModeChanged();
+        });
+
+    if (const auto selectedCamera = m_context->navigator()->currentResource()
+        .dynamicCast<QnVirtualCameraResource>())
+    {
+        updateModels(selectedCamera->systemContext()->as<SystemContext>());
+    }
 }
 
 void RightPanelModelsAdapter::Private::setHighlightedTimestamp(microseconds value)
