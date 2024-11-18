@@ -356,7 +356,8 @@ void AsyncClient::setOnDone(nx::utils::MoveOnlyFunc<void()> handler)
 void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
 {
     m_requestBody = std::move(body);
-    m_requestBody->bindToAioThread(getAioThread());
+    if (m_requestBody)
+        m_requestBody->bindToAioThread(getAioThread());
 }
 
 void AsyncClient::doGet(const nx::utils::Url& url)
