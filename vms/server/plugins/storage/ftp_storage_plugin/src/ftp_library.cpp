@@ -1,17 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <cstring>
-#include <atomic>
 #include <algorithm>
-#include <stdexcept>
-#include <sstream>
+#include <cassert>
 #include <cctype>
 #include <cstdio>
-#include <fstream>
-#include <cassert>
-#include <ctime>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <fstream>
 #include <iostream>
+#include <optional>
+#include <sstream>
+#include <stdexcept>
+#include <unordered_map>
 
 #if defined(__linux__) || defined(__APPLE__)
 #   include <sys/stat.h>
@@ -25,69 +26,8 @@
 #   define NOEXCEPT noexcept
 #endif
 
-namespace nx_spl
-{
-
-// auxiliary data structures/functions
-namespace aux
-{   // Some custom exceptions.
-// Generally we want to distinguish nature of bad things happened.
-class NetworkException
-    : public std::runtime_error
-{
-public:
-    explicit NetworkException(const char* s)
-        : runtime_error(s)
-    {}
-
-    virtual const char* what() const NOEXCEPT
-    {
-        return runtime_error::what();
-    }
-};
-
-class BadUrlException
-    : public std::runtime_error
-{
-public:
-    explicit BadUrlException(const char* s)
-        : runtime_error(s)
-    {}
-
-    virtual const char* what() const NOEXCEPT
-    {
-        return runtime_error::what();
-    }
-};
-
-class ConnectException
-    : public std::runtime_error
-{
-public:
-    explicit ConnectException(const char* s)
-        : runtime_error(s)
-    {}
-
-    virtual const char* what() const NOEXCEPT
-    {
-        return runtime_error::what();
-    }
-};
-
-
-class InternalErrorException
-    : public std::runtime_error
-{
-public:
-    explicit InternalErrorException(const char* s)
-        : runtime_error(s)
-    {}
-
-    virtual const char* what() const NOEXCEPT
-    {
-        return runtime_error::what();
-    }
-};
+namespace nx_spl {
+namespace aux {
 
 // Scoped file remover
 class FileRemover
@@ -123,10 +63,38 @@ public:
             *m_ecode = m_err;
     }
 private:
-    FILE            *m_f;
-    int             *m_ecode;
-    error::code_t    m_err;
+    FILE* m_f;
+    int* m_ecode;
+    error::code_t m_err;
 };
+
+std::string urlDecode(std::string s)
+{
+    static const std::unordered_map<std::string, std::string> kUrlDecodeTable = {
+        {"%21", "!"}, {"%23", "#"}, {"%24", "$"}, {"%26", "&"}, {"%27", "'"}, {"%28", "("},
+        {"%29", ")"}, {"%2A", "*"}, {"%2B", "+"}, {"%2C", ","}, {"%2F", "/"}, {"%3A", ":"},
+        {"%3B", ";"}, {"%3D", "="}, {"%3F", "?"}, {"%40", "@"}, {"%5B", "["}, {"%4D", "]"}
+    };
+
+    std::string result;
+    for (size_t i = 0; i < s.size();)
+    {
+        if (s[i] == '%' && i < s.size() - 2)
+        {
+            const auto it = kUrlDecodeTable.find(std::string(s.cbegin() + i, s.cbegin() + i + 3));
+            if (it != kUrlDecodeTable.cend())
+            {
+                result += it->second;
+                i += 3;
+                continue;
+            }
+        }
+
+        result.push_back(s[i++]);
+    }
+
+    return result;
+}
 
 // Url data structure and custom parsing function
 struct Url
@@ -263,6 +231,7 @@ struct Url
         }
 
     end:
+        u.upasswd = urlDecode(u.upasswd);
         return u;
     } // Url::fromString()
 }; // struct Url
@@ -322,6 +291,24 @@ while(0)
 #undef REQUIRE_THROW
 } // namespace test
 
+std::optional<std::vector<std::string>> readLines(const std::string& path)
+{
+    std::ifstream ifs(path);
+    if (!ifs)
+        return std::nullopt;
+
+    std::string line;
+    std::vector<std::string> result;
+    while (!ifs.eof())
+    {
+        std::getline(ifs, line);
+        if (!line.empty())
+            result.push_back(line);
+    }
+
+    return result;
+}
+
 // Cut dir name from file name and return both.
 void dirFromUri(
     const std::string   &uri, // In
@@ -339,6 +326,8 @@ void dirFromUri(
     else
     {
         dir->assign(uri.begin(), uri.begin() + pos);
+        if (!dir->empty() && dir->at(dir->size() - 1) != '/')
+            *dir += '/';
         if (pos < uri.size() - 1) // if file name is not empty
             file->assign(uri.begin() + pos + 1, uri.end());
     }
@@ -346,62 +335,15 @@ void dirFromUri(
 
 static FileNameAndPath localUniqueFilePath(const std::string& suffix = std::string());
 
-// Checks if remote file exists. Bases on MLSD command response parsing.
-bool remoteFileExists(const std::string& uri, ftplib& impl)
+std::string toRelativeFtpPath(std::string path)
 {
-    const auto fileInfo = localUniqueFilePath();
-    FileRemover fr(fileInfo.fullPath);
-    std::string dir;
-    std::string file;
-    dirFromUri(uri, &dir, &file);
+    if (path.empty())
+        return "./";
 
-    if (file.empty()) // Uri shouldn't end with '/'
-        throw std::runtime_error("empty file name");
+    if (path.size() >= 2 && path[0] == '.' && path[1] == '/')
+        return path;
 
-    if (impl.Nlst(fileInfo.fullPath.c_str(), dir.c_str()) == 0)
-        throw aux::BadUrlException("MLSD failed. Remote dir not exists");
-
-    std::ifstream ifs(fileInfo.fullPath);
-    if (!ifs)
-        throw std::runtime_error("Local file open failed");
-
-    std::string line;
-    bool found = false;
-    while (!ifs.eof())
-    {
-        std::getline(ifs, line);
-        std::string::size_type pos = line.find(file);
-        // check that match is exact. ('a.txt' query shouldn't trigger for 'aaa.txt')
-        if (pos != std::string::npos && (pos == 0 || line[pos-1] == ';' || line[pos-1] == ' '))
-        {
-            found = true;
-            break;
-        }
-    }
-    ifs.close();
-    return found;
-}
-
-// set error code to initial state (NoError generally if storage is available)
-error::code_t checkECode(
-    int            *checked,                // ecode to set
-    const int       avail,                  // pass result of getAvail here
-    error::code_t   toSet = error::NoError  // default ecode
-)
-{
-    if (checked)
-        *checked = error::NoError;
-
-    if (!avail)
-    {
-        if (checked)
-            *checked = error::StorageUnavailable;
-        return error::StorageUnavailable;
-    }
-    else if (checked)
-        *checked = toSet;
-
-    return (error::code_t)*checked;
+    return path[0] == '/' ? "." + path : "./" + path;
 }
 
 // get local file size by it's name
@@ -439,79 +381,260 @@ long long getFileSize(const char *fname)
 #endif
 }
 
-void establishFtpConnection(
-    const std::string              *rawUrl,     // In (May be NULL)
-    std::string                    &url,        // InOut (Out if rawUrl is not null, otherwise should be correctly set)
-    std::string                    &uname,      // InOut (Out if rawUrl is not null, otherwise should be correctly set)
-    std::string                    &upasswd,    // InOut (Out if rawUrl is not null, otherwise should be correctly set)
-    implPtrType                    &impl        // Out
-)
+void log(const std::string& message)
 {
-    try
-    {
-        impl.reset(new ftplib);
-    }
-    catch (const std::exception& e)
-    {
-        throw aux::NetworkException(e.what());
-    }
-
-    if (rawUrl)
-    {
-        aux::Url u;
-        try
-        {
-            u = aux::Url::fromString(*rawUrl);
-        }
-        catch (const std::exception& e)
-        {
-            throw aux::BadUrlException(e.what());
-        }
-        url = u.host + ':' + (u.port.empty() ? std::string("21") : u.port);
-        uname = u.uname.empty() ? "anonymous" : u.uname.c_str();
-        upasswd = u.upasswd.empty() ? "" : u.upasswd.c_str();
-    }
-
-    try
-    {
-        if (impl->Connect(url.c_str()) == 0)
-            throw aux::ConnectException("Couldn't connect");
-
-        if (impl->Login(uname.c_str(), upasswd.c_str()) == 0)
-        {
-            impl->Quit();
-            throw aux::ConnectException("couldn't login");
-        }
-    }
-    catch (const std::exception&)
-    {
-        if (impl)
-            impl->Quit();
-        throw;
-    }
+    static bool kLoggingEnabled = false;
+    if (kLoggingEnabled)
+        std::cout << "ftp storage: " << message << std::endl;
 }
 
-int tryFtpReconnect(
-    const implPtrType   &impl,
-    const std::string   &url,
-    const std::string   &uname,
-    const std::string   &upasswd,
-    int                 *ecode = nullptr
-)
+class FtpLibWrapper
 {
-    impl->Quit();
-    if (impl->Connect(url.c_str()) == 0)
-        return 0;
+public:
+    FtpLibWrapper(const std::string& url);
+    bool isAvailable() const;
+    std::optional<std::vector<std::string>> dir(const std::string& path) const;
+    bool put(const std::string& localPath, const std::string& remotePath);
+    bool get(const std::string& localPath, const std::string& remotePath);
+    bool removeFile(const std::string& remotePath);
+    bool removeDir(const std::string& remotePath);
+    bool renameFile(const std::string& oldPath, const std::string& newPath);
+    std::optional<std::vector<std::string>> nlst(const std::string& remotePath) const;
+    bool pathExists(const std::string& remotePath) const;
+    std::optional<int> fileSize(const std::string& remotePath) const;
+    bool makePath(const std::string& dirPath);
+    std::optional<FileType> fileType(const std::string& remotePath);
 
-    if (impl->Login(uname.c_str(), upasswd.c_str()) == 0)
+private:
+    void establishFtpConnection();
+    void ftpReconnect() const;
+
+    template<typename F>
+    bool executeWithRetry(F f, const std::string& command) const;
+
+private:
+    std::string m_url;
+    std::string m_username;
+    std::string m_password;
+    mutable std::mutex m_mutex;
+    mutable std::unique_ptr<ftplib> m_ftplib;
+};
+
+void FtpLibWrapper::ftpReconnect() const
+{
+    m_ftplib = std::make_unique<ftplib>();
+    if (m_ftplib->Connect(m_url.data()) == 0)
+        throw std::runtime_error("Couldn't connect");
+
+    if (m_ftplib->Login(m_username.data(), m_password.data()) == 0)
+        throw std::runtime_error("Couldn't login");
+}
+
+FtpLibWrapper::FtpLibWrapper(const std::string& url)
+{
+    const auto u = aux::Url::fromString(url);
+    m_url = u.host + ':' + (u.port.empty() ? std::string("21") : u.port);
+    m_username = u.uname.empty() ? "anonymous" : u.uname.data();
+    m_password = u.upasswd.empty() ? "" : u.upasswd.data();
+    ftpReconnect();
+}
+
+template<typename F>
+bool FtpLibWrapper::executeWithRetry(F f, const std::string& command) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (f())
     {
-        impl->Quit();
-        return 0;
+        log(command + " succeeded");
+        return true;
     }
 
-    if(ecode)
-        *ecode = error::NoError;
-    return 1;
+    try
+    {
+        log(command + " failed. Retrying.");
+        ftpReconnect();
+        if (!f())
+        {
+            log(command + " retry failed");
+            return false;
+        }
+    }
+    catch(...)
+    {
+        log(command + " retry failed.");
+        return false;
+    }
+
+    return true;
+}
+
+#define EXEC_WITH_RETRY(command, args) \
+    executeWithRetry([&]() { return m_ftplib->command args; }, #command)
+
+bool FtpLibWrapper::isAvailable() const
+{
+    return EXEC_WITH_RETRY(TestControlConnection, ());
+}
+
+std::optional<std::vector<std::string>> FtpLibWrapper::dir(const std::string& path) const
+{
+    const auto fileInfo = aux::localUniqueFilePath();
+    aux::FileRemover fr(fileInfo.fullPath);
+    log("Dir. path: '" + path + "'");
+    if (!EXEC_WITH_RETRY(Dir, (fileInfo.fullPath.data(), path.data())))
+        return std::nullopt;
+
+    return readLines(fileInfo.fullPath);
+}
+
+bool FtpLibWrapper::put(const std::string& localPath, const std::string& remotePath)
+{
+    log("Put. path: '" + remotePath + "'");
+    return EXEC_WITH_RETRY(Put, (localPath.data(), remotePath.data(), ftplib::image));
+}
+
+bool FtpLibWrapper::get(const std::string& localPath, const std::string& remotePath)
+{
+    log("Get. path: '" + remotePath + "'");
+    return EXEC_WITH_RETRY(Get, (localPath.data(), remotePath.data(), ftplib::image));
+}
+
+bool FtpLibWrapper::removeFile(const std::string& remotePath)
+{
+    log("RemoveFile (Delete). path: '" + remotePath + "'");
+    return EXEC_WITH_RETRY(Delete, (remotePath.data()));
+}
+
+bool FtpLibWrapper::removeDir(const std::string& remotePath)
+{
+    log("RmDir. path: '" + remotePath + "'");
+    return EXEC_WITH_RETRY(Rmdir, (remotePath.data()));
+}
+
+bool FtpLibWrapper::renameFile(const std::string& oldPath, const std::string& newPath)
+{
+    log("Rename. old path: '" + oldPath + "', new path: '" + newPath + "'");
+    return EXEC_WITH_RETRY(Rename, (oldPath.data(), newPath.data()));
+}
+
+std::optional<std::vector<std::string>> FtpLibWrapper::nlst(const std::string& remotePath) const
+{
+    const auto fileInfo = aux::localUniqueFilePath();
+    aux::FileRemover fr(fileInfo.fullPath);
+
+    log("nlst: arg: '" + aux::toRelativeFtpPath(remotePath) + "'");
+    if (!EXEC_WITH_RETRY(Nlst, (fileInfo.fullPath.data(), aux::toRelativeFtpPath(remotePath).data())))
+        return std::nullopt;
+
+    const auto lines = readLines(fileInfo.fullPath);
+    if (!lines)
+    {
+        log("nlst: Failed to read lines from a local file");
+        return std::nullopt;
+    }
+
+    std::vector<std::string> result;
+    for (auto line: *lines)
+    {
+        if (!line.empty())
+        {
+            log("    Nlst entry: '" + line + "'");
+            result.push_back(line);
+        }
+    }
+
+    return result;
+}
+
+bool FtpLibWrapper::pathExists(const std::string& remotePath) const
+{
+    const auto fileInfo = localUniqueFilePath();
+    FileRemover fr(fileInfo.fullPath);
+    std::string dir;
+    std::string file;
+    dirFromUri(remotePath, &dir, &file);
+
+    if (file.empty()) // Uri shouldn't end with '/'
+        throw std::runtime_error("empty file name");
+
+    const auto result = nlst(dir);
+    if (!result)
+    {
+        log("pathExists: nlst failed");
+        return false;
+    }
+
+    const bool existsResult = std::any_of(
+        result->cbegin(), result->cend(), [&remotePath](const auto& line) { return line == remotePath; });
+
+    log("pathExists: result: " + std::to_string(existsResult));
+    return existsResult;
+}
+
+std::optional<int> FtpLibWrapper::fileSize(const std::string& remotePath) const
+{
+    log("FileSize. path: '" + remotePath + "'");
+    int size = -1;
+    if (!EXEC_WITH_RETRY(Size, (remotePath.data(), &size, ftplib::image)))
+        return std::nullopt;
+
+    return size;
+}
+
+bool FtpLibWrapper::makePath(const std::string& dirPath)
+{
+    if (dirPath.empty() || dirPath[0] != '.' || dirPath[1] != '/')
+    {
+        assert(false);
+        return false;
+    }
+
+    size_t pos = 2;
+    while (pos < dirPath.size())
+    {
+        const size_t newPos = dirPath.find("/", pos);
+        if (newPos == std::string::npos)
+        {
+            if (pathExists(dirPath))
+                return true;
+
+            log("Mkdir. (whole) path: '" + dirPath + "'");
+            EXEC_WITH_RETRY(Mkdir, (dirPath.data()));
+            break;
+        }
+        else
+        {
+            std::string path(dirPath.begin(), dirPath.begin() + newPos);
+            if (!pathExists(path))
+            {
+                log("Mkdir. path: '" + path + "'");
+                EXEC_WITH_RETRY(Mkdir, (path.data()));
+            }
+
+            pos = newPos + 1;
+        }
+    }
+
+    return true;
+}
+
+std::optional<FileType> FtpLibWrapper::fileType(const std::string& remotePath)
+{
+    log("fileType. path: '" + remotePath +"'");
+    if (const auto dirResult = dir(remotePath + "/"); dirResult && !dirResult->empty())
+    {
+        log("fileType. path: '" + remotePath + "' is Dir");
+        return FileType::isDir;
+    }
+
+    if (pathExists(remotePath))
+    {
+        log("fileType. path: '" + remotePath + "' is File");
+        return FileType::isFile;
+    }
+
+    log("fileType. path: '" + remotePath + "' is UNKNOWN");
+    return std::nullopt;
 }
 
 /**
@@ -529,7 +652,7 @@ static FileNameAndPath localUniqueFilePath(const std::string& suffix)
         if (result == 0)
             std::cerr << "Failed to get a temporary folder path" << std::endl;
         tmpFolder = buf;
-    #elif defined (__unix__)
+    #elif defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
         for (const auto& v: {"TMP", "TEMP", "TMPDIR", "TEMPDIR"})
         {
             const char* envVar = getenv(v);
@@ -558,88 +681,28 @@ static FileNameAndPath localUniqueFilePath(const std::string& suffix)
 } // namespace aux
 
 // FileInfo Iterator
-FtpFileInfoIterator::FtpFileInfoIterator(
-    ftplib             &impl,
-    FileListType      &&fileList,
-    const std::string  &baseDir
-)
-    : m_impl(impl),
-        m_fileList(std::move(fileList)),
-        m_curFile(m_fileList.cbegin())
+FtpFileInfoIterator::FtpFileInfoIterator(FtpImplPtr impl, FileListType&& fileList):
+    m_impl(impl),
+    m_fileList(std::move(fileList)),
+    m_curFile(m_fileList.cbegin())
 {
-    m_urlData.assign(baseDir.cbegin(), baseDir.cend());
-    if (baseDir.empty() || baseDir[baseDir.size()-1] != '/')
-    {
-        m_urlData.push_back('/');
-        m_basedirsize = (int)(baseDir.size() + 1);
-    }
-    else
-        m_basedirsize = (int)baseDir.size();
 }
 
 FtpFileInfoIterator::~FtpFileInfoIterator()
 {}
 
-int FtpFileInfoIterator::fileInfoFromMLSDString(
-    const char  *mlsd,  // In. Null-terminated.
-    FileInfo    *fi,    // Out.
-    char        *urlBuf // Out. Should be vaild memory.
-) const
-{
-    // MLSD response is array of 'attr1=val1;attr2=val2;...; fileName' strings
-    char buf[1024];
-    strcpy(buf, mlsd);
-    const char* vp = strtok(buf, ";");
-    memset(fi, '\0', sizeof(FileInfo));
-    while (vp)
-    {
-        if (const char* eq = strchr(vp, '='))
-        {
-            if (strncmp(vp, "size", 4) == 0 || strncmp(vp, "SIZE", 4) == 0)
-                fi->size = strtoul(eq+1, NULL, 10);
-            else if (strncmp(vp, "type", 4) == 0 || strncmp(vp, "TYPE", 4) == 0)
-            {
-                ++eq;
-                if ((eq[0] == 'd' || eq[0] == 'D') &&
-                    (eq[1] == 'i' || eq[1] == 'I') &&
-                    (eq[2] == 'r' || eq[0] == 'R'))
-                {
-                    fi->type = isDir;
-                }
-                else if ((eq[0] == 'f' || eq[0] == 'F') &&
-                            (eq[1] == 'i' || eq[1] == 'I') &&
-                            (eq[2] == 'l' || eq[0] == 'L'))
-                {
-                    fi->type = isFile;
-                }
-            }
-        }
-        else
-        {
-            while (isspace(*vp))
-                ++vp;
-            memcpy(urlBuf, vp, strlen(vp));
-            urlBuf[strlen(vp)] = '\0';
-        }
-        vp = strtok(NULL, ";");
-    }
-    return 0;
-}
-
-FileInfo* STORAGE_METHOD_CALL FtpFileInfoIterator::next(int* ecode) const
+FileInfo* FtpFileInfoIterator::next(int* ecode) const
 {
     if (ecode)
         *ecode = nx_spl::error::NoError;
 
     if (m_curFile != m_fileList.cend())
     {
-        m_urlData.resize(m_curFile->size() + m_urlData.size());
-        fileInfoFromMLSDString(
-            m_curFile->c_str(),
-            &m_fileInfo,
-            m_urlData.data() + m_basedirsize
-        );
-        m_fileInfo.url = m_urlData.data();
+        m_fileInfo.url = m_curFile->data();
+        const auto fileType = m_impl->fileType(aux::toRelativeFtpPath(*m_curFile));
+        if (fileType)
+            m_fileInfo.type = *fileType;
+
         ++m_curFile;
         return &m_fileInfo;
     }
@@ -675,319 +738,165 @@ int FtpFileInfoIterator::releaseRef() const
     return p_releaseRef();
 }
 
-
 // Ftp Storage
 FtpStorage::FtpStorage(const std::string& url)
-    : m_available(false)
 {
-    try
-    {
-        aux::establishFtpConnection(
-            &url,
-            m_implurl,
-            m_user,
-            m_passwd,
-            m_impl
-        );
-    }
-    catch(const aux::ConnectException&)
-    {
-        m_impl->Quit();
-        m_available = false;
-        return;
-    }
-    catch(...)
-    {
-        m_impl->Quit();
-        throw;
-    }
-    m_available = true;
+    m_impl = std::make_shared<aux::FtpLibWrapper>(url);
 }
 
 FtpStorage::~FtpStorage()
 {
-    m_impl->Quit();
 }
 
-int STORAGE_METHOD_CALL FtpStorage::isAvailable() const
-{   // If PASV failed it means that either there are some network problems
-    // or just we've been idle for too long and server has closed control session.
-    // In the latter case we can try to reestablish connection.
-
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_available = m_impl->TestControlConnection();
-    if (!m_available)
-    {
-        m_available = aux::tryFtpReconnect(
-            m_impl,
-            m_implurl,
-            m_user,
-            m_passwd
-        );
-    }
-    return m_available;
+int FtpStorage::isAvailable() const
+{
+    return m_impl->isAvailable();
 }
 
-uint64_t STORAGE_METHOD_CALL FtpStorage::getFreeSpace(int* ecode) const
-{   // In general there is no reliable way to determine FTP server free disk space
-    //if (ecode)
-    //    *ecode = error::SpaceInfoNotAvailable;
-    //return unknown_size;
+uint64_t FtpStorage::getFreeSpace(int* ecode) const
+{
     if (ecode)
         *ecode = error::NoError;
 
-    return 1000LL * 1000 * 1000 * 100; // for tests
+    return 1000LL * 1000 * 1000 * 100;
 }
 
-uint64_t STORAGE_METHOD_CALL FtpStorage::getTotalSpace(int* ecode) const
-{   // In general there is no reliable way to determine FTP server total disk space
-    //if (ecode)
-    //    *ecode = error::SpaceInfoNotAvailable;
-    //return unknown_size;
+uint64_t FtpStorage::getTotalSpace(int* ecode) const
+{
     if (ecode)
         *ecode = error::NoError;
 
-    return 1000LL * 1000 * 1000 * 100; // for tests
+    return 1000LL * 1000 * 1000 * 100;
 }
 
-int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
+int FtpStorage::getCapabilities() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (!getAvail())
-        return 0;
+    if (m_capabilities != 0)
+        return m_capabilities;
+
+    // list
+    if (m_impl->dir("./"))
+        m_capabilities |= cap::ListFile;
 
     const auto fileInfo = aux::localUniqueFilePath();
     aux::FileRemover fr(fileInfo.fullPath);
 
-    // list
-    int ret = 0;
-    if (m_impl->Dir(fileInfo.fullPath.c_str(), ".") == 1)
-        ret |= cap::ListFile;
-
     FILE* ofs = fopen(fileInfo.fullPath.c_str(), "wb");
-
-    // write file
     if (ofs)
     {
         fwrite("1", 1, 2, ofs);
         fclose(ofs);
-        if (m_impl->Put(fileInfo.fullPath.c_str(),
-                        fileInfo.name.c_str(),
-                        ftplib::image) != 0)
-        {
-            ret |= cap::WriteFile;
-        }
+        if (m_impl->put(fileInfo.fullPath, fileInfo.name))
+            m_capabilities |= cap::WriteFile;
     }
     else
-        return ret;
+        return m_capabilities;
 
-    // read file
-    if (m_impl->Get(fileInfo.fullPath.c_str(), fileInfo.name.c_str(), ftplib::image) != 0)
-        ret |= cap::ReadFile;
+    if (m_impl->get(fileInfo.fullPath.c_str(), fileInfo.name.c_str()))
+        m_capabilities |= cap::ReadFile;
 
     // remove file
-    if (m_impl->Delete(fileInfo.name.c_str()) != 0)
-        ret |= cap::RemoveFile;
+    if (m_impl->removeFile(fileInfo.name.c_str()))
+        m_capabilities |= cap::RemoveFile;
 
-    return ret;
+    return m_capabilities;
 }
 
-void STORAGE_METHOD_CALL FtpStorage::removeFile(
-    const char  *url,
-    int         *ecode
-)
+void FtpStorage::removeFile(const char* url, int* ecode)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
-        return;
-    if (m_impl->Delete(url) == 0 && ecode)
-        *ecode = error::UnknownError;
+    *ecode = m_impl->removeFile(aux::toRelativeFtpPath(url))
+        ? error::NoError : error::StorageUnavailable;
 }
 
-void STORAGE_METHOD_CALL FtpStorage::removeDir(
-    const char  *url,
-    int         *ecode
-)
+void FtpStorage::removeDir(const char* url, int *ecode)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
-        return;
-
-    if (m_impl->Rmdir(url) == 0 && ecode)
-        *ecode = error::UnknownError;
+    *ecode = m_impl->removeDir(aux::toRelativeFtpPath(url))
+        ? error::NoError : error::StorageUnavailable;
 }
 
-void STORAGE_METHOD_CALL FtpStorage::renameFile(
-    const char*     oldUrl,
-    const char*     newUrl,
-    int*            ecode
-)
+void FtpStorage::renameFile(const char* oldUrl, const char* newUrl, int* ecode)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
-        return;
-
-    if (m_impl->Rename(oldUrl, newUrl) == 0 && ecode)
-        *ecode = error::UnknownError;
+    *ecode = m_impl->renameFile(aux::toRelativeFtpPath(oldUrl), aux::toRelativeFtpPath(newUrl))
+        ? error::NoError : error::StorageUnavailable;
 }
 
-FileInfoIterator* STORAGE_METHOD_CALL FtpStorage::getFileIterator(
-    const char*     dirUrl,
-    int*            ecode
-) const
+FileInfoIterator* FtpStorage::getFileIterator(const char* dirUrl, int* ecode) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
+    auto paths = m_impl->nlst(dirUrl);
+    *ecode = paths ? error::NoError : error::StorageUnavailable;
+    if (!paths)
         return nullptr;
 
-    const auto fileInfo = aux::localUniqueFilePath();
-    aux::FileRemover fr(fileInfo.fullPath);
-
-    if (m_impl->Nlst(fileInfo.fullPath.c_str(), dirUrl) == 0)
+    for (auto& p: *paths)
     {
-        *ecode = error::UnknownError;
-        return nullptr;
+        while (p.size() > 1 && (p[0] == '.' || p[0] == '/'))
+            p = std::string(p.begin() + 1, p.end());
     }
 
-    std::ifstream ifs(fileInfo.fullPath);
-    if (!ifs)
-    {
-        *ecode = error::UnknownError;
-        return nullptr;
-    }
-
-    std::string line;
-    std::vector<std::string> urls;
-
-    while (!ifs.eof())
-    {
-        std::getline(ifs, line);
-        if (!line.empty())
-            urls.push_back(line);
-    }
-
-    return new FtpFileInfoIterator(
-        *m_impl,
-        std::move(urls),
-        dirUrl
-    );
+    return new FtpFileInfoIterator(m_impl, std::move(*paths));
 }
 
-int STORAGE_METHOD_CALL FtpStorage::fileExists(
-    const char  *url,
-    int         *ecode
-) const
+int FtpStorage::fileExists(const char* url, int* ecode) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
-        return 0;
+    *ecode = error::NoError;
+    const auto remotePath = aux::toRelativeFtpPath(url);
+    const auto type = m_impl->fileType(aux::toRelativeFtpPath(remotePath));
+    if (type && *type == FileType::isFile)
+        return 1;
 
-    try
-    {
-        if (!aux::remoteFileExists(url, *m_impl))
-            return 0;
-        else
-            return 1;
-    }
-    catch (const std::exception&)
-    {
-        *ecode = error::UnknownError;
-        return 0;
-    }
+    return 0;
 }
 
-int STORAGE_METHOD_CALL FtpStorage::dirExists(
-    const char  *url,
-    int         *ecode
-) const
+int FtpStorage::dirExists(const char* url, int* ecode) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
-        return 0;
+    *ecode = error::NoError;
+    const auto remotePath = aux::toRelativeFtpPath(url);
+    const auto type = m_impl->fileType(aux::toRelativeFtpPath(remotePath));
+    if (type && *type == FileType::isDir)
+        return 1;
 
-    const auto fileInfo = aux::localUniqueFilePath();
-    aux::FileRemover fr(fileInfo.fullPath);
-
-    if (m_impl->Nlst(fileInfo.fullPath.c_str(), url) == 0)
-        return 0;
-
-    return 1;
+    return 0;
 }
 
-uint64_t STORAGE_METHOD_CALL FtpStorage::fileSize(
-    const char*     url,
-    int*            ecode
-) const
+uint64_t FtpStorage::fileSize(const char* url, int* ecode ) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(aux::checkECode(ecode, getAvail()) != nx_spl::error::NoError)
-        return 0;
-
-    int size;
-
-    if (m_impl->Size(url, &size, ftplib::image) == 0)
+    const auto result = m_impl->fileSize(aux::toRelativeFtpPath(url));
+    if (!result)
     {
         *ecode = error::UnknownError;
         return unknown_size;
     }
 
-    return size;
+    *ecode = error::NoError;
+    return *result;
 }
 
-IODevice* STORAGE_METHOD_CALL FtpStorage::open(
-    const char*     uri,
-    int             flags,
-    int*            ecode
-) const
+IODevice* FtpStorage::open(const char* uri, int flags, int* ecode) const
 {
     *ecode = error::NoError;
-    IODevice *ret = nullptr;
-    if (!getAvail())
-    {
-        *ecode = error::StorageUnavailable;
-        return nullptr;
-    }
-
     try
     {
-        ret = new FtpIODevice(
-            uri,
-            flags,
-            m_implurl,
-            m_user,
-            m_passwd
-        );
+        return new FtpIODevice(m_impl, uri, flags);
     }
-    catch (const aux::BadUrlException&)
-    {
-        *ecode = error::UrlNotExists;
-        return nullptr;
-    }
-    catch (const aux::InternalErrorException&)
+    catch (...)
     {
         *ecode = error::UnknownError;
         return nullptr;
     }
-    catch (const std::exception&)
-    {
-        *ecode = error::UnknownError;
-        return nullptr;
-    }
-    return ret;
 }
 
 void* FtpStorage::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if (std::memcmp(&interfaceID,
-                    &IID_Storage,
-                    sizeof(nxpl::NX_GUID)) == 0)
+    if (std::memcmp(&interfaceID, &IID_Storage, sizeof(nxpl::NX_GUID)) == 0)
     {
         addRef();
         return static_cast<nx_spl::Storage*>(this);
     }
-    else if (std::memcmp(&interfaceID,
-                            &nxpl::IID_PluginInterface,
-                            sizeof(nxpl::IID_PluginInterface)) == 0)
+    else if (std::memcmp(
+        &interfaceID,
+        &nxpl::IID_PluginInterface,
+        sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -1004,7 +913,6 @@ int FtpStorage::releaseRef() const
 {
     return p_releaseRef();
 }
-
 
 // FtpStorageFactory
 FtpStorageFactory::FtpStorageFactory()
@@ -1041,16 +949,13 @@ int FtpStorageFactory::releaseRef() const
     return p_releaseRef();
 }
 
-const char** STORAGE_METHOD_CALL FtpStorageFactory::findAvailable() const
+const char** FtpStorageFactory::findAvailable() const
 {
     assert(false);
     return nullptr;
 }
 
-Storage* STORAGE_METHOD_CALL FtpStorageFactory::createStorage(
-    const char* url,
-    int*        ecode
-)
+Storage* FtpStorageFactory::createStorage(const char* url, int* ecode)
 {
     Storage* ret = nullptr;
     *ecode = error::NoError;
@@ -1058,19 +963,7 @@ Storage* STORAGE_METHOD_CALL FtpStorageFactory::createStorage(
     {
         ret = new FtpStorage(url);
     }
-    catch (const std::bad_alloc&)
-    {
-        if (ecode)
-            *ecode = error::UnknownError;
-        return nullptr;
-    }
-    catch (const aux::NetworkException&)
-    {
-        if (ecode)
-            *ecode = error::UnknownError;
-        return nullptr;
-    }
-    catch (const aux::BadUrlException&)
+    catch (...)
     {
         if (ecode)
             *ecode = error::UrlNotExists;
@@ -1110,85 +1003,52 @@ const char* FtpStorageFactory::lastErrorMessage(int ecode) const
 
 
 // Ftp IO Device
-FtpIODevice::FtpIODevice(
-    const char         *uri,
-    int                 mode,
-    const std::string  &storageUrl,
-    const std::string  &uname,
-    const std::string  &upasswd
-)
-    : m_mode(mode),
-        m_pos(0),
-        m_uri(uri),
-        m_altered(false),
-        m_localsize(0),
-        m_implurl(storageUrl),
-        m_user(uname),
-        m_passwd(upasswd)
+FtpIODevice::FtpIODevice(FtpImplPtr ftpImplPtr, const char *uri, int mode):
+    m_impl(ftpImplPtr),
+    m_mode(mode),
+    m_pos(0),
+    m_uri(aux::toRelativeFtpPath(uri)),
+    m_altered(false),
+    m_localsize(0)
 {
-    //  If file opened for read-only and no such file uri in storage throw BadUrl
-    //  If file opened for write and no such file uri in stor - create it.
-    std::lock_guard<std::mutex> lock(m_mutex);
     try
     {
-        aux::establishFtpConnection(
-            nullptr,
-            m_implurl,
-            m_user,
-            m_passwd,
-            m_impl
-        );
         std::string remoteDir, remoteFile;
-        aux::dirFromUri(uri, &remoteDir, &remoteFile);
+        aux::dirFromUri(m_uri, &remoteDir, &remoteFile);
         m_localfile = aux::localUniqueFilePath("--" + remoteFile);
-        bool fileExists = false;
-        try
-        {
-            fileExists = aux::remoteFileExists(uri, *m_impl);
-        }
-        catch (const aux::BadUrlException& e)
-        {
-            if (m_impl->Mkdir(remoteDir.c_str()) == 0)
-                throw aux::InternalErrorException(e.what());
-            else fileExists = false;
-        }
-        catch (const std::exception& e)
-        {
-            throw aux::InternalErrorException(e.what());
-        }
-
+        const bool fileExists = m_impl->pathExists(m_uri);
         if (mode & io::WriteOnly)
         {
             if (!fileExists)
             {
                 FILE *f = fopen(m_localfile.fullPath.c_str(), "wb");
                 if (f == NULL)
-                    throw aux::InternalErrorException("couldn't create local temporary file");
+                    throw std::runtime_error("couldn't create local temporary file");
                 fclose(f);
-                if (m_impl->Put(m_localfile.fullPath.c_str(), uri, ftplib::image) == 0)
-                    throw aux::InternalErrorException("ftp put failed");
+                m_impl->makePath(remoteDir);
+                if (!m_impl->put(m_localfile.fullPath, m_uri))
+                    throw std::runtime_error("ftp put failed");
             }
             else
             {
-                if (m_impl->Get(m_localfile.fullPath.c_str(), uri, ftplib::image) == 0)
-                    throw aux::InternalErrorException("ftp get failed");
+                if (!m_impl->get(m_localfile.fullPath, m_uri))
+                    throw std::runtime_error("ftp get failed");
             }
         }
         else if (mode & io::ReadOnly)
         {
             if (!fileExists)
-                throw aux::BadUrlException("file not found in storage");
-            else if (m_impl->Get(m_localfile.fullPath.c_str(), uri, ftplib::image) == 0)
-                throw aux::InternalErrorException("ftp get failed");
+                throw std::runtime_error("file not found in storage");
+            else if (!m_impl->get(m_localfile.fullPath, m_uri))
+                throw std::runtime_error("ftp get failed");
         }
 
         // calculate local file size
         if ((m_localsize = aux::getFileSize(m_localfile.fullPath.c_str())) == -1)
-            throw aux::InternalErrorException("local file calculate size failed");
+            throw std::runtime_error("local file calculate size failed");
     }
     catch(...)
     {
-        m_impl->Quit();
         throw;
     }
 }
@@ -1197,36 +1057,15 @@ FtpIODevice::~FtpIODevice()
 {
     flush();
     remove(m_localfile.fullPath.c_str());
-    m_impl->Quit();
 }
 
-// Since there is no explicit 'close' function,
-// synchronization attempt is made in this function and
-// this function is called from destructor.
-// That's why all possible errors are discarded.
 void FtpIODevice::flush()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    int alive =
-        m_impl->TestControlConnection() ?
-            true :
-            aux::tryFtpReconnect(
-                m_impl,
-                m_implurl,
-                m_user,
-                m_passwd,
-                nullptr
-            );
-
-    if(alive && m_altered)
-        m_impl->Put(m_localfile.fullPath.c_str(), m_uri.c_str(), ftplib::image);
+    if(m_altered)
+        m_impl->put(m_localfile.fullPath, m_uri);
 }
 
-uint32_t STORAGE_METHOD_CALL FtpIODevice::write(
-    const void     *src,
-    const uint32_t  size,
-    int            *ecode
-)
+uint32_t FtpIODevice::write(const void* src, const uint32_t size, int* ecode)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (ecode)

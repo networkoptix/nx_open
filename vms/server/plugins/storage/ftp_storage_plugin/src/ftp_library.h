@@ -38,6 +38,7 @@
  * - Password: `12345678`
  */
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -51,55 +52,57 @@
 
 namespace nx_spl
 {
-    namespace aux
-    {   // Generic reference counter Mix-In. Private inherit it.
-        template <typename P>
-        class PluginRefCounter
+namespace aux
+{   // Generic reference counter Mix-In. Private inherit it.
+    template <typename P>
+    class PluginRefCounter
+    {
+    public:
+        PluginRefCounter()
+            : m_count(1)
+        {}
+
+        int p_addRef() const { return ++m_count; }
+
+        int p_releaseRef() const
         {
-        public:
-            PluginRefCounter()
-                : m_count(1)
-            {}
-
-            int p_addRef() const { return ++m_count; }
-
-            int p_releaseRef() const
-            {
-                int new_count = --m_count;
-                if (new_count <= 0) {
-                    delete static_cast<const P*>(this);
-                }
-                return new_count;
+            int new_count = --m_count;
+            if (new_count <= 0) {
+                delete static_cast<const P*>(this);
             }
-        private:
-            mutable std::atomic<int> m_count;
-        }; // class PluginRefCounter
+            return new_count;
+        }
+    private:
+        mutable std::atomic<int> m_count;
+    }; // class PluginRefCounter
 
-        class NonCopyable
-        {
-        public:
-            NonCopyable() {}
-            NonCopyable(const NonCopyable&);
-            NonCopyable& operator =(const NonCopyable&);
+    class NonCopyable
+    {
+    public:
+        NonCopyable() {}
+        NonCopyable(const NonCopyable&);
+        NonCopyable& operator =(const NonCopyable&);
 
-            NonCopyable(NonCopyable&&);
-            NonCopyable& operator =(NonCopyable&&);
-        }; // class NonCopyable
+        NonCopyable(NonCopyable&&);
+        NonCopyable& operator =(NonCopyable&&);
+    }; // class NonCopyable
 
-        /**
-         * A file name and a full path, containing this name. When we communicate with the remote
-         * FTP server, * we operate bare file names. But locally we need to map this file to a full
-         * path. That's why it's convenient to have both.
-         */
-        struct FileNameAndPath
-        {
-            std::string name;
-            std::string fullPath;
-        };
+    /**
+        * A file name and a full path, containing this name. When we communicate with the remote
+        * FTP server, * we operate bare file names. But locally we need to map this file to a full
+        * path. That's why it's convenient to have both.
+        */
+    struct FileNameAndPath
+    {
+        std::string name;
+        std::string fullPath;
+    };
 
-    } //namespace aux
+class FtpLibWrapper;
 
-    typedef std::shared_ptr<ftplib> implPtrType;
+} //namespace aux
+
+    using FtpImplPtr = std::shared_ptr<aux::FtpLibWrapper>;
     class FtpStorage;
     // At construction phase we synchronise remote file with local one.
     // During destruction synchronisation attempt is repeated.
@@ -111,13 +114,7 @@ namespace nx_spl
     {
         friend class aux::PluginRefCounter<FtpIODevice>;
     public:
-        FtpIODevice(
-            const char         *uri,
-            int                 mode,
-            const std::string  &storageUrl,
-            const std::string  &uname,
-            const std::string  &upasswd
-        );
+        FtpIODevice(FtpImplPtr ftpImplPtr, const char *uri, int mode);
 
         virtual uint32_t STORAGE_METHOD_CALL write(
             const void*     src,
@@ -152,19 +149,18 @@ namespace nx_spl
         ~FtpIODevice();
 
     private:
-        int                 m_mode;
-        mutable int64_t     m_pos;
-        std::string         m_uri; //file URI
-        implPtrType         m_impl;
-        aux::FileNameAndPath     m_localfile;
-        bool                m_altered;
-        long long           m_localsize;
-        mutable
-        std::mutex          m_mutex;
-        std::string         m_implurl;
-        std::string         m_user;
-        std::string         m_passwd;
-    }; // class FtpIODevice
+        FtpImplPtr m_impl;
+        int m_mode;
+        mutable int64_t m_pos;
+        std::string m_uri; //file URI
+        aux::FileNameAndPath m_localfile;
+        bool m_altered;
+        long long m_localsize;
+        mutable std::mutex m_mutex;
+        std::string m_implurl;
+        std::string m_user;
+        std::string m_passwd;
+    };
 
     // Fileinfo list is obtained from the server at construction phase.
     // After this phase there are no real interactions with FTP server.
@@ -175,15 +171,10 @@ namespace nx_spl
     {
         friend class aux::PluginRefCounter<FtpFileInfoIterator>;
 
-        typedef std::vector<std::string>        FileListType;
-        typedef FileListType::const_iterator    FileListIteratorType;
+        typedef std::vector<std::string> FileListType;
+        typedef FileListType::const_iterator FileListIteratorType;
     public:
-        FtpFileInfoIterator(
-            ftplib              &impl,
-            FileListType       &&fileList, // caller doesn't really need this list after Iterator is constructed
-            const std::string   &baseDir
-        );
-
+        FtpFileInfoIterator(FtpImplPtr impl, FileListType&& fileList);
         virtual FileInfo* STORAGE_METHOD_CALL next(int* ecode) const override;
 
     public: // plugin interface implementation
@@ -193,24 +184,13 @@ namespace nx_spl
         virtual int releaseRef() const override;
 
     private:
-        // In response to MLSD request list of structured file dsecription lines is returned.
-        // In this function we try to parse this line and get information we need.
-        int fileInfoFromMLSDString(
-            const char  *mlsd,  // In. Null-terminated.
-            FileInfo    *fi,    // Out
-            char        *urlBuf // Out. Should be preallocated.
-        ) const;
-        // delete only with releaseRef()
         ~FtpFileInfoIterator();
 
     private:
-        mutable std::vector<char>   m_urlData;
-        mutable FileInfo            m_fileInfo;
-        ftplib&                     m_impl;
-        FileListType                m_fileList;
-        mutable
-        FileListIteratorType        m_curFile;
-        int                         m_basedirsize;
+        FtpImplPtr m_impl;
+        mutable FileInfo m_fileInfo;
+        FileListType m_fileList;
+        mutable FileListIteratorType m_curFile;
     }; // class FtpFileListIterator
 
     class FtpStorage
@@ -219,11 +199,9 @@ namespace nx_spl
           private aux::PluginRefCounter<FtpStorage>
     {
         friend class aux::PluginRefCounter<FtpStorage>;
-        // we need pointer because 'ftplib' default constructor can throw
-        // and we want to handle it explicitly.
-    public: // ctors, helper functions
+
+    public:
         FtpStorage(const std::string& url);
-        int getAvail() const {return m_available;}
 
     public: // Storage interface implementation
         virtual int STORAGE_METHOD_CALL isAvailable() const override;
@@ -285,12 +263,9 @@ namespace nx_spl
         ~FtpStorage();
 
     private:
-        implPtrType         m_impl;
-        std::string         m_implurl;
-        std::string         m_user;
-        std::string         m_passwd;
-        mutable std::mutex  m_mutex;
-        mutable int         m_available;
+        FtpImplPtr m_impl;
+        mutable std::mutex m_mutex;
+        mutable int m_capabilities = 0;
     }; // class Ftpstorage
 
     class FtpStorageFactory
