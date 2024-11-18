@@ -44,19 +44,11 @@ ComboBox
 
     // Maximum height for the popup.
     // By default, calculated as the space between the bottom ComboBox and the bottom of the dialog window.
-    property int maxItemsPopupHeight:
-    {
-        const window = Window.window //< Window where ComboBox is displayed.
-        if (!window)
-            return 0
 
-        let controlGlobalY = Math.abs(control.mapToItem(null, 0, 0).y);
-        // TODO: #vutkevich Add support of maxItemsPopupHeight recalculation on scroll in Flickable.
-        return window.height - controlGlobalY - control.implicitHeight - itemHeight
-    }
+    property int maxItemsPopupHeight: 0
 
     // Max visible items, based on available space or defaults to 10.
-    property int maxVisibleItems: 
+    property int maxVisibleItems:
     {
         const maxPossibleVisibleItems = maxItemsPopupHeight > 0 ? maxItemsPopupHeight / itemHeight : 0
         return maxPossibleVisibleItems ? Math.min(maxPossibleVisibleItems, 10) : 10
@@ -386,6 +378,25 @@ ComboBox
         padding: 0
         topPadding: 2
         bottomPadding: 2
+        modal: true
+
+        function updateMaxItemsPopupHeight()
+        {
+            const window = control.Window.window //< Window where ComboBox is displayed.
+            if (!window)
+            {
+                control.maxItemsPopupHeight = 0
+                return
+            }
+
+            const controlGlobalY = Math.abs(control.mapToItem(null, 0, 0).y)
+            control.maxItemsPopupHeight = window.height - controlGlobalY - control.implicitHeight - control.itemHeight
+        }
+
+        onOpened:
+        {
+            updateMaxItemsPopupHeight()
+        }
 
         background: Rectangle
         {

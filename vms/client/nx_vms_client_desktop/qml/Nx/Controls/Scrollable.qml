@@ -38,6 +38,11 @@ Item
         scrollView.updateScrollBar()
     }
 
+    function scrollContentY(delta)
+    {
+        flickable.scrollContentY(delta)
+    }
+
     ScrollView
     {
         id: scrollView

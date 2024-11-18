@@ -56,6 +56,8 @@ ModalDialog
 
                 RowLayout
                 {
+                    id: rowLayout
+
                     Layout.fillWidth: true
                     spacing: 6
 
@@ -69,25 +71,67 @@ ModalDialog
                         text: modelData
                     }
 
-                    LookupListElementEditor
+                    FocusScope
                     {
-                        Layout.preferredWidth: 340
-                        objectType: dialog.objectType
-                        attribute: TaxonomyUtils.findAttribute(objectType, modelData)
+                        focus: true
 
-                        onValueChanged:
+                        onActiveFocusChanged:
                         {
-                            if (isDefinedValue())
-                                entry[modelData] = value
-                            else
-                                delete entry[modelData]
-                            updateAddButton()
+                            if (activeFocus)
+                                elementEditor.makeVisible()
                         }
 
-                        Component.onCompleted:
+                        implicitWidth: elementEditor.implicitWidth
+                        implicitHeight: elementEditor.implicitHeight
+
+                        LookupListElementEditor
                         {
-                            if (index === 0)
-                                startEditing()
+                            id: elementEditor
+                            Layout.preferredWidth: 340
+                            objectType: dialog.objectType
+                            attribute: TaxonomyUtils.findAttribute(objectType, modelData)
+
+                            function makeVisible()
+                            {
+                                if (table.scrollView.contentHeight === -1)
+                                {
+                                    // Scroll view is not calculated content height yet.
+                                    return
+                                }
+
+                                const scrollBar = table.scrollView.ScrollBar.vertical
+                                const editorYOnScroll = rowLayout.y
+                                let topYVisible = scrollBar.position * table.scrollView.contentHeight
+                                let bottomYVisible = topYVisible + table.scrollView.height
+
+                                if (editorYOnScroll < topYVisible)
+                                {
+                                    // Need to scroll down the page to fully show the editor.
+                                    table.scrollContentY(topYVisible - editorYOnScroll)
+                                }
+                                else if (editorYOnScroll + height > bottomYVisible)
+                                {
+                                    // Need to scroll up the page to fully show the editor.
+                                    table.scrollContentY(
+                                        bottomYVisible - editorYOnScroll - height * 2 - rowLayout.spacing)
+                                }
+                            }
+
+                            onValueChanged:
+                            {
+                                if (isDefinedValue())
+                                    entry[modelData] = value
+                                else
+                                    delete entry[modelData]
+
+                                updateAddButton()
+                            }
+
+                            Component.onCompleted:
+                            {
+                                if (index === 0)
+                                    startEditing()
+                            }
                         }
                     }
                 }
