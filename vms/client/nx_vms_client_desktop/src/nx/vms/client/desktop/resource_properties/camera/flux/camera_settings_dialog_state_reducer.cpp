@@ -1230,6 +1230,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.analytics.userEnabledEngines = {};
     state.analytics.settingsByEngineId = {};
     state.analytics.streamByEngineId = {};
+    state.analytics.engines = {};
     state.motion = {};
     state.motion.currentSensitivity = QnMotionRegion::kDefaultSensitivity;
     state.virtualCameraIgnoreTimeZone = false;
