@@ -78,9 +78,9 @@ QuickControls.Page
     {
         if (CoreUtils.keyIsBack(event.key))
         {
-            if (page.customBackHandler)
+            if (control.customBackHandler)
             {
-                page.customBackHandler()
+                control.customBackHandler()
             }
             else
             {
