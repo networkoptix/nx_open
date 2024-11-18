@@ -71,6 +71,7 @@ private:
     QString textData(Column column, const EventLogModelData& data) const;
     QString htmlData(Column column, const EventLogModelData& data) const;
     QString tooltip(Column column, const EventLogModelData& data) const;
+    QString description(const EventLogModelData& data) const;
 
 private:
     QList<Column> m_columns;

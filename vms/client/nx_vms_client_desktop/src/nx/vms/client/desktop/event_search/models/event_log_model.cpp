@@ -173,30 +173,14 @@ QnResourcePtr eventSource(SystemContext* context, const EventLogModelData& data)
     return context->resourcePool()->getResourceById(eventSourceId(context, data));
 }
 
-bool hasAccessToCamera(const QnResourcePtr& resource)
-{
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!NX_ASSERT(camera, "Resource is not a camera"))
-        return false;
-
-    return SystemContext::fromResource(camera)->accessController()
-        ->hasPermissions(camera, Qn::ViewContentPermission);
-}
-
-bool hasAccessToArchive(const QnResourcePtr& resource)
-{
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!NX_ASSERT(camera, "Resource is not a camera"))
-        return false;
-
-    return SystemContext::fromResource(camera)->accessController()
-        ->hasPermissions(camera, Qn::ViewFootagePermission);
-}
-
 bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
 {
-    return (data.record().flags.testFlag(nx::vms::api::rules::EventLogFlag::videoLinkExists)
-        && hasAccessToCamera(eventSource(context, data)));
+    if (!data.record().flags.testFlag(nx::vms::api::rules::EventLogFlag::videoLinkExists))
+        return false;
+
+    const auto device = eventSource(context, data).dynamicCast<QnVirtualCameraResource>();
+
+    return device && context->accessController()->hasPermissions(device, Qn::ViewContentPermission);
 }
 
 } // namespace
@@ -457,7 +441,6 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
 QString EventLogModel::textData(Column column, const EventLogModelData& data) const
 {
     const auto& eventDetails = data.details(systemContext());
-    const auto& actionDetails = data.actionDetails(systemContext());
 
     switch (column)
     {
@@ -484,13 +467,8 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
             return actionTargetText(systemContext(), data);
 
         case DescriptionColumn:
-        {
-            auto description = actionDetails.value(rules::utils::kDescriptionDetailName).toString();
-            if (description.isEmpty())
-                description = nx::vms::rules::Strings::eventDetails(eventDetails).join('\n');
+            return description(data);
 
-            return description;
-        }
         default:
             return QString();
     }
@@ -499,28 +477,11 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
 QString EventLogModel::htmlData(Column column, const EventLogModelData& data) const
 {
     QString text = textData(column, data);
-    QString url = motionUrl(column, data);
-    if (url.isEmpty())
-        return text;
 
-    if (text.isEmpty())
-    {
-        const auto device = eventSource(systemContext(), data).dynamicCast<QnVirtualCameraResource>();
+    if (const auto url = motionUrl(column, data); !url.isEmpty())
+        return nx::vms::common::html::customLink(text, url);
 
-        if (hasAccessToArchive(device))
-        {
-            text = tr("Open event video");
-        }
-        else
-        {
-            text = QnDeviceDependentStrings::getNameFromSet(
-                resourcePool(),
-                {tr("Open event device"), tr("Open event camera")},
-                device);
-        }
-    }
-
-    return nx::vms::common::html::customLink(text, url);
+    return text;
 }
 
 QString EventLogModel::tooltip(Column column, const EventLogModelData& data) const
@@ -529,6 +490,37 @@ QString EventLogModel::tooltip(Column column, const EventLogModelData& data) con
         return QString();
 
     return textData(column, data);
+}
+
+QString EventLogModel::description(const EventLogModelData& data) const
+{
+    auto result =
+        data.actionDetails(systemContext()).value(rules::utils::kDescriptionDetailName).toString();
+
+    if (result.isEmpty())
+        result = nx::vms::rules::Strings::eventDetails(data.details(systemContext())).join('\n');
+
+    if (result.isEmpty() && hasVideoLink(systemContext(), data))
+    {
+        if (const auto device = eventSource(systemContext(), data)
+            .dynamicCast<QnVirtualCameraResource>())
+        {
+            if (systemContext()->accessController()->hasPermissions(
+                device, Qn::ViewFootagePermission))
+            {
+                result = tr("Open event video");
+            }
+            else
+            {
+                result = QnDeviceDependentStrings::getNameFromSet(
+                    resourcePool(),
+                    {tr("Open event device"), tr("Open event camera")},
+                    device);
+            }
+        }
+    }
+
+    return result;
 }
 
 void EventLogModel::sort(int column, Qt::SortOrder order)
