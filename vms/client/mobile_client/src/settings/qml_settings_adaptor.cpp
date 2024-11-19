@@ -52,6 +52,10 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                     emit useVideoDownloadFeatureChanged();
                     break;
 
+                case QnMobileClientSettings::UseMaxHardwareDecodersCount:
+                    emit useMaxHardwareDecodersCountChanged();
+                    break;
+
                 default:
                     break;
             }
@@ -194,6 +198,17 @@ bool QmlSettingsAdaptor::useVideoDownloadFeature() const
 void QmlSettingsAdaptor::setUseVideoDownloadFeature(bool value)
 {
     qnSettings->setUseDownloadVideoFeature(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::useMaxHardwareDecodersCount() const
+{
+    return qnSettings->useMaxHardwareDecodersCount();
+}
+
+void QmlSettingsAdaptor::setUseMaxHardwareDecodersCount(bool value)
+{
+    qnSettings->setUseMaxHardwareDecodersCount(value);
     qnSettings->save();
 }
 

@@ -60,6 +60,11 @@ class QmlSettingsAdaptor: public QObject
         READ useVideoDownloadFeature
         NOTIFY useVideoDownloadFeatureChanged)
 
+    Q_PROPERTY(bool useMaxHardwareDecodersCount
+        WRITE setUseMaxHardwareDecodersCount
+        READ useMaxHardwareDecodersCount
+        NOTIFY useMaxHardwareDecodersCountChanged)
+
 public:
     explicit QmlSettingsAdaptor(QObject* parent = nullptr);
 
@@ -97,6 +102,9 @@ public:
     bool useVideoDownloadFeature() const;
     void setUseVideoDownloadFeature(bool value);
 
+    bool useMaxHardwareDecodersCount() const;
+    void setUseMaxHardwareDecodersCount(bool value);
+
 signals:
     void liveVideoPreviewsChanged();
     void lastUsedQualityChanged();
@@ -109,6 +117,7 @@ signals:
     void ignoreCustomizationChanged();
     void localeChanged();
     void useVideoDownloadFeatureChanged();
+    void useMaxHardwareDecodersCountChanged();
 };
 
 } // namespace mobile
