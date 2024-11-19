@@ -61,10 +61,42 @@ Page
                         return
 
                     settings.enableHolePunching = value
-                    Workflow.openStandardDialog(
-                        qsTr("Please restart the app to apply the changes."))
+                    d.openRestartDialog()
                 }
             }
+
+            LabeledSwitch
+            {
+                id: useMaxHardwareDecodersCount
+
+                width: parent.width
+
+                icon: lp("/images/max_hardware_decoders_count.svg")
+                text: qsTr("Maximum decoders count")
+                extraText:
+                    qsTr("Improve video decoding perfomance using maximum hardware decoders count")
+                checkState: settings.useMaxHardwareDecodersCount ? Qt.Checked : Qt.Unchecked
+                onCheckStateChanged:
+                {
+                    const value = checkState !== Qt.Unchecked
+                    if (value === settings.useMaxHardwareDecodersCount)
+                        return
+
+                    settings.useMaxHardwareDecodersCount = value
+                    d.openRestartDialog()
+                }
+            }
+        }
+    }
+
+    QtObject
+    {
+        id: d
+
+        function openRestartDialog()
+        {
+            Workflow.openStandardDialog(
+                qsTr("Please restart the app to apply the changes."))
         }
     }
 }
