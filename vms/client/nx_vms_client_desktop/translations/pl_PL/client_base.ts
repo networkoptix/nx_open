@@ -6959,7 +6959,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>Nie udało się usunąć grupy &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
@@ -9424,13 +9424,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 grupa</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 i %n więcej grup</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
@@ -9439,7 +9439,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Dziedziczy uprawnienia %1 od</translation>
     </message>
   </context>
   <context>
@@ -9716,11 +9716,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronize</source>
-      <translation type="unfinished">Synchronize</translation>
+      <translation>Synchronizacja</translation>
     </message>
     <message>
       <source>Connection OK</source>
-      <translation type="unfinished">Connection OK</translation>
+      <translation>Połączenie OK</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9732,7 +9732,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Nie można połączyć się z serwerem LDAP</translation>
     </message>
   </context>
   <context>
@@ -9868,7 +9868,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>Podany link jest nieprawidłowy lub wygasł</translation>
     </message>
   </context>
   <context>
@@ -10003,7 +10003,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation type="unfinished">Network request failed</translation>
+      <translation>Błąd połączenia sieciowego</translation>
     </message>
   </context>
   <context>
