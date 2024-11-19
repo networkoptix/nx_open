@@ -91,7 +91,8 @@ static void handleQtMessage(
         || message.contains("unknown user type")
         || message.contains("QCharRef with an index pointing outside the valid range of a QString")
         || message.contains("behavior is deprecated")
-        || message.contains("destroying locked mutex"))
+        || message.contains("destroying locked mutex")
+        || message.contains("Recursive repaint detected"))
     {
         assertFailure(/*isCritical*/ false, message);
     }
