@@ -51,8 +51,8 @@ public:
         if (sortColumn() == QnCameraListModel::IpColumn)
         {
             return m_collator.compare(
-                left.data(sortColumn()).toString(),
-                right.data(sortColumn()).toString()) < 0;
+                left.data(sortRole()).toString(),
+                right.data(sortRole()).toString()) < 0;
         }
 
         return QSortFilterProxyModel::lessThan(left, right);
