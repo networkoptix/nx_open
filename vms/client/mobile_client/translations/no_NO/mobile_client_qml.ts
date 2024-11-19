@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Trykk og hold for å</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Nåværende</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Fraværende</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>Betafunksjoner</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>Nedlasting av video</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>Muligheten til å laste ned video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>Hurtigere tilkoblinger</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>Forbedre nettverksytelsen</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>Start appen på nytt for å bruke endringene.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Nei</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>I / O-modul</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Kamerainnstillinger</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Informasjon</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Lyd</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Endre kvalitet</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>Skriv inn serveradressen</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Feltet kan ikke være tomt</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Passordet kan ikke være tomt</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Slett innlogging &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Påloggingsfeltet kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Passordfeltet kan ikke være tomt</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Forhåndsvisning</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>Vis på kamera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>Lognivå</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>Kopier logg-ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Enhet</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,46 @@
       <source>Retry</source>
       <translation>Prøv på nytt</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Koble til</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>For å koble til gamle servere kan du laste ned det eldre programmet fra Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>For å koble til gamle servere kan du laste ned det eldre programmet fra App Store.</translation>
+      <source>Download next</source>
+      <translation>Last ned neste</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>For å koble til gamle servere, last ned det eldre programmet fra Internett.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n minutter</numerusform>
+        <numerusform>%n minutter</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Last ned</translation>
+      <source>No filters</source>
+      <translation>Ingen filtre</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +296,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Kan ikke koble til %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +324,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>Du er ikke koblet til noe system</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Enhver</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Tøm</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Passord</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Passordfeltet kan ikke være tomt</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +377,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>Systemer</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Varsler</translation>
     </message>
@@ -239,20 +385,8 @@
       <translation>Ferdig</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Alle systemer</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Valgte systemer</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>VELG</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>Minst ett system må velges</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +399,22 @@
     <message>
       <source>Save changes?</source>
       <translation>Lagre endringer?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Nettsteder</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +436,38 @@
       <translation>Beste kvalitet</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>Transcoding er deaktivert.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>Transcoding støttes ikke for dette kameraet.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>Transcoding støttes ikke for servere med versjon lavere enn 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>Transcoding støttes ikke for ARM-servere.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>Fra</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Til</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Skriv</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Undertype</translation>
     </message>
   </context>
   <context>
@@ -330,6 +498,33 @@
     <message>
       <source>Search</source>
       <translation>Søk</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objekter</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Bokmerker</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Ingen gjenstander</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Ingen bokmerker</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Prøv å endre filtrene eller konfigurer objektdeteksjon i innstillingene for kameraplugin</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Prøv å endre filtrene for å vise resultatene</translation>
     </message>
   </context>
   <context>
@@ -404,10 +599,6 @@
       <translation>Koble til en annen server...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Ingen systemer funnet</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Logg inn på %1</translation>
@@ -420,6 +611,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +664,6 @@
       <translation>Logg inn på clouden for å bruke push-meldinger</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Push-varsler er slått av i systeminnstillingene</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Logg inn på servere automatisk</translation>
     </message>
@@ -487,6 +678,26 @@
     <message>
       <source>Strict</source>
       <translation>Streng</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Aktiver maskinvareakselerasjon</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Øk ytelsen og batterilevetiden</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>Betafunksjoner</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>Tidlig tilgang til nye funksjoner</translation>
     </message>
   </context>
   <context>
@@ -507,16 +718,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>Stol på denne serveren</translation>
+      <source>Common name</source>
+      <translation>Vanlig navn</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Koble til likevel</translation>
+      <source>Issued by</source>
+      <translation>Utstedt av </translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
+      <source>Expires</source>
+      <translation>Utløper</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Fingeravtrykk</translation>
     </message>
   </context>
   <context>
@@ -529,6 +744,11 @@
     <message>
       <source>Log out</source>
       <translation>Logg ut</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Gå til %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +779,13 @@
     <message>
       <source>Select All</source>
       <translation>Velg alle</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +856,12 @@
       <translation>Angi passord på dette kameraet ved å bruke %1 klient eller kameraets webside for å se video</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>Kan ikke dekryptere media</translation>
+      <source>Archive encrypted</source>
+      <translation>Arkiv kryptert</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +894,6 @@
       <translation>Område</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Endre kvalitet</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Informasjon</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>Trykk og hold for å velge et område</translation>
     </message>
@@ -683,15 +906,16 @@
       <translation>Ugyldig tilpasset område. Vennligst prøv igjen.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Lyd</translation>
+      <source>Camera Settings</source>
+      <translation>Kamerainnstillinger</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Hopp over</translation>
+      <source>Bookmarks</source>
+      <translation>Bokmerker</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objekter</translation>
     </message>
   </context>
   <context>

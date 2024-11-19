@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>请长按</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>存在</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>不存在</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation type="unfinished">Speedup connections</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation type="unfinished">Improve network performance</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>是</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>否</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>I/O 模块</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>摄像机设置</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>信息</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>音频</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>更改质量</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>输入服务器地址</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>登录名不能为空。</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>密码不能为空。</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>删除登录&quot;%1&quot;？</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation type="unfinished">Login field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>预览</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation type="unfinished">Show on Camera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>日志等级</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>设备</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,45 @@
       <source>Retry</source>
       <translation>重试</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>连接</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>若需连接旧服务器，请从安卓市场下载旧程序.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>若需连接旧服务器，请从苹果市场下载旧程序.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>若需连接旧服务器，请下载旧程序.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n 分钟</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>下载</translation>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +295,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>无法连接到 %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +323,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>您没有连接到任何系统</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>任何</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>清除</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>密码</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +376,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>系统</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>通知</translation>
     </message>
@@ -239,20 +384,8 @@
       <translation>完成</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>所有系统</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>选定系统</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>选择</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>至少必须选择一个系统</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +398,22 @@
     <message>
       <source>Save changes?</source>
       <translation>是否保存更改？</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +435,38 @@
       <translation>最好的质量</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>转码已禁用。</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>本相机不支持转码。</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>对于版本低于3.0的服务器，不支持转码。</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>ARM服务器不支持转码。</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>发送至</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>类型</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>子类型</translation>
     </message>
   </context>
   <context>
@@ -330,6 +497,33 @@
     <message>
       <source>Search</source>
       <translation>搜索</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>物件</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>书签</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>无物件</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>无书签</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>尝试在摄像机套件设定中更改筛选器或物件侦测参数</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
     </message>
   </context>
   <context>
@@ -404,10 +598,6 @@
       <translation>连接到另一台服务器...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>未发现系统</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>登录到 %1</translation>
@@ -420,6 +610,10 @@
     <message>
       <source>Nothing found</source>
       <translation>未找到内容</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +663,6 @@
       <translation>登录云端以使用推播通知</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>推播通知在系统设置中已关闭</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>自动登录服务器</translation>
     </message>
@@ -487,6 +677,26 @@
     <message>
       <source>Strict</source>
       <translation>严格</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation type="unfinished">Enable hardware acceleration</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation type="unfinished">Increase performance and battery life</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +717,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>信任此台服务器</translation>
+      <source>Common name</source>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>继续连线</translation>
+      <source>Issued by</source>
+      <translation>发布者</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>撤消</translation>
+      <source>Expires</source>
+      <translation>到期</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>凭证指纹</translation>
     </message>
   </context>
   <context>
@@ -529,6 +743,11 @@
     <message>
       <source>Log out</source>
       <translation>注销</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>转到 %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +778,13 @@
     <message>
       <source>Select All</source>
       <translation>选择全部</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +855,12 @@
       <translation>请使用%1 客户端对该台摄像机设置密码或透过摄像机的网页版来观看视频</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>解密视频时发生错误</translation>
+      <source>Archive encrypted</source>
+      <translation>存档加密</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +893,6 @@
       <translation>区域</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>更改质量</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>信息</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>点击并按住以选择一个区域</translation>
     </message>
@@ -683,15 +905,16 @@
       <translation>自定义区域无效。请重新绘制正确的区域。</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>音频</translation>
+      <source>Camera Settings</source>
+      <translation>摄像机设置</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>跳过</translation>
+      <source>Bookmarks</source>
+      <translation>书签</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>物件</translation>
     </message>
   </context>
   <context>

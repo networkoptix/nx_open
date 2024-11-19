@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Presione y mantenga presionado</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Presente</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Ausente</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation type="unfinished">Speedup connections</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation type="unfinished">Improve network performance</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Si</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>No</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>Módulo E/S</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Ajustes de la cámara</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Información</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Cambiar la Calidad</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>Introduzca la dirección del servidor</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Usuario no puede estar vacío</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>La contraseña no puede estar vacía</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Eliminar usuario &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Los campos de ingreso no pueden estar vacíos</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>El campo para la contraseña no puede estar vacío</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Previsualización</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>Mostrar en cámara</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>Nivel de registro</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Dispositivo</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,46 @@
       <source>Retry</source>
       <translation>Volver a intentar</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Conexión</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para conectar a viejos servidores descargar la aplicación antigua desde Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para conectar a viejos servidores por favor descargar la aplicación antigua desde la App Store.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para conectar a viejos servidores por favor, descarga la aplicación antigua desde Internet.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n minutos</numerusform>
+        <numerusform>%n minutos</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Descargar</translation>
+      <source>No filters</source>
+      <translation>Sin filtros</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +296,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>No se puede conectar a %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +324,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>Usted no está conectado a ningún sistema</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Cualquiera</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Claro</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Contraseña</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>El campo para la contraseña no puede estar vacío</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +377,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>Sistemas</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Notificaciones</translation>
     </message>
@@ -239,20 +385,8 @@
       <translation>Hecho</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Todos los sistemas</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Sistema Seleccionado</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>SELECCIONE</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>Se debe seleccionar al menos un sistema</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +399,22 @@
     <message>
       <source>Save changes?</source>
       <translation>¿Guardar los cambios?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Sitios</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +436,38 @@
       <translation>Mejor calidad</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>La transcodificación está desactivada.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>La transcodificación no es compatible con esta cámara.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>La transcodificación no es compatible con servidores con una versión inferior a 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>La transcodificación no es compatible con los servidores ARM.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>A</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Tipo</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Subtipo</translation>
     </message>
   </context>
   <context>
@@ -330,6 +498,33 @@
     <message>
       <source>Search</source>
       <translation>Búsqueda</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objetos</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Marcadores</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Sin objetos</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>No hay marcadores</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Intente cambiar los filtros o configure la detección de objetos en la configuración del complemento de la cámara</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Intenta cambiar los filtros para mostrar los resultados</translation>
     </message>
   </context>
   <context>
@@ -404,10 +599,6 @@
       <translation>Conectarse a otro servidor...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Sistemas no encontrados</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Iniciando sesión en %1</translation>
@@ -420,6 +611,10 @@
     <message>
       <source>Nothing found</source>
       <translation>No hubo resultado</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +664,6 @@
       <translation>Inicie sesión en la nube para usar notificaciones push</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Las notificaciones push están desactivadas en los ajustes del sistema</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Iniciar sesión automáticamente en servidores</translation>
     </message>
@@ -487,6 +678,26 @@
     <message>
       <source>Strict</source>
       <translation>Estricto</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation type="unfinished">Enable hardware acceleration</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Aumenta el rendimiento y la duración de la batería</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +718,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation>Denominación general</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Conéctese de todos modos</translation>
+      <source>Issued by</source>
+      <translation>Emitido por</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <source>Expires</source>
+      <translation>Expira</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Huellas digitales</translation>
     </message>
   </context>
   <context>
@@ -529,6 +744,11 @@
     <message>
       <source>Log out</source>
       <translation>Cerrar Sessión</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Ir a %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +779,13 @@
     <message>
       <source>Select All</source>
       <translation>Seleccionar todo</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +856,12 @@
       <translation>Establezca la contraseña en esta cámara usando %1 cliente o página web de la cámara para ver el video</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>No se pueden descifrar los medios</translation>
+      <source>Archive encrypted</source>
+      <translation type="unfinished">Archive encrypted</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +894,6 @@
       <translation>Area</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Cambiar la Calidad</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Información</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>Mantenga pulsado para seleccionar un área</translation>
     </message>
@@ -683,15 +906,16 @@
       <translation>Área personalizada no válida. Por favor dibuja una correcta.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Audio</translation>
+      <source>Camera Settings</source>
+      <translation>Configuración de la cámara</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Omitir</translation>
+      <source>Bookmarks</source>
+      <translation>Marcadores</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objetos</translation>
     </message>
   </context>
   <context>

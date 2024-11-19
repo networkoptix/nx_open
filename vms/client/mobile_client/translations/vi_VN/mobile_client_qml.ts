@@ -5,14 +5,63 @@
     <name>ActionButtonsHint</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Lịch trình bị vô hiêu hóa</translation>
+      <translation>Tắt theo lịch trình</translation>
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Nhấn và giữ để</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation>TÌM KIẾM NÂNG CAO</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Có</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Không</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>Tính năng Beta</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>Tải xuống Video</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>Khả năng tải xuống video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>Tăng tốc kết nối</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>Cải thiện hiệu suất mạng</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>Vui lòng khởi động lại ứng dụng để áp dụng các thay đổi.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Có</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Không</translation>
     </message>
   </context>
   <context>
@@ -23,11 +72,11 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation>Mật khẩu bắt buộc</translation>
+      <translation>Yêu cầu mật khẩu</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>Không Hỗ Trợ Firmware Cho Phiên Bản Này</translation>
+      <translation>Phiên bản firmware không được hỗ trợ</translation>
     </message>
     <message>
       <source>Offline</source>
@@ -39,11 +88,30 @@
     </message>
   </context>
   <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Cài đặt Camera</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Tin tức</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Âm thanh</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Thay đổi chất lượng</translation>
+    </message>
+  </context>
+  <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Đăng nhập %1</translation>
+      <translation>Đăng nhập vào %1</translation>
     </message>
   </context>
   <context>
@@ -69,35 +137,57 @@
       <translation>Nhập địa chỉ máy chủ</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Đăng nhập không thể để trống</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Password không có sản phẩm nào</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Xóa đăng nhập &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Trường đăng nhập không được để trống</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Mật khẩu không được để trống</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Xem trước</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>Hiển thị trên camera</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Cài đặt Nhà phát triển</translation>
+      <translation>Cài đặt dành cho nhà phát triển</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Mức đăng nhập</translation>
+      <translation>Cấp độ Nhật ký</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>Sao chép ID nhật ký</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Thiết bị</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -123,26 +213,45 @@
       <source>Retry</source>
       <translation>Thử lại</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Kết nối</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Để kết nối đến các máy chủ cũ xin vui lòng tải về các ứng dụng kế thừa từ Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Để kết nối đến các máy chủ cũ xin vui lòng tải về các ứng dụng kế thừa từ App Store.</translation>
+      <source>Download next</source>
+      <translation>Tải xuống tiếp</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Để kết nối đến các máy chủ cũ xin vui lòng tải về các ứng dụng kế thừa từ Internet.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n phút</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Tải xuống</translation>
+      <source>No filters</source>
+      <translation>Không lọc</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation>Bộ lọc Tìm kiếm</translation>
     </message>
   </context>
   <context>
@@ -164,7 +273,7 @@
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Lo-Res</translation>
+      <translation>Độ phân giải thấp</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
@@ -172,7 +281,7 @@
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation>Tùy chỉnh-Res</translation>
+      <translation>Độ phân giải tùy chỉnh</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -183,6 +292,14 @@
       <source>%1 Mbps</source>
       <comment>%1 is a mebgabits per second</comment>
       <translation>%1 Mbps</translation>
+    </message>
+  </context>
+  <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Không thể kết nối với %1</translation>
     </message>
   </context>
   <context>
@@ -206,8 +323,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>Bạn chưa kết nối với bất kỳ Hệ thống nào</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Bất kỳ</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Tẩy</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Mật khẩu không được để trống</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation>Plugin</translation>
     </message>
   </context>
   <context>
@@ -221,42 +370,26 @@
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>Thiết lập PTZ</translation>
+      <translation>Cài đặt trước PTZ</translation>
     </message>
   </context>
   <context>
     <name>PushExpertModeScreen</name>
-    <message>
-      <source>Systems</source>
-      <translation>Hệ thống</translation>
-    </message>
     <message>
       <source>Notifications</source>
       <translation>Thông báo</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Làm xong</translation>
-    </message>
-    <message>
-      <source>All Systems</source>
-      <translation>Tất cả các hệ thống</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Hệ thống được chọn</translation>
+      <translation>Hoàn Thành</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>LỰA CHỌN</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>Ít nhất một hệ thống phải được chọn</translation>
+      <translation>CHỌN</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation>Có</translation>
+      <translation>Đồng ý</translation>
     </message>
     <message>
       <source>No</source>
@@ -265,6 +398,22 @@
     <message>
       <source>Save changes?</source>
       <translation>Lưu thay đổi?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Các chi nhánh</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +435,38 @@
       <translation>Chất lượng tốt nhất</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>Chuyển mã đã bị tắt.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
-      <translation>Không hỗ trợ Dual-Streaming cho camera này.</translation>
+      <translation>Không hỗ trợ Chuyển mã cho camera này.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>Chuyển mã không được hỗ trợ cho các máy chủ có phiên bản thấp hơn 3,0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>Chuyển mã bị tắt bởi Máy chủ.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>Chuyển mã không được hỗ trợ cho máy chủ ARM.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>Chuyển mã không được hỗ trợ cho Máy chủ có phiên bản thấp hơn 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>Từ</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Đến</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Kiểu</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Kiểu phụ</translation>
     </message>
   </context>
   <context>
@@ -314,7 +481,7 @@
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation>Không có camera nào trên layout này</translation>
+      <translation>Không có camera nào trên bố cục này</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -330,6 +497,33 @@
     <message>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Đối tượng</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Dấu trang</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Không có đối tượng</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Không có dấu trang</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Thử thay đổi bộ lọc để hiển thị kết quả</translation>
     </message>
   </context>
   <context>
@@ -382,15 +576,15 @@
     <name>SessionItem</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>KHÔNG THÍCH HỢP</translation>
+      <translation>KHÔNG TƯƠNG THÍCH</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>Không thể sử dụng được</translation>
+      <translation>Không thể truy cập được</translation>
     </message>
   </context>
   <context>
@@ -404,22 +598,22 @@
       <translation>Kết nối đến các máy chủ khác...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Không tìm thấy Hệ thống</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Đăng nhập %1</translation>
+      <translation>Đăng nhập vào %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <comment>%1 is a button name</comment>
-      <translation>Kiểm tra kết nối mạng của bạn hoặc nhấn nút &quot;%1&quot; để nhập địa chỉ máy chủ đã biết.</translation>
+      <translation>Kiểm tra kết nối mạng hoặc nhấn nút &quot;%1&quot; để nhập địa chỉ máy chủ đã biết.</translation>
     </message>
     <message>
       <source>Nothing found</source>
       <translation>Không tìm thấy kết quả nào</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -434,7 +628,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -450,7 +644,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Hiển thị xem trước trong danh sách máy ảnh</translation>
+      <translation>Hiển thị xem trước trong danh sách camera</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -469,10 +663,6 @@
       <translation>Đăng nhập vào đám mây để sử dụng thông báo đẩy</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Thông báo đẩy được tắt trong cài đặt hệ thống</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Tự động đăng nhập vào máy chủ</translation>
     </message>
@@ -487,6 +677,26 @@
     <message>
       <source>Strict</source>
       <translation>Nghiêm ngặt</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Kích hoạt Gia tốc Phần cứng</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Tăng hiệu suất và tuổi thọ pin</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>Tính năng Beta</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>Quyền truy cập sớm vào các tính năng mới</translation>
     </message>
   </context>
   <context>
@@ -507,16 +717,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>Tin cậy máy chủ này</translation>
+      <source>Common name</source>
+      <translation>Tên thường gặp</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Vẫn kết nối</translation>
+      <source>Issued by</source>
+      <translation>Phát hành bởi</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <source>Expires</source>
+      <translation>Hết hạn</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Dấu vân tay</translation>
     </message>
   </context>
   <context>
@@ -529,6 +743,11 @@
     <message>
       <source>Log out</source>
       <translation>Đăng xuất</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Đi tới %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +778,13 @@
     <message>
       <source>Select All</source>
       <translation>Chọn tất cả</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation>Khoảng thời gian</translation>
     </message>
   </context>
   <context>
@@ -600,11 +826,11 @@
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>Không Hỗ Trợ Firmware Cho Phiên Bản Này</translation>
+      <translation>Phiên bản firmware không được hỗ trợ</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation>Vui lòng cập nhật chương trình cơ sở</translation>
+      <translation>Vui lòng cập nhật Firmware</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -612,7 +838,7 @@
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation>I/O giao diện không được hỗ trợ được</translation>
+      <translation>Giao diện I/O chưa được hỗ trợ</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
@@ -626,18 +852,22 @@
     <message>
       <source>Set password on this camera using %1 client or camera web-page to view video</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Đặt mật khẩu trên máy ảnh này bằng ứng dụng %1 hoặc trang web của máy ảnh để xem video</translation>
+      <translation>Đặt mật khẩu trên camera này bằng cách sử dụng trang web client %1 hoặc camera để xem video</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>Không thể giải mã dữ liệu đa phương tiện</translation>
+      <source>Archive encrypted</source>
+      <translation>Lưu trữ được mã hóa</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation>Camera này không có dữ liệu về chuyển động</translation>
+      <translation>Không có dữ liệu chuyển động cho camera này</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
@@ -645,7 +875,7 @@
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation>Không tìm thấy chuyển động trong khu vực quan sát</translation>
+      <translation>Không tìm thấy chuyển động nào trong vùng nhìn thấy được</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -663,35 +893,28 @@
       <translation>Khu vực</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Thay đổi chất lượng</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Tin tức</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
-      <translation>Chạm và giữ để chọn một khu vực</translation>
+      <translation>Nhấn và giữ để chọn một khu vực</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation>Mở tìm kiếm chuyển động trước để chọn một khu vực</translation>
+      <translation>Trước tiên hãy bật tìm kiếm chuyển động để chọn khu vực</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Khu vực tùy chỉnh không hợp lệ. Vui lòng vẽ lại.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Âm thanh</translation>
+      <source>Camera Settings</source>
+      <translation>Cài đặt Camera</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Bỏ qua</translation>
+      <source>Bookmarks</source>
+      <translation>Dấu trang</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Đối tượng</translation>
     </message>
   </context>
   <context>

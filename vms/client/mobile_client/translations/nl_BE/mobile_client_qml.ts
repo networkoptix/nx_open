@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Ingedrukt houden om</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Aanwezig</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Afwezig</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation type="unfinished">Speedup connections</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation type="unfinished">Improve network performance</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Nee</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>I/O module</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Camera-instellingen</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Informatie</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Kwaliteit wijzigen</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>Voer het serveradres in</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Login mag niet leeg zijn</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Wachtwoord kan niet leeg zijn</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Verwijder login &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation type="unfinished">Login field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Voorbeeld</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation type="unfinished">Show on Camera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>Log niveau</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Apparaat</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,46 @@
       <source>Retry</source>
       <translation>Opnieuw proberen</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Verbinden</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Om verbinding te maken met oude servers, download de legacy-applicatie van Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Om verbinding te maken met oude servers, download de legacy-applicatie van de App Store.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Als u verbinding wilt maken met oude servers, kunt u de legacy-applicatie van het internet downloaden.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n minuten</numerusform>
+        <numerusform>%n minuten</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Download</translation>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +296,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Kan geen verbinding maken met %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +324,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>U bent niet verbonden met een systeem</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Elk</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Wissen</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Password</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +377,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>Systemen</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Notificatie's</translation>
     </message>
@@ -239,20 +385,8 @@
       <translation>Voltooid</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Alle systemen</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Geselecteerde systemen</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>SELECTEER</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>Ten minste één systeem moet worden geselecteerd</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +399,22 @@
     <message>
       <source>Save changes?</source>
       <translation>Wijzigingen opslaan?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +436,38 @@
       <translation>Beste kwaliteit</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>Transcoderen is uitgeschakeld.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>Transcodering wordt niet ondersteund voor deze camera.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>Transcoderen wordt niet ondersteund voor servers met een versie lager dan 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>Transcoderen wordt niet ondersteund voor ARM-servers.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Aan</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Type</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Subtype</translation>
     </message>
   </context>
   <context>
@@ -330,6 +498,33 @@
     <message>
       <source>Search</source>
       <translation>Zoek</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objecten</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Bladwijzers</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Geen objecten</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Geen bladwijzers</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Probeer de filters te wijzigen of configureer objectdetectie in de camera plugin instellingen</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
     </message>
   </context>
   <context>
@@ -404,10 +599,6 @@
       <translation>Verbinding maken met een andere server...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Geen systemen gevonden</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Log in op %1</translation>
@@ -420,6 +611,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +664,6 @@
       <translation>Log in op de cloud om push meldingen te gebruiken</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Push meldingen zijn uitgeschakeld in de systeeminstellingen</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Automatisch inloggen op servers</translation>
     </message>
@@ -487,6 +678,26 @@
     <message>
       <source>Strict</source>
       <translation>Streng</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Schakel hardware acceleratie in</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation type="unfinished">Increase performance and battery life</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +718,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>Vertrouw deze server</translation>
+      <source>Common name</source>
+      <translation>Algemene naam</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Toch verbinden</translation>
+      <source>Issued by</source>
+      <translation>Uitgegeven door</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Annuleren</translation>
+      <source>Expires</source>
+      <translation>Verloopt</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Vingerafdruk</translation>
     </message>
   </context>
   <context>
@@ -529,6 +744,11 @@
     <message>
       <source>Log out</source>
       <translation>Uitloggen</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Ga naar %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +779,13 @@
     <message>
       <source>Select All</source>
       <translation>Alles selecteren</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +856,12 @@
       <translation>Stel een wachtwoord in op deze camera met %1 client of de camera webpagina om de video te bekijken</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>Kan media niet decoderen</translation>
+      <source>Archive encrypted</source>
+      <translation>Archief is versleuteld</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +894,6 @@
       <translation>Gebied</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Kwaliteit wijzigen</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Informatie</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>Tik en houd ingedrukt om een gebied te selecteren</translation>
     </message>
@@ -683,15 +906,16 @@
       <translation>Ongeldig aangepast gebied. Teken een juist gebied.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Audio</translation>
+      <source>Camera Settings</source>
+      <translation>Camera-instellingen</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Overslaan</translation>
+      <source>Bookmarks</source>
+      <translation>Bladwijzers</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objecten</translation>
     </message>
   </context>
   <context>

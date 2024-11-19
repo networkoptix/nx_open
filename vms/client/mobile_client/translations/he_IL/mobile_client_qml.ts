@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>לחץ והחזק את המקש</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation type="unfinished">Speedup connections</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation type="unfinished">Improve network performance</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>כן</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>לא</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>מודול קלט/פלט</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>הגדרות מצלמה</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>מידע</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>אודיו</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>שינוי איכות</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>הזן כתובת שרת</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>לא ניתן להותיר את שדה שם המשתמש ריק</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>לא ניתן להותיר את שדה הסיסמה ריק</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>האם למחוק את פרטי ההתחברות &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation type="unfinished">Login field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>תצוגה מקדימה</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation type="unfinished">Show on Camera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>רמת יומן</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>מכשיר</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,48 @@
       <source>Retry</source>
       <translation>נסה שוב</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>חיבור</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>להתחברות לשרתים ישנים יש להוריד את האפליקציה הישנה מחנות האפליקציות של גוגל.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>להתחברות לשרתים ישנים יש להוריד את האפליקציה הישנה מחנות האפליקציות של אפל.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>להתחברות לשרתים ישנים יש להוריד את האפליקציה הישנה מהאינטרנט.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation type="unfinished">
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>הורדה</translation>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +298,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>אין אפשרות להתחבר אל %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +326,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>אינך מחובר למערכת כלשהי</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>כל</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>מחק</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>סיסמה</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +379,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>מערכות</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>התראות</translation>
     </message>
@@ -239,20 +387,8 @@
       <translation>בוצע</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>כל המערכות</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>מערכות נבחרות</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>בחר</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>יש לבחור לפחות מערכת אחת</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +401,22 @@
     <message>
       <source>Save changes?</source>
       <translation>האם לשמור שינויים?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +438,38 @@
       <translation>האיכות הטובה ביותר</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>קידוד מחדש מושבת.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>קידוד מחדש אינו נתמך עבור מצלמה זו.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>קידוד מחדש אינו נתמך עבור שרתים עם גרסה נמוכה מ -3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>קידוד מחדש אינו נתמך עבור שרתי ARM.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>אל</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>סוג</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -333,6 +503,33 @@
     </message>
   </context>
   <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>אובייקטים</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>סימניות</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>אין אובייקטים</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>אין סימניות</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
+    </message>
+  </context>
+  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -340,7 +537,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>מומלץ</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -404,10 +601,6 @@
       <translation>התחבר לשרת אחר...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>לא נמצאו מערכות</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>התחבר ל %1</translation>
@@ -420,6 +613,10 @@
     <message>
       <source>Nothing found</source>
       <translation>לא נמצא דבר</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +666,6 @@
       <translation>היכנס לענן כדי להשתמש בהודעות דחיפה</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>התראות דחיפה כבויות בהגדרות המערכת</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>התחבר אוטומטית לשרתים</translation>
     </message>
@@ -482,11 +675,31 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>מומלץ</translation>
     </message>
     <message>
       <source>Strict</source>
       <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation type="unfinished">Enable hardware acceleration</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation type="unfinished">Increase performance and battery life</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +720,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Issued by</source>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>ביטול</translation>
+      <source>Expires</source>
+      <translation>יפוג</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>
@@ -529,6 +746,11 @@
     <message>
       <source>Log out</source>
       <translation>להתנתק</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>עבור אל %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +781,13 @@
     <message>
       <source>Select All</source>
       <translation>בחר הכל</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +858,12 @@
       <translation>הגדר סיסמה במצלמה זו באמצעות קליינט %1 או דף אינטרנט של המצלמה לצפייה בוידאו</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <source>Archive encrypted</source>
+      <translation type="unfinished">Archive encrypted</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +896,6 @@
       <translation>אזור</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>שינוי איכות</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>מידע</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>הקש והחזק כדי לבחור אזור</translation>
     </message>
@@ -683,15 +908,16 @@
       <translation>האזור שסומן לא תקין. נא לסמן אזור מחדש.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>אודיו</translation>
+      <source>Camera Settings</source>
+      <translation>הגדרות מצלמה</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>דלג</translation>
+      <source>Bookmarks</source>
+      <translation>סימניות</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>אובייקטים</translation>
     </message>
   </context>
   <context>

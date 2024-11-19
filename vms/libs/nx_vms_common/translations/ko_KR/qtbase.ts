@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>설정...</translation>
+      <translation>환경 설정...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -266,12 +266,12 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation>취소하려면 ESC를 누르세요</translation>
+      <translation>커서가 %1, %2에 있습니다. 취소하려면 ESC를 누르세요.</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
@@ -573,7 +573,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>당신은 &apos;%1&apos; 삭제 하 시겠습니까?</translation>
+      <translation>당신은 &apos;%1&apos; 삭제 하시겠습니까?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -834,7 +834,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>

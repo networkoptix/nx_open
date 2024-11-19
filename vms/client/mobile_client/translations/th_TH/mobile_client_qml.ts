@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>กดค้างไว้</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>เพิ่มความเร็วของการเชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>ปรับปรุงประสิทธิภาพของเครือข่าย</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>โปรดเริ่มต้นแอปพลิเคชันเพื่อใช้การเปลี่ยนแปลง</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>ใช่</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>ไม่</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>I/O โมดูล</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>การตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>ข้อมูล</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>เสียง</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>เปลี่ยนแปลงคุณภาพ</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>ที่อยู่เซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>ช่องผู้ใช้งาน ต้องไม่ปล่อยว่าง</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>รหัสผ่านต้องไม่ปล่อยว่าง</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>ลบข้อมูลเข้าสู่ระบบ &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>ช่องเข้าสู่ระบบไม่สามารถเว้นว่างได้</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>ต้องระบุช่องรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>แสดงตัวอย่าง</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation type="unfinished">Show on Camera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>ระดับล็อก</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>คัดลอก log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>อุุปกรณ์</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,45 @@
       <source>Retry</source>
       <translation>ลองอีกครั้ง</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>เชื่อมต่อ</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์เก่าโปรดดาวน์โหลดแอปพลิมรดกจาก Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์เก่าโปรดดาวน์โหลดแอปพลิมรดกจาก App Store.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์เก่าโปรดดาวน์โหลดแอปพลิมรดกจากอินเทอร์เน็ต.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation type="unfinished">
+        <numerusform>%n minutes</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>ดาวน์โหลด</translation>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +295,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>เชื่อมต่อกับกล้องไม่ได้%1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +323,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>คุณไม่ได้เชื่อมต่อกับระบบ</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>รายการใดก็ได้</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>ล้าง</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>รหัสผ่าน</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>ต้องระบุช่องรหัสผ่าน</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +376,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>ระบบ</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>การแจ้งเตือน</translation>
     </message>
@@ -239,20 +384,8 @@
       <translation>เสร็จ</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>ระบบทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>เลือกระบบ</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>เลือก</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>ต้องเลือกอย่างน้อยหนึ่งระบบ</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +398,22 @@
     <message>
       <source>Save changes?</source>
       <translation>ต้องการบันทึกการเปลี่ยนแปลง?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>ไซต์</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +435,38 @@
       <translation>คุณภาพดีที่สุด</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>การแปลงรหัสถูกปิดใช้งาน</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>ไม่สนับสนุนการ Transcoding สำหรับกล้องนี้</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>ไม่สนับสนุนการ Transcoding สำหรับเซิร์ฟเวอร์ที่มีรุ่นต่ำกว่า 3.0</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>การแปลงรหัสถูกปิดใช้งานโดยเซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>ไม่สนับสนุนการ Transcoding สำหรับเซิร์ฟเวอร์ ARM</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>ไม่รองรับการ Transcoding สำหรับเซิร์ฟเวอร์ที่มีเวอร์ชันต่ำกว่า 3.0</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>ถึง</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>ประเภท</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -333,6 +500,33 @@
     </message>
   </context>
   <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>วัตถุ</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>บุ๊คมาร์ค</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>วัตถุ</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>ไม่มีบุ๊กมาร์ก</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
+    </message>
+  </context>
+  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -340,19 +534,19 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>แนะนำ</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>การยืนยันของคุณจะถูกขอให้ปักหมุดใบรับรองที่ลงนามด้วยตนเอง</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>เข้มงวด</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>เชื่อมต่อเฉพาะเซิร์ฟเวอร์ที่มี public certificates</translation>
     </message>
   </context>
   <context>
@@ -404,10 +598,6 @@
       <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>ไม่พบระบบ</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>เข้าสู่ระบบ %1</translation>
@@ -420,6 +610,10 @@
     <message>
       <source>Nothing found</source>
       <translation>ไม่พบสิ่งใด</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +663,6 @@
       <translation>เข้าสู่ระบบคลาวด์เพื่อใช้การแจ้งเตือนแบบพุช</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>การแจ้งเตือนแบบพุชจะถูกปิดในการตั้งค่าระบบ</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>เข้าสู่โดยอัตโนมัติไปยังเซิร์ฟเวอร์</translation>
     </message>
@@ -482,11 +672,31 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>แนะนำ</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>เข้มงวด</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>เปิดใช้งานการเร่งด้วยฮาร์ดแวร์</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>เพิ่มประสิทธิภาพและอายุการใช้งานแบตเตอรี่</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +717,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation>ชื่อทั่วไป:</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Issued by</source>
+      <translation>ออกโดย</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>ยกเลิก</translation>
+      <source>Expires</source>
+      <translation>หมดอายุแล้ว</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>ลายนิ้วมือ</translation>
     </message>
   </context>
   <context>
@@ -529,6 +743,11 @@
     <message>
       <source>Log out</source>
       <translation>ออกจากระบบ</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>ไปที่ %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +778,13 @@
     <message>
       <source>Select All</source>
       <translation>เลือกทั้งหมด</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +855,12 @@
       <translation>ตั้งรหัสผ่านในกล้องนี้ใช้ %1 ไคลเอ็นต์หรือกล้องหน้าเว็บเพื่อดูวิดีโอ</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <source>Archive encrypted</source>
+      <translation>การเข้ารหัสถูกเก็บถาวร</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +893,6 @@
       <translation>พื้นที่</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>เปลี่ยนแปลงคุณภาพ</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>ข้อมูล</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>แตะ ค้างไว้เพื่อเลือกพื้นที่</translation>
     </message>
@@ -683,15 +905,16 @@
       <translation>พื้นที่ที่กำหนดไม่ถูกต้อง โปรดวาดที่ถูกต้อง</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>เสียง</translation>
+      <source>Camera Settings</source>
+      <translation>การตั้งค่ากล้อง</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>ข้าม</translation>
+      <source>Bookmarks</source>
+      <translation>บุ๊คมาร์ค</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>วัตถุ</translation>
     </message>
   </context>
   <context>

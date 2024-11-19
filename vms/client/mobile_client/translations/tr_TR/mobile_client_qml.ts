@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Bas ve bırakma</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation>GELİŞMİŞ ARAMA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Mevcut</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Yok</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>Beta Özellikleri</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>Video İndirme</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>Video indirme yeteneği</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>Bağlantıları hızlandırma</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>Ağ performansını iyileştirin</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>Değişikliklerin geçerli olması için lütfen uygulamayı yeniden başlatın.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Evet</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Hayır</translation>
     </message>
   </context>
   <context>
@@ -27,7 +76,7 @@
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation>Desteklenmeyen yazılım versiyonu</translation>
+      <translation>Desteklenmeyen ürün yazılımı sürümü</translation>
     </message>
     <message>
       <source>Offline</source>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation>I/O modül</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Kamera Ayarları</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Bilgi</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Ses</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Kaliteyi değiştir</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation>Sunucu adresini girin</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Giriş bilgileri boş bırakılamaz</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Parola boş olamaz</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Giriş &quot;%1&quot; silinsin mi?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Bu alan boş bırakılamaz</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Şifre alanı boş bırakılamaz</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Ön izleme</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>Kamerada Göster</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>Günlük kayıt seviyesi</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>Günlük ID kopyala</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Cihaz</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,46 @@
       <source>Retry</source>
       <translation>Tekrar Dene</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Bağlan</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Eski versiyonlara bağlanmak için Lütfen Google Play'den uyumlu versiyonu indirin.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Eski versiyonlara bağlanmak için Lütfen Apple Store'dan uyumlu versiyonu indirin.</translation>
+      <source>Download next</source>
+      <translation>Sonrakini indir</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Eski versiyonlara bağlanmak için Lütfen uyumlu versiyonu indirin.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n dakika</numerusform>
+        <numerusform>%n dakika</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>İndir</translation>
+      <source>No filters</source>
+      <translation>Filtre yok</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation>Arama Filtreleri</translation>
     </message>
   </context>
   <context>
@@ -186,6 +296,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 e bağlanılamıyor</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +324,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>İstemci herhangi bir sisteme bağlı değil</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Herhangi</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Temizle</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Parola</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Şifre alanı boş bırakılamaz</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation>Eklenti</translation>
     </message>
   </context>
   <context>
@@ -227,10 +377,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>Sistemler</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Bildirimler</translation>
     </message>
@@ -239,20 +385,8 @@
       <translation>Bitti</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Tüm sistemler</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Seçilmiş Sistemler</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>SEÇ</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>En az bir sistem seçilmelidir</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +399,22 @@
     <message>
       <source>Save changes?</source>
       <translation>Değişiklikler kaydedilsin mi?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Siteler</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +436,38 @@
       <translation>En iyi kalite</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>Kod dönüştürme devre dışı.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>Bu kamera için kod çözme desteklenmiyor.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>Sürüm 3.0 dan düşük ile sunucular için transcoding desteklemiyor.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>Kod dönüştürme, Sunucu tarafından devre dışı bırakıldı.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>Transcoding ARM sunucular için desteklenmez.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>Kod dönüştürme, 3.0'dan daha düşük sürüme sahip Sunucular için desteklenmiyor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>İtibaren</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Kime</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Tür</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Alt tip</translation>
     </message>
   </context>
   <context>
@@ -333,6 +501,33 @@
     </message>
   </context>
   <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Nesneler</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Yer imleri</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Nesne yok</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Yer imi yok</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Filtreleri değiştirmeyi deneyin veya kamera eklentisi ayarlarında nesne algılamayı yapılandırın</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Sonuçları görüntülemek için filtreleri değiştirmeyi deneyin</translation>
+    </message>
+  </context>
+  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -340,19 +535,19 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Önerilen</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Kendinden imzalı sertifikaları sabitlemek için onayınız istenecek</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Yalnızca genel sertifikalara sahip sunucuları bağlayın</translation>
     </message>
   </context>
   <context>
@@ -404,10 +599,6 @@
       <translation>Başka bir Sunucuya Bağlan...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Hiçbir sistem bulundu</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1 e giriş yapın</translation>
@@ -420,6 +611,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Hiçbir şey bulunamadı</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +664,6 @@
       <translation>Anlık bildirimleri kullanmak için bulutta oturum açın</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Anlık bildirimler sistem ayarlarında kapalı</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Sunuculara otomatik olarak oturum aç</translation>
     </message>
@@ -482,11 +673,31 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Önerilen</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Sıkı</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Donanım hızlandırmayı etkinleştir</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Performansı ve pil ömrünü artırın</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>Beta Özellikleri</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>Yeni özelliklere erken erişim</translation>
     </message>
   </context>
   <context>
@@ -507,16 +718,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation>Genel ad</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Issued by</source>
+      <translation>Veren kuruluş</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>İptal</translation>
+      <source>Expires</source>
+      <translation>Bitiş tarihi</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Parmak izleri</translation>
     </message>
   </context>
   <context>
@@ -529,6 +744,11 @@
     <message>
       <source>Log out</source>
       <translation>Çıkış</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 e git</translation>
     </message>
   </context>
   <context>
@@ -559,6 +779,13 @@
     <message>
       <source>Select All</source>
       <translation>Tümünü Seç</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation>Periyot</translation>
     </message>
   </context>
   <context>
@@ -629,8 +856,12 @@
       <translation>Video izlemek için %1 istemci veya kamera web sayfasını kullanarak bu kamerada şifre belirleyin</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <source>Archive encrypted</source>
+      <translation>Arşiv şifreli</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +894,6 @@
       <translation>Alan</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Kaliteyi değiştir</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Bilgi</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>Bir alan seçmek için dokunun ve basılı tutun</translation>
     </message>
@@ -683,15 +906,16 @@
       <translation>Geçersiz özel alan. Lütfen doğru bir tane çizin.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Ses</translation>
+      <source>Camera Settings</source>
+      <translation>Kamera Ayarları</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Geç</translation>
+      <source>Bookmarks</source>
+      <translation>Yer İmleri</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Nesneler</translation>
     </message>
   </context>
   <context>

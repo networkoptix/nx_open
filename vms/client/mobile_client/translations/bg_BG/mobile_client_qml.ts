@@ -9,10 +9,59 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation type="unfinished">Speedup connections</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation type="unfinished">Improve network performance</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation type="unfinished">Yes</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
     </message>
   </context>
   <context>
@@ -36,6 +85,25 @@
     <message>
       <source>I/O module</source>
       <translation type="unfinished">I/O module</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation type="unfinished">Camera Settings</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation type="unfinished">Audio</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation type="unfinished">Change Quality</translation>
     </message>
   </context>
   <context>
@@ -69,17 +137,28 @@
       <translation type="unfinished">Enter server address</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation type="unfinished">Login field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation type="unfinished">Preview</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation type="unfinished">Show on Camera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation type="unfinished">Log Level</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation type="unfinished">Device</translation>
     </message>
   </context>
   <context>
@@ -123,26 +213,46 @@
       <source>Retry</source>
       <translation type="unfinished">Retry</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation type="unfinished">Connect</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the App Store.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the Internet.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation type="unfinished">
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +296,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Cannot connect to %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +324,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation type="unfinished">Any</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation type="unfinished">Clear</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation type="unfinished">Password</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +377,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation type="unfinished">Systems</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation type="unfinished">Notifications</translation>
     </message>
@@ -239,20 +385,8 @@
       <translation type="unfinished">Done</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation type="unfinished">Selected Systems</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation type="unfinished">SELECT</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation type="unfinished">At least one system has to be selected</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +399,22 @@
     <message>
       <source>Save changes?</source>
       <translation type="unfinished">Save changes?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +436,38 @@
       <translation type="unfinished">Best quality</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation type="unfinished">Transcoding is disabled.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation type="unfinished">Transcoding is not supported for this camera.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation type="unfinished">Transcoding is not supported for servers with version lower than 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation type="unfinished">Transcoding is not supported for ARM servers.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation type="unfinished">To</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -330,6 +498,33 @@
     <message>
       <source>Search</source>
       <translation type="unfinished">Search</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation type="unfinished">Bookmarks</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation type="unfinished">No objects</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation type="unfinished">No bookmarks</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
     </message>
   </context>
   <context>
@@ -404,10 +599,6 @@
       <translation type="unfinished">Connect to Another Server...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation type="unfinished">Log in to %1</translation>
@@ -420,6 +611,10 @@
     <message>
       <source>Nothing found</source>
       <translation type="unfinished">Nothing found</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +664,6 @@
       <translation type="unfinished">Log in to the cloud to use push notifications</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation type="unfinished">Push notifications are turned off in system settings</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation type="unfinished">Automatically log in to servers</translation>
     </message>
@@ -487,6 +678,26 @@
     <message>
       <source>Strict</source>
       <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation type="unfinished">Enable hardware acceleration</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation type="unfinished">Increase performance and battery life</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +718,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Issued by</source>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <source>Expires</source>
+      <translation type="unfinished">Expires</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>
@@ -529,6 +744,11 @@
     <message>
       <source>Log out</source>
       <translation type="unfinished">Log out</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Go to %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +779,13 @@
     <message>
       <source>Select All</source>
       <translation type="unfinished">Select All</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +856,12 @@
       <translation type="unfinished">Set password on this camera using %1 client or camera web-page to view video</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <source>Archive encrypted</source>
+      <translation type="unfinished">Archive encrypted</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +894,6 @@
       <translation type="unfinished">Area</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation type="unfinished">Information</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation type="unfinished">Tap and hold to select an area</translation>
     </message>
@@ -683,15 +906,16 @@
       <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <source>Camera Settings</source>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <source>Bookmarks</source>
+      <translation type="unfinished">Bookmarks</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>

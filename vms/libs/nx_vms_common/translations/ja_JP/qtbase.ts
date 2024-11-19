@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>すべてを選択(&amp;S)</translation>
+      <translation>すべて選択(&amp;S)</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Config</source>
-      <translation>コンフィグ</translation>
+      <translation>設定</translation>
     </message>
     <message>
       <source>Preference</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>すべてを選択</translation>
+      <translation>すべて選択</translation>
     </message>
   </context>
   <context>
@@ -262,7 +262,7 @@
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation>アルファチャネル(&amp;L):</translation>
+      <translation>アルファチャンネル (&amp;L):</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
@@ -299,11 +299,11 @@ Press ESC to cancel</source>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation>偽</translation>
+      <translation>False</translation>
     </message>
     <message>
       <source>True</source>
-      <translation>真</translation>
+      <translation>True</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
@@ -376,11 +376,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation>コピー元のファイルが存在しません。</translation>
+      <translation>ソースファイルが存在しません。</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation>コピー先のファイルは既に存在しています</translation>
+      <translation>保存先のファイルはすでに存在しています</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
@@ -400,19 +400,19 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation>コピー元ファイル %1 を読み込み用に開けません</translation>
+      <translation>入力用に %1 を開けません</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation>コピー先のファイルを開けません</translation>
+      <translation>出力用にファイルを開けません</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>ブロックの書き込みに失敗</translation>
+      <translation>ブロックの書き込みに失敗しました</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>コピー先として %1 を作成できません</translation>
+      <translation>出力用の %1 を作成できません</translation>
     </message>
   </context>
   <context>
@@ -570,8 +570,8 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; は書き込み禁止です。
-削除しますか？</translation>
+      <translation>&apos;%1&apos; は書き込み保護されています。
+削除してもよろしいですか?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -644,15 +644,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt+Left</translation>
+      <translation>Alt+左</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt+Right</translation>
+      <translation>Alt+右</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt+Up</translation>
+      <translation>Alt+上</translation>
     </message>
   </context>
   <context>
@@ -683,7 +683,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません。 &lt;/b&gt;&lt;p&gt;文字数を減らすか、句読記号を付けずに別の名前を使用してください。</translation>
+      <translation>&lt;b&gt; &quot;%1&quot; という名前は使用できません。&lt;/b&gt;&lt;p&gt;文字数を減らすか、句読点を含まない別の名前を使用してください。</translation>
     </message>
     <message>
       <source>Name</source>
@@ -771,11 +771,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>開くファイルはディレクトリです</translation>
+      <translation>開くファイルとしてディレクトリが指定されています</translation>
     </message>
   </context>
   <context>
@@ -798,14 +798,14 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
     </message>
     <message>
       <source>Device is not set</source>
@@ -824,7 +824,7 @@ Do you want to delete it anyway?</source>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation>値を入力:</translation>
+      <translation>値を入力してください:</translation>
     </message>
   </context>
   <context>
@@ -867,7 +867,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>すべてを選択</translation>
+      <translation>すべて選択</translation>
     </message>
   </context>
   <context>
@@ -878,7 +878,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>詳細の非表示</translation>
+      <translation>詳細を非表示...</translation>
     </message>
     <message>
       <source>OK</source>
@@ -986,7 +986,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>ファイル名でディレクトリを指定しています。</translation>
+      <translation>ディレクトリをファイル名として指定しています。</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
