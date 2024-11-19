@@ -3,8 +3,11 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQml.Models
 
 import Nx.Controls
+
+import "."
 
 import nx.vms.client.core
 
@@ -44,33 +47,43 @@ Control
             font.weight: FontConfig.small.weight
         }
 
-        Flow
+        LimitedFlow
         {
-            spacing: 4
+            id: tagFlow
+
+            Layout.fillWidth: true
+
             visible: control.bookmark.tags.length
+            spacing: 4
+            rowLimit: 1
 
-            Repeater
+            delegate: Tag
             {
-                model: control.bookmark.tags
-
-                Tag
+                text: model.tag
+                onClicked:
                 {
-                    text: modelData
-                    textColor: "#51ACF6"
-                    textCapitalization: Font.MixedCase
-                    color: "transparent"
-                    border.color: textColor
-                    border.width: 1
-
-                    MouseArea
-                    {
-                        anchors.fill: parent
-                        onClicked:
-                        {
-                            control.tagClicked(modelData)
-                        }
-                    }
+                    control.tagClicked(model.tag)
                 }
+            }
+
+            sourceModel: ListModel
+            {
+                id: tagListModel
+            }
+
+            Tag
+            {
+                text: "+" + tagFlow.remaining
+                onClicked:
+                {
+                    tagFlow.rowLimit *= 3
+                }
+            }
+
+            Component.onCompleted:
+            {
+                for (let tag of control.bookmark.tags)
+                    tagListModel.append({"tag": tag})
             }
         }
 

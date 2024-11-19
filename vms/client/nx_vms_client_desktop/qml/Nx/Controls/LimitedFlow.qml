@@ -59,6 +59,7 @@ Flow
         visible: limitedModel.remaining > 0
     }
 
+    onRowLimitChanged: repopulate()
     onWidthChanged: repopulate()
 
     function repopulate()
@@ -74,10 +75,10 @@ Flow
             return
 
         const rowHeight = moreGroupsButton.height + (control.rowLimit > 1 ? control.spacing : 0)
-        const errorMargin = control.spacing * 0.5
+        const errorMargin = control.rowLimit > 1 ? control.spacing * 0.5 : 0
         const yLimit = control.topPadding + control.rowLimit * rowHeight - errorMargin
 
-        const childrenWithinLimit = control.childrenRect.height < yLimit
+        const childrenWithinLimit = control.childrenRect.height <= yLimit
 
         if (childrenWithinLimit)
         {
