@@ -4,6 +4,7 @@
 
 namespace nx::cloud::oauth2::api {
 
+static constexpr char kPingPath[] = "/oauth2/ping";
 static constexpr char kOauthIntrospectPath[] = "/oauth2/v1/introspect";
 static constexpr char kOauthLogoutPath[] = "/oauth2/v1/user/self";
 static constexpr char kOauthJwksPath[] = "/oauth2/v1/jwks";

@@ -83,6 +83,8 @@ struct Result
     }
 
     bool ok() const { return code == ResultCode::ok; }
+    bool isTechnicalError();
+    bool isBusinessLogicError();
 
     std::string toString() const
     {
