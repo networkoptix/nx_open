@@ -12,16 +12,16 @@
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>New Site</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Your Site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Owner: %1</source>
+        <comment>%1 is a user/company name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
