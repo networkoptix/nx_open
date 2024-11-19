@@ -2,6 +2,41 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="no_NO" sourcelanguage="en">
   <context>
+    <name>AccessRightHelper</name>
+    <message>
+      <source>View Live</source>
+      <translation>Se live</translation>
+    </message>
+    <message>
+      <source>Play Audio</source>
+      <translation type="unfinished">Play Audio</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation>Vis arkiv</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation>Eksporter arkiv</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation>Vis bokmerker</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Administrere bokmerker</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>Brukerinndata</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation>Rediger innstillinger</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -17,46 +52,15 @@
     </message>
   </context>
   <context>
-    <name>AuthResultTranslations</name>
+    <name>BookmarkFacadeStrings</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation>Denne brukeren eksisterer ikke.</translation>
+      <source>Removed camera</source>
+      <translation>Fjernet kamera</translation>
     </message>
     <message>
-      <source>Wrong password.</source>
-      <translation>Feil passord.</translation>
-    </message>
-    <message>
-      <source>The password is expired. Please contact your system administrator.</source>
-      <translation>Passordet er utløpt. Ta kontakt med systemadministratoren din.</translation>
-    </message>
-    <message>
-      <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>LDAP-serveren er ikke tilgjengelig. Prøv igjen senere.</translation>
-    </message>
-    <message>
-      <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 er ikke tilgjengelig ennå. Prøv igjen senere.</translation>
-    </message>
-    <message>
-      <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>Brukeren er utestengt på grunn av flere mislykkede forsøk. Prøv igjen senere.</translation>
-    </message>
-    <message>
-      <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation>Denne autorisasjonsmetoden er forbudt. Ta kontakt med systemadministratoren din.</translation>
-    </message>
-    <message>
-      <source>The session key is invalid or expired.</source>
-      <translation>Sesjonsnøkkelen er ugyldig eller utløpt.</translation>
-    </message>
-    <message>
-      <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>Intern serverfeil (%1). Ta kontakt med systemadministratoren din.</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>Denne brukeren har blitt deaktivert av en systemadministrator.</translation>
+      <source>Site Event</source>
+      <comment>Shows that the bookmark was created by a site event</comment>
+      <translation type="unfinished">Site Event</translation>
     </message>
   </context>
   <context>
@@ -141,11 +145,127 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
+    <name>PredefinedUserGroups</name>
     <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Systemhendelse</translation>
+      <source>Administrators</source>
+      <translation>Administratorer</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>Superbrukere</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>Avanserte brukere</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>Brukere</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>Livebrukere</translation>
+    </message>
+    <message>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation>Medlemmer av denne gruppen kan se live-videoer, I/O-moduler og nettsider.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation>Medlemmer av denne gruppen kan, i tillegg til tillatelsene gitt av seergruppen, se og aktivere PTZ-posisjoner og PTZ-turer, bruke 2-veis lyd, betjene I/O-modulknapper, opprette og redigere bokmerker og se hendelsesloggen.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation>Medlemmer av denne gruppen kan, i tillegg til tillatelsene gitt av Live Viewers-gruppen, se og eksportere arkiv og bokmerker.</translation>
+    </message>
+    <message>
+      <source>Site Health Viewers</source>
+      <translation type="unfinished">Site Health Viewers</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBusinessResourceValidationStrings</name>
+    <message numerus="yes">
+      <source>%1 of %n devices</source>
+      <translation>
+        <numerusform>%1 av %n enheter</numerusform>
+        <numerusform>%1 av %n enheter</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n cameras</source>
+      <translation>
+        <numerusform>%1 av %n kameraer</numerusform>
+        <numerusform>%1 av %n kameraer</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n I/O modules</source>
+      <translation>
+        <numerusform>%1 av %n I/O-moduler</numerusform>
+        <numerusform>%1 av %n I/O-moduler</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Enhver enhet</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Hvilket som helst kamera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>Velg minst en enhet</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>Velg minst ett kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>Servere som støtter buzzer</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>Analytics er ikke tilgjengelig for %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+      <source>Select device</source>
+      <translation>Velg enhet</translation>
+    </message>
+    <message>
+      <source>Select camera</source>
+      <translation>Velg kamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 does not support two-way audio</source>
+      <translation>
+        <numerusform>%1 støtter ikke toveis lyd</numerusform>
+        <numerusform>%1 støtter ikke toveis lyd</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -243,14 +363,6 @@
       <translation>Ukjent kameraproblem.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>Ugyldige data ble mottatt fra enheten %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>Ugyldige data ble mottatt fra kameraet %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>For mange media feil. Vennligst åpne enhetsproblemdialog for mer informasjon.</translation>
     </message>
@@ -273,10 +385,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Ukjent I / O-modul problem.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Ugyldige data ble mottatt fra I / O-modulen %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -374,82 +482,102 @@
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Hvis deaktivert, prøv å aktivere opptak i I/O-modulinnstillinger (feil &quot;%1&quot;).</translation>
     </message>
-  </context>
-  <context>
-    <name>QnFfmpegAudioTranscoder</name>
     <message>
-      <source>Audio context was not specified.</source>
-      <translation>Lyd kontekst ble ikke spesifisert.</translation>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>Ugyldige data ble mottatt fra enheten. Detaljer: &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Kunne ikke finne encoder for codec %1.</translation>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>Ugyldige data ble mottatt fra kameraet. Detaljer: &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Kunne ikke initialisere lydkoderen.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Kunne ikke initialisere lydkoderen.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Kunne ikke finne encoder for codec %1.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Kunne ikke sende lydramme til koder, Feilkode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Kunne ikke sende lydramme til koder, Feilkode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Kunne ikke sende lydramme til koder, Feilkode: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Kunne ikke allokere prøvebuffere</translation>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>Ugyldige data ble mottatt fra I/O-modulen. Detaljer: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Container %1 ble ikke funnet i FFMPEG-biblioteket.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Kunne ikke opprette utgangskontekst for format %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kunne ikke allokere utgangsstrøm for opptak.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Kunne ikke utføre direkte stream kopiering fordi rammestørrelsen er udefinert.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Kunne ikke finne kodek %1.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Video- eller lydkodek er inkompatibel med container %1.</translation>
+    <name>QnCameraInputPolicy</name>
+    <message numerus="yes">
+      <source>%1 have no input ports</source>
+      <translation>
+        <numerusform>%1 har ingen inngangsporter</numerusform>
+        <numerusform>%1 har ingen inngangsporter</numerusform>
+      </translation>
     </message>
   </context>
   <context>
-    <name>QnFfmpegVideoTranscoder</name>
+    <name>QnCameraMotionPolicy</name>
     <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Kunne ikke finne encoder for codec %1.</translation>
+      <source>Recording or motion detection is disabled for %1</source>
+      <translation>Innspilling eller bevegelsesdeteksjon er deaktivert i %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Fjernet kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraOutputPolicy</name>
+    <message numerus="yes">
+      <source>%1 have no output relays</source>
+      <translation>
+        <numerusform>%1 har ingen utgangsreléer</numerusform>
+        <numerusform>%1 har ingen utgangsreléer</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraRecordingPolicy</name>
+    <message>
+      <source>Recording is disabled for %1</source>
+      <translation>Innspillingen er deaktivert i %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n av %1 utvalgte brukere er ikke %2 brukere og vil ikke motta mobilvarsler.</numerusform>
+        <numerusform>%n av %1 utvalgte brukere er ikke %2 brukere og vil ikke motta mobilvarsler.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnExecPtzPresetPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Velg nøyaktig ett kamera</translation>
     </message>
     <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Kunne ikke initialisere video encoder.</translation>
+      <source>%1 has no PTZ presets</source>
+      <translation>%1 har ingen PTZ-posisjoner</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>Servere som støtter vifte diagnostikk</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Velg nøyaktig ett kamera</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on the selected layout</source>
+      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on some of the selected layouts</source>
+      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
     </message>
   </context>
   <context>
@@ -753,57 +881,87 @@
         <numerusform>%n/%1 NVR-lisenser</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Local Recording</source>
+      <translation>Lokalt opptak</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation>Lokal opptakstjeneste</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Local Recording Services</source>
+      <translation>
+        <numerusform>%n Lokale opptakstjenester</numerusform>
+        <numerusform>%n Lokale opptakstjenester</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Lokale opptakstjenester</numerusform>
+        <numerusform>%n/%1 Lokale opptakstjenester</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>Servere som støtter PoE-overvåking</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation>
+        <numerusform>%n grupper</numerusform>
+        <numerusform>%n grupper</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n brukere</numerusform>
+        <numerusform>%n brukere</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation>%1 og %2 har ikke %3 tilgang til noen av valgte kameraer</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n grupper har ikke %1 tillatelse til noen av valgte kameraer</numerusform>
+        <numerusform>%n grupper har ikke %1 tillatelse til noen av valgte kameraer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation>%1 gruppe har ikke %2 tillatelse til noen valgte kameraer</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n brukere har ikke %1 tillatelse til noen av valgte kameraer</numerusform>
+        <numerusform>%n brukere har ikke %1 tillatelse til noen av valgte kameraer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 user does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>%1 brukeren har ikke %2 tillatelse for noen av de valgte kameraene</translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message>
-      <source>Cameras</source>
-      <translation>Kameraer</translation>
-    </message>
-    <message>
-      <source>cameras</source>
-      <translation>kameraer</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>camera</source>
-      <translation>kamera</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Enheter</translation>
-    </message>
-    <message>
-      <source>devices</source>
-      <translation>enheter</translation>
-    </message>
-    <message>
-      <source>Device</source>
-      <translation>Enhet</translation>
-    </message>
-    <message>
-      <source>device</source>
-      <translation>enhet</translation>
-    </message>
-    <message>
-      <source>I/O Modules</source>
-      <translation>I / O-moduler</translation>
-    </message>
-    <message>
-      <source>I/O modules</source>
-      <translation>I / O-moduler</translation>
-    </message>
-    <message>
-      <source>I/O Module</source>
-      <translation>I / O-Modul</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I / O-modul</translation>
-    </message>
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
@@ -868,6 +1026,13 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>Maskinvare-ID: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSubjectValidationPolicy</name>
+    <message>
+      <source>None of selected user roles contain users</source>
+      <translation type="unfinished">None of selected user roles contain users</translation>
     </message>
   </context>
   <context>
@@ -1016,17 +1181,113 @@
         <numerusform>år</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation>Msek</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation>Sek</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>Min</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation>Timer</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation>Dager</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation>Uke</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation>Mnd</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation>År</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>Millisekunder</numerusform>
+        <numerusform>Millisekunder</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>Sekunder</numerusform>
+        <numerusform>Sekunder</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>Minutter</numerusform>
+        <numerusform>Minutter</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>Timer</numerusform>
+        <numerusform>Timer</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation>
+        <numerusform>Dager</numerusform>
+        <numerusform>Dager</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>Uker</numerusform>
+        <numerusform>Uker</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation>
+        <numerusform>Måneder</numerusform>
+        <numerusform>Måneder</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation>
+        <numerusform>År</numerusform>
+        <numerusform>År</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL-transkoding er ikke implementert.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Ukjent transkodingsmetode.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCLTranscode er ikke implementert.</translation>
@@ -1037,206 +1298,157 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Eier</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrator</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Avansert Bruker</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>Bruker</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Live Bruker</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Tilpasset rolle</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Tilpasset</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Kan håndtere alle kameraer og bokmerker.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Kan vise alle kameraer og eksportere video.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Kan se live video fra alle kameraer.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Tilpasset brukerrolle.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Tilpassede tillatelser.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Har tilgang til hele systemet og kan gjøre alt.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Har tilgang til hele systemet og kan redigere innstillinger. Kan skape brukere.</translation>
+      <source>Multiple groups</source>
+      <translation>Flere grupper</translation>
     </message>
   </context>
   <context>
-    <name>Result</name>
+    <name>QnUsersWithEmailValidationPolicy</name>
     <message>
-      <source>Missing required parameter: %1.</source>
-      <translation>Mangler nødvendig parameter: %1.</translation>
+      <source>Email address is not set for all the selected users.</source>
+      <translation type="unfinished">Email address is not set for all the selected users.</translation>
     </message>
     <message>
-      <source>Failed to process request.</source>
-      <translation>Kunne ikke behandle forespørselen.</translation>
+      <source>Email address is not set for some selected users.</source>
+      <translation type="unfinished">Email address is not set for some selected users.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation>Lokalt opptak</translation>
     </message>
     <message>
-      <source>Forbidden.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Forbudt.</translation>
+      <source>Integration</source>
+      <translation>Integrasjon</translation>
     </message>
     <message>
-      <source>Conflict.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Konflikt.</translation>
+      <source>Cloud storage</source>
+      <translation>Skylagring</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation>Kontakt kanalpartneren din for detaljer.</translation>
     </message>
     <message>
-      <source>Bad request.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Ugyldig forespørsel.</translation>
-    </message>
-    <message>
-      <source>Not implemented.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Ikke implementert.</translation>
-    </message>
-    <message>
-      <source>Not found.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Ikke funnet.</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>Intern feil.</translation>
-    </message>
-    <message>
-      <source>Unsupported media type.</source>
-      <translation>Ustøttet medietype.</translation>
-    </message>
-    <message>
-      <source>Service unavailable.</source>
-      <translation>Tjenesten er utilgjengelig.</translation>
-    </message>
-    <message>
-      <source>Unauthorized.</source>
-      <translation>Uautorisert.</translation>
-    </message>
-    <message>
-      <source>Session expired.</source>
-      <translation>Sesjon utløpt.</translation>
-    </message>
-    <message>
-      <source>Invalid parameter `%1`: %2.</source>
-      <comment>%1 is name, %2 is value.</comment>
-      <translation>Ugyldig parameter `%1: %2.</translation>
-    </message>
-    <message>
-      <source>Session authorization required.</source>
-      <translation>Øktautorisasjon kreves.</translation>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation>Sjekk internettforbindelsen mellom VMS og lisensserver.</translation>
     </message>
   </context>
   <context>
     <name>SystemHelpers</name>
     <message>
-      <source>New System</source>
-      <translation>Nytt system</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
     <message>
-      <source>SMTP host</source>
-      <translation>SMTP-vert</translation>
+      <source>just now</source>
+      <translation>akkurat nå</translation>
     </message>
     <message>
-      <source>Email from</source>
-      <translation>E-post fra</translation>
+      <source>yesterday</source>
+      <translation>i går</translation>
     </message>
     <message>
-      <source>SMTP user</source>
-      <translation>SMTP-bruker</translation>
+      <source>a week ago</source>
+      <translation>en uke siden</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n minutter siden</numerusform>
+        <numerusform>%n minutter siden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n timer siden</numerusform>
+        <numerusform>%n timer siden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n dager siden</numerusform>
+        <numerusform>%n dager siden</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Intern feil</translation>
     </message>
     <message>
-      <source>SMTP password</source>
-      <translation>SMTP passord</translation>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Tilsvarende beholder i FFMPEG-bibliotek ble ikke funnet.</translation>
     </message>
     <message>
-      <source>Email signature</source>
-      <translation>E-post signatur</translation>
+      <source>Could not create output file for video recording.</source>
+      <translation>Kunne ikke opprette utdatafil for videoopptak.</translation>
     </message>
     <message>
-      <source>Email support link</source>
-      <translation>Link for e-poststøtte</translation>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Kunne ikke allokere utgangsstrøm for opptak.</translation>
     </message>
     <message>
-      <source>SMTP connection type</source>
-      <translation>SMTP-tilkoblingstype</translation>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Kunne ikke allokere utgangsljudstrøm.</translation>
     </message>
     <message>
-      <source>SMTP port</source>
-      <translation>SMTP-port</translation>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Kunne ikke allokere metadatastrøm.</translation>
     </message>
     <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>SMTP-tidsavbrudd (sekunder)</translation>
+      <source>Invalid audio codec information.</source>
+      <translation>Ugyldig lydkodingsinformasjon.</translation>
     </message>
     <message>
-      <source>SMTP name</source>
-      <translation>SMTP Navn</translation>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video- eller lydkodek er uforenlig med det valgte formatet.</translation>
     </message>
     <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
+      <source>Video transcoding required.</source>
+      <translation>Videotranskoding kreves.</translation>
     </message>
     <message>
-      <source>LDAP Admin DN</source>
-      <translation>LDAP Admin DN</translation>
+      <source>Invalid resource type for data export.</source>
+      <translation>Ugyldig ressurstype for dataeksport.</translation>
     </message>
     <message>
-      <source>LDAP Admin password</source>
-      <translation>LDAP Admin passord</translation>
+      <source>No data exported.</source>
+      <translation>Ingen data eksportert.</translation>
     </message>
     <message>
-      <source>LDAP search base</source>
-      <translation>LDAP-søkebase</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Lås opp denne delen av arkivet for å eksportere innholdet.</translation>
     </message>
     <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP-søkefilter</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Arkivet er utilgjengelig nå. Prøv igjen senere.</translation>
     </message>
     <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>Utløp av LDAP-passord (millisekunder)</translation>
+      <source>File write error.</source>
+      <translation>Filskrivefeil.</translation>
     </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>Tidsavbrudd for LDAP-søk (sekunder)</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Anonym statistikkrapport tillatt</translation>
@@ -1270,10 +1482,6 @@
       <translation>Anonym statistikk rapporterer Klientinnstillinger</translation>
     </message>
     <message>
-      <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation>Oppdateringsintervall for systemet (sekunder, 1s-1t)</translation>
-    </message>
-    <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
       <translation>Tidsavbrudd for proxy-tilkobling (sekunder, 1s-1t)</translation>
     </message>
@@ -1303,31 +1511,11 @@
     </message>
     <message>
       <source>Cloud owner account</source>
-      <translation>Cloud eierkonto</translation>
-    </message>
-    <message>
-      <source>Cloud System ID</source>
-      <translation>Cloud system ID</translation>
+      <translation>Eiers skykonto</translation>
     </message>
     <message>
       <source>Cloud authorization key</source>
       <translation>Cloud autorisasjonsnøkkel</translation>
-    </message>
-    <message>
-      <source>System name</source>
-      <translation>Systemnavn</translation>
-    </message>
-    <message>
-      <source>Local System ID</source>
-      <translation>Lokal System-ID</translation>
-    </message>
-    <message>
-      <source>Last master System merge ID</source>
-      <translation>Siste hovedsystemsammenslåings-ID</translation>
-    </message>
-    <message>
-      <source>Last slave System merge ID</source>
-      <translation>Siste slave Systemsammenslåings-ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
@@ -1340,11 +1528,6 @@
     <message>
       <source>Thumbnails auto-update</source>
       <translation>Automatisk oppdatering av miniatyrbilder</translation>
-    </message>
-    <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Bruk %1 -tjenesten for å sende e-poster i stedet for SMTP-klienten</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -1427,10 +1610,6 @@
       <translation>Maks. postkø størrelse (elementer, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Antall RTP-forsøk på nytt</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>RTP timeout (millisekunder)</translation>
     </message>
@@ -1473,10 +1652,6 @@
     <message>
       <source>Watermark settings</source>
       <translation>Vannmerkeinnstillinger</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Levetid for autorisasjonsøkttoken (minutter)</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server</source>
@@ -1587,15 +1762,6 @@
       <translation>Bruk kun HTTPS for kameraer</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation>Aktiver utdaterte API-funksjoner (usikre)</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Aktiver utdaterte API-funksjoner som for øyeblikket brukes av %1 programvare (usikkert)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>La IP-adresser bli automatisk oppdaget</translation>
     </message>
@@ -1606,10 +1772,6 @@
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
       <translation>Mediebufferstørrelse for bare lydenheter (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the System</source>
-      <translation>Aktiver 2FA for systemet</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -1639,67 +1801,102 @@
       <source>Update releases.json file URL</source>
       <translation>Oppdater nettadressen til releases.json-filen</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
     <message>
-      <source>Internal error</source>
-      <translation>Intern feil</translation>
+      <source>LDAP settings</source>
+      <translation>LDAP-innstillinger</translation>
     </message>
     <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Tilsvarende beholder i FFMPEG-bibliotek ble ikke funnet.</translation>
+      <source>SMTP settings</source>
+      <translation>SMTP-innstillinger</translation>
     </message>
     <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Kunne ikke opprette utdatafil for videoopptak.</translation>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation>Levetid for autorisasjonsøkttoken (sekunder)</translation>
     </message>
     <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Kunne ikke allokere utgangsstrøm for opptak.</translation>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Semikolon-separert liste over servere som er utpekt til å koble til skyen. Servere på toppen av listen har høyere prioritet. Hvis listen er tom, velges en Server for Cloud-tilkoblingen automatisk.</translation>
     </message>
     <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Kunne ikke allokere utgangsljudstrøm.</translation>
+      <source>Allow Power User editing Security Settings</source>
+      <translation>Tillat at Powerbruker redigerer sikkerhetsinnstillinger</translation>
     </message>
     <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Kunne ikke allokere metadatastrøm.</translation>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation>Aktiver utdaterte API-funksjoner (usikker)</translation>
     </message>
     <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Ugyldig lydkodingsinformasjon.</translation>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Maksimalt antall påfølgende RTP-feil før serveren kobler til RTSP-økten på nytt.</translation>
     </message>
     <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video- eller lydkodek er uforenlig med det valgte formatet.</translation>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Aktiver utdaterte API-funksjoner som brukes av %1 programvare (usikker)</translation>
     </message>
     <message>
-      <source>Video transcoding required.</source>
-      <translation>Videotranskoding kreves.</translation>
+      <source>Organization Id</source>
+      <translation>Organisasjons-ID</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Fil skrive feil. Ikke nok ledig plass.</translation>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>Intervall mellom Cloud polling HTTP-forespørsler for å synkronisere dataene.</translation>
     </message>
     <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Ugyldig ressurstype for dataeksport.</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
     <message>
-      <source>No data exported.</source>
-      <translation>Ingen data eksportert.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Feil kryptert strømstørrelse.</translation>
+      <source>Device storage information update interval</source>
+      <translation>Oppdateringsintervall for enhetslagring</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Skadet kryptert strøm header.</translation>
+      <source>Site alive update interval (seconds, 1s-1h)</source>
+      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+    </message>
+    <message>
+      <source>Proxy connection access policy</source>
+      <translation type="unfinished">Proxy connection access policy</translation>
+    </message>
+    <message>
+      <source>Cloud Site ID</source>
+      <translation type="unfinished">Cloud Site ID</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the Site</source>
+      <translation type="unfinished">Enable 2FA for the Site</translation>
+    </message>
+    <message>
+      <source>Site name</source>
+      <translation type="unfinished">Site name</translation>
+    </message>
+    <message>
+      <source>Local Site ID, null means the Site is not set up yet.</source>
+      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+    </message>
+    <message>
+      <source>Last master Site merge ID</source>
+      <translation type="unfinished">Last master Site merge ID</translation>
+    </message>
+    <message>
+      <source>Last slave Site merge ID</source>
+      <translation type="unfinished">Last slave Site merge ID</translation>
+    </message>
+    <message>
+      <source>Pixelation settings</source>
+      <translation type="unfinished">Pixelation settings</translation>
+    </message>
+    <message>
+      <source>Apply session limit for Cloud tokens</source>
+      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+    </message>
+    <message>
+      <source>Enable or disable the creation of new Integration registration requests</source>
+      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+    </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation>Anonym Crash Report Server API URL</translation>
     </message>
   </context>
   <context>
@@ -2038,27 +2235,12 @@
       <source>Trigger Name</source>
       <translation>Navn på utløser</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Rolle</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n brukere</numerusform>
         <numerusform>%n brukere</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Roller</numerusform>
-        <numerusform>%n Roller</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Alle administratorer</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2262,10 +2444,6 @@
       <translation>Kunne ikke sikkerhetskopiere filen %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Vis Intercom Informer</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Gjør HTTP(S)-forespørsel</translation>
     </message>
@@ -2280,10 +2458,6 @@
     <message>
       <source>Connection to device was unexpectedly closed.</source>
       <translation>Tilkobling til enheten ble uventet lukket.</translation>
-    </message>
-    <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation>Kunne ikke tvinge bruk av kameratid, da det henger for mye. Systemtid vil bli brukt i stedet.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
@@ -2337,12 +2511,110 @@
       <source>Also play on source camera</source>
       <translation>Spill også på kildekamera</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>Removed camera</source>
-      <translation>Fjernet kamera</translation>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP-synkroniseringsproblem</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation>
+        <numerusform>%1 (%n ganger)</numerusform>
+        <numerusform>%1 (%n ganger)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>Kunne ikke koble til LDAP-serveren.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>Kunne ikke fullføre synkroniseringen innen et tidsavbrudd på %1.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation>Kunne ikke fullføre synkroniseringen innen et gitt tidsavbrudd.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>Ingen brukerkontoer på LDAP-serveren samsvarer med synkroniseringsinnstillingene.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>Noen LDAP-brukere eller -grupper ble ikke funnet i LDAP-databasen.</translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>Tjenester problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation>Server &quot;%1&quot; har problemer med lisensmigrering</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>Overforbruk av tjenester</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation>Følgende lisenser ble ikke migrert:</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>Tillatelse</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+        <numerusform>Opptak på %n kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+        <numerusform>Sikkerhetskopiering av skylagring på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+        <numerusform>Bruk av betalte integreringstjenester på %n -kanaler ble stoppet på grunn av overforbruk av tjenesten.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>Kunne ikke migrere lisenser.</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>Hoppet over import av lisenser. Et nytt migreringsforsøk blir automatisk planlagt til senere.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
     </message>
   </context>
 </TS>

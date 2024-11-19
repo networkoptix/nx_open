@@ -5,14 +5,63 @@
     <name>ActionButtonsHint</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation>スケジュールで無効</translation>
+      <translation>スケジュールにより無効</translation>
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>押したまま</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation>詳細検索</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>存在</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>なし</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>ベータ版機能</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>映像のダウンロード</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>映像のダウンロード機能</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>接続の高速化</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>ネットワークパフォーマンスの向上</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>変更を適用するには、アプリを再起動してください。</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>はい</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>いいえ</translation>
     </message>
   </context>
   <context>
@@ -39,6 +88,25 @@
     </message>
   </context>
   <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>カメラ設定</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>情報</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>音声</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>画質の変更</translation>
+    </message>
+  </context>
+  <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
@@ -58,7 +126,7 @@
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation>サーバーのアドレスおよびその他のログインは保存されたままです　全ての接続情報を削除するには、保存されているログインを削除してください</translation>
+      <translation>サーバーアドレスとその他のログイン情報は保存されたままになります。すべての接続情報を削除するには、保存されているすべてのログイン情報を削除する必要があります。</translation>
     </message>
     <message>
       <source>Delete connection?</source>
@@ -69,17 +137,28 @@
       <translation>サーバーのアドレスを入力してください</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>ログインを空にすることはできません</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>パスワードは空白にできません</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>&quot;%1&quot; を削除しますか？</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>ログイン欄に入力してください</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>パスワード欄に入力してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>プレビュー</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>カメラで表示</translation>
     </message>
   </context>
   <context>
@@ -91,6 +170,17 @@
     <message>
       <source>Log Level</source>
       <translation>ログレベル</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>ログIDをコピー</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>デバイス</translation>
     </message>
   </context>
   <context>
@@ -121,28 +211,47 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation>もう一度試す</translation>
+      <translation>再試行</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>接続</translation>
     </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>古いサーバーに接続するにはGoogle Playよりレガシーアプリケーションをダウンロードしてください.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>古いサーバーに接続するにはApp Storeよりレガシーアプリケーションをダウンロードしてください.</translation>
+      <source>Download next</source>
+      <translation>次のファイルをダウンロード</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>古いサーバーに接続するにはインターネットよりレガシーアプリケーションをダウンロードしてください.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n 分</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>ダウンロード</translation>
+      <source>No filters</source>
+      <translation>フィルターなし</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation>検索フィルター</translation>
     </message>
   </context>
   <context>
@@ -186,6 +295,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 に接続できません</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -196,7 +313,7 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation>画像をタップしてカメラの位置を決める</translation>
+      <translation>画像をタップしてカメラの位置を指定してください</translation>
     </message>
     <message>
       <source>CANCEL</source>
@@ -206,8 +323,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>どのシステムにも接続されていません</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>すべて</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>クリア</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>パスワード</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>パスワード欄に入力してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation>プラグイン</translation>
     </message>
   </context>
   <context>
@@ -227,10 +376,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>システム</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>通知</translation>
     </message>
@@ -239,20 +384,8 @@
       <translation>完了</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>すべてのシステム</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>選択されたシステム</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>選択</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>少なくとも1つのシステムを選択する必要があります</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +398,22 @@
     <message>
       <source>Save changes?</source>
       <translation>変更を保存しますか？</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>サイト</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -279,27 +428,45 @@
     </message>
     <message>
       <source>Highest speed</source>
-      <translation>最高速度</translation>
+      <translation>速度優先</translation>
     </message>
     <message>
       <source>Best quality</source>
       <translation>最高画質</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>トランスコーディングは無効になっています。</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>このカメラではトランスコーディングがサポートされていません。</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>バージョン3.0未満のサーバーではトランスコーディングはサポートされていません。</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>トランスコーディングはサーバーによって無効になっています。</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>ARMサーバーではトランスコーディングはサポートされていません。</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>バージョン3.0未満のサーバーではトランスコーディングがサポートされていません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>開始</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>終了</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>タイプ</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>サブタイプ</translation>
     </message>
   </context>
   <context>
@@ -322,7 +489,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>何も見つかりませんでした</translation>
+      <translation>見つかりません</translation>
     </message>
   </context>
   <context>
@@ -330,6 +497,33 @@
     <message>
       <source>Search</source>
       <translation>検索</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>オブジェクト</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>ブックマーク</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>オブジェクトはありません</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>ブックマークはありません</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>フィルターを変更するか、カメラプラグイン設定でオブジェクト検出を設定してください</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>結果を表示するには、フィルターの変更をお試しください</translation>
     </message>
   </context>
   <context>
@@ -397,15 +591,11 @@
     <name>SessionsScreen</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>サーバーに接続....</translation>
+      <translation>サーバーに接続...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
       <translation>他のサーバーに接続...</translation>
-    </message>
-    <message>
-      <source>No Systems found</source>
-      <translation>システムが見つかりませんでした</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -419,7 +609,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>何も見つかりませんでした</translation>
+      <translation>見つかりません</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -450,7 +644,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>カメラリストにプレビューを表示する</translation>
+      <translation>カメラリストにプレビューを表示</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -466,11 +660,7 @@
     </message>
     <message>
       <source>Log in to the cloud to use push notifications</source>
-      <translation>プッシュ通知を使用するには、クラウドにログインしてください</translation>
-    </message>
-    <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>プッシュ通知はシステム設定でオフになっています</translation>
+      <translation>プッシュ通知を使用するには、クラウドにログインしてください。</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
@@ -488,6 +678,26 @@
       <source>Strict</source>
       <translation>厳格</translation>
     </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>ハードウェアアクセラレーションを有効化</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>パフォーマンスとバッテリー効率の向上</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>ベータ版機能</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>新機能の早期公開</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>
@@ -497,7 +707,7 @@
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>接続サーバーから切断</translation>
+      <translation>サーバーから切断</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -507,16 +717,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>このサーバーを信用する</translation>
+      <source>Common name</source>
+      <translation>一般名</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>理解した上で接続</translation>
+      <source>Issued by</source>
+      <translation>発行者</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <source>Expires</source>
+      <translation>有効期限</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>フィンガープリント</translation>
     </message>
   </context>
   <context>
@@ -529,6 +743,11 @@
     <message>
       <source>Log out</source>
       <translation>ログアウト</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 に移動</translation>
     </message>
   </context>
   <context>
@@ -558,7 +777,14 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation>期間</translation>
     </message>
   </context>
   <context>
@@ -572,11 +798,11 @@
     <name>VideoDummy</name>
     <message>
       <source>Cannot load video</source>
-      <translation>ビデオを読み込むことができません</translation>
+      <translation>動画を読み込めません</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation>ビデオストリームを再生できません</translation>
+      <translation>いずれの映像ストリームも再生できません</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -592,7 +818,7 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation>ライセンスが足りません</translation>
+      <translation>ライセンスが不足しています</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -612,12 +838,12 @@
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation>I / Oインタフェースはまだサポートされていません</translation>
+      <translation>I/O インターフェースはまだサポートされていません</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>このアプリケーションでは、I / Oモジュールはサウンド入力デバイスとしてのみ使用できます。コントロールモジュールとして使用するには、%1のデスクトップバージョンを使用してください</translation>
+      <translation>このアプリケーションでは、I/Oモジュールは音声入力デバイスとしてのみ使用できます。コントロールモジュールとして使用するには、%1 のデスクトップバージョンを使用してください</translation>
     </message>
     <message>
       <source>No live stream</source>
@@ -626,11 +852,15 @@
     <message>
       <source>Set password on this camera using %1 client or camera web-page to view video</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>ビデオを表示するには、 %1 クライアントまたはカメラのWebページを使用して、このカメラにパスワードを設定します</translation>
+      <translation>映像を表示するには、 %1 クライアントまたはカメラの Web ページを使用して、このカメラにパスワードを設定してください</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>メディアを復号できません</translation>
+      <source>Archive encrypted</source>
+      <translation>アーカイブは暗号化されています</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +893,6 @@
       <translation>エリア</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>画質の変更</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>情報</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>領域を選択するにはタップしてホールド</translation>
     </message>
@@ -683,15 +905,16 @@
       <translation>カスタムエリアが無効です。正しく指定してください。</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>オーディオ</translation>
+      <source>Camera Settings</source>
+      <translation>カメラ設定</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>スキップ</translation>
+      <source>Bookmarks</source>
+      <translation>ブックマーク</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>オブジェクト</translation>
     </message>
   </context>
   <context>
