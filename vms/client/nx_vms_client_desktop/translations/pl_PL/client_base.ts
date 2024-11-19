@@ -6941,12 +6941,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Wiele grup ma tę samą nazwę, co może prowadzić do zamieszania. Aby zachować przejrzystą i uporządkowaną strukturę, sugerujemy podanie unikalnych nazw dla każdej grupy.</translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n istniejących grup LDAP nie znaleziono w bazie danych LDAP.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
@@ -6963,7 +6963,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to delete group &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+      <translation>Nie udało się usunąć grupy &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Failed to delete group.</source>
@@ -6980,7 +6980,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
-      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+      <translation>Niektóre grupy mają siebie nawzajem jako swoich nadrzędnych i podrzędnych członków lub są częścią takiego cyklicznego łańcucha odniesień. Może to prowadzić do nieprawidłowych obliczeń uprawnień.</translation>
     </message>
   </context>
   <context>
@@ -9423,18 +9423,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Generate events</source>
-      <translation type="unfinished">Generate events</translation>
+      <translation>Zdarzenia generowane</translation>
     </message>
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 grupa</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 i %n więcej grup</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
@@ -9443,7 +9443,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Dziedziczy uprawnienia %1 od</translation>
     </message>
   </context>
   <context>
@@ -9720,11 +9720,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronize</source>
-      <translation type="unfinished">Synchronize</translation>
+      <translation>Synchronizacja</translation>
     </message>
     <message>
       <source>Connection OK</source>
-      <translation type="unfinished">Connection OK</translation>
+      <translation>Połączenie OK</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9736,7 +9736,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Nie można połączyć się z serwerem LDAP</translation>
     </message>
   </context>
   <context>
@@ -9872,7 +9872,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>Podany link jest nieprawidłowy lub wygasł</translation>
     </message>
   </context>
   <context>
@@ -9915,7 +9915,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>Domyślny poziom logowania</translation>
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
@@ -10007,7 +10007,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
     <message>
       <source>Network request failed</source>
-      <translation type="unfinished">Network request failed</translation>
+      <translation>Błąd połączenia sieciowego</translation>
     </message>
   </context>
   <context>
@@ -10113,11 +10113,11 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Bieżący (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Zdalny (%1)</translation>
     </message>
     <message>
       <source>Success</source>
@@ -10125,7 +10125,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>Zdalny</translation>
     </message>
   </context>
   <context>
