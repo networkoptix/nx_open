@@ -1730,9 +1730,13 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
     if (m_calendar)
     {
-        m_calendar->range = {
-            QDateTime::fromMSecsSinceEpoch(startTimeMSec + m_calendar->displayOffset),
-            QDateTime::fromMSecsSinceEpoch(endTimeMSec + m_calendar->displayOffset)};
+        const auto start =
+            QDateTime::fromMSecsSinceEpoch(startTimeMSec + m_calendar->displayOffset);
+        const auto end = QDateTime::fromMSecsSinceEpoch(endTimeMSec + m_calendar->displayOffset);
+
+        NX_VERBOSE(this, "Update calendar range. Start: %1 (%2), end: %3 (%4)",
+            start, start.toMSecsSinceEpoch(), end, end.toMSecsSinceEpoch());
+        m_calendar->range = {start, end};
     }
 
     if (!m_currentWidgetLoaded && widgetLoaded && !isSearch
