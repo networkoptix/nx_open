@@ -210,10 +210,10 @@ QString StringsHelper::eventName(EventType value, int count) const
                 tr("Any Device Issue"),
                 tr("Any Camera Issue"));
 
-        case EventType::systemHealthEvent + (int)MessageType::showIntercomInformer:
+        case EventType::siteHealthEvent + (int) MessageType::showIntercomInformer:
             return tr("Call Request");
 
-        case EventType::systemHealthEvent + (int)MessageType::showMissedCallInformer:
+        case EventType::siteHealthEvent + (int) MessageType::showMissedCallInformer:
             return tr("Call Request Missed");
 
         default:

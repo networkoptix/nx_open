@@ -158,10 +158,10 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
             [this](const vms::event::AbstractActionPtr& businessAction)
             {
                 vms::api::EventType eventType = businessAction->getRuntimeParams().eventType;
-                if (eventType >= vms::api::EventType::systemHealthEvent
-                    && eventType <= vms::api::EventType::maxSystemHealthEvent)
+                if (eventType >= vms::api::EventType::siteHealthEvent
+                    && eventType <= vms::api::EventType::maxSiteHealthEvent)
                 {
-                    auto healthMessage = MessageType(eventType - vms::api::EventType::systemHealthEvent);
+                    auto healthMessage = MessageType(eventType - vms::api::EventType::siteHealthEvent);
                     if (healthMessage == MessageType::archiveRebuildFinished
                         || healthMessage == MessageType::archiveFastScanFinished
                         || healthMessage == MessageType::remoteArchiveSyncError)

@@ -17,7 +17,7 @@ SystemHealthAction::SystemHealthAction(
     base_type(ActionType::showPopupAction, EventParameters())
 {
     EventParameters runtimeParams;
-    runtimeParams.eventType = EventType(EventType::systemHealthEvent + (int) message);
+    runtimeParams.eventType = EventType(EventType::siteHealthEvent + (int) message);
     runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     runtimeParams.eventResourceId = eventResourceId;
     runtimeParams.attributes = attributes;

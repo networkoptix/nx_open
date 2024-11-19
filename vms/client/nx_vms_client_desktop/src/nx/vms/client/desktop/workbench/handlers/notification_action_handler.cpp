@@ -264,10 +264,10 @@ void NotificationActionHandler::addNotification(const vms::event::AbstractAction
 {
     const auto eventType = action->getRuntimeParams().eventType;
 
-    if (eventType >= vms::api::EventType::systemHealthEvent
-        && eventType <= vms::api::EventType::maxSystemHealthEvent)
+    if (eventType >= vms::api::EventType::siteHealthEvent
+        && eventType <= vms::api::EventType::maxSiteHealthEvent)
     {
-        int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
+        int healthMessage = eventType - vms::api::EventType::siteHealthEvent;
         addSystemHealthEvent(MessageType(healthMessage), action);
         return;
     }
@@ -309,10 +309,10 @@ void NotificationActionHandler::removeNotification(const vms::event::AbstractAct
 {
     const vms::api::EventType eventType = action->getRuntimeParams().eventType;
 
-    if (eventType >= vms::api::EventType::systemHealthEvent
-        && eventType <= vms::api::EventType::maxSystemHealthEvent)
+    if (eventType >= vms::api::EventType::siteHealthEvent
+        && eventType <= vms::api::EventType::maxSiteHealthEvent)
     {
-        const int healthMessage = eventType - vms::api::EventType::systemHealthEvent;
+        const int healthMessage = eventType - vms::api::EventType::siteHealthEvent;
 
         setSystemHealthEventVisibleInternal(
             MessageType(healthMessage), QVariant::fromValue(action), false);

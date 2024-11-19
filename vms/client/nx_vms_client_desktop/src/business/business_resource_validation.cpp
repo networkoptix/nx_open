@@ -223,11 +223,11 @@ bool actionAllowedForUser(
         return false;
 
     const auto eventType = action->getRuntimeParams().eventType;
-    if (eventType >= nx::vms::api::EventType::systemHealthEvent
-        && eventType <= nx::vms::api::EventType::maxSystemHealthEvent)
+    if (eventType >= nx::vms::api::EventType::siteHealthEvent
+        && eventType <= nx::vms::api::EventType::maxSiteHealthEvent)
     {
         const auto healthMessage = nx::vms::common::system_health::MessageType(
-            eventType - nx::vms::api::EventType::systemHealthEvent);
+            eventType - nx::vms::api::EventType::siteHealthEvent);
 
         if (healthMessage == nx::vms::common::system_health::MessageType::showIntercomInformer
             || healthMessage == nx::vms::common::system_health::MessageType::showMissedCallInformer)

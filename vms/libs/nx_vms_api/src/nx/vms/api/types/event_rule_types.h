@@ -155,10 +155,10 @@ NX_REFLECTION_ENUM(EventType,
     saasIssueEvent = 20,
 
     /** Site health message. */
-    systemHealthEvent = 500,
+    siteHealthEvent = 500,
 
     /** Site health message. */
-    maxSystemHealthEvent = 599,
+    maxSiteHealthEvent = 599,
 
     /** Event group. */
     anyCameraEvent = 600,
