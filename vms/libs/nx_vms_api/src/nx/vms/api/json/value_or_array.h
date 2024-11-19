@@ -41,8 +41,6 @@ struct ValueOrArray
 template<typename T>
 inline void serialize(QnJsonContext* ctx, const ValueOrArray<T>& value, QJsonValue* target)
 {
-    NX_ASSERT(!value.valueOrArray.empty());
-
     if (value.valueOrArray.size() == 1)
         serialize(ctx, value.valueOrArray[0], target);
     else
