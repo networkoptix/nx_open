@@ -2,6 +2,6 @@
   <g class="52x24/Solid/thumbnails">
     <rect width="52" height="24" fill="#212A2F" class="Secondary" rx="2"/>
     <path fill="#171C1F" d="M2 8h2v8H2z" class="Tertiary"/>
-    <path fill="#D9D9D9" fill-rule="evenodd" d="M21 7H11v2h1v6h-1v2h30v-2h-1V9h1V7H21Zm18 2h-8v6h8V9Zm-9 0v6h-8V9h8Zm-9 0h-8v6h8V9Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#FFFFFF" fill-rule="evenodd" d="M21 7H11v1.5h1v7h-1V17h30v-1.5h-1v-7h1V7H21Zm18 1.5h-8v7h8v-7Zm-9 0v7h-8v-7h8Zm-9 0h-8v7h8v-7Z" class="Primary" clip-rule="evenodd"/>
   </g>
 </svg>
