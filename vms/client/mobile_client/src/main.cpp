@@ -385,6 +385,14 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
+    if (nx::build_info::isAndroid())
+    {
+        // Clear the clipboard to avoid warning in Android 12. Despite some issues were fixed in
+        // Qt 5.15 code base, for some reasons we still have this issue even if our code does not
+        // contain any clipboard access operations. This code workarounds it. Also see QTBUG-98412.
+        qApp->clipboard()->clear();
+    }
+
     // Set up application parameters so that QSettings know where to look for settings.
     QGuiApplication::setOrganizationName(nx::branding::company());
     QGuiApplication::setApplicationName(nx::branding::mobileClientInternalName());
