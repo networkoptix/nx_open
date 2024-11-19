@@ -46,7 +46,6 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
-#include <common/static_common_module.h>
 #include <nx/audio/audiodevice.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>

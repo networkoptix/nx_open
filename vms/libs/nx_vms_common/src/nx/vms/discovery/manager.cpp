@@ -2,7 +2,6 @@
 
 #include "manager.h"
 
-#include <common/static_common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json.h>
@@ -11,6 +10,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/synctime.h>
@@ -150,7 +150,7 @@ struct Manager::Private
                 const bool isOwnServer = serverModeInfo && (module.id == serverModeInfo->peerId);
 
                 if (!isOwnServer && endpoints.size() != 0
-                    && !qnStaticCommon->isCertificateValidationLevelStrict())
+                    && !nx::vms::common::appContext()->isCertificateValidationLevelStrict())
                 {
                     moduleConnector->newEndpoints(
                         {endpoints.cbegin(), endpoints.cend()},
@@ -183,7 +183,7 @@ struct Manager::Private
             [this](const nx::vms::api::ModuleInformation& module,
                 const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip)
             {
-                if (qnStaticCommon->isCertificateValidationLevelStrict())
+                if (nx::vms::common::appContext()->isCertificateValidationLevelStrict())
                     return;
 
                 moduleConnector->newEndpoints(

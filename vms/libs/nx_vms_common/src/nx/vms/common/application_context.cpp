@@ -36,11 +36,11 @@ static ApplicationContext* s_instance = nullptr;
 struct ApplicationContext::Private
 {
     ApplicationContext* const q;
+    const PeerType localPeerType;
+    const Features features;
 
-    cloud::tcp::EndpointVerificatorFactory::Function endpointVerificatorFactoryBak;
     mutable nx::Mutex mutex;
     QMap<nx::Uuid, int> longToShortInstanceId;
-    const PeerType localPeerType;
     QString locale{nx::branding::defaultLocale()};
 
     std::unique_ptr<QnLongRunnablePool> longRunnablePool;
@@ -50,18 +50,46 @@ struct ApplicationContext::Private
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ApplicationMetricsStorage> metricsStorage;
     std::unique_ptr<nx::i18n::TranslationManager> translationManager;
+    cloud::tcp::EndpointVerificatorFactory::Function endpointVerificatorFactoryBak;
+
+    void initNetworking(const QString& customCloudHost)
+    {
+        SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost.toStdString());
+        SocketGlobals::addressResolver().addFixedAddress("localhost",
+            SocketAddress::anyPrivateAddress);
+
+        // Providing mediaserver-specific way of validating peer id.
+        endpointVerificatorFactoryBak =
+            cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
+                [](const std::string& connectSessionId)
+                    -> std::unique_ptr<cloud::tcp::AbstractEndpointVerificator>
+                {
+                    return std::make_unique<CloudMediaServerEndpointVerificator>(
+                        connectSessionId);
+                });
+    }
+
+    void deinitNetworking()
+    {
+        cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
+            std::move(endpointVerificatorFactoryBak));
+        SocketGlobals::addressResolver().removeFixedAddress("localhost",
+            SocketAddress::anyPrivateAddress);
+        SocketGlobals::deinit();
+    }
 };
 
 ApplicationContext::ApplicationContext(
     PeerType localPeerType,
     const QString& customCloudHost,
+    Features features,
     QObject* parent)
     :
     QObject(parent),
     d(new Private{
         .q = this,
-        .localPeerType = localPeerType
-    })
+        .localPeerType = localPeerType,
+        .features = features})
 {
     if (NX_ASSERT(!s_instance))
         s_instance = this;
@@ -77,14 +105,16 @@ ApplicationContext::ApplicationContext(
     d->longRunableCleanup = std::make_unique<QnLongRunableCleanup>();
     QnFfmpegHelper::registerLogCallback();
 
-    initNetworking(customCloudHost);
+    if (features.testFlag(Feature::networking))
+        d->initNetworking(customCloudHost);
 
     d->syncTime = std::make_unique<QnSyncTime>();
     d->storagePluginFactory = std::make_unique<QnStoragePluginFactory>();
     d->timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
     d->metricsStorage = std::make_unique<ApplicationMetricsStorage>();
 
-    d->translationManager = std::make_unique<nx::i18n::TranslationManager>();
+    if (features.testFlag(Feature::translations))
+        d->translationManager = std::make_unique<nx::i18n::TranslationManager>();
 }
 
 void ApplicationContext::stopAll()
@@ -99,7 +129,10 @@ ApplicationContext::~ApplicationContext()
     // Long runnables with async destruction should be destroyed before we deinitialize networking.
     d->longRunableCleanup.reset();
     d->longRunnablePool.reset();
-    deinitNetworking();
+
+    if (d->features.testFlag(Feature::networking))
+        d->deinitNetworking();
+
     d->translationManager.reset();
 
     if (NX_ASSERT(s_instance == this))
@@ -108,32 +141,7 @@ ApplicationContext::~ApplicationContext()
 
 ApplicationContext* ApplicationContext::instance()
 {
-    //NX_ASSERT(s_instance);
     return s_instance;
-}
-
-void ApplicationContext::initNetworking(const QString& customCloudHost)
-{
-    SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost.toStdString());
-    SocketGlobals::addressResolver().addFixedAddress("localhost", SocketAddress::anyPrivateAddress);
-
-    // Providing mediaserver-specific way of validating peer id.
-    d->endpointVerificatorFactoryBak =
-        cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-            [](const std::string& connectSessionId)
-                -> std::unique_ptr<cloud::tcp::AbstractEndpointVerificator>
-            {
-                return std::make_unique<CloudMediaServerEndpointVerificator>(
-                    connectSessionId);
-            });
-}
-
-void ApplicationContext::deinitNetworking()
-{
-    cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-        std::move(d->endpointVerificatorFactoryBak));
-    SocketGlobals::addressResolver().removeFixedAddress("localhost", SocketAddress::anyPrivateAddress);
-    SocketGlobals::deinit();
 }
 
 nx::vms::api::PeerType ApplicationContext::localPeerType() const

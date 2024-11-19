@@ -6,7 +6,6 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <common/static_common_module.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/custom_headers.h>
@@ -18,6 +17,7 @@
 #include <nx/p2p/transport/p2p_http_server_transport.h>
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/utils/log/format.h>
+#include <nx/vms/common/application_context.h>
 #include <transaction/transaction_message_bus_base.h>
 
 // For debug purpose only
@@ -508,11 +508,12 @@ void ConnectionBase::setMaxSendBufferSize(size_t value)
 void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
     NX_ASSERT(!data.empty());
+    auto context = nx::vms::common::appContext();
 
-    if (nx::log::isToBeLogged(nx::log::Level::verbose, this) && qnStaticCommon)
+    if (nx::log::isToBeLogged(nx::log::Level::verbose, this) && context)
     {
-        auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);
-        auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
+        auto localPeerName = context->moduleDisplayName(localPeer().id);
+        auto remotePeerName = context->moduleDisplayName(remotePeer().id);
 
         MessageType messageType = (MessageType)data[0];
         if (messageType != MessageType::pushTransactionData &&

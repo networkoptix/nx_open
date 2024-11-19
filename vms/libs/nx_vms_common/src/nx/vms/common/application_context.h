@@ -30,9 +30,20 @@ protected:
     using PeerType = nx::vms::api::PeerType;
 
 public:
+    enum class Feature
+    {
+        none = 0,
+        networking = 1 << 0,
+        translations = 1 << 1,
+
+        all = networking | translations
+    };
+    Q_DECLARE_FLAGS(Features, Feature)
+
     ApplicationContext(
         PeerType localPeerType = PeerType::notDefined,
         const QString& customCloudHost = QString(),
+        Features features = Feature::all,
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
@@ -40,9 +51,6 @@ public:
      * Main context of the VMS applications. Exists through all application lifetime.
      */
     static ApplicationContext* instance();
-
-    void initNetworking(const QString& customCloudHost = QString());
-    void deinitNetworking();
 
     PeerType localPeerType() const;
 

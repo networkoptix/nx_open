@@ -14,7 +14,6 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/update_information_reply.h>
-#include <common/static_common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -3303,7 +3302,7 @@ nx::network::http::Credentials getRequestCredentials(
     const QnMediaServerResourcePtr& targetServer)
 {
     using namespace nx::vms::api;
-    const auto localPeerType = qnStaticCommon->localPeerType();
+    const auto localPeerType = nx::vms::common::appContext()->localPeerType();
     if (PeerData::isClient(localPeerType))
         return connection->credentials();
 
@@ -3341,7 +3340,7 @@ bool setupAuth(
 
     if (route.reverseConnect)
     {
-        if (nx::vms::api::PeerData::isClient(qnStaticCommon->localPeerType()))
+        if (nx::vms::api::PeerData::isClient(nx::vms::common::appContext()->localPeerType()))
         {
             const auto connection = systemContext->messageBusConnection();
             if (!NX_ASSERT(connection))

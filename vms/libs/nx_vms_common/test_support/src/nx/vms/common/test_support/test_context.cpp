@@ -3,7 +3,6 @@
 #include "test_context.h"
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <nx/vms/common/api/message_processor_mock.h>
 #include <nx/vms/common/system_context.h>
 

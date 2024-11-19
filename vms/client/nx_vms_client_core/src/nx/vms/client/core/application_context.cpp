@@ -10,7 +10,6 @@
 #include <QtQml/private/qv4engine_p.h>
 
 #include <client_core/client_core_meta_types.h>
-#include <common/static_common_module.h>
 #include <nx/branding.h>
 #include <nx/branding_proxy.h>
 #include <nx/build_info_proxy.h>
@@ -171,7 +170,11 @@ ApplicationContext::ApplicationContext(
     const QString& customExternalResourceFile,
     QObject* parent)
     :
-    common::ApplicationContext(peerType, customCloudHost, parent),
+    common::ApplicationContext(
+        peerType,
+        customCloudHost,
+        common::ApplicationContext::Feature::all,
+        parent),
     d(new Private{
         .q = this,
         .mode = mode,

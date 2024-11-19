@@ -9,7 +9,6 @@
 #include <api/runtime_info_manager.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <client_core/client_core_module.h>
-#include <common/static_common_module.h>
 #include <context/context.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/mobile_client_resource_factory.h>

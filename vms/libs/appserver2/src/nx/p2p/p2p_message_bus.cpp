@@ -3,7 +3,6 @@
 #include "p2p_message_bus.h"
 
 #include <api/runtime_info_manager.h>
-#include <common/static_common_module.h>
 #include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
@@ -18,6 +17,7 @@
 #include <nx/utils/std/cmath.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
 #include <transaction/json_transaction_serializer.h>
@@ -49,7 +49,7 @@ std::chrono::milliseconds MessageBus::DelayIntervals::minInterval() const
 
 QString MessageBus::peerName(const nx::Uuid& id)
 {
-    return qnStaticCommon->moduleDisplayName(id);
+    return nx::vms::common::appContext()->moduleDisplayName(id);
 }
 
 struct GotTransactionFuction

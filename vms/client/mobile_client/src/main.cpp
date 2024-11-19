@@ -21,7 +21,6 @@ extern "C" {
 #include <QtWebView/QtWebView>
 
 #include <camera/camera_thumbnail_cache.h>
-#include <common/static_common_module.h>
 #include <context/context.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -51,6 +50,8 @@ extern "C" {
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/testkit/http_server.h>
+#include <nx/vms/client/core/testkit/testkit.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
@@ -61,9 +62,6 @@ extern "C" {
 
 #include "gl_context_synchronizer.h"
 #include "ini.h"
-
-#include <nx/vms/client/core/testkit/testkit.h>
-#include <nx/vms/client/core/testkit/http_server.h>
 
 using namespace nx::vms::client;
 using namespace nx::mobile_client;

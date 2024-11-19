@@ -7,7 +7,6 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
-#include <common/static_common_module.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/camera_resource.h>
