@@ -26,15 +26,15 @@
 namespace nx {
 namespace media {
 
-void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions)
+void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions,
+    int maxHardwareDecodersCount)
 {
     // ATTENTION: Order of registration defines the priority of choosing: first comes first.
 
     #if defined(Q_OS_ANDROID)
     {
-        static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(
-            "AndroidVideoDecoder", kHardwareDecodersCount);
+            "AndroidVideoDecoder", maxHardwareDecodersCount);
         // HW audio decoder crashes in readOutputBuffer() for some reason. So far, disabling it.
         //AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
     }
@@ -42,9 +42,8 @@ void DecoderRegistrar::registerDecoders(const QMap<int, QSize>& maxFfmpegResolut
 
     #if defined(Q_OS_IOS) || defined(Q_OS_MACOS)
     {
-        static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<MacVideoDecoder>(
-            "MacVideoDecoder", kHardwareDecodersCount);
+            "MacVideoDecoder", maxHardwareDecodersCount);
     }
     #endif
 

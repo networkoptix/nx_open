@@ -18,8 +18,11 @@ public:
      *
      * @param maxFfmpegResolutions Limits applicability of the decoder. If empty, there is no limit.
      *     Map key with value 0 means default resolution limit otherwise limit for specified AV codec.
+     * @param maxHardwareDecodersCount Maximum number of the simultaneously working hardware
+     *     decoders.
      */
-    static void registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions);
+    static void registerDecoders(const QMap<int, QSize>& maxFfmpegResolutions,
+        int maxHardwareDecodersCount = 1);
 };
 
 } // namespace media

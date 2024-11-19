@@ -57,6 +57,8 @@ public:
         // Beta features flags.
         UseDownloadVideoFeature,
 
+        UseMaxHardwareDecodersCount,
+
         VariableCount
     };
 
@@ -139,6 +141,11 @@ private:
             bool,
             useDownloadVideoFeature, setUseDownloadVideoFeature,
             UseDownloadVideoFeature, false)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            useMaxHardwareDecodersCount, setUseMaxHardwareDecodersCount,
+            UseMaxHardwareDecodersCount, true)
 
     QN_END_PROPERTY_STORAGE()
 
