@@ -33,6 +33,10 @@ QString toString( ResultCode resCode );
 class NX_CODEC_API JpegParser
 {
 public:
+    static constexpr size_t kMarkerHeaderSize = 2;
+    static constexpr size_t kMarkerLengthSize = 2;
+
+public:
     //!bool( int markerType, size_t markerLength, size_t currentOffset )
     /*!
         \param markerLength Length of marker, including 2-byte marker length field, but not including entropy-coded data
