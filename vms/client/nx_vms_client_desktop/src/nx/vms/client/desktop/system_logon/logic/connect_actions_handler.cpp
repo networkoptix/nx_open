@@ -962,8 +962,6 @@ void ConnectActionsHandler::showWarnMessagesOnce()
     /* Collect and send crash dumps if allowed */
     d->crashReporter->scanAndReportAsync();
 
-    menu()->triggerIfPossible(menu::VersionMismatchMessageAction);
-
     workbenchContext()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 
     // Ask user for analytics storage locations (e.g. in the case of migration).

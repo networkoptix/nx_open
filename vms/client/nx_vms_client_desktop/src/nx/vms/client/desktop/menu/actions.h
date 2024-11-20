@@ -160,13 +160,6 @@ enum IDType
     EscapeHotkeyAction,
 
     /**
-     * Displays version mismatch dialog, pulling mismatch data from
-     * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
-     * is no mismatches.
-     */
-    VersionMismatchMessageAction,
-
-    /**
      * Displays beta version warning dialog.
      */
     BetaVersionMessageAction,

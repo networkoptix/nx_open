@@ -161,7 +161,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
-#include <ui/models/resource/resource_list_model.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_state.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
@@ -457,8 +456,6 @@ ActionHandler::ActionHandler(QObject *parent) :
         &ActionHandler::at_escapeHotkeyAction_triggered);
     connect(action(menu::BrowseUrlAction), &QAction::triggered, this,
         &ActionHandler::at_browseUrlAction_triggered);
-    connect(action(menu::VersionMismatchMessageAction), &QAction::triggered, this,
-        &ActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(menu::BetaVersionMessageAction), &QAction::triggered, this,
         &ActionHandler::at_betaVersionMessageAction_triggered);
     connect(action(menu::ConfirmAnalyticsStorageAction), &QAction::triggered, this,
@@ -3099,92 +3096,6 @@ void ActionHandler::at_browseUrlAction_triggered() {
         return;
 
     QDesktopServices::openUrl(nx::utils::Url::fromUserInput(url).toQUrl());
-}
-
-void ActionHandler::at_versionMismatchMessageAction_triggered()
-{
-    if (!qnRuntime->isDesktopMode())
-        return;
-
-    if (showOnceSettings()->versionMismatch())
-        return;
-
-    QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
-    if (!watcher->hasMismatches())
-        return;
-
-    constexpr auto kServerComponent = QnWorkbenchVersionMismatchWatcher::Component::server;
-
-    const auto latestVersion = watcher->latestVersion();
-    auto latestMsVersion = watcher->latestVersion(kServerComponent);
-
-    // if some component is newer than the newest mediaserver, focus on its version
-    if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
-        latestMsVersion = latestVersion;
-
-    QnResourceList mismatched;
-
-    for (const auto& data: watcher->components())
-    {
-        if (data.component == kServerComponent)
-        {
-            NX_ASSERT(data.server);
-            if (data.server)
-                mismatched << data.server;
-        }
-    }
-
-    QScopedPointer<QnSessionAwareMessageBox> messageBox(
-        new QnSessionAwareMessageBox(mainWindowWidget()));
-    messageBox->setIcon(QnMessageBoxIcon::Warning);
-    messageBox->setText(tr("Components of Site have different versions:"));
-
-    const QString extras = tr("Please update all components to the version %1").arg(latestMsVersion.toString());
-    messageBox->setInformativeText(extras);
-
-    // Add a list of mismatched servers if there are any.
-    if (!mismatched.empty())
-    {
-        auto serverList = new QTableView();
-        serverList->setShowGrid(false);
-
-        auto serverListModel = new QnResourceListModel(serverList);
-
-        serverListModel->setCustomColumnAccessor(1, nx::vms::client::desktop::resourceVersionAccessor);
-        serverListModel->setHasStatus(true);
-        serverListModel->setResources(mismatched);
-
-        serverList->setModel(serverListModel);
-        serverList->setItemDelegateForColumn(0, new QnResourceItemDelegate(this));
-        serverList->setItemDelegateForColumn(1, makeVersionStatusDelegate(context(), serverListModel));
-
-        auto horisontalHeader = serverList->horizontalHeader();
-        horisontalHeader->hide();
-        horisontalHeader->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
-        horisontalHeader->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-
-        auto verticalHeader = serverList->verticalHeader();
-        verticalHeader->hide();
-        verticalHeader->setDefaultSectionSize(kSectionHeight);
-
-        // Adding to Layout::Content (default value) looks much better than to the main layout.
-        messageBox->addCustomWidget(serverList);
-    }
-
-    messageBox->setCheckBoxEnabled();
-
-    const auto updateButton = messageBox->addButton(
-        tr("Update..."), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-    messageBox->addButton(
-        tr("Skip"), QDialogButtonBox::RejectRole);
-
-    messageBox->exec();
-
-    if (messageBox->isChecked())
-        showOnceSettings()->versionMismatch = true;
-
-    if (messageBox->clickedButton() == updateButton)
-        menu()->trigger(menu::SystemUpdateAction);
 }
 
 void ActionHandler::handleBetaUpdateWarning()
