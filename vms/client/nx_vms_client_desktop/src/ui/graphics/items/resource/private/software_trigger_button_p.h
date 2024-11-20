@@ -64,7 +64,6 @@ private:
     Qt::Edge m_toolTipEdge = Qt::LeftEdge;
     QString m_toolTipText;
     bool m_prolonged = false;
-    bool m_live = true;
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;

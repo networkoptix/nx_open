@@ -163,6 +163,7 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
         [this, q]()
         {
             updateToolTipText();
+            updateToolTipVisibility();
             q->update();
         });
 }
@@ -188,7 +189,8 @@ void SoftwareTriggerButtonPrivate::setToolTip(const QString& toolTip)
 
 void SoftwareTriggerButtonPrivate::updateToolTipText()
 {
-    m_toolTip->setText(m_live
+    Q_Q(SoftwareTriggerButton);
+    m_toolTip->setText(q->isLive()
         ? m_toolTipText
         : SoftwareTriggerButton::tr("Go to Live"));
 
@@ -386,7 +388,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     Q_Q(SoftwareTriggerButton);
     const auto state = q->state();
-    if (!m_live && (q->isHovered() || q->isPressed()))
+    if (!q->isLive() && (q->isHovered() || q->isPressed()))
     {
         paintPixmapSharp(painter, q->isPressed()
             ? m_goToLivePixmapPressed
@@ -410,7 +412,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
-    if (q->isDisabled() || !m_live)
+    if (q->isDisabled() || !q->isLive())
         painter->setOpacity(painter->opacity() * kDisabledTriggerOpacity);
 
     switch (effectiveState)
