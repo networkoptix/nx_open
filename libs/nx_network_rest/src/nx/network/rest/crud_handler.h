@@ -256,7 +256,12 @@ protected:
         if (list.empty())
             throw Exception{{emptyError, NX_FMT("Resource '%1' is not found", id)}};
 
-        if (const auto size = list.size(); size != 1)
+        size_t size = 0; //< Remove constexpr of std::array::size() to suppress warning C4127.
+        if constexpr (nx::reflect::IsArrayV<decltype(list)>)
+            size = list.size();
+        else
+            size = list.size();
+        if (size != 1)
         {
             const auto error =
                 NX_FMT("There are %1 resources with '%2' id while it should be one.", size, id);
@@ -464,7 +469,11 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
         if (const auto id = idParam(request);
             (id.value && id.isInPath) || m_idParamName.isEmpty())
         {
-            const auto size = list.size();
+            size_t size = 0; //< Remove constexpr of std::array::size() to suppress warning C4127.
+            if constexpr (nx::reflect::IsArrayV<decltype(list)>)
+                size = list.size();
+            else
+                size = list.size();
             if (size == 1)
             {
                 return response(detail::front(std::move(list)),
