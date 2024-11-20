@@ -391,7 +391,9 @@ TextInput
         MenuItem
         {
             text: qsTr("Paste")
-            enabled: control.canPaste
+            enabled: Qt.platform.os === "ios"
+                ? true //< Because of the bug in iOS (excessive security warning) is always true.
+                : control.canPaste
             onTriggered: control.paste()
         }
 
