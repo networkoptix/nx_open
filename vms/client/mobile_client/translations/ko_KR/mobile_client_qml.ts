@@ -52,6 +52,14 @@
       <source>Please restart the app to apply the changes.</source>
       <translation>변경 사항을 적용하려면 앱을 다시 시작하십시오.</translation>
     </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation type="unfinished">Maximum decoders count</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>
