@@ -61,6 +61,7 @@ struct TwoWayAudioButton::Private
 {
     TwoWayAudioButton* const q;
 
+    QString toolTipText;
     GraphicsLabel* const hint;
     QTimer hintStateTimer = QTimer{};
     QElapsedTimer stateTimer;
@@ -189,6 +190,8 @@ void TwoWayAudioButton::Private::setHintState(HintState value)
 
     hintState = value;
 
+    q->base_type::setToolTip(hintState == HintState::ok ? toolTipText : "");
+
     if (hintState == HintState::error)
     {
         if (stateTimer.isValid())
@@ -279,6 +282,15 @@ TwoWayAudioButton::TwoWayAudioButton(QGraphicsItem* parent):
 
 TwoWayAudioButton::~TwoWayAudioButton()
 {
+}
+
+void TwoWayAudioButton::setToolTip(const QString& toolTip)
+{
+    if (d->toolTipText == toolTip)
+        return;
+
+    d->toolTipText = toolTip;
+    base_type::setToolTip(toolTip);
 }
 
 void TwoWayAudioButton::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,

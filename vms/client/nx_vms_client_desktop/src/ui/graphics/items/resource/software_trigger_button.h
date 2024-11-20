@@ -4,26 +4,20 @@
 
 #include <QtCore/QScopedPointer>
 
-#include "camera_button.h"
+#include "jump_to_live_button.h"
 
 namespace nx::vms::client::desktop {
 
 class SoftwareTriggerButtonPrivate;
 
-class SoftwareTriggerButton: public CameraButton
+class SoftwareTriggerButton: public JumpToLiveButton
 {
     Q_OBJECT
-    using base_type = CameraButton;
+    using base_type = JumpToLiveButton;
 
 public:
     SoftwareTriggerButton(QGraphicsItem* parent = nullptr);
     virtual ~SoftwareTriggerButton();
-
-    QString toolTip() const;
-    void setToolTip(const QString& toolTip);
-
-    Qt::Edge toolTipEdge() const;
-    void setToolTipEdge(Qt::Edge edge);
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;

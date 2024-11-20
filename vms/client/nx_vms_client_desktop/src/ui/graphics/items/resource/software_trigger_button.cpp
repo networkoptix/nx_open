@@ -20,30 +20,6 @@ SoftwareTriggerButton::~SoftwareTriggerButton()
     emit released();
 }
 
-QString SoftwareTriggerButton::toolTip() const
-{
-    Q_D(const SoftwareTriggerButton);
-    return d->toolTip();
-}
-
-void SoftwareTriggerButton::setToolTip(const QString& toolTip)
-{
-    Q_D(SoftwareTriggerButton);
-    d->setToolTip(toolTip);
-}
-
-Qt::Edge SoftwareTriggerButton::toolTipEdge() const
-{
-    Q_D(const SoftwareTriggerButton);
-    return d->toolTipEdge();
-}
-
-void SoftwareTriggerButton::setToolTipEdge(Qt::Edge edge)
-{
-    Q_D(SoftwareTriggerButton);
-    d->setToolTipEdge(edge);
-}
-
 void SoftwareTriggerButton::paint(QPainter* painter,
     const QStyleOptionGraphicsItem* option, QWidget* widget)
 {

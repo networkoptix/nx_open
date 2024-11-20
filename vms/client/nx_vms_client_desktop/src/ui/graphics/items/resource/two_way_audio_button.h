@@ -4,18 +4,20 @@
 
 #include <nx/utils/impl_ptr.h>
 
-#include "camera_button.h"
+#include "jump_to_live_button.h"
 
 namespace nx::vms::client::desktop {
 
-class TwoWayAudioButton: public CameraButton
+class TwoWayAudioButton: public JumpToLiveButton
 {
-    using base_type = CameraButton;
+    using base_type = JumpToLiveButton;
     Q_OBJECT
 
 public:
     TwoWayAudioButton(QGraphicsItem* parent = nullptr);
     virtual ~TwoWayAudioButton() override;
+
+    virtual void setToolTip(const QString& toolTip) override;
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;

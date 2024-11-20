@@ -71,7 +71,6 @@ CameraButton::CameraButton(QGraphicsItem* parent,
 
 CameraButton::~CameraButton()
 {
-
 }
 
 QString CameraButton::iconName() const

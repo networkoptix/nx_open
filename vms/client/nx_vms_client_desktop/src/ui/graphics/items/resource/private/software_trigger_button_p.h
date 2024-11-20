@@ -9,10 +9,6 @@
 
 #include "../software_trigger_button.h"
 
-class HoverFocusProcessor;
-class QnStyledTooltipWidget;
-class QTimer;
-
 namespace nx::vms::client::desktop {
 
 class BusyIndicatorGraphicsWidget;
@@ -30,28 +26,10 @@ public:
     SoftwareTriggerButtonPrivate(SoftwareTriggerButton* main);
     virtual ~SoftwareTriggerButtonPrivate();
 
-    QString toolTip() const;
-    void setToolTip(const QString& toolTip);
-
-    Qt::Edge toolTipEdge() const;
-    void setToolTipEdge(Qt::Edge edge);
-
     void updateState();
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget);
-
-    void updateToolTipText();
-
-private:
-    void updateToolTipPosition();
-    void updateToolTipTailEdge();
-    void updateToolTipVisibility();
-
-    void paintCircle(QPainter* painter, const QColor& background,
-        const QColor& frame = QColor());
-
-    void paintPixmap(QPainter* painter, const QPixmap& pixmap);
 
     void scheduleChange(std::function<void()> callback, int delayMs);
     void cancelScheduledChange();
@@ -59,11 +37,6 @@ private:
     void ensureImages();
 
 private:
-    Qt::Edge m_toolTipEdge = Qt::LeftEdge;
-    QString m_toolTipText;
-
-    QnStyledTooltipWidget* const m_toolTip;
-    HoverFocusProcessor* const m_toolTipHoverProcessor;
     QScopedPointer<BusyIndicatorGraphicsWidget> m_busyIndicator;
     QPointer<QTimer> m_scheduledChangeTimer = nullptr;
     bool m_imagesDirty = false;
@@ -75,8 +48,6 @@ private:
     QPixmap m_failurePixmap;
     QPixmap m_failureFramePixmap;
     QPixmap m_activityFramePixmap;
-    QPixmap m_goToLivePixmap;
-    QPixmap m_goToLivePixmapPressed;
 };
 
 } // namespace nx::vms::client::desktop
