@@ -52,6 +52,14 @@
         <source>Please restart the app to apply the changes.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Maximum decoders count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BooleanSelector</name>
