@@ -12,7 +12,6 @@
 #include <devpkey.h>
 #include <mmeapi.h>
 #include <mmdeviceapi.h>
-#include <dsound.h>
 #include <MMSystem.h>
 #include <FunctionDiscoveryKeys_devpkey.h>
 

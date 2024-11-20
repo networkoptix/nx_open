@@ -69,6 +69,13 @@ AudioDevice *AudioDevice::instance()
 AudioDevice::AudioDevice(QObject* parent):
     QObject(parent)
 {
+    #if defined(__SANITIZE_ADDRESS__) && defined(Q_OS_WINDOWS)
+        // According to the following thread, this issue most probably won't be fixed.
+        // https://developercommunity.visualstudio.com/t/ASAN-x64-causes-unhandled-exception-at-0/1365655
+        NX_INFO(this, "Audio output is disabled due to conflict with ASan on Windows");
+        return;
+    #endif
+
     #if defined(OPENAL_STATIC)
         alc_init();
         NX_DEBUG(this, "OpenAL init");
