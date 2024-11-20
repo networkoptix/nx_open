@@ -54,7 +54,7 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device}},
-            {utils::kServerIdFieldName, {ResourceType::server}},
+            {utils::kUsersFieldName, {ResourceType::user}},
         },
     };
     return kDescriptor;
@@ -63,13 +63,6 @@ const ItemDescriptor& ShowOnAlarmLayoutAction::manifest()
 ShowOnAlarmLayoutAction::ShowOnAlarmLayoutAction()
 {
     setLevel(nx::vms::event::Level::critical);
-}
-
-QVariantMap ShowOnAlarmLayoutAction::details(common::SystemContext* context) const
-{
-    auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
-    return result;
 }
 
 } // namespace nx::vms::rules

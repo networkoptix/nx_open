@@ -116,6 +116,9 @@ FiltrationResult filterResourcesByPermission(
     auto result = FiltrationResult{FiltrationAction::Clone};
     for (const auto& [fieldName, descriptor]: manifest.resources)
     {
+        if (!descriptor.readPermissions)
+            continue;
+
         const QVariant value = object->property(fieldName.c_str());
 
         if (value.canConvert<nx::Uuid>())

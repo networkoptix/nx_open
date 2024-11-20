@@ -19,6 +19,7 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/rules/helpers/help_id.h>
+#include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -28,6 +29,7 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/event_details.h>
@@ -48,6 +50,99 @@ using namespace nx::vms::rules;
 
 namespace {
 
+struct ResourceData
+{
+    QStringList names;
+    QnResourceList resources;
+    nx::vms::api::UserGroupDataList groups;
+    bool all = false;
+    int removed = 0;
+
+    bool empty() const
+    {
+        return !all && resources.empty() && groups.empty() && names.empty() && removed < 1;
+    }
+};
+
+using ResourceDataMap = std::map<ResourceType, ResourceData>;
+
+constexpr auto kResourceOrder =
+    { ResourceType::device, ResourceType::user, ResourceType::layout, ResourceType::server };
+
+ResourceData actionUserData(SystemContext* systemContext, const EventLogModelData& data)
+{
+    const auto action = data.action(systemContext);
+    ResourceData result;
+
+    for (auto email: action->property(nx::vms::rules::utils::kEmailsFieldName).toString().split(
+        ';', Qt::SkipEmptyParts))
+    {
+        result.names.push_back(email.trimmed());
+    }
+
+    if (const auto userProp = action->property(nx::vms::rules::utils::kUsersFieldName);
+        userProp.isValid() && userProp.canConvert<UuidSelection>())
+    {
+        const auto selection = userProp.value<UuidSelection>();
+        if (selection.all)
+        {
+            result.all = true;
+        }
+        else
+        {
+            QnUserResourceList users;
+            nx::vms::common::getUsersAndGroups(systemContext, selection.ids, users, result.groups);
+
+            result.resources = users.filtered<QnResource>();
+
+            result.removed = int(selection.ids.size()) - (users.size() + result.groups.size());
+            NX_ASSERT(result.removed >= 0);
+        }
+    }
+
+    return result;
+}
+
+ResourceDataMap actionResourceMap(SystemContext* systemContext, const EventLogModelData& data)
+{
+    const auto manifest = systemContext->vmsRulesEngine()->actionDescriptor(data.actionType());
+    ResourceDataMap result;
+
+    for (const auto& [name, desc]: manifest->resources)
+    {
+        if (const auto field = vms::rules::utils::fieldByName(
+            QString::fromStdString(name), *manifest))
+        {
+            if (const auto visible = field->properties.value("visible");
+                visible.isValid() && !visible.toBool())
+            {
+                continue;
+            }
+        }
+
+        if (desc.type == ResourceType::user)
+        {
+            if (auto resourceData = actionUserData(systemContext, data); !resourceData.empty())
+                result.emplace(desc.type, std::move(resourceData));
+        }
+        else
+        {
+            const auto ids =
+                nx::vms::rules::utils::fieldResourceIds(data.action(systemContext), name);
+
+            if (ids.empty())
+                continue;
+
+            auto resources = systemContext->resourcePool()->getResourcesByIds(ids);
+
+            result.emplace(desc.type, ResourceData{
+                .resources = resources, .removed = int(ids.size() - resources.size()) });
+        }
+    }
+
+    return result;
+}
+
 int helpTopicIdData(EventLogModel::Column column, const EventLogModelData& data)
 {
     switch (column)
@@ -64,7 +159,7 @@ int helpTopicIdData(EventLogModel::Column column, const EventLogModelData& data)
 QString resourceName(const QnResourcePtr& resource)
 {
     const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
-    return rules::Strings::resource(resource, infoLevel);
+    return vms::rules::Strings::resource(resource, infoLevel);
 }
 
 QString resourceNames(const QnResourceList& resources)
@@ -87,80 +182,101 @@ QIcon resourceIcon(QnResourceIconCache::Key key)
 QString actionTargetText(SystemContext* context, const EventLogModelData& data)
 {
     if (auto destination =
-        data.actionDetails(context).value(rules::utils::kDestinationDetailName).toString();
+        data.actionDetails(context).value(vms::rules::utils::kDestinationDetailName).toString();
         !destination.isEmpty())
     {
         return destination;
     }
 
-    const auto pool = context->resourcePool();
+    QStringList targets;
+    auto resourceMap = actionResourceMap(context, data);
 
-    if (const auto devices = pool->getResourcesByIds(utils::getDeviceIds(data.action(context)));
-        !devices.empty())
+    for (auto type: kResourceOrder)
     {
-        return resourceNames(devices);
+        if (auto it = resourceMap.find(type); it != resourceMap.end())
+        {
+            auto& resourceData = it->second;
+
+            if (type == ResourceType::user) // Special formatting of users & groups.
+            {
+                resourceData.names.append(desktop::rules::Strings::subjectsShort(
+                    resourceData.all,
+                    resourceData.resources.filtered<QnUserResource>(),
+                    resourceData.groups,
+                    resourceData.removed));
+
+            }
+            else
+            {
+                resourceData.names.append(desktop::rules::Strings::resourcesShort(
+                    context, type, resourceData.resources, resourceData.removed));
+            }
+
+            targets.append(resourceData.names);
+        }
     }
 
-    if (const auto servers = pool->getResourcesByIds(utils::getServerIds(data.action(context)));
-        !servers.empty())
+    return targets.join(", ");
+}
+
+QString actionTargetTooltip(SystemContext* context, const EventLogModelData& data)
+{
+    static constexpr auto kMaxResource = 20;
+    QStringList targets;
+    auto resourceMap = actionResourceMap(context, data);
+
+    for (auto type: kResourceOrder)
     {
-        return resourceNames(servers);
+        if (auto it = resourceMap.find(type); it != resourceMap.end())
+        {
+            auto& resourceData = it->second;
+
+            if (type == ResourceType::user) // Special formatting of users & groups.
+            {
+                resourceData.names.append(desktop::rules::Strings::subjectsLong(
+                    resourceData.all,
+                    resourceData.resources.filtered<QnUserResource>(),
+                    resourceData.groups,
+                    resourceData.removed,
+                    kMaxResource));
+
+            }
+            else
+            {
+                resourceData.names.append(desktop::rules::Strings::resourcesLong(
+                    context, type, resourceData.resources, resourceData.removed, kMaxResource));
+            }
+
+            targets.append(resourceData.names);
+        }
     }
 
-    return {};
+    return targets.join(", ");
 }
 
 QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLogModelData& data)
 {
-    const auto action = data.action(context);
-    auto userCount = action->property("emails").toString().count('@');
+    using Key = QnResourceIconCache::KeyPart;
 
-    if (userCount > 1)
-        return QnResourceIconCache::Users;
+    const auto resourceMap = actionResourceMap(context, data);
 
-    if (const auto userProp = action->property(rules::utils::kUsersFieldName);
-        userProp.isValid() && userProp.canConvert<UuidSelection>())
-    {
-        const auto selection = userProp.value<UuidSelection>();
-        if (selection.all)
-            return QnResourceIconCache::Users;
+    if (resourceMap.empty() || resourceMap.size() > 1)
+        return QnResourceIconCache::Unknown; // No icon in case of multiple resource types.
 
-        QnUserResourceList users;
-        QSet<nx::Uuid> groups;
-        nx::vms::common::getUsersAndGroups(context, selection.ids, users, groups);
+    const auto& resourceData = resourceMap.begin()->second;
+    const bool multiple = resourceData.all || !resourceData.groups.empty()
+        || (resourceData.names.size() + resourceData.resources.size()) > 1;
 
-        if (!groups.empty())
-            return QnResourceIconCache::Users;
+    static const std::map<ResourceType, std::pair<Key, Key>> iconMap = {
+        {ResourceType::server, {Key::Server, Key::Servers}},
+        {ResourceType::device, {Key::Camera, Key::Cameras}},
+        {ResourceType::layout, {Key::Layout, Key::Layouts}},
+        {ResourceType::user, {Key::User, Key::Users}}};
 
-        userCount += users.size();
-    }
+    if (const auto it = iconMap.find(resourceMap.begin()->first); it != iconMap.end())
+        return multiple ? it->second.second : it->second.first;
 
-    if (userCount > 1)
-        return QnResourceIconCache::Users;
-    if (userCount == 1)
-        return QnResourceIconCache::User;
-
-    const auto pool = context->resourcePool();
-
-    if (const auto devices = pool->getResourcesByIds(utils::getDeviceIds(action));
-        !devices.empty())
-    {
-        if (devices.size() > 1)
-            return QnResourceIconCache::Cameras;
-
-        return qnResIconCache->key(devices.first());
-    }
-
-    if (const auto servers = pool->getResourcesByIds(utils::getServerIds(action));
-        !servers.empty())
-    {
-        if (servers.size() > 1)
-            return QnResourceIconCache::Servers;
-
-        return qnResIconCache->key(servers.first());
-    }
-
-    return QnResourceIconCache::Unknown;
+    return Key::Unknown;
 }
 
 nx::Uuid eventSourceId(SystemContext* context, const EventLogModelData& data)
@@ -414,7 +530,7 @@ QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData&
 
     if (column == EventLogModel::ActionCameraColumn)
     {
-        if (const auto ids = rules::utils::getResourceIds(data.action(systemContext()));
+        if (const auto ids = vms::rules::utils::getResourceIds(data.action(systemContext()));
             !ids.empty())
         {
             return resourcePool()->getResourceById(ids.front());
@@ -455,13 +571,13 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
 
         case EventCameraColumn:
         {
-            QString result = eventDetails.value(rules::utils::kSourceNameDetailName).toString();
+            QString result = eventDetails.value(vms::rules::utils::kSourceNameDetailName).toString();
             if (result.isEmpty())
                 result = resourceName(getResource(EventCameraColumn, data));
             return result;
         }
         case ActionColumn:
-            return rules::Strings::actionName(systemContext(), data.actionType());
+            return vms::rules::Strings::actionName(systemContext(), data.actionType());
 
         case ActionCameraColumn:
             return actionTargetText(systemContext(), data);
@@ -486,6 +602,9 @@ QString EventLogModel::htmlData(Column column, const EventLogModelData& data) co
 
 QString EventLogModel::tooltip(Column column, const EventLogModelData& data) const
 {
+    if (column == ActionCameraColumn)
+        return actionTargetTooltip(systemContext(), data);
+
     if (column != DescriptionColumn)
         return QString();
 
@@ -494,8 +613,8 @@ QString EventLogModel::tooltip(Column column, const EventLogModelData& data) con
 
 QString EventLogModel::description(const EventLogModelData& data) const
 {
-    auto result =
-        data.actionDetails(systemContext()).value(rules::utils::kDescriptionDetailName).toString();
+    auto result = data.actionDetails(systemContext()).value(
+        vms::rules::utils::kDescriptionDetailName).toString();
 
     if (result.isEmpty())
         result = nx::vms::rules::Strings::eventDetails(data.details(systemContext())).join('\n');
@@ -544,10 +663,10 @@ QString EventLogModel::motionUrl(Column column, const EventLogModelData& data) c
     if (auto connection = this->connection(); NX_ASSERT(connection))
         connectionAddress = connection->address();
 
-    return rules::Strings::urlForCamera(
+    return vms::rules::Strings::urlForCamera(
         device,
         data.event(systemContext())->timestamp(),
-        rules::Strings::publicIp, //< Not used on the client side anyway.
+        vms::rules::Strings::publicIp, //< Not used on the client side anyway.
         connectionAddress);
 }
 
@@ -561,7 +680,7 @@ QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) con
     if (!hasVideoLink(systemContext(), data))
         return {};
 
-    return resourcePool()->getResourcesByIds(rules::utils::getDeviceIds(
+    return resourcePool()->getResourcesByIds(vms::rules::utils::getDeviceIds(
         AggregatedEventPtr::create(data.event(systemContext()))));
 }
 
@@ -659,7 +778,7 @@ vms::api::analytics::EventTypeId EventLogModel::analyticsEventType(int row) cons
         return {};
 
     return m_index->at(row).event(systemContext())
-        ->property(rules::utils::kAnalyticsEventTypeDetailName).toString();
+        ->property(vms::rules::utils::kAnalyticsEventTypeDetailName).toString();
 }
 
 QnResourcePtr EventLogModel::eventResource(int row) const

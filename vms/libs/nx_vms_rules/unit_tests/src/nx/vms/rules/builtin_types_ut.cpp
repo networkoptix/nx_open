@@ -14,6 +14,7 @@
 #include <nx/vms/rules/events/builtin_events.h>
 #include <nx/vms/rules/group.h>
 #include <nx/vms/rules/plugin.h>
+#include <nx/vms/rules/utils/common.h>
 #include <nx/vms/rules/utils/serialization.h>
 
 #include "test_event.h"
@@ -88,7 +89,7 @@ public:
     }
 
     template<class T>
-    void testResourceDescriptors(auto... args)
+    void testResourceDescriptors(bool needField, auto... args)
     {
         const auto& manifest = T::manifest(args...);
         const auto& meta = T::staticMetaObject;
@@ -96,12 +97,13 @@ public:
         static const auto resProps = QSet<QString>{
             utils::kCameraIdFieldName,
             utils::kDeviceIdsFieldName,
-            utils::kUserIdFieldName,
-            utils::kServerIdFieldName,
-            utils::kServerIdsFieldName,
             utils::kEngineIdFieldName,
             utils::kLayoutIdFieldName,
             utils::kLayoutIdsFieldName,
+            utils::kServerIdFieldName,
+            utils::kServerIdsFieldName,
+            utils::kUserIdFieldName,
+            utils::kUsersFieldName,
         };
 
         // Check resource named fields for descriptors.
@@ -113,6 +115,16 @@ public:
             if (resProps.contains(propName))
             {
                 SCOPED_TRACE(NX_FMT("%1 %2", manifest.id, propName).toStdString());
+
+                if (needField)
+                {
+                    if (const auto field = rules::utils::fieldByName(propName, manifest);
+                        !field || field->id.contains("event"))
+                    {
+                        continue;
+                    }
+                }
+
                 auto it = manifest.resources.find(propName);
                 EXPECT_NE(it, manifest.resources.end());
             }
@@ -124,15 +136,18 @@ public:
     {
         const auto& manifest = T::manifest(args...);
         const auto& meta = T::staticMetaObject;
-        static const auto propTypes =
-            std::set{qMetaTypeId<nx::Uuid>(), qMetaTypeId<UuidList>(), qMetaTypeId<UuidSet>()};
+        static const auto kResourceTypes = std::set{
+            qMetaTypeId<nx::Uuid>(),
+            qMetaTypeId<UuidList>(),
+            qMetaTypeId<UuidSet>(),
+            qMetaTypeId<UuidSelection>()};
 
         int targetCount = 0;
 
         // Check all permission fields correspond to properties with the same name.
         for (const auto& [fieldName, descriptor]: manifest.resources)
         {
-            SCOPED_TRACE(nx::format("Resource permission field: %1", fieldName).toStdString());
+            SCOPED_TRACE(nx::format("Resource field: %1", fieldName).toStdString());
             ASSERT_FALSE(fieldName.empty());
 
             const auto propIndex = meta.indexOfProperty(fieldName.c_str());
@@ -140,7 +155,7 @@ public:
 
             const auto prop = meta.property(propIndex);
             EXPECT_TRUE(prop.isValid());
-            EXPECT_TRUE(propTypes.contains(prop.userType()));
+            EXPECT_TRUE(kResourceTypes.contains(prop.userType()));
 
             if (descriptor.flags.testFlag(FieldFlag::target))
                 ++targetCount;
@@ -205,7 +220,7 @@ public:
         const auto& manifest = T::manifest(args...);
         SCOPED_TRACE(nx::format("Event id: %1", manifest.id).toStdString());
         testManifestValidity<T>(args...);
-        testResourceDescriptors<T>(args...);
+        testResourceDescriptors<T>(/*needField*/ false, args...);
         testPermissionsValidity<T>(args...);
 
         SCOPED_TRACE(nx::format("Group id: %1", manifest.groupId).toStdString());
@@ -239,7 +254,7 @@ public:
         SCOPED_TRACE(nx::format("Action id: %1", manifest.id).toStdString());
 
         testManifestValidity<T>();
-        testResourceDescriptors<T>();
+        testResourceDescriptors<T>(/*needFields*/ true);
         testPermissionsValidity<T>();
 
         // Check if all fields are registered.

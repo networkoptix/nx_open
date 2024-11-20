@@ -49,7 +49,8 @@ const ItemDescriptor& SendEmailAction::manifest()
                 {},
                 FieldProperties{.visible = false}.toVariantMap()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
-        }
+        },
+        .resources = {{utils::kUsersFieldName, {ResourceType::user}}},
     };
     return kDescriptor;
 }

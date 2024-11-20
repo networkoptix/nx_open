@@ -33,7 +33,10 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
                     .acceptAll = true
                 }.toVariantMap()),
         },
-        .resources = {{utils::kLayoutIdsFieldName, {ResourceType::layout}}},
+        .resources = {
+            {utils::kLayoutIdsFieldName, {ResourceType::layout}},
+            {utils::kUsersFieldName, {ResourceType::user}},
+        },
     };
     return kDescriptor;
 }

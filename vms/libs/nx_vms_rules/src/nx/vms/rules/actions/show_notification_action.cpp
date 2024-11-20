@@ -70,18 +70,10 @@ const ItemDescriptor& NotificationAction::manifest()
                 utils::kExtendedCaptionDetailName),
         },
         .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::device}},
-            {utils::kServerIdFieldName, {ResourceType::server}},
+            {utils::kUsersFieldName, {ResourceType::user}},
         },
     };
     return kDescriptor;
-}
-
-QVariantMap NotificationAction::details(common::SystemContext* context) const
-{
-    auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
-    return result;
 }
 
 } // namespace nx::vms::rules

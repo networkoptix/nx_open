@@ -57,7 +57,10 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 utils::kDetailingFieldName,
                 utils::kDetailingDetailName),
         },
-        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device}}},
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device}},
+            {utils::kUsersFieldName, {ResourceType::user}},
+        },
     };
     return kDescriptor;
 }

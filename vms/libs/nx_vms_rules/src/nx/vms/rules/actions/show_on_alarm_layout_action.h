@@ -20,8 +20,6 @@ public:
     static const ItemDescriptor& manifest();
 
     ShowOnAlarmLayoutAction();
-
-    QVariantMap details(common::SystemContext* context) const override;
 };
 
 } // namespace nx::vms::rules

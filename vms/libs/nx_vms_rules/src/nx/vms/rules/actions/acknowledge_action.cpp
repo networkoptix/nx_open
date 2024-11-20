@@ -18,6 +18,10 @@ const ItemDescriptor& AcknowledgeAction::manifest()
         .flags = {ItemFlag::instant, ItemFlag::system},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::currentServer,
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device}},
+            {utils::kUsersFieldName, {ResourceType::user}},
+        },
     };
     return kDescriptor;
 }

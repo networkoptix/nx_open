@@ -60,8 +60,6 @@ public:
         Url urlType,
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt);
 
-    static QString subjects(common::SystemContext* context, const UuidSelection& selection);
-
     static QString eventName(common::SystemContext* context, const QString& type);
     // Keep in sync with StringsHelper::eventDetails(). Includes reason.
     static QStringList eventDetails(const QVariantMap& details);

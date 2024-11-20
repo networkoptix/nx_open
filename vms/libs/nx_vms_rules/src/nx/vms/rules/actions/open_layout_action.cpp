@@ -11,13 +11,6 @@
 
 namespace nx::vms::rules {
 
-QVariantMap OpenLayoutAction::details(common::SystemContext* context) const
-{
-    auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
-    return result;
-}
-
 const ItemDescriptor& OpenLayoutAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
@@ -40,7 +33,10 @@ const ItemDescriptor& OpenLayoutAction::manifest()
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
-        .resources = {{utils::kLayoutIdFieldName, {ResourceType::layout, Qn::ReadPermission}}},
+        .resources = {
+            {utils::kLayoutIdFieldName, {ResourceType::layout, Qn::ReadPermission}},
+            {utils::kUsersFieldName, {ResourceType::user}},
+        },
     };
     return kDescriptor;
 }

@@ -44,6 +44,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .resources = {
             {utils::kCameraIdFieldName, {ResourceType::device}},
             {utils::kLayoutIdsFieldName, {ResourceType::layout}},
+            {utils::kUsersFieldName, {ResourceType::user}},
         },
     };
     return kDescriptor;

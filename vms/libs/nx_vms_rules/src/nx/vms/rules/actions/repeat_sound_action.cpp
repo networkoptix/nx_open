@@ -63,7 +63,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         },
         .resources = {
             {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},
-            {utils::kServerIdFieldName, {ResourceType::server}},
+            {utils::kUsersFieldName, {ResourceType::user}},
         },
     };
     return kDescriptor;

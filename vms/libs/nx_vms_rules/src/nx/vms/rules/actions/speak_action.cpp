@@ -52,7 +52,8 @@ const ItemDescriptor& SpeakAction::manifest()
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
         .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}
+            {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},
+            {utils::kUsersFieldName, { ResourceType::user }},
         },
     };
     return kDescriptor;

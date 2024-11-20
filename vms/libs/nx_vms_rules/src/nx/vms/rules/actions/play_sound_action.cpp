@@ -46,7 +46,11 @@ const ItemDescriptor& PlaySoundAction::manifest()
                 Strings::volume()),
             utils::makeIntervalFieldDescriptor(Strings::intervalOfAction()),
         },
-        .resources = {{utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
+        .resources = {
+            {utils::kDeviceIdsFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},
+            {utils::kUsersFieldName, {ResourceType::user}}
+        },
+
     };
     return kDescriptor;
 }

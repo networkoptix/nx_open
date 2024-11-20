@@ -61,18 +61,10 @@ const ItemDescriptor& PushNotificationAction::manifest()
             utils::makeExtractDetailFieldDescriptor("level", utils::kLevelDetailName),
         },
         .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::device}},
-            {utils::kServerIdFieldName, {ResourceType::server}},
+            {utils::kUsersFieldName, {ResourceType::user}},
         },
     };
     return kDescriptor;
-}
-
-QVariantMap PushNotificationAction::details(common::SystemContext* context) const
-{
-    auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, Strings::subjects(context, users()));
-    return result;
 }
 
 } // namespace nx::vms::rules

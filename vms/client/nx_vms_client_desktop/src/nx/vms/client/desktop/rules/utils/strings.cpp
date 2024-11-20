@@ -9,6 +9,8 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
@@ -30,9 +32,12 @@
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
 #include <nx/vms/rules/manifest.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::client::desktop::rules {
+
+using nx::vms::rules::ResourceType;
 
 QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayoutField* field)
 {
@@ -76,7 +81,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayo
     if (resources.size() == 1)
         return resources.first()->getName();
 
-    return tr("%n Layouts", "", static_cast<int>(resources.size()));
+    return number(ResourceType::layout, resources);
 }
 
 QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServersField* field)
@@ -119,7 +124,7 @@ QString Strings::selectButtonText(
     SystemContext* context, vms::rules::TargetUsersField* field, int additionalCount)
 {
     if (field->acceptAll())
-        return tr("All Users");
+        return allUsers();
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
@@ -211,7 +216,7 @@ QString Strings::getName(const QnMediaServerResourceList& resources)
     if (resources.size() == 1)
         return resources.first()->getName();
 
-    return tr("%n Servers", "", static_cast<int>(resources.size()));
+    return number(ResourceType::server, resources);
 }
 
 QString Strings::getName(
@@ -262,6 +267,11 @@ QString Strings::in()
     return tr("In");
 }
 
+QString Strings::allUsers()
+{
+    return tr("All Users");
+}
+
 QString Strings::targetRecipientsString(
     const QnUserResourceList& users,
     const api::UserGroupDataList& groups,
@@ -276,36 +286,211 @@ QString Strings::targetRecipientsString(
     return result.join("; ");
 }
 
-QString Strings::getName(const QnUserResourceList& users, const api::UserGroupDataList& groups)
+QString Strings::subjectsShort(
+    bool all, const QnUserResourceList& users, const api::UserGroupDataList& groups, int removed)
+{
+    if (all)
+        return allUsers();
+
+    if (removed <= 0)
+        return getName(users, groups, /*tryNames*/ true);
+
+    const QString removedSubjectsText = Strings::removed(nullptr, ResourceType::user, removed);
+    return groups.empty() && users.empty()
+        ? removedSubjectsText
+        : getName(users, groups, /*tryNames*/ false) + ", " + removedSubjectsText;
+}
+
+QStringList Strings::subjectsLong(
+    bool all,
+    const QnUserResourceList& users,
+    const api::UserGroupDataList& groups,
+    int removed,
+    int max)
+{
+    if (all)
+        return QStringList{allUsers()};
+
+    QStringList result;
+
+    for (int i = 0; i < max && i < users.count(); ++i)
+        result.push_back(users[i]->getName());
+
+    result.sort(Qt::CaseInsensitive);
+    max -= result.size();
+
+    QStringList groupNames;
+    for  (int i = 0; i < max && i < groups.size(); ++i)
+        groupNames.push_back(groups[i].name);
+
+    groupNames.sort(Qt::CaseInsensitive);
+    result.append(std::move(groupNames));
+
+    if (const int more = users.size() + groups.size() - result.size(); more > 0)
+        result.push_back(Strings::more(nullptr, ResourceType::user, more));
+
+    if (removed > 0)
+        result.push_back(Strings::removed(nullptr, ResourceType::user, removed));
+
+    return result;
+}
+
+QStringList Strings::resourcesShort(
+    SystemContext* context,
+    nx::vms::rules::ResourceType type,
+    const QnResourceList& resources,
+    int removed)
+{
+    const int maxNames = (removed > 0) ? 1 : 2;
+    const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
+    QStringList result;
+
+    if (resources.size() <= maxNames)
+    {
+        for (const auto& resource: resources)
+            result.push_back(nx::vms::rules::Strings::resource(resource, infoLevel));
+
+        result.sort(Qt::CaseInsensitive);
+    }
+    else if (!resources.empty())
+    {
+        result.push_back(number(type, resources));
+    }
+
+    if (removed > 0)
+        result.push_back(Strings::removed(context, type, removed));
+
+    return result;
+}
+
+QStringList Strings::resourcesLong(
+    SystemContext* context,
+    nx::vms::rules::ResourceType type,
+    const QnResourceList& resources,
+    int removed,
+    int max)
+{
+    if (resources.empty())
+        return {};
+
+    const auto infoLevel = appContext()->localSettings()->resourceInfoLevel();
+    QStringList result;
+
+    for (int i = 0; i < max && i < resources.size(); ++i)
+        result.push_back(nx::vms::rules::Strings::resource(resources[i], infoLevel));
+
+    result.sort(Qt::CaseInsensitive);
+
+    if (const int more = resources.size() - result.size(); more > 0)
+        result.push_back(Strings::more(context, type, more));
+
+    if (removed > 0)
+        result.push_back(Strings::removed(context, type, removed));
+
+    return result;
+}
+
+QString Strings::getName(
+    const QnUserResourceList& users, const api::UserGroupDataList& groups, bool tryNames)
 {
     if (users.empty() && groups.empty())
         return {};
 
-    if (users.size() == 1 && groups.empty())
-        return users.front()->getName();
-
-    if (users.empty() && groups.size() <= 2)
+    if (tryNames)
     {
-        QStringList groupNames;
-        for (const auto& group: groups)
-            groupNames.push_back(group.name);
+        if (users.size() == 1 && groups.empty())
+            return users.front()->getName();
 
-        groupNames.sort(Qt::CaseInsensitive);
+        if (users.empty() && groups.size() <= 2)
+        {
+            QStringList groupNames;
+            for (const auto& group: groups)
+                groupNames.push_back(group.name);
 
-        return groupNames.join(", ");
+            groupNames.sort(Qt::CaseInsensitive);
+
+            return groupNames.join(", ");
+        }
     }
 
-    if (groups.empty())
-        return tr("%n Users", "", static_cast<int>(users.size()));
+    QStringList result;
+
+    if (!groups.empty())
+        result.push_back(tr("%n Groups", "", static_cast<int>(groups.size())));
 
     if (!users.empty())
-    {
-        return QString{"%1, %2"}
-            .arg(tr("%n Groups", "", static_cast<int>(groups.size())))
-            .arg(tr("%n Users", "", static_cast<int>(users.size())));
-    }
+        result.push_back(tr("%n Users", "", static_cast<int>(users.size())));
 
-    return tr("%n Groups", "", static_cast<int>(groups.size()));
+    return result.join(", ");
+}
+
+QString Strings::removed(SystemContext* context, nx::vms::rules::ResourceType type, int count)
+{
+    if (!NX_ASSERT(count > 0))
+        return {};
+
+    switch (type)
+    {
+        case ResourceType::user:
+            return tr("%n removed subjects", {}, count);
+        case ResourceType::device:
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                context->resourcePool(),
+                tr("%n removed devices", {}, count),
+                tr("%n removed cameras", {}, count));
+        case ResourceType::server:
+            return tr("%n removed servers", {}, count);
+        case ResourceType::layout:
+            return tr("%n removed layouts", {}, count);
+        default:
+            NX_ASSERT(false, "Unexpected resource type: %1", type);
+            return {};
+    }
+}
+
+QString Strings::more(SystemContext* context, nx::vms::rules::ResourceType type, int count)
+{
+    if (!NX_ASSERT(count > 0))
+        return {};
+
+    switch (type)
+    {
+        case ResourceType::user:
+            return tr("%n subjects more", "", count);
+        case ResourceType::device:
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                context->resourcePool(),
+                tr("%n devices more", {}, count),
+                tr("%n cameras more", {}, count));
+        case ResourceType::server:
+            return tr("%n servers more", {}, count);
+        case ResourceType::layout:
+            return tr("%n layouts more", {}, count);
+        default:
+            NX_ASSERT(false, "Unexpected resource type: %1", type);
+            return {};
+    }
+}
+
+QString Strings::number(nx::vms::rules::ResourceType type, const QnResourceList& resources)
+{
+    if (!NX_ASSERT(!resources.empty()))
+        return {};
+
+    switch (type)
+    {
+        case ResourceType::device:
+            return QnDeviceDependentStrings::getNumericName(
+                SystemContext::fromResource(resources.first())->resourcePool(),
+                resources.filtered<QnVirtualCameraResource>());
+        case ResourceType::server:
+            return tr("%n Servers", {}, resources.size());
+        case ResourceType::layout:
+            return tr("%n Layouts", {}, resources.size());
+        default:
+            NX_ASSERT(false, "Unexpected resource type: %1", type);
+            return {};
+    }
 }
 
 } // namespace nx::vms::client::desktop::rules

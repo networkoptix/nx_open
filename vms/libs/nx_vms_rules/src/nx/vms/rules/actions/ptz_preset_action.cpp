@@ -43,7 +43,10 @@ const ItemDescriptor& PtzPresetAction::manifest()
                     .acceptAll = true
                 }.toVariantMap()),
         },
-        .resources = {{utils::kCameraIdFieldName, {ResourceType::device, {}, {}, FieldFlag::target}}},
+        .resources = {
+            {utils::kCameraIdFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},
+            {utils::kUsersFieldName, {ResourceType::user}},
+        },
     };
     return kDescriptor;
 }

@@ -195,28 +195,6 @@ QString Strings::urlForCamera(
     return url.toWebClientStandardViolatingUrl();
 }
 
-QString Strings::subjects(common::SystemContext* context, const UuidSelection& selection)
-{
-    if (selection.all)
-        return tr("All users");
-
-    // TODO: #amalov Remove dependency;
-    nx::vms::event::StringsHelper oldHelper(context);
-    QnUserResourceList users;
-    nx::vms::api::UserGroupDataList groups;
-    nx::vms::common::getUsersAndGroups(context, selection.ids, users, groups);
-
-    const int numDeleted = int(selection.ids.size()) - (users.size() + groups.size());
-    NX_ASSERT(numDeleted >= 0);
-    if (numDeleted <= 0)
-        return oldHelper.actionSubjects(users, groups);
-
-    const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
-    return groups.empty() && users.empty()
-        ? removedSubjectsText
-        : oldHelper.actionSubjects(users, groups, false) + ", " + removedSubjectsText;
-}
-
 QString Strings::eventName(common::SystemContext* context, const QString& type)
 {
     if (const auto engine = context->vmsRulesEngine(); NX_ASSERT(engine))

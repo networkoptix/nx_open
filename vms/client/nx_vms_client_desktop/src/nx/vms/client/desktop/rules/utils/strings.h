@@ -10,6 +10,8 @@
 #include <nx/vms/rules/action_builder_fields/action_builder_fields_fwd.h>
 #include <nx/vms/rules/event_filter_fields/event_filter_fields_fwd.h>
 
+namespace nx::vms::rules { enum class ResourceType; }
+
 namespace nx::vms::client::desktop::rules {
 
 class Strings
@@ -39,11 +41,35 @@ public:
     static QString isListed();
     static QString isNotListed();
     static QString in();
+    static QString allUsers();
 
     static QString targetRecipientsString(
         const QnUserResourceList& users,
         const api::UserGroupDataList& groups,
         const QStringList& additionalRecipients);
+
+    static QString subjectsShort(
+        bool all, const QnUserResourceList& users, const api::UserGroupDataList& groups, int removed);
+
+    static QStringList subjectsLong(
+        bool all,
+        const QnUserResourceList& users,
+        const api::UserGroupDataList& groups,
+        int removed,
+        int max);
+
+    static QStringList resourcesShort(
+        SystemContext* context,
+        nx::vms::rules::ResourceType type,
+        const QnResourceList& resources,
+        int removed);
+
+    static QStringList resourcesLong(
+        SystemContext* context,
+        nx::vms::rules::ResourceType type,
+        const QnResourceList& resources,
+        int removed,
+        int max);
 
 private:
     static QString getName(SystemContext* context, const QnVirtualCameraResourceList& resources);
@@ -51,7 +77,11 @@ private:
     static QString getName(
         const QnUserResourceList& users, const api::UserGroupDataList& groups, int additionalCount);
     static QString getName(
-        const QnUserResourceList& users, const api::UserGroupDataList& groups);
+        const QnUserResourceList& users, const api::UserGroupDataList& groups, bool tryNames = true);
+
+    static QString removed(SystemContext* context, nx::vms::rules::ResourceType type, int count);
+    static QString number(nx::vms::rules::ResourceType type, const QnResourceList& resources);
+    static QString more(SystemContext* context, nx::vms::rules::ResourceType type, int count);
 };
 
 } // namespace nx::vms::client::desktop::rules

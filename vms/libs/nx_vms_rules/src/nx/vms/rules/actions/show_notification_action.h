@@ -27,9 +27,8 @@ class NX_VMS_RULES_API NotificationAction: public NotificationActionBase
 
 public:
     NotificationAction() = default;
-    static const ItemDescriptor& manifest();
 
-    virtual QVariantMap details(common::SystemContext* context) const override;
+    static const ItemDescriptor& manifest();
 };
 
 } // namespace nx::vms::rules
