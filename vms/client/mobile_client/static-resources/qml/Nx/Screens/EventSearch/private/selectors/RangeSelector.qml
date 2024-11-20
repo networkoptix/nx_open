@@ -29,7 +29,11 @@ OptionSelector
 
     screenDelegate: Column
     {
+        id: content
+
         spacing: 4
+
+        signal applyRequested()
 
         function clear()
         {
@@ -48,6 +52,11 @@ OptionSelector
             minimum: control.attribute ? control.attribute.minValue : undefined
             maximum: toInput.value
             onValueChanged: d.updateValue(value, d.innerValue.to)
+            onApplyRequested:
+            {
+                toInput.selectAll()
+                toInput.forceActiveFocus()
+            }
         }
 
         NumberInput
@@ -61,6 +70,7 @@ OptionSelector
             minimum: fromInput.value
             maximum: control.attribute ? control.attribute.maxValue : undefined
             onValueChanged: d.updateValue(d.innerValue.from, value)
+            onApplyRequested: content.applyRequested()
         }
 
         Component.onCompleted: fromInput.forceActiveFocus()

@@ -27,6 +27,11 @@ Item
 
     signal applyRequested()
 
+    function selectAll()
+    {
+        textField.selectAll()
+    }
+
     function clear()
     {
         textField.clear()
