@@ -69,9 +69,6 @@ public:
     /** Promo overlay for PTZ Cameras with auto-tracking feature description. */
     Property<bool> autoTrackingPromo{this, "autoTrackingPromo"};
 
-    /** Suggestion to update all outdated Servers in the System to the latest version. */
-    Property<bool> versionMismatch{this, "versionMismatch"};
-
     /** Warning which is displayed when a User Group is removed from the System. */
     Property<bool> deleteUserGroups{this, "deleteUserGroups"};
 
