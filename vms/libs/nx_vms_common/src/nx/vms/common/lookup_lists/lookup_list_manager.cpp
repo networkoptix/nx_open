@@ -75,8 +75,8 @@ void LookupListManager::addOrUpdate(nx::vms::api::LookupListData list)
         if (!d->initialized)
             return;
 
-        auto iter = std::find_if(d->data.begin(), d->data.end(),
-            [id](const auto& item) { return item.id == id; });
+        auto iter = std::find_if(
+            d->data.begin(), d->data.end(), [id](const auto& item) { return item.id == id; });
 
         if (iter != d->data.end())
             *iter = std::move(list);
@@ -94,8 +94,8 @@ void LookupListManager::remove(const nx::Uuid& id)
         if (!d->initialized)
             return;
 
-        auto iter = std::find_if(d->data.begin(), d->data.end(),
-            [id](const auto& item) { return item.id == id; });
+        auto iter = std::find_if(
+            d->data.begin(), d->data.end(), [id](const auto& item) { return item.id == id; });
 
         if (iter == d->data.end())
             return;
