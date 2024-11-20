@@ -58,7 +58,6 @@ void ShowOnceSettings::migrate()
     deleteLocalLayouts = readValue("DeleteLocalLayouts");
     ptzPresetInUse = readValue("PtzPresetInUse");
     newPtzMechanicPromo = readValue("NewPtzMechanicPromoBlock");
-    versionMismatch = readValue("VersionMismatch");
 
     migrationDone = true;
 }

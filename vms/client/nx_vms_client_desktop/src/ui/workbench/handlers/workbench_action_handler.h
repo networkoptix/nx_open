@@ -218,8 +218,6 @@ protected slots:
 
     void at_browseUrlAction_triggered();
 
-    void at_versionMismatchMessageAction_triggered();
-
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();

@@ -586,10 +586,6 @@ void initialize(Manager* manager, Action* root)
         .shortcutContext(Qt::ApplicationShortcut)
         .condition(PreventWhenFullscreenTransition::condition());
 
-    factory(VersionMismatchMessageAction)
-        .flags(NoTarget)
-        .requiredPowerUserPermissions();
-
     factory(BetaVersionMessageAction)
         .flags(NoTarget)
         .mode(DesktopMode);
