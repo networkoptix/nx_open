@@ -47,6 +47,7 @@ public:
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
     nx::utils::Url getCurrentStreamUrl() const;
+    void setUserAgent(const QString& value);
 
     static bool probeStream(
         const char* address,

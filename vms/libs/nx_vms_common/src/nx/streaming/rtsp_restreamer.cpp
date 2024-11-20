@@ -69,6 +69,11 @@ RtspRestreamer::~RtspRestreamer()
 {
 }
 
+void RtspRestreamer::setUserAgent(const QString& value)
+{
+    m_reader.setUserAgent(value);
+}
+
 const std::string& RtspRestreamer::cloudAddressTemplate()
 {
     // {server_id}.{system_id}.relay.cloud.host

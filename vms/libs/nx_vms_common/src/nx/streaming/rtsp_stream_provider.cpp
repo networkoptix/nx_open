@@ -105,7 +105,6 @@ RtspStreamProvider::RtspStreamProvider(
 
     m_numberOfVideoChannels = 1;
     m_customVideoLayout.reset();
-
 }
 
 RtspStreamProvider::~RtspStreamProvider()
