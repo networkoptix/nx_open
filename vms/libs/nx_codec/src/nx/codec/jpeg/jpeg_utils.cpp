@@ -8,9 +8,6 @@
 namespace nx::media::jpeg
 {
 
-static const int MARKER_HEADER_SIZE = 2;
-static const int MARKER_LENGTH_SIZE = 2;
-
 struct Component
 {
     uint8_t id = 0;
@@ -202,10 +199,10 @@ ResultCode JpegParser::parse(const quint8* data, size_t size)
                 else
                 {
                     if (m_parseHandler)
-                        if (!m_parseHandler(m_currentMarkerCode, 0, pos - data - MARKER_HEADER_SIZE))
+                        if (!m_parseHandler(m_currentMarkerCode, 0, pos - data - kMarkerHeaderSize))
                         {
                             if (m_errorHandler)
-                                m_errorHandler(interrupted, pos - data - MARKER_HEADER_SIZE);
+                                m_errorHandler(interrupted, pos - data - kMarkerHeaderSize);
                             return interrupted;
                         }
                     m_state = waitingStartOfMarker;
@@ -217,15 +214,15 @@ ResultCode JpegParser::parse(const quint8* data, size_t size)
                 if (pos + 1 >= dataEnd)
                 {
                     if (m_errorHandler)
-                        m_errorHandler(badData, pos - data - MARKER_HEADER_SIZE);
+                        m_errorHandler(badData, pos - data - kMarkerHeaderSize);
                     return badData;   //error
                 }
                 const size_t markerLength = (*pos << 8) | *(pos+1);
                 if (m_parseHandler)
-                    if (!m_parseHandler(m_currentMarkerCode, markerLength, pos - data - MARKER_HEADER_SIZE))
+                    if (!m_parseHandler(m_currentMarkerCode, markerLength, pos - data - kMarkerHeaderSize))
                     {
                         if (m_errorHandler)
-                            m_errorHandler(interrupted, pos - data - MARKER_HEADER_SIZE);
+                            m_errorHandler(interrupted, pos - data - kMarkerHeaderSize);
                         return interrupted;
                     }
                 //skipping marker body
@@ -246,15 +243,19 @@ bool readJpegImageInfo(const quint8* data, size_t size, ImageInfo* const imgInfo
     bool parsed = false;
     auto parseHandler = [&parsed, data, size, imgInfo]( int markerType, size_t markerLength, size_t currentOffset ) -> bool
     {
-        static const size_t MIN_SOF_SIZE = 5;
+        static constexpr size_t kMinSofSize = 5;
         if( !(markerType == 0xC0 || markerType == 0xC2) )
             return true;   //not SOF marker, continue parsing
-        if( (markerLength < MARKER_LENGTH_SIZE + MIN_SOF_SIZE) ||       //marker size not enough to read data. marker not recognized?
-            (currentOffset + MARKER_HEADER_SIZE + MARKER_LENGTH_SIZE + MIN_SOF_SIZE >= size) )  //not enough data in source buffer
+
+        const size_t startOffset =
+            currentOffset + JpegParser::kMarkerHeaderSize + JpegParser::kMarkerLengthSize;
+
+        if( (markerLength < JpegParser::kMarkerLengthSize + kMinSofSize) || //< Marker size not enough to read data. marker not recognized?
+            (startOffset + kMinSofSize >= size) )  //< Not enough data in source buffer.
         {
             return false;
         }
-        const quint8* sofDataStart = data + currentOffset + MARKER_HEADER_SIZE + MARKER_LENGTH_SIZE;
+        const quint8* sofDataStart = data + startOffset;
         imgInfo->precision = sofDataStart[0];
         imgInfo->height = (sofDataStart[1] << 8) | sofDataStart[2];
         imgInfo->width = (sofDataStart[3] << 8) | sofDataStart[4];
