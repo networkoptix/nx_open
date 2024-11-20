@@ -241,7 +241,15 @@ void QnNavigationItem::createZoomButton(
         {QnIcon::Disabled, {.primary = "dark9", .secondary = "dark6"}}
     };
 
-    button->setIcon(qnSkin->icon(fileName, themeSubstitutions));
+    const auto icon = qnSkin->icon(fileName, themeSubstitutions);
+    button->setIcon(icon);
+    const auto sizeDifference = kZoomButtonSize - icon.pixmap(kZoomButtonSize.width(),
+        kZoomButtonSize.height()).size() / qApp->devicePixelRatio();
+    button->setImageMargins({
+        sizeDifference.width() / 2,
+        sizeDifference.height() / 2,
+        sizeDifference.width() / 2,
+        sizeDifference.height() / 2});
     button->setPreferredSize(kZoomButtonSize);
     statisticsModule()->controls()->registerButton(
         statisticsName,
