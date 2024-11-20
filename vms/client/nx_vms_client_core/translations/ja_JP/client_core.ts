@@ -13,11 +13,11 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>新規サイト</translation>
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>自分のサイト</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -151,43 +151,43 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>このエラーが解決しない場合は、サイト管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>シャットダウン状態のサイトに %1 ユーザーとしてログインすることは禁止されています。ローカルユーザーとしては引き続き接続できます。</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>サスペンド状態のサイトに %1 ユーザーとしてログインすることは禁止されています。ローカルユーザーとしては引き続き接続できます。</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>%2 ユーザーとしてこのサイトにログインするには、 %1 にログインしてください</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>セッションの有効期限は、サイト管理者が変更できます。</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>このサイトへのアクセス有効期限が切れました。</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>アクセスを回復するには、サイト管理者に連絡してください。</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>このサイトにログインするには、 %2 で &quot;%1 アカウントでログインするたびに確認コードを要求する&quot; を無効にしてください。</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>このユーザーはサイト管理者によって無効にされています。</translation>
     </message>
   </context>
   <context>
@@ -253,15 +253,15 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>証明書をご確認のうえ、接続先サーバーが信頼できることをお確かめください。</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>サーバーの証明書をご確認のうえ、接続先サイトが信頼できることをお確かめください。</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</translation>
+      <translation>期限切れのサーバー証明書、もしくは第三者による攻撃が原因である可能性があります。詳細な調査については、サイト管理者にお問い合わせください。</translation>
     </message>
   </context>
   <context>

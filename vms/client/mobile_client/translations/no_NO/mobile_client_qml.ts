@@ -52,6 +52,14 @@
       <source>Please restart the app to apply the changes.</source>
       <translation>Start appen på nytt for å bruke endringene.</translation>
     </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation type="unfinished">Maximum decoders count</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>
@@ -223,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Skriv inn ditt %1 kontopassord for å koble til nettstedet</translation>
     </message>
   </context>
   <context>
@@ -325,7 +333,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>Du er ikke koblet til noe nettsted</translation>
     </message>
   </context>
   <context>
@@ -406,15 +414,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle nettsteder</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Utvalgte nettsteder</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Minst ett nettsted må velges</translation>
     </message>
   </context>
   <context>
@@ -614,7 +622,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>Ingen nettsteder funnet</translation>
     </message>
   </context>
   <context>
@@ -689,7 +697,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Varsler er slått av i enhetsinnstillingene</translation>
     </message>
     <message>
       <source>Beta Features</source>

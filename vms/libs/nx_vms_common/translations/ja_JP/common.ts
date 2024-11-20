@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>音声の再生</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>サイトイベント</translation>
     </message>
   </context>
   <context>
@@ -174,20 +174,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>サイトヘルスビューアー</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>このグループのメンバーには無制限のサイト権限があります。管理者は、パワーユーザーの作成および変更、サイトの統合、 %1 への接続および解除ができます。</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>このグループのメンバーは、上位ビューアーの権限に加えて、サイト構成の大部分を制御できます。ただし、自身に対するグループや権限の変更または削除といった管理者関連の設定変更は許可されておらず、他のパワーユーザーの作成や編集もできません。</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>このグループのメンバーは、サイトヘルスモニタリング情報およびサーバーのプロセッサー負荷をリアルタイムで表示できます (サーバーモニタリング)。</translation>
     </message>
   </context>
   <context>
@@ -560,11 +560,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>このカメラは現在、選択されたレイアウトに存在しません</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>このカメラは現在、選択されたうち一部のレイアウトに存在しません</translation>
     </message>
   </context>
   <context>
@@ -981,7 +981,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>選択したユーザーロールにユーザーが含まれていません</translation>
     </message>
   </context>
   <context>
@@ -1245,11 +1245,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>選択したすべてのユーザーにメールアドレスが設定されていません。</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>選択されたユーザーの一部にメールアドレスが設定されていません。</translation>
     </message>
   </context>
   <context>
@@ -1282,7 +1282,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>新規サイト</translation>
     </message>
   </context>
   <context>
@@ -1782,47 +1782,47 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>サイト死活監視間隔 (秒, 1秒-1時間)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
+      <translation>プロキシ接続アクセスポリシー</translation>
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>クラウドサイトID</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>サイトの二要素認証を有効化</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>サイト名</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>ローカルサイトID。null の場合、サイトがまだセットアップされていないことを意味します。</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
+      <translation>最終マスターサイト統合ID</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
+      <translation>最終スレーブサイト統合ID</translation>
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>ピクセル化設定</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>クラウドトークンにセッション制限を適用する</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>新しいインテグレーション登録リクエストの作成を有効または無効にする</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
@@ -2520,15 +2520,15 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにサイト時刻が使用されます。</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>通話リクエスト</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>通話リクエストを逃しました</translation>
     </message>
   </context>
 </TS>

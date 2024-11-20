@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Lire l'audio</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Événement du site</translation>
     </message>
   </context>
   <context>
@@ -180,20 +180,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Visualisateur d’intégrité du site</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Les membres de ce groupe disposent de privilèges de site illimités. Les administrateurs peuvent créer et modifier des utilisateurs expérimentés, fusionner des sites et connecter ou déconnecter des sites à %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs Avancés, contrôler la plupart de la configuration du site, mais ne sont pas autorisés à modifier les paramètres liés à l'administrateur, comme supprimer ou modifier leurs propres groupes et permissions, et ne peut pas créer ou modifier d'autres utilisateurs expérimentés</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Les membres de ce groupe peuvent consulter les informations sur la surveillance de la santé du site et la charge du processeur du serveur en temps réel (Surveillance du serveur).</translation>
     </message>
   </context>
   <context>
@@ -573,11 +573,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Cette caméra n'est pas actuellement sur la mise en page sélectionnée</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Cette caméra n'est pas actuellement sur certaines des mises en page sélectionnées</translation>
     </message>
   </context>
   <context>
@@ -1032,7 +1032,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Aucun des rôles d'utilisateur sélectionnés ne contient d'utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -1312,11 +1312,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>L'adresse e-mail n'est pas définie pour tous les utilisateurs sélectionnés.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>L'adresse e-mail n'est pas définie pour certains utilisateurs sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -1349,7 +1349,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nouveau site</translation>
     </message>
   </context>
   <context>
@@ -1858,43 +1858,43 @@
     </message>
     <message>
       <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
+      <translation>Politique d'accès à la connexion proxy</translation>
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>ID du site cloud</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>Activer 2FA pour le site</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>Nom du site</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>ID du site local, null signifie que le site n'est pas encore configuré.</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
+      <translation>Dernier ID de fusion du site maître</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
+      <translation>Dernier identifiant de fusion du site esclave</translation>
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>Paramètres de pixellisation</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>Appliquer la limite de session pour les jetons Cloud</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Activer ou désactiver la création de nouvelles demandes d'enregistrement d'intégration</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>

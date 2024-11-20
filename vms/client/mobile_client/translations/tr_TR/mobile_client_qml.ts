@@ -52,6 +52,14 @@
       <source>Please restart the app to apply the changes.</source>
       <translation>Değişikliklerin geçerli olması için lütfen uygulamayı yeniden başlatın.</translation>
     </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation type="unfinished">Maximum decoders count</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>

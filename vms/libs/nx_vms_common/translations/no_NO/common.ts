@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Spill av lyd</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Site Event</translation>
     </message>
   </context>
   <context>
@@ -180,20 +180,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Nettstedshelsevisere</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Medlemmer av denne gruppen har ubegrensede nettstedrettigheter. Administratorer kan opprette og endre avanserte brukere, slå sammen nettsteder og koble til eller fra nettstedet til %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Medlemmer av denne gruppen kan, i tillegg til tillatelsene gitt av Advanced Viewers-gruppen, kontrollere det meste av nettstedkonfigurasjonen, men har ikke lov til å endre noen administratorrelaterte innstillinger, som å slette eller endre sine egne grupper og tillatelser, og kan ikke opprette eller redigere andre avanserte brukere.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Medlemmer av denne gruppen kan se informasjon om Site Health Monitoring og serverprosessorbelastning i sanntid (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -573,11 +573,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Dette kameraet er for øyeblikket ikke på den valgte layouten</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Dette kameraet er for øyeblikket ikke på noen av de valgte layoutene</translation>
     </message>
   </context>
   <context>
@@ -1032,7 +1032,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Ingen av de valgte brukerrollene inneholder brukere</translation>
     </message>
   </context>
   <context>
@@ -1312,11 +1312,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>E-postadressen er ikke angitt for alle de valgte brukerne.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>E-postadresse er ikke angitt for enkelte valgte brukere.</translation>
     </message>
   </context>
   <context>
@@ -1349,7 +1349,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Ny site</translation>
     </message>
   </context>
   <context>
@@ -1852,47 +1852,47 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>Nettstedets oppdateringsintervall (sekunder, 1s-1t)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
+      <translation>Retningslinjer for tilgang til proxy-tilkobling</translation>
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>Cloud Site ID</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>Aktiver 2FA for nettstedet</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>Navn på nettsted</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>Local Site ID, null betyr at nettstedet ikke er konfigurert ennå.</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
+      <translation>Siste hovedsidesammenslåings-ID</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
+      <translation>Siste slavesidesammenslåings-ID</translation>
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>Pikseleringsinnstillinger</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>Bruk øktgrense for Cloud-tokens</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Aktiver eller deaktiver oppretting av nye integreringsregistreringsforespørsler</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
@@ -2606,15 +2606,15 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Kunne ikke tvinge bruk av kameratid, da den henger for mye. Stedstid vil bli brukt i stedet.</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Anropsforespørsel</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Anropsforespørsel tapt</translation>
     </message>
   </context>
 </TS>
