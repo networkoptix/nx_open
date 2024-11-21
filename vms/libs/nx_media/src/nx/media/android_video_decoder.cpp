@@ -494,7 +494,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
         if (!frame)
         {
             NX_WARNING(this, "Failed to convert h264/h265 video to Annex B format");
-            return 0;
+            return -1;
         }
     }
 
@@ -503,12 +503,17 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     if (!d->initialized)
     {
         if (!frame)
-            return 0;
+        {
+            NX_DEBUG(this, "Failed to initialize decoder on flushing");
+            return -1;
+        }
 
         d->frameSize = getFrameSize(frame.get());
         if (d->frameSize.isEmpty())
+        {
+            NX_DEBUG(this, "Failed to initialize decoder, waiting for key frame");
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
-
+        }
         d->fboManager.init(d->frameSize);
 
         glGenTextures(1, &d->textureId);
@@ -524,7 +529,8 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
         {
             d->releaseSurface();
             glDeleteTextures(1, &d->textureId);
-            return 0; //< wait for I frame
+            NX_WARNING(this, "Failed to initialize decoder");
+            return -1; //< wait for I frame
         }
     }
 
@@ -556,7 +562,8 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
                 d->initialized = false;
                 d->releaseSurface();
                 glDeleteTextures(1, &d->textureId);
-                return 0;
+                NX_WARNING(this, "Failed to decode frame");
+                return -1;
             }
         }
         else
@@ -566,7 +573,10 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     } while (outFrameNum == kNoInputBuffers && ++retryCounter < kDequeueInputBufferRetyrCounter);
 
     if (outFrameNum <= 0)
+    {
+        NX_WARNING(this, "Failed to decode frame, error code: %1", outFrameNum);
         return outFrameNum;
+    }
 
     auto time1 = tm.elapsed();
 
@@ -586,8 +596,11 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     // If we didn't find a timestamp for the frame, that usually means that android decoder
     // provided a frame out of order. In this case we should just skip it.
     if (frameTime < 0)
+    {
+        NX_WARNING(this, "Failed to decode frame, timestamp not found: %1, %2",
+            outFrameNum, frameTime);
         return 0;
-
+    }
     FboTextureHolder textureHolder;
 
     if (d->threadGlCtx)
@@ -605,7 +618,10 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
     }
 
     if (textureHolder.isNull())
-        return 0;
+    {
+        NX_WARNING(this, "Failed to render frame to FBO");
+        return -1;
+    }
 
     NX_VERBOSE(this, "Got frame num %1 decode time1=%2 time2=%3",
         outFrameNum, time1, tm.elapsed());

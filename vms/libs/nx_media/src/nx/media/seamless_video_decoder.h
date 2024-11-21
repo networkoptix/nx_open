@@ -41,6 +41,14 @@ public:
     void setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor);
 
     /**
+     * If true and the hardware decoder failed to decode the video, then the software decoder
+     * will be used.
+     */
+    void setAllowSoftwareDecoderFallback(bool value);
+
+    bool isSoftwareDecoderFallbackMode();
+
+    /**
      * Decode a video frame. This is a sync function and it could take a lot of CPU. This call is
      * not thread-safe.
      * @param frame Compressed video data. If frame is null, then the function must flush internal

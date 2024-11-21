@@ -20,6 +20,8 @@ namespace media {
 
 namespace {
 
+constexpr int kMaxHarwdareDecoderErrors = 10;
+
 /**
  * This data is used to compare current and previous frame so as to reset video decoder if needed.
  */
@@ -72,6 +74,9 @@ public:
     /** Relative frame number (frameNumber value when the decoder was created). */
     int decoderFrameOffset;
 
+    /** Sequential hardware decoder error count, needed to fallback to software decoder. */
+    int hardwareDecoderErrorCount = 0;
+
     double sar = 1.0;
 
     /** Associate extra information with output frames which corresponds to input frames. */
@@ -79,6 +84,8 @@ public:
 
     bool allowOverlay;
     bool allowHardwareAcceleration = false;
+    bool allowSoftwareDecoderFallback = true;
+    bool isSoftwareFallbackMode = false;
     bool resetDecoder = false;
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
@@ -179,6 +186,18 @@ void SeamlessVideoDecoder::setAllowHardwareAcceleration(bool value)
     d->resetDecoder = true;
 }
 
+void SeamlessVideoDecoder::setAllowSoftwareDecoderFallback(bool value)
+{
+    Q_D(SeamlessVideoDecoder);
+    d->allowSoftwareDecoderFallback = value;
+}
+
+bool SeamlessVideoDecoder::isSoftwareDecoderFallbackMode()
+{
+    Q_D(SeamlessVideoDecoder);
+    return d->isSoftwareFallbackMode;
+}
+
 void SeamlessVideoDecoder::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
 {
     Q_D(SeamlessVideoDecoder);
@@ -192,6 +211,8 @@ void SeamlessVideoDecoder::pleaseStop()
 bool SeamlessVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& frame, VideoFramePtr* result)
 {
+    NX_VERBOSE(this, "Decode video frame: %1, resolution: %2x%3, flags: %4",
+        frame->compressionType, frame->width, frame->height, frame->flags);
     Q_D(SeamlessVideoDecoder);
     if (result)
         result->reset();
@@ -210,8 +231,16 @@ bool SeamlessVideoDecoder::decode(
         if (frame->flags.testFlag(QnAbstractMediaData::MediaFlags_newCodecParams))
             isSimilarParams = false;
     }
+
     if (!isSimilarParams || (d->resetDecoder && frame->flags & QnAbstractMediaData::MediaFlags_AVKey))
     {
+        if (!isSimilarParams && d->isSoftwareFallbackMode)
+        {
+            d->isSoftwareFallbackMode = false;
+            setAllowHardwareAcceleration(true);
+            NX_DEBUG(this, "The video stream has been changed, the hardware decoder is back on");
+        }
+
         d->resetDecoder = false;
         if (d->videoDecoder)
         {
@@ -235,6 +264,12 @@ bool SeamlessVideoDecoder::decode(
             d->allowOverlay,
             d->allowHardwareAcceleration,
             d->renderContextSynchronizer);
+        if (!d->videoDecoder)
+        {
+            NX_WARNING(this, "Failed to create video decoder, codec: %1, size: %2",
+                frame->compressionType, frameInfo.size);
+            return false;
+        }
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;
@@ -249,13 +284,30 @@ bool SeamlessVideoDecoder::decode(
     }
 
     d->pushMetadata(frame);
-    int decodedFrameNum = 0;
+    int decodedFrameNum = -1;
     if (d->videoDecoder)
     {
         VideoFramePtr decodedFrame;
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
+
+        const bool isHwAccelerated = d->videoDecoder->capabilities().testFlag(
+            AbstractVideoDecoder::Capability::hardwareAccelerated);
+        if (d->allowSoftwareDecoderFallback && decodedFrameNum < 0 && isHwAccelerated)
+        {
+            ++d->hardwareDecoderErrorCount;
+            if (d->hardwareDecoderErrorCount >= kMaxHarwdareDecoderErrors)
+            {
+                NX_DEBUG(this, "Hardware decoder failed to decode video, try software one(from next key frame)");
+                setAllowHardwareAcceleration(false);
+                d->isSoftwareFallbackMode = true;
+            }
+        }
+
         if (decodedFrame)
+        {
             pushFrame(decodedFrame, decodedFrameNum, d->sar);
+            d->hardwareDecoderErrorCount = 0;
+        }
     }
 
     if (d->queue.empty())
