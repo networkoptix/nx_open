@@ -266,8 +266,8 @@
       <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
     </message>
   </context>
   <context>
