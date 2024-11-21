@@ -4,6 +4,7 @@
 
 #include <nx/cloud/db/api/oauth_data.h>
 #include <nx/cloud/db/api/result_code.h>
+#include <nx/cloud/db/client/async_http_requests_executor.h>
 #include <nx/network/http/generic_api_client.h>
 #include <nx/utils/basic_factory.h>
 
@@ -75,8 +76,12 @@ public:
             handler) = 0;
 };
 
-class Oauth2Client : public AbstractOauth2Client
+class Oauth2Client:
+    public AbstractOauth2Client,
+    public nx::network::http::GenericApiClient<db::client::ResultCodeDescriptor>
 {
+    using base_type = nx::network::http::GenericApiClient<db::client::ResultCodeDescriptor>;
+
 public:
     Oauth2Client(
         const nx::utils::Url& url,

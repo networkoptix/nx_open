@@ -2,58 +2,95 @@
 
 #include "oauth2_client.h"
 
+#include <nx/network/http/rest/http_rest_client.h>
+
+#include "api/request_paths.h"
+
 namespace nx::cloud::oauth2::client {
 
 Oauth2Client::Oauth2Client(
-    const nx::utils::Url&,
-    const nx::network::http::Credentials&)
+    const nx::utils::Url& url,
+    const nx::network::http::Credentials& credentials):
+    base_type(url, nx::network::ssl::kDefaultCertificateCheck)
 {
+    setHttpCredentials(credentials);
 }
 
 void Oauth2Client::issueToken(
-    const db::api::IssueTokenRequest&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)>)
+    const db::api::IssueTokenRequest& request,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueTokenResponse)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<db::api::IssueTokenResponse>(
+        nx::network::http::Method::post,
+        api::kOauthTokenPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
 }
 
 void Oauth2Client::issueAuthorizationCode(
-    const db::api::IssueTokenRequest&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>)
+    const db::api::IssueTokenRequest& request,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<db::api::IssueCodeResponse>(
+        nx::network::http::Method::post,
+        api::kOauthTokenPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
 }
 
 void Oauth2Client::introspectToken(
-    const db::api::TokenIntrospectionRequest&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)>)
+    const db::api::TokenIntrospectionRequest& request,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::TokenIntrospectionResponse)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<db::api::TokenIntrospectionResponse>(
+        nx::network::http::Method::post,
+        api::kOauthIntrospectPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
 }
 
-void Oauth2Client::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>)
+void Oauth2Client::logout(nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<void>(
+        nx::network::http::Method::delete_,
+        api::kOauthIntrospectPath,
+        {}, // query
+        std::move(handler));
 }
 
 void Oauth2Client::getJwtPublicKeys(
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)>)
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, std::vector<nx::network::jwk::Key>)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<std::vector<nx::network::jwk::Key>>(
+        nx::network::http::Method::get,
+        api::kOauthJwksPath,
+        {}, // query
+        std::move(handler));
 }
 
 void Oauth2Client::getJwtPublicKeyByKid(
-    const std::string&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)>)
+    const std::string& kid,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::network::jwk::Key)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<nx::network::jwk::Key>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(api::kOauthJwkByIdPath, {kid}),
+        {}, // query
+        std::move(handler));
 }
 
 void Oauth2Client::introspectSession(
-    const std::string&,
-    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>)
+    const std::string& session,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)> handler)
 {
-    throw std::logic_error("not implemented");
+    base_type::template makeAsyncCall<api::GetSessionResponse>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(api::kOauthSessionPath, {session}),
+        {}, // query
+        std::move(handler));
 }
 
 void Oauth2Client::internalLogout(
