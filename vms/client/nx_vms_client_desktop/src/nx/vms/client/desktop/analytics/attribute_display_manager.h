@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 
 #include <nx/utils/impl_ptr.h>
 
@@ -18,7 +20,6 @@ static const QString kObjectTypeAttributeName = "^/OBJECT_TYPE/^";
 class NX_VMS_CLIENT_DESKTOP_API AttributeDisplayManager: public QObject
 {
     Q_OBJECT
-
     Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
     Q_PROPERTY(bool cameraVisible READ cameraVisible NOTIFY cameraVisibleChanged)
@@ -28,7 +29,7 @@ class NX_VMS_CLIENT_DESKTOP_API AttributeDisplayManager: public QObject
 public:
     static void registerQmlType();
 
-        enum class Mode { tileView, tableView };
+    enum class Mode { tileView, tableView };
     Q_ENUM(Mode)
 
     AttributeDisplayManager(Mode mode,
@@ -53,6 +54,9 @@ public:
     void placeAttributeBefore(const QString& attribute, const QString& anchorAttribute);
 
     virtual QStringList attributesForObjectType(const QStringList& objectTypeIds) const;
+
+    /** Attribute indexes in the `attributes` list, used for external sorting. */
+    QHash<QString, int> attributeIndexes() const;
 
 signals:
     void cameraVisibleChanged();

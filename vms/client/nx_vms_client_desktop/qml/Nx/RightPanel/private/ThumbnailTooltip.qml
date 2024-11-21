@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.Items
 import Nx.Controls
 import Nx.Effects
 import Nx.Items
@@ -18,7 +19,7 @@ Bubble
     property alias previewSource: thumbnail.previewSource
     property alias previewState: thumbnail.previewState
     property alias previewAspectRatio: thumbnail.previewAspectRatio
-    property alias attributes: attributeTable.items
+    property alias attributes: attributeTable.attributes
 
     property bool thumbnailVisible: false
     property alias thumbnailHighlightRect: thumbnail.highlightRect
@@ -111,7 +112,7 @@ Bubble
                 text: toolTip.text
             }
 
-            NameValueTable
+            AnalyticsAttributeTable
             {
                 id: attributeTable
 

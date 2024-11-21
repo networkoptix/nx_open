@@ -7,7 +7,7 @@
 
 #include <QtCore/QRectF>
 
-#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
+#include <nx/vms/client/core/event_search/models/abstract_async_search_list_model.h>
 
 namespace nx::analytics::db { struct ObjectTrack; }
 
@@ -16,10 +16,10 @@ namespace nx::vms::client::core {
 class TextFilterSetup;
 class SystemContext;
 
-class NX_VMS_CLIENT_CORE_API AnalyticsSearchListModel: public AbstractAttributedEventModel
+class NX_VMS_CLIENT_CORE_API AnalyticsSearchListModel: public AbstractAsyncSearchListModel
 {
     Q_OBJECT
-    using base_type = AbstractAttributedEventModel;
+    using base_type = AbstractAsyncSearchListModel;
 
 public:
     explicit AnalyticsSearchListModel(

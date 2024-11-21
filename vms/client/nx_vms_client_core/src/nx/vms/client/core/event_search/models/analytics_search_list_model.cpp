@@ -22,6 +22,7 @@
 #include <nx/vms/api/data/thumbnail_filter.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>

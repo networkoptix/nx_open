@@ -15,6 +15,7 @@
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/detail/multi_request_id_holder.h>

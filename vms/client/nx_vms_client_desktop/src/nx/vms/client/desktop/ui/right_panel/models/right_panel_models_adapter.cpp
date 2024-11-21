@@ -45,7 +45,6 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
@@ -234,8 +233,7 @@ public:
         PreviewIdRole = Qn::ItemDataRoleCount,
         CommandActionRole,
         AdditionalActionRole,
-        OnCloseActionRole,
-        FilteredFieldsRole
+        OnCloseActionRole
     };
 
 private:
@@ -289,7 +287,6 @@ private:
     DetectableObjectTypeModel* m_objectTypeModel = nullptr; //< Owned by `m_analyticsSetup`.
 
     std::unique_ptr<AnalyticsEventModel> m_analyticsEvents;
-    analytics::taxonomy::AttributeDisplayManager* m_attributeManager = nullptr;
 
     microseconds m_highlightedTimestamp = -1us;
     QSet<QnResourcePtr> m_highlightedResources;
@@ -415,22 +412,6 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             }
         }
 
-        case Private::FilteredFieldsRole:
-        {
-            auto attributeOrder = d->attributeManager()->attributes();
-            const auto visibleAttributees = d->attributeManager()->visibleAttributes();
-            attributeOrder.removeIf(
-                [&visibleAttributees](const QString& name)
-                {
-                    return name == analytics::taxonomy::kDateTimeAttributeName
-                        || name == analytics::taxonomy::kTitleAttributeName
-                        || name == analytics::taxonomy::kCameraAttributeName
-                        || name == analytics::taxonomy::kObjectTypeAttributeName
-                        || !visibleAttributees.contains(name);
-                });
-            return attributeOrder;
-        }
-
         case Qn::ProgressValueRole:
         {
             const auto progressVariant = base_type::data(index, role);
@@ -479,7 +460,6 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Qn::AlternateColorRole] = "isInformer";
     roles[Qn::ProgressValueRole] = "progressValue";
     roles[Qn::HelpTopicIdRole] = "helpTopicId";
-    roles[Private::FilteredFieldsRole] = "filteredFields";
     return roles;
 }
 
@@ -763,17 +743,6 @@ QVector<RightPanel::VmsEventGroup> RightPanelModelsAdapter::eventGroups() const
 QAbstractItemModel* RightPanelModelsAdapter::analyticsEvents() const
 {
     return d->analyticsEvents();
-}
-
-analytics::taxonomy::AttributeDisplayManager* RightPanelModelsAdapter::attributeManager() const
-{
-    return d->attributeManager();
-}
-
-void RightPanelModelsAdapter::setAttributeManager(
-    analytics::taxonomy::AttributeDisplayManager* attributeManager)
-{
-    d->setAttributeManager(attributeManager);
 }
 
 void RightPanelModelsAdapter::registerQmlTypes()
@@ -1570,36 +1539,6 @@ void RightPanelModelsAdapter::Private::setUnreadTrackingEnabled(bool value)
 
     const auto guard = makeUnreadCountGuard();
     m_unreadItems.clear();
-}
-
-analytics::taxonomy::AttributeDisplayManager*
-    RightPanelModelsAdapter::Private::attributeManager() const
-{
-    return m_attributeManager;
-}
-
-void RightPanelModelsAdapter::Private::setAttributeManager(
-    analytics::taxonomy::AttributeDisplayManager* value)
-{
-    using namespace analytics::taxonomy;
-
-    if (value == m_attributeManager)
-        return;
-
-    if (m_attributeManager)
-        m_attributeManager->disconnect(this);
-
-    m_attributeManager = value;
-
-    if (m_attributeManager)
-    {
-        connect(m_attributeManager, &AttributeDisplayManager::attributesChanged, this,
-            [this]() { allItemsDataChangeNotify({FilteredFieldsRole}); });
-        connect(m_attributeManager, &AttributeDisplayManager::visibleAttributesChanged, this,
-            [this]() { allItemsDataChangeNotify({FilteredFieldsRole}); });
-    }
-
-    emit q->attributeManagerChanged();
 }
 
 bool RightPanelModelsAdapter::Private::crossSiteMode() const

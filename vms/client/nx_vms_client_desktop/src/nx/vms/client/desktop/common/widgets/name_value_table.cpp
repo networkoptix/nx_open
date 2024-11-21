@@ -25,10 +25,11 @@
 #endif
 
 #include <client_core/client_core_module.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -118,6 +119,9 @@ public:
     void render(
         NameValueTable* widget,
         const QVariantList& items,
+        const QString nameRole,
+        const QString valuesRole,
+        const QString colorsRole,
         QSize& outSize,
         QPixmap& outPixmap,
         int maxRowCount = 0)
@@ -128,6 +132,9 @@ public:
 
         rootItem->setProperty("items", QVariantList{});
         rootItem->setWidth(widget->width());
+        rootItem->setProperty("nameRole", nameRole);
+        rootItem->setProperty("valuesRole", valuesRole);
+        rootItem->setProperty("colorsRole", colorsRole);
         rootItem->setProperty("maxRowCount", maxRowCount);
         rootItem->setProperty("nameFont", nameFont);
         rootItem->setProperty("valueFont", valueFont);
@@ -357,7 +364,6 @@ struct NameValueTable::Private
     core::analytics::AttributeList content;
     QSize size;
 
-    QVariantList flatItems;
     int maxRowCount = 0;
 
     QPixmap pixmap;
@@ -386,13 +392,12 @@ struct NameValueTable::Private
             return;
 
         content = value;
-        flatItems = AbstractAttributedEventModel::flattenAttributeList(content);
         updateImage();
     }
 
     void updateImage()
     {
-        if (flatItems.isEmpty() || !renderer)
+        if (content.empty() || !renderer)
         {
             size = QSize();
             pixmap = QPixmap();
@@ -400,7 +405,11 @@ struct NameValueTable::Private
         }
 
         const auto oldSize = size;
-        renderer->render(q, flatItems, size, pixmap, maxRowCount);
+
+        renderer->render(q,
+            nx::utils::toQVariantList(content), "displayedName", "displayedValues", "colorValues",
+            size, pixmap, maxRowCount);
+
         if (size != oldSize)
             q->updateGeometry();
     }

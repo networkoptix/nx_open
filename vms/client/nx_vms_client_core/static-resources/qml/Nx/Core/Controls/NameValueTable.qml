@@ -9,8 +9,18 @@ Item
 {
     id: control
 
+    /**
+     * An array of objects with the following properties:
+     *      ${nameRole}, default "name" - item's name
+     *      ${valuesRole}, default "values" - item's values or a single value
+     *      ${colorsRole}, default "colors" [optional] - item's colors or a single color,
+     *          if present must have the same length as values
+     */
     property var items: []
-    property var filteredFields: null //< Null means the filtration is disabled.
+
+    property string nameRole: "name"
+    property string valuesRole: "values"
+    property string colorsRole: "colors"
 
     // If positive, only maxRowCount rows will be visible.
     property int maxRowCount: 0
@@ -21,25 +31,24 @@ Item
     property color valueColor: "white"
     property int valueAlignment: Text.AlignLeft
 
-    property string textRoleName: "text"
-    property string valuesRoleName: "values"
-
-    // If color is specified, a color rectangle icon is added to the line.
-    property string colorsRoleName: "colors"
-
     property font font
     property font nameFont: control.font
     property font valueFont: control.font
 
     property real labelFraction: 0.4 //< Default: 40% to label, 60% to value.
 
-    property bool copyable: false
-    readonly property int kHighlightLeftPadding: 8
-
-    signal searchRequested(int row)
+    property bool interactive: false
+    property Menu contextMenu
+    readonly property alias hoveredRow: highlight.rowIndex
+    readonly property var hoveredItem: hoveredRow >= 0 ? items[hoveredRow] : undefined
 
     property real tableLineHeight: CoreSettings.iniConfigValue("attributeTableLineHeightFactor")
     property real attributeTableSpacing: CoreSettings.iniConfigValue("attributeTableSpacing")
+
+    property alias leftPadding: grid.leftPadding
+    property alias rightPadding: grid.rightPadding
+    property alias topPadding: grid.topPadding
+    property alias bottomPadding: grid.bottomPadding
 
     implicitWidth: 400
     implicitHeight: grid.implicitHeight
@@ -49,14 +58,6 @@ Item
         grid.forceLayout()
     }
 
-    function rowsCount()
-    {
-        return repeater.model.length / 2
-    }
-
-    onItemsChanged: updateItems()
-    onFilteredFieldsChanged: updateItems()
-
     Rectangle
     {
         id: highlight
@@ -64,204 +65,217 @@ Item
         property int rowIndex: -1
 
         color: ColorTheme.colors.dark12
-        width: kHighlightLeftPadding + grid.width
-        visible: copyable && (gridMouseArea.containsMouse || contextMenu.opened)
+        width: control.width
+        visible: interactive && (rowIndex >= 0 || control.contextMenu?.opened)
     }
 
     Grid
     {
         id: grid
 
+        objectName: "dataTable"
+
+        readonly property var sourceData: control.items ?? []
+
+        readonly property var clippedData: control.maxRowCount > 0
+            ? sourceData.slice(0, control.maxRowCount)
+            : sourceData
+
         columns: 2
-        x: copyable ? kHighlightLeftPadding : 0
-        width: control.width - (copyable ? kHighlightLeftPadding : 0)
+        leftPadding: control.interactive ? 8 : 0
+        rightPadding: leftPadding
+        width: control.width
         columnSpacing: 8
         rowSpacing: 0
         verticalItemAlignment: Grid.AlignVCenter
-
-        property var rowLookup: []
+        flow: Grid.TopToBottom
 
         onWidthChanged:
             updateColumnWidths()
 
+        onClippedDataChanged:
+        {
+            if (control.contextMenu?.opened)
+                control.contextMenu.close()
+
+            labelsRepeater.model = clippedData
+            valuesRepeater.model = clippedData
+            updateColumnWidths()
+        }
+
         Component.onCompleted:
             updateColumnWidths()
 
-        onPositioningComplete:
-            updateRowLookup()
-
-        component Values: Row
+        Repeater
         {
-            id: cellValuesRow
+            id: labelsRepeater
 
-            property var values: []
-            property var colors: []
-            property int lastVisibleIndex: 0
-            spacing: 4
-
-            Repeater
+            delegate: Component
             {
-                id: rowRepeater
-
-                anchors.verticalCenter: parent.verticalCenter
-                objectName: "valueRowRepeater"
-                model: cellValuesRow.values
-
-                Row
+                Text
                 {
-                    id: valueItem
+                    id: cellLabel
 
-                    objectName: "valueItem"
-                    spacing: 4
-                    visible: index <= cellValuesRow.lastVisibleIndex
+                    objectName: "cellLabel"
 
-                    Rectangle
-                    {
-                        objectName: "colorRectangle"
-                        width: 16
-                        height: 16
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: !!cellValuesRow.colors[index]
-                        color: cellValuesRow.colors[index] ?? "transparent"
-                        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                        radius: 1
-                    }
+                    readonly property int rowIndex: index
 
-                    Text
-                    {
-                        objectName: "valueText"
-                        anchors.verticalCenter: parent.verticalCenter
+                    color: control.nameColor
+                    font: control.nameFont
 
-                        color: control.valueColor
-                        font: control.valueFont
-                        text: modelData +
-                            (index < cellValuesRow.lastVisibleIndex && !cellValuesRow.colors[index]
-                                ? ","
-                                : "")
-                        lineHeight: control.tableLineHeight
-                        wrapMode: Text.Wrap
-                        elide: Text.ElideRight
-                        maximumLineCount: control.maximumLineCount
-                    }
+                    text: modelData[control.nameRole] || " "
+                    textFormat: Text.StyledText
+
+                    maximumLineCount: control.maximumLineCount
+                    wrapMode: Text.Wrap
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignLeft
+
+                    lineHeight: control.tableLineHeight
+
+                    topPadding: Math.round(control.attributeTableSpacing / 2)
+                    bottomPadding: (control.attributeTableSpacing - topPadding)
                 }
             }
+        }
+
+        Item
+        {
+            width: 1 //< Shouldn't push the name column's width
+            height: footer.height
+            visible: footer.remainder > 0
 
             Text
             {
-                id: appendix
+                id: footer
 
-                anchors.verticalCenter: parent.verticalCenter
-                visible: cellValuesRow.lastVisibleIndex < rowRepeater.count - 1
-                text: `+ ${rowRepeater.count - cellValuesRow.lastVisibleIndex - 1}`
-                color: ColorTheme.darker(control.valueColor, 10)
-                font: control.valueFont
-            }
+                readonly property int remainder:
+                    grid.sourceData.length - grid.clippedData.length
 
-            onWidthChanged:
-            {
-                var lastIndex = rowRepeater.count - 1
-                var sumWidth = 0
-                for (var i = 0; i < rowRepeater.count; ++i)
-                {
-                    const item = rowRepeater.itemAt(i)
-                    if (sumWidth > 0)
-                        sumWidth += spacing
-                    sumWidth += item.implicitWidth
-                    if (sumWidth > width)
-                    {
-                        lastIndex = i - 1
-                        break
-                    }
-                }
-
-                // At least one elided value we should show.
-                if (lastIndex < 0)
-                {
-                    const item = rowRepeater.itemAt(0)
-                    for (var i = 0; i < item.children.length; ++i)
-                    {
-                        var itemChild = item.children[i]
-                        if (itemChild.objectName === "valueText")
-                        {
-                            itemChild.width = width - (appendix.visible ? appendix.width : 0)
-                            break
-                        }
-                    }
-                    lastIndex = 0
-                }
-                lastVisibleIndex = lastIndex
+                objectName: "footer"
+                text: qsTr("+ %n more", "", remainder)
+                width: grid.width
+                color: nameColor
+                lineHeight: tableLineHeight
+                font: control.nameFont
+                wrapMode: Text.Wrap
             }
         }
 
         Repeater
         {
-            id: repeater
+            id: valuesRepeater
 
-            objectName: "dataTable"
             delegate: Component
             {
                 Row
                 {
-                    readonly property bool isLabel: (index % 2) === 0
-                    readonly property int rowIndex: Math.floor(index / 2)
+                    id: cellValues
 
+                    objectName: "cellValues"
+
+                    property var values: modelData[control.valuesRole] ?? []
+                    property var colors: modelData[control.colorsRole] ?? []
+                    property int lastVisibleIndex: 0
                     spacing: 4
+
+                    Repeater
+                    {
+                        id: rowRepeater
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        objectName: "valueRowRepeater"
+                        model: cellValues.values
+
+                        Row
+                        {
+                            id: valueItem
+
+                            objectName: "valueItem"
+                            spacing: 4
+                            visible: index <= cellValues.lastVisibleIndex
+
+                            Rectangle
+                            {
+                                objectName: "colorRectangle"
+                                width: 16
+                                height: 16
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: cellValues.colors[index] ?? false
+                                color: cellValues.colors[index] ?? "transparent"
+                                border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                                radius: 1
+                            }
+
+                            Text
+                            {
+                                objectName: "valueText"
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                color: control.valueColor
+                                font: control.valueFont
+                                text: modelData +
+                                    (index < cellValues.lastVisibleIndex && !cellValues.colors[index]
+                                        ? ","
+                                        : "")
+                                lineHeight: control.tableLineHeight
+                                wrapMode: Text.Wrap
+                                elide: Text.ElideRight
+                                maximumLineCount: control.maximumLineCount
+                            }
+                        }
+                    }
 
                     Text
                     {
-                        id: cellLabel
+                        id: appendix
 
-                        objectName: "cellLabel"
-                        readonly property bool allowed: isLabel && rowAllowed(rowIndex)
-
-                        visible: allowed
-                        color: control.nameColor
-                        font: control.nameFont
-
-                        text: modelData[textRoleName] ?? modelData
-                        textFormat: Text.StyledText
-
-                        maximumLineCount: control.maximumLineCount
-                        wrapMode: Text.Wrap
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignLeft
-
-                        lineHeight: control.tableLineHeight
-
-                        // Copy icon requires more vertical space.
-                        topPadding: copyable
-                            ? 4
-                            : Math.round(control.attributeTableSpacing / 2)
-                        bottomPadding: copyable
-                            ? 4
-                            : (control.attributeTableSpacing - topPadding)
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: cellValues.lastVisibleIndex < rowRepeater.count - 1
+                        text: `+ ${rowRepeater.count - cellValues.lastVisibleIndex - 1}`
+                        color: ColorTheme.darker(control.valueColor, 10)
+                        font: control.valueFont
                     }
 
-                    Values
+                    onWidthChanged:
                     {
-                        id: cellValues
+                        if (!rowRepeater.count)
+                            return
 
-                        objectName: "cellValues"
-                        readonly property bool allowed: !isLabel && rowAllowed(rowIndex)
-                        visible: allowed
-                        colors: modelData[colorsRoleName]
-                        values: modelData[valuesRoleName]
+                        var lastIndex = rowRepeater.count - 1
+                        var sumWidth = 0
+                        for (var i = 0; i < rowRepeater.count; ++i)
+                        {
+                            const item = rowRepeater.itemAt(i)
+                            if (sumWidth > 0)
+                                sumWidth += spacing
+                            sumWidth += item.implicitWidth
+                            if (sumWidth > width)
+                            {
+                                lastIndex = i - 1
+                                break
+                            }
+                        }
+
+                        // At least one elided value we should show.
+                        if (lastIndex < 0)
+                        {
+                            const item = rowRepeater.itemAt(0)
+                            for (var i = 0; i < item.children.length; ++i)
+                            {
+                                var itemChild = item.children[i]
+                                if (itemChild.objectName === "valueText")
+                                {
+                                    itemChild.width = width - (appendix.visible ? appendix.width : 0)
+                                    break
+                                }
+                            }
+                            lastIndex = 0
+                        }
+                        lastVisibleIndex = lastIndex
                     }
                 }
             }
-        }
-
-        Text
-        {
-            id: footer
-
-            objectName: "footer"
-            visible: control.maxRowCount > 0 && rowsCount() > control.maxRowCount
-            text: qsTr("+ %n more", "", rowsCount() - control.maxRowCount)
-            color: nameColor
-            lineHeight: tableLineHeight
-            font: control.nameFont
-            wrapMode: Text.Wrap
         }
 
         function updateColumnWidths()
@@ -269,35 +283,24 @@ Item
             if (grid.width <= 0)
                 return
 
-            function maximumWidth(maxWidth, item)
-            {
-                return Math.max(maxWidth, item.implicitWidth)
-            }
+            const labels = children.filter(child => child.objectName === "cellLabel")
+            const values = children.filter(child => child.objectName === "cellValues")
 
-            const labels = findAllSubitems(this,
-                function(item)
-                {
-                    return item.objectName === "cellLabel" && item.allowed
-                })
-            const implicitLabelWidth = Array.prototype.reduce.call(labels, maximumWidth, 0)
+            const calculateImplicitWidth = (items) =>
+                items.reduce((prevMax, item) => Math.max(prevMax, item.implicitWidth), 0)
 
-            const values = findAllSubitems(this,
-                function(item)
-                {
-                    return item.objectName === "cellValues" && item.allowed
-                })
-            const implicitValueWidth = Array.prototype.reduce.call(values, maximumWidth, 0)
+            const implicitLabelWidth = calculateImplicitWidth(labels)
+            const implicitValuesWidth = calculateImplicitWidth(values)
 
             const availableWidth = grid.width - grid.columnSpacing
-
             const preferredLabelWidth = availableWidth * control.labelFraction
-            const preferredValueWidth = availableWidth - preferredLabelWidth
+            const preferredValuesWidth = availableWidth - preferredLabelWidth
 
             let labelWidth = 0
-            const availableLabelWidth = availableWidth - implicitValueWidth
+            const availableLabelWidth = availableWidth - implicitValuesWidth
 
             // If value is shorter than its preferred space...
-            if (implicitValueWidth < preferredValueWidth)
+            if (implicitValuesWidth < preferredValuesWidth)
             {
                 // Label may occupy not less than its preferred space
                 // and no more than its available space.
@@ -311,86 +314,14 @@ Item
                 labelWidth = Math.max(availableLabelWidth,
                     Math.min(implicitLabelWidth, preferredLabelWidth))
             }
-            const valueWidth = availableWidth - labelWidth
-            for (var i = 0; i < labels.length; ++i)
-                labels[i].width = labelWidth
-            for (var i = 0; i < values.length; ++i)
-                values[i].width = valueWidth
-            updateRowLookup()
-        }
 
-        Timer
-        {
-            id: rowLookupTimer
-            interval: 100
-            repeat: false
-            onTriggered:
-                grid.buildRowLookup()
-        }
+            const valuesWidth = availableWidth - labelWidth
 
-        function updateRowLookup()
-        {
-            if (copyable)
-                rowLookupTimer.start()
-        }
+            for (const label of labels)
+                label.width = labelWidth
 
-        function buildRowLookup()
-        {
-            // Build an array for row lookup by its vertical position.
-            // All rows are sorted by Y, ascending.
-
-            // For the last item in the array, compute its height using Y coordinate
-            // of the provided next item.
-            const computeHeightOfLastItem =
-                (array, nextItem) =>
-                {
-                    if (array.length <= 0)
-                        return
-
-                    let prevItem = array[array.length - 1]
-                    prevItem.height = nextItem.y - prevItem.y
-                }
-
-            // Convert Item's children array into JS Array.
-            let allChildren = []
-            for (let i = 0; i < children.length; ++i)
-                allChildren.push(children[i])
-
-            grid.rowLookup = allChildren.reduce(
-                (result, child, index, array) =>
-                {
-                    if (child.isLabel)
-                    {
-                        computeHeightOfLastItem(result, child)
-
-                        result.push({
-                            y: child.y,
-                            height: 0,
-                            index: index / 2})
-                    }
-                    return result
-                }, [])
-
-            computeHeightOfLastItem(grid.rowLookup, {y: grid.height})
-        }
-
-        function getRowAtY(y)
-        {
-            // Perform a binary search to find a row containing specified Y coordinate.
-
-            let lo = 0
-            let hi = grid.rowLookup.length
-
-            while (lo < hi)
-            {
-                const m = lo + ((hi - lo) >> 1)
-                if (grid.rowLookup[m].y <= y)
-                    lo = m + 1
-                else
-                    hi = m
-            }
-
-            return grid.rowLookup[lo - 1]
+            for (const value of values)
+                value.width = valuesWidth
         }
     }
 
@@ -398,107 +329,29 @@ Item
     {
         id: gridMouseArea
 
-        enabled: control.copyable
-        anchors.fill: control
+        enabled: control.interactive
+        anchors.fill: grid
         hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onPositionChanged: (mouse) =>
         {
-            const row = grid.getRowAtY(mouse.y)
+            const row = grid.childAt(grid.leftPadding, mouse.y)
             if (!row)
                 return
 
             highlight.y = row.y
             highlight.height = row.height
-            highlight.rowIndex = row.index
+            highlight.rowIndex = row.rowIndex
         }
 
-        onClicked: contextMenu.popup()
+        onExited:
+            highlight.rowIndex = -1
 
-        Menu
+        onClicked:
         {
-            id: contextMenu
-
-            property int rowIndex: -1
-
-            onAboutToShow: rowIndex = highlight.rowIndex
-            onAboutToHide: rowIndex = -1
-
-            MenuItem
-            {
-                text: qsTr("Copy")
-                onTriggered:
-                {
-                    NxGlobals.copyToClipboard(items[contextMenu.rowIndex * 2 + 1].text)
-                }
-            }
-
-            MenuItem
-            {
-                text: qsTr("Filter by")
-                onTriggered:
-                {
-                    if (contextMenu.rowIndex >= 0)
-                        control.searchRequested(contextMenu.rowIndex)
-                }
-            }
-        }
-    }
-
-    function updateItems()
-    {
-        repeater.model = filtered(items)
-        grid.updateColumnWidths()
-    }
-
-    function filtered()
-    {
-        if (filteredFields === null)
-            return items
-
-        var visibleItems = []
-        var itemList = items.slice()
-        for (var i = 0; i < filteredFields.length; ++i)
-        {
-            for (var j = 0; j < itemList.length; j += 2)
-            {
-                if (itemList[j].text === filteredFields[i])
-                {
-                    visibleItems.push(itemList[j], itemList[j + 1])
-                    itemList.splice(j, 2)
-                    break
-                }
-            }
-        }
-
-        return visibleItems
-    }
-
-    function rowAllowed(rowIndex)
-    {
-        return control.maxRowCount === 0 || rowIndex < control.maxRowCount
-    }
-
-    function findAllSubitems(root, filter)
-    {
-        var result = []
-        findSubitemsRecursive(root, filter, result)
-        return result
-    }
-
-    function findSubitemsRecursive(item, filter, result)
-    {
-        if (item === null || item === undefined)
-            return
-
-        if (filter(item))
-            result.push(item)
-
-        if (item.children)
-        {
-            for (var i = 0; i < item.children.length; ++i)
-                findSubitemsRecursive(item.children[i], filter, result);
+            if (contextMenu)
+                contextMenu.popup()
         }
     }
 }

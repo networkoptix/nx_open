@@ -22,6 +22,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/desktop/access/screen_recording_watcher.h>
+#include <nx/vms/client/desktop/analytics/analytics_attribute_filter.h>
 #include <nx/vms/client/desktop/analytics/analytics_dialog_table_model.h>
 #include <nx/vms/client/desktop/analytics/attribute_display_manager.h>
 #include <nx/vms/client/desktop/analytics/attribute_visibility_settings_model.h>
@@ -286,6 +287,7 @@ void QnClientMetaTypes::registerQmlTypes()
     DateValidator::registerQmlType();
     WindowContext::registerQmlType();
     CallAlarmManager::registerQmlType();
+    analytics::AttributeFilter::registerQmlType();
     analytics::taxonomy::AttributeVisibilitySettingsModel::registerQmlType();
     analytics::taxonomy::AttributeDisplayManager::registerQmlType();
     analytics::taxonomy::AnalyticsDialogTableModel::registerQmlType();

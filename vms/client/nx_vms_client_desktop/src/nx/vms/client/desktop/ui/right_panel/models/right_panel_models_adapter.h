@@ -29,8 +29,6 @@ class CommonObjectSearchSetup;
 class DetectableObjectTypeModel;
 class WindowContext;
 
-namespace analytics::taxonomy { class AttributeDisplayManager; }
-
 class RightPanelModelsAdapter: public QIdentityProxyModel
 {
     Q_OBJECT
@@ -82,9 +80,6 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
         NOTIFY eventGroupsChanged)
     Q_PROPERTY(QAbstractItemModel* analyticsEvents READ analyticsEvents
         NOTIFY analyticsEventsChanged)
-
-    Q_PROPERTY(analytics::taxonomy::AttributeDisplayManager* attributeManager
-        READ attributeManager WRITE setAttributeManager NOTIFY attributeManagerChanged)
 
     Q_PROPERTY(bool crossSiteMode READ crossSiteMode NOTIFY crossSiteModeChanged)
 
@@ -155,9 +150,6 @@ public:
     QVector<RightPanel::VmsEventGroup> eventGroups() const;
     QAbstractItemModel* analyticsEvents() const;
 
-    analytics::taxonomy::AttributeDisplayManager* attributeManager() const;
-    void setAttributeManager(analytics::taxonomy::AttributeDisplayManager* attributeManager);
-
     void setHighlightedTimestamp(std::chrono::microseconds value);
     void setHighlightedResources(const QSet<QnResourcePtr>& value);
 
@@ -189,7 +181,6 @@ signals:
     void analyticsEventsChanged();
     void unreadTrackingChanged();
     void unreadCountChanged();
-    void attributeManagerChanged();
 
     void clicked(const QModelIndex& index, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
     void doubleClicked(const QModelIndex& index);

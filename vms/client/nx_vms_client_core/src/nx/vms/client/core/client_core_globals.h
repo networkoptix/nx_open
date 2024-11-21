@@ -51,7 +51,6 @@ enum CoreItemDataRole
     ActivateLinkRole,               /**< Role to parse and follow hyperlink (QString). */
     DecorationPathRole,             /**< Role for icon path (QString). */
     AnalyticsAttributesRole,        /**< Role for analytics attribute lists (QList<nx::vms::client::desktop::analytics::Attribute>). */
-    FlatAttributeListRole,          /**< Flattened to QStringList grouped attribute lists (nx::common::metadata::GroupedAttributes). */
     ObjectTrackIdRole,              /**< Role for camera preview stream (CameraImageRequest::objectTrackId). */
     PreviewStreamSelectionRole,     /**< Role for camera preview stream (ImageRequest::StreamSelectionMode). */
 

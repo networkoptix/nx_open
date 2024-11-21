@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.Items
 import Nx.Controls
 import Nx.Effects
 import Nx.Items
@@ -16,11 +17,18 @@ Bubble
 {
     id: bubble
 
-    parent: view
-    color: ColorTheme.colors.dark13
+    function open(view, item, modelData)
+    {
+        d.setData(view, item, modelData)
+    }
 
-    property var view: null
-    property var targetItem: null
+    function close()
+    {
+        d.setData(null, null, null)
+    }
+
+    parent: d.view
+    color: ColorTheme.colors.dark13
 
     contentItem: Item
     {
@@ -30,7 +38,7 @@ Bubble
 
         implicitHeight:
         {
-            const maximumHeight = (view ? view.height : Number.MAX_VALUE)
+            const maximumHeight = (d.view ? d.view.height : Number.MAX_VALUE)
                 - bubble.topPadding - bubble.bottomPadding
 
             const contentHeight = footer.height + spacer.height
@@ -39,11 +47,12 @@ Bubble
             return Math.min(contentHeight, maximumHeight)
         }
 
-        NameValueTable
+        AnalyticsAttributeTable
         {
             id: attributeTable
 
             property bool relevant: items.length > 0
+            visible: relevant
 
             width: content.width
             height: relevant
@@ -53,12 +62,17 @@ Bubble
             layer.effect: EdgeOpacityGradient { edges: Qt.BottomEdge; gradientWidth: 40 }
             layer.enabled: relevant && (height < implicitHeight)
 
-            visible: relevant
-
             nameColor: ColorTheme.colors.light13
             valueColor: ColorTheme.colors.light7
             nameFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
             valueFont { pixelSize: FontConfig.small.pixelSize; weight: Font.Medium }
+
+            Binding on attributes
+            {
+                when: d.modelData?.analyticsAttributes ?? false
+                value: d.modelData?.analyticsAttributes ?? []
+                restoreMode: Binding.RestoreNone
+            }
         }
 
         Item
@@ -96,6 +110,13 @@ Bubble
             color: ColorTheme.colors.light13
             font { pixelSize: FontConfig.small.pixelSize; weight: Font.Normal }
             wrapMode: Text.Wrap
+
+            Binding on text
+            {
+                when: d.modelData?.analyticsEngineName ?? false
+                value: content.getFooterText(d.modelData?.analyticsEngineName ?? "")
+                restoreMode: Binding.RestoreNone
+            }
         }
 
         function getFooterText(engineName)
@@ -114,24 +135,37 @@ Bubble
 
         property bool suppressed: false
 
-        readonly property var parameters:
+        property var targetItem
+        property var view
+        property var modelData
+
+        function setData(view, item, modelData)
         {
-            if (!targetItem || !targetItem.attributeItems || !view)
-                return undefined
+            if (item && view && modelData)
+            {
+                d.modelData = modelData
+                d.view = view
+                d.targetItem = item
+            }
+            else
+            {
+                d.targetItem = null
+                d.view = null
+                d.modelData = null
+            }
+        }
 
-            const engineName = targetItem.getData("analyticsEngineName")
-            if (!engineName && !targetItem.attributeItems.length)
+        property var parameters:
+        {
+            if (!targetItem || !view)
                 return undefined
-
-            footer.text = content.getFooterText(engineName)
-            attributeTable.items = targetItem.attributeItems
 
             const targetRect = view.contentItem.mapFromItem(targetItem,
                 -view.contentX, -view.contentY, targetItem.width, targetItem.height)
             const enclosingRect = Qt.rect(0, 0, view.width, view.height)
             const kMinIntersection = 64
 
-            return calculateParameters(
+            return bubble.calculateParameters(
                 Qt.Horizontal, targetRect, enclosingRect, kMinIntersection)
         }
 
@@ -170,7 +204,7 @@ Bubble
 
         Connections
         {
-            target: view
+            target: d.view
             function onContentYChanged() { d.setSuppressed(true) }
         }
     }

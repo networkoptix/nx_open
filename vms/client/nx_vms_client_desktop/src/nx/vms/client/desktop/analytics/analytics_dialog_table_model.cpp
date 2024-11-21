@@ -99,7 +99,7 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
             for (const auto& attribute: attributes)
             {
                 if (attribute.id == columnName)
-                    return AnalyticsSearchListModel::valuesText(attribute.displayedValues);
+                    return attribute.displayedValues.join(", ");
             }
             break;
         }

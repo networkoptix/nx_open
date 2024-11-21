@@ -15,15 +15,12 @@ Control
 
     readonly property bool selected: controller && controller.selectedRow === index
 
+    readonly property var modelData: model
+
     onSelectedChanged:
     {
         if (selected)
             controller.selectedTile = tile
-    }
-
-    function getData(name)
-    {
-        return model[name]
     }
 
     hoverEnabled: true

@@ -56,6 +56,7 @@
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
 #include <nx/vms/client/core/qml/qml_test_helper.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/resource/access_helper.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
@@ -216,6 +217,10 @@ void initializeMetaTypes()
     qmlRegisterUncreatableMetaObject(welcome_screen::staticMetaObject,
         "nx.vms.client.core", 1, 0, "WelcomeScreen",
         "Cannot create an instance of WelcomeScreen.");
+
+    qmlRegisterUncreatableType<analytics::Attribute>(
+        "nx.vms.client.core.analytics", 1, 0, "DisplayedAttribute",
+        "Cannot create an instance of DisplayedAttribute.");
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::dewarping::staticMetaObject, "nx.vms.api", 1, 0,
         "Dewarping", "Dewarping is a namespace");

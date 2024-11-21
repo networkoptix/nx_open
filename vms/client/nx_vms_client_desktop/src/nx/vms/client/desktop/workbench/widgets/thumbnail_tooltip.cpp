@@ -8,8 +8,8 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
 #include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/core/image_providers/image_provider.h>
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
@@ -204,7 +204,7 @@ void ThumbnailTooltip::setAttributes(const core::analytics::AttributeList& value
         return;
 
     d->sourceAttributes = value;
-    d->attributes = AbstractAttributedEventModel::flattenAttributeList(d->sourceAttributes);
+    d->attributes = nx::utils::toQVariantList(d->sourceAttributes);
 }
 
 } // namespace nx::vms::client::desktop

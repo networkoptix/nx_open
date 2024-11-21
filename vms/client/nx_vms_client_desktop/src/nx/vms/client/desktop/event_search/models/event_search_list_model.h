@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/event_search/models/abstract_attributed_event_model.h>
+#include <nx/vms/client/core/event_search/models/abstract_async_search_list_model.h>
 #include <nx/vms/event/event_fwd.h>
 
 class QnWorkbenchContext;
@@ -20,10 +20,10 @@ namespace nx::vms::client::desktop {
 
 class WindowContext;
 
-class EventSearchListModel: public core::AbstractAttributedEventModel
+class EventSearchListModel: public core::AbstractAsyncSearchListModel
 {
     Q_OBJECT
-    using base_type = core::AbstractAttributedEventModel;
+    using base_type = core::AbstractAsyncSearchListModel;
 
     Q_PROPERTY(nx::vms::api::EventType selectedEventType READ selectedEventType
         WRITE setSelectedEventType NOTIFY selectedEventTypeChanged)

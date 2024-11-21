@@ -1,15 +1,16 @@
 module Nx.Core.Items
 
-VideoPositioner 1.0 VideoPositioner.qml
+AnalyticsAttributeTable 1.0 AnalyticsAttributeTable.qml
+CameraDisplay 1.0 CameraDisplay.qml
+Circle 1.0 Circle.qml
+IntervalPreview 1.0 IntervalPreview.qml
+MaskedUniformGrid 1.0 MaskedUniformGrid.qml
 MultiVideoLayout 1.0 MultiVideoLayout.qml
 MultiVideoOutput 1.0 MultiVideoOutput.qml
 MultiVideoPositioner 1.0 MultiVideoPositioner.qml
-UniformGrid 1.0 UniformGrid.qml
-MaskedUniformGrid 1.0 MaskedUniformGrid.qml
-RoundedMask 1.0 RoundedMask.qml
-Circle 1.0 Circle.qml
-ShadedCircle 1.0 ShadedCircle.qml
 RoiSelectionPreloader 1.0 RoiSelectionPreloader.qml
-IntervalPreview 1.0 IntervalPreview.qml
-CameraDisplay 1.0 CameraDisplay.qml
+RoundedMask 1.0 RoundedMask.qml
+ShadedCircle 1.0 ShadedCircle.qml
+UniformGrid 1.0 UniformGrid.qml
+VideoPositioner 1.0 VideoPositioner.qml
 Watermark 1.0 Watermark.qml

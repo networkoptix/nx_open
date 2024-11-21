@@ -5,6 +5,7 @@ import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.Items
 import Nx.Controls
 import Nx.Effects
 import Nx.Items
@@ -28,7 +29,6 @@ TileBase
     readonly property alias videoPreviewTimestampMs: preview.videoPreviewTimestampMs
     readonly property alias videoPreviewResource: preview.videoPreviewResource
     readonly property alias previewAspectRatio: preview.previewAspectRatio
-    readonly property alias attributeItems: attributeTable.items
     readonly property int tileIndex: index
 
     property alias overlayContainer: overlayContainer
@@ -172,12 +172,12 @@ TileBase
                 tile.linkActivated(link)
         }
 
-        NameValueTable
+        AnalyticsAttributeTable
         {
             id: attributeTable
 
-            items: (model && model.attributes) || []
-            filteredFields: (model && model.filteredFields) || []
+            attributes: model?.analyticsAttributes ?? []
+            attributeManager: tile.controller?.attributeManager ?? null
             visible: items.length > 0 && (!tile.controller || tile.controller.showInformation)
             width: tileContent.width
 

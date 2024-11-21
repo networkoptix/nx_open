@@ -12,6 +12,7 @@ import Nx.RightPanel
 
 import nx.vms.client.core
 import nx.vms.client.desktop
+import nx.vms.client.desktop.analytics as Analytics
 
 Rectangle
 {
@@ -30,7 +31,7 @@ Rectangle
     signal showOnLayoutClicked()
     signal close()
 
-    signal searchRequested(int attributeRow)
+    signal searchRequested(var attribute)
 
     color: ColorTheme.colors.dark8
 
@@ -431,22 +432,56 @@ Rectangle
                     anchors.fill: parent
                     boundsBehavior: Flickable.StopAtBounds
 
-                    NameValueTable
+                    AnalyticsAttributeTable
                     {
                         id: attributeTable
 
-                        items: previewPanel.selectedItem ? previewPanel.selectedItem.attributes : []
+                        attributes: previewPanel.selectedItem
+                            ? previewPanel.selectedItem.attributes
+                            : []
+
                         visible: items.length
                         width: nameValueScrollView.contentWidth
 
-                        copyable: true
                         nameColor: ColorTheme.colors.light16
                         valueColor: ColorTheme.colors.light10
                         nameFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
                         valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
 
-                        onSearchRequested: (row) =>
-                            previewPanel.searchRequested(row)
+                        interactive: true
+
+                        contextMenu: Menu
+                        {
+                            id: menu
+
+                            property var attribute
+
+                            onAboutToShow: attribute = attributeTable.hoveredItem
+                            onAboutToHide: attribute = undefined
+
+                            MenuItem
+                            {
+                                text: qsTr("Copy")
+                                onTriggered:
+                                {
+                                    if (menu.attribute)
+                                    {
+                                        NxGlobals.copyToClipboard(
+                                            menu.attribute.displayedValues.join(", "))
+                                    }
+                                }
+                            }
+
+                            MenuItem
+                            {
+                                text: qsTr("Filter by")
+                                onTriggered:
+                                {
+                                    if (menu.attribute)
+                                        previewPanel.searchRequested(menu.attribute)
+                                }
+                            }
+                        }
                     }
                 }
             }

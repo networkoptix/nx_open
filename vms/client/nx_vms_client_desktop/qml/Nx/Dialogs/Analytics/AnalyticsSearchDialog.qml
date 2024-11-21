@@ -418,7 +418,7 @@ Window
                             ? RightPanelGlobals.VideoPreviewMode.none
                             : RightPanelGlobals.VideoPreviewMode.hover
 
-                        onClicked: row =>
+                        onClicked: (row) =>
                         {
                             if (!showPreview)
                             {
@@ -481,10 +481,24 @@ Window
                     {
                         id: informationToolTip
 
-                        view: showPreview ? null : (dialog.tileView ? eventGrid : tableView)
-                        targetItem: dialog.tileView
-                            ? (eventGrid.hoveredItem && eventGrid.hoveredItem.item)
-                            : tableView.hoveredItem
+                        readonly property Item hoveredItem:
+                        {
+                            if (showPreview)
+                                return null
+
+                            return dialog.tileView
+                                ? (eventGrid.hoveredItem?.item ?? null)
+                                : (tableView.hoveredItem ?? null)
+                        }
+
+                        onHoveredItemChanged:
+                        {
+                            if (dialog.tileView)
+                                open(eventGrid, hoveredItem, hoveredItem?.modelData)
+                            else
+                                open(tableView, hoveredItem, hoveredItem?.tooltipData)
+                        }
+
                         z: 2
                     }
 
@@ -624,7 +638,6 @@ Window
 
                     readonly property alias controller: controller
 
-
                     TableView
                     {
                         id: tableView
@@ -661,8 +674,10 @@ Window
                                 if (tableView.selectionModel.currentIndex.row === selection.index.row)
                                     return
 
-                                tableView.selectionModel.setCurrentIndex(
-                                    tableModel.mapFromSource(selection.index),
+                                console.assert(tableModel === tableView.sourceModel)
+                                const tableModelIndex = tableView.model.mapFromSource(
+                                    tableModel.mapFromSource(selection.index))
+                                tableView.selectionModel.setCurrentIndex(tableModelIndex,
                                     ItemSelectionModel.Current)
 
                                 if (tableView.currentRow >= 0)
@@ -686,12 +701,15 @@ Window
                             readonly property bool isCurrentRow: tableView.currentRow === row
                             readonly property bool isHoveredRow: tableView.hoveredRow === row
                             readonly property var modelData: model
-                            readonly property var attributeItems: getData("attributes")
 
                             function getData(name)
                             {
                                 return accessor.getData(eventModel.index(row, 0), name)
                             }
+
+                            readonly property var tooltipData: ({
+                                "analyticsEngineName": getData("analyticsEngineName"),
+                                "analyticsAttributes": getData("analyticsAttributes")})
 
                             color: isCurrentRow && showPreview
                                 ? ColorTheme.colors.dark9
@@ -802,7 +820,9 @@ Window
                                     }
 
                                     tableView.selectionModel.setCurrentIndex(
-                                        tableModel.index(row, column), ItemSelectionModel.Current)
+                                        tableView.model.index(row, column),
+                                        ItemSelectionModel.Current)
+
                                     if (!showPreview)
                                     {
                                         previewPanel.slideAnimationEnabled = true
@@ -837,7 +857,6 @@ Window
                     context: windowContext
                     type: { return EventSearch.SearchType.analytics }
                     active: true
-                    attributeManager: d.tileViewAttributeManager
 
                     onAnalyticsSetupChanged:
                     {
@@ -895,10 +914,8 @@ Window
             onShowOnLayoutClicked:
                 d.showSelectionOnLayout()
 
-            onSearchRequested: (attributeRow) =>
+            onSearchRequested: (attribute) =>
             {
-                const attributes = accessor.getData(selection.index, "analyticsAttributes")
-                const attribute = attributes[attributeRow]
                 if (attribute)
                     header.searchText = createSearchRequestText(attribute.id, attribute.values)
             }
@@ -926,7 +943,7 @@ Window
                     "hasTitleImage": getData("hasTitleImage") || false,
                     "description": getData("description") || "",
                     "additionalText": getData("additionalText") || "",
-                    "attributes": getData("attributes") || [],
+                    "attributes": getData("analyticsAttributes") || [],
                     "resourceList": getData("resourceList") || []
                 }
             }

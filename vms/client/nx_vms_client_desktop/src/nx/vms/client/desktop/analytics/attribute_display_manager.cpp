@@ -83,6 +83,7 @@ public:
 
         QSignalBlocker blocker(q);
         handleObjectTypesChanged();
+        attributeIndexesDirty = true;
     }
 
     void save()
@@ -127,6 +128,7 @@ public:
                 {
                     allAttributes.insert(attribute);
                     orderedAttributes.append(attribute);
+                    attributeIndexesDirty = true;
                 }
             }
         }
@@ -144,6 +146,8 @@ public:
     QSet<QString> allAttributes;
     QStringList orderedAttributes;
     QMap<QString, QString> displayNameByAttribute;
+    mutable QHash<QString, int> attributeIndexes;
+    mutable bool attributeIndexesDirty = false;
 };
 
 void AttributeDisplayManager::registerQmlType()
@@ -256,6 +260,7 @@ void AttributeDisplayManager::placeAttributeBefore(
     d->orderedAttributes.move(indexFrom, indexTo);
     d->save();
 
+    d->attributeIndexesDirty = true;
     emit attributesChanged();
 }
 
@@ -283,6 +288,21 @@ bool AttributeDisplayManager::objectTypeVisible() const
 bool AttributeDisplayManager::isVisible(const QString& attribute) const
 {
     return d->visibleAttributes.contains(attribute);
+}
+
+QHash<QString, int> AttributeDisplayManager::attributeIndexes() const
+{
+    if (!d->attributeIndexesDirty)
+        return d->attributeIndexes;
+
+    d->attributeIndexes.clear();
+
+    int i = 0;
+    for (const auto& attribute: d->orderedAttributes)
+        d->attributeIndexes[attribute] = i++;
+
+    d->attributeIndexesDirty = false;
+    return d->attributeIndexes;
 }
 
 namespace details {
