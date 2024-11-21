@@ -366,10 +366,19 @@ namespace nxcip
     {
         enum SampleType
         {
+            stNone = -1,
             stU8,   ///< unsigned 8 bits
             stS16,  ///< signed 16 bits
             stS32,  ///< signed 32 bits
-            stFLT
+            stFLT, ///< float
+            stDBL, ///< double
+            stU8P, ///< unsigned 8 bits, planar
+            stS16P, ///< signed 16 bits, planar
+            stS32P, ///< signed 32 bits, planar
+            stFLTP, ///< float, pl`anar
+            stDBLP, ///< double, planar
+            stS64, ///< signed 64 bits
+            stS64P, ///< signed 64 bits, planar
         };
 
         enum ByteOrderType
