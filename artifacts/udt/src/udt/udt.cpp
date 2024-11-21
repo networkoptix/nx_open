@@ -45,8 +45,7 @@ Error::Error(ProtocolError protocolError):
 
 Error::Error(Errno osError, ProtocolError protocolError):
     m_osError(osError),
-    m_protocolError(protocolError),
-    m_errorText(prepareErrorText())
+    m_protocolError(protocolError)
 {
 }
 
@@ -58,71 +57,6 @@ Errno Error::osError() const
 ProtocolError Error::protocolError() const
 {
     return m_protocolError;
-}
-
-const char* Error::errorText() const
-{
-    return m_errorText.c_str();
-}
-
-std::string Error::prepareErrorText()
-{
-    std::string text;
-
-    // Adding "errno" information
-    if (m_osError)
-    {
-#if defined(_WIN32)
-        wchar_t msgBuf[1024];
-        memset(msgBuf, 0, sizeof(msgBuf));
-
-        const size_t msgLen = std::min<std::size_t>(
-            FormatMessage(
-                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL,
-                m_osError,
-                MAKELANGID(LANG_SYSTEM_DEFAULT, SUBLANG_SYS_DEFAULT),
-                (LPTSTR)&msgBuf,
-                sizeof(msgBuf),
-                NULL),
-            sizeof(msgBuf));
-
-        if (msgLen > 0)
-        {
-            const auto msgUtf8Len = WideCharToMultiByte(CP_UTF8, 0, msgBuf, msgLen, NULL, 0, NULL, NULL);
-            if (msgUtf8Len > 0)
-            {
-                text.resize(msgUtf8Len);
-                if (WideCharToMultiByte(
-                        CP_UTF8, 0, msgBuf, msgLen, text.data(), text.size(), NULL, NULL) <= 0)
-                {
-                    text = "Win32 API error " + std::to_string(m_osError);
-                }
-            }
-            else
-            {
-                text = "Win32 API error " + std::to_string(m_osError);
-            }
-
-            while (!text.empty() && std::isspace(text.back()))
-                text.pop_back();
-        }
-#else
-        char errmsg[1024];
-        if (strerror_r(m_osError, errmsg, 1024) == 0)
-            text = errmsg;
-#endif
-    }
-
-    if (m_protocolError != ProtocolError::none)
-    {
-        if (!text.empty())
-            text += ". ";
-
-        text += toString(m_protocolError);
-    }
-
-    return text;
 }
 
 //-------------------------------------------------------------------------------------------------

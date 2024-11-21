@@ -255,14 +255,10 @@ public:
 
     Errno osError() const;
     ProtocolError protocolError() const;
-    const char* errorText() const;
 
 private:
     Errno m_osError;
     ProtocolError m_protocolError;
-    std::string m_errorText;
-
-    std::string prepareErrorText();
 };
 
 //-------------------------------------------------------------------------------------------------
