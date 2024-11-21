@@ -7,11 +7,12 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/data/bookmark_models.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::common {
 
-QString BookmarkFacadeStrings::creatorName(
-    const std::optional<nx::Uuid>& creatorUserId, QnResourcePool* pool)
+QString BookmarkFacadeStrings::creatorName(const std::optional<nx::Uuid>& creatorUserId,
+    QnResourcePool* pool, const QnUserResourcePtr& currentUser)
 {
     if (!creatorUserId || creatorUserId->isNull())
         return {};
@@ -22,7 +23,10 @@ QString BookmarkFacadeStrings::creatorName(
     const auto userResource =
         pool->getResourceById<QnUserResource>(*creatorUserId);
 
-    return userResource ? userResource->getName() : QString{};
+    // Hidden users are shown only to themselves.
+    return userResource == currentUser || !nx::vms::common::isUserHidden(userResource)
+        ? userResource->getName()
+        : QString{};
 }
 
 QString BookmarkFacadeStrings::cameraName(const nx::Uuid& deviceId, QnResourcePool* pool)
