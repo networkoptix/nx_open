@@ -859,7 +859,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     d->checkVideoStreamPeriodMsAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
         "checkVideoStreamPeriodMs", 10s, this,
-        [] { return tr("Check video stream period (milliseconds)"); });
+        [] { return tr("Check video stream permissions on VMS server period (milliseconds)"); });
 
     d->storageEncryptionAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "storageEncryption", false, this, [] { return tr("Storage encryption enabled"); });
