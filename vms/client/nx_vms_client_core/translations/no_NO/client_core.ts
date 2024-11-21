@@ -262,8 +262,8 @@
       <translation>Se gjennom sertifikatene til serverne for å sikre at du stoler på nettstedet du kobler til.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</source>
-      <translation>Dette kan skyldes et utløpt serversertifikat eller noen som prøver. Kontakt nettstedadministratoren for videre undersøkelser.</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
     </message>
   </context>
   <context>

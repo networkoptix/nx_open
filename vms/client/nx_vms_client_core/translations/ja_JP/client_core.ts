@@ -260,8 +260,8 @@
       <translation>サーバーの証明書をご確認のうえ、接続先サイトが信頼できることをお確かめください。</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</source>
-      <translation>期限切れのサーバー証明書、もしくは第三者による攻撃が原因である可能性があります。詳細な調査については、サイト管理者にお問い合わせください。</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
     </message>
   </context>
   <context>

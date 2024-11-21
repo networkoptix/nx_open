@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Spela ljud</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Systemhändelse</translation>
     </message>
   </context>
   <context>
@@ -180,20 +180,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Användare av systemhälsa</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Medlemmar i denna grupp har obegränsade systembehörigheter. Administratörer kan skapa och ändra Power Users, slå samman system och ansluta eller koppla från System till %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Medlemmar i den här gruppen kan, utöver de behörigheter som beviljas av gruppen Advanced Viewers, kontrollera det mesta av systemkonfigurationen, men de får inte ändra några administratörsrelaterade inställningar, som att ta bort eller ändra sina egna grupper och behörigheter, och kan inte skapa eller redigera andra avancerade användare.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Medlemmar i denna grupp kan se information och serverprocessorbelastning i realtid (Server Monitoring).</translation>
     </message>
   </context>
   <context>

@@ -54,11 +54,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>デコーダーの最大数</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>ハードウェアデコーダーの最大数を使用してビデオデコードパフォーマンスを向上</translation>
     </message>
   </context>
   <context>
