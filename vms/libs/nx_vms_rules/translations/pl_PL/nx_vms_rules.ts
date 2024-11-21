@@ -433,7 +433,7 @@
     </message>
     <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Wymuszaj potwierdzenie</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -523,7 +523,7 @@
     </message>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Wiadomość e-mail</translation>
     </message>
   </context>
   <context>

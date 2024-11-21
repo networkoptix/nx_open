@@ -1609,7 +1609,7 @@
     </message>
     <message>
       <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
+      <translation>Informacje o zainstalowanej aktualizacji</translation>
     </message>
     <message>
       <source>Installed update information</source>
