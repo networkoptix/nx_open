@@ -34,10 +34,20 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     RenderContextSynchronizerPtr renderContextSynchronizer)
 {
     QMutexLocker lock(&mutex);
+    auto codecString =
+        [codec, &resolution]()
+        {
+            return QString("%1 [%2x%3]")
+                .arg(codec)
+                .arg(resolution.width())
+                .arg(resolution.height());
+        };
+
 
     static std::map<AbstractVideoDecoder*, Metadata*> decodersInUse;
     for (auto& plugin: m_plugins)
     {
+        NX_DEBUG(this, "Checking video decoder: %1 with codec: %2", plugin.name, codecString());
         if (plugin.useCount < plugin.maxUseCount
             && plugin.isCompatible(codec, resolution, allowOverlay, allowHardwareAcceleration))
         {
@@ -56,6 +66,7 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
                 });
             ++plugin.useCount;
             decodersInUse[videoDecoder.get()] = &plugin;
+            NX_DEBUG(this, "Selected video decoder: %1", plugin.name);
             return videoDecoder;
         }
     }
