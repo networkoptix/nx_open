@@ -155,6 +155,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     if (!frame)
         return;
 
+    NX_DEBUG(this, "Initialize Ffmpeg video decoder: %1", frame->compressionType);
     auto codec = avcodec_find_decoder(frame->compressionType);
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
@@ -236,8 +237,11 @@ bool FfmpegVideoDecoder::isCompatible(
     const AVCodecID codec,
     const QSize& resolution,
     bool /*allowOverlay*/,
-    bool /*allowHardwareAcceleration*/)
+    bool allowHardwareAcceleration)
 {
+    if (!allowHardwareAcceleration)
+        return true;
+
     const QSize maxRes = maxResolution(codec);
     if (maxRes.isEmpty())
         return true;
