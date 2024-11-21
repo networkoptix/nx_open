@@ -319,7 +319,7 @@ distrib_copyServerSystemLibs() # destination_path
         libudev.so.1
     )
 
-    if [[ "${ARCH}" = "x64" ]]; then
+    if [[ "${ARCH}" != "arm" ]]; then
         fallback_libs_to_copy+=(
             libdrm.so.2
         )
