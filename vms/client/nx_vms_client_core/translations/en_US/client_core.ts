@@ -262,7 +262,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</source>
+        <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
