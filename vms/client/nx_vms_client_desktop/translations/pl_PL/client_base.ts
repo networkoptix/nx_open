@@ -9676,7 +9676,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>Resetuj ustawienia</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -9692,11 +9692,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>Usunąć istniejących użytkowników i grupy LDAP?</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>Wygląda na to, że zmieniłeś serwer LDAP. Zaleca się usunięcie wszystkich istniejących użytkowników i grup LDAP przed zaimportowaniem użytkowników i grup z nowego serwera LDAP.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -9712,7 +9712,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+      <translation>Synchronizuj użytkowników i grupy LDAP</translation>
     </message>
     <message>
       <source>Synchronize</source>
@@ -9915,11 +9915,11 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>Poziom logowania obniża wydajność systemu</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+      <translation>Poziom logowania inny niż domyślny. Zalecamy ustawienie go na &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -10105,7 +10105,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Zaleca się kontakt z %1 przed kontynuowaniem.</translation>
     </message>
     <message>
       <source>Current (%1)</source>
