@@ -86,16 +86,17 @@ struct NX_VMS_API QrCodeRequestData
     nx::Uuid serverId;
 
     /**%apidoc
-     * QR Code version.
-     * %example v177x177
+     * QR Code version. Can be omitted, in this case the smallest possible version will be chosen
+     * which can fit given text and correction level.
+     * %example v85x85
      */
-    QrCodeVersion version = QrCodeVersion::v177x177;
+    std::optional<QrCodeVersion> version = std::nullopt;
 
     /**%apidoc
      * QR Code correction level.
      * %example low
      */
-    QrCodeCorrectionLevel correctionLevel = QrCodeCorrectionLevel::low;
+    QrCodeCorrectionLevel correctionLevel = QrCodeCorrectionLevel::medium;
 
     /**%apidoc
      * QR Code image type.
@@ -103,11 +104,14 @@ struct NX_VMS_API QrCodeRequestData
      */
     QrCodeImageType imageType = QrCodeImageType::png;
 
-    /**%apidoc Data to encode. */
-    std::string data;
+    /**%apidoc
+     * QR Code image pixel size.
+     * %example 10
+     */
+    int pixelSize = 10;
 };
 
-#define QrCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType)(data)
+#define QrCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType)(pixelSize)
 NX_REFLECTION_INSTRUMENT(QrCodeRequestData, QrCodeRequestData_Fields)
 
 /**%apidoc QR Code response. */
