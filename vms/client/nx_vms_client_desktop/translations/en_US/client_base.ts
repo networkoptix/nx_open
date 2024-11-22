@@ -13304,22 +13304,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Components of System have different versions:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please update all components to the version %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Skip</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Beta version %1</source>
         <translation></translation>
     </message>

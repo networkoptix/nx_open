@@ -1660,10 +1660,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Check video stream period (milliseconds)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Storage encryption enabled</source>
         <translation></translation>
     </message>
@@ -1806,6 +1802,10 @@
     </message>
     <message>
         <source>Anonymous Crash Report Server API URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check video stream permissions on VMS server period (milliseconds)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
