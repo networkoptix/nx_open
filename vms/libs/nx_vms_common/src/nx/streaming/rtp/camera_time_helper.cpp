@@ -32,6 +32,11 @@ void CameraTimeHelper::setTimePolicy(TimePolicy policy)
     m_timePolicy = policy;
 }
 
+void CameraTimeHelper::resetBadCameraTimeState()
+{
+    m_badCameraTimeState = false;
+}
+
 void CameraTimeHelper::reset()
 {
     m_localOffset.initialized = false;

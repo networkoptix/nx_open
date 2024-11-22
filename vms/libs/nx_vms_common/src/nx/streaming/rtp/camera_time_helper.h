@@ -53,6 +53,7 @@ public:
 
     void setResyncThreshold(std::chrono::milliseconds value) { m_resyncThreshold = value; }
     void setTimePolicy(TimePolicy policy);
+    void resetBadCameraTimeState();
     void reset();
 
     std::chrono::microseconds replayAdjustmentFromHistory(

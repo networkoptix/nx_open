@@ -1115,7 +1115,10 @@ void RtspResourceStreamProvider::updateTimePolicy()
     {
         NX_MUTEX_LOCKER lock(&m_tracksMutex);
         for (auto& track: m_tracks)
+        {
             track.timeHelper->setTimePolicy(getTimePolicy());
+            track.timeHelper->resetBadCameraTimeState();
+        }
     }
 }
 
