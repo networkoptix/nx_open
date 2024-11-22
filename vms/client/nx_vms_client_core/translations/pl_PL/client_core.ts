@@ -13,11 +13,11 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nowa strona</translation>
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Twoja strona</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -151,43 +151,43 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Jeżeli błąd będzie się powtarzał, skontaktuj się z administratorem witryny.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Zalogowanie się jako użytkownik %1 do witryny w stanie wyłączonym jest zabronione. Nadal możesz połączyć się jako użytkownik lokalny.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Zalogowanie się jako użytkownik %1 do witryny w stanie zawieszenia jest zabronione. Nadal możesz połączyć się jako użytkownik lokalny.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>Zaloguj się do %1 aby uzyskać dostęp do tej witryny jako użytkownik %2</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>Limit czasu trwania sesji może zostać zmieniony przez administratora witryny.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>Twój dostęp do tej witryny wygasł.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>Skontaktuj się z administratorem witryny, aby odzyskać dostęp.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Aby zalogować się do tej witryny, wyłącz opcję &quot;Żądaj kodu weryfikacyjnego przy każdym logowaniu na swoje konto %1&quot; w %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Ten użytkownik został wyłączony przez administratora witryny.</translation>
     </message>
   </context>
   <context>
@@ -259,15 +259,15 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>Sprawdź certyfikat, aby upewnić się, czy ufasz serwerowi, z którym się łączysz.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>Sprawdź certyfikaty serwerów, aby upewnić się, czy ufasz witrynie, z którą się łączysz.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>Może to wynikać z wygaśnięcia certyfikatu serwera lub nieprawidłowego certyfikatu. Skontaktuj się z administratorem witryny w celu dalszego zbadania problemu.</translation>
     </message>
   </context>
   <context>
@@ -285,12 +285,12 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Strona</translation>
     </message>
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>Strona (%1)</translation>
     </message>
   </context>
   <context>
@@ -356,7 +356,7 @@
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>Witryna bez nazwy</translation>
     </message>
   </context>
   <context>

@@ -54,11 +54,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Maksimum kod çözücü sayısı</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Maksimum donanım kod çözücü sayısını kullanarak video kod çözme performansını iyileştirin</translation>
     </message>
   </context>
   <context>

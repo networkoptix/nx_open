@@ -261,7 +261,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、サイト管理者にお問い合わせください。</translation>
     </message>
   </context>
   <context>
