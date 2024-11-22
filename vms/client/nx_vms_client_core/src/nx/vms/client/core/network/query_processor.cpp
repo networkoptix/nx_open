@@ -2,6 +2,8 @@
 
 #include "query_processor.h"
 
+#include <QtCore/QPointer>
+
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_async_client.h>
@@ -65,7 +67,7 @@ struct QueryProcessor::Private
 
     const nx::Uuid serverId;
     const nx::Uuid auditId;
-    AbstractCertificateVerifier* certificateVerifier;
+    QPointer<AbstractCertificateVerifier> certificateVerifier;
     nx::network::SocketAddress address;
     nx::network::http::Credentials credentials;
     const Qn::SerializationFormat serializationFormat;
@@ -92,6 +94,7 @@ QueryProcessor::QueryProcessor(
 
 QueryProcessor::~QueryProcessor()
 {
+    NX_ASSERT(d->certificateVerifier, "Invalid destruction order");
     pleaseStopSync();
 }
 

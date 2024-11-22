@@ -199,11 +199,14 @@ struct RemoteConnectionFactoryRequestsManager::Private
     {
         const auto expectedKey = publicKey(context->handshakeCertificateChain);
         bool lastHostIsServer = false;
-        if (NX_ASSERT(!context->handshakeCertificateChain.empty()))
+        if (nx::network::ini().verifyVmsSslCertificates)
         {
-            const auto& hosts = context->handshakeCertificateChain.front().hosts();
-            lastHostIsServer =
-                !hosts.empty() && !nx::Uuid::fromStringSafe(*hosts.begin()).isNull();
+            if (NX_ASSERT(!context->handshakeCertificateChain.empty()))
+            {
+                const auto& hosts = context->handshakeCertificateChain.front().hosts();
+                lastHostIsServer =
+                    !hosts.empty() && !nx::Uuid::fromStringSafe(*hosts.begin()).isNull();
+            }
         }
 
         Request request = std::make_unique<AsyncClient>(
