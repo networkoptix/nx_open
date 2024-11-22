@@ -33,6 +33,8 @@ namespace nx::vms::client::desktop {
 namespace {
 
 constexpr double kServerNameWidthPart = 0.53;
+constexpr int kDefaultHeaderHeight = 64;
+constexpr int kActiveHeaderHeight = 82;
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
     {QIcon::Normal, {.primary = "light16"}},
@@ -329,6 +331,18 @@ void LogsManagementWidget::setupUi()
     setPaletteColor(ui->doneButton, QPalette::Button, finishedColor);
     setPaletteColor(ui->activePage, QPalette::Window, core::colorTheme()->color("dark6"));
     ui->activePage->setAutoFillBackground(true);
+    ui->activePage->setFixedHeight(kActiveHeaderHeight);
+    ui->defaultPage->setFixedHeight(kDefaultHeaderHeight);
+    ui->stackedWidget->setFixedHeight(kDefaultHeaderHeight);
+
+    connect(ui->stackedWidget, &QStackedWidget::currentChanged,
+        [&](const int current)
+        {
+            if (current >= 0)
+            {
+                ui->stackedWidget->setFixedHeight(ui->stackedWidget->widget(current)->height());
+            }
+        });
 
     ui->selectedButton->setFlat(true);
     ui->selectedButton->setIcon(qnSkin->icon(kCrossCloseIcon));
