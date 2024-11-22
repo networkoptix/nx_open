@@ -4,6 +4,7 @@
 
 #include <atomic>
 
+#include <QtCore/QPointer>
 #include <QtNetwork/QAuthenticator>
 
 #include <api/helpers/chunks_request_data.h>
@@ -328,13 +329,19 @@ struct ServerConnection::Private
     const nx::Uuid serverId;
     const nx::log::Tag logTag;
 
+    /**
+     * Unique certificate func id to avoid reusing old functions when the Server Connection is
+     * re-created (thus correct certificate verifier will always be used).
+     */
+    const nx::Uuid certificateFuncId = nx::Uuid::createUuid();
+
     // While most fields of this struct never change during struct's lifetime, some data can be
     // rarely updated. Therefore the following non-const fields should be protected by mutex.
     nx::Mutex mutex;
 
     struct DirectConnect
     {
-        nx::vms::common::AbstractCertificateVerifier* certificateVerifier = nullptr;
+        QPointer<nx::vms::common::AbstractCertificateVerifier> certificateVerifier;
         nx::network::SocketAddress address;
         nx::network::http::Credentials credentials;
     };
@@ -412,10 +419,17 @@ ServerConnection::ServerConnection(
             .address = std::move(address),
             .credentials = std::move(credentials)}}})
 {
+    if (NX_ASSERT(certificateVerifier))
+    {
+        connect(certificateVerifier, &QObject::destroyed, this,
+            [this]() { NX_ASSERT(false, "Invalid destruction order"); });
+    }
 }
 
 ServerConnection::~ServerConnection()
 {
+    if (d->directConnect)
+        NX_ASSERT(d->directConnect->certificateVerifier, "Invalid destruction order");
 }
 
 void ServerConnection::updateAddress(nx::network::SocketAddress address)
@@ -3483,13 +3497,13 @@ Handle ServerConnection::sendRequest(
     std::optional<Timeouts> timeouts)
 {
     auto certificateVerifier = d->directConnect
-        ? d->directConnect->certificateVerifier
+        ? d->directConnect->certificateVerifier.data()
         : d->systemContext->certificateVerifier();
     if (!NX_ASSERT(certificateVerifier))
         return 0;
 
     ContextPtr context(new nx::network::http::ClientPool::Context(
-        d->serverId,
+        d->certificateFuncId,
         certificateVerifier->makeAdapterFunc(
             request.gatewayId.value_or(d->serverId), request.url)));
     context->request = request;
@@ -3507,13 +3521,13 @@ Handle ServerConnection::sendRequest(
     std::optional<Timeouts> timeouts)
 {
     auto certificateVerifier = d->directConnect
-        ? d->directConnect->certificateVerifier
+        ? d->directConnect->certificateVerifier.data()
         : d->systemContext->certificateVerifier();
     if (!NX_ASSERT(certificateVerifier))
         return 0;
 
     ContextPtr context(new nx::network::http::ClientPool::Context(
-        d->serverId,
+        d->certificateFuncId,
         certificateVerifier->makeAdapterFunc(
             request.gatewayId.value_or(d->serverId), request.url)));
     context->request = request;
