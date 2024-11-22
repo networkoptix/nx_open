@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
@@ -379,17 +380,20 @@ void LookupListActionHandler::openLookupListsDialog()
     if (appContext()->qmlEngine()->baseUrl().isLocalFile())
         appContext()->qmlEngine()->clearComponentCache();
 
-    d->dialog = std::make_unique<LookupListsDialog>(systemContext(), mainWindowWidget());
-    if (lookupListManager()->isInitialized())
+    if (!d->dialog)
     {
-        d->dialog->setData(lookupListManager()->lookupLists());
+        d->dialog = std::make_unique<LookupListsDialog>(systemContext(), mainWindowWidget());
+        if (lookupListManager()->isInitialized())
+            d->dialog->setData(lookupListManager()->lookupLists());
+
+        connect(d->dialog.get(), &LookupListsDialog::saveRequested, this,
+            [this](LookupListDataList data) { d->saveData(std::move(data)); });
+
+        connect(windowContext(), &WindowContext::beforeSystemChanged, this,
+            [this] { d->dialog.reset(); });
     }
 
-    connect(d->dialog.get(), &LookupListsDialog::saveRequested, this,
-        [this](LookupListDataList data) { d->saveData(std::move(data)); });
-
     d->dialog->exec(Qt::ApplicationModal);
-    d->dialog.reset();
 }
 
 void LookupListActionHandler::openLookupListEditDialog()
@@ -409,7 +413,7 @@ void LookupListActionHandler::openLookupListEditDialog()
     LookupListEditDialog dialog(systemContext(),
         taxonomy,
         // If there is argument Qn::AnalyticsObjectTypeIdRole, open LookupListEditDialog with
-        // specified type otherwize, any type of list is allowed
+        // specified type otherwise, any type of list is allowed.
         params.hasArgument(Qn::AnalyticsObjectTypeIdRole) ? &sourceModel : nullptr,
         parentWidget);
     dialog.setTransientParent(parentWidget);
