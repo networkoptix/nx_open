@@ -10,6 +10,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 namespace {
 
@@ -66,8 +69,12 @@ public:
     }
 };
 
-QString getNewGroupSubId(const QnResourcePool* resourcePool)
+QString getNewGroupSubId()
 {
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
+    const auto cloudResourcePool =
+        appContext()->cloudLayoutsManager()->systemContext()->resourcePool();
+
     QSet<QString> usedGroupIds;
 
     const auto extractGroupSubIds =
@@ -78,19 +85,23 @@ QString getNewGroupSubId(const QnResourcePool* resourcePool)
             if (compositeGroupId.isEmpty())
                 return;
 
-            auto splittedGroupId = compositeGroupId.split(kSubIdDelimiter, Qt::SkipEmptyParts);
-            for (const auto& groupId: splittedGroupId)
+            auto splitGroupId = compositeGroupId.split(kSubIdDelimiter, Qt::SkipEmptyParts);
+            for (const auto& groupId: splitGroupId)
                 usedGroupIds.insert(groupId.toLower()); //< Case insensitive.
         };
 
     const auto allCameras = resourcePool->getAllCameras(nx::Uuid(), /*ignoreDesktopCameras*/ true);
     const auto allLayouts = resourcePool->getResources<QnLayoutResource>();
+    const auto allCloudLayouts = cloudResourcePool->getResources<QnLayoutResource>();
 
     for (const auto& camera: allCameras)
         extractGroupSubIds(camera);
 
     for (const auto& layout: allLayouts)
         extractGroupSubIds(layout);
+
+    for (const auto& cloudLayout: allCloudLayouts)
+        extractGroupSubIds(cloudLayout);
 
     for (int i = 0; true; ++i)
     {

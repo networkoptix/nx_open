@@ -52,7 +52,7 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
 
     const auto resources = parameters.resources();
     const auto compositeGroupId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
-    const auto newGroupSubId = getNewGroupSubId(resourcePool());
+    const auto newGroupSubId = getNewGroupSubId();
     const auto nodeTypeArgument = parameters.argument(Qn::NodeTypeRole);
 
     for (const auto& resource: resources)

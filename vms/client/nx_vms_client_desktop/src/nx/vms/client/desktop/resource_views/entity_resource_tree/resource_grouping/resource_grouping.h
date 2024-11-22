@@ -21,7 +21,7 @@ static const QString kCustomGroupIdPropertyKey("customGroupId");
  * @returns Unique name (comparison is case insensitive) for the newly created group from the
  *     sequence 'New Group, New Group 1, ..., New Group n'.
  */
-NX_VMS_CLIENT_DESKTOP_API QString getNewGroupSubId(const QnResourcePool* resourcePool);
+NX_VMS_CLIENT_DESKTOP_API QString getNewGroupSubId();
 
 /**
  * @param cameraResource Valid pointer to the QnResourcePtr expected.
