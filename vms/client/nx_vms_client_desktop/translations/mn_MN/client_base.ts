@@ -13325,22 +13325,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">Failed to upload image</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation type="unfinished">Beta version %1</translation>
     </message>

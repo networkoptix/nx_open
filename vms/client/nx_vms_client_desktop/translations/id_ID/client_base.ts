@@ -13126,22 +13126,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <translation>Gagal mengupload image</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Komponen Sistem memiliki versi yang berbeda:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Mohon update semua komponen ke versi %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Mengupdate...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Lewati</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Versi beta %1</translation>
     </message>

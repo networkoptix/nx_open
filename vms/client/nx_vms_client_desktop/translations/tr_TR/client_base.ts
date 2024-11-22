@@ -13318,22 +13318,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <translation>Resim yüklenemedi</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Sistem bileşenlerinde farklı versiyonlar var:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Tüm bileşenleri sürüm %1 güncelleyin</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Güncelle...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Geç</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>%1 Beta Versiyon</translation>
     </message>

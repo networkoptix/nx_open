@@ -13723,22 +13723,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>טעינת התמונה נכשלה</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>לרכיבי המערכת יש גרסאות שונות:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>עדכן את כל הרכיבים לגרסה %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>עדכן...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>דלג</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>גירסת ביתא %1</translation>
     </message>

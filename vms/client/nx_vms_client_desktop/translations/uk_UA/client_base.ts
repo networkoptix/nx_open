@@ -13723,22 +13723,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Не вдалося завантажити зображення</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Компоненти Системи мають різні версії:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Будь ласка, оновіть всі компоненти до версії %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Оновлення...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Пропустити</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Бета версія %1</translation>
     </message>

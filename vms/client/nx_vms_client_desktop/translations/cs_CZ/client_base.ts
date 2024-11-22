@@ -13723,22 +13723,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Nahrání obrázku se nezdařilo</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Komponenty systému mají různé verze:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Prosím aktualizujte všechny komponenty na verzi %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Aktualizace...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Přeskočit</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Beta verze %1</translation>
     </message>

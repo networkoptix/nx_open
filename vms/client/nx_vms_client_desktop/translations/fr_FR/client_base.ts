@@ -13326,22 +13326,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Échec d'envoie d'image</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Composants du système ont des versions différentes:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>S.V.P mettre à jour tous les composants à la version %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Mise à jour...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Passer</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Version Beta %1</translation>
     </message>

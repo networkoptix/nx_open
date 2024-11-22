@@ -13125,22 +13125,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>画像のアップロードに失敗しました</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>バージョンの異なるシステムコンポーネントが含まれています:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>すべてのコンポーネントをバージョン %1 に更新してください</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>スキップ</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>ベータバージョン %1</translation>
     </message>

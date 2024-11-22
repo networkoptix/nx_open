@@ -1601,10 +1601,6 @@
       <translation>失敗時強制授予分析資料庫儲存掛載點權限</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>視訊串流檢查週期（毫秒）</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>啟用錄影資料加密</translation>
     </message>
@@ -1748,6 +1744,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

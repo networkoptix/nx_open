@@ -13124,22 +13124,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>이미지를 업로드 하지 못했습니다.</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>시스템의 구성 요소가 서로 다른 버전입니다:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>버전 %1으로 모든 구성 요소를 업데이트 하십시오</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>업데이트...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>건너 뛰기</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>베타 버젼 %1</translation>
     </message>

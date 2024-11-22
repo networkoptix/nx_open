@@ -13325,22 +13325,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>No s'ha pogut carregar la imatge</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Els components del sistema tenen versions diferents:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Actualitzeu tots els components a la versió %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Actualitza...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Omet</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Versió beta %1</translation>
     </message>

@@ -13722,22 +13722,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Не удалось загрузить изображение</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Компоненты системы имеют разные версии:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Пожалуйста, обновите все компоненты системы на версию %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Обновление...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Пропустить</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Бета-версия %1</translation>
     </message>

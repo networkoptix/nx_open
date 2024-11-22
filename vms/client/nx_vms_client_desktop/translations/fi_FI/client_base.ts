@@ -13325,22 +13325,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Kuvan lataaminen epäonnistui</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Järjestelmän komponenteilla on eri versioita:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Päivitä kaikki komponentit versioon %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Päivittää...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Ohita</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Beta-versio %1</translation>
     </message>

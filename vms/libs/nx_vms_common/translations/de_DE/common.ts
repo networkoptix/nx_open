@@ -1660,10 +1660,6 @@
       <translation>Erzwingen von Berechtigungen für den Einhängepunkt des Analytics-DB-Speichers im Falle eines Ausfalls</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Prüfung der Dauer des Videostreams (Millisekunden)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Speicherverschlüsselung aktiviert</translation>
     </message>
@@ -1807,6 +1803,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

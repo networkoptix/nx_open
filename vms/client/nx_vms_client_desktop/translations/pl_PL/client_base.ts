@@ -13719,22 +13719,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <translation>Nie udało się przesłać obrazu</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Składniki systemu mają różne wersje:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Proszę zaktualizować wszystkie składniki do wersji %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Aktualizacja...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Pomiń</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Wersja beta %1</translation>
     </message>
