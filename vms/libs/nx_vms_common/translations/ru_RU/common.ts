@@ -1778,10 +1778,6 @@
       <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation type="unfinished">Storage encryption enabled</translation>
     </message>
@@ -1925,6 +1921,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

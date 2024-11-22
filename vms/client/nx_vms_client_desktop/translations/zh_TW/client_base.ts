@@ -13121,22 +13121,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>上傳影像失敗</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>系統元件有不同的版本:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>請更新所有元件到 %1 版本</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>略過</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>測試版 %1</translation>
     </message>

@@ -13323,22 +13323,6 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
       <translation>No fue posible cargar la imagen</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Los componentes del sistema tienen diferentes versiones:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Actualice todos los componentes a la versión %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Actualizar...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Siguiente</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Versión Beta %1</translation>
     </message>

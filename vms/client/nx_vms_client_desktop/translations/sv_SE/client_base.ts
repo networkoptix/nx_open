@@ -13324,22 +13324,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <translation>Det gick inte att ladda upp bild</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Systemets komponenter har olika versioner:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Uppdatera alla komponenter till version %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Uppdatering...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Hoppa över</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Betaversion %1</translation>
     </message>

@@ -13126,22 +13126,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>อัปโหลดภาพไม่สำเร็จ</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>ส่วนประกอบของระบบมีเวอร์ชันต่างกัน:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>โปรดอัปเดตคอมโพเนนต์ทั้งหมดเป็นเวอร์ชัน %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>อัพเดต...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>ข้าม</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>รุ่น ทดสอบ %1</translation>
     </message>

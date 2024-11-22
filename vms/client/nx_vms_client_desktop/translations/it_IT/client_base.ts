@@ -13325,22 +13325,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Impossibile caricare l'immagine</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>I componenti del sistema hanno diverse versioni:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Si prega di aggiornare tutti i componenti alla versione %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Aggiornare...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Salta</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Versione beta %1</translation>
     </message>

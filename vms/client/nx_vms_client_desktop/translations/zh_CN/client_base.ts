@@ -13121,22 +13121,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>保存图像失败</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>系统的组件有不同的版本︰</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>请更新所有组件到版本 %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>跳过</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>测试版%1</translation>
     </message>

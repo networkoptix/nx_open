@@ -13325,22 +13325,6 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
       <translation>Het uploaden van de afbeelding is mislukt</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Componenten van het systeem hebben verschillende versies:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Update alle componenten naar versie %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Bijwerken...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Overslaan</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Beta versie %1</translation>
     </message>

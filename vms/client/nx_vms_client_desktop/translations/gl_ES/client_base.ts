@@ -3160,16 +3160,16 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>A conta non está activada.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Por favor, inicia sesión en %1 e sigue as instrucións proporcionadas.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Contrasinal non válido</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -3180,7 +3180,7 @@ Clave de licenza: %2</translation>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation type="unfinished">Logging in...</translation>
+      <translation>Accedendo...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -3214,9 +3214,9 @@ Clave de licenza: %2</translation>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n de %1 usuarios seleccionados non son %2 usuarios e non recibirán notificacións móbiles.</numerusform>
+        <numerusform>%n de %1 usuarios seleccionados non son %2 usuarios e non recibirán notificacións móbiles.</numerusform>
       </translation>
     </message>
   </context>
@@ -3224,29 +3224,29 @@ Clave de licenza: %2</translation>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation>Por favor, pecha a aplicación e iníciaa de novo usando o atallo do menú Inicio.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>Vaia, produciuse un fallo ao conectar co servidor</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation type="unfinished">Client and Server have different versions</translation>
+      <translation>Vaia, cliente e servidor teñen versións diferentes</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Client - %1</translation>
+      <translation>Cliente - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Server - %1</translation>
+      <translation>Servidor - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation type="unfinished">Download Client version %1?</translation>
+      <translation>Descargar a versión do cliente %1?</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -3254,7 +3254,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation type="unfinished">Failed to download and launch version %1</translation>
+      <translation>Upps, produciuse un erro ao descargar e lanzar a versión %1</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -3262,43 +3262,43 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+      <translation>Upps, roduciuse un erro ao reiniciar %1 no modo de compatibilidade</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation>Por favor, pecha %1 e iníciao de novo usando o atallo do menú Inicio.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+      <translation>Tes que descargar outra versión de %1 para conectarte a este servidor.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation>Tes que reiniciar %1 en modo de compatibilidade para conectarte a este servidor.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+      <translation>Reiniciar %1 no modo de compatibilidade?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation type="unfinished">Failed to restart %1</translation>
+      <translation>Produciuse un erro ao reiniciar %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Descargar &amp;&amp; Instalar</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Produciuse un erro ao entrar no modo de compatibilidade para a versión %1</translation>
     </message>
     <message>
       <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <translation>O sistema non é compatible coa autenticación de dous factores</translation>
     </message>
     <message>
       <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <translation>Vaia, produciuse un erro ao iniciar sesión no sistema &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Log In...</source>
@@ -3317,19 +3317,19 @@ Clave de licenza: %2</translation>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Se o campo está baleiro, o evento sempre se activará.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias na fonte con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias no título con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias na descrición con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -12744,11 +12744,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeywordsPicker</name>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias na fonte con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Se o campo está baleiro, o evento sempre se activará.</translation>
     </message>
   </context>
   <context>
@@ -13323,22 +13323,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to upload image</source>
       <translation type="unfinished">Failed to upload image</translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
     </message>
     <message>
       <source>Beta version %1</source>

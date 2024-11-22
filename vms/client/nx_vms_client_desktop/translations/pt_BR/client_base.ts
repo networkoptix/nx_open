@@ -13324,22 +13324,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       <translation>Falha ao carregar imagem</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Os componentes do sistema têm versões diferentes:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Por favor, atualize todos os componentes para a versão %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Atualizar...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Pular</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Versão Beta %1</translation>
     </message>

@@ -1601,10 +1601,6 @@
       <translation>장애 발생 시 강제 분석 DB 스토리지 마운트 지점 권한 부여</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>비디오 스트림 기간 (밀리초) 확인</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>저장소 암호화가 활성화됨</translation>
     </message>
@@ -1748,6 +1744,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation>익명 충돌 보고 서버 API URL</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

@@ -1662,10 +1662,6 @@
       <translation>Forcer les permissions du point de montage de la base de données analytique en cas d'échec</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Vérifier la période du flux vidéo (en millisecondes)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Chiffrement du stockage activé</translation>
     </message>
@@ -1809,6 +1805,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation>URL de l'API du serveur de rapport d'incident anonyme</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

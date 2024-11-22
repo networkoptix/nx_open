@@ -1660,10 +1660,6 @@
       <translation>Tvinga tillstånd för monteringspunkt för analytics DB-lagring vid fel</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Kontrollera videoströmningsperioden (millisekunder)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Lagringskryptering aktiverad</translation>
     </message>
@@ -1807,6 +1803,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation>Anonym Crash Report Server API URL</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

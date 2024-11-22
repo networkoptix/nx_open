@@ -13325,22 +13325,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>Hiba a kép feltöltése során</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Rendszer elemei különböző verziókból állnak:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Frissítsen minden összetevőt %1 verzióra</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Frissítés...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Kihagy</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>%1 Beta verzió</translation>
     </message>

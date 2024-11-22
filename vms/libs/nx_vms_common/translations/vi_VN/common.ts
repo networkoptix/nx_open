@@ -1601,10 +1601,6 @@
       <translation>Trao quyền đối với điểm gắn kết lưu trữ của Cơ sở dữ liệu phân tích đề phòng trường hợp bị lỗi</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Kiểm tra khoảng thời gian luồng video (mili giây)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Mã hóa bộ nhớ đã được bật</translation>
     </message>
@@ -1748,6 +1744,10 @@
     <message>
       <source>Anonymous Crash Report Server API URL</source>
       <translation>URL API máy chủ báo cáo sự cố ẩn danh</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

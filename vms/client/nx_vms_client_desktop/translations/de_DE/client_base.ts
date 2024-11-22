@@ -13325,22 +13325,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <translation>Fehler beim Hochladen des Bildes</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Die Komponenten des Systems haben verschiedene Versionen:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Aktualisieren Sie bitte alle Komponenten auf die Version %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Update...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Überspringen</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Betaversion %1</translation>
     </message>

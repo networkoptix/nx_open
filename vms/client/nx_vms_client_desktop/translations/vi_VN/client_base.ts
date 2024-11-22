@@ -13125,22 +13125,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Tải hình ảnh thất bại</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Thành phần của hệ thống có phiên bản khác nhau:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Vui lòng cập nhật tất cả các thành phần lên phiên bản %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Cập nhật...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Bỏ qua</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Phiên bản Beta %1</translation>
     </message>

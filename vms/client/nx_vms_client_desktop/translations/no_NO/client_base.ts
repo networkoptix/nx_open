@@ -13321,22 +13321,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Kunne ikke laste opp bildet</translation>
     </message>
     <message>
-      <source>Components of System have different versions:</source>
-      <translation>Komponenter i systemet har forskjellige versjoner:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Oppdater alle komponentene til versjon %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Oppdater...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Hopp over</translation>
-    </message>
-    <message>
       <source>Beta version %1</source>
       <translation>Betaversjon %1</translation>
     </message>
