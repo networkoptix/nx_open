@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>Bunun nedeni, süresi dolmuş bir sunucu sertifikası veya geçersiz bir sertifika olabilir. Daha fazlası için sistem yöneticinizle iletişime geçin.</translation>
     </message>
   </context>
   <context>
