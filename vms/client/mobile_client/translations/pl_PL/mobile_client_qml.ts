@@ -12,7 +12,7 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation type="unfinished">ADVANCED SEARCH</translation>
+      <translation>WYSZUKIWANIE ZAAWANSOWANE</translation>
     </message>
   </context>
   <context>
@@ -54,11 +54,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Maksymalna liczba dekoderów</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Popraw wydajność dekodowania wideo, wykorzystując maksymalną liczbę dekoderów sprzętowych</translation>
     </message>
   </context>
   <context>
@@ -231,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Wprowadź swoje hasło do konta %1 aby się połączyć</translation>
     </message>
   </context>
   <context>
@@ -335,7 +335,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>Nie jesteś połączony z żadną witryną</translation>
     </message>
   </context>
   <context>
@@ -416,15 +416,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Wszystkie witryny</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Wybrane witryny</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Należy wybrać co najmniej jedną witrynę</translation>
     </message>
   </context>
   <context>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>Nie znaleziono żadnych witryn</translation>
     </message>
   </context>
   <context>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Powiadomienia są wyłączone w ustawieniach urządzenia</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -871,7 +871,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Wprowadź hasło szyfrowania na komputerze, aby odszyfrować to archiwum lub poproś administratora o pomoc.</translation>
     </message>
   </context>
   <context>

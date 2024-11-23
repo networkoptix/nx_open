@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+      <translation>Dette kan skyldes et utløpt serversertifikat eller et ugyldig sertifikat. Kontakt systemansvarlig for området for videre undersøkelse.</translation>
     </message>
   </context>
   <context>
