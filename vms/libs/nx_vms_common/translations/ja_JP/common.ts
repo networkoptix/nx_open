@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒)</translation>
     </message>
   </context>
   <context>
