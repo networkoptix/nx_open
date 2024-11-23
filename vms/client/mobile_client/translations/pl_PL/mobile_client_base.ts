@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Twoja Strona</translation>
     </message>
   </context>
   <context>
@@ -52,7 +52,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Nie można połączyć się ze stroną &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -74,7 +74,7 @@
     </message>
     <message>
       <source>Session duration limit can be changed by the site administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the site administrators</translation>
+      <translation>Limit czasu trwania sesji może zostać zmieniony przez administratora witryny</translation>
     </message>
   </context>
   <context>
