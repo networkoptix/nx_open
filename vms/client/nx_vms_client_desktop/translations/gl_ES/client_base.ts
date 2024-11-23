@@ -3165,11 +3165,11 @@ a %1</translation>
     </message>
     <message>
       <source>Server API</source>
-      <translation type="unfinished">Server API</translation>
+      <translation>API do servidor</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
+      <translation>Para xerar un evento xenérico, por favor, consulta %1.</translation>
     </message>
   </context>
   <context>
@@ -3191,47 +3191,47 @@ a %1</translation>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Gardar copia de seguridade da base de datos...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
+      <translation>Estase descargando a copia de seguridade da base de datos do servidor. Por favor, agarda.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation type="unfinished">Open Database Backup...</translation>
+      <translation>Abrir copia de seguridade da base de datos...</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
+      <translation>Estase cargando a copia de seguridade da base de datos no servidor. Por favor, agarda.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation type="unfinished">Failed to back up database</translation>
+      <translation>Erro ao realizar a copia de seguridade da base de datos</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation type="unfinished">Database backed up to file</translation>
+      <translation>Copia de seguridade da base de datos no ficheiro</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Erro ao abrir o ficheiro</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation type="unfinished">Failed to restore database</translation>
+      <translation>Erro ao restaurar a base de datos</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Ficheiros de copia de seguridade da base de datos</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Gardar copia de seguridade da base de datos</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Introduce o contrasinal da túa conta para crear unha copia de seguridade</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3239,11 +3239,11 @@ a %1</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Restaurar dende a copia de seguridade da base de datos</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Introduce o contrasinal da túa conta para restaurar o sistema desde a copia de seguridade</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -3251,35 +3251,35 @@ a %1</translation>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation type="unfinished">Restore database?</translation>
+      <translation>Queres restaurar a base de datos?</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>A configuración do sistema restaurarase a partir da copia de seguridade, reiniciarase a aplicación do servidor.</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Restaurouse a base de datos correctamente. A aplicación do servidor reiniciarase en breve.</translation>
     </message>
   </context>
   <context>
     <name>QnDeprecatedUserListModel</name>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Usuario local</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 usuario</translation>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>Usuario LDAP</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Activado</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3310,31 +3310,31 @@ a %1</translation>
     </message>
     <message>
       <source>View live video</source>
-      <translation type="unfinished">View live video</translation>
+      <translation>Ver vídeo en directo</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
-      <translation type="unfinished">Adjust device settings</translation>
+      <translation>Axustar a configuración do dispositivo</translation>
     </message>
     <message>
       <source>Adjust camera settings</source>
-      <translation type="unfinished">Adjust camera settings</translation>
+      <translation>Axustar a configuración da cámara</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
-      <translation type="unfinished">Use PTZ controls</translation>
+      <translation>Usar os controis PTZ</translation>
     </message>
     <message>
       <source>View video archives</source>
-      <translation type="unfinished">View video archives</translation>
+      <translation>Ver arquivos de vídeo</translation>
     </message>
     <message>
       <source>Export video</source>
-      <translation type="unfinished">Export video</translation>
+      <translation>Exportar vídeo</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation type="unfinished">Control Video Walls</translation>
+      <translation>Control de Video Walls / Muros</translation>
     </message>
   </context>
   <context>
@@ -3345,64 +3345,64 @@ a %1</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Coa autenticación de resumo activada</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>As persoas usuarias pódense importar dende un servidor LDAP. Só poderán iniciar sesión se o servidor LDAP está en liña e as súas contas están activas nel.</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation type="unfinished">Could not find video encoder %1.</translation>
+      <translation>Non se puido atopar o codificador de vídeo %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Non se puido inicializar o codificador de vídeo.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Non se puido inicializar o codificador de audio.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation type="unfinished">Could not start primary audio device.</translation>
+      <translation>Non se puido iniciar o dispositivo de audio principal.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation type="unfinished">Screen width must be a multiple of 8.</translation>
+      <translation>O ancho da pantalla debe ser un múltiplo de 8.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation>Non se puido inicializar o dispositivo de son &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Non se puido detectar a resolución de captura</translation>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>O dispositivo de captura de audio non admite formatos de audio axeitados. Selecciona outro dispositivo de audio ou &quot;ningún&quot; na configuración de gravación de pantalla.</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>O modo de gravación de pánico cambia a configuración de gravación de todas as cámaras ao máximo FPS e calidade.</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation type="unfinished">Filter Similar Rows</translation>
+      <translation>Filtrar filas similares</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -3418,34 +3418,34 @@ a %1</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Borrar o filtro</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Exportar os eventos seleccionados ao ficheiro</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation type="unfinished">Any Action</translation>
+      <translation>Calquera acción</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Non hai eventos</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Rexistro de eventos para o período de %1 a %2 - %n eventos atopados</numerusform>
+        <numerusform>Rexistro de eventos para o período de %1 a %2 - %n eventos atopados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Rexistro de eventos para %1 - %n eventos atopados</numerusform>
+        <numerusform>Rexistro de eventos para %1 - %n eventos atopados</numerusform>
       </translation>
     </message>
     <message>
@@ -3457,11 +3457,11 @@ a %1</translation>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation type="unfinished">Motion video</translation>
+      <translation>Vídeo en movemento</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation type="unfinished">Date/Time</translation>
+      <translation>Data/Hora</translation>
     </message>
     <message>
       <source>Event</source>
@@ -3838,38 +3838,38 @@ a %1</translation>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>Os axustes proporcionados non son válidos.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>Non se puido realizar unha proba.</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation type="unfinished">Could not load users.</translation>
+      <translation>Non se puideron cargar os usuarios.</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation type="unfinished">Error while loading users.</translation>
+      <translation>Erro ao cargar os usuarios.</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation type="unfinished">No new users found.</translation>
+      <translation>Non se atoparon usuarios novos.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Fóra de prazo</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation type="unfinished">Import Selected</translation>
+      <translation>Importar seleccionado</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation type="unfinished">License Type</translation>
+      <translation>Tipo de licenza</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3877,11 +3877,11 @@ a %1</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation type="unfinished">Locked to Hardware ID</translation>
+      <translation>Bloqueado ao ID de hardware</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Xenérico</translation>
     </message>
     <message>
       <source>Features</source>
@@ -3889,19 +3889,19 @@ a %1</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Pantallas permitidas</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Sesións de control permitidas</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Fluxos de arquivos permitidos</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Desactivacións restantes</translation>
     </message>
   </context>
   <context>
@@ -3924,7 +3924,7 @@ a %1</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Nunca</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -3948,29 +3948,29 @@ a %1</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation type="unfinished">License is active</translation>
+      <translation>A licenza está activa</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>A licenza caducou</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation type="unfinished">Expires soon</translation>
+      <translation>Caduca pronto</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation type="unfinished">License expires today</translation>
+      <translation>A licenza caduca hoxe</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation type="unfinished">License expires tomorrow</translation>
+      <translation>A licenza caduca mañá</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>A licenza caduca en %n días</numerusform>
+        <numerusform>A licenza caduca en %n días</numerusform>
       </translation>
     </message>
     <message>
@@ -3986,13 +3986,13 @@ a %1</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation type="unfinished">Export licenses to a file</translation>
+      <translation>Exportar licenzas a un ficheiro</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Queres desactivar licenzas?</numerusform>
+        <numerusform>Queres desactivar licenzas?</numerusform>
       </translation>
     </message>
     <message>
@@ -4001,7 +4001,7 @@ a %1</translation>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation type="unfinished">Deactivate</translation>
+      <translation>Desactivar</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
@@ -4013,48 +4013,48 @@ a %1</translation>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 están en uso actualmente</numerusform>
+        <numerusform>%1 están en uso actualmente</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Requírense polo menos %1</numerusform>
+        <numerusform>Requírense polo menos %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>Quedan %n desactivacións.</numerusform>
+        <numerusform>Quedan %n desactivacións.</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>Non tes unha licenza válida instalada. Por favor, activa a túa licenza comercial ou de proba.</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation type="unfinished">Activate Trial License</translation>
+      <translation>Activar a licenza de proba</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation type="unfinished">Open License File</translation>
+      <translation>Abrir o ficheiro de licenza</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Erro ao abrir o ficheiro</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Para obter un ficheiro de clave de activación, envía a clave de licenza e o ID de hardware proporcionados a %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
