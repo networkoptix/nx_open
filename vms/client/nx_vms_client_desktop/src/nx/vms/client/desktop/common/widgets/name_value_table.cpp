@@ -377,6 +377,11 @@ struct NameValueTable::Private
         updateOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     }
 
+    bool isMeaningful() const
+    {
+        return !content.empty() && renderer;
+    }
+
     void setMaximumNumberOfRows(int numberOfRows)
     {
         if (maxRowCount == numberOfRows)
@@ -397,18 +402,19 @@ struct NameValueTable::Private
 
     void updateImage()
     {
-        if (content.empty() || !renderer)
-        {
-            size = QSize();
-            pixmap = QPixmap();
-            return;
-        }
-
         const auto oldSize = size;
-
-        renderer->render(q,
-            nx::utils::toQVariantList(content), "displayedName", "displayedValues", "colorValues",
-            size, pixmap, maxRowCount);
+        if (isMeaningful())
+        {
+            renderer->render(q,
+                nx::utils::toQVariantList(content),
+                "displayedName", "displayedValues", "colorValues",
+                size, pixmap, maxRowCount);
+        }
+        else
+        {
+            size = QSize{};
+            pixmap = QPixmap{};
+        }
 
         if (size != oldSize)
             q->updateGeometry();
@@ -464,8 +470,16 @@ bool NameValueTable::event(QEvent* event)
         case QEvent::Resize:
         case QEvent::FontChange:
         case QEvent::PaletteChange:
+            if (d->isMeaningful())
+                d->updateOp.requestOperation();
+            break;
+
         case QEvent::ScreenChangeInternal:
-            d->updateOp.requestOperation();
+            // Events (including timer and metacall) posted during system window drag under certain
+            // conditions are delivered only after the window is dropped. If we want to update DPI
+            // immediately during the drag, we can't use PendingOperation or any delayed call here.
+            if (d->isMeaningful())
+                d->updateImage();
             break;
 
         default:

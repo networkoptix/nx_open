@@ -2,11 +2,10 @@
 
 #pragma once
 
-#include <memory>
-
 #include <QtGui/QFont>
 #include <QtWidgets/QGraphicsItem>
 
+#include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/types.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/highlighted_area_text_painter.h>
 
@@ -44,8 +43,8 @@ public:
     void setFigure(const figure::FigurePtr& figure);
 
 private:
-    class Private;
-    const std::unique_ptr<Private> d;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::desktop

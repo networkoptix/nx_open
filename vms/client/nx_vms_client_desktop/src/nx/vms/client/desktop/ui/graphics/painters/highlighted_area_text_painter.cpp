@@ -62,7 +62,7 @@ void HighlightedAreaTextPainter::setColor(const QColor& color)
     m_color = color;
 }
 
-QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
+QPixmap HighlightedAreaTextPainter::paintText(const QString& text, qreal devicePixelRatio) const
 {
     if (text.isEmpty())
         return QPixmap();
@@ -107,14 +107,13 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
         ? titleFontMetrics.lineSpacing() + kAdditionalTitleSpacing
         : 0;
 
-    static const auto ratio = qApp->devicePixelRatio();
     const auto width = qMax(maxNameWidth + maxValueWidth + kSpacing, titleWidth);
     const auto height = titleSpacing + lineSpacing * lines.size();
     const auto baseSize = QSize(width, height);
-    const auto pixmapSize = baseSize * ratio;
+    const auto pixmapSize = baseSize * devicePixelRatio;
 
     QPixmap pixmap(pixmapSize);
-    pixmap.setDevicePixelRatio(ratio);
+    pixmap.setDevicePixelRatio(devicePixelRatio);
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);

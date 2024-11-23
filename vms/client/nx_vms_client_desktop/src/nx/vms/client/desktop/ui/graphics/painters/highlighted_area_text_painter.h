@@ -31,7 +31,7 @@ public:
     QColor color() const;
     void setColor(const QColor& color);
 
-    QPixmap paintText(const QString& text) const;
+    QPixmap paintText(const QString& text, qreal devicePixelRatio) const;
 
 private:
     Fonts m_fonts;

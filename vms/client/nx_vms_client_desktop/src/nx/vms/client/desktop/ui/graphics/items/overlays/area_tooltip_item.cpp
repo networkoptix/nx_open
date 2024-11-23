@@ -5,11 +5,14 @@
 #include <array>
 
 #include <QtGui/QPainter>
+#include <QtGui/QPaintDevice>
+#include <QtGui/QPaintEngine>
 #include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QWidget>
 
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ui/graphics/painters/highlighted_area_text_painter.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
@@ -133,37 +136,43 @@ void paintArrow(QPainter* painter, const QRectF& rect, const Qt::Edge edge)
 
 using nx::vms::client::core::Geometry;
 
-class AreaTooltipItem::Private
+struct AreaTooltipItem::Private
 {
-public:
-    void updateTextPixmap();
-    void invalidateTextPixmap();
+    AreaTooltipItem* const q;
 
-public:
     QString text;
     QColor backgroundColor;
     figure::FigurePtr figure;
     QRectF targetObjectGeometry;
+    QRectF arrowGeometry;
 
-    QPixmap textPixmap;
     HighlightedAreaTextPainter textPainter;
 
-    QPixmap noBackGroundCache;
-    QPixmap backgroundCache;
-    QRectF arrowGeometry;
+    mutable QPixmap textPixmap;
+    mutable QPixmap noBackGroundCache;
+    mutable QPixmap backgroundCache;
+
+    void ensureTextPixmap(qreal devicePixelRatio) const;
+    void invalidateCachedPixmaps() const;
 };
 
-void AreaTooltipItem::Private::updateTextPixmap()
+void AreaTooltipItem::Private::ensureTextPixmap(qreal devicePixelRatio) const
 {
-    if (!textPixmap.isNull())
+    if (!textPixmap.isNull() && qFuzzyEquals(textPixmap.devicePixelRatioF(), devicePixelRatio))
         return;
 
-    textPixmap = textPainter.paintText(text);
+    const auto oldRect = q->boundingRect();
+
+    invalidateCachedPixmaps();
+    textPixmap = textPainter.paintText(text, devicePixelRatio);
+
+    if (!qFuzzyEquals(oldRect, q->boundingRect()))
+        q->prepareGeometryChange();
 }
 
-void AreaTooltipItem::Private::invalidateTextPixmap()
+void AreaTooltipItem::Private::invalidateCachedPixmaps() const
 {
-    textPixmap = QPixmap();
+    textPixmap = {};
     backgroundCache = {};
     noBackGroundCache = {};
 }
@@ -172,7 +181,7 @@ void AreaTooltipItem::Private::invalidateTextPixmap()
 
 AreaTooltipItem::AreaTooltipItem(QGraphicsItem* parent):
     base_type(parent),
-    d(new Private())
+    d(new Private{.q = this})
 {
 }
 
@@ -193,7 +202,7 @@ void AreaTooltipItem::setText(const QString& text)
     prepareGeometryChange();
 
     d->text = text;
-    d->invalidateTextPixmap();
+    d->invalidateCachedPixmaps();
 }
 
 AreaTooltipItem::Fonts AreaTooltipItem::fonts() const
@@ -208,7 +217,7 @@ void AreaTooltipItem::setFonts(const Fonts& fonts)
 
     prepareGeometryChange();
     d->textPainter.setFonts(fonts);
-    d->invalidateTextPixmap();
+    d->invalidateCachedPixmaps();
 }
 
 QColor AreaTooltipItem::textColor() const
@@ -222,7 +231,7 @@ void AreaTooltipItem::setTextColor(const QColor& color)
         return;
 
     d->textPainter.setColor(color);
-    d->invalidateTextPixmap();
+    d->invalidateCachedPixmaps();
     update();
 }
 
@@ -237,13 +246,12 @@ void AreaTooltipItem::setBackgroundColor(const QColor& color)
         return;
 
     d->backgroundColor = color;
+    d->invalidateCachedPixmaps();
     update();
 }
 
 QRectF AreaTooltipItem::boundingRect() const
 {
-    d->updateTextPixmap();
-
     if (d->textPixmap.isNull())
         return QRectF();
 
@@ -256,7 +264,7 @@ void AreaTooltipItem::paint(
     const QStyleOptionGraphicsItem* /*option*/,
     QWidget* /*widget*/)
 {
-    d->updateTextPixmap();
+    d->ensureTextPixmap(painter->paintEngine()->paintDevice()->devicePixelRatioF());
 
     if (d->textPixmap.isNull())
         return;
