@@ -7535,7 +7535,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Camera in place</source>
-      <translation>所定の位置でカメラを開く</translation>
+      <translation>この位置でカメラを開く</translation>
     </message>
   </context>
   <context>
