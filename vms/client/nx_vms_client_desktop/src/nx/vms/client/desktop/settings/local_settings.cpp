@@ -71,42 +71,6 @@ void migrateMediaFoldersFrom5_1(LocalSettings* settings, QSettings* oldSettings)
     settings->mediaFolders = mediaFoldersWithNativeSeparators;
 }
 
-void migrateMediaFoldersFrom4_3(LocalSettings* settings, QSettings* oldSettings)
-{
-    if (settings->mediaFolders.exists())
-        return;
-
-    QStringList mediaFolders;
-
-    const QVariant mediaRoot = oldSettings->value("mediaRoot");
-    if (!mediaRoot.isNull())
-        mediaFolders.append(mediaRoot.toString());
-
-    const QVariant auxMediaRoot = oldSettings->value("auxMediaRoot");
-    if (!auxMediaRoot.isNull())
-        mediaFolders += auxMediaRoot.toStringList();
-
-    QStringList mediaFoldersWithNativeSeparators;
-
-    for (const auto& mediaFolder: mediaFolders)
-        mediaFoldersWithNativeSeparators.append(QDir::toNativeSeparators(mediaFolder));
-
-    settings->mediaFolders = mediaFoldersWithNativeSeparators;
-}
-
-void migrateLastUsedConnectionFrom4_2(LocalSettings* settings, QSettings* oldSettings)
-{
-    if (settings->lastUsedConnection.exists())
-        return;
-
-    core::ConnectionData data;
-    data.url = oldSettings->value("AppServerConnections/lastUsed/url").toString();
-    data.url.setScheme(nx::network::http::kSecureUrlSchemeName);
-    data.systemId = oldSettings->value("localId").toUuid();
-
-    settings->lastUsedConnection = data;
-}
-
 void migrateLogSettings(LocalSettings* settings, QSettings* oldSettings)
 {
     using nx::utils::property_storage::migrateValue;
@@ -166,8 +130,6 @@ void LocalSettings::migrateOldSettings()
     const auto oldSettings = std::make_unique<QSettings>();
 
     migrateSettingsFrom5_1(this, oldSettings.get());
-    migrateLastUsedConnectionFrom4_2(this, oldSettings.get());
-    migrateMediaFoldersFrom4_3(this, oldSettings.get());
     migrateLogSettings(this, oldSettings.get());
     migrateFrom6_0(this);
 }
