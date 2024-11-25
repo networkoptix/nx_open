@@ -1859,7 +1859,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Take site name and settings from:</source>
+        <source>Take system name and settings from</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2212,10 +2212,6 @@
     <name>PushNotificationBusinessActionWidget</name>
     <message>
         <source>To</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Language Settings</source>
         <translation></translation>
     </message>
     <message>
@@ -2763,6 +2759,10 @@
         <source>Remote Access</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable hardware decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2927,10 +2927,6 @@
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Custom language for Cloud notifications</source>
         <translation></translation>
     </message>
 </context>
