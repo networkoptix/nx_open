@@ -45,6 +45,7 @@ struct OauthClient::Private: public QObject
         const QString& cloudSystem,
         const std::chrono::seconds& refreshTokenLifetime);
 
+    void issueTokensWithoutScope();
     void issueAccessToken();
     std::string email() const;
 };
@@ -91,7 +92,6 @@ void OauthClient::Private::issueAccessToken()
 
             authData.authorizationCode.clear();
             authData.credentials = nx::network::http::BearerAuthToken(response.access_token);
-            authData.refreshToken = std::move(response.refresh_token);
             authData.expiresAt = response.expires_at;
             authData.needValidateToken = response.error == OauthManager::k2faRequiredError;
             emit q->authDataReady();
@@ -99,12 +99,62 @@ void OauthClient::Private::issueAccessToken()
 
     IssueTokenRequest request;
     request.client_id = CloudConnectionFactory::clientId();
-    request.grant_type = GrantType::authorization_code;
-    request.code = authData.authorizationCode;
+    request.grant_type = GrantType::refresh_token;
+    request.refresh_token = authData.refreshToken;
     if (refreshTokenLifetime.count())
         request.refresh_token_lifetime = refreshTokenLifetime;
     if (!cloudSystem.isEmpty())
         request.scope = nx::format("cloudSystemId=%1", cloudSystem).toStdString();
+
+    m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
+}
+
+
+void OauthClient::Private::issueTokensWithoutScope()
+{
+    m_connection = m_cloudConnectionFactory->createConnection();
+    if (!NX_ASSERT(m_connection))
+    {
+        emit q->cancelled();
+        return;
+    }
+
+    auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
+        [this](ResultCode result, IssueTokenResponse response)
+        {
+            NX_DEBUG(
+                this,
+                "Issue token result: %1, error: %2",
+                result,
+                response.error.value_or(std::string()));
+
+            if (result != ResultCode::ok)
+            {
+                q->cancelled();
+                return;
+            }
+
+            authData.authorizationCode.clear();
+            authData.credentials = nx::network::http::BearerAuthToken(response.access_token);
+            authData.refreshToken = std::move(response.refresh_token);
+            authData.expiresAt = response.expires_at;
+            authData.needValidateToken = response.error == OauthManager::k2faRequiredError;
+            if (!cloudSystem.isEmpty())
+                issueAccessToken();
+            else
+                emit q->authDataReady();
+        });
+
+    // There are no situations where a client needs a refresh_token with a scope. However, there are
+    // situations where a client needs a refresh_token without a scope and an access_token with a
+    // scope for a specific system. Therefore, we first issue a refresh_token without a scope, and
+    // then in the callback, an access_token with a scope for the specific system.
+    IssueTokenRequest request;
+    request.client_id = CloudConnectionFactory::clientId();
+    request.grant_type = GrantType::authorization_code;
+    request.code = authData.authorizationCode;
+    if (refreshTokenLifetime.count())
+        request.refresh_token_lifetime = refreshTokenLifetime;
 
     m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
 }
@@ -249,7 +299,7 @@ void OauthClient::setCode(const QString& code)
     }
 
     d->authData.authorizationCode = code.toStdString();
-    d->issueAccessToken();
+    d->issueTokensWithoutScope();
 }
 
 void OauthClient::twoFaVerified(const QString& code)
