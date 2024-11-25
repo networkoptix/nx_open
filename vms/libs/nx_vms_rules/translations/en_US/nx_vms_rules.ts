@@ -2,6 +2,21 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>BasicAction</name>
+    <message>
+        <source>Caption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tooltip text</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Strings</name>
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -204,6 +219,50 @@
         <source>For</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>Selected devices were removed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected cameras were removed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected servers were removed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Selected layouts were removed</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Time value cannot be less than zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration cannot be less than zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value cannot be less than %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value cannot be more than %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::AcknowledgeAction</name>
@@ -213,10 +272,21 @@
     </message>
 </context>
 <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
-        <source>Multiple %1 events have occurred</source>
-        <translation></translation>
+        <source>Empty text is not allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid email address %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -232,14 +302,16 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
+    <message>
+        <source>Analytics event type is not selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
         <source>Object detected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 at camera &apos;%2&apos;</source>
-        <comment> is detected</comment>
         <translation></translation>
     </message>
     <message>
@@ -250,27 +322,17 @@
         <source>And Object</source>
         <translation></translation>
     </message>
-</context>
-<context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
     <message>
-        <source>Server &quot;%1&quot; has finished an archive backup</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Backup Finished</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Archive backup failed. Failed to backup file %1.</source>
+        <source>%1 at %2</source>
+        <comment> is detected</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-        <source>%1 event has occurred</source>
-        <translation></translation>
+        <source>Analytics object type is not selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -333,18 +395,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Device %1 was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera %1 was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O Module %1 was disconnected</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Device Disconnected</source>
         <translation type="unfinished">Device Disconnected</translation>
     </message>
@@ -358,6 +408,11 @@
     </message>
     <message>
         <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 was disconnected</source>
+        <comment>Device name will be substituted</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -381,19 +436,13 @@
         <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
         <translation></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Device IP Conflict</source>
-        <translation>
-            <numerusform>Device IP Conflict</numerusform>
-            <numerusform>Devices IP Conflict</numerusform>
-        </translation>
+        <translation type="unfinished">Device IP Conflict</translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Camera IP Conflict</source>
-        <translation>
-            <numerusform>Camera IP Conflict</numerusform>
-            <numerusform>Cameras IP Conflict</numerusform>
-        </translation>
+        <translation type="unfinished">Camera IP Conflict</translation>
     </message>
 </context>
 <context>
@@ -466,16 +515,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Generic Event at %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Omit logging</source>
         <translation></translation>
     </message>
     <message>
         <source>And Source</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Generic Event from %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -502,6 +551,24 @@
     </message>
     <message>
         <source>HTTP authentication</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+        <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Token field should be filled in case of bearer auth type selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+        <source>HTTP Method should be known</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -547,10 +614,6 @@
 <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
-        <source>Server &quot;%1&quot; has a license problem</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>License Issue</source>
         <translation></translation>
     </message>
@@ -565,6 +628,11 @@
     <message>
         <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>%1 has a license problem</source>
+        <comment>Server name will be substituted</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -657,20 +725,23 @@
         <translation></translation>
     </message>
     <message>
-        <source>Caption</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Tooltip</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Show Desktop Notification</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+        <source>List is not selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List with the given id &apos;%1&apos; does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -683,10 +754,6 @@
 <context>
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
-        <source>Duration cannot be less than zero</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Zero duration cannot be set for the `%1` event state</source>
         <translation type="unfinished"></translation>
     </message>
@@ -694,21 +761,9 @@
         <source>Non zero duration cannot be set for the `%1` event state</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Value cannot be less than %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value cannot be more than %1</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::rules::PanicRecordingAction</name>
-    <message>
-        <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Panic Recording</source>
         <translation></translation>
@@ -747,10 +802,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>PoE over budget at %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server</source>
         <translation></translation>
     </message>
@@ -761,6 +812,22 @@
     <message>
         <source>Power limit exceeded (%1)</source>
         <comment>%1 is consumption</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PoE over budget on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current power consumption: %1 watts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upper consumption limit: %1 watts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower consumption limit: %1 watts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -819,6 +886,14 @@
         <source>`%1` action builder field alerts:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rule is not completed. One filter and one builder are required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The given filter is not compatible with the given builder</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
@@ -836,10 +911,6 @@
     </message>
     <message>
         <source>Paid integration services disabled</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Services issue</source>
         <translation></translation>
     </message>
     <message numerus="yes">
@@ -863,6 +934,10 @@
             <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Services Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::SendEmailAction</name>
@@ -882,12 +957,13 @@
 <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-        <source>Server &quot;%1&quot; certificate error</source>
+        <source>Server Certificate Error</source>
         <translation></translation>
     </message>
     <message>
-        <source>Server Certificate Error</source>
-        <translation></translation>
+        <source>%1 certificate error</source>
+        <comment>Server name will be substituted</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -907,20 +983,17 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; Conflict</source>
+        <source>Server Conflict</source>
         <translation></translation>
     </message>
     <message>
-        <source>Server Conflict</source>
-        <translation></translation>
+        <source>%1 Conflict</source>
+        <comment>Server name will be substituted</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
-    <message>
-        <source>Server &quot;%1&quot; Failure</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Server Failure</source>
         <translation></translation>
@@ -933,16 +1006,20 @@
         <source>Server stopped unexpectedly.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>%1 Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-        <source>Server &quot;%1&quot; Started</source>
+        <source>Server Started</source>
         <translation></translation>
     </message>
     <message>
-        <source>Server Started</source>
-        <translation></translation>
+        <source>%1 Started</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -967,14 +1044,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Trigger: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Soft Trigger %1 at %2</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Soft Trigger</source>
         <translation></translation>
     </message>
@@ -989,6 +1058,14 @@
     <message>
         <source>By</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1094,6 +1171,21 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+        <source>List is not selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List with the given id &apos;%1&apos; does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List with the given id &apos;%1&apos; is not a generic list</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
         <source>Show Text Overlay</source>
@@ -1111,7 +1203,15 @@
 <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-        <source>Unacceptable typed of field</source>
+        <source>Url cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Url must be valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Url should not contains user or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
