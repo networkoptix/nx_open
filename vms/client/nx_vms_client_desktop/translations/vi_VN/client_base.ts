@@ -3832,7 +3832,7 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Features</source>
@@ -9189,7 +9189,7 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>deleted camera</source>
-      <translation>camera bị xóa</translation>
+      <translation>camera đã bị xóa</translation>
     </message>
     <message>
       <source>Bookmark it...</source>

@@ -5536,7 +5536,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Users</source>
-      <translation>Utlisateurs</translation>
+      <translation>Utilisateurs</translation>
     </message>
     <message>
       <source>Security</source>
@@ -6316,7 +6316,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <source>Delete %n items?</source>
       <translation>
         <numerusform>Supprimer %n objet?</numerusform>
-        <numerusform>Supprimer %n objets?</numerusform>
+        <numerusform>Supprimer %n objet?</numerusform>
       </translation>
     </message>
     <message>
@@ -11567,7 +11567,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation>Appliquer les modifications avant de quitter ?</translation>
+      <translation>Appliquer les modifications avant de quitter ?</translation>
     </message>
   </context>
   <context>

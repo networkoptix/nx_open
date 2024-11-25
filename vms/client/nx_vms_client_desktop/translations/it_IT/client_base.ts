@@ -3822,7 +3822,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>DN</source>
@@ -6312,8 +6312,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Elimina %n elementi?</numerusform>
-        <numerusform>Elimina %n elementi?</numerusform>
+        <numerusform>Eliminare %n elementi?</numerusform>
+        <numerusform>Eliminare %n elementi?</numerusform>
       </translation>
     </message>
     <message>

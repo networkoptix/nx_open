@@ -11139,7 +11139,7 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
     </message>
     <message>
       <source>Update...</source>
-      <translation>Update...</translation>
+      <translation>Mengupdate...</translation>
     </message>
     <message>
       <source>Do not notify again about this update</source>

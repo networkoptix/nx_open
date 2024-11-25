@@ -178,7 +178,7 @@
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>新增電視牆...</translation>
+      <translation>新電視牆...</translation>
     </message>
     <message>
       <source>Web Page...</source>

@@ -2579,7 +2579,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation>Bla gjennom...</translation>
+      <translation>Bla igjennom...</translation>
     </message>
     <message>
       <source>Resolution</source>

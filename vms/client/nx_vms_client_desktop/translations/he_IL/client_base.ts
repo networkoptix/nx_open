@@ -3912,7 +3912,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>שם משתמש</translation>
+      <translation>הכנס</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5945,7 +5945,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>שם משתמש</translation>
+      <translation>הכנס</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6023,7 +6023,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layouts</source>
-      <translation>פריסות</translation>
+      <translation>פריסה</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -6050,7 +6050,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Layouts</source>
-      <translation>פריסות</translation>
+      <translation>פריסה</translation>
     </message>
     <message>
       <source>New User...</source>
@@ -6098,7 +6098,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation>שם משתמש</translation>
+      <translation>הכנס</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6462,10 +6462,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>למחוק %n פריטים?</numerusform>
-        <numerusform>למחוק %n פריטים?</numerusform>
-        <numerusform>למחוק %n פריטים?</numerusform>
-        <numerusform>למחוק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
+        <numerusform>מחק %n פריטים?</numerusform>
       </translation>
     </message>
     <message>

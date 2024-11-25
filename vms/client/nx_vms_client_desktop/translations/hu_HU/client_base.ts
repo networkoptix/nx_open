@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Új videófal...</translation>
+      <translation>Új videofal...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -5818,7 +5818,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5977,7 +5977,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -6313,8 +6313,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Töröl %n elemet?</numerusform>
-        <numerusform>Töröl %n elemet?</numerusform>
+        <numerusform>Törli a(z) %n elemet?</numerusform>
+        <numerusform>Törli a(z) %n elemet?</numerusform>
       </translation>
     </message>
     <message>

@@ -1726,7 +1726,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation>ถอนออก</translation>
+      <translation>&amp;ลบ</translation>
     </message>
     <message>
       <source>New License</source>

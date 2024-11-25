@@ -4414,7 +4414,7 @@ til %1</translation>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>Administrere bokmerker</translation>
+      <translation>Administrer bokmerker</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
@@ -6315,7 +6315,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Vil du slette %n element?</numerusform>
+        <numerusform>Vil du slette %n elementer?</numerusform>
         <numerusform>Vil du slette %n elementer?</numerusform>
       </translation>
     </message>
@@ -11563,7 +11563,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation>Lagreendring er før du avslutter?</translation>
+      <translation>Lagre endringer før du går videre?</translation>
     </message>
   </context>
   <context>

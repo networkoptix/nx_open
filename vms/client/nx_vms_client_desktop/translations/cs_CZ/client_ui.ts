@@ -3209,7 +3209,7 @@
     <name>UserRoleSettingsWidget</name>
     <message>
       <source>Name</source>
-      <translation>Jméno</translation>
+      <translation>Název</translation>
     </message>
     <message>
       <source>Users</source>

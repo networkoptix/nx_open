@@ -5957,7 +5957,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Login</source>
-      <translation>Usuario</translation>
+      <translation>Iniciar Sesión</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6313,8 +6313,8 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>¿Borrar %n archivos?</numerusform>
-        <numerusform>¿Borrar %n archivos?</numerusform>
+        <numerusform>¿Eliminar %n artículos?</numerusform>
+        <numerusform>¿Eliminar %n artículos?</numerusform>
       </translation>
     </message>
     <message>

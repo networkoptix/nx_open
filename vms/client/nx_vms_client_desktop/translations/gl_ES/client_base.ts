@@ -3266,16 +3266,16 @@ a %1</translation>
     <name>QnDeprecatedUserListModel</name>
     <message>
       <source>Local user</source>
-      <translation>Usuario local</translation>
+      <translation type="unfinished">Local user</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 usuario</translation>
+      <translation type="unfinished">%1 user</translation>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation>Usuario LDAP</translation>
+      <translation type="unfinished">LDAP user</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -3345,7 +3345,7 @@ a %1</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation>Todas as persoas usuarias</translation>
+      <translation type="unfinished">All users</translation>
     </message>
     <message>
       <source>With enabled digest authentication</source>
@@ -5925,7 +5925,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Activado</translation>
     </message>
     <message>
       <source>User is disabled</source>

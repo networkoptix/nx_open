@@ -178,7 +178,7 @@
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>신규 비디오월...</translation>
+      <translation>새 비디오 월...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -4540,7 +4540,7 @@ to %1</source>
     </message>
     <message>
       <source>Best</source>
-      <translation>최고</translation>
+      <translation>최상</translation>
     </message>
     <message>
       <source>Average</source>

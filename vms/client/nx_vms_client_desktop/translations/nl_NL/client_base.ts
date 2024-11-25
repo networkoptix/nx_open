@@ -3995,7 +3995,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Deactivate</source>

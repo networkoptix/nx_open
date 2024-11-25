@@ -179,7 +179,7 @@
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Yeni Multi Monitör...</translation>
+      <translation>Yeni Video Duvarı...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -3828,7 +3828,7 @@ to %1</source>
     </message>
     <message>
       <source>Name</source>
-      <translation>Ad</translation>
+      <translation>İsim</translation>
     </message>
   </context>
   <context>
@@ -5814,7 +5814,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>E Posta</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5878,7 +5878,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Ekran düzeni</translation>
+      <translation>Ekran Düzenleri</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -5921,7 +5921,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Enabled</source>
-      <translation>Etkin</translation>
+      <translation>Etkinleştir</translation>
     </message>
     <message>
       <source>User is disabled</source>
@@ -5973,7 +5973,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>E Posta</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -6308,8 +6308,8 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>%n öğesi silinsin mi?</numerusform>
-        <numerusform>%n öğesi silinsin mi?</numerusform>
+        <numerusform>%n öğeleri silinsin mi?</numerusform>
+        <numerusform>%n öğeleri silinsin mi?</numerusform>
       </translation>
     </message>
     <message>

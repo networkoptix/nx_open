@@ -3202,7 +3202,7 @@
     <name>UserProfileWidget</name>
     <message>
       <source>Change Password...</source>
-      <translation>Ganti Kata sandi...</translation>
+      <translation>Ganti Kata Sandi...</translation>
     </message>
   </context>
   <context>

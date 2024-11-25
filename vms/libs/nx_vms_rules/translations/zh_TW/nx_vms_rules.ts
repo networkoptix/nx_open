@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>敘述</translation>
+      <translation>&amp;敘述</translation>
     </message>
   </context>
   <context>

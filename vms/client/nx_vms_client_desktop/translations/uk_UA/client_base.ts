@@ -4714,7 +4714,7 @@ to %1</source>
     </message>
     <message>
       <source>Best</source>
-      <translation>Найкраще</translation>
+      <translation>Найкраща</translation>
     </message>
     <message>
       <source>Average</source>
@@ -5266,7 +5266,7 @@ to %1</source>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>User Input</source>
-      <translation>User Input</translation>
+      <translation>Дії Користувача</translation>
     </message>
   </context>
   <context>
@@ -6069,7 +6069,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enabled</source>
-      <translation>Активовано</translation>
+      <translation>Увімкнено</translation>
     </message>
     <message>
       <source>User is disabled</source>
@@ -11530,7 +11530,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Мінімізувати</translation>
+      <translation>Згорнути</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -12016,7 +12016,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>Почати Прокрутку</translation>
+      <translation>Почати Showreel</translation>
     </message>
   </context>
   <context>

@@ -4599,7 +4599,7 @@ a %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Òptim</translation>
+      <translation>Òptima</translation>
     </message>
     <message>
       <source>Average</source>
@@ -9329,7 +9329,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>deleted camera</source>
-      <translation>càmera eliminada</translation>
+      <translation>càmera suprimida</translation>
     </message>
     <message>
       <source>Bookmark it...</source>

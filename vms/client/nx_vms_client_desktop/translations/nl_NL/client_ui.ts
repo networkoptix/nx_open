@@ -1726,7 +1726,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <source>New License</source>

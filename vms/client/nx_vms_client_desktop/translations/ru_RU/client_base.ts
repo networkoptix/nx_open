@@ -6466,9 +6466,9 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Delete %n items?</source>
       <translation>
         <numerusform>Удалить %n элемент?</numerusform>
+        <numerusform>Удалить %n элемент?</numerusform>
+        <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемента?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
-        <numerusform>Удалить %n элементов?</numerusform>
       </translation>
     </message>
     <message>

@@ -5950,7 +5950,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Name</source>
-      <translation>Jméno</translation>
+      <translation>Název</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6115,7 +6115,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Name</source>
-      <translation>Jméno</translation>
+      <translation>Název</translation>
     </message>
     <message>
       <source>Email</source>

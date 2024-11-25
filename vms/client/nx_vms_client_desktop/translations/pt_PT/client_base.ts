@@ -3821,11 +3821,11 @@ a %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>DN</source>
@@ -5808,7 +5808,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5959,7 +5959,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -5991,7 +5991,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Confirmar senha</translation>
+      <translation>Confirme a Senha</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>

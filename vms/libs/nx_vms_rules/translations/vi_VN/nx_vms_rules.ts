@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation>Tình trạng</translation>
+      <translation>Trạng thái</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -320,11 +320,11 @@
     </message>
     <message>
       <source>State</source>
-      <translation>Tiểu bang</translation>
+      <translation>Trạng thái</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -441,7 +441,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>Source</source>
@@ -481,7 +481,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation>Tiểu bang</translation>
+      <translation>Trạng thái</translation>
     </message>
     <message>
       <source>Server</source>
@@ -597,7 +597,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation>Tiểu bang</translation>
+      <translation>Trạng thái</translation>
     </message>
     <message>
       <source>Cameras</source>

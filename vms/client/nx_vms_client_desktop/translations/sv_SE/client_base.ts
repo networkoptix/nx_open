@@ -11565,7 +11565,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation>Spara ändringar före avslut?</translation>
+      <translation>Vill du tillämpa ändringar innan du avslutar?</translation>
     </message>
   </context>
   <context>

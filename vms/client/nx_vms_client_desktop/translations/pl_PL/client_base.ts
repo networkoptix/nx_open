@@ -1602,7 +1602,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation>Użytkownicy zaczną otrzymywać e-maile zaraz po zastosowaniu ustawień</translation>
+      <translation>Użytkownicy zaczną otrzymywać wiadomości e-mail zaraz po zastosowaniu ustawień</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
@@ -3911,7 +3911,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Zalogowanie</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5943,7 +5943,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Zalogowanie</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6096,7 +6096,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Zalogowanie</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6128,7 +6128,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Potwierdź hasło</translation>
+      <translation>Powtórz hasło</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -6459,10 +6459,10 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Usunąć element?</numerusform>
-        <numerusform>Usunąć %n elementy?</numerusform>
         <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Usunąć %n element?</numerusform>
+        <numerusform>Usunąć %n elementów?</numerusform>
+        <numerusform>Usunąć %n elementów?</numerusform>
+        <numerusform>Usunąć %n elementów?</numerusform>
       </translation>
     </message>
     <message>

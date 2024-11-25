@@ -178,7 +178,7 @@
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Video Wall ใหม่....</translation>
+      <translation>สร้างจอแสดงผลใหม่...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -3774,7 +3774,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>อีเมล</translation>
+      <translation>อีเมลล์</translation>
     </message>
     <message>
       <source>DN</source>

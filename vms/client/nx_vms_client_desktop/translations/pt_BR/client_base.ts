@@ -3821,11 +3821,11 @@ a %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>DN</source>
@@ -5808,7 +5808,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Name</source>
@@ -5959,7 +5959,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -9333,7 +9333,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>Adicionar aos marcadores...</translation>
+      <translation>Adicionar ao Marcador...</translation>
     </message>
   </context>
   <context>
@@ -11701,7 +11701,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>Iniciar Exibição</translation>
+      <translation>Iniciar Showreel</translation>
     </message>
   </context>
   <context>
