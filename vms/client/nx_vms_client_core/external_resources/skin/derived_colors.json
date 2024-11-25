@@ -100,6 +100,14 @@
                 "text_hover": "#ffffff",
                 "background_pressed": "#1d5177",
                 "text_pressed": "#d8e2e9"
+            },
+            "tooltip": {
+                "background": "#042A49",
+                "separator": "#349EF4",
+                "scrollBar": {
+                    "indicator": "#349EF4",
+                    "background": "#042A49"
+                }
             }
         },
         "showButton": "#c2a026.setAlpha(199)",

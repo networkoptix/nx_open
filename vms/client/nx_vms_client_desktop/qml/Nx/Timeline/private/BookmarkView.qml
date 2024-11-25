@@ -6,12 +6,14 @@ import QtQuick.Layouts
 import QtQml.Models
 
 import Nx.Controls
+import Nx.Core
+import Nx.Core.Controls
 
 import "."
 
 import nx.vms.client.core
 
-Control
+Item
 {
     id: control
 
@@ -19,82 +21,147 @@ Control
 
     signal tagClicked(string tag)
 
-    padding: 16
+    implicitHeight: contentLayout.implicitHeight
+    implicitWidth: contentLayout.implicitWidth
 
-    contentItem: ColumnLayout
+    ScrollView
     {
-        spacing: 12
+        id: scrollView
+        anchors.fill: parent
+        contentWidth: contentLayout.width
 
-        Text
+        ScrollBar.vertical: ScrollBar
         {
-            Layout.fillWidth: true
+            id: verticalScrollBar
+            parent: scrollView
+            x: scrollView.width - width
+            y: scrollView.topPadding
+            height: scrollView.availableHeight
+            active: scrollView.ScrollBar.horizontal.active
 
-            text: control.bookmark.name
-            font.pixelSize: FontConfig.large.pixelSize
-            font.weight: FontConfig.large.weight
-            color: "white"
-            wrapMode: Text.Wrap
-        }
-
-        Text
-        {
-            text: "%1 | %2"
-               .arg(NxGlobals.timeInShortFormat(control.bookmark.dateTime))
-               .arg(NxGlobals.dateInShortFormat(control.bookmark.dateTime))
-
-            color: "white"
-            font.pixelSize: FontConfig.small.pixelSize
-            font.weight: FontConfig.small.weight
-        }
-
-        LimitedFlow
-        {
-            id: tagFlow
-
-            Layout.fillWidth: true
-
-            visible: control.bookmark.tags.length
-            spacing: 4
-            rowLimit: 1
-
-            delegate: Tag
+            contentItem: Rectangle
             {
-                text: model.tag
-                onClicked:
+                implicitWidth: 8
+                color: ColorTheme.colors.timeline.bookmark.tooltip.scrollBar.indicator
+            }
+
+            background: Rectangle
+            {
+                color: ColorTheme.colors.timeline.bookmark.tooltip.scrollBar.background
+            }
+        }
+
+        ColumnLayout
+        {
+            id: contentLayout
+            width: scrollView.availableWidth
+            spacing: 12
+
+            RowLayout
+            {
+                Layout.fillWidth: true
+                Layout.topMargin: 16
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+
+                Text
                 {
-                    control.tagClicked(model.tag)
+                    Layout.fillWidth: true
+
+                    text: control.bookmark.name
+                    font.pixelSize: FontConfig.large.pixelSize
+                    font.weight: FontConfig.large.weight
+                    color: ColorTheme.colors.light4
+                    wrapMode: Text.Wrap
+                }
+
+                ColoredImage
+                {
+                    visible: control.bookmark.shareable
+                    sourcePath: "image://skin/20x20/Solid/shared.svg"
+                    sourceSize: Qt.size(20, 20)
+                    primaryColor: ColorTheme.colors.light4
+                    secondaryColor: ColorTheme.colors.green
+
+                    HoverHandler
+                    {
+                        id: hoverHandler
+                    }
+
+                    ToolTip.text: qsTr("Shared by link")
+                    ToolTip.visible: hoverHandler.hovered
+                    ToolTip.toolTip.popupType: Popup.Window
                 }
             }
 
-            sourceModel: ListModel
+            Text
             {
-                id: tagListModel
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+
+                text: "%1 | %2"
+                    .arg(NxGlobals.timeInShortFormat(control.bookmark.dateTime))
+                    .arg(NxGlobals.dateInShortFormat(control.bookmark.dateTime))
+
+                color: ColorTheme.colors.light4
+                font.pixelSize: FontConfig.small.pixelSize
+                font.weight: FontConfig.small.weight
             }
 
-            Tag
+            LimitedFlow
             {
-                text: "+" + tagFlow.remaining
-                onClicked:
+                id: tagFlow
+
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+
+                visible: control.bookmark.tags.length
+                spacing: 4
+                rowLimit: 1
+
+                delegate: Tag
                 {
-                    tagFlow.rowLimit *= 3
+                    text: model.tag
+                    onClicked:
+                    {
+                        control.tagClicked(model.tag)
+                    }
+                }
+
+                sourceModel: ListModel
+                {
+                    id: tagListModel
+                }
+
+                Tag
+                {
+                    text: "+" + tagFlow.remaining
+                    onClicked:
+                    {
+                        tagFlow.rowLimit *= 3
+                    }
+                }
+
+                Component.onCompleted:
+                {
+                    for (let tag of control.bookmark.tags)
+                        tagListModel.append({"tag": tag})
                 }
             }
 
-            Component.onCompleted:
+            Text
             {
-                for (let tag of control.bookmark.tags)
-                    tagListModel.append({"tag": tag})
+                Layout.fillWidth: true
+                Layout.leftMargin: 16
+                Layout.rightMargin: 16
+
+                text: control.bookmark.description
+                color: ColorTheme.colors.light4
+                wrapMode: Text.Wrap
+                visible: text
             }
-        }
-
-        Text
-        {
-            Layout.fillWidth: true
-
-            text: control.bookmark.description
-            color: "white"
-            wrapMode: Text.Wrap
-            visible: text
         }
     }
 }

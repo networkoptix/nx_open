@@ -33,7 +33,7 @@ Control
                 icon.source: "image://skin/16x16/Outline/arrow_left.svg"
                 icon.width: 16
                 icon.height: 16
-                icon.color: "white"
+                icon.color: ColorTheme.colors.light4
                 enabled: control.total !== 0 && control.current !== 1
 
                 onClicked:
@@ -46,7 +46,7 @@ Control
             {
                 id: pageDisplay
                 text: "%1/%2".arg(control.current).arg(control.total)
-                color: "white"
+                color: ColorTheme.colors.light4
             }
 
             ImageButton
@@ -55,7 +55,7 @@ Control
                 icon.source: "image://skin/16x16/Outline/arrow_right.svg"
                 icon.width: 16
                 icon.height: 16
-                icon.color: "white"
+                icon.color: ColorTheme.colors.light4
                 enabled: control.total !== 0 && control.current !== control.total
 
                 onClicked:

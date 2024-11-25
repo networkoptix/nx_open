@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import Nx.Controls
+import Nx.Core
 
 import nx.vms.client.core
 
@@ -24,85 +25,55 @@ Page
     padding: 0
     background: Rectangle
     {
-        color: "#042A49"
+        color: ColorTheme.colors.timeline.bookmark.tooltip.background
         opacity: 0.8
         radius: 2
     }
 
-    ScrollView
+    function updateHeight()
     {
-        id: scrollView
-        implicitWidth: bookmarksStackLayout.width
-        implicitHeight:
+        height = footer.height + bookmarksStackLayout.children[bookmarksStackLayout.currentIndex].height
+    }
+
+    StackLayout
+    {
+        id: bookmarksStackLayout
+        currentIndex: pageController.current - 1
+        clip: true
+
+        Repeater
         {
-            const availableHeight = root.kMaxHeight - root.footer.implicitHeight
+            model: root.bookmarks
 
-            if (bookmarksStackLayout.height > availableHeight)
-                return availableHeight
-
-            return bookmarksStackLayout.height
-        }
-
-        ScrollBar.vertical: ScrollBar
-        {
-            parent: scrollView
-            x: scrollView.width - width
-            y: scrollView.topPadding
-            height: scrollView.availableHeight
-            active: scrollView.ScrollBar.horizontal.active
-
-            contentItem: Rectangle
+            BookmarkView
             {
-                implicitWidth: 8
-                color: "#349EF4"
-            }
+                property bool isCurrent: StackLayout.isCurrentItem
 
-            background: Rectangle
-            {
-                color: "#042A49"
-            }
-        }
+                Layout.fillWidth: true
+                Layout.maximumWidth: 300
+                Layout.minimumWidth: 180
 
-        StackLayout
-        {
-            id: bookmarksStackLayout
-            currentIndex: pageController.current - 1
+                Layout.fillHeight: false
+                Layout.maximumHeight: 250
 
-            Repeater
-            {
-                model: root.bookmarks
+                bookmark: modelData
 
-                BookmarkView
+                function updateRootHeight()
                 {
-                    readonly property int kMaxWidth: 300
-                    readonly property int kMinWidth: 180
-                    property bool isCurrent: StackLayout.isCurrentItem
-                    onIsCurrentChanged:
-                    {
-                        StackLayout.layout.implicitHeight = implicitHeight
-                    }
+                    // Bookmark tooltip height must be equal to the current bookmark content height
+                    // plus root item footer height. The given workaround is required as height
+                    // is recalculated multiple time during layout population and changing
+                    // current item.
+                    if (isCurrent)
+                        Qt.callLater(root.updateHeight)
+                }
 
-                    Layout.fillHeight: false
-                    Layout.fillWidth: false
-                    Layout.preferredWidth:
-                    {
-                        if (implicitWidth < kMinWidth)
-                            return kMinWidth
+                onIsCurrentChanged: updateRootHeight()
+                onHeightChanged: updateRootHeight()
 
-                        if (implicitWidth > kMaxWidth)
-                            return kMaxWidth
-
-                        return implicitWidth
-                    }
-
-                    bookmark: modelData
-                    bottomPadding: 0
-                    clip: true
-
-                    onTagClicked: function(tag)
-                    {
-                        root.self.tagClicked(tag)
-                    }
+                onTagClicked: function(tag)
+                {
+                    root.self.tagClicked(tag)
                 }
             }
         }
@@ -128,7 +99,7 @@ Page
                     icon.source: "image://skin/20x20/Solid/play.svg"
                     icon.width: 20
                     icon.height: 20
-                    icon.color: "white"
+                    icon.color: ColorTheme.colors.light4
 
                     onClicked: root.self.onPlayClicked(bookmarksStackLayout.currentIndex)
                 }
@@ -138,7 +109,7 @@ Page
                     icon.source: "image://skin/20x20/Solid/edit.svg"
                     icon.width: 20
                     icon.height: 20
-                    icon.color: "white"
+                    icon.color: ColorTheme.colors.light4
                     visible: !root.readOnly
 
                     onClicked: root.self.onEditClicked(bookmarksStackLayout.currentIndex)
@@ -149,7 +120,7 @@ Page
                     icon.source: "image://skin/20x20/Solid/download.svg"
                     icon.width: 20
                     icon.height: 20
-                    icon.color: "white"
+                    icon.color: ColorTheme.colors.light4
                     visible: root.allowExport
 
                     onClicked: root.self.onExportClicked(bookmarksStackLayout.currentIndex)
@@ -165,7 +136,7 @@ Page
                     icon.source: "image://skin/20x20/Solid/delete.svg"
                     icon.width: 20
                     icon.height: 20
-                    icon.color: "white"
+                    icon.color: ColorTheme.colors.light4
                     visible: !root.readOnly
 
                     onClicked: root.self.onDeleteClicked(bookmarksStackLayout.currentIndex)
@@ -184,7 +155,7 @@ Page
                     width: parent.width
                     anchors.verticalCenter: parent.verticalCenter
                     height: 1
-                    color: "#349EF4"
+                    color: ColorTheme.colors.timeline.bookmark.tooltip.separator
                     opacity: 0.5
                 }
             }

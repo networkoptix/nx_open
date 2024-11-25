@@ -22,6 +22,7 @@ QVariantList toVariantList(const common::CameraBookmarkList& bookmarks)
         bookmarkData.insert("tags", QVariant::fromValue(bookmark.tags));
         bookmarkData.insert(
             "dateTime", QDateTime::fromMSecsSinceEpoch(bookmark.creationTime().count()));
+        bookmarkData.insert("shareable", bookmark.shareable());
 
         result.push_back(bookmarkData);
     }
