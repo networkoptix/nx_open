@@ -50,9 +50,14 @@ similarly to `*.sys.hidden` Attributes, and the following pre-defined attributes
 behavior:
 
 - `nx.sys.color`: Such Attribute defines the color of the Object Bounding Box on video in the
-Client. Its value can be either of the following:
+    Client. Its value can be either of the following:
     - RGB color in form `#RRGGBB`, where `RR`, `GG` and `BB` are hexadecimal values of red, green
         and blue color components respectively.
     - Fixed color name from the following palette (case-sensitive):
         - `Magenta`, `Blue`, `Green`, `Yellow`, `Cyan`, `Purple`, `Orange`, `Red`, `White`.
     - NOTE: Other values are treated as if the Attribute was not specified at all.
+
+- `nx.sys.showAsPoint`: Boolean (`true` or `false`). If such Attribute is present and is `true`,
+    the detected object will be shown on a video frame not as a rectangle, but rather as a cross
+    drawn at the left top corner of the defined rectangle. The size of the defined rectangle will
+    not have any meaning in this case.

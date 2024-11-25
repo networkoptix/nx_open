@@ -73,6 +73,17 @@ std::string Engine::manifestString() const
             {
                 "id": ")json" + kFixedObjectType + R"json(",
                 "name": "Fixed object"
+            },
+            {
+                "id": ")json" + kPointObjectType + R"json(",
+                "name": "Point-like object",
+                "attributes":
+                [
+                    {
+                        "name": "nx.sys.showAsPoint",
+                        "type": "Boolean"
+                    }
+                ]
             }
         ]
     },

@@ -64,7 +64,8 @@ std::string DeviceAgent::manifestString() const
     [
         { "objectTypeId": ")json" + kFixedObjectType + R"json(" },
         { "objectTypeId": ")json" + kBlinkingObjectType + R"json(" },
-        { "objectTypeId": ")json" + kCounterObjectType + R"json(" }
+        { "objectTypeId": ")json" + kCounterObjectType + R"json(" },
+        { "objectTypeId": ")json" + kPointObjectType + R"json(" }
     ],
     "typeLibrary":
     {
@@ -129,6 +130,7 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     }
 
     m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
+    m_deviceAgentSettings.generatePoint = toBool(settingValue(kGeneratePointSetting));
 
     assignNumericSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);
@@ -338,6 +340,41 @@ void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPac
     objectMetadataPacket->addItem(objectMetadata.get());
 }
 
+void DeviceAgent::addPointIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    static float realXOffset = 0.0F;
+    static float realYOffset = 0.0F;
+    constexpr float kOffsetInc = 0.005F;
+    
+    if (!m_deviceAgentSettings.generatePoint)
+        return;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kPointObjectType);
+    objectMetadata->setTrackId(trackId);
+
+    realXOffset = clamp(realXOffset + kOffsetInc, 0.0F, 1.0F);
+    if (realXOffset >= 1.0F - kOffsetInc)
+        realXOffset = 0;    
+
+    realYOffset = clamp(realYOffset + kOffsetInc, 0.0F, 1.0F);
+    if (realYOffset >= 1.0F - kOffsetInc)
+        realYOffset = 0;    
+
+    // The size does not matter.
+    const float realWidth = 0.0F;
+    const float realHeight = 0.0F;
+
+    objectMetadata->setBoundingBox(Rect(realXOffset, realYOffset, realWidth, realHeight));
+    objectMetadata->addAttribute(makePtr<Attribute>(
+        IAttribute::Type::boolean,
+        "nx.sys.showAsPoint",
+        "true"));
+
+    objectMetadataPacket->addItem(objectMetadata.get());
+}
+
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
@@ -359,6 +396,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     addBlinkingObjectIfNeeded(metadataTimestampUs, &result, objectMetadataPacket);
     addFixedObjectIfNeeded(objectMetadataPacket);
     addCounterIfNeeded(objectMetadataPacket);
+    addPointIfNeeded(objectMetadataPacket);
 
     const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
 

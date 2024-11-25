@@ -26,6 +26,7 @@ namespace special_objects {
 
 const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
 const std::string kFixedObjectType = "nx.stub.fixedObject";
+const std::string kPointObjectType = "nx.stub.pointObject";
 const std::string kCounterObjectType = "nx.stub.counter";
 
 class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
@@ -66,6 +67,9 @@ private:
     void addCounterIfNeeded(
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
+    void addPointIfNeeded(
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
+
     void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
 
     void processCustomMetadataPacket(
@@ -89,6 +93,7 @@ private:
         {
             return generateFixedObject
                 || generateCounter
+                || generatePoint
                 || blinkingObjectPeriodMs.load() != std::chrono::milliseconds::zero();
         }
 
@@ -98,6 +103,7 @@ private:
         std::string fixedObjectColor;
 
         std::atomic<bool> generateCounter{false};
+        std::atomic<bool> generatePoint{false};
 
         std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{
             std::chrono::milliseconds::zero()};
