@@ -110,12 +110,13 @@ struct LookupListActionHandler::Private
             QnMessageBox::warning(q->mainWindowWidget(), title, description);
     }
 
-    void saveList(DataDescriptor dataDescriptor)
+    void processSaveQueue()
     {
+        if (!NX_ASSERT(!saveQueue.empty()))
+            return;
+
         auto callback = nx::utils::guarded(q,
-            [this, successHandler = dataDescriptor.successHandler](bool success,
-                rest::Handle requestId,
-                const rest::ServerConnection::EmptyResponseType& /*response*/)
+            [this](bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty result)
             {
                 if (this->requestId != requestId)
                     return;
@@ -124,10 +125,12 @@ struct LookupListActionHandler::Private
                 {
                     this->requestId = std::nullopt;
                     requestAttemptsCount = 0;
+
+                    if (NX_ASSERT(!saveQueue.empty()) && saveQueue.front().successHandler)
+                        saveQueue.front().successHandler();
+
                     saveQueue.pop_front();
 
-                    if (successHandler)
-                        successHandler();
                     processQueues();
                 }
                 else
@@ -139,22 +142,22 @@ struct LookupListActionHandler::Private
                         return;
                     }
 
-                    NX_WARNING(this, "Lookup List save request %1 failed", requestId);
+                    QString error;
+                    if (!std::holds_alternative<rest::Empty>(result))
+                        error = std::get<nx::network::rest::Result>(result).errorString;
+
+                    NX_WARNING(this, "Lookup List save request %1 failed - %2", requestId, error);
                     this->requestId = std::nullopt;
 
-                    handleError(
-                        tr("Network request failed"), tr("Lookup List save request failed"));
+                    handleError(tr("Network request failed"), error);
+
                     if (dialog)
                         dialog->setSaveResult(false);
                 }
             });
 
-        requestId = q->connectedServerApi()->putEmptyResult(
-            nx::format("/rest/v4/lookupLists/%1").arg(dataDescriptor.data.id),
-            {},
-            QByteArray::fromStdString(nx::reflect::json::serialize(dataDescriptor.data)),
-            callback,
-            q->thread());
+        const auto& dataDescriptor = saveQueue.front();
+        requestId = q->connectedServerApi()->saveLookupList(dataDescriptor.data, callback, q->thread());
 
         NX_VERBOSE(this, "Send save list %1 request (%2)", dataDescriptor.data.id, *requestId);
     }
@@ -207,7 +210,7 @@ struct LookupListActionHandler::Private
     {
         if (!saveQueue.empty())
         {
-            saveList(std::move(saveQueue.front()));
+            processSaveQueue();
             return;
         }
 

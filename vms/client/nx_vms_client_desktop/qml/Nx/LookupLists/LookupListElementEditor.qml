@@ -60,7 +60,7 @@ Control
 
         function initCurrentIndex()
         {
-            const index = find(control.value)
+            const index = control.value ? indexOfValue(control.value) : -1
             if (index !== -1)
                 currentIndex = index
         }
@@ -185,9 +185,9 @@ Control
             valueRole: "color"
             model:
             {
-                return [{"name": qsTr("Any %1").arg(attribute.name), "value": ""}].concat(
+                return [{"name": qsTr("Any %1").arg(attribute.name), "color": undefined}].concat(
                     Array.prototype.map.call(attribute.colorSet.items,
-                        name => ({"name": name, "color": attribute.colorSet.color(name)})))
+                        name => ({"name": name, "color": name})))
             }
         }
     }

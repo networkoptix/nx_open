@@ -869,6 +869,11 @@ public:
         Result<ErrorOrData<nx::vms::api::LookupListDataList>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle saveLookupList(
+        const nx::vms::api::LookupListData& lookupList,
+        Result<ErrorOrEmpty>::type callback,
+        QThread* targetThread = nullptr);
+
     Handle jsonRpcBatchCall(
         nx::vms::common::SessionTokenHelperPtr helper,
         const std::vector<nx::vms::api::JsonRpcRequest>& requests,

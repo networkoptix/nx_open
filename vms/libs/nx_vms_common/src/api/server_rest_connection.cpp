@@ -2577,6 +2577,20 @@ Handle ServerConnection::getLookupLists(
     return executeGet("/rest/v3/lookupLists", {}, std::move(callback), targetThread);
 }
 
+Handle ServerConnection::saveLookupList(
+    const nx::vms::api::LookupListData& lookupList,
+    Result<ErrorOrEmpty>::type callback,
+    QThread* targetThread)
+{
+    return executePut(
+        nx::format("/rest/v4/lookupLists/%1").arg(lookupList.id),
+        {},
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        QByteArray::fromStdString(nx::reflect::json::serialize(lookupList)),
+        std::move(callback),
+        targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const nx::network::rest::Params& params) const
