@@ -24,10 +24,6 @@
       <translation>支援</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>系統伺服器</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>開發人員</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation>開放原始碼函式庫</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>進行</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -114,7 +107,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>日誌管理</translation>
     </message>
     <message>
       <source>Download</source>
@@ -134,7 +127,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>開啟檔案資料夾</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>伺服器動作</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>系統動作</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>選擇全部</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>事件規則</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>不啟用備份</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>伺服器已離線，備份設定暫時無法使用。</translation>
     </message>
   </context>
   <context>
@@ -472,7 +458,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>使用事件來源攝影機</translation>
     </message>
   </context>
   <context>
@@ -536,10 +522,6 @@
     <message>
       <source>Restore Defaults</source>
       <translation>恢復預設值</translation>
-    </message>
-    <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>請避免變更這些設定，除非您清楚明白該變更對系統運作及其效能的潛在影響.</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
@@ -622,10 +604,6 @@
       <translation>媒體埠號</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation>使用VMS定義的預設點</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ速度</translation>
     </message>
@@ -647,31 +625,23 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF 設定</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>不錄製主串流</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>不錄製次串流</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>次串流設定檔</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
-    </message>
-    <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>主串流設定檔</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -679,7 +649,38 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>網頁埠號</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>不發送停止 PTZ 命令</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>不錄製音訊</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>從裝置匯入</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>自動匯入錄影資料</translation>
+    </message>
+    <message>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>熱點</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>新增</translation>
     </message>
   </context>
   <context>
@@ -797,7 +798,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>攝影機更換</translation>
     </message>
     <message>
       <source>Name</source>
@@ -817,7 +818,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>新裝置</translation>
     </message>
   </context>
   <context>
@@ -906,19 +907,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>測試版</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>可使用的操作</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>影像匯出</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>即時串流與錄影資料</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -930,15 +931,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>在幫助頁面上了解更多詳細資訊</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>不要再顯示此視窗</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>Cloud佈局功能介紹</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -946,11 +947,22 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>搜索書籤、物件、事件</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>未來</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation>沒有連線</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
     </message>
   </context>
   <context>
@@ -979,11 +991,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>此操作僅能套用於即時事件</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>選擇另一個事件或動作</translation>
     </message>
   </context>
   <context>
@@ -1027,20 +1039,16 @@
       <translation>從備份回復…</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>取消</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
+      <source>Open Folder</source>
+      <translation>開啟資料夾</translation>
     </message>
     <message>
-      <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1164,17 +1172,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>當</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1194,23 +1191,23 @@
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) 網址</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) 內容</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>內容類型</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>驗證類型</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>請求方法</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>備援</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>伺服器位置ID</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>備援優先權...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>未找到任何內容</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>設定排程</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>啟動</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>啟動後自動連線至先前登入的系統</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>自動還原已儲存的視窗設定</translation>
     </message>
@@ -1433,14 +1422,18 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>允許電腦在閒置時進入睡眠模式</translation>
+    </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>系統設定</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>刪除</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>輸入ID</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>可選</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>測試中...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP設定</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>伺服器網址</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>密碼</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>搜尋依據</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>搜尋過濾</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>允許搜尋連線時間 (秒)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>管理者DN或CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>從LDAP中選取使用者...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>讀取中...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>連線錯誤</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>分配給匯入使用者的角色</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>停用匯入的使用者</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>允許匯入的使用者使用Digest認證</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>功能</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>啟動授權 (License)</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>移除</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>新增授權</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>詳細資訊...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>軟體授權給</translation>
     </message>
   </context>
   <context>
@@ -1799,19 +1696,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>日誌級別</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>依大小拆分</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>依時間拆分</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>最大音量限制</translation>
     </message>
   </context>
   <context>
@@ -1835,6 +1732,18 @@
     <message>
       <source>Test</source>
       <translation>測試</translation>
+    </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>使用認證資訊</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>使用連結</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>連結</translation>
     </message>
   </context>
   <context>
@@ -1864,16 +1773,8 @@
       <translation>重試</translation>
     </message>
     <message>
-      <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
-    </message>
-    <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>開啟檔案資料夾</translation>
     </message>
   </context>
   <context>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation>顯示PTZ攝影機的指定覆蓋區</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>合併系統...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>伺服器網址:</translation>
@@ -1954,8 +1855,12 @@
       <translation>檢查</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>使用此系統的名稱與設定：</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>系統名稱和設定取自</translation>
     </message>
   </context>
   <context>
@@ -2002,11 +1907,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>取得更新檔案</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>再次檢查</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>文字</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>選取佈局</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>新增設備</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>到</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>選擇伺服器</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>通訊埠</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>提示</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>登入</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>密碼</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>搜尋</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>添加所有設備</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2068,47 +2019,43 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
+      <translation>連線設定</translation>
     </message>
     <message>
       <source>Password</source>
       <translation>密碼</translation>
     </message>
     <message>
-      <source>User</source>
-      <translation>使用者</translation>
-    </message>
-    <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>伺服器位址</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>安全協定</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>電子郵件設定</translation>
     </message>
     <message>
       <source>Support Signature</source>
       <translation>支援簽章</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>系統簽章</translation>
+      <source>Username</source>
+      <translation>使用者名稱</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation>寄件者</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>登錄</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>密碼</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>使用者名稱</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation>登入Web頁面</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>請注意！超出供電上限</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>顯示所有通知</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>系統通知</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>事件</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>預設</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>發送到</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>語言設定</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>自訂通知內容</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>搜尋使用者</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>啟用</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>停用</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>&amp;刪除...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>強制安全驗證</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>未找到任何內容</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>新增使用者…</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>編輯角色...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP設定...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>從LDAP中選取使用者...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>新增</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>移除此連線選項可能導致系統異常.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>系統管理</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>在電視牆上顯示時間軸</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>畫質</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>暫存目錄</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>額外選項</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>不允許 Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>擷取滑鼠游標</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>建議更換更強的電腦以因應 &quot;最高&quot; 畫質與解析度.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>瀏覽…</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>來源</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>錄影畫質:</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>來源</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>建議更換更強的電腦以因應 &quot;最高&quot; 畫質與解析度.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>螢幕</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>額外選項</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>擷取滑鼠游標</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <source>No services found</source>
+      <translation>未找到服務</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation>請聯絡您的通路合作夥伴新增服務</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <source>Channel Partner Contact</source>
+      <translation>通路合作夥伴聯絡方式</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <source>Services Usage</source>
+      <translation>服務使用情況</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <source>Services state</source>
+      <translation>服務狀態</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation>使用者操作</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>允許非管理者帳號亦能於資源樹列表中看到伺服器的顯示</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>錄影資料加密</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>啟用錄影資料加密將增加CPU資源使用率</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>更改密碼⋯</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>對影像串流通訊加密會大幅提高CPU使用率。</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>若攝影機不支援 HTTPS ，則無法與攝影機進行連線。</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>管理使用者</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation>為非進階使用者在資源樹列表中顯示伺服器</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>適用於</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>細節</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>綁定此憑證</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>檢視綁定的憑證</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>備援</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>備援優先權...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>自動偵測內建或USB攝影機</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>狀態</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>重新建立備份索引檔</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>將停止錄影到停用的儲存裝置上, 而且舊的錄影資料將繼續被刪除.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>已啟用錄影於USB儲存裝置上</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>角色</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>顯示所有使用者</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>找不到符合您的搜尋.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>群組</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>搜尋使用者</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <source>Add Group</source>
+      <translation>新增群組</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <source>Del</source>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>搜尋使用者</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ 新增使用者</translation>
+      <source>Add User</source>
+      <translation>新增使用者</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>更改密碼⋯</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>名稱</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>使用者</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>刪除角色</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>使用者角色</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>新角色</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>目前還沒有自訂使用者角色</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>點擊 &quot;新角色&quot; 按鈕新建一個</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>此使用者可使用digest認證</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>強制安全驗證</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>使用者類型</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>角色</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>編輯角色...</translation>
+      <source>Del</source>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>音量</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>測試</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>一般</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>透過伺服器代理轉送此網頁的連線</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>代理轉送所有請求的內容</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>允許在不驗證SSL憑證的情況下開啟網頁</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>備註：排程時間為伺服器時間.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>啟動授權 (License)</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>移除</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>詳細資訊...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>軟體授權給</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>新增授權</translation>
     </message>
   </context>
   <context>

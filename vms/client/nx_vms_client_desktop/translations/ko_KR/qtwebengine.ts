@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation>파일 찾기가 파일끝을 지났습니다. (이전에 중단 된 다운로드로 재개)</translation>
+      <translation>파일 끝을 지나서 파일 검색(이전에 중단된 다운로드 재개)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>

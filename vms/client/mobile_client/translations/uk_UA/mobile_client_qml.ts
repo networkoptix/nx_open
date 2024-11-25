@@ -9,10 +9,67 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Натисніть та утримуйте, щоб</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation type="unfinished">Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation type="unfinished">Ability to download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation type="unfinished">Speedup connections</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation type="unfinished">Improve network performance</translation>
+    </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation type="unfinished">Maximum decoders count</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Так</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Ні</translation>
     </message>
   </context>
   <context>
@@ -36,6 +93,25 @@
     <message>
       <source>I/O module</source>
       <translation>Модуль вводу-виводу</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Налаштування камери</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Інформація про продукт</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Аудіо</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Змінити якість</translation>
     </message>
   </context>
   <context>
@@ -69,17 +145,28 @@
       <translation>Введіть адресу сервера</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Логін повинен бути заданий</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Пароль не може бути порожнім</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Видалити логін &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation type="unfinished">Login field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Преперегляд</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation type="unfinished">Show on Camera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +178,17 @@
     <message>
       <source>Log Level</source>
       <translation>Рівень журналювання</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation type="unfinished">Copy log ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Пристрій</translation>
     </message>
   </context>
   <context>
@@ -123,26 +221,48 @@
       <source>Retry</source>
       <translation>Повторити</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Під’єднатися</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Для з'єднання зі старою версією сервера завантажте попередній додаток з Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Для з'єднання зі старою версією сервера завантажте попередній додаток з App Store.</translation>
+      <source>Download next</source>
+      <translation type="unfinished">Download next</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Для з'єднання зі старою версією сервера завантажте попередній додаток з Інтернету.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation type="unfinished">
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Завантажити</translation>
+      <source>No filters</source>
+      <translation type="unfinished">No filters</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation type="unfinished">Search Filters</translation>
     </message>
   </context>
   <context>
@@ -186,6 +306,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Не вдається підключитися до %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +334,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>Немає підключення до жодної системи</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Будь-які</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Очистити</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Пароль</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation type="unfinished">Password field cannot be empty</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +387,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>Системи</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Сповіщення</translation>
     </message>
@@ -239,20 +395,8 @@
       <translation>Виконано</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Всі системи</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Вибрані системи</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>ОБРАТИ</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>Потрібно вибрати принаймні одну систему</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +409,22 @@
     <message>
       <source>Save changes?</source>
       <translation>Зберегти зміни?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation type="unfinished">Sites</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +446,38 @@
       <translation>Найвища якість</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>Транскодування відключено.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>Транскодування для цієї камери не підтримується.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>Транскодування не підтримує для серверів з версією нижче 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>Транскодування не підтримує для серверів ARM.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>До</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Тип</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -333,6 +511,33 @@
     </message>
   </context>
   <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Об'єкти</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Закладки</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Немає об'єктів</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Немає закладок</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
+    </message>
+  </context>
+  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -340,7 +545,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Рекомендовані</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -404,10 +609,6 @@
       <translation>Підключитися до іншого серверу...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Системи не знайдені</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Увійдіть до %1</translation>
@@ -420,6 +621,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Нічого не знайдено</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +674,6 @@
       <translation>Увійдіть у хмару, щоб використовувати push-сповіщення</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Push-сповіщення вимкнено в системних налаштуваннях</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Автоматично заходити на сервери</translation>
     </message>
@@ -482,11 +683,31 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Рекомендовані</translation>
     </message>
     <message>
       <source>Strict</source>
       <translation type="unfinished">Strict</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation type="unfinished">Enable hardware acceleration</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation type="unfinished">Increase performance and battery life</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation type="unfinished">Beta Features</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation type="unfinished">Early access to new features</translation>
     </message>
   </context>
   <context>
@@ -507,16 +728,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Issued by</source>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Відміна</translation>
+      <source>Expires</source>
+      <translation>Термін Дії Закінчується</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>
@@ -529,6 +754,11 @@
     <message>
       <source>Log out</source>
       <translation>Вихід</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Перейти до %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +789,13 @@
     <message>
       <source>Select All</source>
       <translation>Вибрати все</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +866,12 @@
       <translation>Встановіть пароль на цю камеру, для перегляду відео з %1 клієнтів або веб-сторінки камери</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <source>Archive encrypted</source>
+      <translation type="unfinished">Archive encrypted</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +904,6 @@
       <translation>Площа</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Змінити якість</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Інформація про продукт</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>Натисніть і утримуйте, щоб вибрати область</translation>
     </message>
@@ -683,15 +916,16 @@
       <translation>Неприпустима обрана область. Будь ласка, намалюйте правильну.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Аудіо</translation>
+      <source>Camera Settings</source>
+      <translation>Налаштування камери</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Пропустити</translation>
+      <source>Bookmarks</source>
+      <translation>Закладки</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Об'єкти</translation>
     </message>
   </context>
   <context>

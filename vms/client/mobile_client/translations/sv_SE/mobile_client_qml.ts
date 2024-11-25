@@ -9,10 +9,67 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>Tryck och håll för att</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation>AVANCERAD SÖKNING</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Närvarande</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Frånvarande</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>Betafunktioner</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>Ladda ner video</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>Möjlighet att ladda ner video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>Snabba upp anslutningar</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>Förbättra nätverksprestanda</translation>
+    </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation>Maximalt antal avkodare</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation>Förbättra videoavkodningsprestanda med maximalt antal hårdvaruavkodare</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>Starta om appen för att tillämpa ändringarna.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Nej</translation>
     </message>
   </context>
   <context>
@@ -36,6 +93,25 @@
     <message>
       <source>I/O module</source>
       <translation>I/O modul</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Kamerainställningar</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Information</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Ljud</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Ändra kvalitet</translation>
     </message>
   </context>
   <context>
@@ -69,17 +145,28 @@
       <translation>Ange serveradress</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>Inloggningen kan inte vara tom</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Lösenordet kan inte vara tomt</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>Ta bort login &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Inloggningsfältet får inte vara tomt</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Lösenordsfältet får inte vara tomt</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Förhandsgranska</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>Visa på kamera</translation>
     </message>
   </context>
   <context>
@@ -91,6 +178,17 @@
     <message>
       <source>Log Level</source>
       <translation>Loggnivå</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>Kopiera logg-ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Enhet</translation>
     </message>
   </context>
   <context>
@@ -123,26 +221,46 @@
       <source>Retry</source>
       <translation>Försök igen</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>Anslut</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>För att ansluta till gamla servrar, ladda ner det gamla programmet från Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>För att ansluta till gamla servrar, ladda ner det gamla programmet från Google Play.</translation>
+      <source>Download next</source>
+      <translation>Ladda ner nästa</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>För att ansluta till gamla servrar, ladda ner det gamla programmet från Google Play.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n minuter</numerusform>
+        <numerusform>%n minuter</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Ladda ner</translation>
+      <source>No filters</source>
+      <translation>Inga filter</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation>Sökfilter</translation>
     </message>
   </context>
   <context>
@@ -186,6 +304,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Kan inte ansluta till %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +332,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>Du är inte ansluten till något system</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Någon</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Rensa</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Lösenord</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Lösenordsfältet kan inte vara tomt</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation>Plugin</translation>
     </message>
   </context>
   <context>
@@ -227,10 +385,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>System</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>Aviseringar</translation>
     </message>
@@ -239,20 +393,8 @@
       <translation>Klart</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Alla system</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>Valda system</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>VÄLJ</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>Minst ett system måste väljas</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +407,22 @@
     <message>
       <source>Save changes?</source>
       <translation>Spara ändringarna?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Platser</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +444,38 @@
       <translation>Bästa kvalitet</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>Transkodning är inaktiverad.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>Transkodning stöds inte för den här kameran.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>Transkodning stöds inte för servrar med version lägre än 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>Omkodning är inaktiverad av servern.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>Transkodning stöds inte för ARM-servrar.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>Omkodning stöds inte för servrar med lägre version än 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>Från</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Till</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Typ</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Undertyp</translation>
     </message>
   </context>
   <context>
@@ -330,6 +506,33 @@
     <message>
       <source>Search</source>
       <translation>Sök</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objekt</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Bokmärken</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Inga objekt</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Inga bokmärken</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Prova att ändra filtren eller konfigurera objektdetektering i kamerans plugin-inställningar</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Försök att ändra filtren för att visa resultaten</translation>
     </message>
   </context>
   <context>
@@ -404,10 +607,6 @@
       <translation>Anslut till en annan server...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>Inga system hittades</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>Logga in på %1</translation>
@@ -420,6 +619,10 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting hittades</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +672,6 @@
       <translation>Logga in i molnet för att använda push-aviseringar</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>Push-meddelanden är avstängda i systeminställningar</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>Logga in automatiskt på servrar</translation>
     </message>
@@ -487,6 +686,26 @@
     <message>
       <source>Strict</source>
       <translation>Strikt</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Aktivera hårdvaruacceleration</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Öka prestanda och batteritid</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>Betafunktioner</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>Tidig tillgång till nya funktioner</translation>
     </message>
   </context>
   <context>
@@ -507,16 +726,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>Lita på den här servern</translation>
+      <source>Common name</source>
+      <translation>Vanligt namn</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Anslut ändå</translation>
+      <source>Issued by</source>
+      <translation>Utfärdad av</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
+      <source>Expires</source>
+      <translation>Förfaller</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Fingeravtryck</translation>
     </message>
   </context>
   <context>
@@ -529,6 +752,11 @@
     <message>
       <source>Log out</source>
       <translation>Logga ut</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Gå till %1</translation>
     </message>
   </context>
   <context>
@@ -559,6 +787,13 @@
     <message>
       <source>Select All</source>
       <translation>Markera alla</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation>Period</translation>
     </message>
   </context>
   <context>
@@ -629,8 +864,12 @@
       <translation>Ange lösenord för den här kameran med hjälp av %1 klient eller kameras webbsida för att visa video</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>Det går inte att dekryptera media</translation>
+      <source>Archive encrypted</source>
+      <translation>Arkivet är krypterat</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +902,6 @@
       <translation>Område</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>Ändra kvalitet</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Information</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>Tryck och håll ned för att välja ett område</translation>
     </message>
@@ -683,15 +914,16 @@
       <translation>Ogiltigt anpassat område. Var god rita ett korrekt.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Ljud</translation>
+      <source>Camera Settings</source>
+      <translation>Kamerainställningar</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Hoppa över</translation>
+      <source>Bookmarks</source>
+      <translation>Bokmärken</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objekt</translation>
     </message>
   </context>
   <context>

@@ -49,31 +49,19 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>Giấy phép không được xác nhận bởi %1</translation>
     </message>
     <message>
       <source>Invalid type</source>
       <translation>kiểu không hợp lệ</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>Mỗi Hệ thống chỉ được phép sử dụng một giấy phép Khởi đầu.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>Bạn đã có một giấy phép Khởi đầu đang được sử dụng.</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>Chỉ một giấy phép NVR được phép cho mỗi Hệ thống.</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>Bạn đã có một giấy phép NVR đang hoạt động.</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>Chỉ một giấy phép loại này được phép cho mỗi Hệ thống.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -86,6 +74,18 @@
     <message>
       <source>Unknown error</source>
       <translation>Lỗi không xác định</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

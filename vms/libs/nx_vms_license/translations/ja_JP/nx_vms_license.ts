@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%1 ライセンス中の %n %2 を使用します。</numerusform>
+        <numerusform>%1 ライセンス中の %n %2 が使用されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -49,31 +49,19 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>ライセンスは %1 によって検証されていません</translation>
     </message>
     <message>
       <source>Invalid type</source>
       <translation>無効なタイプ</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>システムごとに許可されるスターターライセンスは1つだけです。</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>既に有効なスターターライセンスがあります。</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>システムごとに許可されるNVRライセンスは1つだけです。</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>既に有効な NVR ライセンスが一つあります。</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>このタイプのライセンスは、システムごとに1つだけ許可されます。</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -85,7 +73,19 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知のエラー</translation>
+      <translation>不明なエラー</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

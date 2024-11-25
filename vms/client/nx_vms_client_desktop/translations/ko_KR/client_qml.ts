@@ -2,6 +2,80 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR" sourcelanguage="en">
   <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+      <source>Add Entry</source>
+      <translation>항목 추가</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>추가</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+      <source>LDAP - Advanced Settings</source>
+      <translation>LDAP - 고급 설정</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>사용자</translation>
+    </message>
+    <message>
+      <source>Login Attribute</source>
+      <translation>로그인 속성</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>Membership</source>
+      <translation>멤버십</translation>
+    </message>
+    <message>
+      <source>Search Timeout</source>
+      <translation>검색 시간 초과</translation>
+    </message>
+    <message>
+      <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
+      <translation>VMS 데이터베이스에 이미 추가된 LDAP 사용자에 대해 다이제스트 인증을 활성화하려면 이러한 사용자&apos; 설정에서 직접 활성화해야 합니다.</translation>
+    </message>
+    <message>
+      <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+      <translation>VMS 데이터베이스에 이미 추가된 LDAP 사용자에 대해 다이제스트 인증을 비활성화하려면 이러한 사용자&apos; 설정에서 직접 비활성화해야 합니다.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation>가져온 사용자에 대해 안전하지 않은(다이제스트) 인증 허용</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation>사용자 동기화</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation>동기화 주기</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation>그룹 멤버 속성</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>서버를 통한 프록시 LDAP 요청</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
@@ -47,6 +121,30 @@
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>사용자 지정 클라이언트를 사용하고 있습니다. 업데이트 지침을 보려면 %1에 문의하십시오.</translation>
     </message>
+    <message>
+      <source>Offline client updates</source>
+      <translation type="unfinished">Offline client updates</translation>
+    </message>
+    <message>
+      <source>Offline updates are enabled and files are stored on servers.</source>
+      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+    </message>
+    <message>
+      <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
+      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+    </message>
+    <message>
+      <source>This will delete all update files on servers.</source>
+      <translation type="unfinished">This will delete all update files on servers.</translation>
+    </message>
+    <message>
+      <source>Proceed anyway?</source>
+      <translation type="unfinished">Proceed anyway?</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>예</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
@@ -64,6 +162,13 @@
     <message>
       <source>Object Type</source>
       <translation>객체 유형</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsObjectAttributesSelector</name>
+    <message>
+      <source>Select / Deselect All</source>
+      <translation type="unfinished">Select / Deselect All</translation>
     </message>
   </context>
   <context>
@@ -87,20 +192,6 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>카메라 플러그인 설정에서 필터를 변경하거나 객체 감지를 구성합니다.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n 개의 새로운 결과</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>new results</source>
-      <translation>새로운 결과</translation>
-    </message>
-    <message>
-      <source>Detected by</source>
-      <translation>에 의해 감지됨</translation>
     </message>
   </context>
   <context>
@@ -133,15 +224,17 @@
       <source>Any plugin</source>
       <translation>모든 플러그인</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n 개의 새로운 결과</numerusform>
-      </translation>
+    <message>
+      <source>Settings</source>
+      <translation>설정</translation>
     </message>
     <message>
-      <source>new results</source>
-      <translation>새로운 결과</translation>
+      <source>Tile Settings</source>
+      <translation type="unfinished">Tile Settings</translation>
+    </message>
+    <message>
+      <source>Table Settings</source>
+      <translation type="unfinished">Table Settings</translation>
     </message>
   </context>
   <context>
@@ -152,19 +245,39 @@
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
-    </message>
-    <message>
-      <source>Check System Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check System Administration settings to configure this plugin.</translation>
-    </message>
-    <message>
-      <source>This plugin has no settings at the System level.</source>
-      <translation type="unfinished">This plugin has no settings at the System level.</translation>
+      <translation>이 플러그인을 구성하려면 카메라 설정을 확인하세요.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>이 플러그인에는 이 카메라에 대한 설정이 없습니다.</translation>
+    </message>
+    <message>
+      <source>Check Site Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+      <source>Plugins</source>
+      <translation>플러그인</translation>
+    </message>
+    <message>
+      <source>API Integrations</source>
+      <translation>API 통합</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsView</name>
+    <message>
+      <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</source>
+      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
@@ -172,6 +285,130 @@
     <message>
       <source>NO DATA</source>
       <translation>데이터 없음</translation>
+    </message>
+  </context>
+  <context>
+    <name>ApiIntegrations</name>
+    <message>
+      <source>API Integrations</source>
+      <translation>API 통합</translation>
+    </message>
+    <message>
+      <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+      <translation>API 통합은 REST API를 통해 %1 서버와 상호 작용하고 메타데이터를 교환합니다.</translation>
+    </message>
+    <message>
+      <source>New requests</source>
+      <translation>새 요청</translation>
+    </message>
+    <message>
+      <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+      <translation>API 통합은 통합 제공자로부터 수신된 코드를 검증한 후 활성화될 수 있습니다. 원치 않는 상호 작용을 방지하기 위해 새로운 요청은 비활성화될 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Enable %1?</source>
+      <translation>%1을 활성화 하시겠습니까?</translation>
+    </message>
+    <message>
+      <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+      <translation>이 통합은 다음을 수행할 수 있습니다:
+ • 카메라 설정 변경
+ • 보관소 액세스
+ • 비디오 스트림 처리
+ • 네트워크를 통해 메타데이터 교환</translation>
+    </message>
+    <message>
+      <source>Enable Integration</source>
+      <translation>통합 사용</translation>
+    </message>
+    <message>
+      <source>Remove %1?</source>
+      <translation>%1을 제거하시겠습니까?</translation>
+    </message>
+    <message>
+      <source>This will remove Integration request</source>
+      <translation>이렇게 하면 통합 요청이 제거됩니다.</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Remove Request</source>
+      <translation>요청 제거</translation>
+    </message>
+  </context>
+  <context>
+    <name>AuthCode</name>
+    <message>
+      <source>Wrong pairing code</source>
+      <translation type="unfinished">Wrong pairing code</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+  </context>
+  <context>
+    <name>AutoTextField</name>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation>이 필드는 비워둘 수 없습니다</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>자동</translation>
+    </message>
+  </context>
+  <context>
+    <name>BatchUserEditDialog</name>
+    <message numerus="yes">
+      <source>Batch Edit - %n Users</source>
+      <translation>
+        <numerusform>일괄 편집 - %n 사용자</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n 사용자</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User status</source>
+      <comment>Whether users are enabled or disabled</comment>
+      <translation>사용자 상태</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>활성화</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>비활성화</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication</source>
+      <translation>안전하지 않은 (다이제스트) 인증</translation>
+    </message>
+    <message>
+      <source>keep current value</source>
+      <translation>현재 값을 유지하다</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarksPanel</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>즐겨찾기 없음</translation>
+    </message>
+    <message>
+      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
+      <translation>타임라인에서 시간 범위를 선택하고 강조 표시된 부분을 마우스 오른쪽 버튼으로 클릭하여 즐겨찾기를 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -190,6 +427,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>단축키 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>각 버튼을 여러번 누르고 아래 표에 버튼 이름을 적으세요.</translation>
     </message>
   </context>
   <context>
@@ -269,6 +513,14 @@
       <source>Pending</source>
       <translation>보류 중</translation>
     </message>
+    <message>
+      <source>Suspended</source>
+      <translation>정지됨</translation>
+    </message>
+    <message>
+      <source>Shut Down</source>
+      <translation>종료</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -292,6 +544,57 @@
     </message>
   </context>
   <context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+      <source>LDAP - Connection Settings</source>
+      <translation>LDAP - 연결 설정</translation>
+    </message>
+    <message>
+      <source>Host</source>
+      <translation>호스트</translation>
+    </message>
+    <message>
+      <source>Login DN</source>
+      <translation>로그인 DN</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>암호</translation>
+    </message>
+    <message>
+      <source>Ignore LDAP server certificate errors</source>
+      <translation>LDAP 서버 인증서 오류 무시</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>테스트</translation>
+    </message>
+    <message>
+      <source>Connecting...</source>
+      <translation>연결중...</translation>
+    </message>
+    <message>
+      <source>Use StartTLS</source>
+      <translation>StartTLS를 사용하세요</translation>
+    </message>
+    <message>
+      <source>Host cannot be empty</source>
+      <translation>호스트는 비어 있을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty</source>
+      <translation>로그인 DN은 비어 있을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>비밀번호는 필수 정보입니다.</translation>
+    </message>
+    <message>
+      <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
+      <translation>LDAP 사용자가 %1에 로그인할 수 있도록 하려면 %1 와 회사 LDAP 서버 사이에 연결을 설정해야 합니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -299,15 +602,14 @@
     </message>
   </context>
   <context>
+    <name>CopyableLabel</name>
+    <message>
+      <source>copied</source>
+      <translation type="unfinished">copied</translation>
+    </message>
+  </context>
+  <context>
     <name>CounterBlock</name>
-    <message>
-      <source>Remove column</source>
-      <translation>열 제거</translation>
-    </message>
-    <message>
-      <source>Add column</source>
-      <translation>열 추가</translation>
-    </message>
     <message>
       <source>Hide information</source>
       <translation>정보 숨기기</translation>
@@ -324,10 +626,6 @@
       <source>Show thumbnails</source>
       <translation>썸네일 표시</translation>
     </message>
-    <message>
-      <source>Preview</source>
-      <translation>미리보기</translation>
-    </message>
   </context>
   <context>
     <name>DewarpingSettings</name>
@@ -337,7 +635,7 @@
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안카메라</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -345,15 +643,79 @@
     </message>
   </context>
   <context>
+    <name>EditLookupListDialog</name>
+    <message>
+      <source>List Settings</source>
+      <translation>목록 설정</translation>
+    </message>
+    <message>
+      <source>New List</source>
+      <translation>새 목록</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>이름</translation>
+    </message>
+    <message>
+      <source>Column Name</source>
+      <translation>열 이름</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>확인</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>만들다</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>형식</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>속성</translation>
+    </message>
+    <message>
+      <source>Select type</source>
+      <translation type="unfinished">Select type</translation>
+    </message>
+    <message>
+      <source>Removing attributes will delete all associated data</source>
+      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+    </message>
+    <message>
+      <source>Deleting the list will erase all the data inside it.</source>
+      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+    </message>
+    <message>
+      <source>Delete List?</source>
+      <translation type="unfinished">Delete List?</translation>
+    </message>
+    <message numerus="yes">
+      <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
+      <translation type="unfinished">
+        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>EventTypeSelector</name>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+  </context>
+  <context>
     <name>EventsPanel</name>
-    <message>
-      <source>Category</source>
-      <translation>카테고리</translation>
-    </message>
-    <message>
-      <source>See %1 for other events</source>
-      <translation>기타 이벤트는 %1을 참조하십시오.</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>이벤트 없음</translation>
@@ -362,9 +724,28 @@
       <source>Try changing the filters or create an Event Rule</source>
       <translation>필터를 변경하거나 이벤트 규칙을 만드십시오.</translation>
     </message>
+  </context>
+  <context>
+    <name>ExportEntriesProgressDialog</name>
     <message>
-      <source>Event Log</source>
-      <translation>이벤트 로그</translation>
+      <source>Export Lists</source>
+      <translation type="unfinished">Export Lists</translation>
+    </message>
+    <message>
+      <source>Exporting</source>
+      <translation type="unfinished">Exporting</translation>
+    </message>
+    <message>
+      <source>Open File Folder...</source>
+      <translation type="unfinished">Open File Folder...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>취소</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -402,6 +783,44 @@
     <message>
       <source>NO PREVIEW</source>
       <translation>미리보기 없음</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterDialog</name>
+    <message>
+      <source>Name</source>
+      <translation>이름</translation>
+    </message>
+    <message>
+      <source>Base DN</source>
+      <translation>기본 DN</translation>
+    </message>
+    <message>
+      <source>Base DN cannot be empty</source>
+      <translation>기본 DN은 비어 있을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Filter</source>
+      <translation>필터</translation>
+    </message>
+    <message>
+      <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
+      <translation>기본 DN은 LDAP 검색 및 동기화의 시작점을 설정합니다.</translation>
+    </message>
+    <message>
+      <source>Edit Search Base</source>
+      <translation>검색 기준 편집</translation>
+    </message>
+    <message>
+      <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterSettingsDialog</name>
+    <message>
+      <source>Settings</source>
+      <translation>설정</translation>
     </message>
   </context>
   <context>
@@ -456,15 +875,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Equidistant</translation>
+      <translation>등거리</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereographic</translation>
+      <translation>입체사진</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>이퀴솔리드</translation>
     </message>
     <message>
       <source>Size</source>
@@ -482,12 +901,204 @@
       <source>Ellipticity</source>
       <translation>타원</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>자동 보정 실패</translation>
+    </message>
+  </context>
+  <context>
+    <name>FixLookupListImportPage</name>
+    <message>
+      <source>Some values could not be automatically matched. Please map them manually.</source>
+      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+    </message>
+    <message>
+      <source>Back</source>
+      <translation type="unfinished">Back</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation type="unfinished">Finish</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
       <translation>읽는 중...</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+      <source>At the site level, group members have permissions to:</source>
+      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+    </message>
+    <message>
+      <source>At the site level, the user has permissions to:</source>
+      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateDialog</name>
+    <message>
+      <source>New Group</source>
+      <translation>새 그룹</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>리소스</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>글로벌 권한</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>회원</translation>
+    </message>
+    <message>
+      <source>Add Group</source>
+      <translation>그룹 추가</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateTab</name>
+    <message>
+      <source>New Group</source>
+      <translation>새 그룹</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>이름</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>설명</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>권한 그룹</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupEditDialog</name>
+    <message>
+      <source>Group - %1</source>
+      <translation>그룹 - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>리소스</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>글로벌 권한</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>회원</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupGeneralTab</name>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>안내</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>설명</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>회원</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>사용자</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>권한 그룹</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation>그룹에는 부모 그룹과 자식 그룹이 모두 있거나, 그러한 순환 참조 체인의 일부입니다. 권한의 잘못된 계산을 방지하기 위해 이 체인을 해결합니다.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>LDAP 서버와의 지속적인 동기화가 비활성화되면 그룹은 자동으로 동기화되지 않습니다. 이 그룹을 업데이트하려면 수동 동기화를 시작하세요.</translation>
+    </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>LDAP 데이터베이스에서 이 그룹을 찾을 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupMembersTab</name>
+    <message>
+      <source>Users</source>
+      <translation>사용자</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>No members</source>
+      <translation>회원이 없습니다</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add members</source>
+      <translation>왼쪽의 컨트롤을 사용하여 멤버를 추가하세요</translation>
+    </message>
+    <message>
+      <source>Members summary</source>
+      <translation>회원 요약</translation>
+    </message>
+    <message>
+      <source>Inherits membership in current group</source>
+      <translation>현재 그룹의 멤버십을 상속받습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>선택</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>그룹 없음</translation>
     </message>
   </context>
   <context>
@@ -499,14 +1110,82 @@
     </message>
   </context>
   <context>
-    <name>InformationBubble</name>
+    <name>ImportFromDeviceDialog</name>
     <message>
-      <source>Detected by</source>
-      <translation>에 의해 감지됨</translation>
+      <source>Import From Devices</source>
+      <translation>장치에서 가져오기</translation>
     </message>
   </context>
   <context>
-    <name>InformationPanel</name>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation>감지됨</translation>
+    </message>
+  </context>
+  <context>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>조이스틱을 선택하세요.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>연결된 디바이스 없음</translation>
+    </message>
+  </context>
+  <context>
+    <name>InsecureWarning</name>
+    <message>
+      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+      <translation>계정 보안은 중요합니다. 그럴 만한 충분한 이유가 없다면 이 설정을 활성화하지 마세요.</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationHeader</name>
+    <message>
+      <source>Insufficient services</source>
+      <translation>서비스가 부족합니다</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>통합을 켜려면 %n 적합한 통합 서비스가 필요합니다.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>0개의 적합한 서비스가 있습니다</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>오프라인</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>새로고침</translation>
+    </message>
+    <message>
+      <source>Services Required</source>
+      <translation>필요한 서비스</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>새로 고침 중...</translation>
+    </message>
+    <message>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <comment>%1 will be substituted by a date</comment>
+      <translation>이 통합을 사용하는 카메라가 사용 가능한 서비스보다 많습니다. 일부 카메라에 대한 통합을 비활성화하거나 더 적합한 서비스를 추가하세요. 그렇지 않으면 %1에서 자동으로 수행됩니다.</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>삭제</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
       <translation>버전</translation>
@@ -524,12 +1203,34 @@
       <translation>분석을 위해 카메라에서 비디오 스트림을 선택하십시오</translation>
     </message>
     <message>
-      <source>Refresh</source>
-      <translation>새로고침</translation>
+      <source>Usage</source>
+      <translation>사용법</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsDialog</name>
+    <message>
+      <source>Manage Integrations</source>
+      <translation type="unfinished">Manage Integrations</translation>
     </message>
     <message>
-      <source>Refreshing...</source>
-      <translation>새로 고침 중...</translation>
+      <source>Integrations</source>
+      <translation>연동</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>설정</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsTab</name>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>이 플러그인을 구성하려면 카메라 설정을 확인하세요.</translation>
     </message>
   </context>
   <context>
@@ -557,6 +1258,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>반복 토글</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>저장</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>이전</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>다음</translation>
     </message>
   </context>
   <context>
@@ -601,8 +1317,8 @@
       <translation>레이아웃에서 카메라 선택</translation>
     </message>
     <message>
-      <source>Log in to the system to configure how to open layouts</source>
-      <translation>레이아웃을 여는 방법을 구성하려면 시스템에 로그인하십시오.</translation>
+      <source>Log in to the site to configure how to open layouts</source>
+      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
     </message>
   </context>
   <context>
@@ -613,62 +1329,78 @@
     </message>
   </context>
   <context>
-    <name>LeftPanel</name>
+    <name>LdapSettings</name>
     <message>
-      <source>Local Files</source>
-      <translation>로컬 파일</translation>
+      <source>ONLINE</source>
+      <translation>온라인</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>카메라</translation>
+      <source>OFFLINE</source>
+      <translation>오프라인</translation>
     </message>
     <message>
-      <source>Resources</source>
-      <translation>리소스</translation>
+      <source>Users</source>
+      <translation>사용자</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>움직임</translation>
+      <source>Groups</source>
+      <translation>그룹</translation>
     </message>
     <message>
-      <source>Bookmarks</source>
-      <translation>즐겨찾기</translation>
+      <source>Last Sync</source>
+      <translation>마지막 동기화</translation>
     </message>
     <message>
-      <source>Events</source>
-      <translation>이벤트</translation>
+      <source>Edit</source>
+      <translation>수정하기</translation>
     </message>
     <message>
-      <source>Objects</source>
-      <translation>객체</translation>
+      <source>Advanced Settings</source>
+      <translation>고급 설정</translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation>설정</translation>
+      <source>Disconnect</source>
+      <translation>연결 끊기</translation>
     </message>
     <message>
-      <source>Select a camera to see its motion events</source>
-      <translation>모션 이벤트를 볼 카메라 선택</translation>
+      <source>Add</source>
+      <translation>추가</translation>
     </message>
     <message>
-      <source>No motion detected</source>
-      <translation>감지된 동작 없음</translation>
+      <source>Not configured yet</source>
+      <translation>아직 구성되지 않음</translation>
     </message>
     <message>
-      <source>Try changing the filters or enable motion recording</source>
-      <translation>필터를 변경하거나 모션 녹화를 활성화해 보세요.</translation>
+      <source>Configure</source>
+      <translation>구성</translation>
     </message>
     <message>
-      <source>Select Camera...</source>
-      <translation>카메라 선택...</translation>
+      <source>Search Bases</source>
+      <translation>검색 기준</translation>
     </message>
     <message>
-      <source>No bookmarks</source>
-      <translation>즐겨찾기 없음</translation>
+      <source>Add Search Base</source>
+      <translation>검색 기준 추가</translation>
     </message>
     <message>
-      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>타임라인에서 시간 범위를 선택하고 강조 표시된 부분을 마우스 오른쪽 버튼으로 클릭하여 즐겨찾기를 만듭니다.</translation>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>사용자 및 그룹을 동기화하려면 최소한 하나의 검색 기준을 지정하세요.</translation>
+    </message>
+    <message>
+      <source>Connect your Site to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+    </message>
+    <message>
+      <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
+      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
     </message>
   </context>
   <context>
@@ -699,6 +1431,151 @@
     </message>
   </context>
   <context>
+    <name>LookupListElementEditor</name>
+    <message>
+      <source>Any %1</source>
+      <translation type="unfinished">Any %1</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>예</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>아니요</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation>현재의</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>부재 중인</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListImportDialog</name>
+    <message>
+      <source>Import List</source>
+      <translation type="unfinished">Import List</translation>
+    </message>
+    <message>
+      <source>Import Options</source>
+      <translation type="unfinished">Import Options</translation>
+    </message>
+    <message>
+      <source>File:</source>
+      <translation type="unfinished">File:</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
+    </message>
+    <message>
+      <source>Separator:</source>
+      <translation type="unfinished">Separator:</translation>
+    </message>
+    <message>
+      <source>Data contains header</source>
+      <translation type="unfinished">Data contains header</translation>
+    </message>
+    <message>
+      <source>Preview</source>
+      <translation>미리보기</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>가져오기</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>취소</translation>
+    </message>
+    <message>
+      <source>Importing</source>
+      <translation type="unfinished">Importing</translation>
+    </message>
+    <message>
+      <source>Could not open file</source>
+      <translation type="unfinished">Could not open file</translation>
+    </message>
+    <message>
+      <source>Please ensure that file exists and you have access to selected file</source>
+      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+    </message>
+    <message>
+      <source>Fixing imported entries</source>
+      <translation type="unfinished">Fixing imported entries</translation>
+    </message>
+    <message>
+      <source>Could not import selected file</source>
+      <translation type="unfinished">Could not import selected file</translation>
+    </message>
+    <message>
+      <source>The file appears to be empty.</source>
+      <translation type="unfinished">The file appears to be empty.</translation>
+    </message>
+    <message>
+      <source>Please ensure the selected file exists and you have access.</source>
+      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListsDialog</name>
+    <message>
+      <source>Lookup Lists</source>
+      <translation>목록 조회</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>추가</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>가져오기</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>내보내기</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>설정</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>항목 없음</translation>
+    </message>
+    <message>
+      <source>New List...</source>
+      <translation type="unfinished">New List...</translation>
+    </message>
+    <message>
+      <source>Could not save file</source>
+      <translation type="unfinished">Could not save file</translation>
+    </message>
+    <message>
+      <source>Please ensure that you have access to selected folder and enough disk space</source>
+      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation type="unfinished">Export failed</translation>
+    </message>
+    <message>
+      <source>Export Selected</source>
+      <translation type="unfinished">Export Selected</translation>
+    </message>
+  </context>
+  <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
@@ -707,6 +1584,84 @@
     <message>
       <source>Select an area on the video to filter results</source>
       <translation>동영상에서 결과를 필터링할 영역을 선택하세요.</translation>
+    </message>
+  </context>
+  <context>
+    <name>MotionPanel</name>
+    <message>
+      <source>Select a camera to see its motion events</source>
+      <translation>모션 이벤트를 볼 카메라 선택</translation>
+    </message>
+    <message>
+      <source>No motion detected</source>
+      <translation>감지된 동작 없음</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or enable motion recording</source>
+      <translation>필터를 변경하거나 모션 녹화를 활성화해 보세요.</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>카메라 선택...</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultiSelectionComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>선택</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>결과 없음</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>%n 더 보기</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>NewLinkDialog</name>
+    <message>
+      <source>New Link - %1</source>
+      <translation>새로운 링크 - %1</translation>
+    </message>
+    <message>
+      <source>The previous link will be invalidated once a new one has been issued</source>
+      <translation>새로운 링크가 발급되면 이전 링크는 무효화됩니다.</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>만들다</translation>
+    </message>
+  </context>
+  <context>
+    <name>NoListsPage</name>
+    <message>
+      <source>No Lists</source>
+      <translation>목록 없음</translation>
+    </message>
+    <message>
+      <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+      <translation>아직 목록을 만들지 않았습니다. 목록을 사용하면 여러 값을 저장하여 이벤트 규칙에서 사용할 수 있습니다. 새 목록을 만들어 항목 추가를 시작하세요.</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation>새로 만들기...</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationsPanel</name>
+    <message>
+      <source>No new notifications</source>
+      <translation type="unfinished">No new notifications</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation type="unfinished">Notifications Settings</translation>
     </message>
   </context>
   <context>
@@ -728,6 +1683,19 @@
     </message>
   </context>
   <context>
+    <name>ObjectTypeSelector</name>
+    <message numerus="yes">
+      <source>with %n attributes</source>
+      <translation type="unfinished">
+        <numerusform>with %n attributes</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any type</source>
+      <translation type="unfinished">Any type</translation>
+    </message>
+  </context>
+  <context>
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
@@ -743,7 +1711,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -752,6 +1720,186 @@
     <message>
       <source>Remember me</source>
       <translation>기억하기</translation>
+    </message>
+  </context>
+  <context>
+    <name>PanelBase</name>
+    <message>
+      <source>Approve</source>
+      <translation>승인</translation>
+    </message>
+    <message>
+      <source>Reject</source>
+      <translation>거부</translation>
+    </message>
+    <message>
+      <source>Integration pairing code</source>
+      <translation type="unfinished">Integration pairing code</translation>
+    </message>
+  </context>
+  <context>
+    <name>ParentGroupsTab</name>
+    <message>
+      <source>Add Group</source>
+      <translation>그룹 추가</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>사용자 정의</translation>
+    </message>
+    <message>
+      <source>No custom groups yet</source>
+      <translation>아직 사용자 정의 그룹이 없습니다.</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>그룹을 찾을 수 없습니다</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>검색 기준을 변경하거나 새 그룹을 만드세요</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>그룹 없음</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add to a group</source>
+      <translation>왼쪽의 컨트롤을 사용하여 멤버를 추가하세요</translation>
+    </message>
+    <message>
+      <source>Member of</source>
+      <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
+      <translation type="unfinished">Member of</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation type="unfinished">Built-in</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>사용자 정의</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordChangeDialog</name>
+    <message>
+      <source>Change password - %1</source>
+      <translation>비밀번호 변경 - %1</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>로그인</translation>
+    </message>
+    <message>
+      <source>Current password</source>
+      <translation>현재 패스워드</translation>
+    </message>
+    <message>
+      <source>New password</source>
+      <translation>새 패스워드</translation>
+    </message>
+    <message>
+      <source>Confirm password</source>
+      <translation>비밀번호 확인</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>패스워드가 일치하지 않습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionSummary</name>
+    <message>
+      <source>No custom permissions</source>
+      <translation>사용자 정의 권한이 없습니다</translation>
+    </message>
+  </context>
+  <context>
+    <name>Permissions</name>
+    <message>
+      <source>Required permission group</source>
+      <translation type="unfinished">Required permission group</translation>
+    </message>
+    <message>
+      <source>View Permissions</source>
+      <translation type="unfinished">View Permissions</translation>
+    </message>
+    <message>
+      <source>Hide Permissions</source>
+      <translation type="unfinished">Hide Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionsTab</name>
+    <message>
+      <source>No resources found</source>
+      <translation>해당 리소스 없음</translation>
+    </message>
+    <message>
+      <source>Automatically add dependent permissions</source>
+      <translation>자동으로 종속 권한 추가</translation>
+    </message>
+    <message>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation>여러 리소스를 선택하려면 %1 또는 %2 를 사용하고, 선택을 취소하려면 %3 를 사용합니다.</translation>
+    </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>리소스 테이블은 사용자 또는 그룹 권한에 대한 개요를 제공하고 특정 리소스에 대한 권한을 할당할 수 있도록 해줍니다.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>다른 권한에 의존하는 권한을 선택하면 두 권한 모두 자동으로 부여됩니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationIntensityDialog</name>
+    <message>
+      <source>Intensity</source>
+      <translation type="unfinished">Intensity</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationObjectSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>객체</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Any plugin</source>
+      <translation>모든 플러그인</translation>
+    </message>
+  </context>
+  <context>
+    <name>Plugins</name>
+    <message>
+      <source>Plugins</source>
+      <translation>플러그인</translation>
+    </message>
+    <message>
+      <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
+      <comment>%1 is like Nx Witness</comment>
+      <translation>플러그인은 %1 서버에서 실행되는 프로그램으로, 원활한 비디오 분석 통합을 가능하게 합니다.</translation>
     </message>
   </context>
   <context>
@@ -796,13 +1944,6 @@
     </message>
   </context>
   <context>
-    <name>Preview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>데이터 없음</translation>
-    </message>
-  </context>
-  <context>
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
@@ -820,6 +1961,36 @@
       <source>Preview is not available for the selected object</source>
       <translation>선택한 객체에 대해 미리보기를 사용할 수 없습니다.</translation>
     </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Filter by</source>
+      <translation type="unfinished">Filter by</translation>
+    </message>
+  </context>
+  <context>
+    <name>PreviewTableView</name>
+    <message>
+      <source>Select attribute</source>
+      <translation type="unfinished">Select attribute</translation>
+    </message>
+  </context>
+  <context>
+    <name>ProgressDialog</name>
+    <message>
+      <source>Cancel</source>
+      <translation>취소</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation type="unfinished">Finished</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -835,37 +2006,70 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>
-새로운 PTZ 컨트롤을 소개합니다</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>변경된 내용의 간단한 프리젠 테이션입니다</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>PTZ를 활성화하려면 비디오
-내 아무 영역을 드래그하십시오.</translation>
-    </message>
-    <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>이동하려면 화살표 키를 누르고 확대 / 축소하려면 더하기 또는 빼기 키를 누릅니다.</translation>
-    </message>
-    <message>
-      <source>Use the mouse wheel to zoom</source>
-      <translation>마우스 휠을 사용하여 확대 / 축소</translation>
-    </message>
-    <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>고급 PTZ를 사용하려면 Shift 키를 누른 상태에서 마우스 포인터를 클릭, 더블 클릭 또는 드래그하십시오.</translation>
+      <translation>PTZ를 활성화하려면 비디오내 아무 영역을 드래그하십시오.</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>로컬 설정으로 이동하여 비디오 중앙 위로 드래그 마커를 활성화하십시오.</translation>
+    </message>
+    <message>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation>이동하려면 화살표 키를 누르고 확대 / 축소하려면 더하기 또는 빼기 키를 누릅니다.</translation>
+    </message>
+    <message>
+      <source>Use mouse wheel to zoom</source>
+      <translation>마우스 휠을 사용하여 확대 / 축소</translation>
+    </message>
+    <message>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation>로컬 설정 &gt; 고급 &gt; 모든 경고 재설정으로 이동하여 이 가이드를 다시 활성화할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>새로운 PTZ 컨트롤을 소개합니다</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>고급 PTZ를 사용하려면 Shift 키를 누른 상태에서 마우스 포인터를 클릭, 더블 클릭 또는 드래그하십시오.</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>변경된 사항에 대한 간단한 가이드는 다음과 같습니다.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>대상 잠금 추적을 사용하려면
+Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QuickIntervalPanel</name>
+    <message>
+      <source>today</source>
+      <translation>오늘</translation>
+    </message>
+    <message>
+      <source>-1 hour</source>
+      <translation>-1시간</translation>
+    </message>
+    <message>
+      <source>-24 hours</source>
+      <translation>-24시간</translation>
+    </message>
+    <message>
+      <source>-7 days</source>
+      <translation>-7일</translation>
+    </message>
+    <message>
+      <source>-30 days</source>
+      <translation>-30일</translation>
     </message>
   </context>
   <context>
@@ -891,6 +2095,53 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>RemoteAccess</name>
+    <message>
+      <source>Disabled</source>
+      <translation>비활성화</translation>
+    </message>
+    <message>
+      <source>Server is not configured for remote access feature</source>
+      <translation type="unfinished">Server is not configured for remote access feature</translation>
+    </message>
+    <message>
+      <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
+      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation type="unfinished">Learn more</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
+    </message>
+    <message>
+      <source>Connect %1 client application to localhost:%2</source>
+      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+    </message>
+    <message>
+      <source>Local port</source>
+      <translation type="unfinished">Local port</translation>
+    </message>
+    <message>
+      <source>An error occurred</source>
+      <translation type="unfinished">An error occurred</translation>
+    </message>
+    <message>
+      <source>Username</source>
+      <translation type="unfinished">Username</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>암호</translation>
+    </message>
+    <message>
+      <source>Remote access is unavailable</source>
+      <translation type="unfinished">Remote access is unavailable</translation>
+    </message>
+  </context>
+  <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
@@ -899,6 +2150,52 @@ to activate PTZ</source>
     <message>
       <source>Delete</source>
       <translation>삭제</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 권한이 있습니다</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 및 종속 권한 추가</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 권한 추가</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 및 종속 권한 제거</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 권한 제거</translation>
+    </message>
+    <message>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation type="unfinished">Also inherits it from</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>%1 권한을 상속합니다</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation type="unfinished">Already inherited from</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation type="unfinished">Will stay inherited from</translation>
     </message>
   </context>
   <context>
@@ -921,6 +2218,37 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>ResourceFilterButton</name>
+    <message>
+      <source>Available by Permissions</source>
+      <translation>사용 가능 권한</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>카메라 &amp; 장치</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>레이아웃</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation>웹 페이지 및 통합</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>웹페이지</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>상태 모니터링</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>비디오 월</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -939,16 +2267,16 @@ to activate PTZ</source>
       <source>OUTDATED</source>
       <translation>구식인</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>액세스 불가</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
       <translation>검색</translation>
-    </message>
-    <message>
-      <source>All Types</source>
-      <translation>모든 타입</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -975,12 +2303,12 @@ to activate PTZ</source>
       <translation>웹페이지</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>사용자</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>로컬 파일</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>연동</translation>
     </message>
   </context>
   <context>
@@ -1013,8 +2341,42 @@ to activate PTZ</source>
       <translation>이벤트</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>분석</translation>
+      <source>Objects</source>
+      <translation>객체</translation>
+    </message>
+  </context>
+  <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>저장할 파일을 선택하세요.</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSON 파일 (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>결과를 저장할 파일:</translation>
     </message>
   </context>
   <context>
@@ -1032,6 +2394,13 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>접근 금지</translation>
+    </message>
+  </context>
+  <context>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
@@ -1042,7 +2411,7 @@ to activate PTZ</source>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>원격 NVR에서 시간을 뒤로 변경할 때 생성되는 타임라인 식별자입니다. 새 타임라인은 기존 타임라인과 겹칠 수 있습니다.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -1068,7 +2437,14 @@ to activate PTZ</source>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>작업을 수행하려면 일부 매개 변수를 채워야합니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsTab</name>
+    <message>
+      <source>Accept API Integrations registration requests</source>
+      <translation type="unfinished">Accept API Integrations registration requests</translation>
     </message>
   </context>
   <context>
@@ -1189,9 +2565,12 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>지원되지 않는 펌웨어 버전</translation>
     </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
     <message>
-      <source>Access denied</source>
-      <translation>접근이 거부됨</translation>
+      <source>Min 3 characters</source>
+      <translation>최소 3자리 이상</translation>
     </message>
   </context>
   <context>
@@ -1202,26 +2581,78 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation>하지 않음</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation>항상</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation>로그인 시</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>유효 기간 %1 부터 %2 까지 (서버 시간 기준)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>%1 에서 %2 까지 유효(서버 시간 기준) 또는 로그인 후 %3 까지 유효</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkSettings</name>
+    <message>
+      <source>Link Valid Until</source>
+      <translation>링크 유효 기간</translation>
+    </message>
+    <message>
+      <source>The link will remain accessible until the date specified (including, based on server time)</source>
+      <translation>링크는 지정된 날짜까지 계속 액세스할 수 있습니다 (서버 시간 기준)</translation>
+    </message>
+    <message>
+      <source>Revoke access after login</source>
+      <translation>로그인 후 접근 권한 취소</translation>
+    </message>
+    <message>
+      <source>Access may be revoked earlier if the link validity period ends</source>
+      <translation>링크 유효기간이 종료되면 접근이 조기에 취소될 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
+      <translation type="unfinished">In</translation>
+    </message>
+  </context>
+  <context>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
       <translation>결과 없음</translation>
     </message>
     <message>
-      <source>No Favorite Systems</source>
-      <translation>즐겨찾는 시스템 없음</translation>
+      <source>No Favorite Sites</source>
+      <translation type="unfinished">No Favorite Sites</translation>
     </message>
     <message>
-      <source>No Hidden Systems</source>
-      <translation>숨겨진 시스템 없음</translation>
+      <source>No Hidden Sites</source>
+      <translation type="unfinished">No Hidden Sites</translation>
     </message>
     <message>
-      <source>You can add system to the favorites from the context menu</source>
-      <translation>컨텍스트 메뉴에서 즐겨찾기에 시스템을 추가할 수 있습니다.</translation>
+      <source>You can add site to the favorites from the context menu</source>
+      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
     </message>
     <message>
-      <source>You can hide systems from the main list from the context menu</source>
-      <translation>컨텍스트 메뉴의 기본 목록에서 시스템을 숨길 수 있습니다.</translation>
+      <source>You can hide sites from the main list from the context menu</source>
+      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
     </message>
   </context>
   <context>
@@ -1273,6 +2704,10 @@ to activate PTZ</source>
       <source>Selected on Timeline</source>
       <translation>타임 라인에서 선택</translation>
     </message>
+    <message>
+      <source>Time is unavailable due to DST changes</source>
+      <translation>DST 변경으로 인해 시간을 알 수 없습니다.</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>
@@ -1284,18 +2719,307 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>UserCreateDialog</name>
+    <message>
+      <source>New User</source>
+      <translation>신규 사용자</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>리소스</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>글로벌 권한</translation>
+    </message>
+    <message>
+      <source>Add User</source>
+      <translation>사용자 추가</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserCreateTab</name>
+    <message>
+      <source>New User</source>
+      <translation>신규 사용자</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>형식</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>로컬</translation>
+    </message>
+    <message>
+      <source>Cloud</source>
+      <translation>클라우드</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>로그인</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>전체 이름</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>이메일</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>암호</translation>
+    </message>
+    <message>
+      <source>Confirm Password</source>
+      <translation>비밀번호 확인</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>안전하지 않은 (다이제스트) 인증 허용</translation>
+    </message>
+    <message>
+      <source>You need to specify only user&apos;s email address.</source>
+      <translation>사용자&apos;의 이메일 주소만 지정해야 합니다.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>권한 그룹</translation>
+    </message>
+    <message>
+      <source>Access</source>
+      <translation>접근</translation>
+    </message>
+    <message>
+      <source>Regular user with credentials</source>
+      <translation>자격 증명이 있는 일반 사용자</translation>
+    </message>
+    <message>
+      <source>Temporary with link</source>
+      <translation type="unfinished">Temporary with link</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>패스워드가 일치하지 않습니다.</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEditDialog</name>
+    <message>
+      <source>User - %1</source>
+      <translation>사용자 - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>일반</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>리소스</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>글로벌 권한</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>이 사용자는 아직 %1에 가입하지 않았습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEnabledSwitch</name>
+    <message>
+      <source>Enabled user</source>
+      <translation>활성화된 사용자</translation>
+    </message>
+    <message>
+      <source>Disabled user</source>
+      <translation>비활성화된 사용자</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGeneralTab</name>
+    <message>
+      <source>Audit Trail</source>
+      <translation>감사 추적</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>안내</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>전체 이름</translation>
+    </message>
+    <message>
+      <source>Account Settings</source>
+      <translation>계정 설정</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>이메일</translation>
+    </message>
+    <message>
+      <source>Change password</source>
+      <translation>패스워드 변경</translation>
+    </message>
+    <message>
+      <source>Set password to enable insecure authentication</source>
+      <translation>안전하지 않은 인증을 활성화하려면 비밀번호를 설정하세요</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>안전하지 않은 (다이제스트) 인증 허용</translation>
+    </message>
+    <message>
+      <source>This user is not found in LDAP database and is not able to log in.</source>
+      <translation>LDAP 데이터베이스에서 이 사용자를 찾을 수 없으므로 로그인할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>권한 그룹</translation>
+    </message>
+    <message>
+      <source>Access expires</source>
+      <translation>접근 만료</translation>
+    </message>
+    <message>
+      <source>Access Link</source>
+      <translation>접속 링크</translation>
+    </message>
+    <message>
+      <source>Copy Link</source>
+      <translation>링크 복사</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation>종료</translation>
+    </message>
+    <message>
+      <source>New Link...</source>
+      <translation>새로운 링크...</translation>
+    </message>
+    <message>
+      <source>No valid link for this user</source>
+      <translation>이 사용자에 대한 유효한 링크가 없습니다.</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>Copied here means that a link is copied</comment>
+      <translation>복사됨</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation>링크 얻는 중...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>이 컴퓨터가 %1에 연결할 수 있는지 확인하세요.</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation>LDAP 서버가 오프라인 상태입니다. 사용자가 로그인할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>LDAP 서버와의 지속적인 동기화가 비활성화되면 그룹은 자동으로 동기화되지 않습니다. 이 그룹을 업데이트하려면 수동 동기화를 시작하세요.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>이 사용자의 로그인은 다른 사용자의 로그인을 중복합니다. 아무도 로그인할 수 없습니다. 이 문제를 해결하려면 사용자 로그인을 변경하거나 로그인이 중복된 사용자를 비활성화하거나 삭제할 수 있습니다.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+    <message>
+      <source>Interface Language</source>
+      <translation type="unfinished">Interface Language</translation>
+    </message>
+  </context>
+  <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
       <translation>숨겨진</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>모든 시스템</translation>
-    </message>
-    <message>
       <source>Favorites</source>
       <translation>즐겨찾기</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialog</name>
+    <message>
+      <source>Add Rule</source>
+      <translation>규칙 추가</translation>
+    </message>
+    <message>
+      <source>Duplicate</source>
+      <translation>복제</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>항목 없음</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>이벤트정보...</translation>
+    </message>
+    <message>
+      <source>Reset To Defaults...</source>
+      <translation>기본값으로 재설정...</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation type="unfinished">Event Rules</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Schedule</source>
+      <translation type="unfinished">Schedule</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation type="unfinished">State</translation>
     </message>
   </context>
   <context>
@@ -1314,7 +3038,28 @@ to activate PTZ</source>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>%1에 접근할 수 없습니다. 인터넷 연결을 확인하십시오.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>조이스틱을 좌우로 여러 번 움직여보세요.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>조이스틱을 위아래로 여러 번 움직입니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>조이스틱을 시계 방향, 반시계 방향으로 여러 번 돌리세요.</translation>
     </message>
   </context>
 </TS>

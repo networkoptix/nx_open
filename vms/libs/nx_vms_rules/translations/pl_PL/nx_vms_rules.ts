@@ -2,10 +2,298 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl_PL" sourcelanguage="en">
   <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>BasicAction</name>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Wystąpiło wiele zdarzeń %1</translation>
+      <source>Caption</source>
+      <translation>Opis</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Opis</translation>
+    </message>
+    <message>
+      <source>Tooltip text</source>
+      <translation>Tekst podpowiedzi</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
+        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
+        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
+        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>Czas: %1 na %2</translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>Nieznane wydarzenie</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Powód: %1</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation type="unfinished">Unknown action</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Dowolne zdarzenie</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Zdarzenia analityczne</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Dowolne zdarzenie analityczne</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problemy z kamerą</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problemy z urządzeniem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Dowolny problem z kamerą</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Dowolny problem z urządzeniem</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation>Zdarzenia serwera</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Dowolne zdarzenie serwera</translation>
+    </message>
+    <message>
+      <source>Invalid field type is provided</source>
+      <translation>Podano nieprawidłowy typ pola</translation>
+    </message>
+    <message>
+      <source>Unexpected validation policy</source>
+      <translation>Nieoczekiwana polityka walidacji</translation>
+    </message>
+    <message>
+      <source>Select at least one Server</source>
+      <translation>Wybierz co najmniej jeden serwer</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Wybierz co najmniej jednego użytkownika</translation>
+    </message>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Wybierz dokładnie jedną kamerę</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>Wybierz co najmniej jedno urządzenie</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>Wybierz co najmniej jedną kamerę</translation>
+    </message>
+    <message>
+      <source>Not all servers are suitable</source>
+      <translation>Nie wszystkie serwery są odpowiednie</translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation>Brak odpowiednich serwerów</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Na</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Do</translation>
+    </message>
+    <message>
+      <source>Occurs At</source>
+      <translation type="unfinished">Occurs At</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation>Czas trwania</translation>
+    </message>
+    <message>
+      <source>Pre-Recording</source>
+      <translation>Nagrywanie przedalarmowe</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation>Nagrywanie poalarmowe</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Interwał akcji</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation>Stan</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>Głośność</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation type="unfinished">On Layout</translation>
+    </message>
+    <message>
+      <source>Event Devices</source>
+      <translation>Urządzenia zdarzeń</translation>
+    </message>
+    <message>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
+    </message>
+    <message>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
+    </message>
+    <message>
+      <source>Field %1 value must be provided for the given validation policy</source>
+      <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+      <translation>Wartość pola %1 musi zostać podana dla danej polityki walidacji</translation>
+    </message>
+    <message>
+      <source>Chosen local layout can only be shown to its owner %1</source>
+      <translation>Wybrany układ lokalny może być pokazany tylko jego właścicielowi %1</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout</source>
+      <translation>Żaden z wybranych użytkowników nie ma dostępu do wybranego układu</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation>Niektórzy użytkownicy nie mają dostępu do wybranego układu</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation>Dla</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <translation type="unfinished">
+        <numerusform>Wybrane urządzenia zostały usunięte</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <translation type="unfinished">
+        <numerusform>Wybrane kamery zostały usunięte</numerusform>
+        <numerusform>Selected cameras were removed</numerusform>
+        <numerusform>Selected cameras were removed</numerusform>
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <translation type="unfinished">
+        <numerusform>Wybrane serwery zostały usunięte</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <translation type="unfinished">
+        <numerusform>Wybrane układy zostały usunięte</numerusform>
+        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time value cannot be less than zero</source>
+      <translation>Wartość czasu nie może być mniejsza od zera</translation>
+    </message>
+    <message>
+      <source>Duration cannot be less than zero</source>
+      <translation>Czas trwania nie może być krótszy niż zero</translation>
+    </message>
+    <message>
+      <source>Value cannot be less than %1</source>
+      <translation>Wartość nie może być mniejsza niż %1</translation>
+    </message>
+    <message>
+      <source>Value cannot be more than %1</source>
+      <translation>Wartość nie może być większa niż %1</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation type="unfinished">To Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AcknowledgeAction</name>
+    <message>
+      <source>Acknowledge</source>
+      <translation>Potwierdź</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
+    <message>
+      <source>Empty text is not allowed</source>
+      <translation>Pusty tekst nie jest dozwolony</translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation>Nieprawidłowy adres e-mail %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -19,25 +307,12 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%1 na %2</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
-      <source>State</source>
-      <translation>Stan</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Event Type</source>
-      <translation>Typ zdarzenia</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>Opis</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Opis</translation>
+      <source>Analytics event type is not selected</source>
+      <translation>Nie wybrano typu zdarzenia analitycznego</translation>
     </message>
   </context>
   <context>
@@ -47,47 +322,46 @@
       <translation>Wykryto obiekt</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 w kamerze &apos;%2&apos;</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Wykryto obiekt analityczny</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
+      <source>And Object</source>
+      <translation type="unfinished">And Object</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>Typ obiektu</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Atrybuty</translation>
+      <source>%1 at %2</source>
+      <comment> is detected</comment>
+      <translation>%1 na %2</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Serwer &quot;%1&quot; zakończył backup archiwum</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <source>Analytics object type is not selected</source>
+      <translation>Nie wybrano typu obiektu analitycznego</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::BookmarkAction</name>
     <message>
-      <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <source>Create Bookmark</source>
+      <translation type="unfinished">Create Bookmark</translation>
     </message>
     <message>
-      <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <source>Add Tags</source>
+      <translation type="unfinished">Add Tags</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>Buzzer</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation type="unfinished">Action Throttling</translation>
     </message>
   </context>
   <context>
@@ -101,35 +375,16 @@
       <translation>Wejście na %1</translation>
     </message>
     <message>
+      <source>Input Signal on Device</source>
+      <translation type="unfinished">Input Signal on Device</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation type="unfinished">With ID</translation>
+    </message>
+    <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Stan</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Input ID</source>
-      <translation>ID wejścia</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::rules::DebugEvent</name>
-    <message>
-      <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Akcja</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Sygnał na wejściu kamery</translation>
     </message>
   </context>
   <context>
@@ -147,38 +402,25 @@
       <translation>Moduł I/O został odłączony</translation>
     </message>
     <message>
-      <source>Device %1 was disconnected</source>
-      <translation>Urządzenie %1 zostało odłączone</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>Kamera %1 została odłączona</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>Moduł I/O %1 został odłączony</translation>
-    </message>
-    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
-        <numerusform>Device Disconnected</numerusform>
-      </translation>
+      <translation>Urządzenie odłączone</translation>
     </message>
     <message>
-      <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
-    </message>
-    <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
-        <numerusform>Camera Disconnected</numerusform>
-      </translation>
+      <translation>Kamera odłączona</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Urządzenie</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>%1 was disconnected</source>
+      <comment>Device name will be substituted</comment>
+      <translation>%1 rozłączono</translation>
     </message>
   </context>
   <context>
@@ -201,23 +443,65 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Konflikt kamer IP na %1</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Device IP Conflict</source>
-      <translation>
-        <numerusform>Konflikt urządzenia IP</numerusform>
-        <numerusform>Konflikt urządzenia IP</numerusform>
-        <numerusform>Konflikt urządzenia IP</numerusform>
-        <numerusform>Konflikt urządzenia IP</numerusform>
-      </translation>
+      <translation>Konflikt urządzenia IP</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Camera IP Conflict</source>
-      <translation>
-        <numerusform>Konflikt kamery IP</numerusform>
-        <numerusform>Konflikt kamery IP</numerusform>
-        <numerusform>Konflikt kamery IP</numerusform>
-        <numerusform>Konflikt kamery IP</numerusform>
-      </translation>
+      <translation>Konflikt kamery IP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>ID wyjściowe</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation type="unfinished">Device Output</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>Jakość</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>kl./s</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation type="unfinished">Camera Recording</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>Jeśli</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>Ustaw na pełny ekran</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation type="unfinished">Set for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>Wyłącz pełny ekran</translation>
     </message>
   </context>
   <context>
@@ -227,12 +511,8 @@
       <translation>Błąd wentylatora w %1</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>Błąd wentylatora</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>Serwer</translation>
+      <source>Fan Failure</source>
+      <translation type="unfinished">Fan Failure</translation>
     </message>
   </context>
   <context>
@@ -242,86 +522,126 @@
       <translation>Zdarzenie generowane</translation>
     </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>Zdarzenie generowane na %1</translation>
+      <source>Omit logging</source>
+      <translation type="unfinished">Omit logging</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
+      <source>And Source</source>
+      <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Stan</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Źródło</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>Opis</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Opis</translation>
+      <source>Generic Event from %1</source>
+      <translation>Zdarzenie generowane z %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Interval of action</source>
-      <translation>Interwał działania</translation>
+      <source>Content type</source>
+      <translation>Typ zawartości</translation>
     </message>
     <message>
-      <source>Login</source>
-      <translation>Login</translation>
+      <source>HTTP(S) Request</source>
+      <translation type="unfinished">HTTP(S) Request</translation>
     </message>
     <message>
-      <source>Password</source>
-      <translation>Hasło</translation>
+      <source>URL</source>
+      <translation>Adres URL</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <source>Content</source>
+      <translation>Zawartość</translation>
     </message>
     <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <source>Method</source>
+      <translation type="unfinished">Method</translation>
     </message>
     <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <source>HTTP authentication</source>
+      <translation>Uwierzytelnienie HTTP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+      <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+      <translation>Pola użytkownik i hasła należy wypełnić w przypadku wybrania metody uwierzytelniania podstawowego lub skrótowego</translation>
     </message>
     <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <source>Token field should be filled in case of bearer auth type selected</source>
+      <translation>Pole tokenu powinno być wypełnione w przypadku wyboru autoryzacji na okaziciela</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+      <source>HTTP Method should be known</source>
+      <translation>Metoda HTTP powinna być znana</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+      <source>Select layout</source>
+      <translation>Wybierz układ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>LDAP Sync Issue Event</source>
+      <translation>Zdarzenie problemów synchronizacji LDAP</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is a cause of the event</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n razy)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>Nie udało się połączyć z serwerem LDAP.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>Nie udało się ukończyć synchronizacji w ciągu limitu czasu %1.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>Żadne konto użytkownika na serwerze LDAP nie odpowiada ustawieniom synchronizacji.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>Niektórzy użytkownicy lub grupy LDAP nie zostały znalezione w bazie danych LDAP.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Serwer &quot;%1&quot; ma problem z licencją</translation>
-    </message>
     <message>
       <source>License Issue</source>
       <translation>Problem z licencją</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>Za mało licencji. Nagrywanie zostało wyłączone na następujących urządzeniach:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>Za mało licencji. Nagrywanie zostało wyłączone w następujących kamerach:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>Za mało licencji. Nagrywanie zostało wyłączone w następujących modułach I/O:</translation>
+    </message>
+    <message>
+      <source>%1 has a license problem</source>
+      <comment>Server name will be substituted</comment>
+      <translation>%1 ma problem z licencją</translation>
     </message>
   </context>
   <context>
@@ -329,14 +649,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Ruchu na %1</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Stan</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -413,39 +725,66 @@
       <translation>Połączenie z urządzeniem zostało nieoczekiwanie zamknięte.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation>Nie udało się wymusić użycia czasu kamery, ponieważ jest on zbyt opóźniony. Zamiast tego zostanie użyty czas systemowy.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
-    </message>
-    <message>
-      <source>To</source>
-      <translation>Do</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Interwał działania</translation>
-    </message>
-    <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>Wymuszaj potwierdzenie</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>Opis</translation>
+      <source>Show Desktop Notification</source>
+      <translation type="unfinished">Show Desktop Notification</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation>Lista nie została wybrana</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Opis</translation>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation>Lista o podanym identyfikatorze &apos;%1&apos; nie istnieje</translation>
     </message>
     <message>
-      <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+      <translation>Lista o podanym identyfikatorze &apos;%1&apos; ma nieprawidłowy typ obiektu - &apos;%2&apos;, oczekiwany typ - &apos;%3&apos;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>Otwórz układ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
+    <message>
+      <source>Zero duration cannot be set for the `%1` event state</source>
+      <translation>Nie można ustawić zerowego czasu trwania dla stanu zdarzenia `%1`</translation>
+    </message>
+    <message>
+      <source>Non zero duration cannot be set for the `%1` event state</source>
+      <translation>Nie można ustawić czasu trwania innego niż zero dla stanu zdarzenia `%1`</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording</source>
+      <translation type="unfinished">Panic Recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Play Sound</source>
+      <translation type="unfinished">Play Sound</translation>
     </message>
   </context>
   <context>
@@ -455,24 +794,12 @@
       <translation>Zdarzenie diagnostyczne wtyczki</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
+      <source>For Plugin</source>
+      <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Źródło</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>Opis</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Opis</translation>
-    </message>
-    <message>
-      <source>Level</source>
-      <translation>Poziom</translation>
+      <source>And Level Is</source>
+      <translation type="unfinished">And Level Is</translation>
     </message>
   </context>
   <context>
@@ -482,59 +809,174 @@
       <translation>Użycie</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
+      <source>Server</source>
+      <translation>Serwer</translation>
+    </message>
+    <message>
+      <source>PoE Over Budget</source>
+      <translation type="unfinished">PoE Over Budget</translation>
+    </message>
+    <message>
+      <source>Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation>Przekroczono limit mocy (%1)</translation>
+    </message>
+    <message>
+      <source>PoE over budget on %1</source>
       <translation>Przekroczenie limitu PoE w %1</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Przyczyna: Przekroczono limit mocy (%1)</translation>
+      <source>Current power consumption: %1 watts</source>
+      <translation>Aktualny pobór mocy: %1 W</translation>
     </message>
     <message>
-      <source>PoE over Budget</source>
-      <translation>Przekroczenie limitu PoE</translation>
+      <source>Upper consumption limit: %1 watts</source>
+      <translation>Górny limit zużycia: %1 W</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Stan</translation>
+      <source>Lower consumption limit: %1 watts</source>
+      <translation>Dolny limit zużycia: %1 W</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation type="unfinished">Execute PTZ Preset</translation>
     </message>
     <message>
-      <source>Server</source>
-      <translation>Serwer</translation>
+      <source>PTZ Preset</source>
+      <translation type="unfinished">PTZ Preset</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation type="unfinished">Execute to users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>Header</source>
+      <translation>Nagłówek</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>Treść</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation type="unfinished">Send Mobile Notification</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation type="unfinished">Add Source Device name to Body</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>Dźwięk</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation type="unfinished">Repeat Sound</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::Rule</name>
+    <message>
+      <source>`%1` event filter field alerts:</source>
+      <translation type="unfinished">`%1` event filter field alerts:</translation>
+    </message>
+    <message>
+      <source>`%1` action builder field alerts:</source>
+      <translation type="unfinished">`%1` action builder field alerts:</translation>
+    </message>
+    <message>
+      <source>Rule is not completed. One filter and one builder are required</source>
+      <translation>Reguła nie jest ukończona. Wymagany jest jeden filtr i jeden konstruktor</translation>
+    </message>
+    <message>
+      <source>The given filter is not compatible with the given builder</source>
+      <translation>Podany filtr nie jest kompatybilny z danym konstruktorem</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation type="unfinished">License migration issue</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation type="unfinished">Recording services disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation type="unfinished">Cloud storage services disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>Problem z usługami</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
-      <translation>Wyślij e-mail</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>do</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Interwał działania</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
-    </message>
-    <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Wiadomość e-mail</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation type="unfinished">Send Email</translation>
+    </message>
+    <message>
+      <source>Additional Recipients</source>
+      <translation>Dodatkowi odbiorcy</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Błąd certyfikatu serwera &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Błąd certyfikatu serwera</translation>
+    </message>
+    <message>
+      <source>%1 certificate error</source>
+      <comment>Server name will be substituted</comment>
+      <translation>%1 błąd certyfikatu</translation>
     </message>
   </context>
   <context>
@@ -554,20 +996,17 @@
       <translation>MAC #%1: %2</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Konflikt serwera &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>Konflikt serwera</translation>
+    </message>
+    <message>
+      <source>%1 Conflict</source>
+      <comment>Server name will be substituted</comment>
+      <translation>%1 Konflikt</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>Awaria serwera &quot;%1&quot;</translation>
-    </message>
     <message>
       <source>Server Failure</source>
       <translation>Błąd serwera</translation>
@@ -580,16 +1019,35 @@
       <source>Server stopped unexpectedly.</source>
       <translation>Nieoczekiwane zatrzymanie pracy serwera.</translation>
     </message>
+    <message>
+      <source>%1 Failure</source>
+      <translation>%1 Niepowodzenie</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>Uruchomienie serwera &quot;%1&quot;</translation>
-    </message>
-    <message>
       <source>Server Started</source>
       <translation>Uruchomienie serwera</translation>
+    </message>
+    <message>
+      <source>%1 Started</source>
+      <translation>%1 Rozpoczęto</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Pokaż w układzie alarmowym</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>Alarm: %1</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation type="unfinished">Force Alarm Layout Opening</translation>
     </message>
   </context>
   <context>
@@ -599,28 +1057,8 @@
       <translation>Nazwa wyzwalacza</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Wyzwalacz: %1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Wyzwalacz programowy %1 w %2</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>Wyzwalacz programowy</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Stan</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kamery</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Użytkownicy</translation>
     </message>
     <message>
       <source>Name</source>
@@ -630,6 +1068,25 @@
       <source>Icon</source>
       <translation>Ikona</translation>
     </message>
+    <message>
+      <source>By</source>
+      <translation type="unfinished">By</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>Źródło: %1</translation>
+    </message>
+    <message>
+      <source>User: %1</source>
+      <translation>Użytkownik: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SoundFieldValidator</name>
+    <message>
+      <source>Sound is not selected</source>
+      <translation>Dźwięk nie został wybrany</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
@@ -638,24 +1095,19 @@
       <translation>Zamień tekst na mowę</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Kamery</translation>
+      <source>Text</source>
+      <translation>Tekst</translation>
     </message>
     <message>
-      <source>Interval of action</source>
-      <translation>Interwał działania</translation>
+      <source>At Device</source>
+      <translation type="unfinished">At Device</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::StateFieldValidator</name>
     <message>
-      <source>Speak to users</source>
-      <translation>Rozmowa z użytkownikami</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>Powiedz to</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Głośność</translation>
+      <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+      <translation>Stan `%1` nie jest prawidłowy dla zdarzenia `%2` i akcji `%3` z podanymi parametrami</translation>
     </message>
   </context>
   <context>
@@ -698,89 +1150,85 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Błąd bazy danych analizy wideo &quot;%1&quot;: niewystarczające uprawnienia w zamontowanej lokalizacji.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Możnat zainicjować szyfrowanie AES podczas nagrywania archiwum. Dane są zapisywane bez szyfrowania.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Błąd RAID: %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+      <source>Failed to get event descriptor</source>
+      <translation>Nie udało się pobrać deskryptora zdarzenia</translation>
+    </message>
+    <message>
+      <source>Event does not have source camera</source>
+      <translation>Zdarzenie nie ma kamery źródłowej</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
+    <message>
+      <source>Select at least one layout</source>
+      <translation>Wybierz co najmniej jeden układ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation>Lista nie została wybrana</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation>Lista o podanym identyfikatorze &apos;%1&apos; nie istnieje</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; is not a generic list</source>
+      <translation>Lista o podanym identyfikatorze &apos;%1&apos; nie jest listą ogólną</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>Wyświetl tekst na obrazie</translation>
+      <source>Show Text Overlay</source>
+      <translation type="unfinished">Show Text Overlay</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Kamery</translation>
+      <source>Custom Text</source>
+      <translation type="unfinished">Custom Text</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Pokazuj również na kamerze źródłowej</translation>
-    </message>
-    <message>
-      <source>Display text for</source>
-      <translation>Wyświetl tekst przez</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Tekst</translation>
+      <source>Show To</source>
+      <translation>Pokaż na</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::TextWithFields</name>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-      <source>Event: %1</source>
-      <translation>Zdarzenie: %1</translation>
+      <source>Url cannot be empty</source>
+      <translation>Adres URL nie może być pusty</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Źródło: %1</translation>
+      <source>Url must be valid</source>
+      <translation>Adres URL musi być prawidłowy</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>Wtyczka: %1</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>Opis: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Powód: %1</translation>
+      <source>Url should not contains user or password</source>
+      <translation>Adres URL nie powinien zawierać nazwy użytkownika ani hasła</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
-        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
-        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
-        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
-      </translation>
-    </message>
+    <name>nx::vms::rules::WriteToLogAction</name>
     <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Czas: %1 na %2</translation>
+      <source>Write to Log</source>
+      <translation type="unfinished">Write to Log</translation>
     </message>
   </context>
 </TS>

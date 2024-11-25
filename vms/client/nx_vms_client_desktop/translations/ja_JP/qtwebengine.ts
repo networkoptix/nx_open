@@ -267,11 +267,11 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation>&amp;戻る</translation>
+      <translation>戻る</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation>&amp;進む</translation>
+      <translation>進む</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation>全て選択</translation>
+      <translation>すべて選択</translation>
     </message>
     <message>
       <source>Paste and match style</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation>リンクを新しいウィンドウで開く</translation>
+      <translation>リンクを新規ウィンドウで開く</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
@@ -374,7 +374,7 @@
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation>全画面表示を終了</translation>
+      <translation>フルスクリーン表示終了</translation>
     </message>
     <message>
       <source>Save page</source>

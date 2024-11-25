@@ -24,10 +24,6 @@
       <translation>Ủng hộ</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>Máy chủ Hệ thống</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>Nhà phát triển</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation>Thư viện nguồn mở</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>Làm</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>Hành động máy chủ</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>Hành động hệ thống</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>Chọn tất cả</translation>
     </message>
@@ -260,11 +249,11 @@
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Đường mòn kiểm toán</translation>
+      <translation>Báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
     <message>
       <source>Email settings</source>
@@ -276,7 +265,11 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Quy tắc sự kiện</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>Không sao lưu</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Máy chủ đang ngoại tuyến. Cài đặt sao lưu không khả dụng.</translation>
     </message>
   </context>
   <context>
@@ -406,7 +392,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Timeout</source>
@@ -429,18 +415,18 @@
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation>Bookmark Đăng nhập</translation>
+      <translation>Nhật ký dấu trang</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
   </context>
   <context>
     <name>BusinessRuleWidget</name>
     <message>
       <source>Event</source>
-      <translation>Biến cố</translation>
+      <translation>Sự kiện</translation>
     </message>
     <message>
       <source>Schedule...</source>
@@ -487,7 +473,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Quy tắc sự kiện</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -536,10 +522,6 @@
     <message>
       <source>Restore Defaults</source>
       <translation>khôi phục mặc định</translation>
-    </message>
-    <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
@@ -622,10 +604,6 @@
       <translation>Cổng đa phương tiện</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation>Sử dụng các cài đặt trước của hệ thống</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>Tốc độ PTZ</translation>
     </message>
@@ -666,7 +644,23 @@
       <translation>Hồ sơ luồng chính</translation>
     </message>
     <message>
-      <source>Import From Device</source>
+      <source>Web Page</source>
+      <translation>Trang Web</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Cổng trang web</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>Không gửi lệnh Dừng PTZ</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>Không ghi lại âm thanh</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
       <translation>Nhập từ thiết bị</translation>
     </message>
     <message>
@@ -674,12 +668,19 @@
       <translation>Nhập video tự động</translation>
     </message>
     <message>
-      <source>Web Page</source>
-      <translation>Trang Web</translation>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>Hotspots</translation>
     </message>
     <message>
-      <source>Web Page Port</source>
-      <translation>Cổng trang web</translation>
+      <source>Add</source>
+      <translation>Thêm</translation>
     </message>
   </context>
   <context>
@@ -954,6 +955,17 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation>Không có kết nối</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1027,20 +1039,16 @@
       <translation>Trả lời từ bản sao lưu...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation>Tạo bản sao lưu dữ liệu quản lý Hệ thống hoặc khôi phục dữ liệu Quản lý hệ thống từ bản sao lưu hiện có</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Hủy bỏ</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Mở thư mục</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1148,7 +1156,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -1160,18 +1168,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Khi nào</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Sự kiện chung</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
   </context>
   <context>
@@ -1250,7 +1247,7 @@
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Rotation, Dewarping, Image Enhancement vv.</translation>
+      <translation>Xoay, làm phẳng, cải thiện hình ảnh, v. v.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
@@ -1291,7 +1288,7 @@
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>Failover ưu tiên</translation>
+      <translation>Ưu tiên chuyển đổi dự phòng</translation>
     </message>
   </context>
   <context>
@@ -1306,7 +1303,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong (M)</translation>
+      <translation>Trung bình (M)</translation>
     </message>
     <message>
       <source>High</source>
@@ -1318,7 +1315,22 @@
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
+    </message>
+  </context>
+  <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>Chuyển đổi dự phòng</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>ID vị trí máy chủ:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Ưu tiên chuyển đổi dự phòng...</translation>
     </message>
   </context>
   <context>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Thêm bình luận</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Đặt lịch</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Hành động thử nghiệm</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Thêm bình luận</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>Khởi động</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Kết nối với hệ thống trước đó khi khởi động</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Tự động khôi phục cấu hình cửa sổ đã lưu</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation>Cho phép máy tính chuyển sang chế độ ngủ khi không hoạt động</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>Cài đặt hệ thống</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1524,13 +1517,6 @@
     </message>
   </context>
   <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>ID đầu vào</translation>
-    </message>
-  </context>
-  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
@@ -1577,7 +1563,7 @@
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;Thay đổi tỉ lệ màn hình</translation>
+      <translation>Cắt theo tỷ lệ màn hình</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Không bắt buộc</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Thử nghiệm...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP Cài đặt</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>URL Máy chủ</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Mật khẩu</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Cơ sở tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Bộ lọc Tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Thời gian chờ tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Quản trị DN hoặc CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Người dùng lấy từ LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Đang tải...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Lôi kêt nôi</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Gán vai trò của người dùng</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Vô hiệu hóa người dùng nhập</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Cho phép xác thực thông báo cho người dùng mới nhập vào</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>Tính năng</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Giấy phép hoạt động (License)</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Tẩy</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ủy quyền mới</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Chi tiết...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Phần mềm được cấp phép</translation>
     </message>
   </context>
   <context>
@@ -1741,7 +1638,7 @@
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation>Kích hoạt bằng tay</translation>
+      <translation>Kích hoạt thủ công</translation>
     </message>
     <message>
       <source>Select License File...</source>
@@ -1757,11 +1654,11 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>Bắt đầu cấp giấy phép miễn phí</translation>
+      <translation>Kích hoạt giấy phép miễn phí</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization</translation>
+      <translation>Kích hoạt giấy phép</translation>
     </message>
     <message>
       <source>Internet Activation</source>
@@ -1836,6 +1733,18 @@
       <source>Test</source>
       <translation>Thử</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>Sử dụng thông tin xác thực</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>Sử dụng liên kết</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>Liên kết</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>thử lại</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation>Tải xuống hoàn tất!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation>Không thể lưu nhật ký vào thư mục đã chọn</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1924,19 +1825,19 @@
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>Địa chỉ IP cho các camera và máy chủ, nhóm người sử dụng, vv.</translation>
+      <translation>Địa chỉ IP cho camera và máy chủ, nhóm người dùng, vv.</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
       <translation>Hiển thị lớp phủ có tiêu điểm cho camera PTZ</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Kết hợp hệ thống...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>URL máy chủ:</translation>
@@ -1954,8 +1855,12 @@
       <translation>Kiểm tra</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Lấy tên hệ thống và cài đặt từ:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Lấy tên hệ thống và cài đặt từ</translation>
     </message>
   </context>
   <context>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Văn bản</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>Chọn bố cục</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>Thêm thiết bị</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>đến</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>CHỌN MÁY CHỦ</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Cổng</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>Gợi ý</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Thêm tất cả thiết bị</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation>Cài đặt kết nối</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Mật khẩu</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Người sử dụng</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>Chữ ký Hỗ trợ</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>Chữ ký hệ thống</translation>
+      <source>Username</source>
+      <translation>Tên người dùng</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation>Email từ</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Đăng nhập</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Mật khẩu</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>Tên người dùng</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation>Đăng nhập vào trang web</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Chú ý! Vượt quá giới hạn công suất</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>Hiển thị tất cả các thông báo</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Hệ thống Thông báo</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>Sự kiện</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Đặt trước</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>Đến</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>Cài đặt ngôn ngữ</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>Nội dung thông báo tùy chỉnh</translation>
     </message>
@@ -2317,7 +2246,7 @@
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>Đính kèm với bức tường video...</translation>
+      <translation>Đính kèm vào Tường video...</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -2340,49 +2269,6 @@
     <message>
       <source>Restart to the updated version when ready</source>
       <translation>Khởi động lại phiên bản cập nhật khi sẵn sàng</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Tìm kiếm người dùng</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Cho phép</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Vô hiệu hóa</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>&amp;xóa bỏ...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Bắt buộc xác thực an toàn</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Không tìm thấy kết quả nào</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Người dùng mới...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Chỉnh sửa Vai trò...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>Cài đặt LDAP...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Người dùng lấy từ LDAP...</translation>
     </message>
   </context>
   <context>
@@ -2430,22 +2316,22 @@
       <translation>Thêm</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Loại bỏ tùy chọn kết nối này có thể dẫn đến sự cố hệ thống.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>Quản trị hệ thống</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation>Thiết lập bức tường video</translation>
+      <translation>Cài đặt Tường video</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Kích hoạt dòng thời gian trên tường video</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Hình ảnh</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Thư mục tạm thời</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Tùy chọn thêm</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Không được phép Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Chụp con trỏ chuột</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Một máy tính có cấu hình mạnh được khuyến khích sử dụng để cho chất lượng và độ phân giải "Best".</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Duyệt...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Nguồn</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>Chất lượng video</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Nguồn</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Một máy tính có cấu hình mạnh được khuyến khích sử dụng để cho chất lượng và độ phân giải "Best".</translation>
     </message>
     <message>
       <source>Screen</source>
-      <translation>Màn</translation>
+      <translation>Màn hình</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Tùy chọn thêm</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Chụp con trỏ chuột</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Quy tắc cảnh báo/sự kiện</translation>
+      <source>No services found</source>
+      <translation>Không tìm thấy dịch vụ</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation>Quy tắc mới</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation>Liên hệ với Đối tác của bạn để thêm dịch vụ</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation>Xoá quy tắc</translation>
+      <source>Channel Partner Contact</source>
+      <translation>Liên hệ đối tác</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation>Chọn một quy tắc</translation>
+      <source>Services Usage</source>
+      <translation>Sử dụng dịch vụ</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation>Đặt lại quy tắc mặc định</translation>
+      <source>Services state</source>
+      <translation>Trạng thái dịch vụ</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation>Hoạt động của người dùng</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Hiển thị máy chủ trong sơ đồ cây cho người dùng không phải quản trị viên</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Mã hóa Lưu trữ</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>Mã hóa lưu trữ làm tăng mức sử dụng CPU</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>Thay đổi mật khẩu...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Mã hóa lưu lượng video sẽ tăng đáng kể việc sử dụng CPU.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Sẽ bị mất kết nối với camera không hỗ trợ HTTPS.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>Quản lý người dùng</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation>Hiển thị máy chủ trong sơ đồ cây cho người dùng có quyền thấp</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>Khả dụng cho</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2807,7 +2706,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Issued by</source>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>Chi tiết</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Ghim vào chứng chỉ này</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Xem chứng chỉ đã ghim</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Sao lưu</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Failover ưu tiên...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Tự động phát hiện webcam USB và webcam tích hợp sẵn</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Âm thanh</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Quản lý</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Tiểu bang</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -2997,7 +2862,7 @@
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>Nơi lưu trữ</translation>
+      <translation>Vị trí lưu trữ</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
@@ -3006,22 +2871,6 @@
     <message>
       <source>Reindex Backup</source>
       <translation>Lập lại chỉ mục Sao lưu</translation>
-    </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa các đoạn phim lỗi thời khỏi nó sẽ tiếp tục.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn dung lượng. Chúng tôi khuyên bạn nên chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Dữ liệu phân tích và chuyển động sẽ tiếp tục được lưu trữ trên bộ nhớ đã bị vô hiệu hóa.</translation>
     </message>
   </context>
   <context>
@@ -3043,7 +2892,7 @@
     </message>
     <message>
       <source>URL:</source>
-      <translation>Nơi:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Vai trò</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Hiển thị tất cả người dùng</translation>
     </message>
@@ -3072,24 +2917,24 @@
       <source>Nothing matches your search.</source>
       <translation>Không có gì phù hợp với tìm kiếm của bạn.</translation>
     </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
   </context>
   <context>
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation>(đề nghị)</translation>
+      <translation>(khuyến nghị)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>Gửi sử dụng và crash thống kê vô danh với các nhà phát triển phần mềm</translation>
+      <translation>Gửi ẩn danh thông tin sử dụng và thống kê sự cố cho nhà phát triển phần mềm</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation>Ngôn ngữ tùy chỉnh cho thông báo trên Đám mây</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>Tìm kiếm người dùng</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation>+ Thêm nhóm</translation>
+      <source>Add Group</source>
+      <translation>Thêm nhóm</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation>Không tìm thấy nhóm nào</translation>
+      <source>Del</source>
+      <translation>Xóa</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>Tìm kiếm người dùng</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Thêm người dùng</translation>
+      <source>Add User</source>
+      <translation>Thêm người dùng</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation>Không tìm thấy người dùng</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Thay đổi mật khẩu...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Người sử dụng</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Xoá Vai trò</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Vai trò Người dùng</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Vai trò mới</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Vẫn chưa có người dùng nào dùng role này.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Nhấp vào nút &quot;Vai trò mới&quot; để tạo.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Người dùng này có thể sử dụng xác thực thông báo.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Bắt buộc xác thực an toàn</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Nhóm người dùng</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Vai trò</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Chỉnh sửa Vai trò...</translation>
+      <source>Del</source>
+      <translation>Xóa</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Thể tích</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Kiểm tra</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy trang web này qua máy chủ</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>Proxy tất cả các nội dung yêu cầu</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Cho phép mở trang web mà không cần kiểm tra chứng chỉ SSL</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Lưu ý: Lịch trình thời gian cho thời gian máy chủ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Giấy phép hoạt động (License)</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Tẩy</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Chi tiết...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Phần mềm được cấp phép</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Giấy phép mới</translation>
     </message>
   </context>
   <context>

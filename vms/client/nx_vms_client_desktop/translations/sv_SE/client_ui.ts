@@ -24,10 +24,6 @@
       <translation>Support</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>System server</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>Utvecklare</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation>Öppen källkodsbibliotek</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>Gör</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>Serveråtgärder</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>Systemåtgärder</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>Markera allt</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>Händelsesregler</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>Inga säkerhetskopior</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Servern är offline. Säkerhetskopieringsinställningar är inte tillgängliga.</translation>
     </message>
   </context>
   <context>
@@ -538,10 +524,6 @@
       <translation>Återställ standardinställningar</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Ändra inte dessa inställningar om du inte är helt säker på deras eventuella inverkan på systemets prestanda.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Behåll kameraström och profilinställningar</translation>
     </message>
@@ -622,10 +604,6 @@
       <translation>Medieport</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation>Använd systemets förinställningar</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ hastighet</translation>
     </message>
@@ -666,7 +644,23 @@
       <translation>Primär strömningsprofil</translation>
     </message>
     <message>
-      <source>Import From Device</source>
+      <source>Web Page</source>
+      <translation>Webbsida</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Porten för webbsida</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>Skicka inte Stop PTZ-kommandot</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>Spela inte in ljud</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
       <translation>Importera från enhet</translation>
     </message>
     <message>
@@ -674,12 +668,19 @@
       <translation>Importera video automatiskt</translation>
     </message>
     <message>
-      <source>Web Page</source>
-      <translation>Webbsida</translation>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>Hotspots</translation>
     </message>
     <message>
-      <source>Web Page Port</source>
-      <translation>Porten för webbsida</translation>
+      <source>Add</source>
+      <translation>Lägg till</translation>
     </message>
   </context>
   <context>
@@ -954,6 +955,17 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation>Ingen anslutning</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1027,20 +1039,16 @@
       <translation>Återställ från säkerhetskopia...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation>Skapa en säkerhetskopia av systemhanteringsdata, eller återställ systemhanteringsdata från en befintlig säkerhetskopia</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Öppna mapp</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1161,17 +1169,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Händelsesregler...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>När</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Generisk händelse</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Serverns plats:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Failover Prioritet...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting hittades</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Lägg till kommentar</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Ange schema</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Testa åtgärd</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Lägg till kommentar</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>Uppstart</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Anslut till det tidigare systemet vid uppstart</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Återställ automatiskt sparad fönsterkonfiguration</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation>Tillåt datorn att gå in i viloläge</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>Systeminställningar</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Ingångs-ID</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Valfritt</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Testar...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP inställningar</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Lösenord</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Sökbas</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Sökfilter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Sök Timeout (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Admin DN eller CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Hämta användare från LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laddar...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Anslutningsfel</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Roll att tilldela importerade användare</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Inaktivera importerade användare</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Tillåt digest -autentisering för importerade användare</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>Egenskaper</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Aktiva licenser</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Ta bort</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ny licens</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detaljer...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Programvaran är licensierad till</translation>
     </message>
   </context>
   <context>
@@ -1836,6 +1733,18 @@
       <source>Test</source>
       <translation>Test</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>Använd inloggningsuppgifter</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>Använd länk</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>Länk</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>Försök igen</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation>Nedladdning klar!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation>Det gick inte att spara loggar till den valda mappen</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation>Visa målöverlägg för PTZ-kameror</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Sammanfoga system...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>Server URL:</translation>
@@ -1954,8 +1855,12 @@
       <translation>Kontrollera</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Ta systemnamn och inställningar från:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Ta systemnamn och inställningar från</translation>
     </message>
   </context>
   <context>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Text</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>Välj layouter</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>Lägg till enheter</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>till</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>VÄLJ SERVER</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>Tips</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Logga in</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Lösenord</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Sök</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Lägg till alla enheter</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation>Anslutningsinställningar</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Lösenord</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Användare</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>Supportsignatur</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>Systemsignatur</translation>
+      <source>Username</source>
+      <translation>Användarnamn</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation>E-post från</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Logga in</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Lösenord</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>Användarnamn</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation>Logga in på webbsida</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Uppmärksamhet! Effektbegränsningen överskreds</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>Visa alla notifieringar</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Systemnotiser</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>Händelser</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Förinställning</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>Till</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>Inställningar för språk</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>Anpassat aviseringsinnehåll</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Sök användare</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Aktivera</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Avaktivera</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Radera...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Tvinga fram säker autentisering</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Ingenting hittades</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Ny användare...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Redigera roller...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP inställningar...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Hämta användare från LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>Lägg till</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Om du tar bort det här anslutningsalternativet kan det leda till systemfel.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>Systemadministration</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Aktivera tidslinje på videovägg</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalitet</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Tillfällig mapp</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Fler inställningar</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Inaktivera Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Fånga muspekare</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>En kraftfull dator rekommenderas för &quot;Bästa&quot; kvalitet och upplösning.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Bläddra...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Källa</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>Inspelningskvalitet</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Källa</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>En kraftfull dator rekommenderas för &quot;Bästa&quot; kvalitet och upplösning.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Skärm</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Fler inställningar</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Fånga muspekare</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Larm/händelseregler</translation>
+      <source>No services found</source>
+      <translation>Inga tjänster hittades</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation>Ny regel</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation>Kontakta din kanalpartner för att lägga till tjänster</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation>Ta bort regel</translation>
+      <source>Channel Partner Contact</source>
+      <translation>Kanalpartnerkontakt</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation>Välj en regel</translation>
+      <source>Services Usage</source>
+      <translation>Användning av tjänster</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation>Återställ standardregler</translation>
+      <source>Services state</source>
+      <translation>Tjänststatus</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation>Användaraktivitet</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Visa servrar i träd för användare som inte är administratörer</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Arkivet är krypterat</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>Arkivkryptering ökar CPU-användning</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>Ändra lösenord...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Kryptering av videotrafik ökar väsentligt CPU-användningen.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Anslutning med kameror som inte stöder HTTPS kommer att gå förlorade.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>Hantera användare</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation>Visa servrar i träd för användare som inte är administratörer</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>Tillgänglig till</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>Detaljer</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Fäst på detta certifikat</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Visa fäst certifikat</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Failover</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Failover Prioritet...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Upptäck automatiskt inbyggda webbkameror och USB-webbkameror</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Ljud</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Hantera</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Läge</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>Återskapa Backup</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Inspelning till avaktiverad lagring stoppas. Men det kommer att fortsätta att radera utdaterat material från det.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Inspelningen aktiverades på USB-minnet</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Analysdata kan ta stora mängder utrymme. Vi rekommenderar att du väljer en annan plats för den istället för systempartitionen.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Analys- och rörelsedata kommer att fortsätta att lagras på den inaktiverade lagringen.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Roller</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Visa alla användare</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Inget matchar din sökning.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Varning! Detta gör att inställningarna för kvalitet och bildfrekvens (FPS) i inspelningsschemat är irrelevanta.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation>Anpassat språk för molnaviseringar</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>Sök användare</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation>+ Lägg till grupp</translation>
+      <source>Add Group</source>
+      <translation>Lägg till grupp</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation>Inga grupper hittades</translation>
+      <source>Del</source>
+      <translation>Del</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>Sök användare</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Lägg till användare</translation>
+      <source>Add User</source>
+      <translation>Lägg till användare</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation>Inga användare hittades</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Ändra lösenord...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Namn</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Användare</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Ta bort roll</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Användarroller</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Ny roll</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Det finns inga anpassade användarroller ännu.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klicka på &quot;Ny roll&quot; knappen för att skapa en.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Den här användaren kan använda digest-autentisering.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Tvinga fram säker autentisering</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Typ av användare</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Roll</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Redigera roller...</translation>
+      <source>Del</source>
+      <translation>Del</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulär</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volym</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Allmänt</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxyanslut denna webbsida via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>Proxy allt begärt innehåll</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Tillåt öppning av webbsida utan kontroll av SSL-certifikat</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Obs! Schemat är baserat på servertid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Aktiva licenser</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Ta bort</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detaljer...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Programvaran är licensierad till</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Ny licens</translation>
     </message>
   </context>
   <context>

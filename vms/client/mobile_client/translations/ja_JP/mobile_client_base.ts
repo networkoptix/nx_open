@@ -2,15 +2,55 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
+    <name>ParametersVisualizationModel::Private</name>
+    <message numerus="yes">
+      <source>%n Object Types</source>
+      <comment>%n is number of types</comment>
+      <translation>
+        <numerusform>%n オブジェクトタイプ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Object Attributes</source>
+      <comment>%n is number of attributes</comment>
+      <translation>
+        <numerusform>%n オブジェクト属性</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzCameraButtonController</name>
+    <message>
+      <source>Control PTZ</source>
+      <translation>PTZの制御</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudSystemInformationWatcher</name>
+    <message>
+      <source>Owner: %1</source>
+      <comment>%1 is a user name</comment>
+      <translation>オーナー: %1</translation>
+    </message>
+    <message>
+      <source>Your Site</source>
+      <translation>自分のサイト</translation>
+    </message>
+  </context>
+  <context>
     <name>QnContext</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation>サーバに接続できません</translation>
+      <translation>サーバーに接続できません</translation>
     </message>
     <message>
-      <source>Cannot connect to the System &quot;%1&quot;</source>
-      <comment>%1 is a system name</comment>
-      <translation>システム&quot;%1&quot; に接続できません</translation>
+      <source>Cannot connect to the Site &quot;%1&quot;</source>
+      <comment>%1 is a site name</comment>
+      <translation>サイト &quot;%1&quot; に接続できません</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation>不明</translation>
     </message>
   </context>
   <context>
@@ -27,15 +67,19 @@
       <translation>セッションの期限が切れました</translation>
     </message>
     <message>
-      <source>Session duration limit can be changed by the system administrators</source>
-      <translation>セッション期間の制限はシステム管理者が変更できます</translation>
+      <source>Session duration limit can be changed by the site administrators</source>
+      <translation>セッションの有効期限は、サイト管理者が変更できます。</translation>
     </message>
   </context>
   <context>
-    <name>nx::client::mobile::ActionButtonsModel</name>
+    <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
-      <source>Press and hold to speak</source>
-      <translation>長押しで話す</translation>
+      <source>Can&apos;t download video</source>
+      <translation>映像をダウンロードできません</translation>
+    </message>
+    <message>
+      <source>Please check a network connection.</source>
+      <translation>ネットワーク接続を確認してください。</translation>
     </message>
   </context>
   <context>
@@ -45,12 +89,12 @@
       <translation>プッシュ通知設定を変更できません</translation>
     </message>
     <message>
-      <source>Please check internet connection</source>
-      <translation>インターネット接続を確認してください</translation>
-    </message>
-    <message>
       <source>Cannot enable push notifications</source>
       <translation>プッシュ通知を有効にできません</translation>
+    </message>
+    <message>
+      <source>Please check your internet connection</source>
+      <translation>インターネット接続を確認してください</translation>
     </message>
   </context>
 </TS>

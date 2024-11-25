@@ -2,10 +2,284 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en">
   <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>BasicAction</name>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>Flera %1 händelser har inträffat</translation>
+      <source>Caption</source>
+      <translation>Rubrik</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivning</translation>
+    </message>
+    <message>
+      <source>Tooltip text</source>
+      <translation type="unfinished">Tooltip text</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n gånger, först: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n gånger, först: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>Första förekomsten: %1 på %2 (%n gånger totalt)</numerusform>
+        <numerusform>Första förekomsten: %1 på %2 (%n gånger totalt)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>Tid: %1 på %2</translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>Okänd händelse</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Anledning: %1</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation>Okänd åtgärd</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Någon händelse</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Någon kamera har problem</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Invalid field type is provided</source>
+      <translation type="unfinished">Invalid field type is provided</translation>
+    </message>
+    <message>
+      <source>Unexpected validation policy</source>
+      <translation type="unfinished">Unexpected validation policy</translation>
+    </message>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation type="unfinished">Select exactly one camera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation type="unfinished">Select at least one device</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation type="unfinished">Select at least one camera</translation>
+    </message>
+    <message>
+      <source>Not all servers are suitable</source>
+      <translation type="unfinished">Not all servers are suitable</translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation type="unfinished">There are no suitable servers</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Vid</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Till</translation>
+    </message>
+    <message>
+      <source>Occurs At</source>
+      <translation>Inträffar den</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation>Börja när</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation type="unfinished">Duration</translation>
+    </message>
+    <message>
+      <source>Pre-Recording</source>
+      <translation type="unfinished">Pre-Recording</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation type="unfinished">Post-Recording</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>Åtgärdsintervall</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation>Läge</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>Volym</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation>Spola tillbaka</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation>På layout</translation>
+    </message>
+    <message>
+      <source>Event Devices</source>
+      <translation type="unfinished">Event Devices</translation>
+    </message>
+    <message>
+      <source>Of Type</source>
+      <translation>Av typ</translation>
+    </message>
+    <message>
+      <source>And Caption</source>
+      <translation>Och bildtext</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation>Och Beskrivning</translation>
+    </message>
+    <message>
+      <source>Field %1 value must be provided for the given validation policy</source>
+      <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+    </message>
+    <message>
+      <source>Chosen local layout can only be shown to its owner %1</source>
+      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout</source>
+      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time value cannot be less than zero</source>
+      <translation type="unfinished">Time value cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Duration cannot be less than zero</source>
+      <translation type="unfinished">Duration cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Value cannot be less than %1</source>
+      <translation type="unfinished">Value cannot be less than %1</translation>
+    </message>
+    <message>
+      <source>Value cannot be more than %1</source>
+      <translation type="unfinished">Value cannot be more than %1</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation>Till Användare</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AcknowledgeAction</name>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
+    <message>
+      <source>Empty text is not allowed</source>
+      <translation type="unfinished">Empty text is not allowed</translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -19,25 +293,12 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%1 vid %2</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
-      <source>State</source>
-      <translation>Läge</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Event Type</source>
-      <translation>Typ av händelse</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>Rubrik</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
+      <source>Analytics event type is not selected</source>
+      <translation type="unfinished">Analytics event type is not selected</translation>
     </message>
   </context>
   <context>
@@ -47,47 +308,46 @@
       <translation>Objekt upptäckt</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 på kameran &apos;%2&apos;</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>Analysobjekt upptäckt</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
+      <source>And Object</source>
+      <translation>Och objekt</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>Objekttyp</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation>Attribut</translation>
+      <source>%1 at %2</source>
+      <comment> is detected</comment>
+      <translation>%1 vid %2</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Server &quot;%1&quot; har slutfört en säkerhetskopiering av arkivet</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation>Säkerhetskopiering avslutad</translation>
+      <source>Analytics object type is not selected</source>
+      <translation type="unfinished">Analytics object type is not selected</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::BookmarkAction</name>
     <message>
-      <source>Unknown event</source>
-      <translation>Okänd händelse</translation>
+      <source>Create Bookmark</source>
+      <translation>Skapa bokmärke</translation>
     </message>
     <message>
-      <source>%1 event has occurred</source>
-      <translation>%1 händelse har inträffat</translation>
+      <source>Add Tags</source>
+      <translation>Lägg till taggar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>Summer</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation>Åtgärd Strypning</translation>
     </message>
   </context>
   <context>
@@ -101,35 +361,16 @@
       <translation>Ingång på %1</translation>
     </message>
     <message>
+      <source>Input Signal on Device</source>
+      <translation>Ingångssignal på enheten</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation>Med ID</translation>
+    </message>
+    <message>
       <source>Input Signal on Camera</source>
       <translation>Ingångssignal på kameran</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Läge</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Input ID</source>
-      <translation>Ingångs-ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::rules::DebugEvent</name>
-    <message>
-      <source>Debug Event</source>
-      <translation>Felsökningshändelse</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>Åtgärd</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Värde</translation>
     </message>
   </context>
   <context>
@@ -147,34 +388,25 @@
       <translation>I/O-modul kopplades bort</translation>
     </message>
     <message>
-      <source>Device %1 was disconnected</source>
-      <translation>Enhet %1 kopplades bort</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>Kamera %1 kopplades bort</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/O-modul %1 kopplades bort</translation>
-    </message>
-    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation>
-        <numerusform>Enheten är frånkopplad</numerusform>
-        <numerusform>Enheten är frånkopplad</numerusform>
-      </translation>
+      <translation type="unfinished">Device Disconnected</translation>
     </message>
     <message>
-      <source>Device ID</source>
-      <translation>Enhets ID</translation>
-    </message>
-    <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation>
-        <numerusform>Kamera frånkopplad</numerusform>
-        <numerusform>Kamera frånkopplad</numerusform>
-      </translation>
+      <translation type="unfinished">Camera Disconnected</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Enhet</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>%1 was disconnected</source>
+      <comment>Device name will be substituted</comment>
+      <translation type="unfinished">%1 was disconnected</translation>
     </message>
   </context>
   <context>
@@ -197,19 +429,65 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>Kamera IP-konflikt vid %1</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Device IP Conflict</source>
-      <translation>
-        <numerusform>Enheter i IP konflikt</numerusform>
-        <numerusform>Enheter i IP konflikt</numerusform>
-      </translation>
+      <translation type="unfinished">Device IP Conflict</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Camera IP Conflict</source>
-      <translation>
-        <numerusform>Kamera IP-konflikt</numerusform>
-        <numerusform>Kamera IP-konflikt</numerusform>
-      </translation>
+      <translation type="unfinished">Camera IP Conflict</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>Utgångs-ID</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation>Enhetsutgång</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>Kvalitet</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation>Kamerainspelning</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>På</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>Sätt till helskärm</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation>Ange för</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>Avsluta Helskärmsläge</translation>
     </message>
   </context>
   <context>
@@ -219,12 +497,8 @@
       <translation>Fläktfel på %1</translation>
     </message>
     <message>
-      <source>Fan Error</source>
+      <source>Fan Failure</source>
       <translation>Fläktfel</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
     </message>
   </context>
   <context>
@@ -234,71 +508,104 @@
       <translation>Generisk händelse</translation>
     </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>Generisk händelse vid %1</translation>
+      <source>Omit logging</source>
+      <translation>Utelämna loggning</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>Nyckelord åtskilda med blanksteg</translation>
+      <source>And Source</source>
+      <translation>Och Källa</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Läge</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>Källa</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>Rubrik</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
+      <source>Generic Event from %1</source>
+      <translation type="unfinished">Generic Event from %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Interval of action</source>
-      <translation>Åtgärdsintervall</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Logga in</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Lösenord</translation>
-    </message>
-    <message>
-      <source>Do HTTP(S) request</source>
-      <translation>Begär HTTP(S)</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S)-innehåll</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
+      <source>Content type</source>
       <translation>Innehållstyp</translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation>Metod för begäran</translation>
+      <source>HTTP(S) Request</source>
+      <translation>HTTP(S)-förfrågan</translation>
+    </message>
+    <message>
+      <source>URL</source>
+      <translation>URL</translation>
+    </message>
+    <message>
+      <source>Content</source>
+      <translation>Innehåll</translation>
+    </message>
+    <message>
+      <source>Method</source>
+      <translation>Metod</translation>
+    </message>
+    <message>
+      <source>HTTP authentication</source>
+      <translation type="unfinished">HTTP authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+      <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+    </message>
+    <message>
+      <source>Token field should be filled in case of bearer auth type selected</source>
+      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+      <source>HTTP Method should be known</source>
+      <translation type="unfinished">HTTP Method should be known</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>LDAP Sync Issue Event</source>
+      <translation type="unfinished">LDAP Sync Issue Event</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is a cause of the event</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Server &quot;%1&quot; har ett licensproblem</translation>
-    </message>
     <message>
       <source>License Issue</source>
       <translation>Licensproblem</translation>
@@ -315,20 +622,17 @@
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
       <translation>Inte tillräckligt med licenser. Inspelning har inaktiverats på följande I/O-moduler:</translation>
     </message>
+    <message>
+      <source>%1 has a license problem</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 has a license problem</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
       <translation>Rörelse på %1</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Läge</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -403,39 +707,66 @@
       <translation>Anslutningen till enheten stängdes oväntat.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation>Det gick inte att tvinga fram kameratid eftersom den släpar för mycket. Systemtid kommer att användas istället.</translation>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation>Visa notifikation</translation>
-    </message>
-    <message>
-      <source>To</source>
-      <translation>Till</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Intervall av åtgärder</translation>
-    </message>
-    <message>
       <source>Force Acknowledgement</source>
       <translation>Tvinga bekräftelse</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>Rubrik</translation>
+      <source>Show Desktop Notification</source>
+      <translation>Visa skrivbordsavisering</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
     </message>
     <message>
-      <source>Tooltip</source>
-      <translation>Verktygstips</translation>
+      <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>Öppna layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
+    <message>
+      <source>Zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+    </message>
+    <message>
+      <source>Non zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording</source>
+      <translation>Panikinspelning</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Play Sound</source>
+      <translation>Spela ljud</translation>
     </message>
   </context>
   <context>
@@ -445,24 +776,12 @@
       <translation>Plugin Diagnostic Event</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
+      <source>For Plugin</source>
+      <translation>För plugin</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Källa</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>Rubrik</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Beskrivning</translation>
-    </message>
-    <message>
-      <source>Level</source>
-      <translation>Nivå</translation>
+      <source>And Level Is</source>
+      <translation>Och nivå är</translation>
     </message>
   </context>
   <context>
@@ -472,59 +791,168 @@
       <translation>Förbrukning</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>PoE över budget på %1</translation>
+      <source>Server</source>
+      <translation>Server</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>Anledning: Effektbegränsningen överskridits (%1)</translation>
-    </message>
-    <message>
-      <source>PoE over Budget</source>
+      <source>PoE Over Budget</source>
       <translation>PoE över budget</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>Läge</translation>
+      <source>Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Power limit exceeded (%1)</translation>
     </message>
     <message>
-      <source>Server</source>
-      <translation>Server</translation>
+      <source>PoE over budget on %1</source>
+      <translation type="unfinished">PoE over budget on %1</translation>
+    </message>
+    <message>
+      <source>Current power consumption: %1 watts</source>
+      <translation type="unfinished">Current power consumption: %1 watts</translation>
+    </message>
+    <message>
+      <source>Upper consumption limit: %1 watts</source>
+      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+    </message>
+    <message>
+      <source>Lower consumption limit: %1 watts</source>
+      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation>Kör PTZ-förinställning</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation>PTZ förinställning</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation>Utför till användare</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>Header</source>
+      <translation>Rubrik</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>Kropp</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation>Skicka mobilavisering</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation>Lägg till källenhetsnamn i Body</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>Ljud</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation>Upprepa ljud</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::Rule</name>
+    <message>
+      <source>`%1` event filter field alerts:</source>
+      <translation type="unfinished">`%1` event filter field alerts:</translation>
+    </message>
+    <message>
+      <source>`%1` action builder field alerts:</source>
+      <translation type="unfinished">`%1` action builder field alerts:</translation>
+    </message>
+    <message>
+      <source>Rule is not completed. One filter and one builder are required</source>
+      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+    </message>
+    <message>
+      <source>The given filter is not compatible with the given builder</source>
+      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>Problem med licensmigrering</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>Inspelningstjänster inaktiverade</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation>Molnlagringstjänster inaktiverade</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation>Betalda integrationstjänster inaktiverade</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+        <numerusform>Inspelning på %n kanaler stoppades på grund av överanvändning av tjänsten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Säkerhetskopiering av molnlagring på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Säkerhetskopiering av molnlagring på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+        <numerusform>Användningen av betalda integrationstjänster på %n kanaler stoppades på grund av överanvändning av tjänster.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation type="unfinished">Services Issue</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
+      <source>Email Message</source>
+      <translation>E-postmeddelande</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
       <translation>Skicka epost</translation>
     </message>
     <message>
-      <source>to</source>
-      <translation>till</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>Åtgärdsintervall</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
+      <source>Additional Recipients</source>
       <translation>Ytterligare mottagare</translation>
-    </message>
-    <message>
-      <source>Email Message</source>
-      <translation>E-postmeddelande</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>Server &quot;%1&quot; certifikatfel</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>Servercertifikatfel</translation>
+    </message>
+    <message>
+      <source>%1 certificate error</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 certificate error</translation>
     </message>
   </context>
   <context>
@@ -544,20 +972,17 @@
       <translation>MAC #%1: %2</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>Server &quot;%1&quot; Konflikt</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>Serverkonflikt</translation>
+    </message>
+    <message>
+      <source>%1 Conflict</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 Conflict</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>Server &quot;%1&quot; Fel</translation>
-    </message>
     <message>
       <source>Server Failure</source>
       <translation>Serverfel</translation>
@@ -570,16 +995,35 @@
       <source>Server stopped unexpectedly.</source>
       <translation>Servern stoppade oväntat.</translation>
     </message>
+    <message>
+      <source>%1 Failure</source>
+      <translation type="unfinished">%1 Failure</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>Server &quot;%1&quot; Startad</translation>
-    </message>
-    <message>
       <source>Server Started</source>
       <translation>Server startad</translation>
+    </message>
+    <message>
+      <source>%1 Started</source>
+      <translation type="unfinished">%1 Started</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Visa på Alarm Layout</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>Larm: %1</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation>Tvinga öppning av larmlayout</translation>
     </message>
   </context>
   <context>
@@ -589,28 +1033,8 @@
       <translation>Utlösarens namn</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Utlösare: %1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Utlösare %1 vid %2</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>Utlösare</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Läge</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kameror</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Användare</translation>
     </message>
     <message>
       <source>Name</source>
@@ -620,6 +1044,25 @@
       <source>Icon</source>
       <translation>Ikon</translation>
     </message>
+    <message>
+      <source>By</source>
+      <translation>Med</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>Källa: %1</translation>
+    </message>
+    <message>
+      <source>User: %1</source>
+      <translation type="unfinished">User: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SoundFieldValidator</name>
+    <message>
+      <source>Sound is not selected</source>
+      <translation type="unfinished">Sound is not selected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
@@ -628,24 +1071,19 @@
       <translation>Tala</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Kameror</translation>
+      <source>Text</source>
+      <translation>Text</translation>
     </message>
     <message>
-      <source>Interval of action</source>
-      <translation>Handlingsintervall</translation>
+      <source>At Device</source>
+      <translation>På Enhet</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::StateFieldValidator</name>
     <message>
-      <source>Speak to users</source>
-      <translation>Tala med användare</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>Säg följande</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volym</translation>
+      <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
     </message>
   </context>
   <context>
@@ -700,73 +1138,73 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+      <source>Failed to get event descriptor</source>
+      <translation type="unfinished">Failed to get event descriptor</translation>
+    </message>
+    <message>
+      <source>Event does not have source camera</source>
+      <translation type="unfinished">Event does not have source camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; is not a generic list</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>Visa textöverlagring</translation>
+      <source>Show Text Overlay</source>
+      <translation>Visa textöverlägg</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Kameror</translation>
+      <source>Custom Text</source>
+      <translation>Anpassad text</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>Visa också på källkamera</translation>
-    </message>
-    <message>
-      <source>Display text for</source>
-      <translation>Visa text för</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Text</translation>
+      <source>Show To</source>
+      <translation type="unfinished">Show To</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::TextWithFields</name>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-      <source>Event: %1</source>
-      <translation>Händelse: %1</translation>
+      <source>Url cannot be empty</source>
+      <translation type="unfinished">Url cannot be empty</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>Källa: %1</translation>
+      <source>Url must be valid</source>
+      <translation type="unfinished">Url must be valid</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>Plugin: %1</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>Titel: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>Anledning: %1</translation>
+      <source>Url should not contains user or password</source>
+      <translation type="unfinished">Url should not contains user or password</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n gånger, först: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n gånger, först: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Första förekomsten: %1 på %2 (%n gånger totalt)</numerusform>
-        <numerusform>Första förekomsten: %1 på %2 (%n gånger totalt)</numerusform>
-      </translation>
-    </message>
+    <name>nx::vms::rules::WriteToLogAction</name>
     <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>Tid: %1 på %2</translation>
+      <source>Write to Log</source>
+      <translation>Skriv till logg</translation>
     </message>
   </context>
 </TS>

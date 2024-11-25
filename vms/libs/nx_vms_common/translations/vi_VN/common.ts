@@ -2,6 +2,41 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
+    <name>AccessRightHelper</name>
+    <message>
+      <source>View Live</source>
+      <translation>Xem trực tiếp</translation>
+    </message>
+    <message>
+      <source>Play Audio</source>
+      <translation type="unfinished">Play Audio</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation>Xem lưu trữ</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation>Xuất lưu trữ</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation>Xem dấu trang</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Quản lý Dấu trang</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>Nhập người dùng</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation>Chỉnh sửa cài đặt</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -17,46 +52,15 @@
     </message>
   </context>
   <context>
-    <name>AuthResultTranslations</name>
+    <name>BookmarkFacadeStrings</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation>Người dùng này không tồn tại.</translation>
+      <source>Removed camera</source>
+      <translation>Camera bị xóa</translation>
     </message>
     <message>
-      <source>Wrong password.</source>
-      <translation>Sai mật khẩu.</translation>
-    </message>
-    <message>
-      <source>The password is expired. Please contact your system administrator.</source>
-      <translation>Mật khẩu đã hết hạn. Xin vui lòng liên hệ với quản trị hệ thống.</translation>
-    </message>
-    <message>
-      <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>Máy chủ LDAP không thể truy cập được. Vui lòng thử lại sau.</translation>
-    </message>
-    <message>
-      <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 vẫn chưa thể truy cập được. Vui lòng thử lại sau.</translation>
-    </message>
-    <message>
-      <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>Người dùng bị khóa do thử nhiều lần không thành công. Vui lòng thử lại sau.</translation>
-    </message>
-    <message>
-      <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation>Phương thức ủy quyền này bị hạn chế. Xin vui lòng liên hệ với quản trị hệ thống của bạn.</translation>
-    </message>
-    <message>
-      <source>The session key is invalid or expired.</source>
-      <translation>Khóa phiên không hợp lệ hoặc hết hạn.</translation>
-    </message>
-    <message>
-      <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>Lỗi máy chủ nội bộ (%1). Xin vui lòng liên hệ với quản trị hệ thống của bạn.</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>Người dùng này đã bị vô hiệu hóa bởi quản trị viên hệ thống.</translation>
+      <source>Site Event</source>
+      <comment>Shows that the bookmark was created by a site event</comment>
+      <translation type="unfinished">Site Event</translation>
     </message>
   </context>
   <context>
@@ -135,18 +139,130 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
+    <name>PredefinedUserGroups</name>
     <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Sự kiện hệ thống</translation>
+      <source>Administrators</source>
+      <translation>Quản trị viên</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>Người dùng cấp cao</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>Người xem nâng cao</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>Người xem</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>Người xem trực tiếp</translation>
+    </message>
+    <message>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation>Thành viên của nhóm này có thể xem video trực tiếp, mô-đun I/O và trang web.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation>Các thành viên của nhóm này, ngoài các quyền cấp cho nhóm Người xem, có thể xem và kích hoạt các vị trí PTZ và chuyến tham quan PTZ, sử dụng âm thanh 2 chiều, vận hành các nút mô-đun I/O, tạo và chỉnh sửa dấu trang cũng như xem Nhật ký sự kiện.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation>Ngoài các quyền cho nhóm Người xem trực tiếp, các thành viên của nhóm này có thể xem và xuất kho lưu trữ và Dấu trang.</translation>
+    </message>
+    <message>
+      <source>Site Health Viewers</source>
+      <translation type="unfinished">Site Health Viewers</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBusinessResourceValidationStrings</name>
+    <message numerus="yes">
+      <source>%1 of %n devices</source>
+      <translation>
+        <numerusform>%1 of %n thiết bị</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n cameras</source>
+      <translation>
+        <numerusform>%1 trong số %n camera</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n I/O modules</source>
+      <translation>
+        <numerusform>%1 trong tổng số %n mô đun I/O</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Bất kỳ thiết bị nào</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Tất cả camera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>Chọn ít nhất một thiết bị</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>Chọn ít nhất một máy ảnh</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>Máy chủ hỗ trợ buzzer</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>Analytics không khả dụng cho %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+      <source>Select device</source>
+      <translation>Chọn thiết bị</translation>
+    </message>
+    <message>
+      <source>Select camera</source>
+      <translation>Chọn camera</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 does not support two-way audio</source>
+      <translation>
+        <numerusform>%1 không hỗ trợ âm thanh hai chiều</numerusform>
+      </translation>
     </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -237,14 +353,6 @@
       <translation>Sự cố camera không xác định.</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>Nhận được dữ liệu không hợp lệ từ thiết bị %1.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>Nhận được dữ liệu không hợp lệ từ camera %1.</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>Quá nhiều lỗi đa phương tiện. Vui lòng mở hộp thoại sự cố thiết bị để biết thêm chi tiết.</translation>
     </message>
@@ -267,10 +375,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>Sự cố mô-đun I/O không xác định.</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Nhận được dữ liệu không hợp lệ từ các mô-đun I/O %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -368,82 +472,99 @@
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>Nếu đã bị tắt, hãy thử bật Ghi trong Cài đặt mô-đun I/O (error &quot;%1&quot;).</translation>
     </message>
-  </context>
-  <context>
-    <name>QnFfmpegAudioTranscoder</name>
     <message>
-      <source>Audio context was not specified.</source>
-      <translation>Nội dung âm thanh không được chỉ định.</translation>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>Đã nhận được dữ liệu không hợp lệ từ thiết bị. Chi tiết: &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>Đã nhận được dữ liệu không hợp lệ từ camera. Chi tiết: &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>Không thể khởi tạo bộ giải mã âm thanh.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>Không thể gửi khung âm thanh tới bộ mã hóa, Mã lỗi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>Không thể phân bổ bộ đệm mẫu</translation>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>Đã nhận được dữ liệu không hợp lệ từ mô-đun I/O. Chi tiết: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>Trong FFMPEG Thư lãm thư viện không thể tìm thấy một container %1.</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>Không thể thiết lập một định dạng %1 Các đầu ra.</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Không thể thực hiện sao chép luồng trực tiếp vì kích thước khung chưa được xác định.</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>Không thể tìm thấy %1 Mã hóa.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>Mã hóa video hoặc âm thanh không tương thích với vùng chứa %1.</translation>
+    <name>QnCameraInputPolicy</name>
+    <message numerus="yes">
+      <source>%1 have no input ports</source>
+      <translation>
+        <numerusform>%1 Không có cổng đầu vào</numerusform>
+      </translation>
     </message>
   </context>
   <context>
-    <name>QnFfmpegVideoTranscoder</name>
+    <name>QnCameraMotionPolicy</name>
     <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>Không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
+      <source>Recording or motion detection is disabled for %1</source>
+      <translation>%1 Video bên giám sát hoặc chức năng dịch chuyển không thể được sử dụng</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Camera bị xóa</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraOutputPolicy</name>
+    <message numerus="yes">
+      <source>%1 have no output relays</source>
+      <translation>
+        <numerusform>%1 không có rơ le đầu ra</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraRecordingPolicy</name>
+    <message>
+      <source>Recording is disabled for %1</source>
+      <translation>%1 video thể</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%n trên %1 người dùng được chọn không phải là người dùng %2 và sẽ không nhận được thông báo di động.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnExecPtzPresetPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Chọn đúng một máy ảnh</translation>
     </message>
     <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa video.</translation>
+      <source>%1 has no PTZ presets</source>
+      <translation>%1 không cài đặt sẵn PTZ</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>Máy chủ hỗ trợ chẩn đoán quạt</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Chọn đúng một máy ảnh</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on the selected layout</source>
+      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on some of the selected layouts</source>
+      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
     </message>
   </context>
   <context>
@@ -454,7 +575,7 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation>Đặc trưng</translation>
+      <translation>Professional</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -466,7 +587,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>Bức tường video</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -486,7 +607,7 @@
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Giấy phép Chuyên nghiệp</translation>
+      <translation>Giấy phép Professional</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
@@ -555,7 +676,7 @@
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>Giấy phép Chuyên nghiệp %n</numerusform>
+        <numerusform>%n Giấy phép Professional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -634,7 +755,7 @@
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Giấy phép chuyên nghiệp</numerusform>
+        <numerusform>%n/%1 Giấy phép Professional</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -721,57 +842,81 @@
         <numerusform>%n/%1 Giấy phép NVR</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Local Recording</source>
+      <translation>Ghi cục bộ</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation>Dịch vụ ghi cục bộ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Local Recording Services</source>
+      <translation>
+        <numerusform>%n Dịch vụ ghi cục bộ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Dịch vụ ghi cục bộ</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>Máy chủ hỗ trợ giám sát PoE</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n người dùng</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation>%1 và %2 không có quyền %3 đối với một số camera được chọn</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n các nhóm không có quyền %1 đối với một số camera đã chọn</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation>%1 nhóm không có quyền %2 đối với một số camera đã chọn</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>Người dùng %n không có quyền %1 đối với một số camera đã chọn</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 user does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>Người dùng %1 không có quyền %2 đối với một số camera đã chọn</translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message>
-      <source>Cameras</source>
-      <translation>Camera</translation>
-    </message>
-    <message>
-      <source>cameras</source>
-      <translation>camera</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Máy chụp hình</translation>
-    </message>
-    <message>
-      <source>camera</source>
-      <translation>camera</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>Thiết bị</translation>
-    </message>
-    <message>
-      <source>devices</source>
-      <translation>thiết bị</translation>
-    </message>
-    <message>
-      <source>Device</source>
-      <translation>Thiết bị</translation>
-    </message>
-    <message>
-      <source>device</source>
-      <translation>thiết bị</translation>
-    </message>
-    <message>
-      <source>I/O Modules</source>
-      <translation>Mô-đun I/O</translation>
-    </message>
-    <message>
-      <source>I/O modules</source>
-      <translation>Mô-đun I/O</translation>
-    </message>
-    <message>
-      <source>I/O Module</source>
-      <translation>Mô-đun I/O</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>Mô-đun I/O</translation>
-    </message>
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
@@ -830,6 +975,13 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>ID Phần cứng: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSubjectValidationPolicy</name>
+    <message>
+      <source>None of selected user roles contain users</source>
+      <translation type="unfinished">None of selected user roles contain users</translation>
     </message>
   </context>
   <context>
@@ -970,17 +1122,105 @@
         <numerusform>năm</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation>Mili giây</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation>Giây</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>Phút</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation>Giờ</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation>Ngày</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation>Tuần</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation>Tháng</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation>Năm</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>Mili giây</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>Giây</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>Phút</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>Giờ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation>
+        <numerusform>Ngày</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>Tuần</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation>
+        <numerusform>Tháng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation>
+        <numerusform>Năm</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>Chuyển mã OpenCL không được triển khai.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>Phương thức chuyển mã không xác định.</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>Chuyển mã OpenCL không được triển khai.</translation>
@@ -991,206 +1231,158 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>Chủ nhân</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Giám sát viên</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>Người xem nâng cao</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>Người xem</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>Người xem trực tiếp</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>Tùy chỉnh vai trò</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>Tùy chỉnh</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>Có thể quản lý tất cả các camera và dấu trang.</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>Có thể xem tất cả các camera và xuất video.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>Có thể xem video trực tiếp từ tất cả các camera.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>Tùy chỉnh Vai trò người dùng.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>Quyền tùy chỉnh.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>Có quyền truy cập vào toàn bộ Hệ thống và có thể làm tất cả mọi thứ.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>Có quyền truy cập vào toàn bộ Hệ thống và quản lý nó. Có thể tạo người dùng.</translation>
+      <source>Multiple groups</source>
+      <translation>Nhiều nhóm</translation>
     </message>
   </context>
   <context>
-    <name>Result</name>
+    <name>QnUsersWithEmailValidationPolicy</name>
     <message>
-      <source>Missing required parameter: %1.</source>
-      <translation>Thiếu tham số bắt buộc: %1.</translation>
+      <source>Email address is not set for all the selected users.</source>
+      <translation type="unfinished">Email address is not set for all the selected users.</translation>
     </message>
     <message>
-      <source>Failed to process request.</source>
-      <translation>Không thể xử lý yêu cầu.</translation>
+      <source>Email address is not set for some selected users.</source>
+      <translation type="unfinished">Email address is not set for some selected users.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation>Ghi cục bộ</translation>
     </message>
     <message>
-      <source>Forbidden.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Bị cấm.</translation>
+      <source>Integration</source>
+      <translation>Tích hợp</translation>
     </message>
     <message>
-      <source>Conflict.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Mâu thuẫn.</translation>
+      <source>Cloud storage</source>
+      <translation>Bộ nhớ đám mây</translation>
     </message>
     <message>
-      <source>Bad request.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Yêu cầu lỗi.</translation>
+      <source>Live view</source>
+      <translation type="unfinished">Live view</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation>Hãy liên hệ với đối tác của bạn để biết chi tiết.</translation>
     </message>
     <message>
-      <source>Not implemented.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Không được thực hiện.</translation>
-    </message>
-    <message>
-      <source>Not found.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>Không tìm thấy.</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>Lỗi nội bộ.</translation>
-    </message>
-    <message>
-      <source>Unsupported media type.</source>
-      <translation>Loại tập tin không được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>Service unavailable.</source>
-      <translation>Dịch vụ không khả dụng.</translation>
-    </message>
-    <message>
-      <source>Unauthorized.</source>
-      <translation>Không được phép.</translation>
-    </message>
-    <message>
-      <source>Session expired.</source>
-      <translation>Phiên hết hạn.</translation>
-    </message>
-    <message>
-      <source>Invalid parameter `%1`: %2.</source>
-      <comment>%1 is name, %2 is value.</comment>
-      <translation>Tham số không hợp lệ `%1`: %2.</translation>
-    </message>
-    <message>
-      <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation>Kiểm tra kết nối internet giữa VMS và máy chủ cấp phép.</translation>
     </message>
   </context>
   <context>
     <name>SystemHelpers</name>
     <message>
-      <source>New System</source>
-      <translation>Hệ thống mới</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
     <message>
-      <source>SMTP host</source>
-      <translation>Máy chủ SMTP</translation>
+      <source>just now</source>
+      <translation>ngay bây giờ</translation>
     </message>
     <message>
-      <source>Email from</source>
-      <translation>Email từ</translation>
+      <source>yesterday</source>
+      <translation>hôm qua</translation>
     </message>
     <message>
-      <source>SMTP user</source>
-      <translation>Người dùng SMTP</translation>
+      <source>a week ago</source>
+      <translation>một tuần trước</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n phút trước</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n giờ trước</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n ngày trước</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Lỗi nội bộ</translation>
     </message>
     <message>
-      <source>SMTP password</source>
-      <translation>Mật khẩu SMTP</translation>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>Không tìm thấy thư mục tương ứng trong thư viện FFMPEG.</translation>
     </message>
     <message>
-      <source>Email signature</source>
-      <translation>Chữ ký email</translation>
+      <source>Could not create output file for video recording.</source>
+      <translation>Không thể tạo tệp đầu ra để ghi hình.</translation>
     </message>
     <message>
-      <source>Email support link</source>
-      <translation>Liên kết hỗ trợ qua email</translation>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
     </message>
     <message>
-      <source>SMTP connection type</source>
-      <translation>Kiểu kết nối SMTP</translation>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Không thể phân bổ luồng âm thanh đầu ra.</translation>
     </message>
     <message>
-      <source>SMTP port</source>
-      <translation>Cổng SMTP</translation>
+      <source>Could not allocate output metadata stream.</source>
+      <translation>Không thể phân bổ luồng đầu ra siêu dữ liệu.</translation>
     </message>
     <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation>Thời gian chờ SMTP (giây)</translation>
+      <source>Invalid audio codec information.</source>
+      <translation>Thông tin mã hóa âm thanh không hợp lệ.</translation>
     </message>
     <message>
-      <source>SMTP name</source>
-      <translation>Tên SMTP</translation>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Mã hóa hình ảnh hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
     </message>
     <message>
-      <source>LDAP URI</source>
-      <translation>URI LDAP</translation>
+      <source>Video transcoding required.</source>
+      <translation>Yêu cầu chuyển mã video.</translation>
     </message>
     <message>
-      <source>LDAP Admin DN</source>
-      <translation>Quản trị DN LDAP</translation>
+      <source>Invalid resource type for data export.</source>
+      <translation>Loại tài nguyên không hợp lệ để xuất dữ liệu.</translation>
     </message>
     <message>
-      <source>LDAP Admin password</source>
-      <translation>Mật khẩu quản trị LDAP</translation>
+      <source>No data exported.</source>
+      <translation>Không có dữ liệu nào được xuất.</translation>
     </message>
     <message>
-      <source>LDAP search base</source>
-      <translation>Cơ sở tìm kiếm LDAP</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Mở khóa phần lưu trữ này để xuất nội dung.</translation>
     </message>
     <message>
-      <source>LDAP search filter</source>
-      <translation>Bộ lọc tìm kiếm LDAP</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>Lưu trữ hiện không có sẵn. Vui lòng thử lại sau.</translation>
     </message>
     <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation>Mật khẩu LDAP hết hạn (mili giây)</translation>
+      <source>File write error.</source>
+      <translation>Lỗi ghi tệp.</translation>
     </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation>Hết thời gian tìm kiếm LDAP (giây)</translation>
-    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Anonymous statistics report allowed</source>
       <translation>Cho phép báo cáo thống kê ẩn danh</translation>
@@ -1205,7 +1397,7 @@
     </message>
     <message>
       <source>Anonymous statistics report last number</source>
-      <translation>Báo cáo thống kê ẩn danh của số trước</translation>
+      <translation>Báo cáo thống kê ẩn danh gần nhất</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle</source>
@@ -1222,10 +1414,6 @@
     <message>
       <source>Anonymous statistics report Client settings</source>
       <translation>Báo cáo thống kê ẩn danh Cài đặt ứng dụng khách</translation>
-    </message>
-    <message>
-      <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation>Khoảng thời gian cập nhật hệ thống đang hoạt động (giây, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
@@ -1245,11 +1433,11 @@
     </message>
     <message>
       <source>OS time change check period</source>
-      <translation>Thời gian kiểm tra thay đổi thời gian của hệ điều hành</translation>
+      <translation>Chu kỳ kiểm tra thay đổi thời gian của hệ điều hành</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests</source>
-      <translation>Đồng bộ hóa khoảng thời gian đồng bộ hóa cho các yêu cầu mạng</translation>
+      <translation>Đồng bộ khoảng thời gian đồng bộ hóa cho các yêu cầu mạng</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
@@ -1260,28 +1448,8 @@
       <translation>Tài khoản chủ sở hữu đám mây</translation>
     </message>
     <message>
-      <source>Cloud System ID</source>
-      <translation>ID hệ thống đám mây</translation>
-    </message>
-    <message>
       <source>Cloud authorization key</source>
       <translation>Khóa ủy quyền đám mây</translation>
-    </message>
-    <message>
-      <source>System name</source>
-      <translation>Tên hệ thống</translation>
-    </message>
-    <message>
-      <source>Local System ID</source>
-      <translation>ID hệ thống cục bộ</translation>
-    </message>
-    <message>
-      <source>Last master System merge ID</source>
-      <translation>ID hợp nhất hệ thống chính gần đây nhất</translation>
-    </message>
-    <message>
-      <source>Last slave System merge ID</source>
-      <translation>ID hợp nhất hệ thống phụ gần đây nhất</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
@@ -1296,17 +1464,12 @@
       <translation>Tự động cập nhật hình thu nhỏ</translation>
     </message>
     <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Sử dụng dịch vụ %1 để gửi email thay vì ứng dụng khách SMTP</translation>
-    </message>
-    <message>
       <source>Max scene items (0 means default)</source>
       <translation>Các mục cảnh tối đa (0 có nghĩa là mặc định)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
-      <translation>Gửi email văn bản đơn giản</translation>
+      <translation>Gửi email văn bản thuần túy</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails</source>
@@ -1322,7 +1485,7 @@
     </message>
     <message>
       <source>Event log period (days)</source>
-      <translation>Thời gian đăng nhập sự kiện (ngày)</translation>
+      <translation>Khoảng thời gian nhật ký sự kiện (ngày)</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption)</source>
@@ -1381,10 +1544,6 @@
       <translation>Kích thước hàng đợi ghi tối đa (phần tử, 250-4000)</translation>
     </message>
     <message>
-      <source>RTP retry count</source>
-      <translation>Số lần thử lại RTP</translation>
-    </message>
-    <message>
       <source>RTP timeout (milliseconds)</source>
       <translation>Hết thời gian chờ RTP (mili giây)</translation>
     </message>
@@ -1429,10 +1588,6 @@
       <translation>Cài đặt hình mờ</translation>
     </message>
     <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation>Thời gian khả dụng của mã token Phiên Xác thực (phút)</translation>
-    </message>
-    <message>
       <source>Session token count limit on a single Server</source>
       <translation>Giới hạn số lượng mã token theo phiên trên một Máy chủ</translation>
     </message>
@@ -1450,7 +1605,7 @@
     </message>
     <message>
       <source>Default video codec</source>
-      <translation>Codec video mặc định</translation>
+      <translation>Bộ giải mã video mặc định</translation>
     </message>
     <message>
       <source>Default codec for export video</source>
@@ -1458,15 +1613,15 @@
     </message>
     <message>
       <source>Low quality screen video codec</source>
-      <translation>Codec video màn hình chất lượng thấp</translation>
+      <translation>Giải mã video màn hình chất lượng thấp</translation>
     </message>
     <message>
       <source>License server</source>
-      <translation>Giấy phép máy chủ</translation>
+      <translation>Máy chủ cấp giấy phép</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation>URI cho cập nhật tự động resource_data.json</translation>
+      <translation>URL cho cập nhật tự động resource_data.json</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
@@ -1517,10 +1672,6 @@
       <translation>Hiển thị bản xem trước dòng thời gian từ chuột</translation>
     </message>
     <message>
-      <source>Language for Cloud notifications</source>
-      <translation>Ngôn ngữ cho thông báo trên đám mây</translation>
-    </message>
-    <message>
       <source>Media buffer size (KB, 10KB-4MB)</source>
       <translation>Kích thước bộ đệm đa phương tiện (KB, 10KB-4MB)</translation>
     </message>
@@ -1541,15 +1692,6 @@
       <translation>Chỉ sử dụng HTTPS cho camera</translation>
     </message>
     <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation>Bật các hàm API deprecated (không an toàn)</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
-    </message>
-    <message>
       <source>Expose IP addresses for autodiscovery</source>
       <translation>Hiển thị địa chỉ IP để tự động phát hiện</translation>
     </message>
@@ -1560,10 +1702,6 @@
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
       <translation>Kích thước bộ đệm đa phương tiện chỉ dành cho thiết bị âm thanh (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the System</source>
-      <translation>Bật 2fa cho hệ thống</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
@@ -1593,67 +1731,106 @@
       <source>Update releases.json file URL</source>
       <translation>URL cập nhật tệp phát hành .json</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::recording::Error</name>
     <message>
-      <source>Internal error</source>
-      <translation>Lỗi nội bộ</translation>
+      <source>LDAP settings</source>
+      <translation>Cài đặt LDAP</translation>
     </message>
     <message>
-      <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Không tìm thấy thư mục tương ứng trong thư viện FFMPEG.</translation>
+      <source>SMTP settings</source>
+      <translation>Cài đặt SMTP</translation>
     </message>
     <message>
-      <source>Could not create output file for video recording.</source>
-      <translation>Không thể tạo tệp đầu ra để ghi hình.</translation>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation>Thời gian khả dụng của mã phiên xác thực (giây)</translation>
     </message>
     <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>Không thể phân bổ luồng đầu ra để ghi.</translation>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>Danh sách Máy chủ được phân tách bằng dấu chấm phẩy được chỉ định để kết nối với Đám mây. Máy chủ ở đầu danh sách có mức độ ưu tiên cao hơn. Nếu danh sách trống, Máy chủ dành cho kết nối Đám mây sẽ tự động được chọn.</translation>
     </message>
     <message>
-      <source>Could not allocate output audio stream.</source>
-      <translation>Không thể phân bổ luồng âm thanh đầu ra.</translation>
+      <source>Allow Power User editing Security Settings</source>
+      <translation>Cho phép Người dùng cấp cao chỉnh sửa Cài đặt bảo mật</translation>
     </message>
     <message>
-      <source>Could not allocate output metadata stream.</source>
-      <translation>Không thể phân bổ luồng đầu ra siêu dữ liệu.</translation>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation>Bật các hàm API deprecated (không an toàn)</translation>
     </message>
     <message>
-      <source>Invalid audio codec information.</source>
-      <translation>Thông tin mã hóa âm thanh không hợp lệ.</translation>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>Số lỗi RTP liên tiếp tối đa trước khi máy chủ kết nối lại phiên RTSP.</translation>
     </message>
     <message>
-      <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Mã hóa hình ảnh hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>Bật các hàm API deprecated đang được phần mềm %1 sử dụng (không an toàn)</translation>
     </message>
     <message>
-      <source>Video transcoding required.</source>
-      <translation>Yêu cầu chuyển mã video.</translation>
+      <source>Organization Id</source>
+      <translation>ID tổ chức</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>Lỗi ghi tập tin. Không đủ chỗ trống.</translation>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>Khoảng thời gian giữa yêu cầu HTTP thăm dò đám mây để đồng bộ hóa dữ liệu.</translation>
     </message>
     <message>
-      <source>Invalid resource type for data export.</source>
-      <translation>Loại tài nguyên không hợp lệ để xuất dữ liệu.</translation>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+      <translation>Tiêu đề HTTP: Máy chủ, các biến được hỗ trợ: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
     <message>
-      <source>No data exported.</source>
-      <translation>Không có dữ liệu nào được xuất.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
-    <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>Kích thước luồng mã hóa sai.</translation>
+      <source>Device storage information update interval</source>
+      <translation>Khoảng thời gian cập nhật thông tin lưu trữ thiết bị</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>Tiêu đề luồng được mã hóa bị hỏng.</translation>
+      <source>Site alive update interval (seconds, 1s-1h)</source>
+      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+    </message>
+    <message>
+      <source>Proxy connection access policy</source>
+      <translation type="unfinished">Proxy connection access policy</translation>
+    </message>
+    <message>
+      <source>Cloud Site ID</source>
+      <translation type="unfinished">Cloud Site ID</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the Site</source>
+      <translation type="unfinished">Enable 2FA for the Site</translation>
+    </message>
+    <message>
+      <source>Site name</source>
+      <translation type="unfinished">Site name</translation>
+    </message>
+    <message>
+      <source>Local Site ID, null means the Site is not set up yet.</source>
+      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+    </message>
+    <message>
+      <source>Last master Site merge ID</source>
+      <translation type="unfinished">Last master Site merge ID</translation>
+    </message>
+    <message>
+      <source>Last slave Site merge ID</source>
+      <translation type="unfinished">Last slave Site merge ID</translation>
+    </message>
+    <message>
+      <source>Pixelation settings</source>
+      <translation type="unfinished">Pixelation settings</translation>
+    </message>
+    <message>
+      <source>Apply session limit for Cloud tokens</source>
+      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+    </message>
+    <message>
+      <source>Enable or disable the creation of new Integration registration requests</source>
+      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+    </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation>URL API máy chủ báo cáo sự cố ẩn danh</translation>
+    </message>
+    <message>
+      <source>Default locale for new users</source>
+      <translation type="unfinished">Default locale for new users</translation>
     </message>
   </context>
   <context>
@@ -1696,11 +1873,11 @@
     </message>
     <message>
       <source>Device output</source>
-      <translation>Sản lượng thiết bị</translation>
+      <translation>Đầu ra thiết bị</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation>Sản lượng máy ảnh</translation>
+      <translation>Đầu ra camera</translation>
     </message>
     <message>
       <source>Device recording</source>
@@ -1746,7 +1923,7 @@
     </message>
     <message>
       <source>Any Event</source>
-      <translation>Bất kỳ tổ chức sự kiện</translation>
+      <translation>Tất cả sự kiện</translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
@@ -1860,7 +2037,7 @@
     </message>
     <message>
       <source>Event: %1</source>
-      <translation>Biến cố：%1</translation>
+      <translation>Sự kiện: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
@@ -1982,25 +2159,11 @@
       <source>Trigger Name</source>
       <translation>Tên kích hoạt</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>Vai trò</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n Người dùng</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Vai trò</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>Tất cả Quản trị viên</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2204,10 +2367,6 @@
       <translation>Không thể sao lưu tệp %1</translation>
     </message>
     <message>
-      <source>Show Intercom Informer</source>
-      <translation>Hiển thị thông tin liên lạc nội bộ</translation>
-    </message>
-    <message>
       <source>Do HTTP(S) request</source>
       <translation>Thực hiện yêu cầu HTTP(S)</translation>
     </message>
@@ -2222,10 +2381,6 @@
     <message>
       <source>Connection to device was unexpectedly closed.</source>
       <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
-    </message>
-    <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation>Không thể buộc sử dụng thời gian của camera vì bị trễ quá nhiều. Thay vào đó sẽ sử dụng thời gian hệ thống.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
@@ -2253,38 +2408,131 @@
     </message>
     <message>
       <source>Also show source camera</source>
-      <translation>Cũng hiển thị camera nguồn</translation>
+      <translation>Đồng thời hiển thị camera nguồn</translation>
     </message>
     <message>
       <source>Source camera</source>
-      <translation>Máy ảnh nguồn</translation>
+      <translation>Camera nguồn</translation>
     </message>
     <message>
       <source>Also show on source camera</source>
-      <translation>Cũng hiển thị trên máy ảnh nguồn</translation>
+      <translation>Đồng thời hiển thị trên camera nguồn</translation>
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>Cũng cài đặt trên camera nguồn</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>Cũng kích hoạt trên camera nguồn</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>Cũng ghi camera nguồn</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>Cũng hiển thị trên camera nguồn</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>Removed camera</source>
-      <translation>Camera bị xóa</translation>
+      <source>LDAP Sync Issue</source>
+      <translation>Sự cố đồng bộ hóa LDAP</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation>
+        <numerusform>%1 (%n lần)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>Không thể kết nối với máy chủ LDAP.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ %1.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ nhất định.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>Không có tài khoản người dùng nào trên máy chủ LDAP khớp với cài đặt đồng bộ hóa.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>Không tìm thấy người dùng hoặc nhóm LDAP trong cơ sở dữ liệu LDAP.</translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>Sự cố dịch vụ</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation>Máy chủ &quot;%1&quot; có vấn đề di chuyển giấy phép</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>Lạm dụng dịch vụ</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation>Các giấy phép sau chưa được di chuyển:</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>Giấy phép</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Máy chụp hình</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Quá trình ghi trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Sao lưu bộ nhớ đám mây trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>Việc sử dụng dịch vụ tích hợp trả phí trên %n kênh đã bị ngừng do sử dụng dịch vụ quá mức.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>Không thể di chuyển giấy phép.</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>Bỏ qua việc nhập giấy phép. Việc di chuyển tiếp theo sẽ được tự động lên lịch sau.</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
     </message>
   </context>
 </TS>

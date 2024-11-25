@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation>Kiểm tra sự an toàn của tải xuống không thành công vì lý do không mong muốn</translation>
+      <translation>Kiểm tra độ an toàn của việc tải xuống không thành công do những lý do không mong muốn</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation>Phản hồi của máy chủ không mong đợi</translation>
+      <translation>Phản hồi không mong muốn từ máy chủ</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>

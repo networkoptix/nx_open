@@ -10,68 +10,19 @@
     </message>
   </context>
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Sahibi: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Sistem</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>%1 giriş cihazının örnek formatı desteklenmiyor.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Birincil ses cihazı seçili değil.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDirectSystemsFinder</name>
-    <message>
-      <source>System</source>
-      <translation>Sistem</translation>
-    </message>
-    <message>
-      <source>System (%1)</source>
-      <comment>%1 is ip and port of system</comment>
-      <translation>Sistemi (%1)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>Yeni Sunucu</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSystemDescription</name>
-    <message>
-      <source>Unnamed System</source>
-      <translation>İsimlendirilmemiş Sistem</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemsModel</name>
     <message>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+    <message>
+      <source>Your Site</source>
+      <translation type="unfinished">Your Site</translation>
+    </message>
+    <message>
       <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
+      <comment>%1 is a user/company name</comment>
       <translation>Sahibi: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Sistem</translation>
-    </message>
-    <message>
-      <source>New System</source>
-      <translation>Yeni sistem</translation>
     </message>
   </context>
   <context>
@@ -101,10 +52,6 @@
       <translation>Geçersiz sertifika</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Sunucu&amp;apos; sertifikası reddedildi.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 için bağlantıyı geri yükleyin ve tekrar deneyin</translation>
@@ -113,10 +60,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 kullanıcı girişi geçici olarak kullanılamıyor</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Bağlantı zaman aşımına uğradı</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -163,18 +106,9 @@
       <translation>Dahili sunucu hatası. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
-      <source>If this error persists, please contact your system administrator.</source>
-      <translation>Bu hata devam ederse lütfen sistem yöneticinizle iletişime geçin.</translation>
-    </message>
-    <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 için bağlantı henüz hazır değil. İnternet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 için bağlantı henüz hazır değil. Sunucunun internet bağlantısını kontrol edin veya daha sonra tekrar deneyin.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
@@ -190,26 +124,8 @@
       <translation>Lütfen tekrar giriş yapın %1.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with %2 user</source>
-      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Sistemine %2 kullanıcısı ile giriş yapmak için</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by a system administrator.</source>
-      <translation>Oturum süresi sınırı sistem yöneticisi tarafından değiştirilebilir.</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>Bu kullanıcı sistem yöneticisi tarafından devre dışı bırakıldı.</translation>
-    </message>
-    <message>
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>Çok fazla deneme yapıldı. Bir dakika sonra tekrar deneyiniz.</translation>
-    </message>
-    <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Bu Sisteme giriş yapmak için %2 hesabınızda “ %1 hesabınızla her girişte bir doğrulama kodu isteyin” seçeneğini devre dışı bırakın.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -220,13 +136,80 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>%1 için iki faktörlü kimlik doğrulamayı etkinleştirebilirsiniz.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Bağlantı başarısız</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 bağlantısı henüz hazır değil. Sunucunun internet bağlantısını kontrol edin veya daha sonra tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation>Sunucu sertifikası reddedildi.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your site administrator.</source>
+      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this site with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a site administrator.</source>
+      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+    </message>
+    <message>
+      <source>Your access to this site has expired.</source>
+      <translation type="unfinished">Your access to this site has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the site administrator to regain access.</source>
+      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a site administrator.</source>
+      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Bilinmeyen parça</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>silinmiş kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>silinmiş kamera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>%1kimliği doğrulanamıyor</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Sunucunun sertifikası geçersiz.</translation>
@@ -234,10 +217,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>%1 ile ilk kez mi bağlantı sağlıyorsunuz?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>sertifika detayları</translation>
     </message>
     <message>
       <source>help article</source>
@@ -248,32 +227,138 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Sertifika doğrulama hakkında daha fazla bilgi edinmek için bu %1 okuyun.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Bağlandığınız sunucuya güvendiğinizden emin olmak için %1 'i gözden geçirin.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>%n Sunucu kimliği doğrulanamıyor</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>sunucu&apos;s sertifikası</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için bunu okuyun %1.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için %1 görüntüleyebilir veya bunu %2 okuyabilirsiniz.</translation>
+      <source>Cannot verify the identity of %1</source>
+      <translation>%1kimliği doğrulanamıyor</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Bunun nedeni süresi dolmuş bir sunucu sertifikası veya kişisel bilgilerinizi çalmak için %1 kimliğine bürünmeye çalışan biri olabilir.%2</translation>
+      <source>Review the certificate to ensure you trust the server you are connecting to.</source>
+      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Bu mesaj, çok sunuculu bir sisteme bağlanırken birden çok kez gösterilebilir.</translation>
+      <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
+      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Mevcut sorun hakkında daha fazla bilgi edinmek için sunucu&apos;sertifikasını görüntüleyin:</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation>Bunun nedeni, süresi dolmuş bir sunucu sertifikası veya geçersiz bir sertifika olabilir. Daha fazlası için sistem yöneticinizle iletişime geçin.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>%1 giriş cihazının örnek formatı desteklenmiyor.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Birincil ses cihazı seçili değil.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DirectSystemFinder</name>
+    <message>
+      <source>Site</source>
+      <translation>Site</translation>
+    </message>
+    <message>
+      <source>Site (%1)</source>
+      <comment>%1 is ip and port of the site</comment>
+      <translation>Site (%1)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Son gün</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Son 7 Gün</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Son 30 Gün</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Herhangi bir zaman</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Herhangi</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Kameralar</numerusform>
+        <numerusform>%n Kameralar</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Isıtıcı</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Silecek</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Kapıyı Aç</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation>Obje Takibini Durdur</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::LocalSystemDescription</name>
+    <message>
+      <source>New Server</source>
+      <translation>Yeni Sunucu</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SingleSystemDescription</name>
+    <message>
+      <source>Unnamed Site</source>
+      <translation>Adsız Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Bas ve bırakma</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>bas ve basılı tut</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Konuşmak için basılı tutun</translation>
     </message>
   </context>
 </TS>

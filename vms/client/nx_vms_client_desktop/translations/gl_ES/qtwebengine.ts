@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar silencio</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -263,11 +263,11 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Seguro que queres saír desta páxina? É posible que os cambios realizados non se garden.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Volver</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
@@ -275,7 +275,7 @@
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;Recarga</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -286,7 +286,7 @@
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Volver</translation>
     </message>
     <message>
       <source>Forward</source>
@@ -294,19 +294,19 @@
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>Recarga</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Cortar</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Pegar</translation>
     </message>
     <message>
       <source>Undo</source>

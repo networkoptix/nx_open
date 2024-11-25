@@ -10,68 +10,19 @@
     </message>
   </context>
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Dit System</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation type="unfinished">Sample format of input device %1 is not supported.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation type="unfinished">Primary audio device is not selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDirectSystemsFinder</name>
-    <message>
-      <source>System</source>
-      <translation>System</translation>
-    </message>
-    <message>
-      <source>System (%1)</source>
-      <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>Ny server</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSystemDescription</name>
-    <message>
-      <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemsModel</name>
     <message>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+    <message>
+      <source>Your Site</source>
+      <translation type="unfinished">Your Site</translation>
+    </message>
+    <message>
       <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Dit System</translation>
-    </message>
-    <message>
-      <source>New System</source>
-      <translation>Nyt system</translation>
+      <comment>%1 is a user/company name</comment>
+      <translation>Ejer: %1</translation>
     </message>
   </context>
   <context>
@@ -101,10 +52,6 @@
       <translation>Ugyldigt certifikat</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Serverens&amp;apos;s certifikat blev afvist.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Gendan forbindelsen til %1, og prøv igen</translation>
@@ -113,10 +60,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>%1 brugerlogin er midlertidigt utilgængelig</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Forbindelsen fik timeout</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -163,18 +106,9 @@
       <translation>Intern fejl, prøv igen senere.</translation>
     </message>
     <message>
-      <source>If this error persists, please contact your system administrator.</source>
-      <translation>Hvis denne fejl fortsætter, skal du kontakte din systemadministrator.</translation>
-    </message>
-    <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Forbindelsen til %1 er ikke klar endnu. Tjek din internetforbindelse, eller prøv igen senere.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Forbindelsen til %1 er ikke klar endnu. Tjek serverens internetforbindelse, eller prøv igen senere.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
@@ -190,26 +124,8 @@
       <translation>Log venligst ind på %1 igen.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with %2 user</source>
-      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation>Log ind på %1 for at logge på dette system med %2 bruger</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by a system administrator.</source>
-      <translation>Sessionsvarighedsgrænsen kan ændres af systemadministrator.</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>Denne bruger er blevet deaktiveret af en systemadministrator.</translation>
-    </message>
-    <message>
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>For mange loginforsøg. Prøv igen om et minut.</translation>
-    </message>
-    <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>For at logge ind på dette system skal du deaktivere "Spørg om en bekræftelseskode ved hvert login med din %1 -konto" i din %2.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -220,13 +136,80 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Du kan aktivere to-faktor-godkendelse i din %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation type="unfinished">Connection failed</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation>Serverens&apos;s certifikat blev afvist.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your site administrator.</source>
+      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this site with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a site administrator.</source>
+      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+    </message>
+    <message>
+      <source>Your access to this site has expired.</source>
+      <translation type="unfinished">Your access to this site has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the site administrator to regain access.</source>
+      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a site administrator.</source>
+      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation type="unfinished">Unknown track</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>slettet kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>slettet kamera</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Kan ikke bekræfte identiteten af %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Servercertifikat er ugyldigt.</translation>
@@ -236,44 +219,146 @@
       <translation>Opretter forbindelse til %1 for første gang?</translation>
     </message>
     <message>
-      <source>certificate details</source>
-      <translation>Certifikatdetaljer</translation>
-    </message>
-    <message>
       <source>help article</source>
       <translation>hjælpeartikel</translation>
     </message>
     <message>
       <source>Read this %1 to learn more about certificate validation.</source>
       <comment>%1 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">Read this %1 to learn more about certificate validation.</translation>
+      <translation>Læs denne %1 for at lære mere om certifikatvalidering.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation type="unfinished">Review the %1 to ensure you trust the server you are connecting to.%2</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation type="unfinished">To learn more about the current problem read this %1.</translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>serverens&apos;s certifikat</translation>
+      <source>Cannot verify the identity of %1</source>
+      <translation>Kan ikke bekræfte identiteten af %1</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation type="unfinished">You can view %1 or read this %2 to learn more about the current problem.</translation>
+      <source>Review the certificate to ensure you trust the server you are connecting to.</source>
+      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation type="unfinished">This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</translation>
+      <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
+      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Denne meddelelse vises muligvis flere gange, når der oprettes forbindelse til et multi-serversystem.</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Eksempelformat for inputenheden %1 understøttes ikke.</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>For at lære mere om det aktuelle problem, se serveren&apos;s certifikat:</translation>
+      <source>Primary audio device is not selected.</source>
+      <translation>Primær lydenhed er ikke valgt.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DirectSystemFinder</name>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
+    </message>
+    <message>
+      <source>Site (%1)</source>
+      <comment>%1 is ip and port of the site</comment>
+      <translation type="unfinished">Site (%1)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Sidste dag</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Sidste 7 dage</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Sidste 30 dage</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Enhver tid</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Enhver</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Kameraer</numerusform>
+        <numerusform>%n Kameraer</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Varme</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Visker</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::LocalSystemDescription</name>
+    <message>
+      <source>New Server</source>
+      <translation>Ny server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SingleSystemDescription</name>
+    <message>
+      <source>Unnamed Site</source>
+      <translation type="unfinished">Unnamed Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Tryk og hold for at</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation type="unfinished">press and hold</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Tryk og hold for at tale</translation>
     </message>
   </context>
 </TS>

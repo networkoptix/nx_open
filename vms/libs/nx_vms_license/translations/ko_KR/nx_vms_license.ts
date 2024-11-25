@@ -49,31 +49,19 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>라이센스가 %1에 의해 검증되지 않았습니다.</translation>
     </message>
     <message>
       <source>Invalid type</source>
       <translation>유효하지 않은 방식</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>시스템 당 하나의 스타터 라이센스 만 허용됩니다.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>이미 활성 스타터 라이센스가 하나 있습니다.</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>시스템 당 하나의 NVR 라이센스 만 허용됩니다.</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>이미 하나의 활성 NVR 라이센스가 있습니다.</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>이 유형의 라이센스는 시스템 당 하나만 허용됩니다.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -86,6 +74,18 @@
     <message>
       <source>Unknown error</source>
       <translation>알 수 없는 오류</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

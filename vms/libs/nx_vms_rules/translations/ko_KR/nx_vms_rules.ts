@@ -2,10 +2,277 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR" sourcelanguage="en">
   <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>BasicAction</name>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
+      <source>Caption</source>
+      <translation>표제</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>설명</translation>
+    </message>
+    <message>
+      <source>Tooltip text</source>
+      <translation type="unfinished">Tooltip text</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n 번, 첫 번째 : %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>첫번째 발생: %2의 %1 (%n 전체 시간)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>시간: %2 의 %1</translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>알 수 없는 이벤트</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>원인: %1</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation>알 수 없는 동작</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>모든 이벤트</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>카메라 이슈</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Invalid field type is provided</source>
+      <translation type="unfinished">Invalid field type is provided</translation>
+    </message>
+    <message>
+      <source>Unexpected validation policy</source>
+      <translation type="unfinished">Unexpected validation policy</translation>
+    </message>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation type="unfinished">Select exactly one camera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation type="unfinished">Select at least one device</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation type="unfinished">Select at least one camera</translation>
+    </message>
+    <message>
+      <source>Not all servers are suitable</source>
+      <translation type="unfinished">Not all servers are suitable</translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation type="unfinished">There are no suitable servers</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>At</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>받는 사람</translation>
+    </message>
+    <message>
+      <source>Occurs At</source>
+      <translation type="unfinished">Occurs At</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation type="unfinished">Duration</translation>
+    </message>
+    <message>
+      <source>Pre-Recording</source>
+      <translation type="unfinished">Pre-Recording</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation type="unfinished">Post-Recording</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>동작 간격:</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation>상태</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>음량</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation type="unfinished">On Layout</translation>
+    </message>
+    <message>
+      <source>Event Devices</source>
+      <translation type="unfinished">Event Devices</translation>
+    </message>
+    <message>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
+    </message>
+    <message>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
+    </message>
+    <message>
+      <source>Field %1 value must be provided for the given validation policy</source>
+      <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+    </message>
+    <message>
+      <source>Chosen local layout can only be shown to its owner %1</source>
+      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout</source>
+      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time value cannot be less than zero</source>
+      <translation type="unfinished">Time value cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Duration cannot be less than zero</source>
+      <translation type="unfinished">Duration cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Value cannot be less than %1</source>
+      <translation type="unfinished">Value cannot be less than %1</translation>
+    </message>
+    <message>
+      <source>Value cannot be more than %1</source>
+      <translation type="unfinished">Value cannot be more than %1</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation type="unfinished">To Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AcknowledgeAction</name>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
+    <message>
+      <source>Empty text is not allowed</source>
+      <translation type="unfinished">Empty text is not allowed</translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -19,25 +286,12 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%2 에서 %1</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>카메라</translation>
-    </message>
-    <message>
-      <source>Event Type</source>
-      <translation>이벤트 유형</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>표제</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>설명</translation>
+      <source>Analytics event type is not selected</source>
+      <translation type="unfinished">Analytics event type is not selected</translation>
     </message>
   </context>
   <context>
@@ -47,47 +301,46 @@
       <translation>감지된 객체</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>%1 카메라 &apos;%2&apos;</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>분석 개체 감지됨</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>카메라</translation>
+      <source>And Object</source>
+      <translation type="unfinished">And Object</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>객체 유형</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation>속성</translation>
+      <source>%1 at %2</source>
+      <comment> is detected</comment>
+      <translation>%2 에서 %1</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>서버 &quot;%1&quot;가 아카이브 백업을 완료했습니다.</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <source>Analytics object type is not selected</source>
+      <translation type="unfinished">Analytics object type is not selected</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::BookmarkAction</name>
     <message>
-      <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <source>Create Bookmark</source>
+      <translation type="unfinished">Create Bookmark</translation>
     </message>
     <message>
-      <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <source>Add Tags</source>
+      <translation type="unfinished">Add Tags</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>부저</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation type="unfinished">Action Throttling</translation>
     </message>
   </context>
   <context>
@@ -101,35 +354,16 @@
       <translation>%1의 입력</translation>
     </message>
     <message>
+      <source>Input Signal on Device</source>
+      <translation type="unfinished">Input Signal on Device</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation type="unfinished">With ID</translation>
+    </message>
+    <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>카메라</translation>
-    </message>
-    <message>
-      <source>Input ID</source>
-      <translation>입력 ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::rules::DebugEvent</name>
-    <message>
-      <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>동작</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>카메라의 입력 신호</translation>
     </message>
   </context>
   <context>
@@ -147,32 +381,25 @@
       <translation>I/O 모듈 이 끊어졌습니다.</translation>
     </message>
     <message>
-      <source>Device %1 was disconnected</source>
-      <translation>장치%1 연결 끊김</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>카메라 %1연결끊김</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/O 모듈 %1이 끊어졌습니다.</translation>
-    </message>
-    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-      </translation>
+      <translation type="unfinished">Device Disconnected</translation>
     </message>
     <message>
-      <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
-    </message>
-    <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-      </translation>
+      <translation type="unfinished">Camera Disconnected</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>장치</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>카메라</translation>
+    </message>
+    <message>
+      <source>%1 was disconnected</source>
+      <comment>Device name will be substituted</comment>
+      <translation type="unfinished">%1 was disconnected</translation>
     </message>
   </context>
   <context>
@@ -195,17 +422,65 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>%1에서 카메라 IP 충돌</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Device IP Conflict</source>
-      <translation>
-        <numerusform>장치 IP 충돌</numerusform>
-      </translation>
+      <translation type="unfinished">Device IP Conflict</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Camera IP Conflict</source>
-      <translation>
-        <numerusform>카메라 IP 충돌</numerusform>
-      </translation>
+      <translation type="unfinished">Camera IP Conflict</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>출력 ID</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation type="unfinished">Device Output</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>화질</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>프레임</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation type="unfinished">Camera Recording</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>켬</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>카메라</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>전체 화면으로 설정</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation type="unfinished">Set for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>전체화면 나가기</translation>
     </message>
   </context>
   <context>
@@ -215,12 +490,8 @@
       <translation>%1에 팬 오류</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>팬 오류</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>서버:</translation>
+      <source>Fan Failure</source>
+      <translation type="unfinished">Fan Failure</translation>
     </message>
   </context>
   <context>
@@ -230,86 +501,123 @@
       <translation>일반 이벤트</translation>
     </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>%1에서 일반 이벤트</translation>
+      <source>Omit logging</source>
+      <translation type="unfinished">Omit logging</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>공간으로 단어 구분됨</translation>
+      <source>And Source</source>
+      <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>소스</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>표제</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>설명</translation>
+      <source>Generic Event from %1</source>
+      <translation type="unfinished">Generic Event from %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <source>Content type</source>
+      <translation>콘텐츠 형식</translation>
     </message>
     <message>
-      <source>Login</source>
-      <translation>Login</translation>
+      <source>HTTP(S) Request</source>
+      <translation type="unfinished">HTTP(S) Request</translation>
     </message>
     <message>
-      <source>Password</source>
-      <translation>패스워드</translation>
+      <source>URL</source>
+      <translation>URL</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <source>Content</source>
+      <translation>콘텐츠</translation>
     </message>
     <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <source>Method</source>
+      <translation>방법</translation>
     </message>
     <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <source>HTTP authentication</source>
+      <translation type="unfinished">HTTP authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+      <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
     </message>
     <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <source>Token field should be filled in case of bearer auth type selected</source>
+      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+      <source>HTTP Method should be known</source>
+      <translation type="unfinished">HTTP Method should be known</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>LDAP Sync Issue Event</source>
+      <translation type="unfinished">LDAP Sync Issue Event</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is a cause of the event</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>서버 &quot;%1&quot;에 라이센스 문제가 있습니다.</translation>
-    </message>
     <message>
       <source>License Issue</source>
       <translation>인증키 이슈</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>라이센스가 충분하지 않습니다. 다음 기기에서 녹화가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>라이센스가 충분하지 않습니다. 다음 카메라에서 녹화가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>라이센스가 충분하지 않습니다. 다음 I/O 모듈에서 레코딩이 비활성화되었습니다.</translation>
+    </message>
+    <message>
+      <source>%1 has a license problem</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 has a license problem</translation>
     </message>
   </context>
   <context>
@@ -319,16 +627,8 @@
       <translation>%1의 모션</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>카메라</translation>
-    </message>
-    <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>카메라의 모션</translation>
     </message>
   </context>
   <context>
@@ -361,7 +661,7 @@
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>카메라 시간이 정상으로 돌아왔습니다.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
@@ -370,20 +670,20 @@
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>주소 %1 은 이미 기본 스트림의 %2 에 의해 사용 중입니다.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>주소 %1 은 이미 보조 스트림의 %2 에 의해 사용 중입니다.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>멀티캐스트 주소 충돌이 감지되었습니다.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>네트워크 주소 %1 은 멀티캐스트 주소가 아닙니다.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -398,39 +698,66 @@
       <translation>장치 연결이 예상치 못하게 끊김.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
-    </message>
-    <message>
-      <source>To</source>
-      <translation>받는 사람</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>강제 승인</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>표제</translation>
+      <source>Show Desktop Notification</source>
+      <translation type="unfinished">Show Desktop Notification</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>설명</translation>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
     </message>
     <message>
-      <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>레이아웃 열기</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
+    <message>
+      <source>Zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+    </message>
+    <message>
+      <source>Non zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording</source>
+      <translation type="unfinished">Panic Recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Play Sound</source>
+      <translation type="unfinished">Play Sound</translation>
     </message>
   </context>
   <context>
@@ -440,24 +767,12 @@
       <translation>플러그인 진단 이벤트</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>카메라</translation>
+      <source>For Plugin</source>
+      <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>소스</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>표제</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>설명</translation>
-    </message>
-    <message>
-      <source>Level</source>
-      <translation type="unfinished">Level</translation>
+      <source>And Level Is</source>
+      <translation type="unfinished">And Level Is</translation>
     </message>
   </context>
   <context>
@@ -467,59 +782,165 @@
       <translation>소비</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>%1 PoE 용량 초과</translation>
-    </message>
-    <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>이유: 전력 제한 초과 (%1)</translation>
-    </message>
-    <message>
-      <source>PoE over Budget</source>
-      <translation>PoE 용량 초과</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-    <message>
       <source>Server</source>
       <translation>서버:</translation>
+    </message>
+    <message>
+      <source>PoE Over Budget</source>
+      <translation type="unfinished">PoE Over Budget</translation>
+    </message>
+    <message>
+      <source>Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Power limit exceeded (%1)</translation>
+    </message>
+    <message>
+      <source>PoE over budget on %1</source>
+      <translation type="unfinished">PoE over budget on %1</translation>
+    </message>
+    <message>
+      <source>Current power consumption: %1 watts</source>
+      <translation type="unfinished">Current power consumption: %1 watts</translation>
+    </message>
+    <message>
+      <source>Upper consumption limit: %1 watts</source>
+      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+    </message>
+    <message>
+      <source>Lower consumption limit: %1 watts</source>
+      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation>PTZ 프리셋 실행</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation>PTZ 프리셋</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation>사용자에게 실행</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>Header</source>
+      <translation>머리글</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>본문</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation>모바일 알림 보내기</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation>본문에 소스 장치 이름 추가</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>소리</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation>소리 반복</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::Rule</name>
+    <message>
+      <source>`%1` event filter field alerts:</source>
+      <translation type="unfinished">`%1` event filter field alerts:</translation>
+    </message>
+    <message>
+      <source>`%1` action builder field alerts:</source>
+      <translation type="unfinished">`%1` action builder field alerts:</translation>
+    </message>
+    <message>
+      <source>Rule is not completed. One filter and one builder are required</source>
+      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+    </message>
+    <message>
+      <source>The given filter is not compatible with the given builder</source>
+      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>라이센스 마이그레이션 문제</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>녹음 서비스 비활성화됨</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation type="unfinished">Cloud storage services disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>서비스 과부하로 인해 %n 채널의 녹화가 중단되었습니다.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>서비스 초과 사용으로 인해 %n 채널의 클라우드 스토리지 백업이 중단되었습니다.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>서비스 과도한 사용으로 인해 %n 채널의 유료 통합 서비스 사용이 중단되었습니다.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation type="unfinished">Services Issue</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
-      <translation>이메일 보내기</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>로</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
-    </message>
-    <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>이메일 메시지</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation>이메일 전송</translation>
+    </message>
+    <message>
+      <source>Additional Recipients</source>
+      <translation>함께 받는사람</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>서버 &quot;%1&quot; 인증서 오류</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>서버 인증서 오류</translation>
+    </message>
+    <message>
+      <source>%1 certificate error</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 certificate error</translation>
     </message>
   </context>
   <context>
@@ -539,20 +960,17 @@
       <translation>맥 #%1: %2</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>서버 &quot;%1&quot; 충돌</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>서버 충돌</translation>
+    </message>
+    <message>
+      <source>%1 Conflict</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 Conflict</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>서버 &quot;%1&quot; 오류</translation>
-    </message>
     <message>
       <source>Server Failure</source>
       <translation>서버 오류</translation>
@@ -565,16 +983,35 @@
       <source>Server stopped unexpectedly.</source>
       <translation>서버는 예기치 않게 중단 되었습니다.</translation>
     </message>
+    <message>
+      <source>%1 Failure</source>
+      <translation type="unfinished">%1 Failure</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>서버 &quot;%1&quot; 시작됨</translation>
-    </message>
-    <message>
       <source>Server Started</source>
       <translation>서버 시작 됨</translation>
+    </message>
+    <message>
+      <source>%1 Started</source>
+      <translation type="unfinished">%1 Started</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>알람 레이아웃에 표시</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>알람: %1</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation type="unfinished">Force Alarm Layout Opening</translation>
     </message>
   </context>
   <context>
@@ -584,28 +1021,8 @@
       <translation>트리거 이름</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>Trigger: %1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>Soft Trigger %1 at %2</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>Soft Trigger</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>카메라</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>사용자</translation>
     </message>
     <message>
       <source>Name</source>
@@ -615,6 +1032,25 @@
       <source>Icon</source>
       <translation>아이콘</translation>
     </message>
+    <message>
+      <source>By</source>
+      <translation type="unfinished">By</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>소스: %1</translation>
+    </message>
+    <message>
+      <source>User: %1</source>
+      <translation type="unfinished">User: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SoundFieldValidator</name>
+    <message>
+      <source>Sound is not selected</source>
+      <translation type="unfinished">Sound is not selected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
@@ -623,24 +1059,19 @@
       <translation>음성출력</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>카메라</translation>
+      <source>Text</source>
+      <translation>문자</translation>
     </message>
     <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <source>At Device</source>
+      <translation type="unfinished">At Device</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::StateFieldValidator</name>
     <message>
-      <source>Speak to users</source>
-      <translation>사용자와 대화하기</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>출력할 문구</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>음량</translation>
+      <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
     </message>
   </context>
   <context>
@@ -679,87 +1110,89 @@
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>아카이브 백업에 실패했습니다. 파일 %1을(를) 백업하는 데 실패했습니다.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>분석 저장소 &quot;%1&quot; 데이터베이스 오류: 마운트 지점에 대한 권한이 부족합니다.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>미디어 아카이브에서 녹화가 활성화되어 있는 동안 AES 암호화를 초기화할 수 없습니다. 데이터는 암호화되지 않은 상태로 기록됩니다.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID 오류: %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+      <source>Failed to get event descriptor</source>
+      <translation type="unfinished">Failed to get event descriptor</translation>
+    </message>
+    <message>
+      <source>Event does not have source camera</source>
+      <translation type="unfinished">Event does not have source camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; is not a generic list</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>텍스트 오버레이 표시</translation>
+      <source>Show Text Overlay</source>
+      <translation type="unfinished">Show Text Overlay</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>카메라</translation>
+      <source>Custom Text</source>
+      <translation>사용자 정의 텍스트</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>이벤트 발생카메라 보이기</translation>
-    </message>
-    <message>
-      <source>Display text for</source>
-      <translation type="unfinished">Display text for</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>문자</translation>
+      <source>Show To</source>
+      <translation type="unfinished">Show To</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::TextWithFields</name>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-      <source>Event: %1</source>
-      <translation>이벤트: %1</translation>
+      <source>Url cannot be empty</source>
+      <translation type="unfinished">Url cannot be empty</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>소스: %1</translation>
+      <source>Url must be valid</source>
+      <translation type="unfinished">Url must be valid</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>플러그인 : %1</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>캡션: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>원인: %1</translation>
+      <source>Url should not contains user or password</source>
+      <translation type="unfinished">Url should not contains user or password</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n 번, 첫 번째 : %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>첫번째 발생: %2의 %1 (%n 전체 시간)</numerusform>
-      </translation>
-    </message>
+    <name>nx::vms::rules::WriteToLogAction</name>
     <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>시간: %2 의 %1</translation>
+      <source>Write to Log</source>
+      <translation>로그 기록</translation>
     </message>
   </context>
 </TS>

@@ -24,10 +24,6 @@
       <translation>ทีมช่วยเหลือ</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>ระบบเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>นักพัฒนา</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation type="unfinished">Open source libraries</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>ทำ</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>การกระทำของเซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>การดำเนินการระบบ</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>เลือกทั้งหมด</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>กฎเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation type="unfinished">No backup</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
@@ -538,10 +524,6 @@
       <translation>คืนค่าเริ่มต้น</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>คำเตือน! อย่าเปลี่ยนการตั้งค่าเหล่านี้นอกจากคุณจะแน่ใจจริงๆ กับของผลกระทบที่อาจเกิดกับประสิทธิภาพของระบบ</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>เก็บการตั้งค่าโปรไฟล์ของกล้องและโปรไฟล์ไว้</translation>
     </message>
@@ -622,10 +604,6 @@
       <translation type="unfinished">Media Port</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation type="unfinished">PTZ Speed</translation>
     </message>
@@ -666,20 +644,43 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>เว็บเพจ:</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>นำเข้าจากอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>เพิ่ม</translation>
     </message>
   </context>
   <context>
@@ -906,7 +907,7 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
@@ -951,6 +952,17 @@
     <message>
       <source>In the Future</source>
       <translation type="unfinished">In the Future</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
     </message>
   </context>
   <context>
@@ -1027,20 +1039,16 @@
       <translation>ค้นคืนข้อมูล...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>ยกเลิก</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation type="unfinished">Open Folder</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1161,17 +1169,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>กฎเหตุการณ์</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>เมื่อ</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>ล้มเหลว</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>ลำดับความสำคัญล้มเหลว...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>ไม่พบสิ่งใด</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>กำหนดตารางเวลา</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation type="unfinished">Startup</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation type="unfinished">Automatically restore saved windows configuration</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>การตั้งค่าระบบ</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>ลบ</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>หมายเลข ID:</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>ตันฉบับ</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>กำลังทดสอบ...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>การตั้งค่า LDAP</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>URL ของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>รหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>ฐานค้นหา</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>การค้นหาและกรองข้อมูล</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>ค้นหาหมดเวลา (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>ผู้ดูแลระบบ DN หรือ CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>ผู้ใช้สามารถดึงข้อมูลจาก LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>การเชื่อมต่อผิดพลาด</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>บทบาทที่จะมอบหมายให้กับผู้ใช้ที่นำเข้า</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>ปิดการใช้งานผู้ใช้ที่นำเข้า</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>คุณสมบัติ</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>ใบอนุญาติใช้งาน</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>ถอนออก</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>ใบอนุญาติใหม่</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>รายละเอียด...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>ซอฟต์แวร์ได้รับอนุญาตให้</translation>
     </message>
   </context>
   <context>
@@ -1836,6 +1733,18 @@
       <source>Test</source>
       <translation>ทดสอบ</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation type="unfinished">Use Credentials</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation type="unfinished">Use Link</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation type="unfinished">Link</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>ลองอีกครั้ง</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>ผสานระบบ...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>URL เซิร์ฟเวอร์:</translation>
@@ -1954,8 +1855,12 @@
       <translation>ตรวจสอบ</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>ใช้ชื่อระบบและการตั้งค่าจาก:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>ใช้ชื่อระบบและการตั้งค่าจาก</translation>
     </message>
   </context>
   <context>
@@ -1998,7 +1903,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>การตั้งค่าขั้นสูง</translation>
     </message>
     <message>
       <source>Get Update File</source>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>ข้อความ</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>เลือกรูปแบบ</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>เพิ่มอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>ถึง</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>เลือกเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>พอร์ท</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>คำใบ้</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>เข้าสู่ระบบ</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>รหัสผ่าน</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>ค้นหา</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>เพิ่มอุปกรณ์ทั้งหมด</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>อีเมลล์</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>รหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>ผู้ใช้</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>สนับสนุนลายเซ็น</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>ระบบลายเซ็น</translation>
+      <source>Username</source>
+      <translation>ชื่อผู้ใช้</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>เข้าสู่ระบบ</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>รหัสผ่าน</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>ชื่อผู้ใช้</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>สาเหตุ: เกินขีด จำกัด พลังงาน</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>แสดงการแจ้งเตือนทั้งหมด</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>ระบบการแจ้งเตือน</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>เหตุการณ์</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>ตั้งล่วงหน้า</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>ถึง</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>การตั้งค่าภาษา</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>เนื้อหาการแจ้งเตือนที่กำหนดเอง</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>ค้นหาผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>เปิดใช้งาน</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>ปิดการใช้งาน</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>&amp;ลบ...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>ไม่พบสิ่งใด</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>ผู้ใช้ใหม่...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>แก้ไขบทบาท...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>การตั้งค่า LDAP...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>ผู้ใช้สามารถดึงข้อมูลจาก LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>เพิ่ม</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>การลบตัวเลือกการเชื่อมต่อนี้อาจทำให้ระบบทำงานไม่ถูกต้อง</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>ผู้ดูแลระบบ</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>เปิดใช้ไทม์ไลน์บน video wall</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>คุณภาพ</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>โฟลเดอร์ชั่วคราว</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>ตัวเลือกเพิ่มเติม</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>ปิดการใช้งาน Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>จับภาพ Cursor</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>ขอแนะนำให้ใช้คอมพิวเตอร์ที่มีประสิทธิภาพเพื่อคุณภาพและความละเอียด &quot;Best&quot;</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>ค้นหา...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>ทรัพยากร</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>กำลังบันทึกคุณภาพ:</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ทรัพยากร</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>ขอแนะนำให้ใช้คอมพิวเตอร์ที่มีประสิทธิภาพเพื่อคุณภาพและความละเอียด &quot;Best&quot;</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>หน้าจอ</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>ตัวเลือกเพิ่มเติม</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>จับภาพ Cursor</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <source>No services found</source>
+      <translation type="unfinished">No services found</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <source>Channel Partner Contact</source>
+      <translation type="unfinished">Channel Partner Contact</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <source>Services Usage</source>
+      <translation type="unfinished">Services Usage</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <source>Services state</source>
+      <translation type="unfinished">Services state</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation type="unfinished">User Activity</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation type="unfinished">Archive encryption</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>เปลี่ยนรหัสผ่าน...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>การเข้ารหัสวิดีโอจะช่วยเพิ่มการใช้งาน CPU ให้มากขึ้น</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation type="unfinished">Manage Users</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>พร้อมใช้</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2811,7 +2710,7 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>ออกโดย</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
@@ -2827,19 +2726,11 @@
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>ลายนิ้วมือ</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>รายละเอียด</translation>
-    </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
     </message>
   </context>
   <context>
@@ -2856,14 +2747,6 @@
       <translation>Ping ทดสอบ</translation>
     </message>
     <message>
-      <source>Failover</source>
-      <translation>ล้มเหลว</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>ลำดับความสำคัญล้มเหลว...</translation>
-    </message>
-    <message>
       <source>Name</source>
       <translation>ชื่อ</translation>
     </message>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>สำรองข้อมูลการจัดดัชนีใหม่</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>การบันทึกไปยังที่เก็บข้อมูลที่ปิดใช้งานจะหยุดลง อย่างไรก็ตามการลบภาพที่ล้าสมัยออกจากภาพจะดำเนินต่อไป</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>มีการเปิดใช้การบันทึกในที่จัดเก็บข้อมูล USB</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>บทบาท</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>แสดงผู้ใช้ทั้งหมด</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>ไม่มีรายการตรงกับการค้นหาของคุณ</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>ค้นหาผู้ใช้</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <source>Add Group</source>
+      <translation type="unfinished">Add Group</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>ค้นหาผู้ใช้</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Add User</translation>
+      <source>Add User</source>
+      <translation>Add User</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>เปลี่ยนรหัสผ่าน...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>ชื่อ</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ผู้ใช้งาน</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>ลบบทบาท</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>บทบาทผู้ใช้</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>บทบาทใหม่</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>ยังไม่มีบทบาทผู้ใช้ที่กำหนดเอง</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>คลิก &quot;ปุ่มบทบาทใหม่&quot; เพื่อสร้างใหม่</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>ชนิดของผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>บทบาท</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>แก้ไขบทบาท...</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>แบบฟอร์ม</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>ระดับเสียง</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>ทดสอบ</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>ทั่วไป</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation type="unfinished">Proxy all requested contents</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>หมายเหตุ: ตารางการบันทึกขึ้นอยู่กับเวลาของเซิร์ฟเวอร์.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>ใบอนุญาติใช้งาน</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>&amp;ลบ</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>รายละเอียด...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>ซอฟต์แวร์ได้รับอนุญาตให้</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>ใบอนุญาติใหม่</translation>
     </message>
   </context>
   <context>

@@ -24,10 +24,6 @@
       <translation>Suport</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>Servidors del sistema</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>Desenvolupador</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation type="unfinished">Open source libraries</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>Fes</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>Accions del servidor</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>Accions del sistema</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>Selecciona-ho tot</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>Regles d'esdeveniments</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation type="unfinished">No backup</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
@@ -538,10 +524,6 @@
       <translation>Restaura els valors predeterminats</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>No canvieu aquests paràmetres tret que estigueu absolutament segur del seu impacte potencial en el rendiment del sistema.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Conserva el flux de la càmera i la configuració del perfil</translation>
     </message>
@@ -622,10 +604,6 @@
       <translation type="unfinished">Media Port</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation type="unfinished">PTZ Speed</translation>
     </message>
@@ -666,20 +644,43 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Pàgina web</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation type="unfinished">Import from Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Afegeix</translation>
     </message>
   </context>
   <context>
@@ -954,6 +955,17 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1027,20 +1039,16 @@
       <translation>Restaura des de la còpia de seguretat...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Cancel·la</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation type="unfinished">Open Folder</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1161,17 +1169,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Regles dels esdeveniments...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Quan</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>Migració per error</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Prioritat de la migració per error...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>No s'ha trobat res</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Estableix el calendari</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation type="unfinished">Startup</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation type="unfinished">Automatically restore saved windows configuration</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>Configuració del sistema</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>Suprimeix</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>ID d'entrada</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Opcional</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Provant...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>Configuració LDAP</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>URL del servidor</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Contrasenya</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Base de cerca</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Filtre de cerca</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Temps d'espera de cerca (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>DN o CN d'administrador</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Recupera usuaris de LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Carregant...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Error de connexió</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Funció per assignar als usuaris importats</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Desactiva els usuaris importats</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>Característiques</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Llicències actives</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Suprimeix</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Llicència nova</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detalls...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Es concedeix la llicència del programari a</translation>
     </message>
   </context>
   <context>
@@ -1836,6 +1733,18 @@
       <source>Test</source>
       <translation>Prova</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation type="unfinished">Use Credentials</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation type="unfinished">Use Link</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation type="unfinished">Link</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>Torna-ho a provar</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation>Mostra la superposició d'objectiu per a les càmeres PTZ</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Combina els sistemes...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>URL del servidor:</translation>
@@ -1954,8 +1855,12 @@
       <translation>Comprova</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Pren el nom i la configuració del sistema de:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Pren el nom i la configuració del sistema de</translation>
     </message>
   </context>
   <context>
@@ -1998,7 +1903,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Configuració avançada</translation>
     </message>
     <message>
       <source>Get Update File</source>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulari</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Text</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>Selecciona els dissenys</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>Afegeix dispositius</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>a</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>SELECCIONEU EL SERVIDOR</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>Consell</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Usuari</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Contrasenya</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Cerca</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Afegeix tots els dispositius</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Contrasenya</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Usuari</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>Signatura de suport</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>Signatura del sistema</translation>
+      <source>Username</source>
+      <translation>Nom d'usuari</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Inicia la sessió</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Contrasenya</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>Nom d'usuari</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Atenció! S'ha superat el límit de potència</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>Mostra totes les notificacions</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Notificacions del sistema</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>Esdeveniments</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>Formulari</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Predeterminada</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>Per a</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>Configuració d'idioma</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>Contingut de la notificació personalitzada</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Cerca usuaris</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Activa</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Desactiva</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Suprimeix...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>No s'ha trobat res</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Usuari nou...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Edita les funcions...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>Configuració LDAP...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Recupera usuaris de LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>Afegeix</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>L'eliminació d'aquesta opció de connexió pot provocar un mal funcionament del sistema.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>Administració del sistema</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Activa la línia de temps al Video Wall</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulari</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Qualitat</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Carpeta temporal</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Opcions addicionals</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Desactiva l'Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Captura el cursor</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Es recomana utilitzar un ordinador potent per a l'opció de qualitat i resolució &quot;Òptim&quot;.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Explora...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Origen</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>Qualitat de l'enregistrament</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Origen</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Es recomana utilitzar un ordinador potent per a l'opció de qualitat i resolució &quot;Òptim&quot;.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Pantalla</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Opcions addicionals</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Captura el cursor</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <source>No services found</source>
+      <translation type="unfinished">No services found</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <source>Channel Partner Contact</source>
+      <translation type="unfinished">Channel Partner Contact</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <source>Services Usage</source>
+      <translation type="unfinished">Services Usage</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <source>Services state</source>
+      <translation type="unfinished">Services state</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation type="unfinished">User Activity</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation type="unfinished">Archive encryption</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>Canvia la contrasenya...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>El xifratge del trànsit de vídeo augmentarà significativament l'ús de la CPU.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation type="unfinished">Manage Users</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>Disponible per a</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>Detalls</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Migració per error</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Prioritat de la migració per error...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulari</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulari</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Estat</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>Reindexa la còpia de seguretat</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>S'aturarà l'enregistrament a la ubicació d'emmagatzematge desactivada. Tanmateix, es continuaran suprimint les imatges obsoletes.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>S'ha activat l'enregistrament a l'emmagatzematge USB</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Funcions</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Mostra tots els usuaris</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>No hi ha res que coincideixi amb la cerca.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Atenció! Això farà que els paràmetres de qualitat i imatges per segon (FPS) del calendari d'enregistrament siguin irrellevants.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>Cerca usuaris</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <source>Add Group</source>
+      <translation type="unfinished">Add Group</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>Cerca usuaris</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Afegeix usuari</translation>
+      <source>Add User</source>
+      <translation>Afegeix usuari</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Canvia la contrasenya...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Nom</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Usuaris</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Suprimeix la funció</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Funcions d'usuari</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Funció nova</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Encara no hi ha funcions d'usuari personalitzades.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Feu clic al botó &quot;Funció nova&quot; per crear-ne una.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Tipus d'usuari</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Funció</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Edita les funcions...</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulari</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volum</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Prova</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>General</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation type="unfinished">Proxy all requested contents</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Nota: el calendari es basa en l'hora del servidor.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Llicències actives</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Suprimeix</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detalls...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Es concedeix la llicència del programari a</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Llicència nova</translation>
     </message>
   </context>
   <context>

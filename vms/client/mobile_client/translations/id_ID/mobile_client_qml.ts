@@ -5,37 +5,113 @@
     <name>ActionButtonsHint</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Disabled by schedule</translation>
+      <translation>Dinonaktifkan berdasarkan jadwal</translation>
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation>ADVANCED SEARCH</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>Saat Ini</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Absen</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>Fitur Beta</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>Video Download</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>Kemampuan untuk download video</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>Mempercepat koneksi</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>Meningkatkan performa jaringan</translation>
+    </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation type="unfinished">Maximum decoders count</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>Silakan restart aplikasi untuk menerapkan perubahan.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>Ya</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Tidak</translation>
     </message>
   </context>
   <context>
     <name>CameraItem</name>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Otentikasi diperlukan</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Kata sandi diperlukan</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Versi firmware tidak didukung</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Offline</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>Modul I/O</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Pengaturan Kamera</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Informasi</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>Ubah Kualitas</translation>
     </message>
   </context>
   <context>
@@ -54,43 +130,65 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Delete</translation>
+      <translation>Hapus</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>Alamat server dan login lainnya akan tetap disimpan. Untuk menghapus semua informasi koneksi, Anda harus menghapus semua login yang disimpan.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Delete connection?</translation>
+      <translation>Hapus koneksi?</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty</source>
-      <translation>Login cannot be empty</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>Password cannot be empty</translation>
+      <translation>Masukkan alamat server</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Hapus login &quot;%1&quot;?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>Bidang login tidak boleh kosong</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Bidang kata sandi tidak boleh kosong</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>Preview</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>Tampilkan di Kamera</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Pengaturan Developer</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Level Log</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>Salin ID log</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>Device</translation>
     </message>
   </context>
   <context>
@@ -101,83 +199,102 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel</translation>
+      <translation>Batal</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation>Tutup</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ya</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Tidak</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Batalkan</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Coba lagi</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>Koneksikan</translation>
     </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from Google Play.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the App Store.</translation>
+      <source>Download next</source>
+      <translation>Download berikutnya</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the Internet.</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n menit</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>Download</translation>
+      <source>No filters</source>
+      <translation>Tidak ada filter</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation>Filter Pencarian</translation>
     </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation>Tutup</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Tidak dikenal</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation>Hi-Res</translation>
+      <translation>Resolusi Tinggi</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Lo-Res</translation>
+      <translation>Resolusi Rendah</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>Resolusi Kustom</translation>
     </message>
     <message>
       <source>%1 fps</source>
       <comment>%1 is a count of frames per second</comment>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
@@ -186,226 +303,307 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Cannot connect to %1</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Connect</translation>
+      <translation>Koneksikan</translation>
     </message>
   </context>
   <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Tap gambar untuk memposisikan kamera Anda</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>BATAL</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>Semua</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>Clear</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>Kata Sandi</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>Bidang kata sandi tidak boleh kosong</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation>Plugin</translation>
     </message>
   </context>
   <context>
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>PRESET</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>Preset PTZ</translation>
     </message>
   </context>
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation type="unfinished">Systems</translation>
-    </message>
-    <message>
       <source>Notifications</source>
-      <translation>Notifications</translation>
+      <translation>Notifikasi</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
-    </message>
-    <message>
-      <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation type="unfinished">Selected Systems</translation>
+      <translation>Selesai</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation type="unfinished">SELECT</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation type="unfinished">At least one system has to be selected</translation>
+      <translation>PILIH</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ya</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Tidak</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation type="unfinished">Save changes?</translation>
+      <translation>Simpan perubahan?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>Site</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>Kualitas Video</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Tidak dikenal</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>Kecepatan tertinggi</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
-    </message>
-    <message>
-      <source>Transcoding is disabled.</source>
-      <translation type="unfinished">Transcoding is disabled.</translation>
+      <translation>Kualitas terbaik</translation>
     </message>
     <message>
       <source>Transcoding is not supported for this camera.</source>
-      <translation type="unfinished">Transcoding is not supported for this camera.</translation>
+      <translation>Transcoding tidak didukung untuk kamera ini.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation type="unfinished">Transcoding is not supported for servers with version lower than 3.0.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>Transcoding dinonaktifkan oleh Server.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation type="unfinished">Transcoding is not supported for ARM servers.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>Transcoding tidak didukung untuk Server dengan versi lebih rendah dari 3.0.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>Dari</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>Ke</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>Type</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Subtipe</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
-      <translation>Loading...</translation>
+      <translation>Memuat...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Mengkoneksikan...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>Tidak ada kamera yang tersedia pada layout ini</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Tampilkan semua kamera</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation>Tidak ada yang ditemukan</translation>
     </message>
   </context>
   <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Cari</translation>
+    </message>
+  </context>
+  <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>Objek</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>Bookmarks</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>Tidak ada objek</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Tidak ada bookmark</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>Coba ubah filter atau konfigurasikan deteksi objek di pengaturan plugin kamera</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>Coba ubah filter untuk menampilkan hasilnya</translation>
     </message>
   </context>
   <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation>Security</translation>
+      <translation>Keamanan</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Direkomendasikan</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>Konfirmasi Anda akan diminta untuk menyematkan sertifikat yang ditandatangani sendiri</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Ketat</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>Koneksikan hanya server dengan sertifikat publik</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>Host : Port</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Masuk</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Kata Sandi</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>Host</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Users</translation>
+      <translation>Pengguna</translation>
     </message>
   </context>
   <context>
     <name>SessionItem</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>INCOMPATIBLE</translation>
+      <translation>TIDAK KOMPATIBEL</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>OFFLINe</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>UNREACHABLE</translation>
+      <translation>TIDAK DAPAT DICAPAI</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connect to Server...</translation>
+      <translation>Koneksikan ke Server...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Connect to Another Server...</translation>
-    </message>
-    <message>
-      <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>Koneksikan ke Server Lain...</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -415,22 +613,26 @@
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <comment>%1 is a button name</comment>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Periksa koneksi jaringan Anda atau tekan tombol &quot;%1&quot; untuk memasukkan alamat server yang dikenal.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nothing found</translation>
+      <translation>Tidak ada yang ditemukan</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Settings</translation>
+      <translation>Pengaturan</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>Apa yang harus dilakukan dengan kata sandi yang disimpan saat ini?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -438,85 +640,105 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Keep</translation>
+      <translation>Tetap</translation>
     </message>
     <message>
       <source>Use server time</source>
-      <translation type="unfinished">Use server time</translation>
+      <translation>Gunakan waktu server</translation>
     </message>
     <message>
       <source>Live previews</source>
-      <translation type="unfinished">Live previews</translation>
+      <translation>Preview live</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation type="unfinished">Show previews in the cameras list</translation>
+      <translation>Tampilkan preview di daftar kamera</translation>
     </message>
     <message>
       <source>Save passwords</source>
-      <translation type="unfinished">Save passwords</translation>
+      <translation>Simpan kata sandi</translation>
     </message>
     <message>
       <source>Push notifications</source>
-      <translation type="unfinished">Push notifications</translation>
+      <translation>Notifikasi push</translation>
     </message>
     <message>
       <source>All</source>
-      <translation>All</translation>
+      <translation>Semua</translation>
     </message>
     <message>
       <source>Log in to the cloud to use push notifications</source>
-      <translation type="unfinished">Log in to the cloud to use push notifications</translation>
-    </message>
-    <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation type="unfinished">Push notifications are turned off in system settings</translation>
+      <translation>Masuk ke cloud untuk menggunakan notifikasi push</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation type="unfinished">Automatically log in to servers</translation>
+      <translation>Secara otomatis masuk ke server</translation>
     </message>
     <message>
       <source>Security</source>
-      <translation>Security</translation>
+      <translation>Keamanan</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Direkomendasikan</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Ketat</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>Aktifkan akselerasi hardware</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>Meningkatkan performa dan masa pakai baterai</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>Fitur Beta</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>Akses awal ke fitur baru</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation type="unfinished">New connection</translation>
+      <translation>Koneksi baru</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Disconnect from Server</translation>
+      <translation>Putuskan koneksi dari Server</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Settings</translation>
+      <translation>Pengaturan</translation>
     </message>
   </context>
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation type="unfinished">Trust this server</translation>
+      <source>Common name</source>
+      <translation>Nama umum</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Issued by</source>
+      <translation>Dikeluarkan oleh</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Cancel</translation>
+      <source>Expires</source>
+      <translation>Kadaluarsa</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>Sidik jari</translation>
     </message>
   </context>
   <context>
@@ -524,59 +746,71 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Account</translation>
+      <translation>%1 Akun</translation>
     </message>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Keluar</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>Menuju ke %1</translation>
     </message>
   </context>
   <context>
     <name>SystemInformationBlock</name>
     <message>
       <source>New Server</source>
-      <translation>New Server</translation>
+      <translation>Server Baru</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Tidak dikenal</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Potong</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copy</translation>
+      <translation>Salin</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Paste</translation>
+      <translation>Tempel</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Select All</translation>
+      <translation>Pilih Semua</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation>Periode</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Close</translation>
+      <translation>Tutup</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>Tidak dapat memuat video</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Tidak dapat memainkan stream video apa pun</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -584,72 +818,76 @@
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Otentikasi diperlukan</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation type="unfinished">Camera offline</translation>
+      <translation>Kamera offline</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Lisensi tidak cukup</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Kata sandi diperlukan</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Versi firmware tidak didukung</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>Silakan update firmware</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Terlalu banyak koneksi</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>Interface I/O belum didukung</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <translation>Dalam aplikasi ini modul I/O hanya dapat digunakan sebagai perangkat input suara. Untuk menggunakannya sebagai modul kontrol, silakan gunakan versi desktop %1</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Tidak ada streaming live</translation>
     </message>
     <message>
       <source>Set password on this camera using %1 client or camera web-page to view video</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation type="unfinished">Set password on this camera using %1 client or camera web-page to view video</translation>
+      <translation>Tetapkan kata sandi pada kamera ini menggunakan klien %1 atau halaman web kamera untuk melihat video</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <source>Archive encrypted</source>
+      <translation>Archive dienkripsi</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Tidak ada data gerakan untuk kamera ini</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Tidak ada gerakan yang ditemukan di area yang dipilih</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Tidak ditemukan gerakan pada area yang terlihat</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Tidak Ada Archive</translation>
     </message>
     <message>
       <source>LIVE</source>
@@ -660,45 +898,38 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
-    </message>
-    <message>
-      <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>Information</translation>
+      <translation>Area</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Tap dan tahan untuk memilih area</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Aktifkan pencarian gerak terlebih dahulu untuk memilih area</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Area kustom tidak valid. Tolong gambarkan yang benar.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>Audio</translation>
+      <source>Camera Settings</source>
+      <translation>Pengaturan Kamera</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>Skip</translation>
+      <source>Bookmarks</source>
+      <translation>Bookmark</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objek</translation>
     </message>
   </context>
   <context>
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>Server offline. Mengkoneksikan kembali...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>

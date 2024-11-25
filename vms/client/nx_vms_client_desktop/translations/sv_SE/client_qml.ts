@@ -2,6 +2,80 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv_SE" sourcelanguage="en">
   <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+      <source>Add Entry</source>
+      <translation>Lägg till post</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Lägg till</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+      <source>LDAP - Advanced Settings</source>
+      <translation>LDAP - Avancerade inställningar</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Användare</translation>
+    </message>
+    <message>
+      <source>Login Attribute</source>
+      <translation>Inloggningsattribut</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Membership</source>
+      <translation>Medlemskap</translation>
+    </message>
+    <message>
+      <source>Search Timeout</source>
+      <translation>Sök timeout</translation>
+    </message>
+    <message>
+      <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
+      <translation>För att aktivera digestautentisering för LDAP-användare som redan har lagts till i VMS-databasen, måste du aktivera det direkt i dessa användares&apos; -inställningar.</translation>
+    </message>
+    <message>
+      <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+      <translation>För att inaktivera digestautentisering för LDAP-användare som redan har lagts till i WMS-databasen, du måste inaktivera det direkt i dessa användare&apos; inställningar.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation>Tillåt osäker (digest) autentisering för importerade användare</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Allmänt</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation>Synkronisera användare</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation>Synkintervall</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation>Attribut för gruppmedlemmar</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Proxy LDAP-förfrågningar via server</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
@@ -47,6 +121,30 @@
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Du använder en anpassad klient. Kontakta %1 för att få uppdateringsinstruktionerna.</translation>
     </message>
+    <message>
+      <source>Offline client updates</source>
+      <translation type="unfinished">Offline client updates</translation>
+    </message>
+    <message>
+      <source>Offline updates are enabled and files are stored on servers.</source>
+      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+    </message>
+    <message>
+      <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
+      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+    </message>
+    <message>
+      <source>This will delete all update files on servers.</source>
+      <translation type="unfinished">This will delete all update files on servers.</translation>
+    </message>
+    <message>
+      <source>Proceed anyway?</source>
+      <translation type="unfinished">Proceed anyway?</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
@@ -64,6 +162,13 @@
     <message>
       <source>Object Type</source>
       <translation>Objekttyp</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsObjectAttributesSelector</name>
+    <message>
+      <source>Select / Deselect All</source>
+      <translation type="unfinished">Select / Deselect All</translation>
     </message>
   </context>
   <context>
@@ -87,21 +192,6 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Prova att ändra filtren eller konfigurera objektdetektering i kamerans plugin-inställningar</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nya resultat</numerusform>
-        <numerusform>%n nya resultat</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>new results</source>
-      <translation>nya resultat</translation>
-    </message>
-    <message>
-      <source>Detected by</source>
-      <translation>Upptäckt av</translation>
     </message>
   </context>
   <context>
@@ -134,16 +224,17 @@
       <source>Any plugin</source>
       <translation>Någon plugin</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nya resultat</numerusform>
-        <numerusform>%n nya resultat</numerusform>
-      </translation>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
     </message>
     <message>
-      <source>new results</source>
-      <translation>nya resultat</translation>
+      <source>Tile Settings</source>
+      <translation type="unfinished">Tile Settings</translation>
+    </message>
+    <message>
+      <source>Table Settings</source>
+      <translation type="unfinished">Table Settings</translation>
     </message>
   </context>
   <context>
@@ -157,16 +248,36 @@
       <translation>Kontrollera kamerainställningarna för att konfigurera detta plugin.</translation>
     </message>
     <message>
-      <source>Check System Administration settings to configure this plugin.</source>
-      <translation>Kontrollera systemadministrationsinställningar för att konfigurera denna integrering.</translation>
-    </message>
-    <message>
-      <source>This plugin has no settings at the System level.</source>
-      <translation>Denna integration har inga inställningar på systemnivå.</translation>
-    </message>
-    <message>
       <source>This plugin has no settings for this camera.</source>
       <translation>Detta plugin har inga inställningar för denna kamera.</translation>
+    </message>
+    <message>
+      <source>Check Site Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>API Integrations</source>
+      <translation>API-integrationer</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsView</name>
+    <message>
+      <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</source>
+      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
@@ -174,6 +285,132 @@
     <message>
       <source>NO DATA</source>
       <translation>INGA DATA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ApiIntegrations</name>
+    <message>
+      <source>API Integrations</source>
+      <translation>API-integrationer</translation>
+    </message>
+    <message>
+      <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+      <translation>API-integrationer interagerar med %1 Server via REST API och utbyter metadata</translation>
+    </message>
+    <message>
+      <source>New requests</source>
+      <translation>Nya förfrågningar</translation>
+    </message>
+    <message>
+      <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+      <translation>API Integration kan aktiveras efter verifiering av koden som mottagits från Integration provider. Nya förfrågningar kan inaktiveras för att förhindra oönskade interaktioner.</translation>
+    </message>
+    <message>
+      <source>Enable %1?</source>
+      <translation>Aktivera %1?</translation>
+    </message>
+    <message>
+      <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+      <translation>Integrationen kommer att kunna:
+ • ändra inställningar för kameror
+ • få tillgång till arkiv
+ • bearbeta videoströmmar
+ • utbyta metadata över nätverket</translation>
+    </message>
+    <message>
+      <source>Enable Integration</source>
+      <translation>Aktivera integration</translation>
+    </message>
+    <message>
+      <source>Remove %1?</source>
+      <translation>Ta bort %1?</translation>
+    </message>
+    <message>
+      <source>This will remove Integration request</source>
+      <translation>Detta tar bort integrationsbegäran</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Ta bort</translation>
+    </message>
+    <message>
+      <source>Remove Request</source>
+      <translation>Ta bort förfrågan</translation>
+    </message>
+  </context>
+  <context>
+    <name>AuthCode</name>
+    <message>
+      <source>Wrong pairing code</source>
+      <translation type="unfinished">Wrong pairing code</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+  </context>
+  <context>
+    <name>AutoTextField</name>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation>Detta fält kan inte vara tomt</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+  </context>
+  <context>
+    <name>BatchUserEditDialog</name>
+    <message numerus="yes">
+      <source>Batch Edit - %n Users</source>
+      <translation>
+        <numerusform>Batch-redigering - %n användare</numerusform>
+        <numerusform>Batch-redigering - %n användare</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Användare</numerusform>
+        <numerusform>%n Användare</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User status</source>
+      <comment>Whether users are enabled or disabled</comment>
+      <translation>Användarstatus</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktiverad</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Inaktiverad</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication</source>
+      <translation>Osäker (digest) autentisering</translation>
+    </message>
+    <message>
+      <source>keep current value</source>
+      <translation>behåll aktuellt värde</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarksPanel</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Inga bokmärken</translation>
+    </message>
+    <message>
+      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
+      <translation>Välj ett tidsintervall på tidslinjen och högerklicka på den markerade sektionen för att skapa ett bokmärke</translation>
     </message>
   </context>
   <context>
@@ -192,6 +429,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>Snabbtangent %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Tryck på varje knapp flera gånger och skriv namnen på dessa knappar i tabellen nedan.</translation>
     </message>
   </context>
   <context>
@@ -273,6 +517,14 @@
       <source>Pending</source>
       <translation>Väntar</translation>
     </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Suspenderad</translation>
+    </message>
+    <message>
+      <source>Shut Down</source>
+      <translation>Stäng av</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -296,6 +548,57 @@
     </message>
   </context>
   <context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+      <source>LDAP - Connection Settings</source>
+      <translation>LDAP - Anslutningsinställningar</translation>
+    </message>
+    <message>
+      <source>Host</source>
+      <translation>Värd</translation>
+    </message>
+    <message>
+      <source>Login DN</source>
+      <translation>Logga in DN</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Lösenord</translation>
+    </message>
+    <message>
+      <source>Ignore LDAP server certificate errors</source>
+      <translation>Ignorera LDAP-serverfel</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+    <message>
+      <source>Connecting...</source>
+      <translation>Ansluter...</translation>
+    </message>
+    <message>
+      <source>Use StartTLS</source>
+      <translation>Använd StartTLS</translation>
+    </message>
+    <message>
+      <source>Host cannot be empty</source>
+      <translation>Värdnamn kan inte vara tom</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty</source>
+      <translation>Inloggnings-DN kan inte vara tomt</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Lösenordet kan inte vara tomt</translation>
+    </message>
+    <message>
+      <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
+      <translation>För att tillåta LDAP-användare att logga in på %1är det nödvändigt att upprätta en anslutning mellan %1 och en LDAP-server för företag.</translation>
+    </message>
+  </context>
+  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -303,15 +606,14 @@
     </message>
   </context>
   <context>
+    <name>CopyableLabel</name>
+    <message>
+      <source>copied</source>
+      <translation type="unfinished">copied</translation>
+    </message>
+  </context>
+  <context>
     <name>CounterBlock</name>
-    <message>
-      <source>Remove column</source>
-      <translation>Ta bort kolumn</translation>
-    </message>
-    <message>
-      <source>Add column</source>
-      <translation>Lägg till kolumn</translation>
-    </message>
     <message>
       <source>Hide information</source>
       <translation>Dölj information</translation>
@@ -327,10 +629,6 @@
     <message>
       <source>Show thumbnails</source>
       <translation>Visa miniatyrer</translation>
-    </message>
-    <message>
-      <source>Preview</source>
-      <translation>Förhandsgranska</translation>
     </message>
   </context>
   <context>
@@ -349,15 +647,80 @@
     </message>
   </context>
   <context>
+    <name>EditLookupListDialog</name>
+    <message>
+      <source>List Settings</source>
+      <translation>Listinställningar</translation>
+    </message>
+    <message>
+      <source>New List</source>
+      <translation>Ny lista</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Namn</translation>
+    </message>
+    <message>
+      <source>Column Name</source>
+      <translation>Kolumnnamn</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Skapa</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>Allmänt</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Typ</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Attribut</translation>
+    </message>
+    <message>
+      <source>Select type</source>
+      <translation type="unfinished">Select type</translation>
+    </message>
+    <message>
+      <source>Removing attributes will delete all associated data</source>
+      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+    </message>
+    <message>
+      <source>Deleting the list will erase all the data inside it.</source>
+      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+    </message>
+    <message>
+      <source>Delete List?</source>
+      <translation type="unfinished">Delete List?</translation>
+    </message>
+    <message numerus="yes">
+      <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
+      <translation type="unfinished">
+        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>EventTypeSelector</name>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+  </context>
+  <context>
     <name>EventsPanel</name>
-    <message>
-      <source>Category</source>
-      <translation>Kategori</translation>
-    </message>
-    <message>
-      <source>See %1 for other events</source>
-      <translation>Se %1 för andra händelser</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Inga händelser</translation>
@@ -366,9 +729,28 @@
       <source>Try changing the filters or create an Event Rule</source>
       <translation>Försök att ändra filtren eller skapa en händelseregel</translation>
     </message>
+  </context>
+  <context>
+    <name>ExportEntriesProgressDialog</name>
     <message>
-      <source>Event Log</source>
-      <translation>Händelselogg</translation>
+      <source>Export Lists</source>
+      <translation type="unfinished">Export Lists</translation>
+    </message>
+    <message>
+      <source>Exporting</source>
+      <translation type="unfinished">Exporting</translation>
+    </message>
+    <message>
+      <source>Open File Folder...</source>
+      <translation type="unfinished">Open File Folder...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -406,6 +788,44 @@
     <message>
       <source>NO PREVIEW</source>
       <translation>INGEN FÖRHANDSVISNING</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterDialog</name>
+    <message>
+      <source>Name</source>
+      <translation>Namn</translation>
+    </message>
+    <message>
+      <source>Base DN</source>
+      <translation>Bas DN</translation>
+    </message>
+    <message>
+      <source>Base DN cannot be empty</source>
+      <translation>Bas-DN får inte vara tom</translation>
+    </message>
+    <message>
+      <source>Filter</source>
+      <translation>Filter</translation>
+    </message>
+    <message>
+      <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
+      <translation>Bas-DN anger startpunkten för LDAP-sökningar och synkronisering.</translation>
+    </message>
+    <message>
+      <source>Edit Search Base</source>
+      <translation>Redigera sökbas</translation>
+    </message>
+    <message>
+      <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterSettingsDialog</name>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
     </message>
   </context>
   <context>
@@ -486,12 +906,204 @@
       <source>Ellipticity</source>
       <translation>Ellipticitet</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Automatisk kalibrering misslyckades</translation>
+    </message>
+  </context>
+  <context>
+    <name>FixLookupListImportPage</name>
+    <message>
+      <source>Some values could not be automatically matched. Please map them manually.</source>
+      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+    </message>
+    <message>
+      <source>Back</source>
+      <translation type="unfinished">Back</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation type="unfinished">Finish</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
       <translation>Laddar ...</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+      <source>At the site level, group members have permissions to:</source>
+      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+    </message>
+    <message>
+      <source>At the site level, the user has permissions to:</source>
+      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateDialog</name>
+    <message>
+      <source>New Group</source>
+      <translation>Ny grupp</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Allmänt</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Resurser</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Globala rättigheter</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Medlemmar</translation>
+    </message>
+    <message>
+      <source>Add Group</source>
+      <translation>Lägg till grupp</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateTab</name>
+    <message>
+      <source>New Group</source>
+      <translation>Ny grupp</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Namn</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivning</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Behörighetsgrupper</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupEditDialog</name>
+    <message>
+      <source>Group - %1</source>
+      <translation>Grupp - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Allmänt</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Resurser</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Globala rättigheter</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Medlemmar</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupGeneralTab</name>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivning</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Medlemmar</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Användare</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Behörighetsgrupper</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation>Gruppen har en annan grupp som både förälder, och som barnmedlem, eller är en del av en sådan cirkulär referenskedja. Lös denna kedja för att förhindra felaktig beräkning av behörigheter.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>När kontinuerlig synkronisering med LDAP-server är inaktiverad synkroniseras inte grupper automatiskt. För att uppdatera den här gruppen, starta en manuell synkronisering.</translation>
+    </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>Gruppen finns inte i LDAP-databasen.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupMembersTab</name>
+    <message>
+      <source>Users</source>
+      <translation>Användare</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>No members</source>
+      <translation>Inga medlemmar</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add members</source>
+      <translation>Använd kontrollerna till vänster för att lägga till medlemmar</translation>
+    </message>
+    <message>
+      <source>Members summary</source>
+      <translation>Sammanfattning av medlemmar</translation>
+    </message>
+    <message>
+      <source>Inherits membership in current group</source>
+      <translation>Ärv medlemskap i nuvarande grupp</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Välj</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>Inga grupper</translation>
     </message>
   </context>
   <context>
@@ -503,6 +1115,13 @@
     </message>
   </context>
   <context>
+    <name>ImportFromDeviceDialog</name>
+    <message>
+      <source>Import From Devices</source>
+      <translation>Importera från enheter</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
@@ -510,7 +1129,69 @@
     </message>
   </context>
   <context>
-    <name>InformationPanel</name>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Välj joystick.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Inga enheter anslutna.</translation>
+    </message>
+  </context>
+  <context>
+    <name>InsecureWarning</name>
+    <message>
+      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+      <translation>Kontosäkerhet är viktigt. Aktivera inte den här inställningen om du inte har goda skäl att göra det.</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationHeader</name>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Otillräckliga tjänster</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>%n lämpliga integrationstjänster krävs för att aktivera integrationen</numerusform>
+        <numerusform>%n lämpliga integrationstjänster krävs för att aktivera integrationen</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>0 lämpliga tjänster tillgängliga</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>FRÅNKOPPLAD</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Uppdatera</translation>
+    </message>
+    <message>
+      <source>Services Required</source>
+      <translation>Tjänster krävs</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>Uppdaterar...</translation>
+    </message>
+    <message>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <comment>%1 will be substituted by a date</comment>
+      <translation>Det finns fler kameror som använder denna integration än tillgängliga tjänster. Inaktivera integrering för vissa kameror eller lägg till lämpligare tjänster. Annars kommer det att göras automatiskt på %1</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Ta bort</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
       <translation>Version</translation>
@@ -528,12 +1209,34 @@
       <translation>Välj videoström från kameran för analys</translation>
     </message>
     <message>
-      <source>Refresh</source>
-      <translation>Uppdatera</translation>
+      <source>Usage</source>
+      <translation>Användning</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsDialog</name>
+    <message>
+      <source>Manage Integrations</source>
+      <translation type="unfinished">Manage Integrations</translation>
     </message>
     <message>
-      <source>Refreshing...</source>
-      <translation>Uppdaterar...</translation>
+      <source>Integrations</source>
+      <translation>Integrationer</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsTab</name>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Kontrollera kamerainställningarna för att konfigurera detta plugin.</translation>
     </message>
   </context>
   <context>
@@ -561,6 +1264,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Växla Upprepa</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Spara</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Föregående</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Nästa</translation>
     </message>
   </context>
   <context>
@@ -605,8 +1323,8 @@
       <translation>Välj Kamera på Layout</translation>
     </message>
     <message>
-      <source>Log in to the system to configure how to open layouts</source>
-      <translation>Logga in på systemet för att konfigurera hur man öppnar layouter</translation>
+      <source>Log in to the site to configure how to open layouts</source>
+      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
     </message>
   </context>
   <context>
@@ -617,62 +1335,78 @@
     </message>
   </context>
   <context>
-    <name>LeftPanel</name>
+    <name>LdapSettings</name>
     <message>
-      <source>Local Files</source>
-      <translation>Lokala filer</translation>
+      <source>ONLINE</source>
+      <translation>ONLINE</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Kameror</translation>
+      <source>OFFLINE</source>
+      <translation>FRÅNKOPPLAD</translation>
     </message>
     <message>
-      <source>Resources</source>
-      <translation>Resurser</translation>
+      <source>Users</source>
+      <translation>Användare</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Rörelse</translation>
+      <source>Groups</source>
+      <translation>Grupper</translation>
     </message>
     <message>
-      <source>Bookmarks</source>
-      <translation>Bokmärken</translation>
+      <source>Last Sync</source>
+      <translation>Senaste synk</translation>
     </message>
     <message>
-      <source>Events</source>
-      <translation>Händelser</translation>
+      <source>Edit</source>
+      <translation>Redigera</translation>
     </message>
     <message>
-      <source>Objects</source>
-      <translation>Objekt</translation>
+      <source>Advanced Settings</source>
+      <translation>Avancerade inställningar</translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation>Inställningar</translation>
+      <source>Disconnect</source>
+      <translation>Koppla från</translation>
     </message>
     <message>
-      <source>Select a camera to see its motion events</source>
-      <translation>Välj en kamera för att se dess rörelsehändelser</translation>
+      <source>Add</source>
+      <translation>Lägg till</translation>
     </message>
     <message>
-      <source>No motion detected</source>
-      <translation>Ingen rörelse upptäckt</translation>
+      <source>Not configured yet</source>
+      <translation>Inte konfigurerad ännu</translation>
     </message>
     <message>
-      <source>Try changing the filters or enable motion recording</source>
-      <translation>Försök att ändra filtren eller aktivera rörelseinspelning</translation>
+      <source>Configure</source>
+      <translation>Konfigurera</translation>
     </message>
     <message>
-      <source>Select Camera...</source>
-      <translation>Välj kamera...</translation>
+      <source>Search Bases</source>
+      <translation>Sökbas</translation>
     </message>
     <message>
-      <source>No bookmarks</source>
-      <translation>Inga bokmärken</translation>
+      <source>Add Search Base</source>
+      <translation>Lägg till sökbas</translation>
     </message>
     <message>
-      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>Välj ett tidsintervall på tidslinjen och högerklicka på den markerade sektionen för att skapa ett bokmärke</translation>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>Ange minst en sökbas för att synkronisera användare och grupper</translation>
+    </message>
+    <message>
+      <source>Connect your Site to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+    </message>
+    <message>
+      <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
+      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
     </message>
   </context>
   <context>
@@ -705,6 +1439,151 @@
     </message>
   </context>
   <context>
+    <name>LookupListElementEditor</name>
+    <message>
+      <source>Any %1</source>
+      <translation>Någon %1</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Nej</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation>Närvarande</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Frånvarande</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListImportDialog</name>
+    <message>
+      <source>Import List</source>
+      <translation type="unfinished">Import List</translation>
+    </message>
+    <message>
+      <source>Import Options</source>
+      <translation type="unfinished">Import Options</translation>
+    </message>
+    <message>
+      <source>File:</source>
+      <translation type="unfinished">File:</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
+    </message>
+    <message>
+      <source>Separator:</source>
+      <translation type="unfinished">Separator:</translation>
+    </message>
+    <message>
+      <source>Data contains header</source>
+      <translation type="unfinished">Data contains header</translation>
+    </message>
+    <message>
+      <source>Preview</source>
+      <translation>Förhandsgranska</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Importera</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Importing</source>
+      <translation type="unfinished">Importing</translation>
+    </message>
+    <message>
+      <source>Could not open file</source>
+      <translation type="unfinished">Could not open file</translation>
+    </message>
+    <message>
+      <source>Please ensure that file exists and you have access to selected file</source>
+      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+    </message>
+    <message>
+      <source>Fixing imported entries</source>
+      <translation type="unfinished">Fixing imported entries</translation>
+    </message>
+    <message>
+      <source>Could not import selected file</source>
+      <translation type="unfinished">Could not import selected file</translation>
+    </message>
+    <message>
+      <source>The file appears to be empty.</source>
+      <translation type="unfinished">The file appears to be empty.</translation>
+    </message>
+    <message>
+      <source>Please ensure the selected file exists and you have access.</source>
+      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListsDialog</name>
+    <message>
+      <source>Lookup Lists</source>
+      <translation>Söklistor</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Lägg till</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Importera</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Export</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Inställningar</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>Inga poster</translation>
+    </message>
+    <message>
+      <source>New List...</source>
+      <translation type="unfinished">New List...</translation>
+    </message>
+    <message>
+      <source>Could not save file</source>
+      <translation type="unfinished">Could not save file</translation>
+    </message>
+    <message>
+      <source>Please ensure that you have access to selected folder and enough disk space</source>
+      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation type="unfinished">Export failed</translation>
+    </message>
+    <message>
+      <source>Export Selected</source>
+      <translation type="unfinished">Export Selected</translation>
+    </message>
+  </context>
+  <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
@@ -713,6 +1592,85 @@
     <message>
       <source>Select an area on the video to filter results</source>
       <translation>Välj ett område på videon för att filtrera resultat</translation>
+    </message>
+  </context>
+  <context>
+    <name>MotionPanel</name>
+    <message>
+      <source>Select a camera to see its motion events</source>
+      <translation>Välj en kamera för att se dess rörelsehändelser</translation>
+    </message>
+    <message>
+      <source>No motion detected</source>
+      <translation>Ingen rörelse upptäckt</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or enable motion recording</source>
+      <translation>Försök att ändra filtren eller aktivera rörelseinspelning</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Välj kamera...</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultiSelectionComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Välj</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting hittades</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>%n mer</numerusform>
+        <numerusform>%n mer</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>NewLinkDialog</name>
+    <message>
+      <source>New Link - %1</source>
+      <translation>Ny länk - %1</translation>
+    </message>
+    <message>
+      <source>The previous link will be invalidated once a new one has been issued</source>
+      <translation>Den tidigare länken kommer att ogiltigförklaras när en ny har utfärdats</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Skapa</translation>
+    </message>
+  </context>
+  <context>
+    <name>NoListsPage</name>
+    <message>
+      <source>No Lists</source>
+      <translation>Inga listor</translation>
+    </message>
+    <message>
+      <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+      <translation>Du har inte skapat några listor ännu. Med listor kan du lagra flera värden för att använda dem i Event Rules. Skapa en ny lista för att börja lägga till poster.</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation>Skapa ny...</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationsPanel</name>
+    <message>
+      <source>No new notifications</source>
+      <translation type="unfinished">No new notifications</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation type="unfinished">Notifications Settings</translation>
     </message>
   </context>
   <context>
@@ -731,6 +1689,20 @@
     <message>
       <source>Size Constraints</source>
       <translation>Storleksbegränsningar</translation>
+    </message>
+  </context>
+  <context>
+    <name>ObjectTypeSelector</name>
+    <message numerus="yes">
+      <source>with %n attributes</source>
+      <translation type="unfinished">
+        <numerusform>with %n attributes</numerusform>
+        <numerusform>with %n attributes</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any type</source>
+      <translation type="unfinished">Any type</translation>
     </message>
   </context>
   <context>
@@ -758,6 +1730,186 @@
     <message>
       <source>Remember me</source>
       <translation>Kom ihåg mig</translation>
+    </message>
+  </context>
+  <context>
+    <name>PanelBase</name>
+    <message>
+      <source>Approve</source>
+      <translation>Godkänn</translation>
+    </message>
+    <message>
+      <source>Reject</source>
+      <translation>Avvisa</translation>
+    </message>
+    <message>
+      <source>Integration pairing code</source>
+      <translation type="unfinished">Integration pairing code</translation>
+    </message>
+  </context>
+  <context>
+    <name>ParentGroupsTab</name>
+    <message>
+      <source>Add Group</source>
+      <translation>Lägg till grupp</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Anpassad</translation>
+    </message>
+    <message>
+      <source>No custom groups yet</source>
+      <translation>Inga anpassade grupper än</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Inga grupper hittades</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>Ändra sökkriterier eller skapa en ny grupp</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>Inga grupper</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add to a group</source>
+      <translation>Använd kontroller till vänster för att lägga till i en grupp</translation>
+    </message>
+    <message>
+      <source>Member of</source>
+      <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
+      <translation>Medlem av</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation>Inbyggt</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>Anpassad</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordChangeDialog</name>
+    <message>
+      <source>Change password - %1</source>
+      <translation>Ändra lösenord - %1</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Logga in</translation>
+    </message>
+    <message>
+      <source>Current password</source>
+      <translation>Nuvarande lösenord</translation>
+    </message>
+    <message>
+      <source>New password</source>
+      <translation>Nytt lösenord</translation>
+    </message>
+    <message>
+      <source>Confirm password</source>
+      <translation>Bekräfta lösenord</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>Lösenorden matchar inte</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionSummary</name>
+    <message>
+      <source>No custom permissions</source>
+      <translation>Inga anpassade behörigheter</translation>
+    </message>
+  </context>
+  <context>
+    <name>Permissions</name>
+    <message>
+      <source>Required permission group</source>
+      <translation type="unfinished">Required permission group</translation>
+    </message>
+    <message>
+      <source>View Permissions</source>
+      <translation type="unfinished">View Permissions</translation>
+    </message>
+    <message>
+      <source>Hide Permissions</source>
+      <translation type="unfinished">Hide Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionsTab</name>
+    <message>
+      <source>No resources found</source>
+      <translation>Inga resurser hittades</translation>
+    </message>
+    <message>
+      <source>Automatically add dependent permissions</source>
+      <translation>Lägg automatiskt till beroende behörigheter</translation>
+    </message>
+    <message>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation>Använd %1 eller %2 för att välja flera resurser, eller %3 för att rensa urvalet</translation>
+    </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>Resurstabellen ger dig en översikt över användar- eller gruppbehörigheter och låter dig tilldela behörigheter för specifika resurser.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Om du väljer en behörighet som beror på en annan behörighet kommer båda behörigheterna att beviljas automatiskt.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationIntensityDialog</name>
+    <message>
+      <source>Intensity</source>
+      <translation type="unfinished">Intensity</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationObjectSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objekt</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Any plugin</source>
+      <translation>Någon plugin</translation>
+    </message>
+  </context>
+  <context>
+    <name>Plugins</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
+      <comment>%1 is like Nx Witness</comment>
+      <translation>Plugins är program som körs på %1 Server för att möjliggöra sömlösa videoanalysintegrationer.</translation>
     </message>
   </context>
   <context>
@@ -804,13 +1956,6 @@
     </message>
   </context>
   <context>
-    <name>Preview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>INGA DATA</translation>
-    </message>
-  </context>
-  <context>
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
@@ -828,6 +1973,36 @@
       <source>Preview is not available for the selected object</source>
       <translation>Förhandsgranskning är inte tillgänglig för det valda objektet</translation>
     </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Filter by</source>
+      <translation type="unfinished">Filter by</translation>
+    </message>
+  </context>
+  <context>
+    <name>PreviewTableView</name>
+    <message>
+      <source>Select attribute</source>
+      <translation type="unfinished">Select attribute</translation>
+    </message>
+  </context>
+  <context>
+    <name>ProgressDialog</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation type="unfinished">Finished</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -843,38 +2018,75 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>Vi presenterar dig
-nya PTZ-kontroller</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>Här är en snabb presentation
-av vad som har förändrats</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>Dra över någon del av videon
 att aktivera PTZ</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Tryck på piltangenterna för att flytta och plus eller minus för att zooma</translation>
+      <source>Go to Local Settings to enable a drag marker over the center of the video</source>
+      <translation>Gå till Lokala inställningar för att aktivera en dra markör över mitten av videon</translation>
     </message>
     <message>
-      <source>Use the mouse wheel to zoom</source>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation>Tryck på piltangenterna för att flytta runt. Använd plus och minus tangenter för att zooma.</translation>
+    </message>
+    <message>
+      <source>Use mouse wheel to zoom</source>
       <translation>Använd mushjulet för att zooma</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Klicka, dubbelklicka eller dra muspekaren medan du trycker på Skift-tangenten för att använda Advanced PTZ</translation>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation>Du kan aktivera den här guiden igen genom att gå till lokala inställningar &gt; Avancerat &gt; Återställ alla varningar</translation>
     </message>
     <message>
-      <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>Gå till Lokala inställningar för att aktivera en dra markör över mitten av videon</translation>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>Introducerar
+Nya PTZ-kontroller</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>Klicka, dubbelklicka eller dra
+muspekare samtidigt som du trycker på
+Shift-tangent för att använda Advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>Här är en snabbguide
+om vad som har förändrats.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>För att använda mållåsspårning,
+Tryck på Alt + Klicka för att följa objektet</translation>
+    </message>
+  </context>
+  <context>
+    <name>QuickIntervalPanel</name>
+    <message>
+      <source>today</source>
+      <translation>idag</translation>
+    </message>
+    <message>
+      <source>-1 hour</source>
+      <translation>-1 timme</translation>
+    </message>
+    <message>
+      <source>-24 hours</source>
+      <translation>-24 timmar</translation>
+    </message>
+    <message>
+      <source>-7 days</source>
+      <translation>-7 dagar</translation>
+    </message>
+    <message>
+      <source>-30 days</source>
+      <translation>-30 dagar</translation>
     </message>
   </context>
   <context>
@@ -900,6 +2112,53 @@ att aktivera PTZ</translation>
     </message>
   </context>
   <context>
+    <name>RemoteAccess</name>
+    <message>
+      <source>Disabled</source>
+      <translation>Inaktiverad</translation>
+    </message>
+    <message>
+      <source>Server is not configured for remote access feature</source>
+      <translation type="unfinished">Server is not configured for remote access feature</translation>
+    </message>
+    <message>
+      <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
+      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation type="unfinished">Learn more</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
+    </message>
+    <message>
+      <source>Connect %1 client application to localhost:%2</source>
+      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+    </message>
+    <message>
+      <source>Local port</source>
+      <translation type="unfinished">Local port</translation>
+    </message>
+    <message>
+      <source>An error occurred</source>
+      <translation type="unfinished">An error occurred</translation>
+    </message>
+    <message>
+      <source>Username</source>
+      <translation type="unfinished">Username</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Lösenord</translation>
+    </message>
+    <message>
+      <source>Remote access is unavailable</source>
+      <translation type="unfinished">Remote access is unavailable</translation>
+    </message>
+  </context>
+  <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
@@ -908,6 +2167,52 @@ att aktivera PTZ</translation>
     <message>
       <source>Delete</source>
       <translation>Radera</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Har %1 behörighet</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Lägg till %1 och beroende behörigheter</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Lägg till %1 behörighet</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ta bort %1 och beroende behörigheter</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ta bort %1 behörighet</translation>
+    </message>
+    <message>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Ärver det också från</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ärv %1 behörighet från</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Redan ärvd från</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Kommer att förbli ärvt från</translation>
     </message>
   </context>
   <context>
@@ -930,6 +2235,37 @@ att aktivera PTZ</translation>
     </message>
   </context>
   <context>
+    <name>ResourceFilterButton</name>
+    <message>
+      <source>Available by Permissions</source>
+      <translation>Tillgänglig med behörigheter</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Kameror &amp; enheter</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Vyer</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation>Webbsidor och integrationer</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>Webbsidor</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>Hälsoövervakning</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Videoväggar</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -949,16 +2285,16 @@ att aktivera PTZ</translation>
       <source>OUTDATED</source>
       <translation>FÖRÅLDRAD</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>INGEN ÅTKOMST</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
       <translation>Sök</translation>
-    </message>
-    <message>
-      <source>All Types</source>
-      <translation>Alla typer</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -985,12 +2321,12 @@ att aktivera PTZ</translation>
       <translation>Webbsidor</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Användare</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Lokala filer</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrationer</translation>
     </message>
   </context>
   <context>
@@ -1023,8 +2359,42 @@ att aktivera PTZ</translation>
       <translation>Händelser</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analys</translation>
+      <source>Objects</source>
+      <translation>Objekt</translation>
+    </message>
+  </context>
+  <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Välj fil att spara</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>JSON-filer (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>Fil för att spara resultaten:</translation>
     </message>
   </context>
   <context>
@@ -1039,6 +2409,13 @@ att aktivera PTZ</translation>
     <message>
       <source>Search</source>
       <translation>Sök</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>Ingen åtkomst</translation>
     </message>
   </context>
   <context>
@@ -1079,6 +2456,13 @@ att aktivera PTZ</translation>
     <message>
       <source>This action requires some parameters to be filled.</source>
       <translation>Denna åtgärd kräver att vissa parametrar fylls i.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsTab</name>
+    <message>
+      <source>Accept API Integrations registration requests</source>
+      <translation type="unfinished">Accept API Integrations registration requests</translation>
     </message>
   </context>
   <context>
@@ -1200,9 +2584,12 @@ att aktivera PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Firmwareversionen stöds ej</translation>
     </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
     <message>
-      <source>Access denied</source>
-      <translation>Åtkomst nekad</translation>
+      <source>Min 3 characters</source>
+      <translation>Minst 3 tecken</translation>
     </message>
   </context>
   <context>
@@ -1213,26 +2600,78 @@ att aktivera PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation>Aldrig</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation>Alltid</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation>Vid inloggning</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>Giltig från %1 till %2 (av servertid)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>Giltig från %1 till %2 (av servertid) eller för %3 efter inloggning</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkSettings</name>
+    <message>
+      <source>Link Valid Until</source>
+      <translation>Länken gäller t.o.m</translation>
+    </message>
+    <message>
+      <source>The link will remain accessible until the date specified (including, based on server time)</source>
+      <translation>Länken kommer att vara tillgänglig fram till det angivna datumet (inklusive, baserat på servertid)</translation>
+    </message>
+    <message>
+      <source>Revoke access after login</source>
+      <translation>Återkalla åtkomst efter inloggning</translation>
+    </message>
+    <message>
+      <source>Access may be revoked earlier if the link validity period ends</source>
+      <translation>Åtkomsten kan återkallas tidigare om länkens giltighetstid löper ut</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
+      <translation>I</translation>
+    </message>
+  </context>
+  <context>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
       <translation>Inget hittades</translation>
     </message>
     <message>
-      <source>No Favorite Systems</source>
-      <translation>Inga favoritsystem</translation>
+      <source>No Favorite Sites</source>
+      <translation type="unfinished">No Favorite Sites</translation>
     </message>
     <message>
-      <source>No Hidden Systems</source>
-      <translation>Inga dolda system</translation>
+      <source>No Hidden Sites</source>
+      <translation type="unfinished">No Hidden Sites</translation>
     </message>
     <message>
-      <source>You can add system to the favorites from the context menu</source>
-      <translation>Du kan lägga till system till favoriter från snabbmenyn</translation>
+      <source>You can add site to the favorites from the context menu</source>
+      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
     </message>
     <message>
-      <source>You can hide systems from the main list from the context menu</source>
-      <translation>Du kan dölja system från huvudlistan i snabbmenyn</translation>
+      <source>You can hide sites from the main list from the context menu</source>
+      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
     </message>
   </context>
   <context>
@@ -1284,6 +2723,10 @@ att aktivera PTZ</translation>
       <source>Selected on Timeline</source>
       <translation>Markerade på tidslinjen</translation>
     </message>
+    <message>
+      <source>Time is unavailable due to DST changes</source>
+      <translation>Tiden är inte tillgänglig på grund av ändringar i DST</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>
@@ -1296,18 +2739,307 @@ att aktivera PTZ</translation>
     </message>
   </context>
   <context>
+    <name>UserCreateDialog</name>
+    <message>
+      <source>New User</source>
+      <translation>Ny användare</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Allmänt</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Resurser</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Globala rättigheter</translation>
+    </message>
+    <message>
+      <source>Add User</source>
+      <translation>Lägg till användare</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserCreateTab</name>
+    <message>
+      <source>New User</source>
+      <translation>Ny användare</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Typ</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>Lokal</translation>
+    </message>
+    <message>
+      <source>Cloud</source>
+      <translation>Moln</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Logga in</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Fullständigt namn</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>E-post</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Lösenord</translation>
+    </message>
+    <message>
+      <source>Confirm Password</source>
+      <translation>Bekräfta Lösenord</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>Tillåt osäker (digest) autentisering</translation>
+    </message>
+    <message>
+      <source>You need to specify only user&apos;s email address.</source>
+      <translation>Du måste ange endast användare&apos;s e-postadress.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Behörighetsgrupper</translation>
+    </message>
+    <message>
+      <source>Access</source>
+      <translation>Tillgång</translation>
+    </message>
+    <message>
+      <source>Regular user with credentials</source>
+      <translation>Vanlig användare med autentiseringsuppgifter</translation>
+    </message>
+    <message>
+      <source>Temporary with link</source>
+      <translation>Tillfälligt med länk</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>Lösenorden matchar inte</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEditDialog</name>
+    <message>
+      <source>User - %1</source>
+      <translation>Användare - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Allmänt</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Resurser</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Globala rättigheter</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Den här användaren har inte registrerat sig för %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEnabledSwitch</name>
+    <message>
+      <source>Enabled user</source>
+      <translation>Aktiverad användare</translation>
+    </message>
+    <message>
+      <source>Disabled user</source>
+      <translation>Inaktiverad användare</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGeneralTab</name>
+    <message>
+      <source>Audit Trail</source>
+      <translation>Auditlista</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Fullständigt namn</translation>
+    </message>
+    <message>
+      <source>Account Settings</source>
+      <translation>Kontoinställningar</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>E-post</translation>
+    </message>
+    <message>
+      <source>Change password</source>
+      <translation>Ändra lösenord</translation>
+    </message>
+    <message>
+      <source>Set password to enable insecure authentication</source>
+      <translation>Ange lösenord för att aktivera osäker autentisering</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>Tillåt osäker (digest) autentisering</translation>
+    </message>
+    <message>
+      <source>This user is not found in LDAP database and is not able to log in.</source>
+      <translation>Denna användare finns inte i LDAP-databasen och kan inte logga in.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Behörighetsgrupper</translation>
+    </message>
+    <message>
+      <source>Access expires</source>
+      <translation>Åtkomst upphör</translation>
+    </message>
+    <message>
+      <source>Access Link</source>
+      <translation>Åtkomstlänk</translation>
+    </message>
+    <message>
+      <source>Copy Link</source>
+      <translation>Kopiera länk</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation>Avsluta</translation>
+    </message>
+    <message>
+      <source>New Link...</source>
+      <translation>Ny länk...</translation>
+    </message>
+    <message>
+      <source>No valid link for this user</source>
+      <translation>Ingen giltig länk för denna användare</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>Copied here means that a link is copied</comment>
+      <translation>Kopierad</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation>Hämtar länk...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Se till att denna dator kan ansluta till %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation>LDAP-servern är offline. Användaren kan inte logga in.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>När kontinuerlig synkronisering med LDAP-servern är inaktiverad synkroniseras inte användarmedlemskap i grupper automatiskt. För att uppdatera denna information, initiera en manuell synkronisering.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>Denna användares inloggning dubblerar inloggningen för en annan användare. Ingen av dem kan logga in. För att lösa det här problemet kan du ändra användarens inloggning eller inaktivera eller ta bort användare med duplicerade inloggningar.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+    <message>
+      <source>Interface Language</source>
+      <translation type="unfinished">Interface Language</translation>
+    </message>
+  </context>
+  <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
       <translation>Dold</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Alla system</translation>
-    </message>
-    <message>
       <source>Favorites</source>
       <translation>Favoriter</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialog</name>
+    <message>
+      <source>Add Rule</source>
+      <translation>Lägg till regel</translation>
+    </message>
+    <message>
+      <source>Duplicate</source>
+      <translation>Duplicera</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Radera</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>Inga poster</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>Händelselogg...</translation>
+    </message>
+    <message>
+      <source>Reset To Defaults...</source>
+      <translation>Återställ till standard...</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation type="unfinished">Event Rules</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Schedule</source>
+      <translation type="unfinished">Schedule</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation type="unfinished">State</translation>
     </message>
   </context>
   <context>
@@ -1327,6 +3059,27 @@ att aktivera PTZ</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>Du har inte tillgång till %1: an. Kontrollera din internetanslutning.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Flytta joysticken åt vänster och höger flera gånger.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Flytta joysticken upp och ner flera gånger.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Rotera joysticken medurs och moturs flera gånger.</translation>
     </message>
   </context>
 </TS>

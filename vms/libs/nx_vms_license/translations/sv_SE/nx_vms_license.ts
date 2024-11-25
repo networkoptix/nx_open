@@ -53,31 +53,19 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>Licensen är inte validerad av %1</translation>
     </message>
     <message>
       <source>Invalid type</source>
       <translation>Ogiltig typ</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>Endast en startlicens är tillåten per system.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>Du har redan en aktiv starter licens.</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>Endast en NVR-licens är tillåten per system.</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>Du har redan en aktiv NVR-licens.</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>Endast en licens av denna typ är tillåten per System.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -90,6 +78,18 @@
     <message>
       <source>Unknown error</source>
       <translation>Okänt Fel</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

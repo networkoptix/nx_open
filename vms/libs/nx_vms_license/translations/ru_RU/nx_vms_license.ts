@@ -68,24 +68,12 @@
       <translation>Неверный тип</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>Для каждой системы допускается только одна лицензия Starter.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>У вас уже есть одна активная лицензия Starter.</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>Для каждой системы разрешена только одна лицензия NVR.</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>У вас уже есть одна активная лицензия NVR.</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>На систему разрешена только одна лицензия этого типа.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -98,6 +86,18 @@
     <message>
       <source>Unknown error</source>
       <translation>Неизвестная ошибка</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

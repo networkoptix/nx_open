@@ -60,24 +60,12 @@
       <translation>Tipo no válido</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>Solo se permite una licencia Starter por sistema.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>Ya tiene una licencia de Starter activa.</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>Solo se permite una licencia de NVR por sistema.</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>Ya tiene una licencia NVR activa.</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>Solo se permite una licencia de este tipo por sistema.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -90,6 +78,18 @@
     <message>
       <source>Unknown error</source>
       <translation>Error desconocido</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

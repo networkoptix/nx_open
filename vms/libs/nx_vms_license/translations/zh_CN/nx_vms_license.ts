@@ -56,24 +56,12 @@
       <translation>无效类型</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>每個系統只允許启动一組Starter授权.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>您已有一组启用中的Starter授权。</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>每個系統只允許一組NVR授权。</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>您已有一组启用中的NVR授权。</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>每个系统仅允许使用一个这种类型的授权。</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -86,6 +74,18 @@
     <message>
       <source>Unknown error</source>
       <translation>未知的错误</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

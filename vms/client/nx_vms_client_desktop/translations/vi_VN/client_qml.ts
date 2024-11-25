@@ -2,6 +2,80 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+      <source>Add Entry</source>
+      <translation>Thêm mục nhập</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Thêm vào</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+      <source>LDAP - Advanced Settings</source>
+      <translation>LDAP - Cài đặt nâng cao</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Người dùng</translation>
+    </message>
+    <message>
+      <source>Login Attribute</source>
+      <translation>Thuộc tính đăng nhập</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Membership</source>
+      <translation>Thành viên</translation>
+    </message>
+    <message>
+      <source>Search Timeout</source>
+      <translation>Hết thời gian tìm kiếm</translation>
+    </message>
+    <message>
+      <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
+      <translation>Để bật xác thực thông báo cho người dùng LDAP đã được thêm vào cơ sở dữ liệu VMS, bạn cần bật tính năng này trực tiếp trong cài đặt người dùng.</translation>
+    </message>
+    <message>
+      <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+      <translation>Để tắt xác thực thông báo cho người dùng LDAP đã được thêm vào cơ sở dữ liệu VMS, bạn cần tắt nó trực tiếp trong cài đặt người dùng.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation>Cho phép xác thực không an toàn (digest) cho người dùng đã nhập</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Tổng quan</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation>Đồng bộ hóa người dùng</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation>Khoảng thời gian đồng bộ hóa</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation>Thuộc tính thành viên nhóm</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Yêu cầu proxy LDAP qua máy chủ</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
@@ -47,6 +121,30 @@
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Bạn đang sử dụng một máy khách được tùy chỉnh. Vui lòng liên hệ %1 để nhận hướng dẫn cập nhật.</translation>
     </message>
+    <message>
+      <source>Offline client updates</source>
+      <translation type="unfinished">Offline client updates</translation>
+    </message>
+    <message>
+      <source>Offline updates are enabled and files are stored on servers.</source>
+      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+    </message>
+    <message>
+      <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
+      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+    </message>
+    <message>
+      <source>This will delete all update files on servers.</source>
+      <translation type="unfinished">This will delete all update files on servers.</translation>
+    </message>
+    <message>
+      <source>Proceed anyway?</source>
+      <translation type="unfinished">Proceed anyway?</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Đồng ý</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
@@ -64,6 +162,13 @@
     <message>
       <source>Object Type</source>
       <translation>Loại đối tượng</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsObjectAttributesSelector</name>
+    <message>
+      <source>Select / Deselect All</source>
+      <translation type="unfinished">Select / Deselect All</translation>
     </message>
   </context>
   <context>
@@ -87,20 +192,6 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Thử thay đổi bộ lọc hoặc định cấu hình phát hiện đối tượng trong cài đặt plugin camera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n kết quả mới</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>new results</source>
-      <translation>kết quả mới</translation>
-    </message>
-    <message>
-      <source>Detected by</source>
-      <translation>Được phát hiện bởi</translation>
     </message>
   </context>
   <context>
@@ -133,15 +224,17 @@
       <source>Any plugin</source>
       <translation>Tất cả Plugin</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n kết quả mới</numerusform>
-      </translation>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
     </message>
     <message>
-      <source>new results</source>
-      <translation>kết quả mới</translation>
+      <source>Tile Settings</source>
+      <translation type="unfinished">Tile Settings</translation>
+    </message>
+    <message>
+      <source>Table Settings</source>
+      <translation type="unfinished">Table Settings</translation>
     </message>
   </context>
   <context>
@@ -155,16 +248,36 @@
       <translation>Kiểm tra Cài đặt Camera để định cấu hình plugin này.</translation>
     </message>
     <message>
-      <source>Check System Administration settings to configure this plugin.</source>
-      <translation>Kiểm tra Cài đặt quản trị hệ thống để định cấu hình plugin này.</translation>
-    </message>
-    <message>
-      <source>This plugin has no settings at the System level.</source>
-      <translation>Plugin này không có cài đặt ở cấp Hệ thống.</translation>
-    </message>
-    <message>
       <source>This plugin has no settings for this camera.</source>
       <translation>Plugin này không có cài đặt cho camera này.</translation>
+    </message>
+    <message>
+      <source>Check Site Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>API Integrations</source>
+      <translation>Tích hợp API</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsView</name>
+    <message>
+      <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</source>
+      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
@@ -172,6 +285,130 @@
     <message>
       <source>NO DATA</source>
       <translation>KHÔNG CÓ DỮ LIỆU</translation>
+    </message>
+  </context>
+  <context>
+    <name>ApiIntegrations</name>
+    <message>
+      <source>API Integrations</source>
+      <translation>Tích hợp API</translation>
+    </message>
+    <message>
+      <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+      <translation>Tích hợp API tương tác với %1 Máy chủ thông qua REST API và trao đổi siêu dữ liệu</translation>
+    </message>
+    <message>
+      <source>New requests</source>
+      <translation>Yêu cầu mới</translation>
+    </message>
+    <message>
+      <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+      <translation>Tích hợp API có thể được bật sau khi xác minh mã nhận được từ nhà cung cấp Tích hợp. Yêu cầu mới có thể bị vô hiệu hóa để ngăn chặn tương tác không mong muốn.</translation>
+    </message>
+    <message>
+      <source>Enable %1?</source>
+      <translation>Bật %1?</translation>
+    </message>
+    <message>
+      <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+      <translation>Tích hợp này sẽ có thể:
+ • thay đổi cài đặt trên camera
+ • truy cập vào kho lưu trữ
+ • xử lý luồng video
+ • trao đổi siêu dữ liệu qua mạng</translation>
+    </message>
+    <message>
+      <source>Enable Integration</source>
+      <translation>Bật tích hợp</translation>
+    </message>
+    <message>
+      <source>Remove %1?</source>
+      <translation>Xóa %1?</translation>
+    </message>
+    <message>
+      <source>This will remove Integration request</source>
+      <translation>Việc này sẽ xóa yêu cầu tích hợp</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Tẩy</translation>
+    </message>
+    <message>
+      <source>Remove Request</source>
+      <translation>Xóa yêu cầu</translation>
+    </message>
+  </context>
+  <context>
+    <name>AuthCode</name>
+    <message>
+      <source>Wrong pairing code</source>
+      <translation type="unfinished">Wrong pairing code</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+  </context>
+  <context>
+    <name>AutoTextField</name>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation>Trường này không được để trống</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>tự động</translation>
+    </message>
+  </context>
+  <context>
+    <name>BatchUserEditDialog</name>
+    <message numerus="yes">
+      <source>Batch Edit - %n Users</source>
+      <translation>
+        <numerusform>Chỉnh sửa hàng loạt - %n người dùng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Người dùng</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User status</source>
+      <comment>Whether users are enabled or disabled</comment>
+      <translation>Tình trạng người dùng</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Đã bật</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Vô hiệu hóa</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication</source>
+      <translation>Xác thực (digest) không an toàn</translation>
+    </message>
+    <message>
+      <source>keep current value</source>
+      <translation>giữ giá trị hiện tại</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarksPanel</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Không có dấu trang</translation>
+    </message>
+    <message>
+      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
+      <translation>Chọn khoảng thời gian trên dòng thời gian và nhấp chuột phải vào phần nổi bật để tạo dấu trang</translation>
     </message>
   </context>
   <context>
@@ -190,6 +427,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>Phím nóng %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Nhấn từng nút nhiều lần và viết tên của các nút này vào bảng bên dưới.</translation>
     </message>
   </context>
   <context>
@@ -255,7 +499,7 @@
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation>Ẩn</translation>
+      <translation>Ngoại tuyến</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -268,6 +512,14 @@
     <message>
       <source>Pending</source>
       <translation>Đang chờ xử lý</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Bị tạm ngưng</translation>
+    </message>
+    <message>
+      <source>Shut Down</source>
+      <translation>Tắt nguồn</translation>
     </message>
   </context>
   <context>
@@ -292,6 +544,57 @@
     </message>
   </context>
   <context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+      <source>LDAP - Connection Settings</source>
+      <translation>LDAP - Cài đặt kết nối</translation>
+    </message>
+    <message>
+      <source>Host</source>
+      <translation>Máy chủ</translation>
+    </message>
+    <message>
+      <source>Login DN</source>
+      <translation>Đăng nhập DN</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Ignore LDAP server certificate errors</source>
+      <translation>Bỏ qua lỗi chứng chỉ máy chủ LDAP</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Thử</translation>
+    </message>
+    <message>
+      <source>Connecting...</source>
+      <translation>Kết nối ...</translation>
+    </message>
+    <message>
+      <source>Use StartTLS</source>
+      <translation>Sử dụng StartTLS</translation>
+    </message>
+    <message>
+      <source>Host cannot be empty</source>
+      <translation>Host không thể trống</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty</source>
+      <translation>Đăng nhập DN không được để trống</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Mật khẩu không được để trống</translation>
+    </message>
+    <message>
+      <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
+      <translation>Để cho phép người dùng LDAP đăng nhập vào %1, cần thiết lập kết nối giữa %1 và máy chủ LDAP của công ty.</translation>
+    </message>
+  </context>
+  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -299,15 +602,14 @@
     </message>
   </context>
   <context>
+    <name>CopyableLabel</name>
+    <message>
+      <source>copied</source>
+      <translation type="unfinished">copied</translation>
+    </message>
+  </context>
+  <context>
     <name>CounterBlock</name>
-    <message>
-      <source>Remove column</source>
-      <translation>Xóa cột</translation>
-    </message>
-    <message>
-      <source>Add column</source>
-      <translation>Thêm cột</translation>
-    </message>
     <message>
       <source>Hide information</source>
       <translation>Ẩn thông tin</translation>
@@ -324,20 +626,16 @@
       <source>Show thumbnails</source>
       <translation>Hiển thị hình thu nhỏ</translation>
     </message>
-    <message>
-      <source>Preview</source>
-      <translation>Xem trước</translation>
-    </message>
   </context>
   <context>
     <name>DewarpingSettings</name>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>Mắt cá</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -345,15 +643,79 @@
     </message>
   </context>
   <context>
+    <name>EditLookupListDialog</name>
+    <message>
+      <source>List Settings</source>
+      <translation>Cài đặt danh sách</translation>
+    </message>
+    <message>
+      <source>New List</source>
+      <translation>Danh sách mới</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Column Name</source>
+      <translation>Tên Cột</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Tạo</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xoá</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>Tổng quan</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Kiểu</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Các đặc tính</translation>
+    </message>
+    <message>
+      <source>Select type</source>
+      <translation type="unfinished">Select type</translation>
+    </message>
+    <message>
+      <source>Removing attributes will delete all associated data</source>
+      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+    </message>
+    <message>
+      <source>Deleting the list will erase all the data inside it.</source>
+      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+    </message>
+    <message>
+      <source>Delete List?</source>
+      <translation type="unfinished">Delete List?</translation>
+    </message>
+    <message numerus="yes">
+      <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
+      <translation type="unfinished">
+        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>EventTypeSelector</name>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+  </context>
+  <context>
     <name>EventsPanel</name>
-    <message>
-      <source>Category</source>
-      <translation>Loài</translation>
-    </message>
-    <message>
-      <source>See %1 for other events</source>
-      <translation>Xem %1 cho các sự kiện khác</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Không có sự kiện</translation>
@@ -362,16 +724,35 @@
       <source>Try changing the filters or create an Event Rule</source>
       <translation>Thử thay đổi bộ lọc hoặc tạo Quy tắc sự kiện</translation>
     </message>
+  </context>
+  <context>
+    <name>ExportEntriesProgressDialog</name>
     <message>
-      <source>Event Log</source>
-      <translation>Ghi sự kiện</translation>
+      <source>Export Lists</source>
+      <translation type="unfinished">Export Lists</translation>
+    </message>
+    <message>
+      <source>Exporting</source>
+      <translation type="unfinished">Exporting</translation>
+    </message>
+    <message>
+      <source>Open File Folder...</source>
+      <translation type="unfinished">Open File Folder...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation>Đồ họa</translation>
+      <translation>Số liệu</translation>
     </message>
     <message>
       <source>Click to add</source>
@@ -386,11 +767,11 @@
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -405,10 +786,48 @@
     </message>
   </context>
   <context>
+    <name>FilterDialog</name>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Base DN</source>
+      <translation>DN cơ sở</translation>
+    </message>
+    <message>
+      <source>Base DN cannot be empty</source>
+      <translation>DN cơ sở không được để trống</translation>
+    </message>
+    <message>
+      <source>Filter</source>
+      <translation>Lọc</translation>
+    </message>
+    <message>
+      <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
+      <translation>DN cơ sở đặt điểm bắt đầu cho tìm kiếm và đồng bộ hóa LDAP.</translation>
+    </message>
+    <message>
+      <source>Edit Search Base</source>
+      <translation>Chỉnh sửa cơ sở tìm kiếm</translation>
+    </message>
+    <message>
+      <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterSettingsDialog</name>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+  </context>
+  <context>
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation>Hình ảnh không hợp lệ</translation>
+      <translation>Hình ảnh không tròn</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
@@ -448,7 +867,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation>Chỉnh sửa thư viện ảnh</translation>
+      <translation>Chỉnh sửa cuộn camera</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -456,15 +875,15 @@
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Equidistant</translation>
+      <translation>Cách đều nhau</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>Stereographic</translation>
+      <translation>Lập thể</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>Cân bằng</translation>
     </message>
     <message>
       <source>Size</source>
@@ -480,7 +899,26 @@
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation>Ellipticity</translation>
+      <translation>Chế độ elip</translation>
+    </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Hiệu chuẩn tự động thất bại</translation>
+    </message>
+  </context>
+  <context>
+    <name>FixLookupListImportPage</name>
+    <message>
+      <source>Some values could not be automatically matched. Please map them manually.</source>
+      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+    </message>
+    <message>
+      <source>Back</source>
+      <translation type="unfinished">Back</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation type="unfinished">Finish</translation>
     </message>
   </context>
   <context>
@@ -488,6 +926,179 @@
     <message>
       <source>Loading...</source>
       <translation>Đang tải...</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+      <source>At the site level, group members have permissions to:</source>
+      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+    </message>
+    <message>
+      <source>At the site level, the user has permissions to:</source>
+      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateDialog</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nhóm mới</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Tổng quan</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Tài nguyên</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Quyền toàn cầu</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Thành Viên</translation>
+    </message>
+    <message>
+      <source>Add Group</source>
+      <translation>Thêm nhóm</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateTab</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nhóm mới</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Mô tả</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Nhóm quyền</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupEditDialog</name>
+    <message>
+      <source>Group - %1</source>
+      <translation>Nhóm - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Tổng quan</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Tài nguyên</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Quyền toàn cầu</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Thành Viên</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupGeneralTab</name>
+    <message>
+      <source>Delete</source>
+      <translation>Xoá</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Thông tin</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Mô tả</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Thành Viên</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Người dùng</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Nhóm quyền</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation>Nhóm có một nhóm khác vừa là nhóm mẹ, vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Chỉnh lại cài đặt chuỗi này để ngăn việc cấp quyền không chính xác.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>Khi tắt tính năng đồng bộ hóa liên tục với máy chủ LDAP, các nhóm sẽ không tự động đồng bộ hóa. Để cập nhật nhóm này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
+    </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>Không tìm thấy nhóm này trong cơ sở dữ liệu LDAP.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupMembersTab</name>
+    <message>
+      <source>Users</source>
+      <translation>Người dùng</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>No members</source>
+      <translation>Không thành viên</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add members</source>
+      <translation>Sử dụng các điều khiển ở bên trái để thêm thành viên</translation>
+    </message>
+    <message>
+      <source>Members summary</source>
+      <translation>Tóm tắt thành viên</translation>
+    </message>
+    <message>
+      <source>Inherits membership in current group</source>
+      <translation>Kế thừa thành viên trong nhóm hiện tại</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Chọn</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>Không có nhóm</translation>
     </message>
   </context>
   <context>
@@ -499,6 +1110,13 @@
     </message>
   </context>
   <context>
+    <name>ImportFromDeviceDialog</name>
+    <message>
+      <source>Import From Devices</source>
+      <translation>Nhập từ thiết bị</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
@@ -506,7 +1124,68 @@
     </message>
   </context>
   <context>
-    <name>InformationPanel</name>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Chọn cần điều khiển.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Không có thiết bị nào được kết nối.</translation>
+    </message>
+  </context>
+  <context>
+    <name>InsecureWarning</name>
+    <message>
+      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+      <translation>Bảo mật tài khoản là quan trọng. Không bật cài đặt này trừ khi bạn có lý do chính đáng để làm như vậy.</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationHeader</name>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Dịch vụ không đầy đủ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>%n cần có các dịch vụ tích hợp phù hợp để bật tính năng tích hợp</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>0 dịch vụ phù hợp có sẵn</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>OFFLINE</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Làm mới</translation>
+    </message>
+    <message>
+      <source>Services Required</source>
+      <translation>Dịch vụ yêu cầu</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>Đang làm mới...</translation>
+    </message>
+    <message>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <comment>%1 will be substituted by a date</comment>
+      <translation>Có nhiều camera sử dụng tích hợp này hơn các dịch vụ hiện có. Vui lòng tắt tích hợp cho một số camera hoặc thêm các dịch vụ phù hợp hơn. Nếu không, sẽ được thực hiện tự động tại %1</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Tẩy</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
       <translation>Phiên bản</translation>
@@ -524,12 +1203,34 @@
       <translation>Chọn luồng video từ camera để phân tích</translation>
     </message>
     <message>
-      <source>Refresh</source>
-      <translation>Làm mới</translation>
+      <source>Usage</source>
+      <translation>Mức sử dụng</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsDialog</name>
+    <message>
+      <source>Manage Integrations</source>
+      <translation type="unfinished">Manage Integrations</translation>
     </message>
     <message>
-      <source>Refreshing...</source>
-      <translation>Đang làm mới...</translation>
+      <source>Integrations</source>
+      <translation>Tích hợp</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsTab</name>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Kiểm tra Cài đặt Camera để định cấu hình plugin này.</translation>
     </message>
   </context>
   <context>
@@ -557,6 +1258,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Chuyển đổi lặp lại</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Lưu</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Trước</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Tiếp tục</translation>
     </message>
   </context>
   <context>
@@ -601,8 +1317,8 @@
       <translation>Chọn Camera trên Bố cục</translation>
     </message>
     <message>
-      <source>Log in to the system to configure how to open layouts</source>
-      <translation>Đăng nhập vào hệ thống để cấu hình cách mở các bố cục</translation>
+      <source>Log in to the site to configure how to open layouts</source>
+      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
     </message>
   </context>
   <context>
@@ -613,62 +1329,78 @@
     </message>
   </context>
   <context>
-    <name>LeftPanel</name>
+    <name>LdapSettings</name>
     <message>
-      <source>Local Files</source>
-      <translation>Tệp cục bộ</translation>
+      <source>ONLINE</source>
+      <translation>TRỰC TUYẾN</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Camera</translation>
+      <source>OFFLINE</source>
+      <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>Resources</source>
-      <translation>Tài nguyên</translation>
+      <source>Users</source>
+      <translation>Người dùng</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Chuyển động</translation>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
     </message>
     <message>
-      <source>Bookmarks</source>
-      <translation>Dấu trang</translation>
+      <source>Last Sync</source>
+      <translation>Đồng bộ hoá lần cuối</translation>
     </message>
     <message>
-      <source>Events</source>
-      <translation>Sự kiện</translation>
+      <source>Edit</source>
+      <translation>Sửa</translation>
     </message>
     <message>
-      <source>Objects</source>
-      <translation>Đối tượng</translation>
+      <source>Advanced Settings</source>
+      <translation>Cài đặt Nâng cao</translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation>Cài đặt</translation>
+      <source>Disconnect</source>
+      <translation>Ngắt kết nối</translation>
     </message>
     <message>
-      <source>Select a camera to see its motion events</source>
-      <translation>Chọn một camera để xem các sự kiện chuyển động</translation>
+      <source>Add</source>
+      <translation>Thêm vào</translation>
     </message>
     <message>
-      <source>No motion detected</source>
-      <translation>Không phát hiện chuyển động</translation>
+      <source>Not configured yet</source>
+      <translation>Chưa được cấu hình</translation>
     </message>
     <message>
-      <source>Try changing the filters or enable motion recording</source>
-      <translation>Thử thay đổi bộ lọc hoặc bật ghi chuyển động</translation>
+      <source>Configure</source>
+      <translation>Đặt cấu hình</translation>
     </message>
     <message>
-      <source>Select Camera...</source>
-      <translation>Chọn camera...</translation>
+      <source>Search Bases</source>
+      <translation>Cơ sở tìm kiếm</translation>
     </message>
     <message>
-      <source>No bookmarks</source>
-      <translation>Không có dấu trang</translation>
+      <source>Add Search Base</source>
+      <translation>Thêm cơ sở tìm kiếm</translation>
     </message>
     <message>
-      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>Chọn khoảng thời gian trên dòng thời gian và nhấp chuột phải vào phần nổi bật để tạo dấu trang</translation>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>Chỉ định ít nhất một cơ sở tìm kiếm để đồng bộ hóa người dùng và nhóm</translation>
+    </message>
+    <message>
+      <source>Connect your Site to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+    </message>
+    <message>
+      <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
+      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
     </message>
   </context>
   <context>
@@ -699,6 +1431,151 @@
     </message>
   </context>
   <context>
+    <name>LookupListElementEditor</name>
+    <message>
+      <source>Any %1</source>
+      <translation>Bất kỳ %1</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Đồng ý</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Không</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation>Có</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Không</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListImportDialog</name>
+    <message>
+      <source>Import List</source>
+      <translation type="unfinished">Import List</translation>
+    </message>
+    <message>
+      <source>Import Options</source>
+      <translation type="unfinished">Import Options</translation>
+    </message>
+    <message>
+      <source>File:</source>
+      <translation type="unfinished">File:</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
+    </message>
+    <message>
+      <source>Separator:</source>
+      <translation type="unfinished">Separator:</translation>
+    </message>
+    <message>
+      <source>Data contains header</source>
+      <translation type="unfinished">Data contains header</translation>
+    </message>
+    <message>
+      <source>Preview</source>
+      <translation>Xem trước</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Nhập vào</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Importing</source>
+      <translation type="unfinished">Importing</translation>
+    </message>
+    <message>
+      <source>Could not open file</source>
+      <translation type="unfinished">Could not open file</translation>
+    </message>
+    <message>
+      <source>Please ensure that file exists and you have access to selected file</source>
+      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+    </message>
+    <message>
+      <source>Fixing imported entries</source>
+      <translation type="unfinished">Fixing imported entries</translation>
+    </message>
+    <message>
+      <source>Could not import selected file</source>
+      <translation type="unfinished">Could not import selected file</translation>
+    </message>
+    <message>
+      <source>The file appears to be empty.</source>
+      <translation type="unfinished">The file appears to be empty.</translation>
+    </message>
+    <message>
+      <source>Please ensure the selected file exists and you have access.</source>
+      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListsDialog</name>
+    <message>
+      <source>Lookup Lists</source>
+      <translation>Danh sách tra cứu</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Thêm vào</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Nhập vào</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Xuất ra</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Cài đặt</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xoá</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>Không có bản ghi</translation>
+    </message>
+    <message>
+      <source>New List...</source>
+      <translation type="unfinished">New List...</translation>
+    </message>
+    <message>
+      <source>Could not save file</source>
+      <translation type="unfinished">Could not save file</translation>
+    </message>
+    <message>
+      <source>Please ensure that you have access to selected folder and enough disk space</source>
+      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation type="unfinished">Export failed</translation>
+    </message>
+    <message>
+      <source>Export Selected</source>
+      <translation type="unfinished">Export Selected</translation>
+    </message>
+  </context>
+  <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
@@ -707,6 +1584,84 @@
     <message>
       <source>Select an area on the video to filter results</source>
       <translation>Chọn một vùng trên video để lọc kết quả</translation>
+    </message>
+  </context>
+  <context>
+    <name>MotionPanel</name>
+    <message>
+      <source>Select a camera to see its motion events</source>
+      <translation>Chọn một camera để xem các sự kiện chuyển động</translation>
+    </message>
+    <message>
+      <source>No motion detected</source>
+      <translation>Không phát hiện chuyển động</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or enable motion recording</source>
+      <translation>Thử thay đổi bộ lọc hoặc bật ghi chuyển động</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Chọn camera...</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultiSelectionComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Chọn</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Không tìm thấy kết quả nào</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>%n thêm</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>NewLinkDialog</name>
+    <message>
+      <source>New Link - %1</source>
+      <translation>Liên Kết Mới - %1</translation>
+    </message>
+    <message>
+      <source>The previous link will be invalidated once a new one has been issued</source>
+      <translation>Liên kết trước đó sẽ bị vô hiệu khi liên kết mới được phát hành</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Tạo</translation>
+    </message>
+  </context>
+  <context>
+    <name>NoListsPage</name>
+    <message>
+      <source>No Lists</source>
+      <translation>Không có danh sách</translation>
+    </message>
+    <message>
+      <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+      <translation>Bạn chưa tạo bất kỳ Danh sách nào. Bạn có thể lưu trữ nhiều giá trị trong danh sách tạo sẵn để sử dụng trong Quy tắc sự kiện. Tạo một Danh sách mới để bắt đầu thêm các quy tắc.</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation>Tạo mới...</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationsPanel</name>
+    <message>
+      <source>No new notifications</source>
+      <translation type="unfinished">No new notifications</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation type="unfinished">Notifications Settings</translation>
     </message>
   </context>
   <context>
@@ -725,6 +1680,19 @@
     <message>
       <source>Size Constraints</source>
       <translation>Ràng buộc kích thước</translation>
+    </message>
+  </context>
+  <context>
+    <name>ObjectTypeSelector</name>
+    <message numerus="yes">
+      <source>with %n attributes</source>
+      <translation type="unfinished">
+        <numerusform>with %n attributes</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any type</source>
+      <translation type="unfinished">Any type</translation>
     </message>
   </context>
   <context>
@@ -755,6 +1723,186 @@
     </message>
   </context>
   <context>
+    <name>PanelBase</name>
+    <message>
+      <source>Approve</source>
+      <translation>Duyệt</translation>
+    </message>
+    <message>
+      <source>Reject</source>
+      <translation>Từ chối</translation>
+    </message>
+    <message>
+      <source>Integration pairing code</source>
+      <translation type="unfinished">Integration pairing code</translation>
+    </message>
+  </context>
+  <context>
+    <name>ParentGroupsTab</name>
+    <message>
+      <source>Add Group</source>
+      <translation>Thêm nhóm</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Tùy chỉnh</translation>
+    </message>
+    <message>
+      <source>No custom groups yet</source>
+      <translation>Chưa có nhóm tùy chỉnh nào</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Không tìm thấy nhóm nào</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo nhóm mới</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>Không có nhóm</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add to a group</source>
+      <translation>Sử dụng các điều khiển ở bên trái để thêm vào một nhóm</translation>
+    </message>
+    <message>
+      <source>Member of</source>
+      <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
+      <translation>Thành viên của</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation>Tích hợp sẵn</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>Tùy chỉnh</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordChangeDialog</name>
+    <message>
+      <source>Change password - %1</source>
+      <translation>Đổi mật khẩu - %1</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>Current password</source>
+      <translation>Mật khẩu hiện tại</translation>
+    </message>
+    <message>
+      <source>New password</source>
+      <translation>Mật khẩu mới</translation>
+    </message>
+    <message>
+      <source>Confirm password</source>
+      <translation>Xác nhận mật khẩu</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>Mật khẩu không khớp</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionSummary</name>
+    <message>
+      <source>No custom permissions</source>
+      <translation>Không có quyền tùy chỉnh</translation>
+    </message>
+  </context>
+  <context>
+    <name>Permissions</name>
+    <message>
+      <source>Required permission group</source>
+      <translation type="unfinished">Required permission group</translation>
+    </message>
+    <message>
+      <source>View Permissions</source>
+      <translation type="unfinished">View Permissions</translation>
+    </message>
+    <message>
+      <source>Hide Permissions</source>
+      <translation type="unfinished">Hide Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionsTab</name>
+    <message>
+      <source>No resources found</source>
+      <translation>Không tìm thấy nguồn tài nguyên nào</translation>
+    </message>
+    <message>
+      <source>Automatically add dependent permissions</source>
+      <translation>Tự động thêm quyền phụ thuộc</translation>
+    </message>
+    <message>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation>Sử dụng %1 hoặc %2 để chọn nhiều tài nguyên hoặc %3 để xóa lựa chọn</translation>
+    </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>Bảng tài nguyên cung cấp cho bạn cái nhìn tổng quan về quyền của người dùng hoặc nhóm và cho phép bạn chỉ định quyền cho các tài nguyên cụ thể.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Nếu bạn chọn một quyền phụ thuộc vào một quyền khác thì cả hai quyền đó sẽ được cấp tự động.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationIntensityDialog</name>
+    <message>
+      <source>Intensity</source>
+      <translation type="unfinished">Intensity</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationObjectSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Đối tượng</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Any plugin</source>
+      <translation>Tất cả Plugin</translation>
+    </message>
+  </context>
+  <context>
+    <name>Plugins</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
+      <comment>%1 is like Nx Witness</comment>
+      <translation>Plugin là các chương trình chạy trên Máy chủ %1 để cho phép tích hợp phân tích video liền mạch.</translation>
+    </message>
+  </context>
+  <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
@@ -762,21 +1910,21 @@
     </message>
     <message>
       <source>Server is offline</source>
-      <translation>Máy chủ đang ẩn</translation>
+      <translation>Máy chủ đang ngoại tuyến</translation>
     </message>
   </context>
   <context>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
   </context>
   <context>
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation>Lỗi đa giác. Xóa phần sai để tiếp tục.</translation>
+      <translation>Đa giác không hợp lệ. Loại bỏ các nút giao nhau để tiếp tục.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
@@ -791,15 +1939,8 @@
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation>
-        <numerusform>Số điểm tối đa đã đạt được (%n điểm).</numerusform>
+        <numerusform>Đã đạt số điểm tối đa (%n điểm).</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>Preview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
     </message>
   </context>
   <context>
@@ -814,18 +1955,48 @@
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation>Hiển thị trên Layout</translation>
+      <translation>Hiển thị trên Bố cục</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
       <translation>Xem trước không khả dụng cho đối tượng đã chọn</translation>
+    </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Filter by</source>
+      <translation type="unfinished">Filter by</translation>
+    </message>
+  </context>
+  <context>
+    <name>PreviewTableView</name>
+    <message>
+      <source>Select attribute</source>
+      <translation type="unfinished">Select attribute</translation>
+    </message>
+  </context>
+  <context>
+    <name>ProgressDialog</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation type="unfinished">Finished</translation>
     </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Next</source>
@@ -835,38 +2006,75 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>Giới thiệu với bạn
-trình điều khiển PTZ mới</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>Đây là bản báo cáo nhanh
-về những thay đổi gần đây</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>Kéo qua bất kỳ phần nào của video
 để kích hoạt PTZ</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Nhấn các phím mũi tên để di chuyển và các phím cộng hoặc trừ để thu phóng</translation>
+      <source>Go to Local Settings to enable a drag marker over the center of the video</source>
+      <translation>Đi tới Cài đặt cục bộ để bật điểm đánh dấu kéo vào trung tâm của video</translation>
     </message>
     <message>
-      <source>Use the mouse wheel to zoom</source>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation>Nhấn phím mũi tên để di chuyển xung quanh. Sử dụng phím cộng và trừ để phóng to.</translation>
+    </message>
+    <message>
+      <source>Use mouse wheel to zoom</source>
       <translation>Sử dụng con lăn chuột để thu phóng</translation>
     </message>
     <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Nhấp, nhấp đúp hoặc kéo con trỏ chuột cùng với nhấn phím Shift để sử dụng trình PTZ nâng cao</translation>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation>Bạn có thể bật lại hướng dẫn này bằng cách đi tới Cài đặt cục bộ &gt; Nâng cao &gt; Đặt lại tất cả cảnh báo</translation>
     </message>
     <message>
-      <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>Đi tới Cài đặt cục bộ để bật điểm đánh dấu kéo vào trung tâm của video</translation>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>Giới thiệu
+Điều khiển PTZ mới</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>Nhấp, nhấp đúp hoặc kéo
+con trỏ chuột đồng thời nhấn
+phím Shift để sử dụng Trình PTZ nâng cao</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>Đây là hướng dẫn nhanh
+về những thay đổi.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>Để sử dụng Target Lock Tracking,
+Nhấn Alt + Click để theo dõi đối tượng</translation>
+    </message>
+  </context>
+  <context>
+    <name>QuickIntervalPanel</name>
+    <message>
+      <source>today</source>
+      <translation>hôm nay</translation>
+    </message>
+    <message>
+      <source>-1 hour</source>
+      <translation>-1 giờ</translation>
+    </message>
+    <message>
+      <source>-24 hours</source>
+      <translation>-24 giờ</translation>
+    </message>
+    <message>
+      <source>-7 days</source>
+      <translation>-7 ngày</translation>
+    </message>
+    <message>
+      <source>-30 days</source>
+      <translation>-30 ngày</translation>
     </message>
   </context>
   <context>
@@ -892,6 +2100,53 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>RemoteAccess</name>
+    <message>
+      <source>Disabled</source>
+      <translation>Vô hiệu hóa</translation>
+    </message>
+    <message>
+      <source>Server is not configured for remote access feature</source>
+      <translation type="unfinished">Server is not configured for remote access feature</translation>
+    </message>
+    <message>
+      <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
+      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation type="unfinished">Learn more</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
+    </message>
+    <message>
+      <source>Connect %1 client application to localhost:%2</source>
+      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+    </message>
+    <message>
+      <source>Local port</source>
+      <translation type="unfinished">Local port</translation>
+    </message>
+    <message>
+      <source>An error occurred</source>
+      <translation type="unfinished">An error occurred</translation>
+    </message>
+    <message>
+      <source>Username</source>
+      <translation type="unfinished">Username</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Remote access is unavailable</source>
+      <translation type="unfinished">Remote access is unavailable</translation>
+    </message>
+  </context>
+  <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
@@ -900,6 +2155,52 @@ to activate PTZ</source>
     <message>
       <source>Delete</source>
       <translation>Xóa bỏ</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Có %1 quyền</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Thêm %1 và quyền phụ thuộc</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Thêm quyền %1</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Xóa %1 và quyền phụ thuộc</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Xóa quyền %1</translation>
+    </message>
+    <message>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Cũng kế thừa nó từ</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Kế thừa %1 quyền từ</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Đã được kế thừa từ</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Sẽ được kế thừa từ</translation>
     </message>
   </context>
   <context>
@@ -922,6 +2223,37 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>ResourceFilterButton</name>
+    <message>
+      <source>Available by Permissions</source>
+      <translation>Có sẵn theo quyền</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Camera và thiết bị</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Layouts</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation>Trang web &amp; Tích hợp</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>Trang web</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>Theo dõi tài nguyên hệ thống</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Video Walls</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -940,16 +2272,16 @@ to activate PTZ</source>
       <source>OUTDATED</source>
       <translation>Quá hạn</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>KHÔNG TRUY CẬP</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
-    </message>
-    <message>
-      <source>All Types</source>
-      <translation>Tất cả các loại</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -976,12 +2308,12 @@ to activate PTZ</source>
       <translation>Trang web</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Người sử dụng</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Tập tin có sẵn</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Tích hợp</translation>
     </message>
   </context>
   <context>
@@ -1007,15 +2339,49 @@ to activate PTZ</source>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Events</source>
       <translation>Sự kiện</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Phân tích</translation>
+      <source>Objects</source>
+      <translation>Đối tượng</translation>
+    </message>
+  </context>
+  <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Chọn tệp để lưu</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>Tệp JSON (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>File lưu kết quả:</translation>
     </message>
   </context>
   <context>
@@ -1030,6 +2396,13 @@ to activate PTZ</source>
     <message>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>Không có quyền truy cập</translation>
     </message>
   </context>
   <context>
@@ -1070,6 +2443,13 @@ to activate PTZ</source>
     <message>
       <source>This action requires some parameters to be filled.</source>
       <translation>Hành động này yêu cầu điền một vài thông số.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsTab</name>
+    <message>
+      <source>Accept API Integrations registration requests</source>
+      <translation type="unfinished">Accept API Integrations registration requests</translation>
     </message>
   </context>
   <context>
@@ -1190,9 +2570,12 @@ to activate PTZ</source>
       <source>Unsupported firmware version</source>
       <translation>Phiên bản firmware không được hỗ trợ</translation>
     </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
     <message>
-      <source>Access denied</source>
-      <translation>Truy cập bị từ chối</translation>
+      <source>Min 3 characters</source>
+      <translation>Tối thiểu 3 ký tự</translation>
     </message>
   </context>
   <context>
@@ -1203,26 +2586,78 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation>Không hết hạn</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation>Luôn luôn</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation>Khi đăng nhập</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>Có hiệu lực từ %1 đến %2 (theo thời gian của máy chủ)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>Có giá trị từ %1 đến %2 (theo thời gian của máy chủ) hoặc %3 sau khi đăng nhập</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkSettings</name>
+    <message>
+      <source>Link Valid Until</source>
+      <translation>Liên kết có hiệu lực cho đến khi</translation>
+    </message>
+    <message>
+      <source>The link will remain accessible until the date specified (including, based on server time)</source>
+      <translation>Liên kết sẽ vẫn có thể truy cập được cho đến ngày được chỉ định (bao gồm, dựa trên thời gian của máy chủ)</translation>
+    </message>
+    <message>
+      <source>Revoke access after login</source>
+      <translation>Thu hồi quyền truy cập sau khi đăng nhập</translation>
+    </message>
+    <message>
+      <source>Access may be revoked earlier if the link validity period ends</source>
+      <translation>Quyền truy cập có thể bị thu hồi sớm hơn nếu thời hạn hiệu lực của liên kết kết thúc</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
+      <translation>Trong</translation>
+    </message>
+  </context>
+  <context>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
       <translation>Không tìm thấy kết quả</translation>
     </message>
     <message>
-      <source>No Favorite Systems</source>
-      <translation>Không có hệ thống yêu thích</translation>
+      <source>No Favorite Sites</source>
+      <translation type="unfinished">No Favorite Sites</translation>
     </message>
     <message>
-      <source>No Hidden Systems</source>
-      <translation>Không có hệ thống ẩn</translation>
+      <source>No Hidden Sites</source>
+      <translation type="unfinished">No Hidden Sites</translation>
     </message>
     <message>
-      <source>You can add system to the favorites from the context menu</source>
-      <translation>Bạn có thể thêm hệ thống vào danh sách yêu thích từ menu</translation>
+      <source>You can add site to the favorites from the context menu</source>
+      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
     </message>
     <message>
-      <source>You can hide systems from the main list from the context menu</source>
-      <translation>Bạn có thể ẩn các hệ thống khỏi danh sách chính từ menu</translation>
+      <source>You can hide sites from the main list from the context menu</source>
+      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
     </message>
   </context>
   <context>
@@ -1274,6 +2709,10 @@ to activate PTZ</source>
       <source>Selected on Timeline</source>
       <translation>Được chọn trên Dòng thời gian</translation>
     </message>
+    <message>
+      <source>Time is unavailable due to DST changes</source>
+      <translation>Thời gian không có sẵn do thay đổi DST</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>
@@ -1285,18 +2724,307 @@ to activate PTZ</source>
     </message>
   </context>
   <context>
+    <name>UserCreateDialog</name>
+    <message>
+      <source>New User</source>
+      <translation>Người dùng mới</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Tổng quan</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Tài nguyên</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Quyền toàn cầu</translation>
+    </message>
+    <message>
+      <source>Add User</source>
+      <translation>Thêm người dùng</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserCreateTab</name>
+    <message>
+      <source>New User</source>
+      <translation>Người dùng mới</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Kiểu</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>Cục bộ</translation>
+    </message>
+    <message>
+      <source>Cloud</source>
+      <translation>Đám mây</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Họ và tên</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Confirm Password</source>
+      <translation>Xác nhận mật khẩu</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>Cho phép xác thực (digest) không an toàn</translation>
+    </message>
+    <message>
+      <source>You need to specify only user&apos;s email address.</source>
+      <translation>Bạn cần chỉ định địa chỉ email của người dùng.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Nhóm quyền</translation>
+    </message>
+    <message>
+      <source>Access</source>
+      <translation>Truy cập</translation>
+    </message>
+    <message>
+      <source>Regular user with credentials</source>
+      <translation>Người dùng thông thường với thông tin xác thực</translation>
+    </message>
+    <message>
+      <source>Temporary with link</source>
+      <translation>Tạm thời với liên kết</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>Mật khẩu không trùng nhau</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEditDialog</name>
+    <message>
+      <source>User - %1</source>
+      <translation>Người dùng - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Tổng quan</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Tài nguyên</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Quyền toàn cầu</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Người dùng này chưa đăng ký %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEnabledSwitch</name>
+    <message>
+      <source>Enabled user</source>
+      <translation>Người dùng đã kích hoạt</translation>
+    </message>
+    <message>
+      <source>Disabled user</source>
+      <translation>Người dùng bị vô hiệu hóa</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGeneralTab</name>
+    <message>
+      <source>Audit Trail</source>
+      <translation>Báo cáo hành vi người dùng</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xoá</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Thông tin</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Họ và tên</translation>
+    </message>
+    <message>
+      <source>Account Settings</source>
+      <translation>Cài đặt tài khoản</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Change password</source>
+      <translation>Đổi mật khẩu</translation>
+    </message>
+    <message>
+      <source>Set password to enable insecure authentication</source>
+      <translation>Đặt mật khẩu để kích hoạt xác thực không an toàn</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>Cho phép xác thực (digest) không an toàn</translation>
+    </message>
+    <message>
+      <source>This user is not found in LDAP database and is not able to log in.</source>
+      <translation>Không tìm thấy người dùng này trong cơ sở dữ liệu LDAP và không thể đăng nhập.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Nhóm quyền</translation>
+    </message>
+    <message>
+      <source>Access expires</source>
+      <translation>Quyền truy cập hết hạn</translation>
+    </message>
+    <message>
+      <source>Access Link</source>
+      <translation>Liên kết truy cập</translation>
+    </message>
+    <message>
+      <source>Copy Link</source>
+      <translation>Sao chép liên kết</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation>Chấm dứt</translation>
+    </message>
+    <message>
+      <source>New Link...</source>
+      <translation>Liên Kết Mới...</translation>
+    </message>
+    <message>
+      <source>No valid link for this user</source>
+      <translation>Không có liên kết hợp lệ cho người dùng này</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>Copied here means that a link is copied</comment>
+      <translation>Đã sao chép</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation>Lấy liên kết...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Đảm bảo rằng máy tính này có thể kết nối với %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation>Máy chủ LDAP đang ngoại tuyến. Người dùng không thể đăng nhập.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>Khi đồng bộ hóa liên tục với máy chủ LDAP bị tắt, tư cách thành viên của người dùng trong nhóm sẽ không tự động đồng bộ hóa. Để cập nhật thông tin này, hãy bắt đầu đồng bộ hóa thủ công.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>Thông tin đăng nhập của người dùng này trùng lặp với thông tin đăng nhập của người dùng khác. Không ai trong số họ có thể đăng nhập. Để giải quyết vấn đề này, bạn có thể thay đổi thông tin đăng nhập của người dùng hoặc vô hiệu hóa hoặc xóa người dùng có thông tin đăng nhập trùng lặp.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+    <message>
+      <source>Interface Language</source>
+      <translation type="unfinished">Interface Language</translation>
+    </message>
+  </context>
+  <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
       <translation>Ẩn</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Tất cả Hệ thống</translation>
-    </message>
-    <message>
       <source>Favorites</source>
       <translation>Yêu thích</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialog</name>
+    <message>
+      <source>Add Rule</source>
+      <translation>Thêm quy tắc</translation>
+    </message>
+    <message>
+      <source>Duplicate</source>
+      <translation>Tạo bản sao</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xoá</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>Không có bản ghi</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>ghi sự kiện ...</translation>
+    </message>
+    <message>
+      <source>Reset To Defaults...</source>
+      <translation>Khôi phục mặc định...</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation type="unfinished">Event Rules</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Schedule</source>
+      <translation type="unfinished">Schedule</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation type="unfinished">State</translation>
     </message>
   </context>
   <context>
@@ -1316,6 +3044,27 @@ to activate PTZ</source>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>Bạn không có quyền truy cập vào %1. Xin vui lòng kiểm tra kết nối Internet của bạn.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Di chuyển cần điều khiển sang trái và phải nhiều lần.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Di chuyển cần điều khiển lên xuống nhiều lần.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Xoay cần điều khiển theo chiều kim đồng hồ và ngược chiều kim đồng hồ nhiều lần.</translation>
     </message>
   </context>
 </TS>

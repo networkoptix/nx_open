@@ -24,23 +24,16 @@
       <translation>지원</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>시스템 서버</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>개발자</translation>
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation>오픈 소스 라이브러리</translation>
+      <translation>오픈 소스 라이브러브</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>실행</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -114,7 +107,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>로그 관리</translation>
     </message>
     <message>
       <source>Download</source>
@@ -134,7 +127,7 @@
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>파일 폴더 열기</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>서버 동작</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>시스템 동작</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>전체 선택</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>이벤트 규칙</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>백업 없음</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>서버가 오프라인 상태입니다. 백업 설정을 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -472,7 +458,7 @@
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation type="unfinished">Use event source camera</translation>
+      <translation>이벤트 소스 카메라 사용</translation>
     </message>
   </context>
   <context>
@@ -536,10 +522,6 @@
     <message>
       <source>Restore Defaults</source>
       <translation>초기값 복구</translation>
-    </message>
-    <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>시스템 성능에 잠재적으로 영향을 미칠 수 있다는 확신이 들지 않으면이 설정을 변경하지 마십시오.</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
@@ -607,7 +589,7 @@
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Media2를 사용하여 프로필 가져오기</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
@@ -620,10 +602,6 @@
     <message>
       <source>Media Port</source>
       <translation>미디어 포트</translation>
-    </message>
-    <message>
-      <source>Use system presets</source>
-      <translation>시스템 사전 설정 사용</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
@@ -647,31 +625,23 @@
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>ONVIF 설정</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>기본 스트림을 기록하지 마십시오</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>2차 스트림을 기록하지 마십시오</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>2차 스트림 프로필</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
-    </message>
-    <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>기본 스트림 프로필</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -679,7 +649,38 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>웹 페이지 포트</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>Stop PTZ 명령을 보내지 마세요</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>오디오를 녹음하지 마십시오</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>장치에서 가져오기</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>비디오를 자동으로 가져오기</translation>
+    </message>
+    <message>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>핫스팟</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>추가</translation>
     </message>
   </context>
   <context>
@@ -797,7 +798,7 @@
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>카메라 교체</translation>
     </message>
     <message>
       <source>Name</source>
@@ -817,7 +818,7 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>새로운 장치</translation>
     </message>
   </context>
   <context>
@@ -906,19 +907,19 @@
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation type="unfinished">BETA</translation>
+      <translation>베타</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation type="unfinished">Available Actions</translation>
+      <translation>사용 가능한 작업</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation type="unfinished">Video Export</translation>
+      <translation>비디오 내보내기</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation type="unfinished">Live Video and Archive</translation>
+      <translation>라이브 비디오 및 아카이브</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -930,15 +931,15 @@
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation type="unfinished">Read more on the help page</translation>
+      <translation>자세한 내용은 도움말 페이지에서 확인하세요</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation type="unfinished">Do not show this window again</translation>
+      <translation>다시는 이 창을 표시하지 않음</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation type="unfinished">Introducing Cloud Layouts</translation>
+      <translation>클라우드 레이아웃 소개</translation>
     </message>
     <message>
       <source>Motion Search</source>
@@ -946,11 +947,22 @@
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
+      <translation>북마크, 객체, 이벤트 검색</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation type="unfinished">In the Future</translation>
+      <translation>미래에</translation>
+    </message>
+  </context>
+  <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation>연결 안됨</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
     </message>
   </context>
   <context>
@@ -979,11 +991,11 @@
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation type="unfinished">This action can be set only for instant events</translation>
+      <translation>이 동작은 인스턴트 이벤트에만 설정할 수 있습니다.</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation type="unfinished">Select another event or action</translation>
+      <translation>다른 이벤트 또는 작업을 선택하세요</translation>
     </message>
   </context>
   <context>
@@ -1027,20 +1039,16 @@
       <translation>백업파일 복구...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>취소</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation type="unfinished">&lt;Message&gt;</translation>
+      <source>Open Folder</source>
+      <translation>폴더 열기</translation>
     </message>
     <message>
-      <source>Open Folder</source>
-      <translation type="unfinished">Open Folder</translation>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1091,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1122,7 +1130,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -1164,17 +1172,6 @@
     </message>
   </context>
   <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>시점</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
-    </message>
-  </context>
-  <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
@@ -1186,38 +1183,38 @@
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
-      <translation>인증을위한 비밀번호(옵션)</translation>
+      <translation>인증용 암호 (선택)</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <translation>HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <translation>HTTP(S) 콘텐츠</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <translation>콘텐츠 유형</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation type="unfinished">Authentication Type</translation>
+      <translation>인증 유형</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <translation>요청 방법</translation>
     </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation>&amp;PTZ 프리셋</translation>
+      <translation>PTZ 프리셋:</translation>
     </message>
   </context>
   <context>
@@ -1265,7 +1262,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>장애 조치(이중화)</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>서버 위치 ID:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>이중화 우선순위</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>결과 없음</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation type="unfinished">Set Schedule</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>시작</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>시작 시 이전 시스템에 연결</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>저장된 Windows 구성을 자동으로 복원</translation>
     </message>
@@ -1433,14 +1422,18 @@
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>컴퓨터가 유휴 상태일 때 절전 모드로 전환되도록 허용</translation>
+    </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>시스템설정</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1512,7 +1505,7 @@
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>내보내기 날짜</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>삭제</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>입력 ID</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>추가 조건</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>검사중</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP 설정</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>서버 URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>비밀번호</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>검색 기준</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>검색 필터</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>검색 제한 시간</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>도메인 DN 또는 CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 일기</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>읽는 중...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>접속 에러</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>가져온된 사용자에 게 할당할 역할</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>가져온 사용자정보를 사용 안 함</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>불러온 사용자에 대한 다이제스트 인증 허용</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>기능</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>라이선스 키 인증</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>제거</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>신규 라이선스 키</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>세부사항</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>소프트웨어 라이선스</translation>
     </message>
   </context>
   <context>
@@ -1799,19 +1696,19 @@
     </message>
     <message>
       <source>Logging Level</source>
-      <translation type="unfinished">Logging Level</translation>
+      <translation>로깅 레벨</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation type="unfinished">Split File by Size</translation>
+      <translation>크기별로 파일 분할</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation type="unfinished">Split File by Time</translation>
+      <translation>시간별로 파일 분할</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation type="unfinished">Limit Max Volume</translation>
+      <translation>최대 볼륨 제한</translation>
     </message>
   </context>
   <context>
@@ -1830,11 +1727,23 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Test</source>
       <translation>테스트</translation>
+    </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>자격 증명 사용</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>링크 사용</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>링크</translation>
     </message>
   </context>
   <context>
@@ -1864,16 +1773,8 @@
       <translation>다시 시도</translation>
     </message>
     <message>
-      <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
-    </message>
-    <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>파일 폴더 열기</translation>
     </message>
   </context>
   <context>
@@ -1928,22 +1829,22 @@
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation>PTZ 카메라에 조준(에임)오버레이 표시</translation>
+      <translation>PTZ 카메라에 대한 조준 오버레이 표시</translation>
+    </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
     </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>시스템 병합</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>서버 URL:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>암호:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -1954,8 +1855,12 @@
       <translation>확인</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>시스템명 및 설정값 취득:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>시스템명 및 설정값 취득</translation>
     </message>
   </context>
   <context>
@@ -1974,7 +1879,7 @@
     </message>
     <message>
       <source>Browse</source>
-      <translation>Browse</translation>
+      <translation>찾기</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2002,11 +1907,11 @@
     </message>
     <message>
       <source>Get Update File</source>
-      <translation type="unfinished">Get Update File</translation>
+      <translation>업데이트 파일 가져오기</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation type="unfinished">Check Again</translation>
+      <translation>다시 확인</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>문자</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>레이아웃 선택</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>장치 추가</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>로</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>서버 선택</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>포트:</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>힌트</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>로그인</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>암호</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>검색</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>모든 장치 추가</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2068,54 +2019,54 @@
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation type="unfinished">Connection Settings</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>이메일</translation>
+      <translation>연결 설정</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>사용자:</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Server Address</source>
-      <translation type="unfinished">Server Address</translation>
+      <translation>서버 주소</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation type="unfinished">Security Protocol</translation>
+      <translation>보안 프로토콜</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation type="unfinished">Email Settings</translation>
+      <translation>이메일 설정</translation>
     </message>
     <message>
       <source>Support Signature</source>
       <translation>서명 지원</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>시스템 서명</translation>
+      <source>Username</source>
+      <translation>사용자이름</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation>전자 우편에서</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
     <message>
-      <source>Sign in</source>
-      <translation>로그인</translation>
-    </message>
-    <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
     <message>
       <source>Username</source>
       <translation>사용자이름</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation>웹 페이지에 로그인하세요</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>주의! 전력 한도 초과</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>모든 알림 보기</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>시스템 알림</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>이벤트</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>프리셋</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>에게</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>언어 설정</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>사용자 지정 알림 내용</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>사용자 검색</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>사용</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>비활성화</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>삭제...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>강제 보안 인증</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>결과 없음</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>신규 사용자...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>역할 편집...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP 설정</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 일기</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>추가</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>이 연결 옵션을 제거 시스템 고장이 발생할 수 있습니다.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>시스템 관리</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>비디오 월에 타임 라인 사용</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>품질</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>임시 폴더</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>추가옵션</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Aero 비활성화</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>커서 캡처</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>&quot;최상&quot; 품질 및 해상도는 고성능 PC 사용 시에만 설정하기를 권장 합니다.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>찾기...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>소스</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>저장 화질:</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>소스</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>&quot;최상&quot; 품질 및 해상도는 고성능 PC 사용 시에만 설정하기를 권장 합니다.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>화면</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>추가옵션</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>커서 캡처</translation>
     </message>
   </context>
   <context>
@@ -2606,7 +2477,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>암호</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <source>No services found</source>
+      <translation>서비스를 찾을 수 없음</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation>서비스를 추가하려면 채널 파트너에게 문의하세요.</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <source>Channel Partner Contact</source>
+      <translation>채널 파트너 연락처</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <source>Services Usage</source>
+      <translation>서비스 이용</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <source>Services state</source>
+      <translation>서비스 상태</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2745,35 +2620,19 @@
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>카메라에 연결하려면 HTTPS만 사용하세요</translation>
     </message>
     <message>
       <source>User Activity</source>
       <translation>사용자 활동</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>관리자가 아닌 사용자를 위해 트리에 서버 표시</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>아카이브 암호화</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>아카이브 암호화로 CPU 사용량 증가</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>암호 변경...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>비디오 트래픽을 암호화하면 CPU 사용량이 크게 증가합니다.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>사용자 관리</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation>관리자가 아닌 사용자를 위해 트리에 서버 표시</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>사용할 수 있는</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>상세</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>이 인증서에 고정</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>고정된 인증서 보기</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>핑</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>장애 조치(이중화)</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>이중화 우선순위</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2879,6 +2762,14 @@
       <source>Autodetect built-in and USB webcams</source>
       <translation>내장 및 USB 웹캠 자동 감지</translation>
     </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
+    </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2888,7 +2779,7 @@
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
-      <translation>알람레이아웃 갈제로 열기</translation>
+      <translation>알람레이아웃 강제로 열기</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>상태</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>인덱스 재구성 백업</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>비활성화 된 저장 장치에 녹화는 중지됩니다. 그러나 오래된 영상을 삭제하는 것은 계속합니다.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3051,15 +2900,11 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation>암호:</translation>
     </message>
   </context>
   <context>
     <name>SubjectSelectionDialog</name>
-    <message>
-      <source>Roles</source>
-      <translation>역할들:</translation>
-    </message>
     <message>
       <source>Show all users</source>
       <translation>모든 사용자 표시</translation>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>검색과 일치하는 것이 없습니다,</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>그룹</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>주위: 이 옵션 활성화 시 기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>사용자 검색</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <source>Add Group</source>
+      <translation>그룹 추가</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <source>Del</source>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>사용자 검색</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ 사용자 추가</translation>
+      <source>Add User</source>
+      <translation>사용자 추가</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>암호 변경...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>이름</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>사용자</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>역할 삭제</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>사용자 역할</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>새로운 역할</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>지정된 사용자 역할은 아직 없습니다.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>&quot;새 역할&quot; 버튼을 클릭하여 만듭니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>이 사용자는 다이제스트 인증을 사용할 수 있습니다.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>강제 보안 인증</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>사용자 유형</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>역할</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>역할 편집...</translation>
+      <source>Del</source>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>틀</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>음량</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>테스트</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>일반</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>서버를 통해 이 웹 페이지 프록시</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>요청된 모든 콘텐츠 프록시</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>SSL 인증서 확인 없이 웹페이지 열기 허용</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>참고: 일정 설정은 서버시간을 기준으로 함</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>라이선스 키 인증</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>제거</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>세부사항</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>소프트웨어 라이선스</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>신규 라이선스 키</translation>
     </message>
   </context>
   <context>

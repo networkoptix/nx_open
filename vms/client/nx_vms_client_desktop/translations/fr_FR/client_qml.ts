@@ -2,6 +2,80 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR" sourcelanguage="en">
   <context>
+    <name>AddLookupListEntryDialog</name>
+    <message>
+      <source>Add Entry</source>
+      <translation>Ajouter une entrée</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Ajouter</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsDialog</name>
+    <message>
+      <source>LDAP - Advanced Settings</source>
+      <translation>LDAP - Paramètres avancés</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Usagers</translation>
+    </message>
+    <message>
+      <source>Login Attribute</source>
+      <translation>Attribut de connexion</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>Membership</source>
+      <translation>Adhésion</translation>
+    </message>
+    <message>
+      <source>Search Timeout</source>
+      <translation>Délai de recherche dépassé</translation>
+    </message>
+    <message>
+      <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
+      <translation>Pour activer l'authentification Digest pour les utilisateurs LDAP déjà ajoutés à la base de données VMS, vous devez l'activer directement dans les paramètres de ces utilisateurs.</translation>
+    </message>
+    <message>
+      <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
+      <translation>Pour désactiver l'authentification Digest pour les utilisateurs LDAP déjà ajoutés à la base de données VMS, vous devez la désactiver directement dans les paramètres de ces utilisateurs.</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication for imported users</source>
+      <translation>Autoriser l'authentification non sécurisée (digest) pour les utilisateurs importés</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Synchronize Users</source>
+      <translation>Synchroniser les utilisateurs</translation>
+    </message>
+    <message>
+      <source>Sync Interval</source>
+      <translation>Intervalle de synchronisation</translation>
+    </message>
+    <message>
+      <source>Group Members Attribute</source>
+      <translation>Attribut des membres du groupe</translation>
+    </message>
+    <message>
+      <source>Proxy LDAP requests via server</source>
+      <translation>Requêtes LDAP proxy via le serveur</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
@@ -47,6 +121,30 @@
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Vous utilisez un client personnalisé. Veuillez contacter %1 pour obtenir les instructions de mise à jour.</translation>
     </message>
+    <message>
+      <source>Offline client updates</source>
+      <translation type="unfinished">Offline client updates</translation>
+    </message>
+    <message>
+      <source>Offline updates are enabled and files are stored on servers.</source>
+      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+    </message>
+    <message>
+      <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
+      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+    </message>
+    <message>
+      <source>This will delete all update files on servers.</source>
+      <translation type="unfinished">This will delete all update files on servers.</translation>
+    </message>
+    <message>
+      <source>Proceed anyway?</source>
+      <translation type="unfinished">Proceed anyway?</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Oui</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
@@ -64,6 +162,13 @@
     <message>
       <source>Object Type</source>
       <translation>Type d'objet</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsObjectAttributesSelector</name>
+    <message>
+      <source>Select / Deselect All</source>
+      <translation type="unfinished">Select / Deselect All</translation>
     </message>
   </context>
   <context>
@@ -87,21 +192,6 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Essayez de changer les filtres ou de configurer la détection des objets dans les paramètres du plugin caméra</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nouveau résultat</numerusform>
-        <numerusform>%n nouveaux résultats</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>new results</source>
-      <translation>nouveaux résultats</translation>
-    </message>
-    <message>
-      <source>Detected by</source>
-      <translation>Détecté par</translation>
     </message>
   </context>
   <context>
@@ -134,16 +224,17 @@
       <source>Any plugin</source>
       <translation>N'importe quel plugin</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nouveau résultat</numerusform>
-        <numerusform>%n nouveaux résultats</numerusform>
-      </translation>
+    <message>
+      <source>Settings</source>
+      <translation>Paramètres</translation>
     </message>
     <message>
-      <source>new results</source>
-      <translation>nouveaux résultats</translation>
+      <source>Tile Settings</source>
+      <translation type="unfinished">Tile Settings</translation>
+    </message>
+    <message>
+      <source>Table Settings</source>
+      <translation type="unfinished">Table Settings</translation>
     </message>
   </context>
   <context>
@@ -157,16 +248,36 @@
       <translation>Vérifiez les paramètres de la caméra pour configurer ce plugin.</translation>
     </message>
     <message>
-      <source>Check System Administration settings to configure this plugin.</source>
-      <translation>Vérifiez les paramètres d'administration du système pour configurer ce plugin.</translation>
-    </message>
-    <message>
-      <source>This plugin has no settings at the System level.</source>
-      <translation>Ce plugin n'a pas de paramètres au niveau du système.</translation>
-    </message>
-    <message>
       <source>This plugin has no settings for this camera.</source>
       <translation>Ce plugin n'a pas de paramètres pour cette caméra.</translation>
+    </message>
+    <message>
+      <source>Check Site Administration settings to configure this plugin.</source>
+      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+    </message>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsMenu</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>API Integrations</source>
+      <translation>Intégrations API</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSettingsView</name>
+    <message>
+      <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</source>
+      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
+Select an Integration to begin configuring its parameters.</translation>
     </message>
   </context>
   <context>
@@ -174,6 +285,132 @@
     <message>
       <source>NO DATA</source>
       <translation>AUCUNE DONNÉE</translation>
+    </message>
+  </context>
+  <context>
+    <name>ApiIntegrations</name>
+    <message>
+      <source>API Integrations</source>
+      <translation>Intégrations API</translation>
+    </message>
+    <message>
+      <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
+      <translation>Les intégrations d'API interagissent avec %1 Server via l'API REST et échangent des métadonnées</translation>
+    </message>
+    <message>
+      <source>New requests</source>
+      <translation>Nouvelles demandes</translation>
+    </message>
+    <message>
+      <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
+      <translation>L'intégration de l'API peut être activée après avoir vérifié le code reçu du fournisseur d'intégration. De nouvelles requêtes peuvent être désactivées pour éviter les interactions indésirables.</translation>
+    </message>
+    <message>
+      <source>Enable %1?</source>
+      <translation>Activer %1?</translation>
+    </message>
+    <message>
+      <source>This Integration will be able to:
+ • change settings on cameras
+ • get access to archive
+ • process video streams
+ • exchange metadata over the network</source>
+      <translation>Cette intégration sera en mesure de :
+ • modifier les paramètres sur les caméras
+ • obtenir l'accès aux archives
+ • traiter les flux vidéo
+ • échanger les métadonnées sur le réseau</translation>
+    </message>
+    <message>
+      <source>Enable Integration</source>
+      <translation>Activer l'intégration</translation>
+    </message>
+    <message>
+      <source>Remove %1?</source>
+      <translation>Supprimer %1?</translation>
+    </message>
+    <message>
+      <source>This will remove Integration request</source>
+      <translation>Cela supprimera la demande d'intégration</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Enlever</translation>
+    </message>
+    <message>
+      <source>Remove Request</source>
+      <translation>Retirer la demande</translation>
+    </message>
+  </context>
+  <context>
+    <name>AuthCode</name>
+    <message>
+      <source>Wrong pairing code</source>
+      <translation type="unfinished">Wrong pairing code</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <translation type="unfinished">Paste</translation>
+    </message>
+  </context>
+  <context>
+    <name>AutoTextField</name>
+    <message>
+      <source>This field cannot be empty</source>
+      <translation>Ce champ ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+  </context>
+  <context>
+    <name>BatchUserEditDialog</name>
+    <message numerus="yes">
+      <source>Batch Edit - %n Users</source>
+      <translation>
+        <numerusform>Modification par lots - %n Utilisateur</numerusform>
+        <numerusform>Modification par lots - %n Utilisateurs</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n utilisateur</numerusform>
+        <numerusform>%n utilisateur</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User status</source>
+      <comment>Whether users are enabled or disabled</comment>
+      <translation>Statut de l'utilisateur</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Activé</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Désactivé</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication</source>
+      <translation>Authentification non sécurisée (digest)</translation>
+    </message>
+    <message>
+      <source>keep current value</source>
+      <translation>conserver la valeur actuelle</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarksPanel</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Aucun signet</translation>
+    </message>
+    <message>
+      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
+      <translation>Sélectionnez un intervalle de temps sur la timeline et cliquez avec le bouton droit sur la section en surbrillance pour créer un signet</translation>
     </message>
   </context>
   <context>
@@ -192,6 +429,13 @@
     <message>
       <source>Hotkey %1</source>
       <translation>Raccourci %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>Buttons</name>
+    <message>
+      <source>Press each button several times and write the names of these buttons in the table below.</source>
+      <translation>Appuyez plusieurs fois sur chaque bouton et écrivez les noms de ces boutons dans le tableau ci-dessous.</translation>
     </message>
   </context>
   <context>
@@ -273,6 +517,14 @@
       <source>Pending</source>
       <translation>En attente</translation>
     </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Suspendu</translation>
+    </message>
+    <message>
+      <source>Shut Down</source>
+      <translation>Arrêt</translation>
+    </message>
   </context>
   <context>
     <name>CloudTile</name>
@@ -296,6 +548,57 @@
     </message>
   </context>
   <context>
+    <name>ConnectionSettingsDialog</name>
+    <message>
+      <source>LDAP - Connection Settings</source>
+      <translation>LDAP - Paramètres de connexion</translation>
+    </message>
+    <message>
+      <source>Host</source>
+      <translation>Hôte</translation>
+    </message>
+    <message>
+      <source>Login DN</source>
+      <translation>DN de connexion</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mot de passe</translation>
+    </message>
+    <message>
+      <source>Ignore LDAP server certificate errors</source>
+      <translation>Ignorer les erreurs de certificat de serveur LDAP</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+    <message>
+      <source>Connecting...</source>
+      <translation>Connexion...</translation>
+    </message>
+    <message>
+      <source>Use StartTLS</source>
+      <translation>Utiliser StartTLS</translation>
+    </message>
+    <message>
+      <source>Host cannot be empty</source>
+      <translation>L'hôte ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Login DN cannot be empty</source>
+      <translation>Le DN de connexion ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Mot de passe ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
+      <translation>Pour permettre aux utilisateurs LDAP de se connecter à %1, il est nécessaire d'établir une connexion entre %1 et un serveur LDAP d'entreprise.</translation>
+    </message>
+  </context>
+  <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -303,15 +606,14 @@
     </message>
   </context>
   <context>
+    <name>CopyableLabel</name>
+    <message>
+      <source>copied</source>
+      <translation type="unfinished">copied</translation>
+    </message>
+  </context>
+  <context>
     <name>CounterBlock</name>
-    <message>
-      <source>Remove column</source>
-      <translation>Supprimer la colonne</translation>
-    </message>
-    <message>
-      <source>Add column</source>
-      <translation>Ajouter une colonne</translation>
-    </message>
     <message>
       <source>Hide information</source>
       <translation>Masquer l'informations</translation>
@@ -327,10 +629,6 @@
     <message>
       <source>Show thumbnails</source>
       <translation>Afficher les miniatures</translation>
-    </message>
-    <message>
-      <source>Preview</source>
-      <translation>Aperçu</translation>
     </message>
   </context>
   <context>
@@ -349,15 +647,80 @@
     </message>
   </context>
   <context>
+    <name>EditLookupListDialog</name>
+    <message>
+      <source>List Settings</source>
+      <translation>Paramètres de la liste</translation>
+    </message>
+    <message>
+      <source>New List</source>
+      <translation>Nouvelle liste</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Nom</translation>
+    </message>
+    <message>
+      <source>Column Name</source>
+      <translation>Nom de la colonne</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Créer</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>Générique</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Type</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Attributs</translation>
+    </message>
+    <message>
+      <source>Select type</source>
+      <translation type="unfinished">Select type</translation>
+    </message>
+    <message>
+      <source>Removing attributes will delete all associated data</source>
+      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+    </message>
+    <message>
+      <source>Deleting the list will erase all the data inside it.</source>
+      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+    </message>
+    <message>
+      <source>Delete List?</source>
+      <translation type="unfinished">Delete List?</translation>
+    </message>
+    <message numerus="yes">
+      <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
+      <translation type="unfinished">
+        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>EventTypeSelector</name>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+  </context>
+  <context>
     <name>EventsPanel</name>
-    <message>
-      <source>Category</source>
-      <translation>Catégorie</translation>
-    </message>
-    <message>
-      <source>See %1 for other events</source>
-      <translation>Voir %1 pour d'autres événements</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Aucun événement</translation>
@@ -366,9 +729,28 @@
       <source>Try changing the filters or create an Event Rule</source>
       <translation>Essayez de changer les filtres ou créez une règle d'événement</translation>
     </message>
+  </context>
+  <context>
+    <name>ExportEntriesProgressDialog</name>
     <message>
-      <source>Event Log</source>
-      <translation>Journal des événements</translation>
+      <source>Export Lists</source>
+      <translation type="unfinished">Export Lists</translation>
+    </message>
+    <message>
+      <source>Exporting</source>
+      <translation type="unfinished">Exporting</translation>
+    </message>
+    <message>
+      <source>Open File Folder...</source>
+      <translation type="unfinished">Open File Folder...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
     </message>
   </context>
   <context>
@@ -406,6 +788,44 @@
     <message>
       <source>NO PREVIEW</source>
       <translation>PAS DE PRÉVISUALISATION</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterDialog</name>
+    <message>
+      <source>Name</source>
+      <translation>Nom</translation>
+    </message>
+    <message>
+      <source>Base DN</source>
+      <translation>DN de base</translation>
+    </message>
+    <message>
+      <source>Base DN cannot be empty</source>
+      <translation>Le DN de base ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Filter</source>
+      <translation>Filtre</translation>
+    </message>
+    <message>
+      <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
+      <translation>Le DN de base définit le point de départ des recherches LDAP et de la synchronisation.</translation>
+    </message>
+    <message>
+      <source>Edit Search Base</source>
+      <translation>Modifier la base de recherche</translation>
+    </message>
+    <message>
+      <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
+      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilterSettingsDialog</name>
+    <message>
+      <source>Settings</source>
+      <translation>Paramètres</translation>
     </message>
   </context>
   <context>
@@ -486,12 +906,204 @@
       <source>Ellipticity</source>
       <translation>Ellipticité</translation>
     </message>
+    <message>
+      <source>Auto calibration failed</source>
+      <translation>Échec calibrage auto</translation>
+    </message>
+  </context>
+  <context>
+    <name>FixLookupListImportPage</name>
+    <message>
+      <source>Some values could not be automatically matched. Please map them manually.</source>
+      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+    </message>
+    <message>
+      <source>Back</source>
+      <translation type="unfinished">Back</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation type="unfinished">Finish</translation>
+    </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
       <translation>Chargement...</translation>
+    </message>
+  </context>
+  <context>
+    <name>GlobalPermissionsTab</name>
+    <message>
+      <source>At the site level, group members have permissions to:</source>
+      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+    </message>
+    <message>
+      <source>At the site level, the user has permissions to:</source>
+      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateDialog</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nouveau groupe</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ressources</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Permissions globales</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Membres</translation>
+    </message>
+    <message>
+      <source>Add Group</source>
+      <translation>Ajouter un groupe</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupCreateTab</name>
+    <message>
+      <source>New Group</source>
+      <translation>Nouveau groupe</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Nom</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Description</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Groupes de Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupEditDialog</name>
+    <message>
+      <source>Group - %1</source>
+      <translation>Groupe - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ressources</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Permissions globales</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Membres</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupGeneralTab</name>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Description</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>Members</source>
+      <translation>Membres</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Usagers</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Groupes de Permissions</translation>
+    </message>
+    <message>
+      <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
+      <translation>Le groupe a un autre groupe en tant que parent et en tant que membre enfant, ou fait partie d'une telle chaîne de référence circulaire. Résoudre cette chaîne pour éviter le calcul incorrect des permissions.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
+      <translation>Lorsque la synchronisation continue avec le serveur LDAP est désactivée, les groupes ne se synchronisent pas automatiquement. Pour mettre à jour ce groupe, lancez une synchronisation manuelle.</translation>
+    </message>
+    <message>
+      <source>This group is not found in the LDAP database.</source>
+      <translation>Ce groupe est introuvable dans la base de données LDAP.</translation>
+    </message>
+    <message>
+      <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
+      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupMembersTab</name>
+    <message>
+      <source>Users</source>
+      <translation>Usagers</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>No members</source>
+      <translation>Aucun membre</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add members</source>
+      <translation>Utilisez les contrôles à gauche pour ajouter des membres</translation>
+    </message>
+    <message>
+      <source>Members summary</source>
+      <translation>Résumé des membres</translation>
+    </message>
+    <message>
+      <source>Inherits membership in current group</source>
+      <translation>Hérite de l'appartenance au groupe actuel</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupsComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Sélectionner</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>Aucun groupe</translation>
     </message>
   </context>
   <context>
@@ -503,6 +1115,13 @@
     </message>
   </context>
   <context>
+    <name>ImportFromDeviceDialog</name>
+    <message>
+      <source>Import From Devices</source>
+      <translation>Importer depuis des appareils</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
@@ -510,7 +1129,69 @@
     </message>
   </context>
   <context>
-    <name>InformationPanel</name>
+    <name>Initial</name>
+    <message>
+      <source>Select the joystick.</source>
+      <translation>Sélectionnez le joystick.</translation>
+    </message>
+    <message>
+      <source>No devices connected.</source>
+      <translation>Aucun appareil connecté.</translation>
+    </message>
+  </context>
+  <context>
+    <name>InsecureWarning</name>
+    <message>
+      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
+      <translation>La sécurité du compte est importante. N'activez pas ce paramètre à moins que vous n'ayez de bonnes raisons de le faire.</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationHeader</name>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Services insuffisants</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable integration services are required to turn on the integration</source>
+      <comment>Required integration count</comment>
+      <translation>
+        <numerusform>%n service d'intégration adapté est nécessaire pour activer l'intégration</numerusform>
+        <numerusform>%n services d'intégration adaptés sont nécessaires pour activer l'intégration</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>0 suitable services available</source>
+      <translation>0 services adaptés disponibles</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>HORS LIGNE</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Rafraîchir</translation>
+    </message>
+    <message>
+      <source>Services Required</source>
+      <translation>Services Requis</translation>
+    </message>
+    <message>
+      <source>Refreshing...</source>
+      <translation>Actualisation en cours...</translation>
+    </message>
+    <message>
+      <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <comment>%1 will be substituted by a date</comment>
+      <translation>Il y a plus de caméras utilisant cette intégration que les services disponibles. Veuillez désactiver l’intégration de certaines caméras ou ajouter des services adaptés. Sinon, cela se fera automatiquement sur %1</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Enlever</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
       <translation>Version</translation>
@@ -528,12 +1209,34 @@
       <translation>Sélectionner le flux vidéo de la caméra à analyser</translation>
     </message>
     <message>
-      <source>Refresh</source>
-      <translation>Rafraîchir</translation>
+      <source>Usage</source>
+      <translation>Utilisation</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsDialog</name>
+    <message>
+      <source>Manage Integrations</source>
+      <translation type="unfinished">Manage Integrations</translation>
     </message>
     <message>
-      <source>Refreshing...</source>
-      <translation>Actualisation en cours...</translation>
+      <source>Integrations</source>
+      <translation>Intégrations</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Paramètres</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntegrationsTab</name>
+    <message>
+      <source>This plugin has no settings at the Site level.</source>
+      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+    </message>
+    <message>
+      <source>Check Camera Settings to configure this plugin.</source>
+      <translation>Vérifiez les paramètres de la caméra pour configurer ce plugin.</translation>
     </message>
   </context>
   <context>
@@ -561,6 +1264,21 @@
     <message>
       <source>Toggle Repeat</source>
       <translation>Activer/désactiver Répéter</translation>
+    </message>
+  </context>
+  <context>
+    <name>JoystickInvestigationWizard</name>
+    <message>
+      <source>Save</source>
+      <translation>Enregistrer</translation>
+    </message>
+    <message>
+      <source>Previous</source>
+      <translation>Précédent</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Suivant</translation>
     </message>
   </context>
   <context>
@@ -605,8 +1323,8 @@
       <translation>Sélectionner la mise en page de la caméra</translation>
     </message>
     <message>
-      <source>Log in to the system to configure how to open layouts</source>
-      <translation>Connectez-vous au système pour configurer comment ouvrir les mises en page</translation>
+      <source>Log in to the site to configure how to open layouts</source>
+      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
     </message>
   </context>
   <context>
@@ -617,62 +1335,78 @@
     </message>
   </context>
   <context>
-    <name>LeftPanel</name>
+    <name>LdapSettings</name>
     <message>
-      <source>Local Files</source>
-      <translation>Fichiers locaux</translation>
+      <source>ONLINE</source>
+      <translation>EN LIGNE</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>Caméras</translation>
+      <source>OFFLINE</source>
+      <translation>HORS LIGNE</translation>
     </message>
     <message>
-      <source>Resources</source>
-      <translation>Ressources</translation>
+      <source>Users</source>
+      <translation>Usagers</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Mouvement</translation>
+      <source>Groups</source>
+      <translation>Groupes</translation>
     </message>
     <message>
-      <source>Bookmarks</source>
-      <translation>Signets</translation>
+      <source>Last Sync</source>
+      <translation>Dernière synchronisation</translation>
     </message>
     <message>
-      <source>Events</source>
-      <translation>Événements</translation>
+      <source>Edit</source>
+      <translation>Modifier</translation>
     </message>
     <message>
-      <source>Objects</source>
-      <translation>Objets</translation>
+      <source>Advanced Settings</source>
+      <translation>Paramètres avancés</translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation>Paramètres</translation>
+      <source>Disconnect</source>
+      <translation>Déconnecter</translation>
     </message>
     <message>
-      <source>Select a camera to see its motion events</source>
-      <translation>Sélectionnez une caméra pour voir ses événements de mouvement</translation>
+      <source>Add</source>
+      <translation>Ajouter</translation>
     </message>
     <message>
-      <source>No motion detected</source>
-      <translation>Aucun mouvement détecté</translation>
+      <source>Not configured yet</source>
+      <translation>Pas encore configuré</translation>
     </message>
     <message>
-      <source>Try changing the filters or enable motion recording</source>
-      <translation>Essayez de changer les filtres ou activez l'enregistrement de mouvement</translation>
+      <source>Configure</source>
+      <translation>Configurer</translation>
     </message>
     <message>
-      <source>Select Camera...</source>
-      <translation>Sélectionner la caméra...</translation>
+      <source>Search Bases</source>
+      <translation>Bases de recherche</translation>
     </message>
     <message>
-      <source>No bookmarks</source>
-      <translation>Aucun signet</translation>
+      <source>Add Search Base</source>
+      <translation>Ajouter la base de recherche</translation>
     </message>
     <message>
-      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation>Sélectionnez un intervalle de temps sur la timeline et cliquez avec le bouton droit sur la section en surbrillance pour créer un signet</translation>
+      <source>Specify at least one search base to synchronize users and groups</source>
+      <translation>Spécifiez au moins une base de recherche pour synchroniser les utilisateurs et les groupes</translation>
+    </message>
+    <message>
+      <source>Connect your Site to an LDAP server for easier user management</source>
+      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+    </message>
+    <message>
+      <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
+      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+    </message>
+    <message>
+      <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
+      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+    </message>
+    <message>
+      <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
+      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
     </message>
   </context>
   <context>
@@ -705,6 +1439,151 @@
     </message>
   </context>
   <context>
+    <name>LookupListElementEditor</name>
+    <message>
+      <source>Any %1</source>
+      <translation>N'importe quel %1</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Oui</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>Non</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation>Présent</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>Absence</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListImportDialog</name>
+    <message>
+      <source>Import List</source>
+      <translation type="unfinished">Import List</translation>
+    </message>
+    <message>
+      <source>Import Options</source>
+      <translation type="unfinished">Import Options</translation>
+    </message>
+    <message>
+      <source>File:</source>
+      <translation type="unfinished">File:</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
+    </message>
+    <message>
+      <source>Separator:</source>
+      <translation type="unfinished">Separator:</translation>
+    </message>
+    <message>
+      <source>Data contains header</source>
+      <translation type="unfinished">Data contains header</translation>
+    </message>
+    <message>
+      <source>Preview</source>
+      <translation>Aperçu</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Importer</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>Importing</source>
+      <translation type="unfinished">Importing</translation>
+    </message>
+    <message>
+      <source>Could not open file</source>
+      <translation type="unfinished">Could not open file</translation>
+    </message>
+    <message>
+      <source>Please ensure that file exists and you have access to selected file</source>
+      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+    </message>
+    <message>
+      <source>Fixing imported entries</source>
+      <translation type="unfinished">Fixing imported entries</translation>
+    </message>
+    <message>
+      <source>Could not import selected file</source>
+      <translation type="unfinished">Could not import selected file</translation>
+    </message>
+    <message>
+      <source>The file appears to be empty.</source>
+      <translation type="unfinished">The file appears to be empty.</translation>
+    </message>
+    <message>
+      <source>Please ensure the selected file exists and you have access.</source>
+      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookupListsDialog</name>
+    <message>
+      <source>Lookup Lists</source>
+      <translation>Listes de recherche</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Ajouter</translation>
+    </message>
+    <message>
+      <source>Import</source>
+      <translation>Importer</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exporter</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation>Paramètres</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>Aucune entrée</translation>
+    </message>
+    <message>
+      <source>New List...</source>
+      <translation type="unfinished">New List...</translation>
+    </message>
+    <message>
+      <source>Could not save file</source>
+      <translation type="unfinished">Could not save file</translation>
+    </message>
+    <message>
+      <source>Please ensure that you have access to selected folder and enough disk space</source>
+      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation type="unfinished">Export failed</translation>
+    </message>
+    <message>
+      <source>Export Selected</source>
+      <translation type="unfinished">Export Selected</translation>
+    </message>
+  </context>
+  <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
@@ -713,6 +1592,85 @@
     <message>
       <source>Select an area on the video to filter results</source>
       <translation>Sélectionnez une zone sur la vidéo pour filtrer les résultats</translation>
+    </message>
+  </context>
+  <context>
+    <name>MotionPanel</name>
+    <message>
+      <source>Select a camera to see its motion events</source>
+      <translation>Sélectionnez une caméra pour voir ses événements de mouvement</translation>
+    </message>
+    <message>
+      <source>No motion detected</source>
+      <translation>Aucun mouvement détecté</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or enable motion recording</source>
+      <translation>Essayez de changer les filtres ou activez l'enregistrement de mouvement</translation>
+    </message>
+    <message>
+      <source>Select Camera...</source>
+      <translation>Sélectionner la caméra...</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultiSelectionComboBox</name>
+    <message>
+      <source>Select</source>
+      <translation>Sélectionner</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Rien trouvé</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n more</source>
+      <comment>%n is the number of remaining groups</comment>
+      <translation>
+        <numerusform>%n plus</numerusform>
+        <numerusform>%n plus</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>NewLinkDialog</name>
+    <message>
+      <source>New Link - %1</source>
+      <translation>Nouveau lien - %1</translation>
+    </message>
+    <message>
+      <source>The previous link will be invalidated once a new one has been issued</source>
+      <translation>Le lien précédent sera invalidé une fois qu'un nouveau sera délivré</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Créer</translation>
+    </message>
+  </context>
+  <context>
+    <name>NoListsPage</name>
+    <message>
+      <source>No Lists</source>
+      <translation>Aucune liste</translation>
+    </message>
+    <message>
+      <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
+      <translation>Vous n'avez pas encore créé de listes. Avec des listes, vous pouvez stocker plusieurs valeurs pour les utiliser dans les règles d'événement. Créer une nouvelle liste pour commencer à ajouter des entrées.</translation>
+    </message>
+    <message>
+      <source>Create New...</source>
+      <translation>Créer un nouveau...</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationsPanel</name>
+    <message>
+      <source>No new notifications</source>
+      <translation type="unfinished">No new notifications</translation>
+    </message>
+    <message>
+      <source>Notifications Settings</source>
+      <translation type="unfinished">Notifications Settings</translation>
     </message>
   </context>
   <context>
@@ -731,6 +1689,20 @@
     <message>
       <source>Size Constraints</source>
       <translation>Contraintes de taille</translation>
+    </message>
+  </context>
+  <context>
+    <name>ObjectTypeSelector</name>
+    <message numerus="yes">
+      <source>with %n attributes</source>
+      <translation type="unfinished">
+        <numerusform>with %n attributes</numerusform>
+        <numerusform>with %n attributes</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any type</source>
+      <translation type="unfinished">Any type</translation>
     </message>
   </context>
   <context>
@@ -758,6 +1730,186 @@
     <message>
       <source>Remember me</source>
       <translation>Se souvenir de moi</translation>
+    </message>
+  </context>
+  <context>
+    <name>PanelBase</name>
+    <message>
+      <source>Approve</source>
+      <translation>Approuver</translation>
+    </message>
+    <message>
+      <source>Reject</source>
+      <translation>Refuser</translation>
+    </message>
+    <message>
+      <source>Integration pairing code</source>
+      <translation type="unfinished">Integration pairing code</translation>
+    </message>
+  </context>
+  <context>
+    <name>ParentGroupsTab</name>
+    <message>
+      <source>Add Group</source>
+      <translation>Ajouter un groupe</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Personnalisé</translation>
+    </message>
+    <message>
+      <source>No custom groups yet</source>
+      <translation>Aucun groupe personnalisé pour l'instant</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation>Aucun groupe trouvé</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation>Modifier les critères de recherche ou créer un nouveau groupe</translation>
+    </message>
+    <message>
+      <source>No groups</source>
+      <translation>Aucun groupe</translation>
+    </message>
+    <message>
+      <source>Use controls on the left to add to a group</source>
+      <translation>Utilisez les contrôles à gauche pour ajouter à un groupe</translation>
+    </message>
+    <message>
+      <source>Member of</source>
+      <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
+      <translation>Membre de</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <comment>Acronym for The Lightweight Directory Access Protocol</comment>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Built-in</source>
+      <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
+      <translation>Intégré</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
+      <translation>Personnalisé</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordChangeDialog</name>
+    <message>
+      <source>Change password - %1</source>
+      <translation>Changer le mot de passe - %1</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Identifiant</translation>
+    </message>
+    <message>
+      <source>Current password</source>
+      <translation>Mot de passe actuel</translation>
+    </message>
+    <message>
+      <source>New password</source>
+      <translation>Nouveau mot de passe</translation>
+    </message>
+    <message>
+      <source>Confirm password</source>
+      <translation>Confirmez le mot de passe</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>Les mots de passe ne correspondent pas</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionSummary</name>
+    <message>
+      <source>No custom permissions</source>
+      <translation>Aucune autorisation personnalisée</translation>
+    </message>
+  </context>
+  <context>
+    <name>Permissions</name>
+    <message>
+      <source>Required permission group</source>
+      <translation type="unfinished">Required permission group</translation>
+    </message>
+    <message>
+      <source>View Permissions</source>
+      <translation type="unfinished">View Permissions</translation>
+    </message>
+    <message>
+      <source>Hide Permissions</source>
+      <translation type="unfinished">Hide Permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>PermissionsTab</name>
+    <message>
+      <source>No resources found</source>
+      <translation>Aucune ressource trouvée</translation>
+    </message>
+    <message>
+      <source>Automatically add dependent permissions</source>
+      <translation>Ajouter automatiquement les permissions dépendantes</translation>
+    </message>
+    <message>
+      <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
+      <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
+      <translation>Utilisez %1 ou %2 pour sélectionner plusieurs ressources, ou %3 pour effacer la sélection</translation>
+    </message>
+    <message>
+      <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
+      <translation>La table des ressources vous donne un aperçu des autorisations utilisateur ou de groupe et vous permet d'assigner des autorisations pour des ressources spécifiques.</translation>
+    </message>
+    <message>
+      <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
+      <translation>Si vous sélectionnez une autorisation qui dépend d'une autre autorisation, les deux autorisations seront accordées automatiquement.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationIntensityDialog</name>
+    <message>
+      <source>Intensity</source>
+      <translation type="unfinished">Intensity</translation>
+    </message>
+  </context>
+  <context>
+    <name>PixelationObjectSelectionDialog</name>
+    <message>
+      <source>Select Objects</source>
+      <translation type="unfinished">Select Objects</translation>
+    </message>
+    <message>
+      <source>All Objects</source>
+      <translation type="unfinished">All Objects</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objets</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Any plugin</source>
+      <translation>N'importe quel plugin</translation>
+    </message>
+  </context>
+  <context>
+    <name>Plugins</name>
+    <message>
+      <source>Plugins</source>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
+      <comment>%1 is like Nx Witness</comment>
+      <translation>Les plugins sont des programmes qui s'exécutent sur le serveur %1 pour activer les intégrations d'analyse vidéo transparentes.</translation>
     </message>
   </context>
   <context>
@@ -804,13 +1956,6 @@
     </message>
   </context>
   <context>
-    <name>Preview</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>AUCUNE DONNÉE</translation>
-    </message>
-  </context>
-  <context>
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
@@ -828,6 +1973,36 @@
       <source>Preview is not available for the selected object</source>
       <translation>L'aperçu n'est pas disponible pour l'objet sélectionné</translation>
     </message>
+    <message>
+      <source>Copy</source>
+      <translation type="unfinished">Copy</translation>
+    </message>
+    <message>
+      <source>Filter by</source>
+      <translation type="unfinished">Filter by</translation>
+    </message>
+  </context>
+  <context>
+    <name>PreviewTableView</name>
+    <message>
+      <source>Select attribute</source>
+      <translation type="unfinished">Select attribute</translation>
+    </message>
+  </context>
+  <context>
+    <name>ProgressDialog</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuler</translation>
+    </message>
+    <message>
+      <source>Done</source>
+      <translation type="unfinished">Done</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation type="unfinished">Finished</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -843,38 +2018,75 @@
   <context>
     <name>PtzPromoOverlay</name>
     <message>
-      <source>Introducing you
-new PTZ controls</source>
-      <translation>Présentation
-Les nouvelles commandes PTZ</translation>
-    </message>
-    <message>
-      <source>Here is a quick presentation
-of what has changed</source>
-      <translation>Voici une présentation rapide
-de ce qui a changé</translation>
-    </message>
-    <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
       <translation>Faites glisser sur n'importe quelle partie de la vidéo
 pour activer le PTZ</translation>
     </message>
     <message>
-      <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation>Appuyez sur les flèches pour déplacer et sur plus ou moins pour zoomer</translation>
-    </message>
-    <message>
-      <source>Use the mouse wheel to zoom</source>
-      <translation>Utilisez la molette de la souris pour zoomer</translation>
-    </message>
-    <message>
-      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation>Cliquez, double-cliquez ou faites glisser le pointeur de la souris tout en appuyant sur la touche Maj pour utiliser le PTZ avancé</translation>
-    </message>
-    <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
       <translation>Allez dans les paramètres locaux pour activer un marqueur de glissement sur le centre de la vidéo</translation>
+    </message>
+    <message>
+      <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
+      <translation>Appuyez sur les flèches pour vous déplacer. Utilisez les touches plus et moins pour zoomer.</translation>
+    </message>
+    <message>
+      <source>Use mouse wheel to zoom</source>
+      <translation>Utiliser la molette de la souris pour zoomer</translation>
+    </message>
+    <message>
+      <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
+      <translation>Vous pouvez réactiver ce guide en accédant à Paramètres locaux &gt; Avancé &gt; Réinitialiser tous les avertissements</translation>
+    </message>
+    <message>
+      <source>Introducing
+New PTZ controls</source>
+      <translation>Présentation
+Les nouvelles commandes PTZ</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag
+mouse pointer while pressing
+Shift key to use Advanced PTZ</source>
+      <translation>Cliquez, double-cliquez ou faites glisser
+le pointeur de la souris tout en appuyant
+sur la touche Maj pour utiliser le PTZ avancé</translation>
+    </message>
+    <message>
+      <source>Here is a quick guide
+on what has changed.</source>
+      <translation>Voici un guide rapide
+sur ce qui a changé.</translation>
+    </message>
+    <message>
+      <source>To use Target Lock Tracking,
+Press Alt + Click to follow object</source>
+      <translation>Pour utiliser le Suivi de Verrouillage Cible,
+Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
+    </message>
+  </context>
+  <context>
+    <name>QuickIntervalPanel</name>
+    <message>
+      <source>today</source>
+      <translation>aujourd'hui</translation>
+    </message>
+    <message>
+      <source>-1 hour</source>
+      <translation>-1 heure</translation>
+    </message>
+    <message>
+      <source>-24 hours</source>
+      <translation>-24 heures</translation>
+    </message>
+    <message>
+      <source>-7 days</source>
+      <translation>-7 jours</translation>
+    </message>
+    <message>
+      <source>-30 days</source>
+      <translation>-30 jours</translation>
     </message>
   </context>
   <context>
@@ -900,6 +2112,53 @@ pour activer le PTZ</translation>
     </message>
   </context>
   <context>
+    <name>RemoteAccess</name>
+    <message>
+      <source>Disabled</source>
+      <translation>Désactivé</translation>
+    </message>
+    <message>
+      <source>Server is not configured for remote access feature</source>
+      <translation type="unfinished">Server is not configured for remote access feature</translation>
+    </message>
+    <message>
+      <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
+      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation type="unfinished">Learn more</translation>
+    </message>
+    <message>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
+    </message>
+    <message>
+      <source>Connect %1 client application to localhost:%2</source>
+      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+    </message>
+    <message>
+      <source>Local port</source>
+      <translation type="unfinished">Local port</translation>
+    </message>
+    <message>
+      <source>An error occurred</source>
+      <translation type="unfinished">An error occurred</translation>
+    </message>
+    <message>
+      <source>Username</source>
+      <translation type="unfinished">Username</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mot de passe</translation>
+    </message>
+    <message>
+      <source>Remote access is unavailable</source>
+      <translation type="unfinished">Remote access is unavailable</translation>
+    </message>
+  </context>
+  <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
@@ -908,6 +2167,52 @@ pour activer le PTZ</translation>
     <message>
       <source>Delete</source>
       <translation>Supprimer</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceAccessDelegate</name>
+    <message>
+      <source>Has %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Possède l'autorisation %1</translation>
+    </message>
+    <message>
+      <source>Add %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ajouter %1 et les autorisations dépendantes</translation>
+    </message>
+    <message>
+      <source>Add %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Ajouter l'autorisation %1</translation>
+    </message>
+    <message>
+      <source>Remove %1 and dependent permissions</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Supprimer %1 et les autorisations dépendantes</translation>
+    </message>
+    <message>
+      <source>Remove %1 permission</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Supprimer l'autorisation %1</translation>
+    </message>
+    <message>
+      <source>Also inherits it from</source>
+      <comment>&apos;it&apos; refers to a permission</comment>
+      <translation>Hérite également de</translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Hérite de l'autorisation %1 de</translation>
+    </message>
+    <message>
+      <source>Already inherited from</source>
+      <translation>Déjà hérité de</translation>
+    </message>
+    <message>
+      <source>Will stay inherited from</source>
+      <translation>Restera hérité de</translation>
     </message>
   </context>
   <context>
@@ -930,6 +2235,37 @@ pour activer le PTZ</translation>
     </message>
   </context>
   <context>
+    <name>ResourceFilterButton</name>
+    <message>
+      <source>Available by Permissions</source>
+      <translation>Disponible par autorisations</translation>
+    </message>
+    <message>
+      <source>Cameras &amp; Devices</source>
+      <translation>Caméras &amp; Périphériques</translation>
+    </message>
+    <message>
+      <source>Layouts</source>
+      <translation>Mises en page</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation>Pages Web &amp; Intégrations</translation>
+    </message>
+    <message>
+      <source>Web Pages</source>
+      <translation>Pages Web</translation>
+    </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>Moniteurs de santé</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Murs Vidéo</translation>
+    </message>
+  </context>
+  <context>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -949,16 +2285,16 @@ pour activer le PTZ</translation>
       <source>OUTDATED</source>
       <translation>DÉPASSÉ</translation>
     </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>AUCUN ACCÈS</translation>
+    </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Search</source>
       <translation>Recherche</translation>
-    </message>
-    <message>
-      <source>All Types</source>
-      <translation>Tous les types</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -985,12 +2321,12 @@ pour activer le PTZ</translation>
       <translation>Pages Web</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Usagers</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Fichiers locaux</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Intégrations</translation>
     </message>
   </context>
   <context>
@@ -1023,8 +2359,42 @@ pour activer le PTZ</translation>
       <translation>Événements</translation>
     </message>
     <message>
-      <source>Analytics</source>
-      <translation>Analytiques</translation>
+      <source>Objects</source>
+      <translation>Objets</translation>
+    </message>
+  </context>
+  <context>
+    <name>SaasBanner</name>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+    <message>
+      <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
+      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+    </message>
+  </context>
+  <context>
+    <name>SavingResults</name>
+    <message>
+      <source>Choose file to save</source>
+      <translation>Choisir le fichier à enregistrer</translation>
+    </message>
+    <message>
+      <source>JSON files (*.json)</source>
+      <translation>Fichiers JSON (*.json)</translation>
+    </message>
+    <message>
+      <source>File to save the results:</source>
+      <translation>Fichier pour enregistrer les résultats :</translation>
     </message>
   </context>
   <context>
@@ -1039,6 +2409,13 @@ pour activer le PTZ</translation>
     <message>
       <source>Search</source>
       <translation>Recherche</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecurityOverlay</name>
+    <message>
+      <source>No access</source>
+      <translation>Pas d'accès</translation>
     </message>
   </context>
   <context>
@@ -1079,6 +2456,13 @@ pour activer le PTZ</translation>
     <message>
       <source>This action requires some parameters to be filled.</source>
       <translation>Cette action nécessite que certains paramètres soient remplis.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SettingsTab</name>
+    <message>
+      <source>Accept API Integrations registration requests</source>
+      <translation type="unfinished">Accept API Integrations registration requests</translation>
     </message>
   </context>
   <context>
@@ -1200,9 +2584,12 @@ pour activer le PTZ</translation>
       <source>Unsupported firmware version</source>
       <translation>Version du firmware non prise en charge</translation>
     </message>
+  </context>
+  <context>
+    <name>StringEditor</name>
     <message>
-      <source>Access denied</source>
-      <translation>Accès refusé</translation>
+      <source>Min 3 characters</source>
+      <translation>Min 3 caractères</translation>
     </message>
   </context>
   <context>
@@ -1213,26 +2600,78 @@ pour activer le PTZ</translation>
     </message>
   </context>
   <context>
+    <name>SyncComboBox</name>
+    <message>
+      <source>Never</source>
+      <translation>Jamais</translation>
+    </message>
+    <message>
+      <source>Always</source>
+      <translation>Toujours</translation>
+    </message>
+    <message>
+      <source>On Log In</source>
+      <translation>Lors de la connexion</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkDates</name>
+    <message>
+      <source>Valid from %1 to %2 (by server time)</source>
+      <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
+      <translation>Valide de %1 à %2 (par heure du serveur)</translation>
+    </message>
+    <message>
+      <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
+      <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
+      <translation>Valide de %1 à %2 (par heure du serveur) ou pour %3 après connexion</translation>
+    </message>
+  </context>
+  <context>
+    <name>TemporaryLinkSettings</name>
+    <message>
+      <source>Link Valid Until</source>
+      <translation>Lien valide jusqu'au</translation>
+    </message>
+    <message>
+      <source>The link will remain accessible until the date specified (including, based on server time)</source>
+      <translation>Le lien restera accessible jusqu'à la date spécifiée (y compris, en fonction de l'heure du serveur)</translation>
+    </message>
+    <message>
+      <source>Revoke access after login</source>
+      <translation>Révoquer l'accès après la connexion</translation>
+    </message>
+    <message>
+      <source>Access may be revoked earlier if the link validity period ends</source>
+      <translation>L'accès peut être révoqué plus tôt si la période de validité du lien expire</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
+      <translation>Dans</translation>
+    </message>
+  </context>
+  <context>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
       <translation>Rien trouvé</translation>
     </message>
     <message>
-      <source>No Favorite Systems</source>
-      <translation>Aucun système favori</translation>
+      <source>No Favorite Sites</source>
+      <translation type="unfinished">No Favorite Sites</translation>
     </message>
     <message>
-      <source>No Hidden Systems</source>
-      <translation>Aucun système caché</translation>
+      <source>No Hidden Sites</source>
+      <translation type="unfinished">No Hidden Sites</translation>
     </message>
     <message>
-      <source>You can add system to the favorites from the context menu</source>
-      <translation>Vous pouvez ajouter le système aux favoris à partir du menu contextuel</translation>
+      <source>You can add site to the favorites from the context menu</source>
+      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
     </message>
     <message>
-      <source>You can hide systems from the main list from the context menu</source>
-      <translation>Vous pouvez masquer les systèmes de la liste principale à partir du menu contextuel</translation>
+      <source>You can hide sites from the main list from the context menu</source>
+      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
     </message>
   </context>
   <context>
@@ -1284,6 +2723,10 @@ pour activer le PTZ</translation>
       <source>Selected on Timeline</source>
       <translation>Sélectionné sur chronologie</translation>
     </message>
+    <message>
+      <source>Time is unavailable due to DST changes</source>
+      <translation>L'heure n'est pas disponible en raison des changements d'heure d'été</translation>
+    </message>
   </context>
   <context>
     <name>TreeView</name>
@@ -1296,18 +2739,307 @@ pour activer le PTZ</translation>
     </message>
   </context>
   <context>
+    <name>UserCreateDialog</name>
+    <message>
+      <source>New User</source>
+      <translation>Nouvel utilisateur</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ressources</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Autorisations globales</translation>
+    </message>
+    <message>
+      <source>Add User</source>
+      <translation>Ajouter Utilisateur</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserCreateTab</name>
+    <message>
+      <source>New User</source>
+      <translation>Nouvel utilisateur</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Type</translation>
+    </message>
+    <message>
+      <source>Local</source>
+      <translation>Local</translation>
+    </message>
+    <message>
+      <source>Cloud</source>
+      <translation>Cloud</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Identifiant</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Nom complet</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Courriel</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mot de passe</translation>
+    </message>
+    <message>
+      <source>Confirm Password</source>
+      <translation>Confirmer mot de passe</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>Autoriser l'authentification non sécurisée (digest)</translation>
+    </message>
+    <message>
+      <source>You need to specify only user&apos;s email address.</source>
+      <translation>Vous devez spécifier uniquement l'adresse e-mail de l'utilisateur.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Groupes de Permissions</translation>
+    </message>
+    <message>
+      <source>Access</source>
+      <translation>Accès</translation>
+    </message>
+    <message>
+      <source>Regular user with credentials</source>
+      <translation>Utilisateur régulier avec les identifiants</translation>
+    </message>
+    <message>
+      <source>Temporary with link</source>
+      <translation>Temporaire avec lien</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>Les mots de passe ne correspondent pas</translation>
+    </message>
+    <message>
+      <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
+      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEditDialog</name>
+    <message>
+      <source>User - %1</source>
+      <translation>Utilisateur - %1</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Général</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Groupes</translation>
+    </message>
+    <message>
+      <source>Resources</source>
+      <translation>Ressources</translation>
+    </message>
+    <message>
+      <source>Global Permissions</source>
+      <translation>Permissions globales</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Cet usager n'est pas encore inscrit pour %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserEnabledSwitch</name>
+    <message>
+      <source>Enabled user</source>
+      <translation>Utilisateur activé</translation>
+    </message>
+    <message>
+      <source>Disabled user</source>
+      <translation>Utilisateur désactivé</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGeneralTab</name>
+    <message>
+      <source>Audit Trail</source>
+      <translation>Piste d’audit</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation>Nom complet</translation>
+    </message>
+    <message>
+      <source>Account Settings</source>
+      <translation>Paramètres compte</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Courriel</translation>
+    </message>
+    <message>
+      <source>Change password</source>
+      <translation>Changer mot de passe</translation>
+    </message>
+    <message>
+      <source>Set password to enable insecure authentication</source>
+      <translation>Définir le mot de passe pour activer l'authentification non sécurisée</translation>
+    </message>
+    <message>
+      <source>Allow insecure (digest) authentication</source>
+      <translation>Autoriser l'authentification non sécurisée (digest)</translation>
+    </message>
+    <message>
+      <source>This user is not found in LDAP database and is not able to log in.</source>
+      <translation>Cet utilisateur est introuvable dans la base de données LDAP et n'est pas en mesure de se connecter.</translation>
+    </message>
+    <message>
+      <source>Permission Groups</source>
+      <translation>Groupes de Permissions</translation>
+    </message>
+    <message>
+      <source>Access expires</source>
+      <translation>L'accès expire</translation>
+    </message>
+    <message>
+      <source>Access Link</source>
+      <translation>Lien d'accès</translation>
+    </message>
+    <message>
+      <source>Copy Link</source>
+      <translation>Copier le lien</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation>Terminer</translation>
+    </message>
+    <message>
+      <source>New Link...</source>
+      <translation>Nouveau lien...</translation>
+    </message>
+    <message>
+      <source>No valid link for this user</source>
+      <translation>Aucun lien valide pour cet utilisateur</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>Copied here means that a link is copied</comment>
+      <translation>Copié</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation>Obtention du lien...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Assurez-vous que cet ordinateur est capable de se connecter à l' %1</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. User is not able to log in.</source>
+      <translation>Le serveur LDAP est hors ligne. L'utilisateur n'est pas en mesure de se connecter.</translation>
+    </message>
+    <message>
+      <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
+      <translation>Lorsque la synchronisation continue avec le serveur LDAP est désactivée, l'adhésion des utilisateurs dans les groupes ne se synchronise pas automatiquement. Pour mettre à jour ces informations, lancez une synchronisation manuelle.</translation>
+    </message>
+    <message>
+      <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
+      <translation>La connexion de cet utilisateur duplique la connexion d'un autre utilisateur. Aucun d'eux n'est en mesure de se connecter. Pour résoudre ce problème, vous pouvez changer la connexion de l'utilisateur ou désactiver ou supprimer des utilisateurs avec des connexions en double.</translation>
+    </message>
+    <message>
+      <source>Notification Language</source>
+      <translation type="unfinished">Notification Language</translation>
+    </message>
+    <message>
+      <source>Interface Language</source>
+      <translation type="unfinished">Interface Language</translation>
+    </message>
+  </context>
+  <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
       <translation>Caché</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Tous les systèmes</translation>
-    </message>
-    <message>
       <source>Favorites</source>
       <translation>Favoris</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialog</name>
+    <message>
+      <source>Add Rule</source>
+      <translation>Ajouter une règle</translation>
+    </message>
+    <message>
+      <source>Duplicate</source>
+      <translation>Dupliquer</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Supprimer</translation>
+    </message>
+    <message>
+      <source>No Entries</source>
+      <translation>Aucune entrée</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>Journal d'événement...</translation>
+    </message>
+    <message>
+      <source>Reset To Defaults...</source>
+      <translation>Rétablir aux valeurs par défaut...</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation type="unfinished">Event Rules</translation>
+    </message>
+    <message>
+      <source>%1 selected:</source>
+      <translation type="unfinished">%1 selected:</translation>
+    </message>
+    <message>
+      <source>Schedule</source>
+      <translation type="unfinished">Schedule</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation type="unfinished">State</translation>
     </message>
   </context>
   <context>
@@ -1327,6 +3059,27 @@ pour activer le PTZ</translation>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
       <translation>Vous n'avez pas accès à %1. Veuillez vérifier votre connexion Internet.</translation>
+    </message>
+  </context>
+  <context>
+    <name>XAxis</name>
+    <message>
+      <source>Move the joystick left and right several times.</source>
+      <translation>Déplacez le joystick à gauche et à droite plusieurs fois.</translation>
+    </message>
+  </context>
+  <context>
+    <name>YAxis</name>
+    <message>
+      <source>Move the joystick up and down several times.</source>
+      <translation>Déplacez le joystick de haut en bas plusieurs fois.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ZAxis</name>
+    <message>
+      <source>Rotate the joystick clockwise and counterclockwise several times.</source>
+      <translation>Faites pivoter le joystick dans le sens horaire et dans le sens inverse des aiguilles d'une montre plusieurs fois.</translation>
     </message>
   </context>
 </TS>

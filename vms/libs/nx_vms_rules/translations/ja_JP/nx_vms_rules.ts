@@ -2,10 +2,277 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>BasicAction</name>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>複数の%1イベントが発生しました</translation>
+      <source>Caption</source>
+      <translation>キャプション</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>説明</translation>
+    </message>
+    <message>
+      <source>Tooltip text</source>
+      <translation type="unfinished">Tooltip text</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n 回、初回: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>最初の発生: %2 %1 (合計 %n 回)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>日時: %2 %1</translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>不明なイベント</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>理由: %1</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation>不明なアクション</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析イベント</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>すべての分析イベント</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>全カメラ障害</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>すべてのデバイス障害</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>すべてのサーバーイベント</translation>
+    </message>
+    <message>
+      <source>Invalid field type is provided</source>
+      <translation type="unfinished">Invalid field type is provided</translation>
+    </message>
+    <message>
+      <source>Unexpected validation policy</source>
+      <translation type="unfinished">Unexpected validation policy</translation>
+    </message>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation type="unfinished">Select exactly one camera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation type="unfinished">Select at least one device</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation type="unfinished">Select at least one camera</translation>
+    </message>
+    <message>
+      <source>Not all servers are suitable</source>
+      <translation type="unfinished">Not all servers are suitable</translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation type="unfinished">There are no suitable servers</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>対象ユーザー</translation>
+    </message>
+    <message>
+      <source>Occurs At</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation>トリガー</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation type="unfinished">Duration</translation>
+    </message>
+    <message>
+      <source>Pre-Recording</source>
+      <translation type="unfinished">Pre-Recording</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation type="unfinished">Post-Recording</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>実行間隔</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation>状態</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>ボリューム</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation>巻き戻し</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation>レイアウト</translation>
+    </message>
+    <message>
+      <source>Event Devices</source>
+      <translation type="unfinished">Event Devices</translation>
+    </message>
+    <message>
+      <source>Of Type</source>
+      <translation>種類</translation>
+    </message>
+    <message>
+      <source>And Caption</source>
+      <translation>キャプション</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation>内容</translation>
+    </message>
+    <message>
+      <source>Field %1 value must be provided for the given validation policy</source>
+      <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+    </message>
+    <message>
+      <source>Chosen local layout can only be shown to its owner %1</source>
+      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout</source>
+      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time value cannot be less than zero</source>
+      <translation type="unfinished">Time value cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Duration cannot be less than zero</source>
+      <translation type="unfinished">Duration cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Value cannot be less than %1</source>
+      <translation type="unfinished">Value cannot be less than %1</translation>
+    </message>
+    <message>
+      <source>Value cannot be more than %1</source>
+      <translation type="unfinished">Value cannot be more than %1</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation>対象ユーザー</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AcknowledgeAction</name>
+    <message>
+      <source>Acknowledge</source>
+      <translation>確認</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
+    <message>
+      <source>Empty text is not allowed</source>
+      <translation type="unfinished">Empty text is not allowed</translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation>
+        <numerusform>%1 件のうち %n 件の追加メールアドレスが無効です</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -19,25 +286,12 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%2 の %1</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
-      <source>Event Type</source>
-      <translation>イベントタイプ</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <source>Analytics event type is not selected</source>
+      <translation>分析イベントタイプが選択されていません。</translation>
     </message>
   </context>
   <context>
@@ -47,89 +301,69 @@
       <translation>オブジェクト検出</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>カメラ &apos;%2&apos; の %1</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>分析オブジェクト検出</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <source>And Object</source>
+      <translation>オブジェクト</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>オブジェクトタイプ</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation>属性</translation>
+      <source>%1 at %2</source>
+      <comment> is detected</comment>
+      <translation>%2 の %1</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>サーバー&quot;%1&quot; のアーカイブバックアップが完了しました</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation>バックアップが終了しました</translation>
+      <source>Analytics object type is not selected</source>
+      <translation>分析オブジェクトタイプが選択されていません。</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::BookmarkAction</name>
     <message>
-      <source>Unknown event</source>
-      <translation>不明なイベント</translation>
+      <source>Create Bookmark</source>
+      <translation>ブックマークを作成</translation>
     </message>
     <message>
-      <source>%1 event has occurred</source>
-      <translation>%1 イベントが発生しました</translation>
+      <source>Add Tags</source>
+      <translation>タグを追加</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>ブザー</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation>アクションスロットリング</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>入力ポート %1</translation>
+      <translation>I/O入力ポート: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>入力ON %1</translation>
+      <translation>%1 I/O入力</translation>
+    </message>
+    <message>
+      <source>Input Signal on Device</source>
+      <translation>デバイスのI/O入力</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation>ID</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
       <translation>カメラのI/O入力</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
-      <source>Input ID</source>
-      <translation>入力ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::rules::DebugEvent</name>
-    <message>
-      <source>Debug Event</source>
-      <translation>デバッグイベント</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>アクション</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>値</translation>
     </message>
   </context>
   <context>
@@ -140,46 +374,39 @@
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation>カメラの接続が切断されました</translation>
+      <translation>カメラが切断されました</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>I / Oモジュールが切断されました</translation>
+      <translation>I/Oモジュールが切断されました</translation>
     </message>
     <message>
-      <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 切断</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 切断</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
-    </message>
-    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation>
-        <numerusform>デバイス切断</numerusform>
-      </translation>
+      <translation type="unfinished">Device Disconnected</translation>
     </message>
     <message>
-      <source>Device ID</source>
-      <translation>デバイスID</translation>
-    </message>
-    <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation>
-        <numerusform>カメラ切断</numerusform>
-      </translation>
+      <translation type="unfinished">Camera Disconnected</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>デバイス</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>カメラ</translation>
+    </message>
+    <message>
+      <source>%1 was disconnected</source>
+      <comment>Device name will be substituted</comment>
+      <translation>%1 が切断されました</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>重複アドレス %1</translation>
+      <translation>競合アドレス: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -188,24 +415,72 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>デバイスIPが %1 と重複</translation>
+      <translation>%1 でデバイスIPが競合しています</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>カメラIPが %1 と重複</translation>
+      <translation>%1 でカメラのIPが競合しています</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Device IP Conflict</source>
-      <translation>
-        <numerusform>デバイスの IP競合</numerusform>
-      </translation>
+      <translation type="unfinished">Device IP Conflict</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Camera IP Conflict</source>
-      <translation>
-        <numerusform>カメラのIP競合</numerusform>
-      </translation>
+      <translation type="unfinished">Camera IP Conflict</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>出力ID</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation>デバイスI/O出力</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>映像品質</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation>カメラ録画</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>有効</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>カメラ</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>フルスクリーン表示</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation>対象</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>フルスクリーン表示終了</translation>
     </message>
   </context>
   <context>
@@ -215,86 +490,114 @@
       <translation>%1ファンエラー</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>ファンエラー</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
+      <source>Fan Failure</source>
+      <translation>ファン故障</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation>一般的イベント</translation>
+      <translation>汎用イベント</translation>
     </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>一般的イベント %1</translation>
+      <source>Omit logging</source>
+      <translation>ログ書込みを省略</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Source</source>
+      <source>And Source</source>
       <translation>ソース</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <source>Generic Event from %1</source>
+      <translation type="unfinished">Generic Event from %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>ログイン</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>パスワード</translation>
-    </message>
-    <message>
-      <source>Do HTTP(S) request</source>
-      <translation>HTTP(S) リクエストを実行</translation>
-    </message>
-    <message>
-      <source>HTTP(S) URL</source>
-      <translation>HTTP(S) URL</translation>
-    </message>
-    <message>
-      <source>HTTP(S) Content</source>
-      <translation>HTTP(S) コンテンツ</translation>
-    </message>
-    <message>
-      <source>Content Type</source>
+      <source>Content type</source>
       <translation>コンテンツタイプ</translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation>リクエストメソッド</translation>
+      <source>HTTP(S) Request</source>
+      <translation>HTTP(S) リクエスト</translation>
+    </message>
+    <message>
+      <source>URL</source>
+      <translation>URL</translation>
+    </message>
+    <message>
+      <source>Content</source>
+      <translation>コンテンツ</translation>
+    </message>
+    <message>
+      <source>Method</source>
+      <translation>メソッド</translation>
+    </message>
+    <message>
+      <source>HTTP authentication</source>
+      <translation type="unfinished">HTTP authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+      <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+    </message>
+    <message>
+      <source>Token field should be filled in case of bearer auth type selected</source>
+      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+      <source>HTTP Method should be known</source>
+      <translation type="unfinished">HTTP Method should be known</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>LDAP Sync Issue Event</source>
+      <translation type="unfinished">LDAP Sync Issue Event</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is a cause of the event</comment>
+      <translation>
+        <numerusform>%1 (%n 回)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>サーバー&quot;%1&quot; にライセンスの問題があります</translation>
-    </message>
     <message>
       <source>License Issue</source>
       <translation>ライセンス障害</translation>
@@ -311,20 +614,17 @@
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
       <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
     </message>
+    <message>
+      <source>%1 has a license problem</source>
+      <comment>Server name will be substituted</comment>
+      <translation>%1 のライセンスに問題があります</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation>動体検知ON %1</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <translation>%1 モーション検知</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -335,7 +635,7 @@
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation>ネットワーク問題発生 %1</translation>
+      <translation>%1 ネットワーク障害</translation>
     </message>
     <message>
       <source>Network Issue</source>
@@ -365,7 +665,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません。</translation>
+      <translation>デバイスがネットワークリクエストに応答しません。</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
@@ -398,39 +698,66 @@
       <translation>デバイスとの通信が予期せず終了しました。</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにシステム時刻が使用されます。</translation>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation>通知を表示</translation>
-    </message>
-    <message>
-      <source>To</source>
-      <translation>宛先</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
-    </message>
-    <message>
       <source>Force Acknowledgement</source>
       <translation>確認を強制する</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
+      <source>Show Desktop Notification</source>
+      <translation>デスクトップ通知を表示</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>説明(&amp;D)</translation>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
     </message>
     <message>
-      <source>Tooltip</source>
-      <translation>ツールチップ</translation>
+      <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>レイアウトを開く</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
+    <message>
+      <source>Zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+    </message>
+    <message>
+      <source>Non zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording</source>
+      <translation>パニック録画</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Play Sound</source>
+      <translation>サウンド再生</translation>
     </message>
   </context>
   <context>
@@ -440,23 +767,11 @@
       <translation>プラグイン診断イベント</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>カメラ</translation>
+      <source>For Plugin</source>
+      <translation>プラグイン</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ソース</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>キャプション</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>説明</translation>
-    </message>
-    <message>
-      <source>Level</source>
+      <source>And Level Is</source>
       <translation>レベル</translation>
     </message>
   </context>
@@ -467,71 +782,177 @@
       <translation>消費量</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>%1のPoE給電量が給電能力を超えています</translation>
+      <source>Server</source>
+      <translation>サーバー</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>理由：電力制限を超えました（%1）</translation>
-    </message>
-    <message>
-      <source>PoE over Budget</source>
+      <source>PoE Over Budget</source>
       <translation>PoE給電容量超過</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>状態</translation>
+      <source>Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Power limit exceeded (%1)</translation>
     </message>
     <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
+      <source>PoE over budget on %1</source>
+      <translation type="unfinished">PoE over budget on %1</translation>
+    </message>
+    <message>
+      <source>Current power consumption: %1 watts</source>
+      <translation type="unfinished">Current power consumption: %1 watts</translation>
+    </message>
+    <message>
+      <source>Upper consumption limit: %1 watts</source>
+      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+    </message>
+    <message>
+      <source>Lower consumption limit: %1 watts</source>
+      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation>PTZプリセットを実行</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation>PTZ プリセット</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation>実行対象ユーザー</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>Header</source>
+      <translation>ヘッダー</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>本文</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation>モバイル通知を送信</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation>本文にソースデバイス名を追加</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>サウンド</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation>サウンド繰返し</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::Rule</name>
+    <message>
+      <source>`%1` event filter field alerts:</source>
+      <translation>`%1` イベントフィルターフィールドのアラート:</translation>
+    </message>
+    <message>
+      <source>`%1` action builder field alerts:</source>
+      <translation>`%1` アクションビルダーフィールドのアラート:</translation>
+    </message>
+    <message>
+      <source>Rule is not completed. One filter and one builder are required</source>
+      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+    </message>
+    <message>
+      <source>The given filter is not compatible with the given builder</source>
+      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>ライセンス移行障害</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>録画サービスが無効になっています</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation>クラウド ストレージ サービスが無効になっています</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation>有料インテグレーションサービスが無効になっています</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルの録画が停止されました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルのクラウドストレージバックアップが停止されました。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>サービスの過剰使用のため、 %n チャンネルでの有料インテグレーションサービスの使用が停止されました。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation type="unfinished">Services Issue</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
+      <source>Email Message</source>
+      <translation>メールメッセージ</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
       <translation>メールを送信</translation>
     </message>
     <message>
-      <source>to</source>
-      <translation>宛先</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
+      <source>Additional Recipients</source>
       <translation>追加の受信者</translation>
-    </message>
-    <message>
-      <source>Email Message</source>
-      <translation>メールメッセージ</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>サーバー &quot;%1&quot; 証明書エラー</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>サーバー証明書エラー</translation>
+    </message>
+    <message>
+      <source>%1 certificate error</source>
+      <comment>Server name will be substituted</comment>
+      <translation>%1 証明書エラー</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>重複サーバー: %1</translation>
+      <translation>競合サーバー: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>重複サーバー #%1: %2</translation>
+      <translation>競合サーバー #%1: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -539,23 +960,20 @@
       <translation>MAC #%1: %2</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>サーバー&quot;%1&quot; 競合</translation>
+      <source>Server Conflict</source>
+      <translation>サーバー競合</translation>
     </message>
     <message>
-      <source>Server Conflict</source>
-      <translation>サーバの競合</translation>
+      <source>%1 Conflict</source>
+      <comment>Server name will be substituted</comment>
+      <translation>%1 競合</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>サーバー&quot;%1&quot; エラー</translation>
-    </message>
-    <message>
       <source>Server Failure</source>
-      <translation>サーバー不良</translation>
+      <translation>サーバー障害</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -565,16 +983,35 @@
       <source>Server stopped unexpectedly.</source>
       <translation>サーバーが予期せず停止しました。</translation>
     </message>
+    <message>
+      <source>%1 Failure</source>
+      <translation>%1 障害</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>サーバー&quot;%1&quot; 開始</translation>
+      <source>Server Started</source>
+      <translation>サーバー起動</translation>
     </message>
     <message>
-      <source>Server Started</source>
-      <translation>サーバー開始</translation>
+      <source>%1 Started</source>
+      <translation>%1 が起動しました</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>アラームレイアウト表示</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>アラーム: %1</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation>強制的にアラームレイアウトを開く</translation>
     </message>
   </context>
   <context>
@@ -584,28 +1021,8 @@
       <translation>トリガー名</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>トリガー：%1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>%2のソフトトリガー%1</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>ソフトトリガー</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>状態</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ユーザー</translation>
     </message>
     <message>
       <source>Name</source>
@@ -615,43 +1032,57 @@
       <source>Icon</source>
       <translation>アイコン</translation>
     </message>
+    <message>
+      <source>By</source>
+      <translation>ユーザー</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>ソース: %1</translation>
+    </message>
+    <message>
+      <source>User: %1</source>
+      <translation type="unfinished">User: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SoundFieldValidator</name>
+    <message>
+      <source>Sound is not selected</source>
+      <translation type="unfinished">Sound is not selected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation>スピーク</translation>
+      <translation>テキスト読み上げ</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>カメラ</translation>
+      <source>Text</source>
+      <translation>テキスト</translation>
     </message>
     <message>
-      <source>Interval of action</source>
-      <translation>実行間隔</translation>
+      <source>At Device</source>
+      <translation>デバイス</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::StateFieldValidator</name>
     <message>
-      <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>読むテキスト</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>ボリューム</translation>
+      <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+      <translation>状態 `%1` は、指定されたパラメーターを持つ `%2` イベントおよび `%3` アクションに対して有効ではありません。</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1のストレージエラー</translation>
+      <translation>%1のストレージ障害</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>ストレージエラー</translation>
+      <translation>ストレージ障害</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -695,71 +1126,73 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+      <source>Failed to get event descriptor</source>
+      <translation type="unfinished">Failed to get event descriptor</translation>
+    </message>
+    <message>
+      <source>Event does not have source camera</source>
+      <translation type="unfinished">Event does not have source camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; is not a generic list</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>テキストオーバーレイ表示</translation>
+      <source>Show Text Overlay</source>
+      <translation>テキストオーバーレイを表示</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>カメラ</translation>
+      <source>Custom Text</source>
+      <translation>カスタムテキスト</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>ソースカメラも表示する</translation>
-    </message>
-    <message>
-      <source>Display text for</source>
-      <translation>テキスト表示期間</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>テキスト</translation>
+      <source>Show To</source>
+      <translation type="unfinished">Show To</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::TextWithFields</name>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-      <source>Event: %1</source>
-      <translation>イベント: %1</translation>
+      <source>Url cannot be empty</source>
+      <translation type="unfinished">Url cannot be empty</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>ソース:.%1</translation>
+      <source>Url must be valid</source>
+      <translation type="unfinished">Url must be valid</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>プラグイン: %1</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>キャプション: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>理由: %1</translation>
+      <source>Url should not contains user or password</source>
+      <translation type="unfinished">Url should not contains user or password</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n 回、最初: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>最初の発生: %2 %1 (合計%n 回)</numerusform>
-      </translation>
-    </message>
+    <name>nx::vms::rules::WriteToLogAction</name>
     <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>時間: %1 時分 %2・月日</translation>
+      <source>Write to Log</source>
+      <translation>ログ書込み</translation>
     </message>
   </context>
 </TS>

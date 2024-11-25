@@ -5,422 +5,422 @@
     <name>DownloadInterruptReason</name>
     <message>
       <source>Unknown reason or not interrupted</source>
-      <translation type="unfinished">Unknown reason or not interrupted</translation>
+      <translation>Alasan tidak diketahui atau tidak diinterupsi</translation>
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>Kegagalan operasi file umum</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
-      <translation type="unfinished">The file cannot be written locally, due to access restrictions</translation>
+      <translation>File tidak dapat ditulis secara lokal karena pembatasan akses</translation>
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation type="unfinished">Insufficient space on the target drive</translation>
+      <translation>Ruang pada drive target tidak mencukupi</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
-      <translation type="unfinished">The directory or file name is too long</translation>
+      <translation>Direktori atau nama file terlalu panjang</translation>
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>Ukuran file melebihi batasan sistem file</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
-      <translation type="unfinished">The file is infected with a virus</translation>
+      <translation>File tersebut terinfeksi virus</translation>
     </message>
     <message>
       <source>Temporary problem (for example file in use, or too many open files)</source>
-      <translation type="unfinished">Temporary problem (for example file in use, or too many open files)</translation>
+      <translation>Masalah sementara (misalnya file sedang digunakan, atau terlalu banyak file yang dibuka)</translation>
     </message>
     <message>
       <source>The file was blocked due to local policy</source>
-      <translation type="unfinished">The file was blocked due to local policy</translation>
+      <translation>File diblokir karena kebijakan lokal</translation>
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation type="unfinished">Checking the safety of the download failed due to unexpected reasons</translation>
+      <translation>Pemeriksaan keamanan download gagal karena alasan yang tidak terduga</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>Pencarian file melewati akhir file (melanjutkan download yang diinterupsi sebelumnya)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>Sebagian file tidak cocok dengan hash yang diharapkan</translation>
     </message>
     <message>
       <source>General network failure</source>
-      <translation type="unfinished">General network failure</translation>
+      <translation>Kegagalan jaringan umum</translation>
     </message>
     <message>
       <source>The network operation has timed out</source>
-      <translation type="unfinished">The network operation has timed out</translation>
+      <translation>Waktu pengoperasian jaringan telah habis</translation>
     </message>
     <message>
       <source>The network connection has been terminated</source>
-      <translation type="unfinished">The network connection has been terminated</translation>
+      <translation>Koneksi jaringan telah dihentikan</translation>
     </message>
     <message>
       <source>The server has gone down</source>
-      <translation type="unfinished">The server has gone down</translation>
+      <translation>Server mati</translation>
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>Permintaan jaringan tidak valid (misalnya, URL atau skema tidak valid)</translation>
     </message>
     <message>
       <source>General server failure</source>
-      <translation type="unfinished">General server failure</translation>
+      <translation>Kegagalan server umum</translation>
     </message>
     <message>
       <source>The server does not have the requested data</source>
-      <translation type="unfinished">The server does not have the requested data</translation>
+      <translation>Server tidak memiliki data yang diminta</translation>
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation type="unfinished">The server did not authorize access to the resource</translation>
+      <translation>Server tidak mengizinkan akses ke resource</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
-      <translation type="unfinished">A problem with the server certificate occurred</translation>
+      <translation>Terjadi masalah dengan sertifikat server</translation>
     </message>
     <message>
       <source>Access forbidden by the server</source>
-      <translation type="unfinished">Access forbidden by the server</translation>
+      <translation>Akses dilarang oleh server</translation>
     </message>
     <message>
       <source>Unexpected server response</source>
-      <translation type="unfinished">Unexpected server response</translation>
+      <translation>Respons server yang tidak terduga</translation>
     </message>
     <message>
       <source>Download canceled by the user</source>
-      <translation type="unfinished">Download canceled by the user</translation>
+      <translation>Download dibatalkan oleh pengguna</translation>
     </message>
   </context>
   <context>
     <name>QQuickWebEngineView</name>
     <message>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation>Berhenti</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Muat ulang dan Lewati Cache</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Buka link di window ini</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Alihkan Putar/Jeda</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Toggle Mute</translation>
+      <translation>Beralih ke Mute</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Tutup Halaman</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Batalkan pilihan</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;Bold</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;Italic</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;Underline</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;Strikethrough</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Rata Kiri</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Sejajarkan &amp; Tengahkan</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Rata Kanan</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Sejajarkan &amp; Ratakan</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;Indent</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;Outdent</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Masukkan &amp;Daftar Terurut</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Masukkan &amp;Daftar Tidak Terurut</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation>Berhenti</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation type="unfinished">Reload and Bypass Cache</translation>
+      <translation>Muat ulang dan Lewati Cache</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
-      <translation type="unfinished">Toggle Play/Pause</translation>
+      <translation>Alihkan Putar/Jeda</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Toggle Mute</translation>
+      <translation>Beralih ke Mute</translation>
     </message>
     <message>
       <source>Close Page</source>
-      <translation type="unfinished">Close Page</translation>
+      <translation>Tutup Halaman</translation>
     </message>
     <message>
       <source>Unselect</source>
-      <translation type="unfinished">Unselect</translation>
+      <translation>Batalkan pilihan</translation>
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation type="unfinished">Open link in this window</translation>
+      <translation>Buka link di window ini</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>Buka link di tab background baru</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation type="unfinished">&amp;Bold</translation>
+      <translation>&amp;Bold</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
-      <translation type="unfinished">&amp;Italic</translation>
+      <translation>&amp;Italic</translation>
     </message>
     <message>
       <source>&amp;Underline</source>
-      <translation type="unfinished">&amp;Underline</translation>
+      <translation>&amp;Underline</translation>
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation type="unfinished">&amp;Strikethrough</translation>
+      <translation>&amp;Strikethrough</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
-      <translation type="unfinished">Align &amp;Left</translation>
+      <translation>Rata Kiri</translation>
     </message>
     <message>
       <source>Align &amp;Center</source>
-      <translation type="unfinished">Align &amp;Center</translation>
+      <translation>Sejajarkan &amp; Tengahkan</translation>
     </message>
     <message>
       <source>Align &amp;Right</source>
-      <translation type="unfinished">Align &amp;Right</translation>
+      <translation>Rata Kanan</translation>
     </message>
     <message>
       <source>Align &amp;Justified</source>
-      <translation type="unfinished">Align &amp;Justified</translation>
+      <translation>Sejajarkan &amp; Ratakan</translation>
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;Indent</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;Outdent</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Masukkan &amp;Daftar Terurut</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Masukkan &amp;Daftar Tidak Terurut</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Apakah Anda yakin ingin meninggalkan halaman ini? Perubahan yang Anda buat mungkin tidak disimpan.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Kembali</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
-      <translation type="unfinished">&amp;Forward</translation>
+      <translation>&amp;Maju</translation>
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;Muat ulang</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Pilih folder yang akan diupload</translation>
     </message>
   </context>
   <context>
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Kembali</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Maju</translation>
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>Muat ulang</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Potong</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation>Copy</translation>
+      <translation>Salin</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation>Paste</translation>
+      <translation>Tempel</translation>
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>Undo</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>Redo</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation>Select all</translation>
+      <translation>Pilih semua</translation>
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation type="unfinished">Paste and match style</translation>
+      <translation>Tempel dan cocokkan style</translation>
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation type="unfinished">Open link in new window</translation>
+      <translation>Buka link di window baru</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation type="unfinished">Open link in new tab</translation>
+      <translation>Buka link di tab baru</translation>
     </message>
     <message>
       <source>Copy link address</source>
-      <translation type="unfinished">Copy link address</translation>
+      <translation>Salin alamat link</translation>
     </message>
     <message>
       <source>Save link</source>
-      <translation type="unfinished">Save link</translation>
+      <translation>Simpan link</translation>
     </message>
     <message>
       <source>Copy image</source>
-      <translation type="unfinished">Copy image</translation>
+      <translation>Salin gambar</translation>
     </message>
     <message>
       <source>Copy image address</source>
-      <translation type="unfinished">Copy image address</translation>
+      <translation>Salin alamat gambar</translation>
     </message>
     <message>
       <source>Save image</source>
-      <translation type="unfinished">Save image</translation>
+      <translation>Simpan gambar</translation>
     </message>
     <message>
       <source>Copy media address</source>
-      <translation type="unfinished">Copy media address</translation>
+      <translation>Salin alamat media</translation>
     </message>
     <message>
       <source>Show controls</source>
-      <translation type="unfinished">Show controls</translation>
+      <translation>Tampilkan kontrol</translation>
     </message>
     <message>
       <source>Loop</source>
-      <translation type="unfinished">Loop</translation>
+      <translation>Loop</translation>
     </message>
     <message>
       <source>Save media</source>
-      <translation type="unfinished">Save media</translation>
+      <translation>Simpan media</translation>
     </message>
     <message>
       <source>Inspect</source>
-      <translation type="unfinished">Inspect</translation>
+      <translation>Periksa</translation>
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation type="unfinished">Exit full screen</translation>
+      <translation>Keluar dari layar penuh</translation>
     </message>
     <message>
       <source>Save page</source>
-      <translation type="unfinished">Save page</translation>
+      <translation>Simpan halaman</translation>
     </message>
     <message>
       <source>View page source</source>
-      <translation type="unfinished">View page source</translation>
+      <translation>Lihat sumber halaman</translation>
     </message>
   </context>
   <context>
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Koneksikan ke proxy &quot;%1&quot; menggunakan:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Masukkan nama pengguna dan kata sandi untuk &quot;%1&quot; di %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation type="unfinished">Javascript Alert - %1</translation>
+      <translation>Peringatan Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation type="unfinished">Javascript Confirm - %1</translation>
+      <translation>Konfirmasi Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation type="unfinished">Javascript Prompt - %1</translation>
+      <translation>Perintah Javascript - %1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation type="unfinished">Are you sure you want to leave this page?</translation>
+      <translation>Anda yakin ingin meninggalkan halaman ini?</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation type="unfinished">Changes that you made may not be saved.</translation>
+      <translation>Perubahan yang Anda buat mungkin tidak disimpan.</translation>
     </message>
   </context>
   <context>
     <name>WebContentsAdapter</name>
     <message>
       <source>HTTP-POST data can only be sent over HTTP(S) protocol</source>
-      <translation type="unfinished">HTTP-POST data can only be sent over HTTP(S) protocol</translation>
+      <translation>Data HTTP-POST hanya dapat dikirim melalui protokol HTTP(S)</translation>
     </message>
   </context>
 </TS>

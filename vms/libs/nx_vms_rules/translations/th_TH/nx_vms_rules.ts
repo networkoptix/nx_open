@@ -2,10 +2,277 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th_TH" sourcelanguage="en">
   <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>BasicAction</name>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>มีเหตุการณ์ %1 เหตุการณ์เกิดขึ้นหลายรายการ</translation>
+      <source>Caption</source>
+      <translation type="unfinished">Caption</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>&amp;รายละเอียด</translation>
+    </message>
+    <message>
+      <source>Tooltip text</source>
+      <translation type="unfinished">Tooltip text</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n ครั้ง, ครั้งแรก: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>เกิดขึ้นครั้งแรก: %1 บน %2 (%n เวลาทั้งหมดl)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>เวลา: %1 บน %2</translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation type="unfinished">Unknown event</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>เหตุผล: %1</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation type="unfinished">Unknown action</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Invalid field type is provided</source>
+      <translation type="unfinished">Invalid field type is provided</translation>
+    </message>
+    <message>
+      <source>Unexpected validation policy</source>
+      <translation type="unfinished">Unexpected validation policy</translation>
+    </message>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation type="unfinished">Select exactly one camera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation type="unfinished">Select at least one device</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation type="unfinished">Select at least one camera</translation>
+    </message>
+    <message>
+      <source>Not all servers are suitable</source>
+      <translation type="unfinished">Not all servers are suitable</translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation type="unfinished">There are no suitable servers</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>ที่</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>ถึง</translation>
+    </message>
+    <message>
+      <source>Occurs At</source>
+      <translation type="unfinished">Occurs At</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation type="unfinished">Begin When</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation type="unfinished">Duration</translation>
+    </message>
+    <message>
+      <source>Pre-Recording</source>
+      <translation type="unfinished">Pre-Recording</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation type="unfinished">Post-Recording</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>ช่วงเวลาของการดำเนินการ</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation>สถานะ</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>ระดับเสียง</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation type="unfinished">Rewind</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation type="unfinished">On Layout</translation>
+    </message>
+    <message>
+      <source>Event Devices</source>
+      <translation type="unfinished">Event Devices</translation>
+    </message>
+    <message>
+      <source>Of Type</source>
+      <translation type="unfinished">Of Type</translation>
+    </message>
+    <message>
+      <source>And Caption</source>
+      <translation type="unfinished">And Caption</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation type="unfinished">And Description</translation>
+    </message>
+    <message>
+      <source>Field %1 value must be provided for the given validation policy</source>
+      <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+    </message>
+    <message>
+      <source>Chosen local layout can only be shown to its owner %1</source>
+      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout</source>
+      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time value cannot be less than zero</source>
+      <translation type="unfinished">Time value cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Duration cannot be less than zero</source>
+      <translation type="unfinished">Duration cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Value cannot be less than %1</source>
+      <translation type="unfinished">Value cannot be less than %1</translation>
+    </message>
+    <message>
+      <source>Value cannot be more than %1</source>
+      <translation type="unfinished">Value cannot be more than %1</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation type="unfinished">To Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AcknowledgeAction</name>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
+    <message>
+      <source>Empty text is not allowed</source>
+      <translation type="unfinished">Empty text is not allowed</translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -19,25 +286,12 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%1 ที่ %2</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>กล้อง</translation>
-    </message>
-    <message>
-      <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
+      <source>Analytics event type is not selected</source>
+      <translation type="unfinished">Analytics event type is not selected</translation>
     </message>
   </context>
   <context>
@@ -47,47 +301,46 @@
       <translation type="unfinished">Object detected</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation type="unfinished">Analytics Object Detected</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>กล้อง</translation>
+      <source>And Object</source>
+      <translation type="unfinished">And Object</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <source>%1 at %2</source>
+      <comment> is detected</comment>
+      <translation>%1 ที่ %2</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>เซิร์ฟเวอร์ "%1" ได้เสร็จสิ้นการสำรองข้อมูลเก็บถาวร</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <source>Analytics object type is not selected</source>
+      <translation type="unfinished">Analytics object type is not selected</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::BookmarkAction</name>
     <message>
-      <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <source>Create Bookmark</source>
+      <translation type="unfinished">Create Bookmark</translation>
     </message>
     <message>
-      <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <source>Add Tags</source>
+      <translation type="unfinished">Add Tags</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>Buzzer</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation type="unfinished">Action Throttling</translation>
     </message>
   </context>
   <context>
@@ -101,35 +354,16 @@
       <translation>การป้อนข้อมูลบน %1</translation>
     </message>
     <message>
+      <source>Input Signal on Device</source>
+      <translation type="unfinished">Input Signal on Device</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation type="unfinished">With ID</translation>
+    </message>
+    <message>
       <source>Input Signal on Camera</source>
       <translation type="unfinished">Input Signal on Camera</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>กล้อง</translation>
-    </message>
-    <message>
-      <source>Input ID</source>
-      <translation>หมายเลข ID:</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::rules::DebugEvent</name>
-    <message>
-      <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>การกระทำ</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -147,32 +381,25 @@
       <translation>โมดูล I / O ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
-      <source>Device %1 was disconnected</source>
-      <translation>อุปกรณ์ %1 ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>กล้อง %1 ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>โมดูล I/O %1 ขาดการเชื่อมต่อ</translation>
-    </message>
-    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-      </translation>
+      <translation type="unfinished">Device Disconnected</translation>
     </message>
     <message>
-      <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
-    </message>
-    <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-      </translation>
+      <translation type="unfinished">Camera Disconnected</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>อุุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>กล้อง</translation>
+    </message>
+    <message>
+      <source>%1 was disconnected</source>
+      <comment>Device name will be substituted</comment>
+      <translation type="unfinished">%1 was disconnected</translation>
     </message>
   </context>
   <context>
@@ -195,17 +422,65 @@
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
       <translation>ความขัดแย้ง IP กล้องที่ %1</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Device IP Conflict</source>
-      <translation>
-        <numerusform>ความขัดแย้งทางอุปกรณ์ IP</numerusform>
-      </translation>
+      <translation type="unfinished">Device IP Conflict</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Camera IP Conflict</source>
-      <translation>
-        <numerusform>ข้อขัดแย้ง IP ของกล้อง</numerusform>
-      </translation>
+      <translation type="unfinished">Camera IP Conflict</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>รหัสการแสดงผล</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation type="unfinished">Device Output</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>คุณภาพ</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation type="unfinished">Camera Recording</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>เปิด</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>กล้อง</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation type="unfinished">Set to Fullscreen</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation type="unfinished">Set for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>ออกจากเต็มหน้าจอ</translation>
     </message>
   </context>
   <context>
@@ -215,12 +490,8 @@
       <translation>ข้อผิดพลาดของพัดลมที่ %1</translation>
     </message>
     <message>
-      <source>Fan Error</source>
-      <translation>ข้อผิดพลาดของพัดลม</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
+      <source>Fan Failure</source>
+      <translation type="unfinished">Fan Failure</translation>
     </message>
   </context>
   <context>
@@ -230,71 +501,103 @@
       <translation>เหตุการณ์ทั่วไป</translation>
     </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>เหตุการณ์ทั่วไปที่ %1</translation>
+      <source>Omit logging</source>
+      <translation type="unfinished">Omit logging</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>คำที่คั่นด้วยช่องว่าง</translation>
+      <source>And Source</source>
+      <translation type="unfinished">And Source</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>ทรัพยากร</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
+      <source>Generic Event from %1</source>
+      <translation type="unfinished">Generic Event from %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <source>Content type</source>
+      <translation>ชนิดของเนื้อหา</translation>
     </message>
     <message>
-      <source>Login</source>
-      <translation>เข้าสู่ระบบ</translation>
+      <source>HTTP(S) Request</source>
+      <translation type="unfinished">HTTP(S) Request</translation>
     </message>
     <message>
-      <source>Password</source>
-      <translation>รหัสผ่าน</translation>
+      <source>URL</source>
+      <translation>URL</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <source>Content</source>
+      <translation type="unfinished">Content</translation>
     </message>
     <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <source>Method</source>
+      <translation type="unfinished">Method</translation>
     </message>
     <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <source>HTTP authentication</source>
+      <translation type="unfinished">HTTP authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+      <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
     </message>
     <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <source>Token field should be filled in case of bearer auth type selected</source>
+      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+      <source>HTTP Method should be known</source>
+      <translation type="unfinished">HTTP Method should be known</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>LDAP Sync Issue Event</source>
+      <translation type="unfinished">LDAP Sync Issue Event</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is a cause of the event</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>เซิร์ฟเวอร์ &quot;%1&quot; มีปัญหาเกี่ยวกับใบอนุญาต</translation>
-    </message>
     <message>
       <source>License Issue</source>
       <translation>ปัญหาใบอนุญาต</translation>
@@ -311,20 +614,17 @@
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
       <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
+    <message>
+      <source>%1 has a license problem</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 has a license problem</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
       <translation>การเคลื่อนไหวของ %1</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>กล้อง</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -398,39 +698,66 @@
       <translation>การเชื่อมต่อกับอุปกรณ์ที่ถูกปิดโดยไม่คาดคิด.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
-    </message>
-    <message>
-      <source>To</source>
-      <translation>ถึง</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
       <source>Force Acknowledgement</source>
       <translation type="unfinished">Force Acknowledgement</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <source>Show Desktop Notification</source>
+      <translation type="unfinished">Show Desktop Notification</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
     </message>
     <message>
-      <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>เปิดเคร้าโครง</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
+    <message>
+      <source>Zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+    </message>
+    <message>
+      <source>Non zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording</source>
+      <translation type="unfinished">Panic Recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Play Sound</source>
+      <translation type="unfinished">Play Sound</translation>
     </message>
   </context>
   <context>
@@ -440,24 +767,12 @@
       <translation>เหตุการณ์การวิเคราะห์ปลั๊กอิน</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>กล้อง</translation>
+      <source>For Plugin</source>
+      <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>ทรัพยากร</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;รายละเอียด</translation>
-    </message>
-    <message>
-      <source>Level</source>
-      <translation type="unfinished">Level</translation>
+      <source>And Level Is</source>
+      <translation type="unfinished">And Level Is</translation>
     </message>
   </context>
   <context>
@@ -467,59 +782,165 @@
       <translation>ปริมาณการใช้</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>PoE เกินที่ %1</translation>
-    </message>
-    <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>สาเหตุ: เกินขีด จำกัด พลังงาน (%1)</translation>
-    </message>
-    <message>
-      <source>PoE over Budget</source>
-      <translation>PoE มากกว่า</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-    <message>
       <source>Server</source>
       <translation>เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>PoE Over Budget</source>
+      <translation type="unfinished">PoE Over Budget</translation>
+    </message>
+    <message>
+      <source>Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Power limit exceeded (%1)</translation>
+    </message>
+    <message>
+      <source>PoE over budget on %1</source>
+      <translation type="unfinished">PoE over budget on %1</translation>
+    </message>
+    <message>
+      <source>Current power consumption: %1 watts</source>
+      <translation type="unfinished">Current power consumption: %1 watts</translation>
+    </message>
+    <message>
+      <source>Upper consumption limit: %1 watts</source>
+      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+    </message>
+    <message>
+      <source>Lower consumption limit: %1 watts</source>
+      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation type="unfinished">Execute PTZ Preset</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation type="unfinished">PTZ Preset</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation type="unfinished">Execute to users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>Header</source>
+      <translation>หัวข้อ</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>เนื้อความ</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation type="unfinished">Send Mobile Notification</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation type="unfinished">Add Source Device name to Body</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation type="unfinished">Sound</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation type="unfinished">Repeat Sound</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::Rule</name>
+    <message>
+      <source>`%1` event filter field alerts:</source>
+      <translation type="unfinished">`%1` event filter field alerts:</translation>
+    </message>
+    <message>
+      <source>`%1` action builder field alerts:</source>
+      <translation type="unfinished">`%1` action builder field alerts:</translation>
+    </message>
+    <message>
+      <source>Rule is not completed. One filter and one builder are required</source>
+      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+    </message>
+    <message>
+      <source>The given filter is not compatible with the given builder</source>
+      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation type="unfinished">License migration issue</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation type="unfinished">Recording services disabled</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation type="unfinished">Cloud storage services disabled</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation type="unfinished">Paid integration services disabled</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation type="unfinished">Services Issue</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
-      <translation>ส่งอีเมล์</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>ถึง</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
-    </message>
-    <message>
       <source>Email Message</source>
       <translation type="unfinished">Email Message</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation type="unfinished">Send Email</translation>
+    </message>
+    <message>
+      <source>Additional Recipients</source>
+      <translation type="unfinished">Additional Recipients</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation type="unfinished">Server Certificate Error</translation>
+    </message>
+    <message>
+      <source>%1 certificate error</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 certificate error</translation>
     </message>
   </context>
   <context>
@@ -539,20 +960,17 @@
       <translation>MAC #%1: %2  {1:?} {2?}</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>เซิร์ฟเวอร์ &quot;%1&quot; ขัดแย้ง</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>เซิร์ฟเวอร์ ขัดข้อง</translation>
+    </message>
+    <message>
+      <source>%1 Conflict</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 Conflict</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>เซิร์ฟเวอร์ &quot;%1&quot; ล้มเหลว</translation>
-    </message>
     <message>
       <source>Server Failure</source>
       <translation>เซิร์ฟเวอร์ล้มเหลว</translation>
@@ -565,16 +983,35 @@
       <source>Server stopped unexpectedly.</source>
       <translation>วิดีโอหยุดลงอย่างกะทันหัน</translation>
     </message>
+    <message>
+      <source>%1 Failure</source>
+      <translation type="unfinished">%1 Failure</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>เริ่มต้นเซิร์ฟเวอร์ &quot;%1&quot; แล้ว</translation>
-    </message>
-    <message>
       <source>Server Started</source>
       <translation>เซิร์ฟเวอร์เริ่มทำงาน</translation>
+    </message>
+    <message>
+      <source>%1 Started</source>
+      <translation type="unfinished">%1 Started</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>การเตือน: %1</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation type="unfinished">Force Alarm Layout Opening</translation>
     </message>
   </context>
   <context>
@@ -584,28 +1021,8 @@
       <translation>ชื่อทริกเกอร์</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>ทริกเกอร์: %1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>ทริกเกอร์ซอฟต์แวร์ %1 ที่ %2</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>ทริกเกอร์ซอฟต์แวร์</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>สถานะ</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>กล้อง</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ผู้ใช้งาน</translation>
     </message>
     <message>
       <source>Name</source>
@@ -615,6 +1032,25 @@
       <source>Icon</source>
       <translation>ไอคอน</translation>
     </message>
+    <message>
+      <source>By</source>
+      <translation type="unfinished">By</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>แหล่งที่มา: %1</translation>
+    </message>
+    <message>
+      <source>User: %1</source>
+      <translation type="unfinished">User: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SoundFieldValidator</name>
+    <message>
+      <source>Sound is not selected</source>
+      <translation type="unfinished">Sound is not selected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
@@ -623,24 +1059,19 @@
       <translation>พูด</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>กล้อง</translation>
+      <source>Text</source>
+      <translation>ข้อความ</translation>
     </message>
     <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <source>At Device</source>
+      <translation type="unfinished">At Device</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::StateFieldValidator</name>
     <message>
-      <source>Speak to users</source>
-      <translation>พูดคุยกับผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation type="unfinished">Speak the following</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>ระดับเสียง</translation>
+      <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
     </message>
   </context>
   <context>
@@ -695,71 +1126,73 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+      <source>Failed to get event descriptor</source>
+      <translation type="unfinished">Failed to get event descriptor</translation>
+    </message>
+    <message>
+      <source>Event does not have source camera</source>
+      <translation type="unfinished">Event does not have source camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; is not a generic list</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
-      <translation>แสดงการซ้อนทับข้อความ</translation>
+      <source>Show Text Overlay</source>
+      <translation type="unfinished">Show Text Overlay</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>กล้อง</translation>
+      <source>Custom Text</source>
+      <translation type="unfinished">Custom Text</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>ยังแสดงให้เห็นในกล้องแหล่งที่มา</translation>
-    </message>
-    <message>
-      <source>Display text for</source>
-      <translation>แสดงข้อความสำหรับ</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>ข้อความ</translation>
+      <source>Show To</source>
+      <translation type="unfinished">Show To</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::TextWithFields</name>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-      <source>Event: %1</source>
-      <translation>เหตุการณ์: %1</translation>
+      <source>Url cannot be empty</source>
+      <translation type="unfinished">Url cannot be empty</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>แหล่งที่มา: %1</translation>
+      <source>Url must be valid</source>
+      <translation type="unfinished">Url must be valid</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>คำอธิบาย:%1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>เหตุผล: %1</translation>
+      <source>Url should not contains user or password</source>
+      <translation type="unfinished">Url should not contains user or password</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n ครั้ง, ครั้งแรก: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>เกิดขึ้นครั้งแรก: %1 บน %2 (%n เวลาทั้งหมดl)</numerusform>
-      </translation>
-    </message>
+    <name>nx::vms::rules::WriteToLogAction</name>
     <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>เวลา: %1 บน %2</translation>
+      <source>Write to Log</source>
+      <translation type="unfinished">Write to Log</translation>
     </message>
   </context>
 </TS>

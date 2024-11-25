@@ -9,10 +9,67 @@
     </message>
   </context>
   <context>
-    <name>ActionButtonsPanel</name>
+    <name>AnalyticSelectors</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>하기위해 누르고 있음</translation>
+      <source>ADVANCED SEARCH</source>
+      <translation>고급 검색</translation>
+    </message>
+  </context>
+  <context>
+    <name>AttributeSetSelector</name>
+    <message>
+      <source>Present</source>
+      <translation>현재의</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation>부재 중인</translation>
+    </message>
+  </context>
+  <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+      <source>Beta Features</source>
+      <translation>베타 기능</translation>
+    </message>
+    <message>
+      <source>Video Download</source>
+      <translation>동영상 내려받기</translation>
+    </message>
+    <message>
+      <source>Ability to download video</source>
+      <translation>비디오를 다운로드 할 수 있는 기능</translation>
+    </message>
+    <message>
+      <source>Speedup connections</source>
+      <translation>연결 속도 향상</translation>
+    </message>
+    <message>
+      <source>Improve network performance</source>
+      <translation>네트워크 성능 향상</translation>
+    </message>
+    <message>
+      <source>Maximum decoders count</source>
+      <translation type="unfinished">Maximum decoders count</translation>
+    </message>
+    <message>
+      <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+    </message>
+    <message>
+      <source>Please restart the app to apply the changes.</source>
+      <translation>변경 사항을 적용하려면 앱을 다시 시작하십시오.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BooleanSelector</name>
+    <message>
+      <source>Yes</source>
+      <translation>예</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation>아니요</translation>
     </message>
   </context>
   <context>
@@ -36,6 +93,25 @@
     <message>
       <source>I/O module</source>
       <translation>Io장치</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsScreen</name>
+    <message>
+      <source>Camera Settings</source>
+      <translation>카메라 설정</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>정보</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>오디오</translation>
+    </message>
+    <message>
+      <source>Change Quality</source>
+      <translation>품질 변경</translation>
     </message>
   </context>
   <context>
@@ -69,17 +145,28 @@
       <translation>서버 주소 입력</translation>
     </message>
     <message>
-      <source>Login cannot be empty</source>
-      <translation>로그인은 필수 정보입니다.</translation>
-    </message>
-    <message>
-      <source>Password cannot be empty</source>
-      <translation>비밀번호는 필수 정보입니다.</translation>
-    </message>
-    <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
       <translation>로그인 &quot;%1&quot; 을 삭제 하시겠습니까?</translation>
+    </message>
+    <message>
+      <source>Login field cannot be empty</source>
+      <translation>로그인은 필수 정보입니다.</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>비밀번호는 필수 정보입니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>DetailsScreen</name>
+    <message>
+      <source>Preview</source>
+      <translation>미리보기</translation>
+    </message>
+    <message>
+      <source>Show on Camera</source>
+      <translation>카메라에 표시</translation>
     </message>
   </context>
   <context>
@@ -91,6 +178,17 @@
     <message>
       <source>Log Level</source>
       <translation>로그 수준</translation>
+    </message>
+    <message>
+      <source>Copy log ID</source>
+      <translation>로그 ID 복사</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceSelector</name>
+    <message>
+      <source>Device</source>
+      <translation>장치</translation>
     </message>
   </context>
   <context>
@@ -123,26 +221,45 @@
       <source>Retry</source>
       <translation>다시 시도</translation>
     </message>
+    <message>
+      <source>Connect</source>
+      <translation>연결</translation>
+    </message>
   </context>
   <context>
-    <name>DownloadOldClientDialog</name>
+    <name>DigestLogin</name>
     <message>
-      <source>To connect to old servers please download the legacy application from Google Play.</source>
-      <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>오래 된에 연결할 서버 구글 플레이에서 레거시 응용 프로그램을 다운로드 하십시오.</translation>
+      <source>Enter your %1 account password to connect to the Site</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
+  </context>
+  <context>
+    <name>DownloadMediaButton</name>
     <message>
-      <source>To connect to old servers please download the legacy application from the App Store.</source>
-      <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Old 버젼 서버를 접속하려면 엡스토어에서 레거시 버젼을 다운받으세요</translation>
+      <source>Download next</source>
+      <translation>다음 다운로드</translation>
     </message>
-    <message>
-      <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Old 버젼 서버를 접속하려면 인터넷에서 레거시 버젼을 다운받으세요</translation>
+    <message numerus="yes">
+      <source>%n minutes</source>
+      <comment>Number of minutes</comment>
+      <translation>
+        <numerusform>%n 분</numerusform>
+      </translation>
     </message>
+  </context>
+  <context>
+    <name>FiltersPanel</name>
     <message>
-      <source>Download</source>
-      <translation>다운로드</translation>
+      <source>No filters</source>
+      <translation>필터 없음</translation>
+    </message>
+  </context>
+  <context>
+    <name>FiltersScreen</name>
+    <message>
+      <source>Search Filters</source>
+      <translation>필터 검색</translation>
     </message>
   </context>
   <context>
@@ -186,6 +303,14 @@
     </message>
   </context>
   <context>
+    <name>Login</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1에 연결할 수 없습니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -206,8 +331,40 @@
   <context>
     <name>OfflineDummy</name>
     <message>
-      <source>You are not connected to any System</source>
-      <translation>어떤 시스템에 연결 되지 않았습니다.</translation>
+      <source>You are not connected to any Site</source>
+      <translation type="unfinished">You are not connected to any Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelector</name>
+    <message>
+      <source>Any</source>
+      <translation>아무거나</translation>
+    </message>
+  </context>
+  <context>
+    <name>OptionSelectorScreen</name>
+    <message>
+      <source>Clear</source>
+      <translation>초기화</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordTextField</name>
+    <message>
+      <source>Password</source>
+      <translation>패스워드</translation>
+    </message>
+    <message>
+      <source>Password field cannot be empty</source>
+      <translation>비밀번호는 필수 정보입니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginSelector</name>
+    <message>
+      <source>Plugin</source>
+      <translation>플러그인</translation>
     </message>
   </context>
   <context>
@@ -227,10 +384,6 @@
   <context>
     <name>PushExpertModeScreen</name>
     <message>
-      <source>Systems</source>
-      <translation>시스템들</translation>
-    </message>
-    <message>
       <source>Notifications</source>
       <translation>알림</translation>
     </message>
@@ -239,20 +392,8 @@
       <translation>완료</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>모든 시스템들</translation>
-    </message>
-    <message>
-      <source>Selected Systems</source>
-      <translation>선택된 시스템들</translation>
-    </message>
-    <message>
       <source>SELECT</source>
       <translation>선택</translation>
-    </message>
-    <message>
-      <source>At least one system has to be selected</source>
-      <translation>적어도 하나의 시스템을 선택해야 합니다.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -265,6 +406,22 @@
     <message>
       <source>Save changes?</source>
       <translation>변경 내용을 저장 하시겠습니까?</translation>
+    </message>
+    <message>
+      <source>Sites</source>
+      <translation>사이트</translation>
+    </message>
+    <message>
+      <source>All Sites</source>
+      <translation type="unfinished">All Sites</translation>
+    </message>
+    <message>
+      <source>Selected Sites</source>
+      <translation type="unfinished">Selected Sites</translation>
+    </message>
+    <message>
+      <source>At least one site has to be selected</source>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
   </context>
   <context>
@@ -286,20 +443,38 @@
       <translation>최상 품질</translation>
     </message>
     <message>
-      <source>Transcoding is disabled.</source>
-      <translation>트랜스 코딩이 비활성화되었습니다.</translation>
-    </message>
-    <message>
       <source>Transcoding is not supported for this camera.</source>
       <translation>이 카메라에서는 트랜스 코딩이 지원되지 않습니다.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation>3.0버전 이하의 서버에서는 트랜스 코딩이 지원되지 않습니다.</translation>
+      <source>Transcoding is disabled by the Server.</source>
+      <translation>서버에서 트랜스코딩이 비활성화되었습니다.</translation>
     </message>
     <message>
-      <source>Transcoding is not supported for ARM servers.</source>
-      <translation>ARM계열 시스템에서는 트랜스 코딩이 지원되지 않습니다.</translation>
+      <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
+      <translation>3.0버전 이하의 서버에서는 트랜스 코딩이 지원되지 않습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RangeSelector</name>
+    <message>
+      <source>From</source>
+      <translation>로 부터</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>에게</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecursiveObjectTypeSelector</name>
+    <message>
+      <source>Type</source>
+      <translation>형식</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>하위 유형</translation>
     </message>
   </context>
   <context>
@@ -333,6 +508,33 @@
     </message>
   </context>
   <context>
+    <name>SearchScreen</name>
+    <message>
+      <source>Objects</source>
+      <translation>객체</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <translation>즐겨찾기</translation>
+    </message>
+    <message>
+      <source>No objects</source>
+      <translation>객체가 없습니다</translation>
+    </message>
+    <message>
+      <source>No bookmarks</source>
+      <translation>즐겨찾기 없음</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation>카메라 플러그인 설정에서 필터를 변경하거나 객체 탐지를 구성합니다.</translation>
+    </message>
+    <message>
+      <source>Try changing the filters to display the results</source>
+      <translation>결과를 표시하려면 필터를 변경해 보세요.</translation>
+    </message>
+  </context>
+  <context>
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
@@ -344,7 +546,7 @@
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
+      <translation>자체 서명된 인증서를 고정하려면 확인이 요청됩니다.</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -352,7 +554,7 @@
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation type="unfinished">Connect only servers with public certificates</translation>
+      <translation>공인인증서가 있는 서버만 연결</translation>
     </message>
   </context>
   <context>
@@ -404,10 +606,6 @@
       <translation>다른 서버에 연결...</translation>
     </message>
     <message>
-      <source>No Systems found</source>
-      <translation>발견된 시스템 없음.</translation>
-    </message>
-    <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
       <translation>%1에 로그인</translation>
@@ -420,6 +618,10 @@
     <message>
       <source>Nothing found</source>
       <translation>결과 없음</translation>
+    </message>
+    <message>
+      <source>No Sites found</source>
+      <translation type="unfinished">No Sites found</translation>
     </message>
   </context>
   <context>
@@ -469,10 +671,6 @@
       <translation>푸시 알림을 사용하기 위해 클라우드에 로그인</translation>
     </message>
     <message>
-      <source>Push notifications are turned off in system settings</source>
-      <translation>시스템 설정에서 푸시 알림이 해제되어 있습니다</translation>
-    </message>
-    <message>
       <source>Automatically log in to servers</source>
       <translation>서버에 자동 로그인</translation>
     </message>
@@ -487,6 +685,26 @@
     <message>
       <source>Strict</source>
       <translation>엄격한</translation>
+    </message>
+    <message>
+      <source>Enable hardware acceleration</source>
+      <translation>하드웨어 가속 활성화</translation>
+    </message>
+    <message>
+      <source>Increase performance and battery life</source>
+      <translation>성능과 배터리 수명 증가</translation>
+    </message>
+    <message>
+      <source>Notifications are turned off in the device settings</source>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+    </message>
+    <message>
+      <source>Beta Features</source>
+      <translation>베타 기능</translation>
+    </message>
+    <message>
+      <source>Early access to new features</source>
+      <translation>새로운 기능 미리 보기</translation>
     </message>
   </context>
   <context>
@@ -507,16 +725,20 @@
   <context>
     <name>SslCertificateDialog</name>
     <message>
-      <source>Trust this server</source>
-      <translation>이 서버를 신뢰하시겠습니까</translation>
+      <source>Common name</source>
+      <translation>일반 이름</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>그래도 연결</translation>
+      <source>Issued by</source>
+      <translation>발급자</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>취소</translation>
+      <source>Expires</source>
+      <translation>만료</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation>지문</translation>
     </message>
   </context>
   <context>
@@ -529,6 +751,11 @@
     <message>
       <source>Log out</source>
       <translation>로그아웃</translation>
+    </message>
+    <message>
+      <source>Go to %1</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1로 이동</translation>
     </message>
   </context>
   <context>
@@ -559,6 +786,13 @@
     <message>
       <source>Select All</source>
       <translation>모두 선택</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSelector</name>
+    <message>
+      <source>Period</source>
+      <translation>기간</translation>
     </message>
   </context>
   <context>
@@ -629,8 +863,12 @@
       <translation>비디오를 보기 위해서는 %1 클라이언트 또는 카메라 웹 페이지를 사용하여 이 카메라의 암호를 설정하십시요</translation>
     </message>
     <message>
-      <source>Cannot decrypt media</source>
-      <translation>미디어의 암호를 해독할 수 없다.</translation>
+      <source>Archive encrypted</source>
+      <translation>아카이브 암호화</translation>
+    </message>
+    <message>
+      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
+      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
   </context>
   <context>
@@ -663,14 +901,6 @@
       <translation>영역</translation>
     </message>
     <message>
-      <source>Change Quality</source>
-      <translation>품질 변경</translation>
-    </message>
-    <message>
-      <source>Information</source>
-      <translation>정보</translation>
-    </message>
-    <message>
       <source>Tap and hold to select an area</source>
       <translation>영역을 선택하기 위해 길게 탭하시오.</translation>
     </message>
@@ -683,15 +913,16 @@
       <translation>잘못 된 사용자 지정 영역입니다. 올바르게 그리십시요.</translation>
     </message>
     <message>
-      <source>Audio</source>
-      <translation>오디오</translation>
+      <source>Camera Settings</source>
+      <translation>카메라 설정</translation>
     </message>
-  </context>
-  <context>
-    <name>WelcomeScreen</name>
     <message>
-      <source>Skip</source>
-      <translation>건너 뛰기</translation>
+      <source>Bookmarks</source>
+      <translation>즐겨찾기</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>객체</translation>
     </message>
   </context>
   <context>

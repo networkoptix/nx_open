@@ -10,68 +10,19 @@
     </message>
   </context>
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Владелец: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Ваша система</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Формат устройства ввода %1 не поддерживается.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Первичное звуковое устройство не выбрано.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDirectSystemsFinder</name>
-    <message>
-      <source>System</source>
-      <translation>Система</translation>
-    </message>
-    <message>
-      <source>System (%1)</source>
-      <comment>%1 is ip and port of system</comment>
-      <translation>Система (%1)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>Новый сервер</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSystemDescription</name>
-    <message>
-      <source>Unnamed System</source>
-      <translation>Система без имени</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemsModel</name>
     <message>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+    <message>
+      <source>Your Site</source>
+      <translation type="unfinished">Your Site</translation>
+    </message>
+    <message>
       <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
+      <comment>%1 is a user/company name</comment>
       <translation>Владелец: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Ваша система</translation>
-    </message>
-    <message>
-      <source>New System</source>
-      <translation>Новая система</translation>
     </message>
   </context>
   <context>
@@ -101,10 +52,6 @@
       <translation>Неверный сертификат</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Сертификат сервера был отклонен.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Восстановите соединение с %1 и повторите попытку</translation>
@@ -113,10 +60,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>Вход в систему с использованием %1 временно недоступен</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Истекло время ожидания соединения</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -163,18 +106,9 @@
       <translation>Внутренняя ошибка. Повторите попытку позже.</translation>
     </message>
     <message>
-      <source>If this error persists, please contact your system administrator.</source>
-      <translation>Если ошибка остаётся, обратитесь к администратору системы.</translation>
-    </message>
-    <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Подключение к %1 еще не установлено. Проверьте подключение к Интернету или повторите попытку позже.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Подключение к %1 еще не готово. Проверьте интернет-соединение сервера или повторите попытку позже.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
@@ -190,26 +124,8 @@
       <translation>Пожалуйста, войдите в %1 снова.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with %2 user</source>
-      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation>Войдите в %1 для входа в систему с %2 пользователем</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by a system administrator.</source>
-      <translation>Ограничение продолжительности сессии может быть изменено системным администраторам.</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>Этот пользователь отключен системным администратором.</translation>
-    </message>
-    <message>
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>Слишком много попыток входа. Повторите попытку позже.</translation>
-    </message>
-    <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Чтобы войти в систему, отключите «Запрашивать код подтверждения при каждом входе с вашей учётной записью %1» в вашем %2.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -220,13 +136,80 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Вы можете включить двухфакторную аутентификацию в вашем %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Ошибка подключения</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation>Сертификат сервера был отклонен.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your site administrator.</source>
+      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this site with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a site administrator.</source>
+      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+    </message>
+    <message>
+      <source>Your access to this site has expired.</source>
+      <translation type="unfinished">Your access to this site has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the site administrator to regain access.</source>
+      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a site administrator.</source>
+      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Неизвестный трек</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>удаленная камера</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>удаленная камера</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Невозможно проверить личность %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Сертификат сервера недействителен.</translation>
@@ -234,10 +217,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Подключаетесь к %1 в первый раз?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>сведения о сертификате</translation>
     </message>
     <message>
       <source>help article</source>
@@ -248,32 +227,142 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Прочитайте %1, чтобы узнать больше о проверке сертификата.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Проверьте %1, чтобы убедиться, что вы доверяете серверу, к которому подключаетесь.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Не удается проверить подлинность %n серверов</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+        <numerusform>Cannot verify the identity of %n servers</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>сертификат сервера</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>Чтобы узнать больше о текущей проблеме, прочитайте %1.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Вы можете просмотреть %1 или прочитать %2, чтобы узнать больше о текущей проблеме.</translation>
+      <source>Cannot verify the identity of %1</source>
+      <translation>Невозможно проверить личность %1</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Это может произойти из-за просроченного сертификата сервера или из-за того, что кто-то пытается выдать себя за %1, чтобы украсть вашу личную информацию.%2</translation>
+      <source>Review the certificate to ensure you trust the server you are connecting to.</source>
+      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Это сообщение может отображаться несколько раз при подключении к многосерверной системе.</translation>
+      <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
+      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Чтобы узнать больше о текущей проблеме, просмотрите сертификат сервера:</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Формат устройства ввода %1 не поддерживается.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Первичное звуковое устройство не выбрано.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DirectSystemFinder</name>
+    <message>
+      <source>Site</source>
+      <translation>Сайт</translation>
+    </message>
+    <message>
+      <source>Site (%1)</source>
+      <comment>%1 is ip and port of the site</comment>
+      <translation>Сайт (%1)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Последний день</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Последние 7 дней</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Последние 30 дней</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Любое время</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>Любой</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Нагреватель</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Стеклоочиститель</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation type="unfinished">Open Door</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation type="unfinished">Stop Object Tracking</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::LocalSystemDescription</name>
+    <message>
+      <source>New Server</source>
+      <translation>Новый сервер</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SingleSystemDescription</name>
+    <message>
+      <source>Unnamed Site</source>
+      <translation>Безымянный сайт</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Нажмите и удерживайте, чтобы</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>длинное нажатие</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Нажмите и удерживайте, чтобы говорить</translation>
     </message>
   </context>
 </TS>

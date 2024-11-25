@@ -10,68 +10,19 @@
     </message>
   </context>
   <context>
-    <name>QnCloudSystemInformationWatcher</name>
-    <message>
-      <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
-      <translation>Propriétaire: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Votre système</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-      <source>Sample format of input device %1 is not supported.</source>
-      <translation>Format d'échantillon du périphérique d'entré %1 n'est pas supporté.</translation>
-    </message>
-    <message>
-      <source>Primary audio device is not selected.</source>
-      <translation>Périphérique audio principal non sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDirectSystemsFinder</name>
-    <message>
-      <source>System</source>
-      <translation>Système</translation>
-    </message>
-    <message>
-      <source>System (%1)</source>
-      <comment>%1 is ip and port of system</comment>
-      <translation>Système (%1)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLocalSystemDescription</name>
-    <message>
-      <source>New Server</source>
-      <translation>Nouveau serveur</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSystemDescription</name>
-    <message>
-      <source>Unnamed System</source>
-      <translation>Système sans nom</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemsModel</name>
     <message>
+      <source>New Site</source>
+      <translation>Nouveau site</translation>
+    </message>
+    <message>
+      <source>Your Site</source>
+      <translation type="unfinished">Your Site</translation>
+    </message>
+    <message>
       <source>Owner: %1</source>
-      <comment>%1 is a user name</comment>
+      <comment>%1 is a user/company name</comment>
       <translation>Propriétaire: %1</translation>
-    </message>
-    <message>
-      <source>Your System</source>
-      <translation>Votre système</translation>
-    </message>
-    <message>
-      <source>New System</source>
-      <translation>Nouveau système</translation>
     </message>
   </context>
   <context>
@@ -101,10 +52,6 @@
       <translation>Certificat invalide</translation>
     </message>
     <message>
-      <source>The server&amp;apos;s certificate was rejected.</source>
-      <translation>Le certificat du serveur&amp;apos;s a été rejeté.</translation>
-    </message>
-    <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Restaurer la connexion à %1 et réessayer</translation>
@@ -113,10 +60,6 @@
       <source>%1 user login is temporarily unavailable</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
       <translation>La connexion de l'utilisateur %1 est temporairement indisponible</translation>
-    </message>
-    <message>
-      <source>Connection timed out</source>
-      <translation>Connexion expirée</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -163,18 +106,9 @@
       <translation>Erreur interne. Veuillez réessayer plus tard.</translation>
     </message>
     <message>
-      <source>If this error persists, please contact your system administrator.</source>
-      <translation>Si cette erreur persiste, veuillez contacter votre administrateur système.</translation>
-    </message>
-    <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>La connexion à %1 n'est pas encore prête. Vérifiez votre connexion internet ou réessayez plus tard.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>La connexion à %1 n'est pas encore prête. Vérifiez la connexion internet du serveur ou réessayez plus tard.</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
@@ -190,26 +124,8 @@
       <translation>Veuillez vous reconnecter à %1.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with %2 user</source>
-      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation>Connectez-vous à %1 pour vous connecter à ce système avec l'utilisateur %2</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by a system administrator.</source>
-      <translation>La limite de durée de session peut être modifiée par un administrateur système.</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>Cet utilisateur a été désactivé par un administrateur système.</translation>
-    </message>
-    <message>
       <source>Too many login attempts. Try again in a minute.</source>
       <translation>Trop de tentatives de connexion. Réessayez dans une minute.</translation>
-    </message>
-    <message>
-      <source>To log in to this System, disable “Ask for a verification code on every login with your %1 account” in your %2.</source>
-      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Pour vous connecter à ce système, désactivez "Demander un code de vérification à chaque connexion avec votre compte %1 " dans votre %2.</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -220,13 +136,80 @@
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
       <translation>Vous pouvez activer l'authentification à deux facteurs dans votre %1.</translation>
     </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Échec de connexion</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>La connexion à %1 n'est pas encore prête. Vérifiez la connexion Internet du serveur ou réessayez plus tard.</translation>
+    </message>
+    <message>
+      <source>The server&apos;s certificate was rejected.</source>
+      <translation>Le certificat du serveur a été rejeté.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your site administrator.</source>
+      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this site with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a site administrator.</source>
+      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+    </message>
+    <message>
+      <source>Your access to this site has expired.</source>
+      <translation type="unfinished">Your access to this site has expired.</translation>
+    </message>
+    <message>
+      <source>Please contact the site administrator to regain access.</source>
+      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+    </message>
+    <message>
+      <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
+      <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
+      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a site administrator.</source>
+      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::AnalyticsSearchListModel</name>
+    <message>
+      <source>Unknown track</source>
+      <translation>Piste inconnue</translation>
+    </message>
+    <message>
+      <source>deleted camera</source>
+      <translation>caméra supprimée</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::BookmarkSearchListModel</name>
+    <message>
+      <source>deleted camera</source>
+      <translation>caméra supprimée</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::core::CertificateWarning</name>
-    <message>
-      <source>Cannot verify the identity of %1</source>
-      <translation>Impossible de vérifier l'identité de %1</translation>
-    </message>
     <message>
       <source>Server certificate is invalid.</source>
       <translation>Le certificat du serveur est invalide.</translation>
@@ -234,10 +217,6 @@
     <message>
       <source>Connecting to %1 for the first time?</source>
       <translation>Vous vous connectez à %1 pour la première fois?</translation>
-    </message>
-    <message>
-      <source>certificate details</source>
-      <translation>détails du certificat</translation>
     </message>
     <message>
       <source>help article</source>
@@ -248,32 +227,138 @@
       <comment>%1 is &lt;help article&gt; link</comment>
       <translation>Lisez ce %1 pour en savoir plus sur la validation des certificats.</translation>
     </message>
-    <message>
-      <source>Review the %1 to ensure you trust the server you are connecting to.%2</source>
-      <comment>%1 is &lt;certificate details&gt; link, %2 are possible extra details</comment>
-      <translation>Vérifiez le %1 pour vous assurer que vous faites confiance au serveur auquel vous vous connectez.%2</translation>
+    <message numerus="yes">
+      <source>Cannot verify the identity of %n servers</source>
+      <translation>
+        <numerusform>Impossible de vérifier l'identité du serveur %n</numerusform>
+        <numerusform>Impossible de vérifier l'identité des serveurs %n</numerusform>
+      </translation>
     </message>
     <message>
-      <source>the server&apos;s certificate</source>
-      <translation>le certificat du serveur</translation>
+      <source>To learn more about the current problem read this %1.</source>
+      <comment>%1 is &lt;help article&gt; link</comment>
+      <translation>Pour en savoir plus sur le problème actuel, lisez ceci %1.</translation>
     </message>
     <message>
-      <source>You can view %1 or read this %2 to learn more about the current problem.</source>
-      <comment>%1 is &lt;the server&apos;s certificate&gt; link, %2 is &lt;help article&gt; link</comment>
-      <translation>Vous pouvez afficher %1 ou lire ce %2 pour en savoir plus sur le problème actuel.</translation>
+      <source>Cannot verify the identity of %1</source>
+      <translation>Impossible de vérifier l'identité de %1</translation>
     </message>
     <message>
-      <source>This might be due to an expired server certificate or someone trying to impersonate %1 to steal your personal information.%2</source>
-      <comment>%1 is the system name, %2 are possible extra details</comment>
-      <translation>Cela peut être dû à un certificat de serveur expiré ou à quelqu'un essayant de se faire passer pour %1 pour voler vos informations personnelles.%2</translation>
+      <source>Review the certificate to ensure you trust the server you are connecting to.</source>
+      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
     </message>
     <message>
-      <source>This message may be shown multiple times when connecting to a multi-server system.</source>
-      <translation>Ce message peut s'afficher plusieurs fois lors de la connexion à un système multiserveur.</translation>
+      <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
+      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
     </message>
     <message>
-      <source>To learn more about the current problem view the server&apos;s certificate:</source>
-      <translation>Pour en savoir plus sur le problème actuel, consultez le certificat du serveur:</translation>
+      <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
+      <translation type="unfinished">This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DesktopAudioOnlyDataProvider</name>
+    <message>
+      <source>Sample format of input device %1 is not supported.</source>
+      <translation>Format d'échantillon du périphérique d'entré %1 n'est pas supporté.</translation>
+    </message>
+    <message>
+      <source>Primary audio device is not selected.</source>
+      <translation>Périphérique audio principal non sélectionné.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::DirectSystemFinder</name>
+    <message>
+      <source>Site</source>
+      <translation>Site</translation>
+    </message>
+    <message>
+      <source>Site (%1)</source>
+      <comment>%1 is ip and port of the site</comment>
+      <translation>Site (%1)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::EventSearchUtils</name>
+    <message>
+      <source>Last day</source>
+      <translation>Dernier jour</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 derniers jours</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 derniers jours</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>À tout moment</translation>
+    </message>
+    <message>
+      <source>Any</source>
+      <translation>N'importe quel</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <comment>%n is a number of cameras</comment>
+      <translation>
+        <numerusform>%n Caméra</numerusform>
+        <numerusform>%n Caméra</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::ExtendedOutputCameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Chauffage</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Essuie-glaces</translation>
+    </message>
+    <message>
+      <source>Open Door</source>
+      <translation>Ouvrir la porte</translation>
+    </message>
+    <message>
+      <source>Stop Object Tracking</source>
+      <translation>Arrêter le suivi des objets</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::LocalSystemDescription</name>
+    <message>
+      <source>New Server</source>
+      <translation>Nouveau serveur</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SingleSystemDescription</name>
+    <message>
+      <source>Unnamed Site</source>
+      <translation>Site sans nom</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation>Appuyez et maintenez pour</translation>
+    </message>
+    <message>
+      <source>press and hold</source>
+      <translation>appuyez et maintenez</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::core::TwoWayAudioCameraButtonController</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>Appuyez et maintenez pour parler</translation>
     </message>
   </context>
 </TS>

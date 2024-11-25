@@ -2,6 +2,143 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs_CZ" sourcelanguage="en">
   <context>
+    <name>AbstractSearchWidget::Private</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Skrýt informace</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Zobrazit informace</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Skrýt miniatury</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Zobrazit miniatury</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Poslední den</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Posledních 7 dní</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Posledních 30 dní</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Vybrané na časové ose</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Kdykoliv</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Zařízení na rozvržení</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kamery na rozvržení</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Vybrané zařízení</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Vybraná kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation type="unfinished">Choose devices...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation type="unfinished">Choose cameras...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Jakékoliv zařízení</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Jakákoliv kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Vybrat média</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>žádný</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+        <numerusform>%n chosen devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+        <numerusform>%n chosen cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation type="unfinished">Chosen device</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation type="unfinished">Chosen camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>ActionDurationPickerWidget</name>
+    <message>
+      <source>For the duration of event</source>
+      <translation type="unfinished">For the duration of event</translation>
+    </message>
+    <message>
+      <source>Of fixed duration</source>
+      <translation type="unfinished">Of fixed duration</translation>
+    </message>
+    <message>
+      <source>Event occurs</source>
+      <translation type="unfinished">Event occurs</translation>
+    </message>
+    <message>
+      <source>Event starts</source>
+      <translation type="unfinished">Event starts</translation>
+    </message>
+    <message>
+      <source>Event stops</source>
+      <translation type="unfinished">Event stops</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation>Doba trvání</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -41,6 +178,44 @@
     </message>
   </context>
   <context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+        <numerusform>%1 jsou použity</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are required</source>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation type="unfinished">
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 are required</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>CellWidget</name>
+    <message>
+      <source>Canceled</source>
+      <translation type="unfinished">Canceled</translation>
+    </message>
+    <message>
+      <source>Added</source>
+      <translation>Přidáno</translation>
+    </message>
+    <message>
+      <source>Adding</source>
+      <translation>Přidávání</translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -53,6 +228,14 @@
     <message>
       <source>Expires</source>
       <translation>Platnost vyprší</translation>
+    </message>
+  </context>
+  <context>
+    <name>ClipboardButton</name>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Zkopírováno</translation>
     </message>
   </context>
   <context>
@@ -92,21 +275,9 @@
       <source>Verifying update package</source>
       <translation type="unfinished">Verifying update package</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation type="unfinished">Cannot connect to the System</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>
-    <message>
-      <source>Filter...</source>
-      <translation>Filtr...</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>Připojit k systému</translation>
-    </message>
     <message>
       <source>Help</source>
       <translation>Nápověda</translation>
@@ -152,14 +323,6 @@
       <translation>Zobrazit uvítací obrazovku</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>Záložka</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Nová záložka</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>Okno</translation>
     </message>
@@ -172,16 +335,8 @@
       <translation>Uživatel...</translation>
     </message>
     <message>
-      <source>New User...</source>
-      <translation>Nový uživatel...</translation>
-    </message>
-    <message>
       <source>Video Wall...</source>
       <translation>Videostěna...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Nová videostěna...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -256,14 +411,6 @@
       <translation>Otevřít v prohlížeči...</translation>
     </message>
     <message>
-      <source>System Administration...</source>
-      <translation>Správce systému...</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>Aktualizace systému...</translation>
-    </message>
-    <message>
       <source>User Management...</source>
       <translation>Správa uživatelů...</translation>
     </message>
@@ -309,10 +456,6 @@
     <message>
       <source>Cameras List</source>
       <translation>Seznam kamer</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Sloučit systémy...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -361,26 +504,6 @@
     <message>
       <source>Monitor</source>
       <translation>Monitor</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>Otevřít v nové záložce</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>Monitor v nové záložce</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>Otevřít v rozložení poplachů</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>Otevřít v novém okně</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>Monitor v novém okně</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
@@ -499,10 +622,6 @@
       <translation>Odstranit z rozložení</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>Ukončit sdílení rozložení</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Přejmenovat</translation>
     </message>
@@ -517,14 +636,6 @@
     <message>
       <source>User Settings...</source>
       <translation>Nastavení uživatele...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>Uživatelské role...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>Nastavení rolí...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -599,10 +710,6 @@
       <translation>Nastavení videostěny...</translation>
     </message>
     <message>
-      <source>Add Device...</source>
-      <translation>Přidat zařízení...</translation>
-    </message>
-    <message>
       <source>Devices List by Server...</source>
       <translation>Seznam zařízení podle serveru...</translation>
     </message>
@@ -625,10 +732,6 @@
     <message>
       <source>Server Settings...</source>
       <translation>Nastavení serveru...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>Sloučit s aktuálně připojeným systémem...</translation>
     </message>
     <message>
       <source>None</source>
@@ -747,10 +850,6 @@
       <translation>Zobrazit filmový pás...</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>Nový filmový pás...</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>Odstranit z filmového pásu</translation>
     </message>
@@ -777,14 +876,6 @@
     <message>
       <source>Export Bookmark...</source>
       <translation>Export záložek...</translation>
-    </message>
-    <message>
-      <source>Resolution...</source>
-      <translation>Rozlišení...</translation>
-    </message>
-    <message>
-      <source>Cell Aspect Ratio...</source>
-      <translation>Poměr stran buňky...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -817,10 +908,6 @@
     <message>
       <source>Virtual Camera...</source>
       <translation>Virtuální kamera...</translation>
-    </message>
-    <message>
-      <source>New Virtual Camera...</source>
-      <translation>Nová virtuální kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -863,14 +950,6 @@
       <translation>Přepněte na kartu Objekty</translation>
     </message>
     <message>
-      <source>Pin Calendar</source>
-      <translation>Připnout kalendář</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Uvolnit kalendář</translation>
-    </message>
-    <message>
       <source>Page...</source>
       <translation>Stránka...</translation>
     </message>
@@ -897,10 +976,6 @@
     <message>
       <source>New</source>
       <translation type="unfinished">New</translation>
-    </message>
-    <message>
-      <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
@@ -961,7 +1036,7 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Otočit na</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -972,20 +1047,8 @@
       <translation type="unfinished">Remove Group</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
-    </message>
-    <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
-    </message>
-    <message>
-      <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
-    </message>
-    <message>
-      <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Rozestup buněk</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -993,7 +1056,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Pokročilé...</translation>
     </message>
     <message>
       <source>Archive filter...</source>
@@ -1034,6 +1097,160 @@
     <message>
       <source>Save Cloud Layout As...</source>
       <translation type="unfinished">Save Cloud Layout As...</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Přidat</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation type="unfinished">Device...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>Přidat uživatele...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation type="unfinished">Integration...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation type="unfinished">New Integration...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>Nová webová stránka...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation type="unfinished">Add Showreel...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation type="unfinished">Add Virtual Camera...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation type="unfinished">Integration Settings...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation type="unfinished">Proxied Integration...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation type="unfinished">Proxied Web Page...</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation type="unfinished">Show Proxied Resources</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation type="unfinished">Import From Devices...</translation>
+    </message>
+    <message>
+      <source>User Manual...</source>
+      <translation type="unfinished">User Manual...</translation>
+    </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation type="unfinished">Convert to Shared Layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Layout Tab</source>
+      <translation type="unfinished">Layout Tab</translation>
+    </message>
+    <message>
+      <source>New Layout Tab</source>
+      <translation type="unfinished">New Layout Tab</translation>
+    </message>
+    <message>
+      <source>Welcome Screen Tab</source>
+      <translation type="unfinished">Welcome Screen Tab</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen Tab</source>
+      <translation type="unfinished">New Welcome Screen Tab</translation>
+    </message>
+    <message>
+      <source>Site Administration...</source>
+      <translation type="unfinished">Site Administration...</translation>
+    </message>
+    <message>
+      <source>Site Update...</source>
+      <translation type="unfinished">Site Update...</translation>
+    </message>
+    <message>
+      <source>Lists Management...</source>
+      <translation type="unfinished">Lists Management...</translation>
+    </message>
+    <message>
+      <source>Open Integrations...</source>
+      <translation type="unfinished">Open Integrations...</translation>
+    </message>
+    <message>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Open in</source>
+      <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
+      <translation type="unfinished">Open in</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation>Nová záložka</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation>Nové okno</translation>
+    </message>
+    <message>
+      <source>Dedicated Window</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation type="unfinished">Dedicated Window</translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Rozlišení</translation>
+    </message>
+    <message>
+      <source>JavaScript API...</source>
+      <translation type="unfinished">JavaScript API...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected Site...</source>
+      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio</source>
+      <translation type="unfinished">Cell Aspect Ratio</translation>
     </message>
   </context>
   <context>
@@ -1076,10 +1293,10 @@
     </message>
   </context>
   <context>
-    <name>DropdownTextPickerWidgetStrings</name>
+    <name>DirectParentsModel</name>
     <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
     </message>
   </context>
   <context>
@@ -1106,45 +1323,6 @@
     </message>
   </context>
   <context>
-    <name>EventSearchWidget::Private</name>
-    <message>
-      <source>Server events</source>
-      <translation>Události serveru</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analytická událost</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Jakákoliv událost</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Neznámý problém se zařízením</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Neznámý problém s kamerou</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Jakákoli událost serveru</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problémy se zařízením</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problémy s kamerou</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Jakákoli analytická událost</translation>
-    </message>
-  </context>
-  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1158,21 +1336,6 @@
         <numerusform>%n rozložení</numerusform>
         <numerusform>%n rozložení</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Obrázky</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Všechny soubory</translation>
     </message>
   </context>
   <context>
@@ -1232,10 +1395,26 @@
     </message>
   </context>
   <context>
-    <name>LayoutTourTextFactory</name>
+    <name>Groups</name>
     <message>
-      <source>Start Showreel</source>
-      <translation>Spustit filmový pás</translation>
+      <source>Delete group?</source>
+      <translation type="unfinished">Delete group?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>Delete %n groups?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>IntercomManager::Private</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation type="unfinished">%1 Layout</translation>
     </message>
   </context>
   <context>
@@ -1293,10 +1472,6 @@
       <translation>Licence již byla aktivována na jiném serveru</translation>
     </message>
     <message>
-      <source>You already activated this license</source>
-      <translation>Tuto licenci jste již aktivovali</translation>
-    </message>
-    <message>
       <source>To activate License Key manually please contact %1.</source>
       <translation>Chcete-li licenční klíč aktivovat ručně, kontaktujte %1.</translation>
     </message>
@@ -1343,12 +1518,16 @@ License Key: %2</translation>
       <translation type="unfinished">Copy Parameters</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <source>License has already been activated</source>
+      <translation type="unfinished">License has already been activated</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+    </message>
+    <message>
+      <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1491,8 +1670,8 @@ License Key: %2</translation>
   <context>
     <name>OauthLoginDialog</name>
     <message>
-      <source>Connect to System</source>
-      <translation>Připojit k systému</translation>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
     </message>
   </context>
   <context>
@@ -1506,24 +1685,12 @@ License Key: %2</translation>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation type="unfinished">Unsecure</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>Zkontrolovat</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Email není platný.</translation>
-    </message>
-    <message>
       <source>URL is not valid.</source>
       <translation type="unfinished">URL is not valid.</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation>Zde zadejte krátký popis systému.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1565,10 +1732,6 @@ License Key: %2</translation>
       <translation>Úspěšné</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Časový limit připojení vypršel</translation>
-    </message>
-    <message>
       <source>Authentication failed</source>
       <translation>Ověření se nezdařilo</translation>
     </message>
@@ -1577,13 +1740,53 @@ License Key: %2</translation>
       <translation>Neznámá chyba</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation type="unfinished">Unable to test email settings due to no internet connection on any of the active servers</translation>
-    </message>
-    <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation type="unfinished">Cannot reach the server</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation type="unfinished">Username or Password are incorrect</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation type="unfinished">Insecure</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Připojení se nezdařilo</translation>
+    </message>
+    <message>
+      <source>Username cannot be empty</source>
+      <translation type="unfinished">Username cannot be empty</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Heslo nemůže být prázdné</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation type="unfinished">Users are receiving emails</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation type="unfinished">Unable to test SMTP server</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation type="unfinished">Additional info required</translation>
+    </message>
+    <message>
+      <source>Enter a short Site description here.</source>
+      <translation type="unfinished">Enter a short Site description here.</translation>
     </message>
   </context>
   <context>
@@ -1600,10 +1803,6 @@ License Key: %2</translation>
       <source>Weak</source>
       <translation>Slabé</translation>
     </message>
-    <message>
-      <source>Password should contain different types of symbols.</source>
-      <translation>Heslo by mělo obsahovat různé typy symbolů.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1617,85 +1816,69 @@ License Key: %2</translation>
       <source>Short</source>
       <translation>Krátké</translation>
     </message>
-    <message numerus="yes">
-      <source>Password must be at least %n characters long.</source>
-      <translation>
-        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
-        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
-        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
-        <numerusform>Heslo musí obsahovat nejméně %n znaků.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Long</source>
       <translation>Dlouhé</translation>
-    </message>
-    <message numerus="yes">
-      <source>Password must be no longer than %n characters.</source>
-      <translation>
-        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
-        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
-        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
-        <numerusform>Heslo nesmí být delší než %n znaků.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters.</source>
-      <translation>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
-        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků.</numerusform>
-      </translation>
     </message>
     <message>
       <source>Common</source>
       <translation>Běžné</translation>
     </message>
     <message>
-      <source>This password is in list of the most popular passwords.</source>
-      <translation>Toto heslo je v seznamu nejoblíbenějších hesel.</translation>
-    </message>
-    <message>
       <source>Incorrect</source>
       <translation>Nesprávné</translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Jsou povoleny pouze latinské písmena, čísla a symboly klávesnice %1.</translation>
+      <source>Password should contain different types of symbols</source>
+      <translation>Heslo by mělo obsahovat různé typy symbolů</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long</source>
+      <translation>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků</numerusform>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků</numerusform>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků</numerusform>
+        <numerusform>Heslo musí obsahovat nejméně %n znaků</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters</source>
+      <translation>
+        <numerusform>Heslo nesmí být delší než %n znaků</numerusform>
+        <numerusform>Heslo nesmí být delší než %n znaků</numerusform>
+        <numerusform>Heslo nesmí být delší než %n znaků</numerusform>
+        <numerusform>Heslo nesmí být delší než %n znaků</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <translation>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více po sobě jdoucích znaků společně</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <translation>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+        <numerusform>Heslo by nemělo obsahovat %n nebo více opakujících se znaků</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>Jsou povolená pouze latinská písmena, číslice a symboly na klávesnici.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Kamery a zdroje</translation>
+      <source>This password is in list of the most popular passwords</source>
+      <translation>Toto heslo je v seznamu nejoblíbenějších hesel</translation>
     </message>
     <message>
-      <source>Shared Layouts</source>
-      <translation>Sdílené rozložení</translation>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
+      <translation>Jsou povoleny pouze latinské písmena, čísla a symboly klávesnice %1</translation>
     </message>
     <message>
-      <source>Permissions</source>
-      <translation>Oprávnění</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>Vše</translation>
+      <source>Only latin letters, numbers and keyboard symbols are allowed</source>
+      <translation>Jsou povolená pouze latinská písmena, číslice a symboly na klávesnici</translation>
     </message>
   </context>
   <context>
@@ -1824,6 +2007,50 @@ License Key: %2</translation>
       <source>Regional / License support</source>
       <translation>Regionální / licenční podpora</translation>
     </message>
+    <message>
+      <source>Partner information</source>
+      <translation type="unfinished">Partner information</translation>
+    </message>
+    <message>
+      <source>Phones</source>
+      <translation type="unfinished">Phones</translation>
+    </message>
+    <message>
+      <source>Emails</source>
+      <translation type="unfinished">Emails</translation>
+    </message>
+    <message>
+      <source>RHI backend</source>
+      <translation type="unfinished">RHI backend</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation type="unfinished">RHI device</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation type="unfinished">RHI device ID</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation type="unfinished">RHI vendor ID</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation type="unfinished">RHI max texture size</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation type="unfinished">Graphics API</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation type="unfinished">Unable to get GPU information for %1</translation>
+    </message>
+    <message>
+      <source>Platform</source>
+      <translation type="unfinished">Platform</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
@@ -1834,13 +2061,6 @@ License Key: %2</translation>
     <message>
       <source>Saving...</source>
       <translation>Ukládání...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Povolením přístupu k některým rozložením umožníte přístup ke všem kamerám v těchto rozloženích. Uživatel získá také přístup ke všem novým kamerám přidaným do těchto rozložení.</translation>
     </message>
   </context>
   <context>
@@ -1874,7 +2094,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Doporučeno</translation>
     </message>
     <message>
       <source>Strict</source>
@@ -1924,9 +2144,12 @@ License Key: %2</translation>
       <source>Download complete!</source>
       <translation type="unfinished">Download complete!</translation>
     </message>
+  </context>
+  <context>
+    <name>QnAttachToVideowallDialog</name>
     <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation type="unfinished">NVIDIA hardware acceleration is in beta mode</translation>
+      <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
+      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -2002,51 +2225,6 @@ License Key: %2</translation>
       <source>No archive for this position</source>
       <translation>Žádný archiv pro tuto pozici</translation>
     </message>
-    <message numerus="yes">
-      <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
-        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
-        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
-        <numerusform>Tato zařízení jsou ze systému odstraněna</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These cameras are removed from System</source>
-      <translation>
-        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto kamery jsou odebrány ze systému</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These servers are removed from System</source>
-      <translation>
-        <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto servery jsou odebrány ze systému</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from System</source>
-      <translation>
-        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
-        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
-        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
-        <numerusform>Tito uživatelé jsou odebráni ze systému</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These resources are removed from System</source>
-      <translation>
-        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
-        <numerusform>Tyto zdroje jsou odebrány ze systému</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Audit trail replay</source>
       <translation>Přehrát kontrolu akcí</translation>
@@ -2069,6 +2247,51 @@ License Key: %2</translation>
         <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
         <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
         <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These cameras are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These servers are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These servers are removed from Site</numerusform>
+        <numerusform>These servers are removed from Site</numerusform>
+        <numerusform>These servers are removed from Site</numerusform>
+        <numerusform>These servers are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These users are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These users are removed from Site</numerusform>
+        <numerusform>These users are removed from Site</numerusform>
+        <numerusform>These users are removed from Site</numerusform>
+        <numerusform>These users are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These resources are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2101,14 +2324,6 @@ License Key: %2</translation>
     <message>
       <source>Exporting video</source>
       <translation>Exportování videa</translation>
-    </message>
-    <message>
-      <source>System name changed</source>
-      <translation>Název systému byl změněn</translation>
-    </message>
-    <message>
-      <source>System merge</source>
-      <translation>Sloučení systému</translation>
     </message>
     <message>
       <source>General settings updated</source>
@@ -2145,10 +2360,6 @@ License Key: %2</translation>
     <message>
       <source>User</source>
       <translation>Uživatel</translation>
-    </message>
-    <message>
-      <source>IP</source>
-      <translation>IP</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -2193,14 +2404,6 @@ License Key: %2</translation>
     <message>
       <source>Camera removed</source>
       <translation>Kamera byla odstraněna</translation>
-    </message>
-    <message>
-      <source>Device name</source>
-      <translation>Název zařízení</translation>
-    </message>
-    <message>
-      <source>Camera name</source>
-      <translation>Název kamery</translation>
     </message>
     <message>
       <source>Email settings changed</source>
@@ -2267,13 +2470,63 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation type="unfinished">Connected to %1 via %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation type="unfinished">Disconnected from %1 via %2</translation>
+    </message>
+    <message>
+      <source>Site name changed</source>
+      <translation type="unfinished">Site name changed</translation>
+    </message>
+    <message>
+      <source>Site merge</source>
+      <translation type="unfinished">Site merge</translation>
+    </message>
+    <message>
+      <source>Server proxy connection</source>
+      <translation type="unfinished">Server proxy connection</translation>
+    </message>
+    <message>
+      <source>Site has been updated to version %1</source>
+      <translation type="unfinished">Site has been updated to version %1</translation>
+    </message>
+    <message>
+      <source>%1 - %2, Duration: %3, Target: %4</source>
+      <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
+      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+    </message>
+    <message>
+      <source>Start time: %1, Target: %2</source>
+      <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
+      <translation type="unfinished">Start time: %1, Target: %2</translation>
+    </message>
+    <message>
+      <source>User IP</source>
+      <translation type="unfinished">User IP</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Zařízení</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Device IP</source>
+      <translation type="unfinished">Device IP</translation>
+    </message>
+    <message>
+      <source>Camera IP</source>
+      <translation type="unfinished">Camera IP</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>Server</translation>
     </message>
   </context>
   <context>
@@ -2307,10 +2560,6 @@ License Key: %2</translation>
       <translation>6 měsíců</translation>
     </message>
     <message>
-      <source>year</source>
-      <translation>rok</translation>
-    </message>
-    <message>
       <source>Name cannot be empty.</source>
       <translation>Název nemůže být prázdný.</translation>
     </message>
@@ -2318,58 +2567,9 @@ License Key: %2</translation>
       <source>Description cannot be empty</source>
       <translation>Popis nemůže být prázdný</translation>
     </message>
-  </context>
-  <context>
-    <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 z %n zařízení</numerusform>
-        <numerusform>%1 z %n zařízení</numerusform>
-        <numerusform>%1 z %n zařízení</numerusform>
-        <numerusform>%1 z %n zařízení</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 z %n kamer</numerusform>
-        <numerusform>%1 z %n kamer</numerusform>
-        <numerusform>%1 z %n kamer</numerusform>
-        <numerusform>%1 z %n kamer</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Vyberte alespoň jedno zařízení</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Vyberte alespoň jednu kameru</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 z %n I/O modulů</numerusform>
-        <numerusform>%1 z %n I/O modulů</numerusform>
-        <numerusform>%1 z %n I/O modulů</numerusform>
-        <numerusform>%1 z %n I/O modulů</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Jakékoliv zařízení</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Jakákoliv kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Správa záložek</translation>
+      <source>Year</source>
+      <translation type="unfinished">Year</translation>
     </message>
   </context>
   <context>
@@ -2401,10 +2601,6 @@ License Key: %2</translation>
     <message>
       <source>Every %1</source>
       <translation>Každý %1</translation>
-    </message>
-    <message>
-      <source>System</source>
-      <translation>Systém</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2463,6 +2659,10 @@ License Key: %2</translation>
     <message>
       <source>Source Server and %1</source>
       <translation>Zdrojový server a %1</translation>
+    </message>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
     </message>
   </context>
   <context>
@@ -2593,45 +2793,11 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBuzzerPolicy</name>
-    <message>
-      <source>Servers that support buzzer</source>
-      <translation>Servery podporující buzzer</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
       <translation type="unfinished">%1 Running</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAnalyticsPolicy</name>
-    <message>
-      <source>Analytics is not available for %1</source>
-      <translation>Analytika není k dispozici pro %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAudioTransmitPolicy</name>
-    <message>
-      <source>Select device</source>
-      <translation>Vyberte zařízení</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>Vyberte kameru</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
-        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
-        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
-        <numerusform>%1 nepodporuje obousměrný zvuk</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2710,18 +2876,6 @@ License Key: %2</translation>
     <message>
       <source>automatic</source>
       <translation>automatický</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputPolicy</name>
-    <message numerus="yes">
-      <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 nemá žádné vstupní porty</numerusform>
-        <numerusform>%1 nemá žádné vstupní porty</numerusform>
-        <numerusform>%1 nemá žádné vstupní porty</numerusform>
-        <numerusform>%1 nemá žádné vstupní porty</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2840,29 +2994,10 @@ License Key: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCameraMotionPolicy</name>
-    <message>
-      <source>Recording or motion detection is disabled for %1</source>
-      <translation>Záznam nebo detekce pohybu je pro %1 zakázána</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
       <translation>automatický</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputPolicy</name>
-    <message numerus="yes">
-      <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 nemá žádný reléový výstup</numerusform>
-        <numerusform>%1 nemá žádný reléový výstup</numerusform>
-        <numerusform>%1 nemá žádný reléový výstup</numerusform>
-        <numerusform>%1 nemá žádný reléový výstup</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2876,10 +3011,6 @@ License Key: %2</translation>
       <translation>Zopakovat heslo</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Hesla se neshodují.</translation>
-    </message>
-    <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Heslo by mělo mít minimálně délku 8 znaků a mělo by obsahovat různé typy znaků.</translation>
     </message>
@@ -2887,12 +3018,9 @@ License Key: %2</translation>
       <source>Password should not be equal to camera&apos;s user name</source>
       <translation>Heslo by se nemělo být stejné a jménem uživatele kamery&apos;</translation>
     </message>
-  </context>
-  <context>
-    <name>QnCameraRecordingPolicy</name>
     <message>
-      <source>Recording is disabled for %1</source>
-      <translation>Záznam je zakázán pro %1</translation>
+      <source>Passwords do not match</source>
+      <translation>Hesla se neshodují</translation>
     </message>
   </context>
   <context>
@@ -2906,104 +3034,92 @@ License Key: %2</translation>
       <translation>Potvrdit heslo</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Hesla se neshodují.</translation>
-    </message>
-    <message>
       <source>Current Password</source>
       <translation>Aktuální heslo</translation>
     </message>
     <message>
-      <source>To modify your password please enter the existing one.</source>
-      <translation>Chcete-li změnit heslo, zadejte stávající.</translation>
+      <source>Passwords do not match</source>
+      <translation>Hesla se neshodují</translation>
     </message>
     <message>
-      <source>Invalid current password.</source>
-      <translation>Neplatné aktuální heslo.</translation>
+      <source>To modify your password please enter the existing one</source>
+      <translation>Chcete-li změnit heslo, zadejte stávající</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Neplatné aktuální heslo</translation>
     </message>
   </context>
   <context>
     <name>QnCloudManagementWidget</name>
-    <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>Připojte se k vašim systémům
-odkudkoli s libovolnými
-zařízeními</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Odpojit systém od %1</translation>
-    </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Otevřít portál %1</translation>
     </message>
     <message>
-      <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Připojit systém k %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Vytvořit účet %1</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Připojit systém k %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Další informace o %1</translation>
-    </message>
-    <message>
-      <source>Enter your account password to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
-    </message>
-    <message>
       <source>Disconnect</source>
       <translation>Odpojit</translation>
     </message>
     <message>
-      <source>System disconnected from %1</source>
+      <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation type="unfinished">Disconnect Site from %1</translation>
     </message>
     <message>
-      <source>You are about to disconnect System from %1</source>
+      <source>Connect Site to %1...</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connect Site to %1...</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your site and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+    </message>
+    <message>
+      <source>Enter your account password to disconnect Site from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the Site from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+    </message>
+    <message>
+      <source>Site disconnected from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Site disconnected from %1</translation>
+    </message>
+    <message>
+      <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation type="unfinished">Disconnect site from %1?</translation>
     </message>
     <message>
-      <source>All %1 users will be deleted.</source>
+      <source>Recording will stop and all Service Subscriptions will be removed</source>
+      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+    </message>
+    <message>
+      <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Všichni uživatelé %1 budou smazáni.</translation>
+      <translation type="unfinished">All %1 users will be removed from the site</translation>
     </message>
     <message>
-      <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <source>You will be logged out of the site. The site will be accessible only via local network</source>
+      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
     </message>
     <message>
-      <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <source>The site will be accessible only via local network</source>
+      <translation type="unfinished">The site will be accessible only via local network</translation>
     </message>
     <message>
-      <source>Continue</source>
-      <translation>Pokračovat</translation>
+      <source>Existing data (site settings and archive) will be preserved</source>
+      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
     </message>
     <message>
-      <source>Cannot disconnect the System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <source>This action cannot be undone</source>
+      <translation>Tuto akci nelze vrátit zpět</translation>
     </message>
   </context>
   <context>
@@ -3090,25 +3206,22 @@ to %1</source>
       <source>Connect to Server</source>
       <translation>Připojit k serveru</translation>
     </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Přihlásit se k %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation type="unfinished">Logged in as %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
       <translation>Nastavení účtu</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCloudUsersValidationPolicy</name>
-    <message numerus="yes">
-      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
-      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>
-        <numerusform>%n z %1 vybraných uživatelů nejsou %2 uživatelé a nebudou dostávat mobilní oznámení.</numerusform>
-        <numerusform>%n z %1 vybraných uživatelů nejsou %2 uživatelé a nebudou dostávat mobilní oznámení.</numerusform>
-        <numerusform>%n z %1 vybraných uživatelů nejsou %2 uživatelé a nebudou dostávat mobilní oznámení.</numerusform>
-        <numerusform>%n z %1 vybraných uživatelů nejsou %2 uživatelé a nebudou dostávat mobilní oznámení.</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -3184,12 +3297,24 @@ to %1</source>
       <translation>Nepodařilo se vstoupit do režimu kompatibility pro verzi %1</translation>
     </message>
     <message>
-      <source>System is not compatible with two-factor authentication</source>
-      <translation type="unfinished">System is not compatible with two-factor authentication</translation>
+      <source>Log In...</source>
+      <translation type="unfinished">Log In...</translation>
     </message>
     <message>
-      <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to System &quot;%1&quot;</translation>
+      <source>Your session has expired</source>
+      <translation>Platnost relace skončila</translation>
+    </message>
+    <message>
+      <source>Please sign in again with your link to continue</source>
+      <translation type="unfinished">Please sign in again with your link to continue</translation>
+    </message>
+    <message>
+      <source>Site is not compatible with two-factor authentication</source>
+      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to Site &quot;%1&quot;</source>
+      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3217,6 +3342,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Vytváření generické události najdete na %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Obrázky</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Všechny soubory</translation>
     </message>
   </context>
   <context>
@@ -3259,7 +3399,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Uložte zálohu databáze</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3274,10 +3414,6 @@ to %1</source>
       <translation type="unfinished">Restore from Database Backup</translation>
     </message>
     <message>
-      <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
-    </message>
-    <message>
       <source>Restore</source>
       <translation type="unfinished">Restore</translation>
     </message>
@@ -3286,141 +3422,16 @@ to %1</source>
       <translation>Obnovit databázi?</translation>
     </message>
     <message>
-      <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>Konfigurace systému bude obnovena ze zálohy, serverová aplikace bude restartována.</translation>
-    </message>
-    <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
       <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
     <message>
-      <source>Local user</source>
-      <translation>Místní uživatel</translation>
+      <source>Site configuration will be restored from backup, Server application will be restarted.</source>
+      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
     </message>
     <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 uživatel</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>LDAP uživatel</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Povoleno</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Zakázáno</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Role</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>Vlastník</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrátor</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>Zobrazit živé video</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>Úprava nastavení zařízení</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Úprava nastavení kamery</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>Použít ovládání PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Zobrazit video archivy</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Export videa</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Ovládání videostěny</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>Upravit</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Všichni uživatelé</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Uživatelé lze importovat z LDAP serveru. Budou se moci přihlásit pouze v případě, že je LDAP server online a jejich účty jsou na něm aktivní.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>Nelze nalézt enkodér videa %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Nelze inicializovat video enkodér.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Nelze inicializovat zvukový enkodér.</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>Nelze spustit primární zvukové zařízení.</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>Šířka obrazovky musí být násobkem 8.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Nelze inicializovat zvukové zařízení &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>Nelze rozpoznat rozlišení zachytávání</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <source>Enter your account password to restore Site from backup</source>
+      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
     </message>
   </context>
   <context>
@@ -3591,24 +3602,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnExecPtzPresetPolicy</name>
-    <message>
-      <source>Select exactly one camera</source>
-      <translation>Vyberte pouze jednu kameru</translation>
-    </message>
-    <message>
-      <source>%1 has no PTZ presets</source>
-      <translation>%1 nemá žádné PTZ prepozice</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFanErrorPolicy</name>
-    <message>
-      <source>Servers that support fan diagnostic</source>
-      <translation>Servery podporující diagnostiku ventilátorů</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3628,13 +3621,6 @@ to %1</source>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
       <translation>Táto kamera momentálně není v některých vybraných rozloženích. Akce bude fungovat, pokud bude kamera přidána před spuštěním akcí.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraPolicy</name>
-    <message>
-      <source>Select exactly one camera</source>
-      <translation>Vyberte pouze jednu kameru</translation>
     </message>
   </context>
   <context>
@@ -3665,6 +3651,10 @@ to %1</source>
     <message>
       <source>Select Folder...</source>
       <translation type="unfinished">Select Folder...</translation>
+    </message>
+    <message>
+      <source>Notifications filters are moved to the right panel</source>
+      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
     </message>
   </context>
   <context>
@@ -3716,6 +3706,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Otevřete seznam kamer</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrace</translation>
+    </message>
+    <message>
+      <source>Open Integrations</source>
+      <translation type="unfinished">Open Integrations</translation>
     </message>
   </context>
   <context>
@@ -3822,95 +3820,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>Nepodařilo se zapnout I/O port %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>Test se nezdařil</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
-        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
-        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
-        <numerusform>Test byl úspěšně dokončen: bylo nalezeno %n uživatelů.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Změna jiného nastavení LDAP než &quot;vyhledávacího filtru&quot; bude mít za následek ztrátu konektivity pro všechny LDAP uživatele.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>Zadané nastavení nejsou platné.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Nelze provést test.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Čas vypršel</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>Zadané nastavení nejsou platné.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Nelze provést test.</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>Nelze nahrát uživatele.</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>Chyba při načítání uživatelů.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>Nebyli nalezeni žádní nový uživatelé.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Čas vypršel</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>Importovat vybrané</translation>
     </message>
   </context>
   <context>
@@ -4027,75 +3936,9 @@ to %1</source>
       <source>Channels</source>
       <translation>Kanálů</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>Export</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>Export licence do souboru</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deaktivovat licence?</numerusform>
-        <numerusform>Deaktivovat licence?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Odstranit</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>Deaktivovat</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%n kanálů.</numerusform>
-        <numerusform>%n kanálů.</numerusform>
-        <numerusform>%n kanálů.</numerusform>
-        <numerusform>%n kanálů.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-        <numerusform>%1 jsou aktuálně používány</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-        <numerusform>Alespoň %1 jsou požadovány</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>Zbývá %n deaktivací.</numerusform>
-        <numerusform>Zbývá %n deaktivací.</numerusform>
-        <numerusform>Zbývá %n deaktivací.</numerusform>
-        <numerusform>Zbývá %n deaktivací.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <source>Not verified</source>
+      <translation type="unfinished">Not verified</translation>
     </message>
   </context>
   <context>
@@ -4125,6 +3968,10 @@ to %1</source>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Zašlete prosím licenční klíč a ID hardwaru na vaši regionální / licenční podporu (%1) pro získání souboru s aktivačním klíčem.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation type="unfinished">Text Files</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
@@ -4141,20 +3988,8 @@ to %1</source>
       <translation>Záznam obrazovky</translation>
     </message>
     <message>
-      <source>Notifications</source>
-      <translation>Upozornění</translation>
-    </message>
-    <message>
       <source>Advanced</source>
       <translation>Pokročilé</translation>
-    </message>
-    <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Soubor je nastaven pouze pro čtení. Obraťte se prosím na správce systému. Po ukončení programu budou všechny změny ztraceny.</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Nastavení nelze uložit. Obraťte se prosím na správce systému. Po ukončení programu budou všechny změny ztraceny.</translation>
     </message>
     <message>
       <source>Restart required</source>
@@ -4171,6 +4006,10 @@ to %1</source>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>Některé změny se projeví až po restartu %1</translation>
+    </message>
+    <message>
+      <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
+      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
     </message>
   </context>
   <context>
@@ -4220,12 +4059,12 @@ to %1</source>
       <translation>Nastavte čas použitý v klientovi (časová osa, časové značky atd.), pokud jsou klientský a serverový počítač v různých časových pásmech.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Zobrazit IP adresy kamer, serverů a role uživatelů.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Délka času zobrazení každé kamery v rozložení bude zobrazena pokud zahájíte Trasu.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
     </message>
   </context>
   <context>
@@ -4259,25 +4098,12 @@ to %1</source>
       <translation>%1 (Trasa &quot;%2&quot; je aktivní)</translation>
     </message>
     <message>
-      <source>Zoom Window</source>
-      <translation>Okno zvětšení</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation>I/O Modul</translation>
     </message>
     <message>
       <source>Lo-Res</source>
       <translation>Nízké rozlišení</translation>
-    </message>
-    <message>
-      <source>press and hold</source>
-      <comment>Soft Trigger</comment>
-      <translation>stiskněte a podržte</translation>
-    </message>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Zakázáno rozvrhem</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -4299,6 +4125,14 @@ to %1</source>
     <message>
       <source>Object Search</source>
       <translation type="unfinished">Object Search</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation type="unfinished">Mute</translation>
     </message>
   </context>
   <context>
@@ -4331,10 +4165,6 @@ to %1</source>
   <context>
     <name>QnNewVirtualCameraDialog</name>
     <message>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;virtuální kamera&quot; je virtuální úložiště pro video soubory, které lze nahrát na libovolný server Vašeho systému a poté můžou být přístupné jakémukoliv uživateli.</translation>
-    </message>
-    <message>
       <source>Virtual Camera</source>
       <translation>Virtuální kamera</translation>
     </message>
@@ -4349,6 +4179,10 @@ to %1</source>
     <message>
       <source>Name cannot be empty</source>
       <translation>Název nemůže být prázdný</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -4417,71 +4251,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>Upravit nastavení kamery</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>Toto je také nutné k vytvoření / úpravě prepozic PTZ a tras.</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>Ovládání videostěny</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>Zobrazit deník událostí</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>Zobrazit archiv</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>Exportovat archiv</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>Zobrazit záložky</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>Upravit záložky</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>Vstup uživatele</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, výstup zařízení, dvoucestný zvuk, snadné aktivační události.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPoeOverBudgetPolicy</name>
-    <message>
-      <source>Servers that support PoE monitoring</source>
-      <translation>Servery, které podporují monitorování PoE</translation>
-    </message>
-  </context>
-  <context>
     <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Správa záložek</translation>
-    </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Oznámení bude zobrazeno tak dlouho, dokud některý z uživatelů, kteří ji uvidí, nevytvoří záložku s popisem události</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupSettingsWidget</name>
-    <message>
-      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation type="unfinished">These settings apply only to the System you are logged in to and will be removed in future versions.</translation>
     </message>
   </context>
   <context>
@@ -4651,41 +4424,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>Obrazovka %1 - %2x%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (Primární)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Nejlepší</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>Průměrná</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Výkon</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>Výchozí</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>Quarter Native</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
@@ -4758,49 +4496,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>Role %1 nemá %2 oprávnění</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Vybrané role nemají %1 oprávnění</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
-        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
-        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
-        <numerusform>%n z %1 vybraných rolí nemají %2 oprávnění</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Uživatel %1 nemá %2 oprávnění</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Vybraní uživatelé nemají %1 oprávnění</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
-        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
-        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
-        <numerusform>%n z %1 vybraných uživatelů nemají %2 oprávnění</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
@@ -4828,6 +4523,14 @@ to %1</source>
     <message>
       <source>Enter Fullscreen</source>
       <translation type="unfinished">Enter Fullscreen</translation>
+    </message>
+    <message>
+      <source>Zoom Window</source>
+      <translation>Okno zvětšení</translation>
+    </message>
+    <message>
+      <source>Move to a dedicated window</source>
+      <translation type="unfinished">Move to a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -4881,6 +4584,10 @@ to %1</source>
     <message>
       <source>Search</source>
       <translation>Hledat</translation>
+    </message>
+    <message>
+      <source>N/A</source>
+      <translation>Nedostupné</translation>
     </message>
   </context>
   <context>
@@ -4943,6 +4650,30 @@ to %1</source>
     <message>
       <source>Select cameras...</source>
       <translation>Vybrat kamery...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation type="unfinished">Any Layout</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation type="unfinished">All Layouts</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>Vybrat rozvržení...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>%n Rozložení</numerusform>
+        <numerusform>%n Rozložení</numerusform>
+        <numerusform>%n Rozložení</numerusform>
+        <numerusform>%n Rozložení</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5103,41 +4834,13 @@ to %1</source>
       <source>Backup</source>
       <translation>Záloha</translation>
     </message>
-  </context>
-  <context>
-    <name>QnServerSettingsWidget</name>
-    <message>
-      <source>At least two servers are required for this feature.</source>
-      <translation>Pro tuto funkci jsou vyžadovány alespoň dva servery.</translation>
-    </message>
-    <message>
-      <source>Max devices on this server:</source>
-      <translation>Max. počet zařízení na tomto serveru:</translation>
-    </message>
-    <message>
-      <source>Max cameras on this server:</source>
-      <translation>Max. počet kamer na tomto serveru:</translation>
-    </message>
-    <message>
-      <source>This server already has more than max devices</source>
-      <translation>Tento server již má více zařízení než je max. počet</translation>
-    </message>
-    <message>
-      <source>This server already has more than max cameras</source>
-      <translation>Tento server již má více kamer než je max. počet</translation>
-    </message>
-    <message>
-      <source>To avoid issues adjust max number of devices</source>
-      <translation>Chcete-li zabránit problémům, nastavte max. počet zařízení</translation>
-    </message>
-    <message>
-      <source>To avoid issues adjust max number of cameras</source>
-      <translation>Chcete-li zabránit problémům, nastavte max. počet kamer</translation>
-    </message>
     <message>
       <source>Failover</source>
       <translation>Funkce selhání</translation>
     </message>
+  </context>
+  <context>
+    <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
@@ -5161,23 +4864,20 @@ to %1</source>
       <translation>Detaily</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
-    </message>
-    <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
       <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnSessionAwareTabbedDialog</name>
     <message>
-      <source>Unsaved changes:</source>
-      <translation>Neuložené změny:</translation>
+      <source>Certificate details are not available</source>
+      <translation type="unfinished">Certificate details are not available</translation>
     </message>
     <message>
-      <source>Save changes before exit?</source>
-      <translation>Uložit změny před ukončením?</translation>
+      <source>To access certificate details, enable the Audit Trail feature.</source>
+      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
+      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
     </message>
   </context>
   <context>
@@ -5211,34 +4911,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Vstup uživatele</translation>
-    </message>
-  </context>
-  <context>
     <name>QnStatusOverlayController</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>ŽÁDNÁ DATA</translation>
-    </message>
-    <message>
-      <source>UNAUTHORIZED</source>
-      <translation>NEOPRÁVNĚNÝ</translation>
-    </message>
-    <message>
-      <source>SERVER UNAVAILABLE</source>
-      <translation>SERVER NEDOSTUPNÝ</translation>
-    </message>
-    <message>
-      <source>NO ACCESS</source>
-      <translation>ŽÁDNÝ PŘÍSTUP</translation>
-    </message>
-    <message>
-      <source>DEVICE DISABLED</source>
-      <translation>ZAŘÍZENÍ ZAKÁZÁNO</translation>
-    </message>
     <message>
       <source>Device Settings</source>
       <translation>Nastavení zařízení</translation>
@@ -5256,37 +4929,28 @@ to %1</source>
       <translation>Diagnostika</translation>
     </message>
     <message>
-      <source>Enable</source>
-      <translation>Povolit</translation>
-    </message>
-    <message>
       <source>Activate License</source>
       <translation>Aktivovat licenci</translation>
     </message>
     <message>
-      <source>Please check authentication information</source>
-      <translation>Zkontrolujte prosím ověřovací informace</translation>
+      <source>Unlock</source>
+      <translation type="unfinished">Unlock</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation>ŽÁDNÝ STREAM ŽIVÉHO VIDEA</translation>
+      <source>Provide</source>
+      <translation type="unfinished">Provide</translation>
     </message>
     <message>
-      <source>TOO MANY CONNECTIONS</source>
-      <translation>PŘÍLIŠ MNOHO SPOJENÍ</translation>
+      <source>Authorize</source>
+      <translation type="unfinished">Authorize</translation>
     </message>
     <message>
-      <source>PASSWORD REQUIRED</source>
-      <translation>HESLO JE VYŽADOVÁNO</translation>
+      <source>Setup</source>
+      <translation>Nastavení</translation>
     </message>
-    <message>
-      <source>Set for this Camera</source>
-      <translation>Nastavit pro tuto kameru</translation>
-    </message>
-    <message>
-      <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>NEPODPOROVANÁ VERZE FIRMWARU</translation>
-    </message>
+  </context>
+  <context>
+    <name>QnStatusOverlayWidget</name>
     <message>
       <source>NOT ENOUGH LICENSES</source>
       <translation>NENÍ K DISPOZICI DOSTATEK LICENCÍ</translation>
@@ -5296,28 +4960,68 @@ to %1</source>
       <translation>OFFLINE</translation>
     </message>
     <message>
-      <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
+      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
     </message>
     <message>
-      <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <source>UNAUTHORIZED</source>
+      <translation>NEOPRÁVNĚNÝ</translation>
     </message>
     <message>
-      <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
+      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED</source>
+      <translation type="unfinished">UNSUPPORTED</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>HESLO JE VYŽADOVÁNO</translation>
+    </message>
+    <message>
+      <source>SITE SHUT DOWN</source>
+      <translation type="unfinished">SITE SHUT DOWN</translation>
+    </message>
+    <message>
+      <source>STREAM LIMITATION</source>
+      <translation type="unfinished">STREAM LIMITATION</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation type="unfinished">INFORMATION REQUIRED</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation type="unfinished">Provide</translation>
+      <source>AUDIO ONLY</source>
+      <translation type="unfinished">AUDIO ONLY</translation>
     </message>
     <message>
-      <source>ACCESS DENIED</source>
-      <translation type="unfinished">ACCESS DENIED</translation>
+      <source>NO DATA</source>
+      <translation>ŽÁDNÁ DATA</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>ŽÁDNÝ PŘÍSTUP</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>PŘÍLIŠ MNOHO SPOJENÍ</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>ŽÁDNÝ STREAM ŽIVÉHO VIDEA</translation>
+    </message>
+    <message>
+      <source>ARCHIVE ENCRYPTED</source>
+      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+    </message>
+    <message>
+      <source>CERTIFICATE ERROR</source>
+      <translation type="unfinished">CERTIFICATE ERROR</translation>
     </message>
   </context>
   <context>
@@ -5446,6 +5150,67 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>Insufficient permissions to store analytics data.</source>
       <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
     </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage</source>
+      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Nahrávání na nepovolené úložiště se zastaví. Smazání zastaralých záznamů však bude pokračovat.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Záznam byl povolen na USB úložišti</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation type="unfinished">If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation type="unfinished">If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Choose a read-write policy to define how interact with storage directories.</source>
+      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+    </message>
+    <message>
+      <source>Exclusive</source>
+      <translation type="unfinished">Exclusive</translation>
+    </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Isolated</source>
+      <translation type="unfinished">Isolated</translation>
+    </message>
+    <message>
+      <source>The Site Servers have different read-write policies for the storage</source>
+      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+    </message>
+    <message>
+      <source>URL: %1</source>
+      <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
+      <translation type="unfinished">URL: %1</translation>
+    </message>
+    <message>
+      <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
+      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+    </message>
+    <message>
+      <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
+      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
+    <message>
+      <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
+      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5486,10 +5251,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Hlavní</translation>
     </message>
     <message>
-      <source>%1 GB</source>
-      <translation>%1 GB</translation>
-    </message>
-    <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Příliš malé a systémové oddíly jsou vyhrazeny a nepoužívají se pro zápis pokud je k dispozici dostatek úložného prostoru.</translation>
     </message>
@@ -5518,14 +5279,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>síť</translation>
     </message>
     <message>
-      <source>usb</source>
-      <translation>usb</translation>
-    </message>
-    <message>
-      <source>%1 TB</source>
-      <translation>%1 TB</translation>
-    </message>
-    <message>
       <source>smb</source>
       <translation type="unfinished">smb</translation>
     </message>
@@ -5536,6 +5289,62 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Stores analytics and motion data</source>
       <translation type="unfinished">Stores analytics and motion data</translation>
+    </message>
+    <message>
+      <source>cloud</source>
+      <translation>cloudový</translation>
+    </message>
+    <message>
+      <source>Path</source>
+      <translation type="unfinished">Path</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Typ</translation>
+    </message>
+    <message>
+      <source>Purpose</source>
+      <translation type="unfinished">Purpose</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>Velikost</translation>
+    </message>
+    <message>
+      <source>Isolated</source>
+      <translation type="unfinished">Isolated</translation>
+    </message>
+    <message>
+      <source>Exclusive</source>
+      <translation type="unfinished">Exclusive</translation>
+    </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Nedefinováno</translation>
+    </message>
+    <message>
+      <source>removable</source>
+      <translation type="unfinished">removable</translation>
+    </message>
+    <message>
+      <source>Unknown size</source>
+      <translation type="unfinished">Unknown size</translation>
+    </message>
+    <message>
+      <source>The storage has different read-write policies across various Servers in the Site</source>
+      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+    </message>
+    <message>
+      <source>Click on the icon to see Servers list</source>
+      <translation type="unfinished">Click on the icon to see Servers list</translation>
+    </message>
+    <message>
+      <source>Read-Write Policy</source>
+      <translation type="unfinished">Read-Write Policy</translation>
     </message>
   </context>
   <context>
@@ -5615,10 +5424,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Aktualizovat</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Uživatelé</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Zabezpečení</translation>
     </message>
@@ -5641,6 +5446,18 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Advanced</source>
       <translation>Pokročilé</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrace</translation>
+    </message>
+    <message>
+      <source>Services</source>
+      <translation>Služby</translation>
+    </message>
+    <message>
+      <source>Failed to save site settings</source>
+      <translation type="unfinished">Failed to save site settings</translation>
     </message>
   </context>
   <context>
@@ -5670,10 +5487,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Oprava indexu archivu je zrušena uživatelem</translation>
     </message>
     <message>
-      <source>Email address is not set for user %1</source>
-      <translation>Emailová adresa není nastavena pro uživatele %1</translation>
-    </message>
-    <message>
       <source>Email address is not set.</source>
       <translation>Emailová adresa není nastavena.</translation>
     </message>
@@ -5690,14 +5503,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Nelze nahrávat video z kamer.</translation>
     </message>
     <message>
-      <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>Oprava indexu archivu je dokončena na následujícím serveru:</translation>
-    </message>
-    <message>
-      <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>Oprava indexu archivu je zrušena uživatelem na následujícím serveru:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Zjistit více</translation>
     </message>
@@ -5710,46 +5515,16 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Někteří uživatelé si nenastavili své emailové adresy</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by email.</source>
-      <translation>Systémová oznámení nemůžete přijímat emailem.</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses.</source>
       <translation>Někteří uživatelé si nenastavili své emailové adresy.</translation>
-    </message>
-    <message>
-      <source>They cannot receive System notifications by email.</source>
-      <translation>Systémová oznámení nemůžou přijímat emailem.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
       <translation>Při odesílání emailu došlo k chybě</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>Byla dokončena vzdálená synchronizace archivu</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>Vzdálená synchronizace archivu probíhá</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>Vzdálená synchronizace archivu byla dokončena pro následující zařízení:</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>Byl zjištěn problém integrity archivu</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Připojte Váš systém k %1 &amp;mdash;, aby byl přístupný odkudkoliv!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Vyzkoušejte %1 &amp;mdash; připojte se k Vašemu systému odkudkoli!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -5760,28 +5535,12 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Žádný server nemá přístup k internetu pro synchronizaci času</translation>
     </message>
     <message>
-      <source>The System has no internet access for time synchronization</source>
-      <translation>Systém nemá přístup k internetu pro synchronizaci času</translation>
-    </message>
-    <message>
-      <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>Žádný online server v systému nemá přístup k internetu pro synchronizaci času.</translation>
-    </message>
-    <message>
-      <source>Error occurred during remote archive synchronization</source>
-      <translation>Při vzdálené synchronizaci archivu došlo k chybě</translation>
-    </message>
-    <message>
       <source>Backup storage is not configured</source>
       <translation type="unfinished">Backup storage is not configured</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation type="unfinished">Camera recording schedule is invalid</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation type="unfinished">Remote archive synchronization has been stopped</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
@@ -5796,28 +5555,193 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
     </message>
     <message>
-      <source>Remote archive synchronization is available</source>
-      <translation type="unfinished">Remote archive synchronization is available</translation>
-    </message>
-    <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
       <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+    </message>
+    <message>
+      <source>Local recording services overused</source>
+      <translation type="unfinished">Local recording services overused</translation>
+    </message>
+    <message>
+      <source>Cloud storage services overused</source>
+      <translation type="unfinished">Cloud storage services overused</translation>
+    </message>
+    <message>
+      <source>Paid integrations services overused</source>
+      <translation type="unfinished">Paid integrations services overused</translation>
+    </message>
+    <message>
+      <source>Intercom call</source>
+      <translation type="unfinished">Intercom call</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation type="unfinished">Intercom missed call</translation>
+    </message>
+    <message>
+      <source>The Site has no internet access for time synchronization</source>
+      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>System partition is used for analytics data</source>
+      <translation type="unfinished">System partition is used for analytics data</translation>
+    </message>
+    <message>
+      <source>Site suspended</source>
+      <translation type="unfinished">Site suspended</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>Reject intercom call</source>
+      <translation type="unfinished">Reject intercom call</translation>
+    </message>
+    <message>
+      <source>Email address is not set for your account</source>
+      <translation type="unfinished">Email address is not set for your account</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
+    </message>
+    <message>
+      <source>Missed call</source>
+      <translation type="unfinished">Missed call</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage is not configured on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Storage is not configured on %n servers</numerusform>
+        <numerusform>Storage is not configured on %n servers</numerusform>
+        <numerusform>Storage is not configured on %n servers</numerusform>
+        <numerusform>Storage is not configured on %n servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule is invalid</source>
+      <translation type="unfinished">Recording schedule is invalid</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid on %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Email address is not set for %n users</source>
+      <translation>
+        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
+        <numerusform>Emailová adresa není nastavena pro %n uživatele</numerusform>
+        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
+        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Check out %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Check out %1</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization failed</source>
+      <translation type="unfinished">Remote archive synchronization failed</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connect to your Site from anywhere!</source>
+      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+    </message>
+    <message>
+      <source>No online server in the site has internet access for time synchronization.</source>
+      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+    </message>
+    <message>
+      <source>You cannot receive Site notifications by email.</source>
+      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+    </message>
+    <message>
+      <source>They cannot receive Site notifications by email.</source>
+      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some cameras are set to record in a mode they do not support.</source>
+      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Site will stop functioning soon</source>
+      <translation type="unfinished">Site will stop functioning soon</translation>
+    </message>
+    <message>
+      <source>Site has stopped functioning</source>
+      <translation type="unfinished">Site has stopped functioning</translation>
+    </message>
+    <message>
+      <source>Site will stop functioning today</source>
+      <translation type="unfinished">Site will stop functioning today</translation>
+    </message>
+    <message>
+      <source>Site will stop functioning tomorrow</source>
+      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+    </message>
+    <message numerus="yes">
+      <source>Site will stop functioning in %n days</source>
+      <translation type="unfinished">
+        <numerusform>Site will stop functioning in %n days</numerusform>
+        <numerusform>Site will stop functioning in %n days</numerusform>
+        <numerusform>Site will stop functioning in %n days</numerusform>
+        <numerusform>Site will stop functioning in %n days</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Notification and interface languages differ</source>
+      <translation type="unfinished">Notification and interface languages differ</translation>
+    </message>
+    <message>
+      <source>Notifications language differs from the interface language</source>
+      <translation type="unfinished">Notifications language differs from the interface language</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Allow System to optimize device settings</source>
-      <translation>Povolit systému optimalizovat nastavení zařízení</translation>
-    </message>
-    <message>
-      <source>Allow System to optimize camera settings</source>
-      <translation>Umožněte systému optimalizovat nastavení kamery</translation>
-    </message>
-    <message>
-      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Zahrnuje informace o systému, jako jsou modely kamer, verze firmwaru, počet serverů atd.</translation>
-    </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Nezahrnuje žádné osobní údaje a je zcela anonymní.</translation>
@@ -5831,12 +5755,24 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Povolit automatickou detekci kamer a serverů a automatickou kontrolu stavu kamer</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation>Je-li tato funkce povolena, systém průběžně hledá nové kamery a servery a odesílá žádosti kamerám o aktualizaci stavu.</translation>
-    </message>
-    <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
       <translation>Pokud je funkce Failover povolena, server může stále žádat o aktualizaci stavu kamery bez ohledu na toto nastavení.</translation>
+    </message>
+    <message>
+      <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
+      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+    </message>
+    <message>
+      <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Allow optimize device settings</source>
+      <translation type="unfinished">Allow optimize device settings</translation>
+    </message>
+    <message>
+      <source>Allow optimize camera settings</source>
+      <translation type="unfinished">Allow optimize camera settings</translation>
     </message>
   </context>
   <context>
@@ -5866,269 +5802,33 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidget::Private</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Input device is not selected</source>
-      <translation>Vstupní zařízení není vybráno</translation>
+      <source>Custom</source>
+      <translation>Vlastní</translation>
     </message>
     <message>
-      <source>Streaming is not ready yet</source>
-      <translation>Streamování není dosud připraveno</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Chyba sítě</translation>
-    </message>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Přidržet hovor</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserProfileWidget</name>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Jméno</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Role</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>Název role nemůže být prázdné.</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>Role se stejným názvem již existuje.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>Žádní uživatelé nemají tuto roli</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>Vlastní bez oprávnění</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>Uživatelé nebudou mít žádné oprávnění, dokud se později nezmění.</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>Přiřaďte novou roli</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>Smazat tyto uživatele</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
-        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
-        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
-        <numerusform>Vyberte prosím akci, která se bude provádět u %n uživatelů s touto rolí</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>Informace o roli</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Oprávnění</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Kamery &amp;&amp; zdroje</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Rozložení</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>Nová role</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>Nová role %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>Informace o uživateli</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Oprávnění</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Kamery &amp;&amp; zdroje</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Rozložení</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Nový uživatel...</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>Nastavení uživatele - %1 (pouze čtení)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>Nastavení uživatele - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Povoleno</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>Uživatel je zakázán</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>Použít změny před přepnutím na jiného uživatele?</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Tento uživatel se dosud nezaregistroval pro %1</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>Místní</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>Přihlášení nemůže být prázdné.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>Uživatel s uvedeným přihlášením již existuje.</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>Uživatel byl přejmenován. Heslo musí být aktualizováno.</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Jméno</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>Email nemůže být prázdný.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Heslo</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>Potvrdit heslo</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>Hesla se neshodují.</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 uživatel s uvedenou emailovou adresou již existuje.</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>Místní uživatel</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 uživatelů</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 patří pouze do tohoto systému a jsou plně spravováni správci systému.</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 může mít přístup k mnoha systémům. Správci mohou spravovat pouze jejich oprávnění.</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <source>Custom access rights</source>
+      <translation type="unfinished">Custom access rights</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
-      <source>Email cannot be empty.</source>
-      <translation>Email nemůže být prázdný.</translation>
+      <source>Email cannot be empty</source>
+      <translation>Email nemůže být prázdný</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Email není platný.</translation>
+      <source>Email is not valid</source>
+      <translation>Email není platný</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Heslo nemůže být prázdné.</translation>
+      <source>Password cannot be empty</source>
+      <translation>Heslo nemůže být prázdné</translation>
     </message>
     <message>
-      <source>Avoid leading and trailing spaces.</source>
-      <translation>Vyhnout se počátečním a koncovým místům.</translation>
+      <source>Avoid leading and trailing spaces</source>
+      <translation>Vyhnout se počátečním a koncovým místům</translation>
     </message>
   </context>
   <context>
@@ -6181,31 +5881,20 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <source>Integration settings...</source>
+      <translation type="unfinished">Integration settings...</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <source>Web Page settings...</source>
+      <translation type="unfinished">Web Page settings...</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <source>Auto-refresh every %1</source>
+      <translation type="unfinished">Auto-refresh every %1</translation>
     </message>
     <message>
-      <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+      <source>Refresh</source>
+      <translation>Obnovit</translation>
     </message>
   </context>
   <context>
@@ -6241,13 +5930,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
       <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchNotificationsHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Na odebrané kameře nelze událost potvrdit.</translation>
     </message>
   </context>
   <context>
@@ -6296,37 +5978,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>Nepodařilo se odstranit %n položek:</numerusform>
         <numerusform>Nepodařilo se odstranit %n položek:</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchScreenRecordingHandler</name>
-    <message>
-      <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Subsystém snímání obrazovky ještě není inicializován. Prosím zkuste to znovu později.</translation>
-    </message>
-    <message>
-      <source>Recording in %1...</source>
-      <translation>Nahrávání v %1...</translation>
-    </message>
-    <message>
-      <source>Recorded Video</source>
-      <translation>Nahrané video</translation>
-    </message>
-    <message>
-      <source>Save Recording As...</source>
-      <translation>Uložit záznam jako...</translation>
-    </message>
-    <message>
-      <source>Failed to start recording</source>
-      <translation>Spouštění záznamu se nezdařilo</translation>
-    </message>
-    <message>
-      <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
-    </message>
-    <message>
-      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
     </message>
   </context>
   <context>
@@ -6402,15 +6053,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Failed to apply changes</source>
       <translation>Použití změn se nezdařilo</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Zastavit videostěnu?</translation>
@@ -6422,15 +6064,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Stop</source>
       <translation>Zastavit</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Odstranit %n matice?</numerusform>
-        <numerusform>Odstranit %n matice?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6456,9 +6089,6430 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Activate License...</source>
       <translation>Aktivovat licenci...</translation>
     </message>
+    <message numerus="yes">
+      <source>Failed to open %n devices on the video wall:</source>
+      <translation type="unfinished">
+        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to open %n cameras on the video wall:</source>
+      <translation type="unfinished">
+        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
+      <translation type="unfinished">
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Screen is locked and cannot be changed</source>
+      <translation type="unfinished">Screen is locked and cannot be changed</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>To add a Video Wall, the Site should be in active state. %1</source>
+      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+    </message>
   </context>
   <context>
-    <name>QnWorkbenchVirtualCameraHandler</name>
+    <name>Resources</name>
+    <message>
+      <source>There is another layout with the same name</source>
+      <translation>Existuje další rozložení se stejným názvem</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>Nemáte oprávnění k jeho přepsání.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout?</source>
+      <translation>Přepsat existující rozložení?</translation>
+    </message>
+    <message>
+      <source>There is another layout with the same name.</source>
+      <translation>Existuje další rozložení se stejným názvem.</translation>
+    </message>
+    <message>
+      <source>Changes will affect other users</source>
+      <translation>Změny ovlivní ostatní uživatele</translation>
+    </message>
+    <message>
+      <source>This layout is shared with other users, so you change it for them too.</source>
+      <translation>Toto rozložení je sdílené s ostatními uživateli, takže jim je také změníte.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout?</source>
+      <translation>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
+        <numerusform>Odstranit %n položek z rozložení?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Odstranit</translation>
+    </message>
+    <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>Chystáte se smazat některé zdroje, ke kterým máte přístup pouze z videostěny. Po smazání je nebudete vidět ve svém seznamu zdrojů a nebudete je moci znovu přidat do videostěny.</translation>
+    </message>
+    <message>
+      <source>You will lose access to following resources:</source>
+      <translation>Ztratíte přístup k následujícím zdrojům:</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n devices?</source>
+      <translation>
+        <numerusform>Smazat %n zařízení?</numerusform>
+        <numerusform>Smazat %n zařízení?</numerusform>
+        <numerusform>Smazat %n zařízení?</numerusform>
+        <numerusform>Smazat %n zařízení?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n cameras?</source>
+      <translation>
+        <numerusform>Smazat %n kamer?</numerusform>
+        <numerusform>Smazat %n kamer?</numerusform>
+        <numerusform>Smazat %n kamer?</numerusform>
+        <numerusform>Smazat %n kamer?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n I/O Modules?</source>
+      <translation>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
+        <numerusform>Smazat %n I/O modulů?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n items?</source>
+      <translation>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+        <numerusform>Smazat %n položek?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of them are auto-discovered.</source>
+      <translation>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
+        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras are auto-discovered.</source>
+      <translation>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
+        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules are auto-discovered.</source>
+      <translation>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
+        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>They may be auto-discovered again after removing.</source>
+      <translation>Po odstranění mohou být znovu automaticky nalezeny.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing showreel?</source>
+      <translation>Přepsat existující filmový pás?</translation>
+    </message>
+    <message>
+      <source>There is another showreel with the same name.</source>
+      <translation>Existuje další filmový pás se stejným názvem.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from showreel?</source>
+      <translation>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
+        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Zastavit nahrávání?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Zastavit</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video files are still being uploaded to %n virtual cameras:</source>
+      <translation>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
+        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Merge this group with %1?</source>
+      <translation type="unfinished">Merge this group with %1?</translation>
+    </message>
+    <message>
+      <source>Two groups with the same name cannot exist.</source>
+      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+    </message>
+    <message>
+      <source>Merge</source>
+      <translation>Sloučit</translation>
+    </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
+      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+    </message>
+    <message>
+      <source>Move anyway?</source>
+      <translation type="unfinished">Move anyway?</translation>
+    </message>
+    <message>
+      <source>Move</source>
+      <translation>Přesunout</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Zrušit</translation>
+    </message>
+    <message>
+      <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
+      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+    </message>
+    <message>
+      <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
+      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+    </message>
+    <message>
+      <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
+      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+    </message>
+    <message>
+      <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
+      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+    </message>
+    <message>
+      <source>Virtual cameras cannot be moved between servers</source>
+      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+    </message>
+    <message>
+      <source>USB or web cameras cannot be moved between servers</source>
+      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+    </message>
+    <message>
+      <source>Only some of the selected devices can be moved to %1</source>
+      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
+    </message>
+    <message>
+      <source>Move Partially</source>
+      <translation type="unfinished">Move Partially</translation>
+    </message>
+    <message numerus="yes">
+      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
+      <translation type="unfinished">
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>Delete %n layouts?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation type="unfinished">
+        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n items were not deleted.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete layout?</source>
+      <translation type="unfinished">Delete layout?</translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>Smazat uživatele?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+        <numerusform>Odstranit %n matice?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation type="unfinished">All members of %1 and %2 groups will get access to this layout</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation type="unfinished">Convert</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation type="unfinished">
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <translation>
+        <numerusform>Smazat %n uživatelů?</numerusform>
+        <numerusform>Smazat %n uživatelů?</numerusform>
+        <numerusform>Smazat %n uživatelů?</numerusform>
+        <numerusform>Smazat %n uživatelů?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unable to move device</source>
+      <translation type="unfinished">Unable to move device</translation>
+    </message>
+    <message>
+      <source>Maximum number of devices for this server is reached</source>
+      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Spustit filmový pás</translation>
+    </message>
+  </context>
+  <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Chcete-li filtrovat výsledky, vyberte oblast na videu</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Ve vybrané oblasti</translation>
+    </message>
+  </context>
+  <context>
+    <name>StreamQualityStrings</name>
+    <message>
+      <source>Lowest</source>
+      <translation>Nejnižší</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Nízká</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Střední</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Vysoká</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>Nejlepší</translation>
+    </message>
+    <message>
+      <source>Preset</source>
+      <translation>Prepozice</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Nedefinováno</translation>
+    </message>
+    <message>
+      <source>Lst</source>
+      <extracomment>Short for &apos;Lowest&apos;</extracomment>
+      <translation>Pos</translation>
+    </message>
+    <message>
+      <source>Lo</source>
+      <extracomment>Short for &apos;Low&apos;</extracomment>
+      <translation>Ni</translation>
+    </message>
+    <message>
+      <source>Me</source>
+      <extracomment>Short for &apos;Medium&apos;</extracomment>
+      <translation>St</translation>
+    </message>
+    <message>
+      <source>Hi</source>
+      <extracomment>Short for &apos;High&apos;</extracomment>
+      <translation>Vy</translation>
+    </message>
+    <message>
+      <source>Bst</source>
+      <extracomment>Short for &apos;Best&apos;</extracomment>
+      <translation>Nej</translation>
+    </message>
+    <message>
+      <source>Ps</source>
+      <extracomment>Short for &apos;Preset&apos;</extracomment>
+      <translation>Pr</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%n Layouts</source>
+      <translation type="unfinished">%n Layouts</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Zdrojový server</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Source Server and %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Všichni uživatelé</translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Jakékoliv zařízení</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Jakákoliv kamera</translation>
+    </message>
+    <message>
+      <source>Any Server</source>
+      <translation>Jakýkoli server</translation>
+    </message>
+    <message>
+      <source>Any User</source>
+      <translation>Jakýkoliv uživatel</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Chyba</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Varování</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Informace</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Nedefinováno</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>%n Servers</source>
+      <translation type="unfinished">%n Servers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+        <numerusform>%n dodatečný</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+        <numerusform>%n uživatelé</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation type="unfinished">
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+        <numerusform>%n Groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation type="unfinished">Select</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Zdrojová kamera</translation>
+    </message>
+    <message>
+      <source>Developer Mode Info</source>
+      <translation type="unfinished">Developer Mode Info</translation>
+    </message>
+    <message>
+      <source>Is listed</source>
+      <translation type="unfinished">Is listed</translation>
+    </message>
+    <message>
+      <source>Is not listed</source>
+      <translation type="unfinished">Is not listed</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <translation type="unfinished">In</translation>
+    </message>
+    <message>
+      <source>%n removed subjects</source>
+      <translation type="unfinished">%n removed subjects</translation>
+    </message>
+    <message>
+      <source>%n removed devices</source>
+      <translation type="unfinished">%n removed devices</translation>
+    </message>
+    <message>
+      <source>%n removed cameras</source>
+      <translation type="unfinished">%n removed cameras</translation>
+    </message>
+    <message>
+      <source>%n removed servers</source>
+      <translation type="unfinished">%n removed servers</translation>
+    </message>
+    <message>
+      <source>%n removed layouts</source>
+      <translation type="unfinished">%n removed layouts</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n subjects more</source>
+      <translation type="unfinished">
+        <numerusform>%n subjects more</numerusform>
+        <numerusform>%n subjects more</numerusform>
+        <numerusform>%n subjects more</numerusform>
+        <numerusform>%n subjects more</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%n devices more</source>
+      <translation type="unfinished">%n devices more</translation>
+    </message>
+    <message>
+      <source>%n cameras more</source>
+      <translation type="unfinished">%n cameras more</translation>
+    </message>
+    <message>
+      <source>%n servers more</source>
+      <translation type="unfinished">%n servers more</translation>
+    </message>
+    <message>
+      <source>%n layouts more</source>
+      <translation type="unfinished">%n layouts more</translation>
+    </message>
+  </context>
+  <context>
+    <name>TierUsageStrings</name>
+    <message>
+      <source>Number of servers per Site</source>
+      <translation type="unfinished">Number of servers per Site</translation>
+    </message>
+    <message>
+      <source>Number of devices per server</source>
+      <translation type="unfinished">Number of devices per server</translation>
+    </message>
+    <message>
+      <source>Number of items on layout</source>
+      <translation type="unfinished">Number of items on layout</translation>
+    </message>
+    <message>
+      <source>Number of days of archive</source>
+      <translation type="unfinished">Number of days of archive</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation type="unfinished">LDAP</translation>
+    </message>
+    <message>
+      <source>Video Wall</source>
+      <translation>Videostěna</translation>
+    </message>
+    <message>
+      <source>Cross-Site features</source>
+      <translation type="unfinished">Cross-Site features</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeDurationWidget</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
+    </message>
+  </context>
+  <context>
+    <name>UpdateStrings</name>
+    <message>
+      <source>This Linux platform is no longer supported</source>
+      <translation>Tato platforma Linux již není podporována</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported</source>
+      <translation>Tato verze OS již není podporována</translation>
+    </message>
+    <message>
+      <source>This %1 version is no longer supported</source>
+      <comment>%1 is OS name, e.g. Windows</comment>
+      <translation>Tato verze %1 již není podporována</translation>
+    </message>
+    <message>
+      <source>%1 %2 is no longer supported</source>
+      <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
+      <translation>%1 %2 již není podporována</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserGroupsWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>No groups found</source>
+      <translation type="unfinished">No groups found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new group</source>
+      <translation type="unfinished">Change search criteria or create a new group</translation>
+    </message>
+    <message>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n groups</numerusform>
+        <numerusform>Delete %n groups</numerusform>
+        <numerusform>Delete %n groups</numerusform>
+        <numerusform>Delete %n groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete group &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Failed to delete group.</source>
+      <translation type="unfinished">Failed to delete group.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+        <numerusform>Failed to delete %n groups.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation type="unfinished">Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Všichni uživatelé</translation>
+    </message>
+    <message>
+      <source>Users with Digest Authentication</source>
+      <translation type="unfinished">Users with Digest Authentication</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation type="unfinished">Change search criteria or create a new user</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Upravit</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation type="unfinished">Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Smazat %n uživatelů</numerusform>
+        <numerusform>Smazat %n uživatelů</numerusform>
+        <numerusform>Smazat %n uživatelů</numerusform>
+        <numerusform>Smazat %n uživatelů</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation type="unfinished">
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation type="unfinished">
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+        <numerusform>Failed to delete %n users.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation type="unfinished">
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Videowall</name>
+    <message>
+      <source>There is another video wall with the same name</source>
+      <translation>Existuje další videostěna se stejným názvem</translation>
+    </message>
+    <message>
+      <source>Close %1 before starting Video Wall?</source>
+      <translation>Zavřete %1 před spuštěním videostěny?</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>Zavřít</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Ponechat</translation>
+    </message>
+    <message>
+      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+      <translation>Místní soubory nelze umístit na obrazovku videostěny připojené k jinému počítači</translation>
+    </message>
+    <message>
+      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+      <translation>Chcete-li zobrazit místní soubory na videostěně, připojte je pomocí počítače, na kterém je videostěna umístěna.</translation>
+    </message>
+  </context>
+  <context>
+    <name>VmsRulesDialogHelper</name>
+    <message>
+      <source>This action cannot be undone</source>
+      <translation>Tuto akci nelze vrátit zpět</translation>
+    </message>
+    <message>
+      <source>Reset all rules to defaults?</source>
+      <translation type="unfinished">Reset all rules to defaults?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n rules?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n rules?</numerusform>
+        <numerusform>Delete %n rules?</numerusform>
+        <numerusform>Delete %n rules?</numerusform>
+        <numerusform>Delete %n rules?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Ukládání rozložení</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>Exportování videa</translation>
+    </message>
+    <message>
+      <source>Stop Saving</source>
+      <translation>Zastavte ukládání</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Zastavit export</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Je vyžadováno překódování. Export relace restartován.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimalizovat</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Použít</translation>
+    </message>
+    <message>
+      <source>Unsaved changes:</source>
+      <translation>Neuložené změny:</translation>
+    </message>
+    <message>
+      <source>Save changes before exit?</source>
+      <translation>Uložit změny před ukončením?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>View Archive</source>
+      <translation type="unfinished">View Archive</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation type="unfinished">Export Archive</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation type="unfinished">View Bookmarks</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Správa záložek</translation>
+    </message>
+    <message>
+      <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
+      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+    </message>
+    <message>
+      <source>Allows users to access a resource and view live footage from a camera.</source>
+      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+    </message>
+    <message>
+      <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
+      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation type="unfinished">View Live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Vstup uživatele.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation type="unfinished">Edit Settings.</translation>
+    </message>
+    <message>
+      <source>Play Audio</source>
+      <translation type="unfinished">Play Audio</translation>
+    </message>
+    <message>
+      <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
+      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
+    <message>
+      <source>All Cameras &amp; Resources</source>
+      <translation>Všechny kamery a zdroje</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
+    <message>
+      <source>Backup and Restore</source>
+      <translation>Zálohovat a obnovit</translation>
+    </message>
+    <message>
+      <source>Logs Management</source>
+      <translation type="unfinished">Logs Management</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
+    <message>
+      <source>Alarms</source>
+      <translation>Poplachy</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
+    <message>
+      <source>Add To List</source>
+      <translation type="unfinished">Add To List</translation>
+    </message>
+    <message>
+      <source>Create New List...</source>
+      <translation type="unfinished">Create New List...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
+    <message>
+      <source>No objects</source>
+      <translation>Žádné objekty</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects</source>
+      <translation>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>ŽÁDNÁ DATA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
+    <message>
+      <source>Select Device...</source>
+      <translation type="unfinished">Select Device...</translation>
+    </message>
+    <message>
+      <source>Use audio stream from</source>
+      <translation type="unfinished">Use audio stream from</translation>
+    </message>
+    <message>
+      <source>Transmit audio stream to</source>
+      <translation type="unfinished">Transmit audio stream to</translation>
+    </message>
+    <message>
+      <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
+      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+    </message>
+    <message>
+      <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
+      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+    </message>
+    <message>
+      <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
+      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+    </message>
+    <message>
+      <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
+      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+    </message>
+    <message>
+      <source>Use this device for audio output</source>
+      <translation type="unfinished">Use this device for audio output</translation>
+    </message>
+    <message>
+      <source>Use this camera for audio output</source>
+      <translation type="unfinished">Use this camera for audio output</translation>
+    </message>
+    <message>
+      <source>Use audio stream from another device</source>
+      <translation type="unfinished">Use audio stream from another device</translation>
+    </message>
+    <message>
+      <source>Use audio stream from another camera</source>
+      <translation type="unfinished">Use audio stream from another camera</translation>
+    </message>
+    <message>
+      <source>Transmit audio stream to another device</source>
+      <translation type="unfinished">Transmit audio stream to another device</translation>
+    </message>
+    <message>
+      <source>Transmit audio stream to another camera</source>
+      <translation type="unfinished">Transmit audio stream to another camera</translation>
+    </message>
+    <message>
+      <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
+      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+    </message>
+    <message>
+      <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
+      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+    </message>
+    <message>
+      <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
+      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+    </message>
+    <message>
+      <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
+      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+    </message>
+    <message>
+      <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
+      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+    </message>
+    <message>
+      <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
+      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+    </message>
+    <message>
+      <source>Use audio stream from this device</source>
+      <translation type="unfinished">Use audio stream from this device</translation>
+    </message>
+    <message>
+      <source>Use audio stream from this camera</source>
+      <translation type="unfinished">Use audio stream from this camera</translation>
+    </message>
+    <message>
+      <source>%1 is connected to another server. Audio stream is not available</source>
+      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+    </message>
+    <message>
+      <source>Selected device is connected to another server. Audio stream is not available.</source>
+      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+    </message>
+    <message>
+      <source>Selected camera is connected to another server. Audio stream is not available.</source>
+      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
+    <message>
+      <source>Select an area on the schedule to apply chosen settings.</source>
+      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
+    <message>
+      <source>The camera has neither recorded footage nor recording scheduled</source>
+      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled</source>
+      <translation>Detekce pohybu je deaktivována</translation>
+    </message>
+    <message>
+      <source>No analytics plugins</source>
+      <translation type="unfinished">No analytics plugins</translation>
+    </message>
+    <message>
+      <source>Cameras</source>
+      <translation>Kamery</translation>
+    </message>
+    <message>
+      <source>What to backup</source>
+      <translation type="unfinished">What to backup</translation>
+    </message>
+    <message>
+      <source>Quality</source>
+      <translation>Kvalita</translation>
+    </message>
+    <message>
+      <source>Cannot be modified for new added cameras</source>
+      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+    </message>
+    <message>
+      <source>This device provides only one data stream</source>
+      <translation type="unfinished">This device provides only one data stream</translation>
+    </message>
+    <message>
+      <source>Stream setting is not applicable to this device type</source>
+      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+    </message>
+    <message>
+      <source>Not supported</source>
+      <translation type="unfinished">Not supported</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation type="unfinished">Backup is not supported for this device</translation>
+    </message>
+    <message>
+      <source>Nothing to backup</source>
+      <translation type="unfinished">Nothing to backup</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation type="unfinished">Insufficient services</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n suitable cloud storage services are required</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <translation type="unfinished">
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Megapixels</source>
+      <translation type="unfinished">
+        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapixels</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unknown resolution</source>
+      <translation type="unfinished">Unknown resolution</translation>
+    </message>
+    <message>
+      <source>No suitable cloud storage services available</source>
+      <translation type="unfinished">No suitable cloud storage services available</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services available</source>
+      <translation type="unfinished">
+        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n suitable cloud storage services available</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Rozlišení</translation>
+    </message>
+    <message>
+      <source>Setting was changed</source>
+      <translation type="unfinished">Setting was changed</translation>
+    </message>
+    <message>
+      <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
+    <message>
+      <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
+      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+    </message>
+    <message>
+      <source>What to backup</source>
+      <translation type="unfinished">What to backup</translation>
+    </message>
+    <message>
+      <source>Quality</source>
+      <translation>Kvalita</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for %n selected devices</source>
+      <translation type="unfinished">
+        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Set for %n selected devices</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
+    <message>
+      <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BackupSettingsWidget</name>
+    <message>
+      <source>Settings</source>
+      <translation>Nastavení</translation>
+    </message>
+    <message>
+      <source>Bandwidth Limit</source>
+      <translation type="unfinished">Bandwidth Limit</translation>
+    </message>
+    <message>
+      <source>New added cameras</source>
+      <translation type="unfinished">New added cameras</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation>Správa úložiště</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Server je offline</translation>
+    </message>
+    <message>
+      <source>Backup settings are not available</source>
+      <translation type="unfinished">Backup settings are not available</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation type="unfinished">Applies to all servers</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
+      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BackupStatusWidget</name>
+    <message>
+      <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
+      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+    </message>
+    <message>
+      <source>Skip backup for existing footage?</source>
+      <translation type="unfinished">Skip backup for existing footage?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone.</source>
+      <translation>Tuto akci nelze vrátit zpět.</translation>
+    </message>
+    <message>
+      <source>Applies only to the cameras connected to current server.</source>
+      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup is enabled for %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>Backup is enabled for %n devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup is enabled for %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Backup is enabled for %n cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>The progress will be displayed once the backup process starts</source>
+      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
+    </message>
+    <message>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
+      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
+    <message>
+      <source>No bookmarks</source>
+      <translation>Žádné záložky</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
+      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation type="unfinished">Calling...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Otevřít</translation>
+    </message>
+    <message>
+      <source>Missed call</source>
+      <translation type="unfinished">Missed call</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
+    <message>
+      <source>Loading values...</source>
+      <translation>Načítání hodnot...</translation>
+    </message>
+    <message>
+      <source>Applying changes...</source>
+      <translation>Aplikování změn...</translation>
+    </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation type="unfinished">Force Motion Detection</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraButtonManager</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Zakázáno rozvrhem</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
+    <message>
+      <source>Login</source>
+      <translation>Přihlásit</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Heslo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraExpertSettingsWidget</name>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic RTP transport type</comment>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Pomáhá vyřešit problémy s kvalitou obrazu u některých kamer, u ostatních kamer způsobí významné zvýšení datového toku.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Vlastní číslo, které lze přiřadit kameře pro rychlou identifikaci a přístup</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras:</source>
+      <translation>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>Server nezmění žádné nastavení kamer, bude přijímat a používat stream kamery jak je.</translation>
+    </message>
+    <message>
+      <source>Multicast</source>
+      <translation>Multicast</translation>
+    </message>
+    <message>
+      <source>Use if supported</source>
+      <translation type="unfinished">Use if supported</translation>
+    </message>
+    <message>
+      <source>Never</source>
+      <translation>Nikdy</translation>
+    </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation type="unfinished">Force Motion Detection</translation>
+    </message>
+    <message>
+      <source>Pan</source>
+      <translation type="unfinished">Pan</translation>
+    </message>
+    <message>
+      <source>Pan &amp; Tilt</source>
+      <translation type="unfinished">Pan &amp; Tilt</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+    </message>
+    <message>
+      <source>default</source>
+      <translation>výchozí</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <comment>Automatic profile selection</comment>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
+      <translation>Nastavení kvality a rychlosti snímkování (FPS) v rozvrhu záznamu se stanou nepodstatnými</translation>
+    </message>
+    <message>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation type="unfinished">Open Camera</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation type="unfinished">Open Camera in new Tab</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation type="unfinished">Open Camera in place</translation>
+    </message>
+    <message>
+      <source>Open Layout in new Tab</source>
+      <translation type="unfinished">Open Layout in new Tab</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation type="unfinished">Place Hotspot</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>ŽÁDNÁ DATA</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>ŽÁDNÝ PŘÍSTUP</translation>
+    </message>
+    <message>
+      <source>Select Target...</source>
+      <translation type="unfinished">Select Target...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation type="unfinished">Color</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation type="unfinished">Pointed</translation>
+    </message>
+    <message>
+      <source>Target resource does not exist</source>
+      <translation type="unfinished">Target resource does not exist</translation>
+    </message>
+    <message>
+      <source>Select Camera or Layout...</source>
+      <translation type="unfinished">Select Camera or Layout...</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Cíl</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Select Hotspot Target</source>
+      <translation type="unfinished">Select Hotspot Target</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraInfoWidget</name>
+    <message>
+      <source>Device Rules</source>
+      <translation>Oprávnění zařízení</translation>
+    </message>
+    <message>
+      <source>Camera Rules</source>
+      <translation>Oprávnění kamery</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules</source>
+      <translation>Oprávnění I/O modulu</translation>
+    </message>
+    <message>
+      <source>More Info</source>
+      <translation>Více informací</translation>
+    </message>
+    <message>
+      <source>Less Info</source>
+      <translation>Méně informací</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
+    <message numerus="yes">
+      <source>Use License</source>
+      <translation>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
+        <numerusform>Použít licenci</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation type="unfinished">
+        <numerusform>Use Service</numerusform>
+        <numerusform>Use Service</numerusform>
+        <numerusform>Use Service</numerusform>
+        <numerusform>Use Service</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
+    <message>
+      <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
+      <translation>Detekce pohybu bude fungovat pouze když je kamera zobrazena. Aktivujte nahrávání, aby detekce mohla pracovat po celou dobu.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion detection rectangles for current camera is reached</source>
+      <translation>Je dosažen maximální počet obdélníků detekce pohybu aktuální kamery</translation>
+    </message>
+    <message>
+      <source>Maximum number of ignore motion rectangles for current camera is reached</source>
+      <translation>Je dosažen maximální počet obdélníků ignorování pohybu aktuální kamery</translation>
+    </message>
+    <message>
+      <source>Maximum number of detect motion rectangles for current camera is reached</source>
+      <translation>Je dosažen maximální počet obdélníků detekce pohybu aktuální kamery</translation>
+    </message>
+    <message>
+      <source>Reset motion regions to default?</source>
+      <translation>Resetovat oblastí pohybu na výchozí hodnotu?</translation>
+    </message>
+    <message>
+      <source>This action cannot be undone.</source>
+      <translation>Tuto akci nelze vrátit zpět.</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Primární stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Sekundární stream</translation>
+    </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation type="unfinished">Force Motion Detection</translation>
+    </message>
+    <message>
+      <source>Select areas on the preview to set chosen sensitivity for</source>
+      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for</translation>
+    </message>
+    <message>
+      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
+      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraReplacementDialog</name>
+    <message>
+      <source>Failed to replace camera</source>
+      <translation type="unfinished">Failed to replace camera</translation>
+    </message>
+    <message>
+      <source>Abort camera replacement?</source>
+      <translation type="unfinished">Abort camera replacement?</translation>
+    </message>
+    <message>
+      <source>Will be transferred partially:</source>
+      <translation type="unfinished">Will be transferred partially:</translation>
+    </message>
+    <message>
+      <source>Will not be transferred:</source>
+      <translation type="unfinished">Will not be transferred:</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Další</translation>
+    </message>
+    <message>
+      <source>Finish</source>
+      <translation>Dokončit</translation>
+    </message>
+    <message>
+      <source>Camera for Replacement</source>
+      <translation type="unfinished">Camera for Replacement</translation>
+    </message>
+    <message>
+      <source>Data for Transfer</source>
+      <translation type="unfinished">Data for Transfer</translation>
+    </message>
+    <message>
+      <source>Camera replaced!</source>
+      <translation type="unfinished">Camera replaced!</translation>
+    </message>
+    <message>
+      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
+      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
+    </message>
+    <message>
+      <source>Some data and settings may not be compatible with the new camera</source>
+      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
+    </message>
+    <message>
+      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
+      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the Site and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraScheduleWidget</name>
+    <message>
+      <source>Recording Schedule</source>
+      <translation>Rozvrh záznamu</translation>
+    </message>
+    <message>
+      <source>based on server time</source>
+      <translation>založeno na čase serveru</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to</source>
+      <translation>Pro použití vybraných parametrů zvolte oblasti v rozvrhu</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
+      <translation>Nastavte parametry záznamu a vyberte oblasti v rozvrhu, na které je chcete aplikovat</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices</source>
+      <translation>Vysoká minimální hodnota může vést k poklesu délky archivu u jiných zařízení</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras</source>
+      <translation>Vysoká minimální hodnota může vést k poklesu délky archivu u ostatních kamer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSelectionDialog</name>
+    <message>
+      <source>Show all devices</source>
+      <translation type="unfinished">Show all devices</translation>
+    </message>
+    <message>
+      <source>Show all cameras</source>
+      <translation>Zobrazit všechny kamery</translation>
+    </message>
+    <message>
+      <source>Select Devices</source>
+      <translation>Vybrat zařízení</translation>
+    </message>
+    <message>
+      <source>Select Cameras</source>
+      <translation>Vybrat kamery</translation>
+    </message>
+    <message>
+      <source>Select Device</source>
+      <translation type="unfinished">Select Device</translation>
+    </message>
+    <message>
+      <source>Select Camera</source>
+      <translation type="unfinished">Select Camera</translation>
+    </message>
+    <message>
+      <source>No cameras available</source>
+      <translation type="unfinished">No cameras available</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Zdrojová kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Obecné</translation>
+    </message>
+    <message>
+      <source>Recording</source>
+      <translation>Nahrávání</translation>
+    </message>
+    <message>
+      <source>I/O Ports</source>
+      <translation>I/O porty</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation>Pohyb</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>Pokročilé</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webová stránka</translation>
+    </message>
+    <message>
+      <source>Expert</source>
+      <translation>Expert</translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n devices are not saved:</source>
+      <translation>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n cameras are not saved:</source>
+      <translation>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Changes to the following %n I/O Modules are not saved:</source>
+      <translation>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
+        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Apply changes before switching to another camera?</source>
+      <translation>Chcete provést změny před přepnutím na jinou kameru?</translation>
+    </message>
+    <message>
+      <source>Device Settings</source>
+      <translation>Nastavení zařízení</translation>
+    </message>
+    <message>
+      <source>Devices Settings</source>
+      <translation>Nastavení zařízení</translation>
+    </message>
+    <message>
+      <source>Camera Settings</source>
+      <translation>Nastavení kamery</translation>
+    </message>
+    <message>
+      <source>Cameras Settings</source>
+      <translation>Nastavení kamer</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings</source>
+      <translation>Nastavení I/O modulu</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings</source>
+      <translation>Nastavení I/O modulu</translation>
+    </message>
+    <message>
+      <source>Dewarping</source>
+      <translation>Dewarping</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Pouze pohyb</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation type="unfinished">Objects Only</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation type="unfinished">Motion &amp; Objects Only</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Pohyb + nízké rozlišení</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation type="unfinished">Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Plugins</source>
+      <translation>Pluginy</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrace</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
+    <message numerus="yes">
+      <source>Failed to enable audio on %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Failed to enable audio on %n devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to enable 2-way audio on %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Audio will be disabled</source>
+      <translation type="unfinished">Audio will be disabled</translation>
+    </message>
+    <message>
+      <source>You need to select a device that will provide audio.</source>
+      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+    </message>
+    <message>
+      <source>2-way audio will be disabled</source>
+      <translation type="unfinished">2-way audio will be disabled</translation>
+    </message>
+    <message>
+      <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
+      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Primární stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Sekundární stream</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation>Žádný sekundární stream</translation>
+    </message>
+    <message>
+      <source>Invalid stream address</source>
+      <translation type="unfinished">Invalid stream address</translation>
+    </message>
+    <message>
+      <source>Streaming protocol mismatch</source>
+      <translation type="unfinished">Streaming protocol mismatch</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CertificateSelectionDialog</name>
+    <message>
+      <source>Select a certificate to authenticate yourself to %1:</source>
+      <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
+      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation type="unfinished">Select</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
+    <message>
+      <source>Your confirmation is required to provide a token to</source>
+      <comment>... a web page (below there is a web page name with an icon)</comment>
+      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+    </message>
+    <message>
+      <source>Allow</source>
+      <translation type="unfinished">Allow</translation>
+    </message>
+    <message>
+      <source>This web page is requesting access to your account for authorization</source>
+      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClientUpdateTool</name>
+    <message>
+      <source>This update is already installed.</source>
+      <translation>Tato aktualizace je již nainstalována.</translation>
+    </message>
+    <message>
+      <source>This version is not installed.</source>
+      <translation>Tato verze je již nainstalována.</translation>
+    </message>
+    <message>
+      <source>Invalid version format.</source>
+      <translation>Neplatný formát verze.</translation>
+    </message>
+    <message>
+      <source>Broken update package.</source>
+      <translation>Přerušený aktualizační balíček.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Vnitřní chyba.</translation>
+    </message>
+    <message>
+      <source>Not enough space on disk to install the client update.</source>
+      <translation>Na disku není dostatek místa k instalaci aktualizace klienta.</translation>
+    </message>
+    <message>
+      <source>Installation package has been lost.</source>
+      <translation>Instalační balíček byl ztracen.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
+    </message>
+    <message>
+      <source>Cannot download update file</source>
+      <translation type="unfinished">Cannot download update file</translation>
+    </message>
+    <message>
+      <source>There is no enough space to download update file</source>
+      <translation type="unfinished">There is no enough space to download update file</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopírovat</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>Kopírovat do schránky</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Vložit</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Vložit ze schránky</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Zkopírováno</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation>Vloženo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudActionsHandler</name>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Login to %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
+    <message>
+      <source>Inaccessible</source>
+      <translation>Nedostupný</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Nahrávání...</translation>
+    </message>
+    <message>
+      <source>Click to Show Cameras</source>
+      <translation type="unfinished">Click to Show Cameras</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
+    <message>
+      <source>Introducing %1 Layouts</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Introducing %1 Layouts</translation>
+    </message>
+    <message>
+      <source>Read more on the %1</source>
+      <translation type="unfinished">Read more on the %1</translation>
+    </message>
+    <message>
+      <source>help page</source>
+      <translation type="unfinished">help page</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
+    <message>
+      <source>%1 (Copy)</source>
+      <comment>Original name will be substituted</comment>
+      <translation type="unfinished">%1 (Copy)</translation>
+    </message>
+    <message>
+      <source>%1 (Copy %2)</source>
+      <comment>Original name will be substituted as %1, counter as %2</comment>
+      <translation type="unfinished">%1 (Copy %2)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CommonMessageBar</name>
+    <message>
+      <source>Close</source>
+      <translation>Zavřít</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectActionsHandler</name>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Videostěna je ze serveru odstraněna a bude zavřena.</translation>
+    </message>
+    <message>
+      <source>Could not connect to server. Video Wall will be closed.</source>
+      <translation>Nelze se připojit k serveru. Videostěna bude zavřena.</translation>
+    </message>
+    <message>
+      <source>Could not connect to server. Application will be closed.</source>
+      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+    </message>
+    <message>
+      <source>Failed to connect to the selected server</source>
+      <translation>Nelze se připojit k zadanému serveru</translation>
+    </message>
+    <message>
+      <source>Re-authentication required</source>
+      <translation type="unfinished">Re-authentication required</translation>
+    </message>
+    <message>
+      <source>Enter password to continue your session</source>
+      <translation type="unfinished">Enter password to continue your session</translation>
+    </message>
+    <message>
+      <source>Your session has expired. Please sign in again to continue.</source>
+      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <comment>Dialog button text.</comment>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Enter access link to continue your session</source>
+      <translation type="unfinished">Enter access link to continue your session</translation>
+    </message>
+    <message>
+      <source>Your session has expired. Please sign in again with your link to continue.</source>
+      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+    </message>
+    <message>
+      <source>Authentication details are incorrect</source>
+      <translation type="unfinished">Authentication details are incorrect</translation>
+    </message>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Login to %1</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to disconnect?</source>
+      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Odpojit</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCloudTool</name>
+    <message>
+      <source>Internal error. Please try again later.</source>
+      <translation type="unfinished">Internal error. Please try again later.</translation>
+    </message>
+    <message>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+    </message>
+    <message>
+      <source>Local Site owner is absent or disabled.</source>
+      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+    </message>
+    <message>
+      <source>Site connected to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Site connected to %1</translation>
+    </message>
+    <message>
+      <source>Failed to connect Site to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Failed to connect Site to %1</translation>
+    </message>
+    <message>
+      <source>Connect Site to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connect Site to %1</translation>
+    </message>
+    <message>
+      <source>Connect Site to %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connect Site to %1?</translation>
+    </message>
+    <message>
+      <source>Enter your account password to connect Site to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <comment>Connect current Site to cloud</comment>
+      <translation>Připojit</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
+    <message>
+      <source>Configuring Server</source>
+      <translation>Konfigurování serveru</translation>
+    </message>
+    <message>
+      <source>Total amount of licenses will decrease</source>
+      <translation>Celkový počet licencí se sníží</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Zadat heslo...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Heslo správce</translation>
+    </message>
+    <message>
+      <source>Merge Server to the Site</source>
+      <comment>Dialog title</comment>
+      <translation type="unfinished">Merge Server to the Site</translation>
+    </message>
+    <message>
+      <source>Enter your account password to merge Server to the Site</source>
+      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+    </message>
+    <message>
+      <source>Merge</source>
+      <comment>Merge Server to the current Site (dialog button text)</comment>
+      <translation>Sloučit</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
+    <message>
+      <source>Connect</source>
+      <translation>Připojit</translation>
+    </message>
+    <message>
+      <source>Setup</source>
+      <translation>Nastavení</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Úspěšné</translation>
+    </message>
+    <message>
+      <source>Test Failed</source>
+      <translation>Test selhal</translation>
+    </message>
+    <message>
+      <source>Request timeout</source>
+      <translation>Časový limit požadavku</translation>
+    </message>
+    <message>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
+    <message>
+      <source>Recording cannot be enabled for some cameras.</source>
+      <translation>Nahrávání nelze u některých kamer povolit.</translation>
+    </message>
+    <message>
+      <source>Schedule settings are not compatible with some devices.</source>
+      <translation>Nastavení rozvrhu nejsou kompatibilní s některými zařízeními.</translation>
+    </message>
+    <message>
+      <source>Copy archive length settings</source>
+      <translation>Zkopírovat nastavení délky archívu</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+    </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
+    <message>
+      <source>Unknown camera</source>
+      <translation type="unfinished">Unknown camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
+    <message>
+      <source>Set Password</source>
+      <translation>Nastavit heslo</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up</source>
+      <translation>Táto kamera vyžaduje nastavení hesla</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up</source>
+      <translation>Některé z vybraných kamer vyžadují nastavení hesla</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
+      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Nelze rozpoznat rozlišení zachytávání</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>Nelze nalézt enkodér videa %1.</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>Šířka obrazovky musí být násobkem 8.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>Nelze inicializovat video enkodér.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>Nelze inicializovat zvukový enkodér.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>Nelze inicializovat zvukové zařízení &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>Nelze spustit primární zvukové zařízení.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
+    <message>
+      <source>Start address</source>
+      <translation>Počáteční adresa</translation>
+    </message>
+    <message>
+      <source>End address</source>
+      <translation>Koncová adresa</translation>
+    </message>
+    <message>
+      <source>IP / Hostname / RTSP link / UDP link</source>
+      <translation>IP / Jméno hosta / odkaz RTSP / odkaz UDP</translation>
+    </message>
+    <message>
+      <source>Examples:</source>
+      <translation>Příklady:</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>Server je offline</translation>
+    </message>
+    <message>
+      <source>Device search failed</source>
+      <translation>Hledání zařízení se nezdařilo</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to add %n devices</source>
+      <translation>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Scan</source>
+      <translation>Skenovat</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Hledat</translation>
+    </message>
+    <message>
+      <source>Initializing scan...</source>
+      <translation>Inicializace skenování...</translation>
+    </message>
+    <message>
+      <source>Scanning online hosts...</source>
+      <translation>Skenování online hostů...</translation>
+    </message>
+    <message>
+      <source>Checking host...</source>
+      <translation>Kontrola hostitele...</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation>Dokončeno</translation>
+    </message>
+    <message>
+      <source>Aborted</source>
+      <translation>Přerušeno</translation>
+    </message>
+    <message>
+      <source>Searching...</source>
+      <translation>Hledání...</translation>
+    </message>
+    <message>
+      <source>No devices found</source>
+      <translation>Nebyly nalezena žádná zařízení</translation>
+    </message>
+    <message>
+      <source>All devices are already added</source>
+      <translation>Všechna zařízení již byla přidána</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices are being added. You can close this dialog or start a new search</source>
+      <translation>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Přidat všechna zařízení</translation>
+    </message>
+    <message numerus="yes">
+      <source>Add %n Devices</source>
+      <translation>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Address field cannot be empty</source>
+      <translation>Adresa nemůže být prázdná</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+    </message>
+    <message>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
+    </message>
+    <message>
+      <source>Maximum number of Devices for the Site is reached</source>
+      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
+    <message>
+      <source>Decrypt</source>
+      <translation type="unfinished">Decrypt</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Nesprávné heslo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EulaDialog</name>
+    <message>
+      <source>Please review and agree to the %1 in order to proceed</source>
+      <translation>Chcete-li pokračovat, zkontrolujte a souhlaste s %1</translation>
+    </message>
+    <message>
+      <source>To use the software you must agree with the end user license agreement</source>
+      <translation>Chcete-li používat software, musíte souhlasit s licenční smlouvou koncového uživatele</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>Filtrovat podobné řádky</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>Kopírovat výbrané do schránky</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>Export vybraného do souboru...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>Vybrat vše</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Smazat filtr</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Popis</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>Žádné události</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>Jakákoliv akce</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+        <numerusform>Protokol událostí pro období od %1 do %2 - %n nalezené události</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+        <numerusform>Protokol událostí pro %1 - %n událost</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>Export vybraných událostí do souboru</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Datum/Čas</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>Událost</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Zdroj</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>Akce</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Cíl</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Popis</translation>
+    </message>
+    <message>
+      <source>Open event video</source>
+      <translation type="unfinished">Open event video</translation>
+    </message>
+    <message>
+      <source>Open event device</source>
+      <translation type="unfinished">Open event device</translation>
+    </message>
+    <message>
+      <source>Open event camera</source>
+      <translation type="unfinished">Open event camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventPanel::Private</name>
+    <message>
+      <source>Notifications</source>
+      <comment>Notifications tab title</comment>
+      <translation>Upozornění</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <comment>Motion tab title</comment>
+      <translation>Pohyb</translation>
+    </message>
+    <message>
+      <source>Bookmarks</source>
+      <comment>Bookmarks tab title</comment>
+      <translation>Záložky</translation>
+    </message>
+    <message>
+      <source>Events</source>
+      <comment>Events tab title</comment>
+      <translation>Události</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <comment>Analytics tab title</comment>
+      <translation>Objekty</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventRibbon::Private</name>
+    <message>
+      <source>INFORMATION REQUIRED</source>
+      <translation type="unfinished">INFORMATION REQUIRED</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventSearchWidget</name>
+    <message>
+      <source>No events</source>
+      <translation>Žádné události</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventTile</name>
+    <message>
+      <source>UNKNOWN</source>
+      <translation type="unfinished">UNKNOWN</translation>
+    </message>
+    <message numerus="yes">
+      <source> + %n</source>
+      <translation type="unfinished">
+        <numerusform> + %n</numerusform>
+        <numerusform> + %n</numerusform>
+        <numerusform> + %n</numerusform>
+        <numerusform> + %n</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportPasswordWidget</name>
+    <message>
+      <source>Please enter the password.</source>
+      <translation>Zadejte prosím heslo.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Nepodporované médium pro export dat.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>Vybraný formát není podporován knihovnou FFMPEG.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>Chyba knihovny FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Video nebo audio kodek není kompatibilní s vybraným formátem.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Chyba při zápisu souboru.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Žádná data nebyla vyexportována.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Vnitřní chyba</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Je vyžadováno překódování videa.</translation>
+    </message>
+    <message>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>Export</source>
+      <translation>Export</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Rychlý přehled</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Nastavení exportu</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Přidat časovou značku</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Smazat časovou značku</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Časová značka</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Přidat obrázek</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Smazat obrázek</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Obrázek</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Přidat text</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Smazat text</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Text</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Resetovat rychlost</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Přidat informace o záložce</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Smazat informace o záložce</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Informace o záložce</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>vyexportováno</translation>
+    </message>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Zvolená nastavení vyžadují překódování. Zvýší se tím zatížení CPU a může to trvat velmi dlouho.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Doporučujeme exportovat video z této kamery jako &quot;Multi Video&quot; abyste se vyhnuli degradaci rozlišení.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>Vyexportovaný soubor .EXE bude mít velikost přes 4 GB a nelze jej otevřít dvojitým poklepáním v systému Windows. Lze jej přehrávat pouze v %1 klientovi.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>Nastavení nejsou k dispozici pro soubory .NOV a .EXE.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Místní soubory, monitorovací widgety serveru a webové stránky nebudou exportovány.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
+      <translation>Chystáte se exportovat dlouhé video. To může vyžadovat spoustu úložného prostoru a zabere to značný čas.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Informace</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+    </message>
+    <message>
+      <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
+      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+    </message>
+    <message>
+      <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
+      <translation type="unfinished">You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
+    <message>
+      <source>Exported: %1</source>
+      <comment>Duration will be substituted</comment>
+      <translation type="unfinished">Exported: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
+    <message>
+      <source>Low</source>
+      <translation>Nízká</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Střední</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Vysoká</translation>
+    </message>
+    <message>
+      <source>No Failover</source>
+      <translation type="unfinished">No Failover</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FailoverWidget</name>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</translation>
+    </message>
+    <message>
+      <source>Failover</source>
+      <translation>Funkce selhání</translation>
+    </message>
+    <message>
+      <source>Max devices on this server:</source>
+      <translation>Max. počet zařízení na tomto serveru:</translation>
+    </message>
+    <message>
+      <source>Max cameras on this server:</source>
+      <translation>Max. počet kamer na tomto serveru:</translation>
+    </message>
+    <message>
+      <source>At least two servers are required for this feature.</source>
+      <translation>Pro tuto funkci jsou vyžadovány alespoň dva servery.</translation>
+    </message>
+    <message>
+      <source>This server already has more than max devices</source>
+      <translation>Tento server již má více zařízení než je max. počet</translation>
+    </message>
+    <message>
+      <source>This server already has more than max cameras</source>
+      <translation>Tento server již má více kamer než je max. počet</translation>
+    </message>
+    <message>
+      <source>To avoid issues adjust max number of devices</source>
+      <translation>Chcete-li zabránit problémům, nastavte max. počet zařízení</translation>
+    </message>
+    <message>
+      <source>To avoid issues adjust max number of cameras</source>
+      <translation>Chcete-li zabránit problémům, nastavte max. počet kamer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Složka</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Název</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>Název nemůže být prázdný.</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation type="unfinished">Force secure authentication?</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>Tuto zprávu již příště nezobrazovat</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Povolit</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FoundDevicesModel</name>
+    <message>
+      <source>Brand</source>
+      <translation>Značka</translation>
+    </message>
+    <message>
+      <source>Model</source>
+      <translation>Model</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation>Adresa</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new</source>
+      <translation>
+        <numerusform>%n nový</numerusform>
+        <numerusform>%n nové</numerusform>
+        <numerusform>%n nové</numerusform>
+        <numerusform>%n nové</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices total</source>
+      <translation>
+        <numerusform>Celkem %n zařízení</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>Zobrazit deník událostí</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation type="unfinished">Generate events</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">%1 group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation type="unfinished">Inherits %1 permission from</translation>
+    </message>
+    <message>
+      <source>View video without redaction</source>
+      <translation type="unfinished">View video without redaction</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Delete failed</source>
+      <translation type="unfinished">Delete failed</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>Zrušit</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation type="unfinished">New Group</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation type="unfinished">New Group %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation>Uložit změny</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Uložit</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Použití změn se nezdařilo</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation type="unfinished">Delete groups</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>Group name cannot be empty</source>
+      <translation type="unfinished">Group name cannot be empty</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists</source>
+      <translation type="unfinished">Group with the same name already exists</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes to %1 group</source>
+      <translation type="unfinished">Failed to apply changes to %1 group</translation>
+    </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation type="unfinished">Current group is a member of all groups selected on this tab and inherits permissions from each of them.</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation type="unfinished">Select one or multiple groups from which the current group will inherit permissions</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::HintButton</name>
+    <message>
+      <source>Click on the icon to read more</source>
+      <translation type="unfinished">Click on the icon to read more</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ImageControlWidget</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>%1 degrees</source>
+      <translation>%1 stupňů</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Vyberte soubor...</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Chyba</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>Obrázek nelze nahrát.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
+    <message>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation>Po dokončení synchronizace databáze se zobrazí ve stromu zdroje.</translation>
+    </message>
+    <message>
+      <source>Sites will be merged shortly</source>
+      <translation type="unfinished">Sites will be merged shortly</translation>
+    </message>
+    <message>
+      <source>Servers from the other Site will appear in the resource tree.</source>
+      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+    </message>
+    <message>
+      <source>Connecting to the current Site...</source>
+      <translation type="unfinished">Connecting to the current Site...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to Site shortly</source>
+      <translation type="unfinished">Server will be connected to Site shortly</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our site.</source>
+      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LabelSelectionManager</name>
+    <message>
+      <source>Copy</source>
+      <translation>Kopírovat</translation>
+    </message>
+    <message>
+      <source>Copy Link Location</source>
+      <translation>Kopírovat umístění odkazu</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutActionHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>Uložit rozložení jako</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>Zadejte název rozložení:</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation type="unfinished">Save Layout As Cloud</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Nové rozložení</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>Zadejte název rozložení, které chcete vytvořit:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>buňky</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Žádný obrázek</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Chyba při načítání obrázku</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Chyba při nahrávání obrázku</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Vyberte soubor...</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Obrázek nelze přečíst</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Obrázek nelze nahrát</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>buňky</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation>Vlastní číslo, které lze přiřadit rozložení pro rychlou identifikaci a přístup</translation>
+    </message>
+    <message>
+      <source>This ID is already in use. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Obecné</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation>Pozadí</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>ŽÁDNÁ DATA</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>ŽÁDNÁ KAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
+    </message>
+    <message>
+      <source>OFFLINE</source>
+      <translation>OFFLINE</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation type="unfinished">Disconnect LDAP server?</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Odpojit</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation type="unfinished">Reset Settings</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Resetovat</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Připojení se nezdařilo</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Ano</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation type="unfinished">Apply Settings</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Použít</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation type="unfinished">Synchronize</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation type="unfinished">Connection OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Použití změn se nezdařilo</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation type="unfinished">LDAP</translation>
+    </message>
+    <message>
+      <source>Cannot connect to LDAP server</source>
+      <translation type="unfinished">Cannot connect to LDAP server</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanálů.</numerusform>
+        <numerusform>%n kanálů.</numerusform>
+        <numerusform>%n kanálů.</numerusform>
+        <numerusform>%n kanálů.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Export</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+        <numerusform>%1 jsou aktuálně používány</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+        <numerusform>Alespoň %1 jsou požadovány</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>Zbývá %n deaktivací.</numerusform>
+        <numerusform>Zbývá %n deaktivací.</numerusform>
+        <numerusform>Zbývá %n deaktivací.</numerusform>
+        <numerusform>Zbývá %n deaktivací.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>Deaktivovat licence?</numerusform>
+        <numerusform>Deaktivovat licence?</numerusform>
+        <numerusform>Deaktivovat licence?</numerusform>
+        <numerusform>Deaktivovat licence?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>Deaktivovat</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>Export licence do souboru</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Odstranit</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
+    <message>
+      <source>Your session expires soon</source>
+      <translation type="unfinished">Your session expires soon</translation>
+    </message>
+    <message>
+      <source>Re-Authenticate Now</source>
+      <translation type="unfinished">Re-Authenticate Now</translation>
+    </message>
+    <message>
+      <source>Less than a minute left</source>
+      <translation type="unfinished">Less than a minute left</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n minutes left</source>
+      <translation type="unfinished">
+        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minutes left</numerusform>
+        <numerusform>%n minutes left</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogSettingsDialog</name>
+    <message>
+      <source>Reset to Default</source>
+      <translation type="unfinished">Reset to Default</translation>
+    </message>
+    <message>
+      <source>Must be greater than or equal to the value set for Split File by Size</source>
+      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+    </message>
+    <message>
+      <source>Must be less than or equal to the value set for Limit Max Volume</source>
+      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
+      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
+The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+    </message>
+    <message>
+      <source>The selected Logging Level may degrade performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
+      <translation type="unfinished">The selected Logging Level may degrade performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LoginDialog</name>
+    <message>
+      <source>Connect to Server...</source>
+      <translation>Připojit k serveru...</translation>
+    </message>
+    <message>
+      <source>Version %1</source>
+      <translation>Verze %1</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid or has expired</source>
+      <translation type="unfinished">The provided link is not valid or has expired</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementModel</name>
+    <message>
+      <source>Unit</source>
+      <translation type="unfinished">Unit</translation>
+    </message>
+    <message>
+      <source>Current Level</source>
+      <translation type="unfinished">Current Level</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Klient</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Žádný</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Chyba</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Varování</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Informace</translation>
+    </message>
+    <message>
+      <source>Debug</source>
+      <translation>Ladění</translation>
+    </message>
+    <message>
+      <source>Verbose</source>
+      <translation>Podrobnosti</translation>
+    </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation type="unfinished">Default Logging level</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+    </message>
+    <message>
+      <source>Logging level degrades performance</source>
+      <translation type="unfinished">Logging level degrades performance</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
+    <message>
+      <source>Logs downloaded</source>
+      <translation type="unfinished">Logs downloaded</translation>
+    </message>
+    <message numerus="yes">
+      <source>Debug logging is enabled on %n Servers</source>
+      <translation type="unfinished">
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation type="unfinished">Apply Settings</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Použít</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled on the client</source>
+      <translation type="unfinished">Debug logging is enabled on the client</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled.
+Client performance is degraded.</source>
+      <translation type="unfinished">Debug logging is enabled.
+Client performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled</source>
+      <translation type="unfinished">Debug logging is enabled</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled.
+Site performance is degraded.</source>
+      <translation type="unfinished">Debug logging is enabled.
+Site performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Logs download canceled</source>
+      <translation type="unfinished">Logs download canceled</translation>
+    </message>
+    <message>
+      <source>Downloading logs...</source>
+      <translation type="unfinished">Downloading logs...</translation>
+    </message>
+    <message>
+      <source>Logs download failed</source>
+      <translation type="unfinished">Logs download failed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LogsManagementWidget</name>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
+    </message>
+    <message>
+      <source>Downloading...</source>
+      <translation type="unfinished">Downloading...</translation>
+    </message>
+    <message>
+      <source>Download completed with errors</source>
+      <translation type="unfinished">Download completed with errors</translation>
+    </message>
+    <message>
+      <source>Download success</source>
+      <translation type="unfinished">Download success</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Retry (%1)</source>
+      <translation type="unfinished">Retry (%1)</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation type="unfinished">Network request failed</translation>
+    </message>
+    <message>
+      <source>Lookup List save request failed</source>
+      <translation type="unfinished">Lookup List save request failed</translation>
+    </message>
+    <message>
+      <source>Lookup List remove request failed</source>
+      <translation type="unfinished">Lookup List remove request failed</translation>
+    </message>
+    <message>
+      <source>Could not add object to the List</source>
+      <translation type="unfinished">Could not add object to the List</translation>
+    </message>
+    <message>
+      <source>An object doesn&apos;t have attributes that matches selected list</source>
+      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+    </message>
+    <message>
+      <source>Object was added to the List</source>
+      <translation type="unfinished">Object was added to the List</translation>
+    </message>
+    <message>
+      <source>An object has been added to the &quot;%1&quot; successfully</source>
+      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListEntriesModel</name>
+    <message>
+      <source>Yes</source>
+      <translation>Ano</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+    <message>
+      <source>Any %1</source>
+      <translation type="unfinished">Any %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListExportProcessor</name>
+    <message>
+      <source>Text files</source>
+      <translation type="unfinished">Text files</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Vše</translation>
+    </message>
+    <message>
+      <source>Export List</source>
+      <translation type="unfinished">Export List</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
+    <message>
+      <source>Import Lookup List</source>
+      <translation type="unfinished">Import Lookup List</translation>
+    </message>
+    <message>
+      <source>Text files</source>
+      <translation type="unfinished">Text files</translation>
+    </message>
+    <message>
+      <source>All other text files</source>
+      <translation type="unfinished">All other text files</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
+    <message>
+      <source>Server is not specified</source>
+      <translation>Server není specifikován</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>Server je offline</translation>
+    </message>
+    <message>
+      <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
+      <translation>Pole adresy zařízení musí obsahovat platnou URL adresu, IP adresu nebo odkaz RTSP.</translation>
+    </message>
+    <message>
+      <source>First address in range is greater than the last one.</source>
+      <translation>První adresa v dosahu je větší než poslední.</translation>
+    </message>
+    <message>
+      <source>The specified IP address range has more than 255 addresses.</source>
+      <translation>Zadaný rozsah IP adres má více než 255 adres.</translation>
+    </message>
+    <message>
+      <source>Can not start the search process</source>
+      <translation>Nelze spustit proces vyhledávání</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
+    <message>
+      <source>File Settings</source>
+      <translation>Nastavení souborů</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MergeSystemsDialog</name>
+    <message>
+      <source>URL is invalid.</source>
+      <translation>Adresa URL je neplatná.</translation>
+    </message>
+    <message>
+      <source>The login cannot be empty.</source>
+      <translation>Přihlášení nemůže být prázdné.</translation>
+    </message>
+    <message>
+      <source>Testing...</source>
+      <translation>Testování...</translation>
+    </message>
+    <message>
+      <source>Use a specific hostname or IP address rather than %1.</source>
+      <translation>Použijte konkrétní název hosta nebo IP adresu raději než %1.</translation>
+    </message>
+    <message>
+      <source>Merge with %1</source>
+      <translation>Sloučit s %1</translation>
+    </message>
+    <message>
+      <source>You will be reconnected.</source>
+      <translation>Budete znovu připojen.</translation>
+    </message>
+    <message>
+      <source>support</source>
+      <translation>podpora</translation>
+    </message>
+    <message>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>Merge Sites</source>
+      <translation type="unfinished">Merge Sites</translation>
+    </message>
+    <message>
+      <source>Enter your account password to merge Sites</source>
+      <translation type="unfinished">Enter your account password to merge Sites</translation>
+    </message>
+    <message>
+      <source>Merge</source>
+      <comment>Merge two Sites together (dialog button text)</comment>
+      <translation>Sloučit</translation>
+    </message>
+    <message>
+      <source>Merging Sites...</source>
+      <translation type="unfinished">Merging Sites...</translation>
+    </message>
+    <message>
+      <source>This is the current Site URL.</source>
+      <translation type="unfinished">This is the current Site URL.</translation>
+    </message>
+    <message>
+      <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>Sites will be merged shortly</source>
+      <translation type="unfinished">Sites will be merged shortly</translation>
+    </message>
+    <message>
+      <source>Failed to merge Sites</source>
+      <translation type="unfinished">Failed to merge Sites</translation>
+    </message>
+    <message>
+      <source>Remote</source>
+      <translation type="unfinished">Remote</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation type="unfinished">Current (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation type="unfinished">Remote (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Úspěšné</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MergeSystemsTool</name>
+    <message>
+      <source>The password or user name is invalid.</source>
+      <translation>Heslo nebo uživatelské jméno je neplatné.</translation>
+    </message>
+    <message>
+      <source>This user does not have permissions for the requested operation.</source>
+      <translation>Tento uživatel nemá oprávnění k požadované operaci.</translation>
+    </message>
+    <message>
+      <source>Cannot create database backup.</source>
+      <translation>Nelze vytvořit zálohu databáze.</translation>
+    </message>
+    <message>
+      <source>Merge anyway?</source>
+      <translation>Sloučit jakkoliv?</translation>
+    </message>
+    <message>
+      <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
+      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+    </message>
+    <message>
+      <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
+      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Neznámá chyba.</translation>
+    </message>
+    <message>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+    <message>
+      <source>Site was not found.</source>
+      <translation type="unfinished">Site was not found.</translation>
+    </message>
+    <message>
+      <source>The discovered Site %1 has an incompatible version %2.</source>
+      <comment>%1 is name of Site, %2 is version information</comment>
+      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+    </message>
+    <message>
+      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
+      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Sites with Starter licenses.</source>
+      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Sites with NVR licenses.</source>
+      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+    </message>
+    <message>
+      <source>Could not configure the remote Site %1.</source>
+      <comment>%1 is name of the Site</comment>
+      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+    </message>
+    <message>
+      <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+    </message>
+    <message>
+      <source>Both Sites are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+    </message>
+    <message>
+      <source>%1 sites have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+    </message>
+    <message>
+      <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
+    <message>
+      <source>Site name is not configured yet.</source>
+      <translation type="unfinished">Site name is not configured yet.</translation>
+    </message>
+    <message>
+      <source>Maximum number of Servers for the Site is reached.</source>
+      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MotionStreamAlerts</name>
+    <message>
+      <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
+      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+    </message>
+    <message>
+      <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
+You can force it, but it may significantly increase CPU load.</source>
+      <comment>&quot;
+&quot; is a line break, don&apos;t change it.</comment>
+      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
+You can force it, but it may significantly increase CPU load.</translation>
+    </message>
+    <message>
+      <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
+You can force it, but it may significantly increase CPU load.</source>
+      <comment>&quot;
+&quot; is a line break, don&apos;t change it.</comment>
+      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
+You can force it, but it may significantly increase CPU load.</translation>
+    </message>
+    <message>
+      <source>Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
+You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
+      <comment>&quot;
+&quot; is a line break, don&apos;t change it.</comment>
+      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
+You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
+    <message>
+      <source>Release notes</source>
+      <translation>Poznámky k verzi</translation>
+    </message>
+    <message>
+      <source>Download in External Browser</source>
+      <translation>Stahnout v externím prohlížeči</translation>
+    </message>
+    <message>
+      <source>Copy Link to Clipboard</source>
+      <translation>Zkopírovat odkaz do schránky</translation>
+    </message>
+    <message>
+      <source>You have already installed this version.</source>
+      <translation>Tuto verzi jste již nainstalovali.</translation>
+    </message>
+    <message>
+      <source>Build not found</source>
+      <translation>Soubor nenalezen</translation>
+    </message>
+    <message>
+      <source>Cannot update from the selected file</source>
+      <translation>Nelze aktualizovat z vybraného souboru</translation>
+    </message>
+    <message>
+      <source>Invalid update information</source>
+      <translation>Neplatné informace o aktualizaci</translation>
+    </message>
+    <message>
+      <source>Downgrade to earlier versions is not possible</source>
+      <translation>Přechod na předchozí verze není možný</translation>
+    </message>
+    <message>
+      <source>Update file is not found</source>
+      <translation>Aktualizační soubor nebyl nalezen</translation>
+    </message>
+    <message>
+      <source>Upgrade package is broken</source>
+      <translation>Balíček aktualizace je nefunkční</translation>
+    </message>
+    <message>
+      <source>Missing update package for some servers</source>
+      <translation>Chybějící balíček aktualizací pro některé servery</translation>
+    </message>
+    <message>
+      <source>No update package available</source>
+      <translation>Žádné dostupné aktualizace</translation>
+    </message>
+    <message>
+      <source>Select Update File...</source>
+      <translation>Vybrat soubor aktualizace...</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Aktualizovat soubory</translation>
+    </message>
+    <message>
+      <source>Some servers are offline and will not be updated. Skip them?</source>
+      <translation>Některé servery jsou offline a nebudou aktualizovány. Přeskočit je?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
+        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Chybí aktualizace pro klienta</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Neexistují žádné online servery pro aktualizaci.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Zrušit aktualizaci a smazat všechna stažená data?</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Verze OS klienta již není podporována. Aktualizujte prosím svůj operační systém na podporovanou verzi.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Aktualizace se nepodařilo spustit</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Nepodařilo se zrušit aktualizaci</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Nepodařilo se spustit instalaci</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Některé servery nedokončily proces aktualizace. I přesto dokončit?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Stahování aktualizačních balíčků do některých součástí se nezdařilo</translation>
+    </message>
+    <message>
+      <source>If the problem persists, please contact Customer Support.</source>
+      <translation>Pokud problém přetrvává, kontaktujte prosím zákaznickou podporu.</translation>
+    </message>
+    <message>
+      <source>Try again</source>
+      <translation>Zkusit znovu</translation>
+    </message>
+    <message>
+      <source>Cancel Update</source>
+      <translation>Zrušit aktualizaci</translation>
+    </message>
+    <message>
+      <source>Update completed</source>
+      <translation>Aktualizace byla dokončena</translation>
+    </message>
+    <message>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Aktualizace byla dokončena, ale některé části se znezdařilo aktualizovat</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Aktualizujte prosím %1 ručně pomocí instalačního balíčku.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Při instalaci aktualizací došlo k chybě:</translation>
+    </message>
+    <message>
+      <source>Downloading updates...</source>
+      <translation>Stahování aktualizací...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Dokončete aktualizaci</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Zrušit</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Nainstalována aktuální verze</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Tato verze je již nainstalována</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Instalovat aktualizaci</translation>
+    </message>
+    <message>
+      <source>Upload</source>
+      <translation>Nahrát</translation>
+    </message>
+    <message>
+      <source>Upload &amp;&amp; Install</source>
+      <translation>Nahrát a instalovat</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Stáhnout</translation>
+    </message>
+    <message>
+      <source>Download &amp;&amp; Install</source>
+      <translation>Stáhnout a nainstalovat</translation>
+    </message>
+    <message>
+      <source>Browse for Another File...</source>
+      <translation>Vyhledat další soubor...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Zvolte jinou možnost</translation>
+    </message>
+    <message>
+      <source>Update to Specific Build</source>
+      <translation>Aktualizace na konkrétní sestavení</translation>
+    </message>
+    <message>
+      <source>Downloading client package...</source>
+      <translation>Stahování klientského paketu...</translation>
+    </message>
+    <message>
+      <source>Installing updates...</source>
+      <translation>Instalace aktualizací...</translation>
+    </message>
+    <message>
+      <source>Installing client updates...</source>
+      <translation>Instalace aktualizace klienta...</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Zahájení aktualizace ...</translation>
+    </message>
+    <message>
+      <source>Updating to ...</source>
+      <translation>Aktualizování ...</translation>
+    </message>
+    <message>
+      <source>Ready to update to</source>
+      <translation>Připraveno k aktualizaci na</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Některé servery nemají k dispozici žádné aktualizace.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Některé servery zaznamenaly interní chybu.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Prosím kontaktujte zákaznickou podporu.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Některé servery jsou offline. Počkejte prosím, až budou opět připojeny a pokračujte.</translation>
+    </message>
+    <message>
+      <source>Continue in Background</source>
+      <translation>Pokračovat v pozadí</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Nejnovější dostupná aktualizace</translation>
+    </message>
+    <message>
+      <source>Specific Build</source>
+      <translation>Konkrétní sestavení</translation>
+    </message>
+    <message>
+      <source>Browse for Update File</source>
+      <translation>Procházet soubor aktualizace</translation>
+    </message>
+    <message>
+      <source>Update from mediaservers</source>
+      <translation>Aktualizace z mediálních serverů</translation>
+    </message>
+    <message>
+      <source>Unable to check updates on the Internet</source>
+      <translation>Nelze ověřit aktualizace na Internetu</translation>
+    </message>
+    <message>
+      <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
+      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+    </message>
+    <message>
+      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
+      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+    </message>
+    <message>
+      <source>Uploading offline update packages to Servers...</source>
+      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+    </message>
+    <message>
+      <source>Applying updates at the end of the week is not recommended</source>
+      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+    </message>
+    <message>
+      <source>Site updated to</source>
+      <translation type="unfinished">Site updated to</translation>
+    </message>
+    <message>
+      <source>Site update in process</source>
+      <translation type="unfinished">Site update in process</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
+    <message>
+      <source>You do not have any layouts</source>
+      <translation>Nemáte žádné rozvržení</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
+    <message>
+      <source>Possible formats:</source>
+      <translation type="unfinished">Possible formats:</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>Server je offline</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Správce systému</translation>
+    </message>
+    <message>
+      <source>Device search failed</source>
+      <translation>Hledání zařízení se nezdařilo</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to add %n devices</source>
+      <translation>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Initializing scan...</source>
+      <translation>Inicializace skenování...</translation>
+    </message>
+    <message>
+      <source>Scanning online hosts...</source>
+      <translation>Skenování online hostů...</translation>
+    </message>
+    <message>
+      <source>Checking host...</source>
+      <translation>Kontrola hostitele...</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation>Dokončeno</translation>
+    </message>
+    <message>
+      <source>Aborted</source>
+      <translation>Přerušeno</translation>
+    </message>
+    <message>
+      <source>Searching...</source>
+      <translation>Hledání...</translation>
+    </message>
+    <message>
+      <source>No devices found</source>
+      <translation>Nebyly nalezena žádná zařízení</translation>
+    </message>
+    <message>
+      <source>All devices are already added</source>
+      <translation>Všechna zařízení již byla přidána</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices are being added. You can close this dialog or start a new search</source>
+      <translation>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Přidat všechna zařízení</translation>
+    </message>
+    <message numerus="yes">
+      <source>Add %n Devices</source>
+      <translation>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+        <numerusform>Přidat %n zařízení</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation type="unfinished">You do not have permissions to modify this user</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation type="unfinished">You do not have permissions to modify this group</translation>
+    </message>
+    <message>
+      <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
+      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+    </message>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the site level</source>
+      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationActionExecutor</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Na odebrané kameře nelze událost potvrdit.</translation>
+    </message>
+    <message>
+      <source>Unable to acknowledge event on inaccessible camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationActionHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Na odebrané kameře nelze událost potvrdit.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationListModel::Private</name>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>Poplach: %1</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>Vzít na vědomí</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
+    <message numerus="yes">
+      <source>%n notifications</source>
+      <translation type="unfinished">
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No new notifications</source>
+      <translation>Žádné nové oznámení</translation>
+    </message>
+    <message>
+      <source>Current Site</source>
+      <translation type="unfinished">Current Site</translation>
+    </message>
+    <message>
+      <source>Any Notification</source>
+      <translation type="unfinished">Any Notification</translation>
+    </message>
+    <message>
+      <source>Event Notifications</source>
+      <translation type="unfinished">Event Notifications</translation>
+    </message>
+    <message>
+      <source>System Notifications</source>
+      <translation type="unfinished">System Notifications</translation>
+    </message>
+    <message>
+      <source>Choose Types...</source>
+      <translation type="unfinished">Choose Types...</translation>
+    </message>
+    <message>
+      <source>Any notification</source>
+      <translation type="unfinished">Any notification</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n notification types</source>
+      <translation type="unfinished">
+        <numerusform>%n notification types</numerusform>
+        <numerusform>%n notification types</numerusform>
+        <numerusform>%n notification types</numerusform>
+        <numerusform>%n notification types</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
+    <message>
+      <source>Select Notification Types</source>
+      <translation type="unfinished">Select Notification Types</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation>Nelze se připojit k %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation type="unfinished">Object tracking is ON</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
+    <message>
+      <source>None of selected users have access to the selected layout. Action will not work.</source>
+      <translation>Žádný z vybraných uživatelů nemá přístup k vybranému rozložení. Akce nebude fungovat.</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>Vybrat rozložení...</translation>
+    </message>
+    <message>
+      <source>None of selected user roles contain users. Action will not work.</source>
+      <translation>Žádná z vybraných uživatelských rolí neobsahuje uživatele. Akce nebude fungovat.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Někteří uživatelé nemají přístup k vybranému uspořádání, akce pro ně nebude fungovat.</translation>
+    </message>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>Místní rozložení lze zobrazit pouze jejich majitelům</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
+    <message>
+      <source>Not supported</source>
+      <translation type="unfinished">Not supported</translation>
+    </message>
+    <message>
+      <source>This tab will be available in future versions</source>
+      <translation type="unfinished">This tab will be available in future versions</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Zjistit více</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PasswordDialog</name>
+    <message>
+      <source>Sign In</source>
+      <translation>Přihlásit se</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PeerStateTracker</name>
+    <message>
+      <source>The server is taking too long to respond</source>
+      <translation>Odezva servru je příliš dlouhá</translation>
+    </message>
+    <message>
+      <source>No update task</source>
+      <translation>Žádná aktualizace</translation>
+    </message>
+    <message>
+      <source>Ready to download update</source>
+      <translation>Připraven ke stažení aktualizace</translation>
+    </message>
+    <message>
+      <source>Downloading update</source>
+      <translation>Stahování aktualizace</translation>
+    </message>
+    <message>
+      <source>Ready to restart to the new version</source>
+      <translation>Připraveno k restartování na novou verzi</translation>
+    </message>
+    <message>
+      <source>Installing update</source>
+      <translation>Instalace aktualizace</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Nainstalováno</translation>
+    </message>
+    <message>
+      <source>Waiting for peer data</source>
+      <translation>Čekání na peer data</translation>
+    </message>
+    <message>
+      <source>There is not enough space to download update files.</source>
+      <translation>Nedostatek místa pro stažení aktualizačních souborů.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to extract update files.</source>
+      <translation>Nedostatek místa pro extrahování aktualizačních souborů.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages.</source>
+      <translation>Nepodařilo se stáhnout balíčky aktualizací.</translation>
+    </message>
+    <message>
+      <source>Update contents are invalid.</source>
+      <translation>Obsah aktualizace je neplatný.</translation>
+    </message>
+    <message>
+      <source>Update archive is corrupted.</source>
+      <translation>Archiv aktualizací je poškozen.</translation>
+    </message>
+    <message>
+      <source>Update files cannot be extracted.</source>
+      <translation>Aktualizační soubory nelze extrahovat.</translation>
+    </message>
+    <message>
+      <source>Internal downloader error.</source>
+      <translation>Interní chyba stahování.</translation>
+    </message>
+    <message>
+      <source>Unknown error.</source>
+      <translation>Neznámá chyba.</translation>
+    </message>
+    <message>
+      <source>Unexpected error code.</source>
+      <translation>Neočekávaný chybový kód.</translation>
+    </message>
+    <message>
+      <source>Ready to install update</source>
+      <translation>Připraven k instalaci aktualizace</translation>
+    </message>
+    <message>
+      <source>Update package is not found.</source>
+      <translation>Aktualizační balíček nebyl nalezen.</translation>
+    </message>
+    <message>
+      <source>There is not enough space to install update.</source>
+      <translation>Není dostatek místa pro instalaci aktualizace.</translation>
+    </message>
+    <message>
+      <source>Internal server error.</source>
+      <translation>Vnitřní chyba serveru.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Tato verze OS již není podporována.</translation>
+    </message>
+    <message>
+      <source>Update installation failed.</source>
+      <translation>Instalace aktualizace se nezdařila.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation type="unfinished">video is paused</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
+    <message>
+      <source>Disconnected</source>
+      <translation>Odpojeno</translation>
+    </message>
+    <message>
+      <source>Connected</source>
+      <translation>Připojeno</translation>
+    </message>
+    <message>
+      <source>Powered</source>
+      <translation>Napájeno</translation>
+    </message>
+    <message>
+      <source>Unexpected</source>
+      <translation>Neočekávané</translation>
+    </message>
+    <message>
+      <source>Empty</source>
+      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
+      <translation>Prázdný</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Spotřeba</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Stav</translation>
+    </message>
+    <message>
+      <source>Power</source>
+      <translation>Napájení</translation>
+    </message>
+    <message>
+      <source>Unknown device</source>
+      <translation>Neznámé zařízení</translation>
+    </message>
+    <message>
+      <source>Unknown device %1</source>
+      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
+      <translation>Neznámé zařízení %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PoeSettingsWidget</name>
+    <message>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Pozor! Byl překročen limit výkonu</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>%1 Settings</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation>%1 Nastavení</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols over</source>
+      <translation>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+        <numerusform>%n symbolů</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n symbols left</source>
+      <translation>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+        <numerusform>Zbývá %n symbolů</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::QnWebpageDialog</name>
+    <message>
+      <source>Name</source>
+      <translation>Název</translation>
+    </message>
+    <message>
+      <source>URL</source>
+      <translation>URL</translation>
+    </message>
+    <message>
+      <source>URL cannot be empty.</source>
+      <translation>Adresa URL nemůže být prázdná.</translation>
+    </message>
+    <message>
+      <source>Wrong URL format.</source>
+      <translation>Formát URL adresy je nesprávný.</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webová stránka</translation>
+    </message>
+    <message>
+      <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
+      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+    </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+    </message>
+    <message>
+      <source>The web page can interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+    </message>
+    <message>
+      <source>Proxy this integration through the server</source>
+      <translation type="unfinished">Proxy this integration through the server</translation>
+    </message>
+    <message>
+      <source>Proxy this web page through the server</source>
+      <translation type="unfinished">Proxy this web page through the server</translation>
+    </message>
+    <message>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>Nová webová stránka</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>Upravit webovou stránku</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation type="unfinished">New Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation type="unfinished">Edit Proxied Web Page</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation type="unfinished">New Integration</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation type="unfinished">Edit Integration</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation type="unfinished">New Proxied Integration</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation type="unfinished">Edit Proxied Integration</translation>
+    </message>
+    <message>
+      <source>To allow the use of a client API, create a web integration instead. %1</source>
+      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+    </message>
+    <message>
+      <source>Learn more...</source>
+      <translation>Zjistit více...</translation>
+    </message>
+    <message>
+      <source>Auto-refresh integration</source>
+      <translation type="unfinished">Auto-refresh integration</translation>
+    </message>
+    <message>
+      <source>Auto-refresh web page</source>
+      <translation type="unfinished">Auto-refresh web page</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Nastavit rozlišení rozložení na &quot;Auto&quot; pro zvýšení výkonu.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
+        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>Obrazovka %1 - %2x%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (Primární)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>Nejlepší</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>Průměrná</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>Výkon</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>Výchozí</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>Quarter Native</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation type="unfinished">Select Folder...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
+    <message>
+      <source>Not recording</source>
+      <translation>Bez záznamu</translation>
+    </message>
+    <message>
+      <source>Recording everything</source>
+      <translation>Nahrát vše</translation>
+    </message>
+    <message>
+      <source>Recording motion only</source>
+      <translation>Nahrát pouze pohyb</translation>
+    </message>
+    <message>
+      <source>Recording motion and low quality</source>
+      <translation>Nahrát pohyb nízkou kvalitou</translation>
+    </message>
+    <message>
+      <source>Continuous</source>
+      <translation>Kontinuální</translation>
+    </message>
+    <message>
+      <source>Motion only</source>
+      <translation>Pouze pohyb</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Pohyb + nízké rozlišení</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation type="unfinished">Recording motion and objects</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation type="unfinished">Recording objects only</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation type="unfinished">Recording motion, objects and low quality</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation type="unfinished">Recording objects and low quality</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation type="unfinished">Motion, Objects</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation type="unfinished">Objects only</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation type="unfinished">Objects + Lo-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>%1 layout</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation type="unfinished">%1 layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+        <numerusform>%1 and %n more layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 video wall</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">%1 video wall</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
+        <numerusform>%1 and %n more video walls</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">%1 group</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourceGroupingActionHandler</name>
+    <message>
+      <source>Maximum level of nesting is reached</source>
+      <translation type="unfinished">Maximum level of nesting is reached</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
+    <message>
+      <source>add to current layout</source>
+      <translation>přidat do aktuálního rozložení</translation>
+    </message>
+    <message>
+      <source>open all at a new layout</source>
+      <translation>otevřít vše v novém rozložení</translation>
+    </message>
+    <message>
+      <source>open all</source>
+      <translation>otevřít vše</translation>
+    </message>
+    <message>
+      <source>Health Monitor</source>
+      <translation>Monitor stavu</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation type="unfinished">Confirm</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RightPanelModelsAdapter</name>
+    <message numerus="yes">
+      <source>%n motion events</source>
+      <translation>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks</source>
+      <translation>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+        <numerusform>%n záložky</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects</source>
+      <translation>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+        <numerusform>%n objektů</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n notifications</source>
+      <translation type="unfinished">
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+        <numerusform>%n notifications</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation type="unfinished">Active</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation type="unfinished">Suspended</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation type="unfinished">Shut down</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScheduleGridWidget</name>
+    <message>
+      <source>All</source>
+      <translation>Vše</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>Nastavení kvality určuje pouze rychlost komprese a nemá vliv na rozlišení. Nízká, Střední, Vysoká a Nejlepší jsou přednastavené hodnoty rychlosti přenosu.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Méně nastavení</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Více nastavení</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled or not supported</source>
+      <translation>Detekce pohybu je vypnutá nebo není podporována</translation>
+    </message>
+    <message>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Duální streamování je deaktivováno nebo není podporováno</translation>
+    </message>
+    <message>
+      <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
+      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+    </message>
+    <message>
+      <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
+You can still change quality and FPS directly on the camera.</source>
+      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
+You can still change quality and FPS directly on the camera.</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation type="unfinished">Motion, Objects</translation>
+    </message>
+    <message>
+      <source>Motion, Objects
+ + Low-Res</source>
+      <translation type="unfinished">Motion, Objects
+ + Low-Res</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation type="unfinished">Objects Only</translation>
+    </message>
+    <message>
+      <source>Objects
+ + Low-Res</source>
+      <translation type="unfinished">Objects
+ + Low-Res</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Pouze pohyb</translation>
+    </message>
+    <message>
+      <source>Motion
+ + Low-Res</source>
+      <translation type="unfinished">Motion
+ + Low-Res</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation type="unfinished">Object detection is disabled for this camera</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+    </message>
+    <message>
+      <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
+You can still change quality and FPS directly on the camera.</source>
+      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
+You can still change quality and FPS directly on the camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScreenRecordingActionHandler</name>
+    <message>
+      <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
+      <translation>Subsystém snímání obrazovky ještě není inicializován. Prosím zkuste to znovu později.</translation>
+    </message>
+    <message>
+      <source>Recording in %1...</source>
+      <translation>Nahrávání v %1...</translation>
+    </message>
+    <message>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+    </message>
+    <message>
+      <source>Recorded Video</source>
+      <translation>Nahrané video</translation>
+    </message>
+    <message>
+      <source>Save Recording As...</source>
+      <translation>Uložit záznam jako...</translation>
+    </message>
+    <message>
+      <source>AVI (Audio/Video Interleaved)</source>
+      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+    </message>
+    <message>
+      <source>Failed to start recording</source>
+      <translation>Spouštění záznamu se nezdařilo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SearchLineEdit</name>
+    <message>
+      <source>Search</source>
+      <translation>Hledat</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Sledovat a zaznamenávat všechny akce uživatele.</translation>
+    </message>
+    <message>
+      <source>Archive encryption password</source>
+      <translation type="unfinished">Archive encryption password</translation>
+    </message>
+    <message>
+      <source>Failed to set archive encryption password</source>
+      <translation type="unfinished">Failed to set archive encryption password</translation>
+    </message>
+    <message>
+      <source>Does not affect the connections established by server.</source>
+      <translation type="unfinished">Does not affect the connections established by server.</translation>
+    </message>
+    <message>
+      <source>Enables RTSP traffic encryption.</source>
+      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+    </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation>Zjistit více.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation type="unfinished">
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>The recommended maximum user session lifetime is %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+    </message>
+    <message>
+      <source>Encrypting video traffic may significantly increase CPU usage</source>
+      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost</source>
+      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+    </message>
+    <message>
+      <source>Archive encryption increases CPU usage</source>
+      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+    </message>
+    <message>
+      <source>Additional configuration might be required on the server machine.</source>
+      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+    </message>
+    <message>
+      <source>The encryption password will be required to restore the archive.
+Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
+      <translation type="unfinished">The encryption password will be required to restore the archive.
+Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+    </message>
+    <message>
+      <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
+      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
+      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</name>
+    <message>
+      <source>No objects</source>
+      <translation>Žádné objekty</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects selected</source>
+      <translation type="unfinished">
+        <numerusform>%n objects selected</numerusform>
+        <numerusform>%n objects selected</numerusform>
+        <numerusform>%n objects selected</numerusform>
+        <numerusform>%n objects selected</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All objects</source>
+      <translation type="unfinished">All objects</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerCertificateError</name>
+    <message>
+      <source>Failed to connect to server</source>
+      <translation type="unfinished">Failed to connect to server</translation>
+    </message>
+    <message>
+      <source>View certificate</source>
+      <translation type="unfinished">View certificate</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerCertificateViewer</name>
+    <message>
+      <source>The certificate was presented by %1</source>
+      <translation type="unfinished">The certificate was presented by %1</translation>
+    </message>
+    <message>
+      <source>This certificate does not match the certificate %1 is pinned to.</source>
+      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+    </message>
+    <message>
+      <source>This is a custom certificate installed on %1</source>
+      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+    </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation type="unfinished">Pin this certificate to %1?</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Pin</translation>
+    </message>
+    <message>
+      <source>The certificate is auto-generated and pinned to %1</source>
+      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+    </message>
+    <message>
+      <source>Server ID: %1</source>
+      <translation type="unfinished">Server ID: %1</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
+Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Custom Certificate</source>
+      <translation type="unfinished">Custom Certificate</translation>
+    </message>
+    <message>
+      <source>Auto-generated Certificate</source>
+      <translation type="unfinished">Auto-generated Certificate</translation>
+    </message>
+    <message>
+      <source>Unknown Certificate</source>
+      <translation type="unfinished">Unknown Certificate</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Contact a user with Administrators permissions to resolve this issue.</source>
+      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation type="unfinished">Not Part Of Certificate</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation type="unfinished">View pinned certificate</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation type="unfinished">Pin to this certificate</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>Connect Anyway</source>
+      <translation type="unfinished">Connect Anyway</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Pokračovat</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation type="unfinished">
+        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust these servers</numerusform>
+        <numerusform>I trust these servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation type="unfinished">I trust this server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation type="unfinished">There are no suitable servers</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
+    <message>
+      <source>Library</source>
+      <translation>Knihovna</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Verze</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Výrobce</translation>
+    </message>
+    <message>
+      <source>no error</source>
+      <translation>žádné chyby</translation>
+    </message>
+    <message>
+      <source>library file cannot be loaded</source>
+      <translation>soubor knihovny nelze načíst</translation>
+    </message>
+    <message>
+      <source>invalid or incompatible plugin library</source>
+      <translation>neplatná nebo nekompatibilní knihovna pluginů</translation>
+    </message>
+    <message>
+      <source>plugin library failed to initialize</source>
+      <translation>inicializace knihovny pluginů se nezdařila</translation>
+    </message>
+    <message>
+      <source>plugin returned bad manifest</source>
+      <translation>plugin vrátil špatný manifest</translation>
+    </message>
+    <message>
+      <source>plugin API version is no longer supported</source>
+      <translation>verze pluginu API již není podporována</translation>
+    </message>
+    <message>
+      <source>unknown error</source>
+      <translation>neznámá chyba</translation>
+    </message>
+    <message>
+      <source>Not loaded</source>
+      <translation>Nenačteno</translation>
+    </message>
+    <message>
+      <source>Loaded</source>
+      <translation>Načteno</translation>
+    </message>
+    <message>
+      <source>plugin is in the black list</source>
+      <translation>plugin je na černé listině</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Stav</translation>
+    </message>
+    <message>
+      <source>plugin is optional and is not in the white list</source>
+      <translation>plugin je volitelný a není na bílém seznamu</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>vnitřní chyba</translation>
+    </message>
+    <message>
+      <source>unknown status</source>
+      <translation type="unfinished">unknown status</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
+    <message>
+      <source>Skipped</source>
+      <translation>Přeskočeno</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation>Nainstalováno</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation>Probíhá instalace...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation>Staženo</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation>Čekání na odpověď serveru...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdateTool</name>
+    <message>
+      <source>No connection to the server.</source>
+      <translation>Žádné připojení k serveru.</translation>
+    </message>
+    <message>
+      <source>Network error.</source>
+      <translation>Chyba sítě.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Chyba serveru.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerUpdatesModel</name>
+    <message>
+      <source>Status</source>
+      <translation>Stav</translation>
+    </message>
+    <message>
+      <source>Message</source>
+      <translation>Zpráva</translation>
+    </message>
+    <message>
+      <source>Store Update Files</source>
+      <translation>Uložte aktualizační soubory</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Klient</translation>
+    </message>
+    <message>
+      <source>Component</source>
+      <translation>Komponenty</translation>
+    </message>
+    <message>
+      <source>Installed Version</source>
+      <translation>Instalovaná verze</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SessionRefreshDialog</name>
+    <message>
+      <source>Login</source>
+      <translation>Přihlásit</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Heslo</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation>Neznámá chyba</translation>
+    </message>
+    <message>
+      <source>Access Link</source>
+      <translation type="unfinished">Access Link</translation>
+    </message>
+    <message>
+      <source>Invalid Link</source>
+      <translation type="unfinished">Invalid Link</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid</source>
+      <translation type="unfinished">The provided link is not valid</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>Filmový pás</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Filmový pás %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Smazat filmový pás %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>Rozložení nebo kameru přidáte do filmového pásu jejích přetažením sem</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>K přepnutí mezi rozloženími použijte šipky na klávesnic. Pro ukončení filmového pásu stiskněte klávesu Esc.</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation type="unfinished">Press Esc to stop the tour.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>Přepnout na</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>Zobrazit pro</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>Zobrazit vybrané pro</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
+    <message>
+      <source>Motion</source>
+      <translation>Pohyb</translation>
+    </message>
+    <message>
+      <source>Bookmark it...</source>
+      <translation>Označit to záložkou...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
+    <message>
+      <source>No motion detected</source>
+      <translation>Nebyl zjištěn žádný pohyb</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n motion events</source>
+      <translation>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+        <numerusform>%n události pohybu</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Try changing the filters or enable motion recording</source>
+      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Přejít na živé video</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Nastavit hesla</translation>
+    </message>
+    <message>
+      <source>Replaced camera discovered</source>
+      <translation type="unfinished">Replaced camera discovered</translation>
+    </message>
+    <message>
+      <source>Camera %1 has been replaced by %2.</source>
+      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+    </message>
+    <message>
+      <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
+      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+    </message>
+    <message>
+      <source>Undo Replace</source>
+      <translation type="unfinished">Undo Replace</translation>
+    </message>
+    <message>
+      <source>Add more services or fix overuse by stopping using services for some devices.</source>
+      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+    </message>
+    <message>
+      <source>If no action is taken, required number of services will be released automatically on %1.</source>
+      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+    </message>
+    <message>
+      <source>Some features may not be available.</source>
+      <translation type="unfinished">Some features may not be available.</translation>
+    </message>
+    <message>
+      <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
+      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+    </message>
+    <message>
+      <source>Open Settings</source>
+      <translation type="unfinished">Open Settings</translation>
+    </message>
+    <message>
+      <source>Open Services</source>
+      <translation type="unfinished">Open Services</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SystemTabBar</name>
+    <message>
+      <source>Open in New Window</source>
+      <translation>Otevřít v novém okně</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>Zavřít</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TemporaryUserExpirationWatcher</name>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation type="unfinished">and</translation>
+    </message>
+    <message>
+      <source>Your access to the Site expires %1</source>
+      <comment>%1 is a date</comment>
+      <translation type="unfinished">Your access to the Site expires %1</translation>
+    </message>
+    <message>
+      <source>Your access to the Site expires in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation type="unfinished">Your access to the Site expires in %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TileInteractionHandler</name>
+    <message numerus="yes">
+      <source>... and %n more</source>
+      <translation>
+        <numerusform>... a %n dalších</numerusform>
+        <numerusform>... a %n dalších</numerusform>
+        <numerusform>... a %n dalších</numerusform>
+        <numerusform>... a %n dalších</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
+      <translation>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No available archive</source>
+      <translation>Žádný dostupný archiv</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Nepodařilo se spustit plugin</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Název</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Start time</source>
+      <translation>Čas počátku</translation>
+    </message>
+    <message>
+      <source>Length</source>
+      <translation>Délka</translation>
+    </message>
+    <message>
+      <source>Created</source>
+      <translation>Vytvořeno</translation>
+    </message>
+    <message>
+      <source>Creator</source>
+      <translation>Autor</translation>
+    </message>
+    <message>
+      <source>Tags</source>
+      <translation>Značky</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Popis</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Otevřít</translation>
+    </message>
+    <message>
+      <source>Open in New Tab</source>
+      <translation>Otevřít v nové záložce</translation>
+    </message>
+    <message>
+      <source>This action is not supported for notifications from other Sites</source>
+      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
+    <message>
+      <source>Server</source>
+      <translation>Server</translation>
+    </message>
+    <message>
+      <source>Time Zone</source>
+      <translation>Časové pásmo</translation>
+    </message>
+    <message>
+      <source>Date</source>
+      <translation>Datum</translation>
+    </message>
+    <message>
+      <source>Server OS Time</source>
+      <translation>Čas OS serveru</translation>
+    </message>
+    <message>
+      <source>VMS Time</source>
+      <translation>Čas VMS</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
+    <message>
+      <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
+      <translation>Čas, společný a synchronizovaný mezi všemi servery. se může lišit od času OS na konkrétním serveru.</translation>
+    </message>
+    <message>
+      <source>Synchronized with the Internet</source>
+      <translation>Synchronizováno s internetem</translation>
+    </message>
+    <message>
+      <source>Synchronized with the local time at the selected server</source>
+      <translation>Synchronizováno s místním časem na vybraném serveru</translation>
+    </message>
+    <message>
+      <source>Not synchronized. Each server uses its own local time.</source>
+      <translation>Nesynchronizováno. Každý server používá svůj vlastní místní čas.</translation>
+    </message>
+    <message>
+      <source>Equal to the server local time</source>
+      <translation>Stejné jako místní čas serveru</translation>
+    </message>
+    <message>
+      <source>No Internet connection. Time is not being synchronized.</source>
+      <translation>Žádné internetové připojení. Čas není synchronizován.</translation>
+    </message>
+    <message>
+      <source>Time Server is offline. Time is not being synchronized.</source>
+      <translation>Time Server je offline. Čas není synchronizován.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>Dlouhé</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Krátké</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TwoWayAudioButton</name>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Přidržet hovor</translation>
+    </message>
+    <message>
+      <source>Input device is not selected</source>
+      <translation>Vstupní zařízení není vybráno</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Chyba sítě</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>Nelze otevřít soubor &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>Nelze vypočítat md5 pro soubor &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side: %1</source>
+      <translation>Nahrávání na straně serveru se nepodařilo vytvořit: %1</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation>Nelze nahrát chunk soubor na server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation>Nelze zkontrolovat nahraný soubor na server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation>Soubor byl poškozen při nahrávání na server</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Vzdálený soubor &quot;%1&quot; je poškozen</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Server již tento soubor obsahuje &quot;%1&quot;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserGroupListModel</name>
+    <message>
+      <source>LDAP group</source>
+      <translation type="unfinished">LDAP group</translation>
+    </message>
+    <message>
+      <source>Built-in group</source>
+      <translation type="unfinished">Built-in group</translation>
+    </message>
+    <message>
+      <source>Custom group</source>
+      <translation type="unfinished">Custom group</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Název</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Popis</translation>
+    </message>
+    <message>
+      <source>Group is not found in the LDAP database.</source>
+      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+    </message>
+    <message>
+      <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
+      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Vlastní</translation>
+    </message>
+    <message>
+      <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
+    <message>
+      <source>Invalid JSON</source>
+      <translation type="unfinished">Invalid JSON</translation>
+    </message>
+    <message>
+      <source>Invalid request</source>
+      <translation type="unfinished">Invalid request</translation>
+    </message>
+    <message>
+      <source>Method not found</source>
+      <translation type="unfinished">Method not found</translation>
+    </message>
+    <message>
+      <source>Invalid parameters</source>
+      <translation>Neplatné parametry</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Vnitřní chyba</translation>
+    </message>
+    <message>
+      <source>Connection failure</source>
+      <translation type="unfinished">Connection failure</translation>
+    </message>
+    <message>
+      <source>Invalid encoding</source>
+      <translation type="unfinished">Invalid encoding</translation>
+    </message>
+    <message>
+      <source>Invalid encoding charset</source>
+      <translation type="unfinished">Invalid encoding charset</translation>
+    </message>
+    <message>
+      <source>Application Error</source>
+      <translation type="unfinished">Application Error</translation>
+    </message>
+    <message>
+      <source>Transport Error</source>
+      <translation type="unfinished">Transport Error</translation>
+    </message>
+    <message>
+      <source>Server error code %1</source>
+      <translation type="unfinished">Server error code %1</translation>
+    </message>
+    <message>
+      <source>Reserved error code %1</source>
+      <translation type="unfinished">Reserved error code %1</translation>
+    </message>
+    <message>
+      <source>Unknown error code %1</source>
+      <translation type="unfinished">Unknown error code %1</translation>
+    </message>
+    <message>
+      <source>Site Error</source>
+      <translation type="unfinished">Site Error</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserListModel</name>
+    <message>
+      <source>Local user</source>
+      <translation>Místní uživatel</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 uživatel</translation>
+    </message>
+    <message>
+      <source>LDAP user</source>
+      <translation>LDAP uživatel</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Přihlásit</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Vlastní</translation>
+    </message>
+    <message>
+      <source>LDAP server is offline. Users are not able to log in.</source>
+      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+    </message>
+    <message>
+      <source>User is not found in the LDAP database.</source>
+      <translation type="unfinished">User is not found in the LDAP database.</translation>
+    </message>
+    <message>
+      <source>Temporary user</source>
+      <translation type="unfinished">Temporary user</translation>
+    </message>
+    <message>
+      <source>Full Name</source>
+      <translation type="unfinished">Full Name</translation>
+    </message>
+    <message>
+      <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
+      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserManagementTabWidget</name>
+    <message>
+      <source>Users</source>
+      <translation>Uživatelé</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation type="unfinished">LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>Chcete-li změnit heslo, zadejte stávající.</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 uživatel s uvedenou emailovou adresou již existuje.</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation type="unfinished">Enter your account password</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Uložit</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Použití změn se nezdařilo</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation type="unfinished">Apply changes?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>Zrušit</translation>
+    </message>
+    <message>
+      <source>Copy Access Link</source>
+      <translation type="unfinished">Copy Access Link</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Neplatné aktuální heslo</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Email nemůže být prázdný</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty</source>
+      <translation>Přihlášení nemůže být prázdné</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation>Uživatel s uvedeným přihlášením již existuje</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to terminate access link?</source>
+      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation type="unfinished">Terminate</translation>
+    </message>
+    <message>
+      <source>Terminate access link</source>
+      <translation type="unfinished">Terminate access link</translation>
+    </message>
+    <message>
+      <source>Create access link</source>
+      <translation type="unfinished">Create access link</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation type="unfinished">Create</translation>
+    </message>
+    <message>
+      <source>New Link - %1</source>
+      <translation type="unfinished">New Link - %1</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation type="unfinished">Access link has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
+      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended.</source>
+      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+    </message>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation type="unfinished">and</translation>
+    </message>
+    <message>
+      <source>New User</source>
+      <translation type="unfinished">New User</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation type="unfinished">User %1 has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation type="unfinished">Obtaining Link...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation>v %1</translation>
+    </message>
+    <message>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
+    </message>
+    <message>
+      <source>This will instantly remove an access to the site for this user</source>
+      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::VersionSelectionDialog</name>
+    <message>
+      <source>Select Version</source>
+      <translation type="unfinished">Select Version</translation>
+    </message>
+    <message>
+      <source>Version</source>
+      <translation>Verze</translation>
+    </message>
+    <message>
+      <source>Invalid version.</source>
+      <translation type="unfinished">Invalid version.</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Heslo</translation>
+    </message>
+    <message>
+      <source>The password is incorrect.</source>
+      <translation>Heslo je nesprávné.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::VirtualCameraActionHandler</name>
     <message>
       <source>Failed to add virtual camera</source>
       <translation>Přidání virtuální kamery se nezdařilo</translation>
@@ -6648,4733 +12702,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>Resources</name>
-    <message>
-      <source>There is another layout with the same name</source>
-      <translation>Existuje další rozložení se stejným názvem</translation>
-    </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>Nemáte oprávnění k jeho přepsání.</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout?</source>
-      <translation>Přepsat existující rozložení?</translation>
-    </message>
-    <message>
-      <source>There is another layout with the same name.</source>
-      <translation>Existuje další rozložení se stejným názvem.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>Uživatel bude mít stále přístup k %n odstraněným zdrojům:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>Chcete-li odstranit přístup, přejděte do části Nastavení uživatele.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí získají přístup k %n zdrojům:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>Chcete-li odstranit přístup, přejděte do části Nastavení role.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí budou mít stále přístup k %n odstraněným zdrojům:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changes will affect other users</source>
-      <translation>Změny ovlivní ostatní uživatele</translation>
-    </message>
-    <message>
-      <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>Toto rozložení je sdílené s ostatními uživateli, takže jim je také změníte.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>Uživatel ztratí přístup k %n zdrojům:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
-        <numerusform>Všichni uživatelé s touto rolí ztratí přístup k %n zdrojům:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
-        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
-        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
-        <numerusform>Chcete smazat %n sdílené rozložení?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
-        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
-        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
-        <numerusform>Tyto %n rozložení jsou sdíleny s ostatními uživateli, takže je jim také smažete.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>Odstranit %n položek z rozložení?</numerusform>
-        <numerusform>Odstranit %n položek z rozložení?</numerusform>
-        <numerusform>Odstranit %n položek z rozložení?</numerusform>
-        <numerusform>Odstranit %n položek z rozložení?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Odstranit</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>Chystáte se smazat některé zdroje, ke kterým máte přístup pouze z videostěny. Po smazání je nebudete vidět ve svém seznamu zdrojů a nebudete je moci znovu přidat do videostěny.</translation>
-    </message>
-    <message>
-      <source>You will lose access to following resources:</source>
-      <translation>Ztratíte přístup k následujícím zdrojům:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>Smazat %n uživatelů?</numerusform>
-        <numerusform>Smazat %n uživatelů?</numerusform>
-        <numerusform>Smazat %n uživatelů?</numerusform>
-        <numerusform>Smazat %n uživatelů?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>Smazat %n zařízení?</numerusform>
-        <numerusform>Smazat %n zařízení?</numerusform>
-        <numerusform>Smazat %n zařízení?</numerusform>
-        <numerusform>Smazat %n zařízení?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>Smazat %n kamer?</numerusform>
-        <numerusform>Smazat %n kamer?</numerusform>
-        <numerusform>Smazat %n kamer?</numerusform>
-        <numerusform>Smazat %n kamer?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>Smazat %n I/O modulů?</numerusform>
-        <numerusform>Smazat %n I/O modulů?</numerusform>
-        <numerusform>Smazat %n I/O modulů?</numerusform>
-        <numerusform>Smazat %n I/O modulů?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-        <numerusform>Smazat %n položek?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
-        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
-        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
-        <numerusform>%n z nich je automaticky nalezeno.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
-        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
-        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
-        <numerusform>%n kamer je automaticky nalezeno.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
-        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
-        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
-        <numerusform>%n I/O modulů je automaticky nalezeno.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>They may be auto-discovered again after removing.</source>
-      <translation>Po odstranění mohou být znovu automaticky nalezeny.</translation>
-    </message>
-    <message>
-      <source>Overwrite existing showreel?</source>
-      <translation>Přepsat existující filmový pás?</translation>
-    </message>
-    <message>
-      <source>There is another showreel with the same name.</source>
-      <translation>Existuje další filmový pás se stejným názvem.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from showreel?</source>
-      <translation>
-        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
-        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
-        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
-        <numerusform>Odstranit %n položek z filmového pásu?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Stop uploading?</source>
-      <translation>Zastavit nahrávání?</translation>
-    </message>
-    <message>
-      <source>Stop</source>
-      <translation>Zastavit</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation>
-        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
-        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
-        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
-        <numerusform>Některé videosoubory se stále nahrávají do %n virtuálních kamer:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
-    </message>
-    <message>
-      <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
-    </message>
-    <message>
-      <source>Merge</source>
-      <translation>Sloučit</translation>
-    </message>
-    <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
-    </message>
-    <message>
-      <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
-    </message>
-    <message>
-      <source>Move</source>
-      <translation>Přesunout</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Zrušit</translation>
-    </message>
-    <message>
-      <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
-    </message>
-    <message>
-      <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
-    </message>
-    <message>
-      <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
-    </message>
-    <message>
-      <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
-    </message>
-    <message>
-      <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
-    </message>
-    <message>
-      <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
-    </message>
-    <message>
-      <source>Only some of the selected devices can be moved to %1</source>
-      <translation type="unfinished">Only some of the selected devices can be moved to %1</translation>
-    </message>
-    <message>
-      <source>Move Partially</source>
-      <translation type="unfinished">Move Partially</translation>
-    </message>
-    <message numerus="yes">
-      <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>SimpleMotionSearchWidget::Private</name>
-    <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Chcete-li filtrovat výsledky, vyberte oblast na videu</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Ve vybrané oblasti</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vybraná kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Vybrané zařízení</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Vybrat média</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>žádný</translation>
-    </message>
-  </context>
-  <context>
-    <name>SourcePickerWidgetStrings</name>
-    <message>
-      <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Vyberte alespoň jednoho uživatele</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Vyberte alespoň jedno zařízení</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Vyberte alespoň jednu kameru</translation>
-    </message>
-    <message>
-      <source>Select at least one I/O module</source>
-      <translation type="unfinished">Select at least one I/O module</translation>
-    </message>
-  </context>
-  <context>
-    <name>StreamQualityStrings</name>
-    <message>
-      <source>Lowest</source>
-      <translation>Nejnižší</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Nízká</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Střední</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Vysoká</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Nejlepší</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Prepozice</translation>
-    </message>
-    <message>
-      <source>Undefined</source>
-      <translation>Nedefinováno</translation>
-    </message>
-    <message>
-      <source>Lst</source>
-      <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Pos</translation>
-    </message>
-    <message>
-      <source>Lo</source>
-      <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Ni</translation>
-    </message>
-    <message>
-      <source>Me</source>
-      <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>St</translation>
-    </message>
-    <message>
-      <source>Hi</source>
-      <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Vy</translation>
-    </message>
-    <message>
-      <source>Bst</source>
-      <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Nej</translation>
-    </message>
-    <message>
-      <source>Ps</source>
-      <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Pr</translation>
-    </message>
-  </context>
-  <context>
-    <name>UpdateStrings</name>
-    <message>
-      <source>This Linux platform is no longer supported</source>
-      <translation>Tato platforma Linux již není podporována</translation>
-    </message>
-    <message>
-      <source>This OS version is no longer supported</source>
-      <translation>Tato verze OS již není podporována</translation>
-    </message>
-    <message>
-      <source>This %1 version is no longer supported</source>
-      <comment>%1 is OS name, e.g. Windows</comment>
-      <translation>Tato verze %1 již není podporována</translation>
-    </message>
-    <message>
-      <source>%1 %2 is no longer supported</source>
-      <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation>%1 %2 již není podporována</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserListModel</name>
-    <message>
-      <source>Owner</source>
-      <translation>Vlastník</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrátor</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>Zobrazit živé video</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>Úprava nastavení zařízení</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Úprava nastavení kamery</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>Použít ovládání PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Zobrazit video archivy</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Export videa</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Ovládání videostěny</translation>
-    </message>
-  </context>
-  <context>
-    <name>Videowall</name>
-    <message>
-      <source>There is another video wall with the same name</source>
-      <translation>Existuje další videostěna se stejným názvem</translation>
-    </message>
-    <message>
-      <source>Close %1 before starting Video Wall?</source>
-      <translation>Zavřete %1 před spuštěním videostěny?</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>Zavřít</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Ponechat</translation>
-    </message>
-    <message>
-      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>Místní soubory nelze umístit na obrazovku videostěny připojené k jinému počítači</translation>
-    </message>
-    <message>
-      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>Chcete-li zobrazit místní soubory na videostěně, připojte je pomocí počítače, na kterém je videostěna umístěna.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
-    <message>
-      <source>Hide information</source>
-      <translation>Skrýt informace</translation>
-    </message>
-    <message>
-      <source>Show information</source>
-      <translation>Zobrazit informace</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Skrýt miniatury</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Zobrazit miniatury</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Poslední den</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Posledních 7 dní</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Posledních 30 dní</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Vybrané na časové ose</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Kdykoliv</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>žádný</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Zařízení na rozvržení</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kamery na rozvržení</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Jakékoliv zařízení</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Jakákoliv kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Vybrané zařízení</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vybraná kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
-    </message>
-    <message>
-      <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AccessibleMediaViewHeaderWidget</name>
-    <message>
-      <source>All Cameras &amp; Resources</source>
-      <translation>Všechny kamery a zdroje</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AdvancedSystemSettingsWidget</name>
-    <message>
-      <source>Backup and Restore</source>
-      <translation>Zálohovat a obnovit</translation>
-    </message>
-    <message>
-      <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AlarmLayoutHandler</name>
-    <message>
-      <source>Alarms</source>
-      <translation>Poplachy</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
-    <message>
-      <source>deleted camera</source>
-      <translation>smazaná kamera</translation>
-    </message>
-    <message>
-      <source>Unknown track</source>
-      <translation>Neznámá cesta</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
-    <message>
-      <source>No objects</source>
-      <translation>Žádné objekty</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n objects</source>
-      <translation>
-        <numerusform>%n objektů</numerusform>
-        <numerusform>%n objektů</numerusform>
-        <numerusform>%n objektů</numerusform>
-        <numerusform>%n objektů</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AsyncImageWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>ŽÁDNÁ DATA</translation>
-    </message>
-    <message>
-      <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
-    <message>
-      <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
-    </message>
-    <message>
-      <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
-    </message>
-    <message>
-      <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
-    </message>
-    <message>
-      <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
-    </message>
-    <message>
-      <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
-    </message>
-    <message>
-      <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
-    </message>
-    <message>
-      <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
-    </message>
-    <message>
-      <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
-    </message>
-    <message>
-      <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
-    </message>
-    <message>
-      <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
-    </message>
-    <message>
-      <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
-    </message>
-    <message>
-      <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
-    </message>
-    <message>
-      <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
-    </message>
-    <message>
-      <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
-    </message>
-    <message>
-      <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
-    </message>
-    <message>
-      <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
-    </message>
-    <message>
-      <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
-    </message>
-    <message>
-      <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
-    </message>
-    <message>
-      <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
-    </message>
-    <message>
-      <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
-    </message>
-    <message>
-      <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
-    </message>
-    <message>
-      <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
-    </message>
-    <message>
-      <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
-    </message>
-    <message>
-      <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
-    <message>
-      <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
-    <message>
-      <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled</source>
-      <translation>Detekce pohybu je deaktivována</translation>
-    </message>
-    <message>
-      <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>Kamery</translation>
-    </message>
-    <message>
-      <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalita</translation>
-    </message>
-    <message>
-      <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
-    </message>
-    <message>
-      <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
-    </message>
-    <message>
-      <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
-    </message>
-    <message>
-      <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
-    </message>
-    <message>
-      <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
-    <message>
-      <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
-    </message>
-    <message>
-      <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalita</translation>
-    </message>
-    <message numerus="yes">
-      <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
-    <message>
-      <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupSettingsWidget</name>
-    <message>
-      <source>Settings</source>
-      <translation>Nastavení</translation>
-    </message>
-    <message>
-      <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
-    </message>
-    <message>
-      <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
-    </message>
-    <message>
-      <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>Správa úložiště</translation>
-    </message>
-    <message>
-      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
-      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
-    </message>
-    <message>
-      <source>To enable backup add more drives to use them as backup storage in %1</source>
-      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BackupStatusWidget</name>
-    <message>
-      <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
-    </message>
-    <message>
-      <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Tuto akci nelze vrátit zpět.</translation>
-    </message>
-    <message>
-      <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Footage from these cameras is backed up through to %1 %2</source>
-      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
-    </message>
-    <message>
-      <source>The progress will be displayed once the backup process starts</source>
-      <translation type="unfinished">The progress will be displayed once the backup process starts</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
-    <message>
-      <source>deleted camera</source>
-      <translation>smazaná kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
-    <message>
-      <source>No bookmarks</source>
-      <translation>Žádné záložky</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n záložky</numerusform>
-        <numerusform>%n záložky</numerusform>
-        <numerusform>%n záložky</numerusform>
-        <numerusform>%n záložky</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
-    <message>
-      <source>Loading values...</source>
-      <translation>Načítání hodnot...</translation>
-    </message>
-    <message>
-      <source>Applying changes...</source>
-      <translation>Aplikování změn...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraButtonController</name>
-    <message>
-      <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
-    </message>
-    <message>
-      <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
-    </message>
-    <message>
-      <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation type="unfinished">Unmute</translation>
-    </message>
-    <message>
-      <source>Open Door</source>
-      <translation type="unfinished">Open Door</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Heslo</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraExpertSettingsWidget</name>
-    <message>
-      <source>Auto</source>
-      <comment>Automatic RTP transport type</comment>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Pomáhá vyřešit problémy s kvalitou obrazu u některých kamer, u ostatních kamer způsobí významné zvýšení datového toku.</translation>
-    </message>
-    <message>
-      <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>Vlastní číslo, které lze přiřadit kameře pro rychlou identifikaci a přístup</translation>
-    </message>
-    <message numerus="yes">
-      <source>This ID is already used on the following %n cameras:</source>
-      <translation>
-        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
-        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
-        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
-        <numerusform>Toto ID se již používá na následujících %n kamerách:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>Server nezmění žádné nastavení kamer, bude přijímat a používat stream kamery jak je.</translation>
-    </message>
-    <message>
-      <source>Multicast</source>
-      <translation>Multicast</translation>
-    </message>
-    <message>
-      <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
-    </message>
-    <message>
-      <source>Never</source>
-      <translation>Nikdy</translation>
-    </message>
-    <message>
-      <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
-    </message>
-    <message>
-      <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
-    </message>
-    <message>
-      <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
-    </message>
-    <message>
-      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Nastavení kvality a rychlosti snímkování (FPS) v rozvrhu záznamu se stanou nepodstatnými.</translation>
-    </message>
-    <message>
-      <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
-    </message>
-    <message>
-      <source>default</source>
-      <translation>výchozí</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <comment>Automatic profile selection</comment>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation type="unfinished">Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraInfoWidget</name>
-    <message>
-      <source>Device Rules</source>
-      <translation>Oprávnění zařízení</translation>
-    </message>
-    <message>
-      <source>Camera Rules</source>
-      <translation>Oprávnění kamery</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules</source>
-      <translation>Oprávnění I/O modulu</translation>
-    </message>
-    <message>
-      <source>More Info</source>
-      <translation>Více informací</translation>
-    </message>
-    <message>
-      <source>Less Info</source>
-      <translation>Méně informací</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
-    <message numerus="yes">
-      <source>Use License</source>
-      <translation>
-        <numerusform>Použít licenci</numerusform>
-        <numerusform>Použít licenci</numerusform>
-        <numerusform>Použít licenci</numerusform>
-        <numerusform>Použít licenci</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
-    <message>
-      <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Detekce pohybu bude fungovat pouze když je kamera zobrazena. Aktivujte nahrávání, aby detekce mohla pracovat po celou dobu.</translation>
-    </message>
-    <message>
-      <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation>Je dosažen maximální počet obdélníků detekce pohybu aktuální kamery</translation>
-    </message>
-    <message>
-      <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation>Je dosažen maximální počet obdélníků ignorování pohybu aktuální kamery</translation>
-    </message>
-    <message>
-      <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation>Je dosažen maximální počet obdélníků detekce pohybu aktuální kamery</translation>
-    </message>
-    <message>
-      <source>Reset motion regions to default?</source>
-      <translation>Resetovat oblastí pohybu na výchozí hodnotu?</translation>
-    </message>
-    <message>
-      <source>This action cannot be undone.</source>
-      <translation>Tuto akci nelze vrátit zpět.</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Primární stream</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Sekundární stream</translation>
-    </message>
-    <message>
-      <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
-    </message>
-    <message>
-      <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
-    </message>
-    <message>
-      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraReplacementDialog</name>
-    <message>
-      <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
-    </message>
-    <message>
-      <source>Abort camera replacement?</source>
-      <translation type="unfinished">Abort camera replacement?</translation>
-    </message>
-    <message>
-      <source>Will be transferred partially:</source>
-      <translation type="unfinished">Will be transferred partially:</translation>
-    </message>
-    <message>
-      <source>Will not be transferred:</source>
-      <translation type="unfinished">Will not be transferred:</translation>
-    </message>
-    <message>
-      <source>Next</source>
-      <translation>Další</translation>
-    </message>
-    <message>
-      <source>Finish</source>
-      <translation>Dokončit</translation>
-    </message>
-    <message>
-      <source>Camera for Replacement</source>
-      <translation type="unfinished">Camera for Replacement</translation>
-    </message>
-    <message>
-      <source>Data for Transfer</source>
-      <translation type="unfinished">Data for Transfer</translation>
-    </message>
-    <message>
-      <source>Camera replaced!</source>
-      <translation type="unfinished">Camera replaced!</translation>
-    </message>
-    <message>
-      <source>Checking if the old camera&apos;s data can be transferred to the new camera.</source>
-      <translation type="unfinished">Checking if the old camera&apos;s data can be transferred to the new camera.</translation>
-    </message>
-    <message>
-      <source>Some data and settings may not be compatible with the new camera</source>
-      <translation type="unfinished">Some data and settings may not be compatible with the new camera</translation>
-    </message>
-    <message>
-      <source>%1 will be removed from the System and replaced by the selected camera</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the System and replaced by the selected camera</translation>
-    </message>
-    <message>
-      <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
-      <translation type="unfinished">The Camera Replacement operation is not possible as the Server is unavailable.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraScheduleWidget</name>
-    <message>
-      <source>Recording Schedule</source>
-      <translation>Rozvrh záznamu</translation>
-    </message>
-    <message>
-      <source>based on server time</source>
-      <translation>založeno na čase serveru</translation>
-    </message>
-    <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>Pro použití vybraných parametrů zvolte oblasti v rozvrhu.</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>Nastavte parametry záznamu a vyberte oblasti v rozvrhu, na které je chcete aplikovat.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Vysoká minimální hodnota může vést k poklesu délky archivu u jiných zařízení.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Vysoká minimální hodnota může vést k poklesu délky archivu u ostatních kamer.</translation>
-    </message>
-    <message>
-      <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraSelectionDialog</name>
-    <message>
-      <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
-    </message>
-    <message>
-      <source>Show all cameras</source>
-      <translation>Zobrazit všechny kamery</translation>
-    </message>
-    <message>
-      <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
-    </message>
-    <message>
-      <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
-    </message>
-    <message>
-      <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
-    </message>
-    <message>
-      <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
-    </message>
-    <message>
-      <source>No cameras available</source>
-      <translation type="unfinished">No cameras available</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraSettingsDialog</name>
-    <message>
-      <source>General</source>
-      <translation>Obecné</translation>
-    </message>
-    <message>
-      <source>Recording</source>
-      <translation>Nahrávání</translation>
-    </message>
-    <message>
-      <source>I/O Ports</source>
-      <translation>I/O porty</translation>
-    </message>
-    <message>
-      <source>Motion</source>
-      <translation>Pohyb</translation>
-    </message>
-    <message>
-      <source>Advanced</source>
-      <translation>Pokročilé</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Webová stránka</translation>
-    </message>
-    <message>
-      <source>Expert</source>
-      <translation>Expert</translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n devices are not saved:</source>
-      <translation>
-        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících zařízení %n nejsou uloženy:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n cameras are not saved:</source>
-      <translation>
-        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících kamerách %n nejsou uloženy:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation>
-        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
-        <numerusform>Změny v následujících I/O modulech %n nejsou uloženy:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another camera?</source>
-      <translation>Chcete provést změny před přepnutím na jinou kameru?</translation>
-    </message>
-    <message>
-      <source>Device Settings</source>
-      <translation>Nastavení zařízení</translation>
-    </message>
-    <message>
-      <source>Devices Settings</source>
-      <translation>Nastavení zařízení</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Nastavení kamery</translation>
-    </message>
-    <message>
-      <source>Cameras Settings</source>
-      <translation>Nastavení kamer</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings</source>
-      <translation>Nastavení I/O modulu</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings</source>
-      <translation>Nastavení I/O modulu</translation>
-    </message>
-    <message>
-      <source>Dewarping</source>
-      <translation>Dewarping</translation>
-    </message>
-    <message>
-      <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
-    </message>
-    <message>
-      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
-    </message>
-    <message>
-      <source>Motion Only</source>
-      <translation>Pouze pohyb</translation>
-    </message>
-    <message>
-      <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
-    </message>
-    <message>
-      <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Pohyb + nízké rozlišení</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Plugins</source>
-      <translation>Pluginy</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
-    <message numerus="yes">
-      <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
-    </message>
-    <message>
-      <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
-    </message>
-    <message>
-      <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
-    </message>
-    <message>
-      <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-      <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 jsou použity</numerusform>
-        <numerusform>%1 jsou použity</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraStreamsDialog</name>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Primární stream</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Sekundární stream</translation>
-    </message>
-    <message>
-      <source>No secondary stream</source>
-      <translation>Žádný sekundární stream</translation>
-    </message>
-    <message>
-      <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
-    </message>
-    <message>
-      <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CertificateSelectionDialog</name>
-    <message>
-      <source>Select a certificate to authenticate yourself to %1:</source>
-      <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
-    </message>
-    <message>
-      <source>Select</source>
-      <translation type="unfinished">Select</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
-    <message>
-      <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
-    </message>
-    <message>
-      <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
-    </message>
-    <message>
-      <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ClientApiAuthDialog</name>
-    <message>
-      <source>Your confirmation is required to provide a token to</source>
-      <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
-    </message>
-    <message>
-      <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
-    </message>
-    <message>
-      <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ClientUpdateTool</name>
-    <message>
-      <source>This update is already installed.</source>
-      <translation>Tato aktualizace je již nainstalována.</translation>
-    </message>
-    <message>
-      <source>This version is not installed.</source>
-      <translation>Tato verze je již nainstalována.</translation>
-    </message>
-    <message>
-      <source>Invalid version format.</source>
-      <translation>Neplatný formát verze.</translation>
-    </message>
-    <message>
-      <source>Broken update package.</source>
-      <translation>Přerušený aktualizační balíček.</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>Vnitřní chyba.</translation>
-    </message>
-    <message>
-      <source>Not enough space on disk to install the client update.</source>
-      <translation>Na disku není dostatek místa k instalaci aktualizace klienta.</translation>
-    </message>
-    <message>
-      <source>Installation package has been lost.</source>
-      <translation>Instalační balíček byl ztracen.</translation>
-    </message>
-    <message>
-      <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
-    </message>
-    <message>
-      <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
-    </message>
-    <message>
-      <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
-    </message>
-    <message>
-      <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ClipboardButton</name>
-    <message>
-      <source>Copy</source>
-      <comment>to Clipboard</comment>
-      <translation>Kopírovat</translation>
-    </message>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Kopírovat do schránky</translation>
-    </message>
-    <message>
-      <source>Paste</source>
-      <comment>from Clipboard</comment>
-      <translation>Vložit</translation>
-    </message>
-    <message>
-      <source>Paste from Clipboard</source>
-      <translation>Vložit ze schránky</translation>
-    </message>
-    <message>
-      <source>Copied</source>
-      <comment>to Clipboard</comment>
-      <translation>Zkopírováno</translation>
-    </message>
-    <message>
-      <source>Pasted</source>
-      <comment>from Clipboard</comment>
-      <translation>Vloženo</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudActionsHandler</name>
-    <message>
-      <source>Login to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudCrossSystemContext</name>
-    <message>
-      <source>Inaccessible</source>
-      <translation>Nedostupný</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Nahrávání...</translation>
-    </message>
-    <message>
-      <source>Click to Show Cameras</source>
-      <translation type="unfinished">Click to Show Cameras</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsIntroDialog</name>
-    <message>
-      <source>Introducing %1 Layouts</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Introducing %1 Layouts</translation>
-    </message>
-    <message>
-      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
-    </message>
-    <message>
-      <source>Read more on the %1</source>
-      <translation type="unfinished">Read more on the %1</translation>
-    </message>
-    <message>
-      <source>help page</source>
-      <translation type="unfinished">help page</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CloudLayoutsManager</name>
-    <message>
-      <source>%1 (Copy)</source>
-      <comment>Original name will be substituted</comment>
-      <translation type="unfinished">%1 (Copy)</translation>
-    </message>
-    <message>
-      <source>%1 (Copy %2)</source>
-      <comment>Original name will be substituted as %1, counter as %2</comment>
-      <translation type="unfinished">%1 (Copy %2)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ConnectActionsHandler</name>
-    <message>
-      <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Videostěna je ze serveru odstraněna a bude zavřena.</translation>
-    </message>
-    <message>
-      <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation>Nelze se připojit k serveru. Videostěna bude zavřena.</translation>
-    </message>
-    <message>
-      <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
-    </message>
-    <message>
-      <source>Failed to connect to the selected server</source>
-      <translation>Nelze se připojit k zadanému serveru</translation>
-    </message>
-    <message>
-      <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
-    </message>
-    <message>
-      <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
-    </message>
-    <message>
-      <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
-    </message>
-    <message>
-      <source>OK</source>
-      <comment>Dialog button text.</comment>
-      <translation>OK</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ConnectToCloudTool</name>
-    <message>
-      <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
-    </message>
-    <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
-    </message>
-    <message>
-      <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Systém je připojen k %1</translation>
-    </message>
-    <message>
-      <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Nepodařilo se připojit systém k %1</translation>
-    </message>
-    <message>
-      <source>Connect System to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Připojit systém k %1</translation>
-    </message>
-    <message>
-      <source>Connect System to %1?</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Připojit systém k %1?</translation>
-    </message>
-    <message>
-      <source>Enter your account password to connect System to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
-    </message>
-    <message>
-      <source>Connect</source>
-      <comment>Connect current System to cloud</comment>
-      <translation>Připojit</translation>
-    </message>
-    <message>
-      <source>Internal error. Please try again later.</source>
-      <translation type="unfinished">Internal error. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
-    <message>
-      <source>Configuring Server</source>
-      <translation>Konfigurování serveru</translation>
-    </message>
-    <message>
-      <source>Total amount of licenses will decrease</source>
-      <translation>Celkový počet licencí se sníží</translation>
-    </message>
-    <message>
-      <source>Enter password...</source>
-      <translation>Zadat heslo...</translation>
-    </message>
-    <message>
-      <source>Administrator password</source>
-      <translation>Heslo správce</translation>
-    </message>
-    <message>
-      <source>Merge Server to the System</source>
-      <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
-    </message>
-    <message>
-      <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
-    </message>
-    <message>
-      <source>Merge</source>
-      <comment>Merge Server to the current System (dialog button text)</comment>
-      <translation>Sloučit</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
-    <message>
-      <source>Connect</source>
-      <translation>Připojit</translation>
-    </message>
-    <message>
-      <source>Setup</source>
-      <translation>Nastavení</translation>
-    </message>
-    <message>
-      <source>Success</source>
-      <translation>Úspěšné</translation>
-    </message>
-    <message>
-      <source>Test Failed</source>
-      <translation>Test selhal</translation>
-    </message>
-    <message>
-      <source>Request timeout</source>
-      <translation>Časový limit požadavku</translation>
-    </message>
-    <message>
-      <source>New System</source>
-      <translation>Nový systém</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
-    <message>
-      <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Nahrávání nelze u některých kamer povolit.</translation>
-    </message>
-    <message>
-      <source>Schedule settings are not compatible with some devices.</source>
-      <translation>Nastavení rozvrhu nejsou kompatibilní s některými zařízeními.</translation>
-    </message>
-    <message>
-      <source>Copy archive length settings</source>
-      <translation>Zkopírovat nastavení délky archívu</translation>
-    </message>
-    <message>
-      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
-    <message>
-      <source>Unknown camera</source>
-      <translation type="unfinished">Unknown camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
-    <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>Táto kamera vyžaduje nastavení hesla.</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras require password to be set up.</source>
-      <translation>Některé z vybraných kamer vyžadují nastavení hesla.</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>Požádejte správce systému, aby to udělal.</translation>
-    </message>
-    <message>
-      <source>Set Password</source>
-      <translation>Nastavit heslo</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
-    <message>
-      <source>Start address</source>
-      <translation>Počáteční adresa</translation>
-    </message>
-    <message>
-      <source>End address</source>
-      <translation>Koncová adresa</translation>
-    </message>
-    <message>
-      <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation>IP / Jméno hosta / odkaz RTSP / odkaz UDP</translation>
-    </message>
-    <message>
-      <source>Examples:</source>
-      <translation>Příklady:</translation>
-    </message>
-    <message>
-      <source>Server offline</source>
-      <translation>Server je offline</translation>
-    </message>
-    <message>
-      <source>Device search failed</source>
-      <translation>Hledání zařízení se nezdařilo</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to add %n devices</source>
-      <translation>
-        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
-        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
-        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
-        <numerusform>Nepodařilo se přidat %n zařízení</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Scan</source>
-      <translation>Skenovat</translation>
-    </message>
-    <message>
-      <source>Search</source>
-      <translation>Hledat</translation>
-    </message>
-    <message>
-      <source>Initializing scan...</source>
-      <translation>Inicializace skenování...</translation>
-    </message>
-    <message>
-      <source>Scanning online hosts...</source>
-      <translation>Skenování online hostů...</translation>
-    </message>
-    <message>
-      <source>Checking host...</source>
-      <translation>Kontrola hostitele...</translation>
-    </message>
-    <message>
-      <source>Finished</source>
-      <translation>Dokončeno</translation>
-    </message>
-    <message>
-      <source>Aborted</source>
-      <translation>Přerušeno</translation>
-    </message>
-    <message>
-      <source>Searching...</source>
-      <translation>Hledání...</translation>
-    </message>
-    <message>
-      <source>No devices found</source>
-      <translation>Nebyly nalezena žádná zařízení</translation>
-    </message>
-    <message>
-      <source>All devices are already added</source>
-      <translation>Všechna zařízení již byla přidána</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation>
-        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
-        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
-        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
-        <numerusform>%n zařízení se přidává. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Add all Devices</source>
-      <translation>Přidat všechna zařízení</translation>
-    </message>
-    <message numerus="yes">
-      <source>Add %n Devices</source>
-      <translation>
-        <numerusform>Přidat %n zařízení</numerusform>
-        <numerusform>Přidat %n zařízení</numerusform>
-        <numerusform>Přidat %n zařízení</numerusform>
-        <numerusform>Přidat %n zařízení</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Address field cannot be empty</source>
-      <translation>Adresa nemůže být prázdná</translation>
-    </message>
-    <message>
-      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
-    </message>
-    <message>
-      <source>System Administration</source>
-      <translation>Správce systému</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
-    <message>
-      <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
-    </message>
-    <message>
-      <source>Invalid password</source>
-      <translation>Nesprávné heslo</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EulaDialog</name>
-    <message>
-      <source>Please review and agree to the %1 in order to proceed</source>
-      <translation>Chcete-li pokračovat, zkontrolujte a souhlaste s %1</translation>
-    </message>
-    <message>
-      <source>To use the software you must agree with the end user license agreement</source>
-      <translation>Chcete-li používat software, musíte souhlasit s licenční smlouvou koncového uživatele</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventPanel::Private</name>
-    <message>
-      <source>Notifications</source>
-      <comment>Notifications tab title</comment>
-      <translation>Upozornění</translation>
-    </message>
-    <message>
-      <source>Motion</source>
-      <comment>Motion tab title</comment>
-      <translation>Pohyb</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <comment>Bookmarks tab title</comment>
-      <translation>Záložky</translation>
-    </message>
-    <message>
-      <source>Events</source>
-      <comment>Events tab title</comment>
-      <translation>Události</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <comment>Analytics tab title</comment>
-      <translation>Objekty</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventRibbon::Private</name>
-    <message>
-      <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>No events</source>
-      <translation>Žádné události</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n událostí</numerusform>
-        <numerusform>%n událostí</numerusform>
-        <numerusform>%n událostí</numerusform>
-        <numerusform>%n událostí</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::EventTile</name>
-    <message numerus="yes">
-      <source>...and %n more</source>
-      <translation>
-        <numerusform>... a dalších %n</numerusform>
-        <numerusform>... a dalších %n</numerusform>
-        <numerusform>... a dalších %n</numerusform>
-        <numerusform>... a dalších %n</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ExportPasswordWidget</name>
-    <message>
-      <source>Please enter the password.</source>
-      <translation>Zadejte prosím heslo.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ExportProcess</name>
-    <message>
-      <source>Unsupported media for data export.</source>
-      <translation>Nepodporované médium pro export dat.</translation>
-    </message>
-    <message>
-      <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Vybraný formát není podporován knihovnou FFMPEG.</translation>
-    </message>
-    <message>
-      <source>FFMPEG library error.</source>
-      <translation>Chyba knihovny FFMPEG.</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Video nebo audio kodek není kompatibilní s vybraným formátem.</translation>
-    </message>
-    <message>
-      <source>File write error.</source>
-      <translation>Chyba při zápisu souboru.</translation>
-    </message>
-    <message>
-      <source>No data exported.</source>
-      <translation>Žádná data nebyla vyexportována.</translation>
-    </message>
-    <message>
-      <source>Internal error</source>
-      <translation>Vnitřní chyba</translation>
-    </message>
-    <message>
-      <source>Video transcoding required.</source>
-      <translation>Je vyžadováno překódování videa.</translation>
-    </message>
-    <message>
-      <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
-    </message>
-    <message>
-      <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ExportSettingsDialog</name>
-    <message>
-      <source>Export</source>
-      <translation>Export</translation>
-    </message>
-    <message>
-      <source>Rapid Review</source>
-      <translation>Rychlý přehled</translation>
-    </message>
-    <message>
-      <source>Export Settings</source>
-      <translation>Nastavení exportu</translation>
-    </message>
-    <message>
-      <source>Add Timestamp</source>
-      <translation>Přidat časovou značku</translation>
-    </message>
-    <message>
-      <source>Delete Timestamp</source>
-      <translation>Smazat časovou značku</translation>
-    </message>
-    <message>
-      <source>Timestamp</source>
-      <translation>Časová značka</translation>
-    </message>
-    <message>
-      <source>Add Image</source>
-      <translation>Přidat obrázek</translation>
-    </message>
-    <message>
-      <source>Delete Image</source>
-      <translation>Smazat obrázek</translation>
-    </message>
-    <message>
-      <source>Image</source>
-      <translation>Obrázek</translation>
-    </message>
-    <message>
-      <source>Add Text</source>
-      <translation>Přidat text</translation>
-    </message>
-    <message>
-      <source>Delete Text</source>
-      <translation>Smazat text</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Text</translation>
-    </message>
-    <message>
-      <source>Reset Speed</source>
-      <translation>Resetovat rychlost</translation>
-    </message>
-    <message>
-      <source>Add Bookmark Info</source>
-      <translation>Přidat informace o záložce</translation>
-    </message>
-    <message>
-      <source>Delete Bookmark Info</source>
-      <translation>Smazat informace o záložce</translation>
-    </message>
-    <message>
-      <source>Bookmark Info</source>
-      <translation>Informace o záložce</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>vyexportováno</translation>
-    </message>
-    <message>
-      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>Zvolená nastavení vyžadují překódování. Zvýší se tím zatížení CPU a může to trvat velmi dlouho.</translation>
-    </message>
-    <message>
-      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>Doporučujeme exportovat video z této kamery jako &quot;Multi Video&quot; abyste se vyhnuli degradaci rozlišení.</translation>
-    </message>
-    <message>
-      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>Vyexportovaný soubor .EXE bude mít velikost přes 4 GB a nelze jej otevřít dvojitým poklepáním v systému Windows. Lze jej přehrávat pouze v %1 klientovi.</translation>
-    </message>
-    <message>
-      <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>Nastavení nejsou k dispozici pro soubory .NOV a .EXE.</translation>
-    </message>
-    <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Místní soubory, monitorovací widgety serveru a webové stránky nebudou exportovány.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation>Chystáte se exportovat dlouhé video. To může vyžadovat spoustu úložného prostoru a zabere to značný čas.</translation>
-    </message>
-    <message>
-      <source>Add Info</source>
-      <translation type="unfinished">Add Info</translation>
-    </message>
-    <message>
-      <source>Delete Info</source>
-      <translation type="unfinished">Delete Info</translation>
-    </message>
-    <message>
-      <source>Info</source>
-      <translation>Informace</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
-    </message>
-    <message>
-      <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
-    <message>
-      <source>Exported: %1</source>
-      <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
-    <message>
-      <source>Low</source>
-      <translation>Nízká</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Střední</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Vysoká</translation>
-    </message>
-    <message>
-      <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::FilenamePanel</name>
-    <message>
-      <source>Folder</source>
-      <translation>Složka</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-    <message>
-      <source>Name cannot be empty.</source>
-      <translation>Název nemůže být prázdný.</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation>Tuto zprávu již příště nezobrazovat</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Povolit</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::FoundDevicesModel</name>
-    <message>
-      <source>Brand</source>
-      <translation>Značka</translation>
-    </message>
-    <message>
-      <source>Model</source>
-      <translation>Model</translation>
-    </message>
-    <message>
-      <source>Address</source>
-      <translation>Adresa</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n new</source>
-      <translation>
-        <numerusform>%n nový</numerusform>
-        <numerusform>%n nové</numerusform>
-        <numerusform>%n nové</numerusform>
-        <numerusform>%n nové</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n devices total</source>
-      <translation>
-        <numerusform>Celkem %n zařízení</numerusform>
-        <numerusform>Celkem %n zařízení</numerusform>
-        <numerusform>Celkem %n zařízení</numerusform>
-        <numerusform>Celkem %n zařízení</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::HintButton</name>
-    <message>
-      <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ImageControlWidget</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>%1 degrees</source>
-      <translation>%1 stupňů</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ImageOverlaySettingsWidget</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Vyberte soubor...</translation>
-    </message>
-    <message>
-      <source>Error</source>
-      <translation>Chyba</translation>
-    </message>
-    <message>
-      <source>Image cannot be loaded.</source>
-      <translation>Obrázek nelze nahrát.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
-    <message>
-      <source>Systems will be merged shortly</source>
-      <translation>Systémy budou brzy sloučeny</translation>
-    </message>
-    <message>
-      <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>Servery z jiného systému se zobrazí ve stromu zdrojů.</translation>
-    </message>
-    <message>
-      <source>Connecting to the current System...</source>
-      <translation>Připojování k aktuálnímu systému...</translation>
-    </message>
-    <message>
-      <source>Server will be connected to System shortly</source>
-      <translation>Za okamžik bude server připojen k systému</translation>
-    </message>
-    <message>
-      <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Po dokončení synchronizace databáze se zobrazí ve stromu zdroje.</translation>
-    </message>
-    <message>
-      <source>Failed to merge %1 to our system.</source>
-      <translation>Nepodařilo se sloučit %1 s naším systémem.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
-    <message>
-      <source>Access granted by:</source>
-      <translation>Přístup přidělil:</translation>
-    </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>a %n dalších</numerusform>
-        <numerusform>a %n dalších</numerusform>
-        <numerusform>a %n dalších</numerusform>
-        <numerusform>a %n dalších</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IntercomManager</name>
-    <message>
-      <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LabelSelectionManager</name>
-    <message>
-      <source>Copy</source>
-      <translation>Kopírovat</translation>
-    </message>
-    <message>
-      <source>Copy Link Location</source>
-      <translation>Kopírovat umístění odkazu</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LayoutBackgroundSettingsWidget</name>
-    <message>
-      <source>cells</source>
-      <translation>buňky</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Žádný obrázek</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Chyba při načítání obrázku</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Chyba při nahrávání obrázku</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Vyberte soubor...</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Obrázek nelze přečíst</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Obraz je příliš velký. Maximální velikost je %1 MB</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Obrázek nelze nahrát</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LayoutGeneralSettingsWidget</name>
-    <message>
-      <source>cells</source>
-      <translation>buňky</translation>
-    </message>
-    <message>
-      <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation>Vlastní číslo, které lze přiřadit rozložení pro rychlou identifikaci a přístup</translation>
-    </message>
-    <message>
-      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation>Toto ID je již v systému použito. Použijte tlačítko Generovat pro nalezení volného ID.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
-    <message>
-      <source>General</source>
-      <translation>Obecné</translation>
-    </message>
-    <message>
-      <source>Background</source>
-      <translation>Pozadí</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>ŽÁDNÁ DATA</translation>
-    </message>
-    <message>
-      <source>NOT A CAMERA</source>
-      <translation>ŽÁDNÁ KAMERA</translation>
-    </message>
-    <message>
-      <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
-    </message>
-    <message>
-      <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
-    <message>
-      <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
-    </message>
-    <message>
-      <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
-    </message>
-    <message>
-      <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogSettingsDialog</name>
-    <message>
-      <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
-    </message>
-    <message>
-      <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
-    </message>
-    <message>
-      <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
-    </message>
-    <message>
-      <source>The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
-    </message>
-    <message>
-      <source>The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade your system&apos;s performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LoginDialog</name>
-    <message>
-      <source>Connect to Server...</source>
-      <translation>Připojit k serveru...</translation>
-    </message>
-    <message>
-      <source>Version %1</source>
-      <translation>Verze %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementModel</name>
-    <message>
-      <source>Unit</source>
-      <translation type="unfinished">Unit</translation>
-    </message>
-    <message>
-      <source>Current Level</source>
-      <translation type="unfinished">Current Level</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>Klient</translation>
-    </message>
-    <message>
-      <source>None</source>
-      <translation>Žádný</translation>
-    </message>
-    <message>
-      <source>Error</source>
-      <translation>Chyba</translation>
-    </message>
-    <message>
-      <source>Warning</source>
-      <translation>Varování</translation>
-    </message>
-    <message>
-      <source>Info</source>
-      <translation>Informace</translation>
-    </message>
-    <message>
-      <source>Debug</source>
-      <translation>Ladění</translation>
-    </message>
-    <message>
-      <source>Verbose</source>
-      <translation>Podrobnosti</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWatcher</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... a %n dalších</numerusform>
-        <numerusform>... a %n dalších</numerusform>
-        <numerusform>... a %n dalších</numerusform>
-        <numerusform>... a %n dalších</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Downloading file...</source>
-      <translation>Stahování souborů...</translation>
-    </message>
-    <message>
-      <source>Pending download...</source>
-      <translation type="unfinished">Pending download...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n servery</numerusform>
-        <numerusform>%n servery</numerusform>
-        <numerusform>%n servery</numerusform>
-        <numerusform>%n servery</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
-    </message>
-    <message>
-      <source>Logs downloading failed</source>
-      <translation type="unfinished">Logs downloading failed</translation>
-    </message>
-    <message>
-      <source>Debug logging is enabled on the Client</source>
-      <translation type="unfinished">Debug logging is enabled on the Client</translation>
-    </message>
-    <message>
-      <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation type="unfinished">Debug logging is enabled, resulting in degraded system performance.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Logs downloading canceled</source>
-      <translation type="unfinished">Logs downloading canceled</translation>
-    </message>
-    <message>
-      <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
-    </message>
-    <message>
-      <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
-    </message>
-    <message>
-      <source>Apply</source>
-      <translation>Použít</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LogsManagementWidget</name>
-    <message>
-      <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
-    <message>
-      <source>Server is not specified</source>
-      <translation>Server není specifikován</translation>
-    </message>
-    <message>
-      <source>Server offline</source>
-      <translation>Server je offline</translation>
-    </message>
-    <message>
-      <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation>Pole adresy zařízení musí obsahovat platnou URL adresu, IP adresu nebo odkaz RTSP.</translation>
-    </message>
-    <message>
-      <source>First address in range is greater than the last one.</source>
-      <translation>První adresa v dosahu je větší než poslední.</translation>
-    </message>
-    <message>
-      <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>Zadaný rozsah IP adres má více než 255 adres.</translation>
-    </message>
-    <message>
-      <source>Can not start the search process</source>
-      <translation>Nelze spustit proces vyhledávání</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
-    <message>
-      <source>File Settings</source>
-      <translation>Nastavení souborů</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MergeSystemsDialog</name>
-    <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Chystáte se sloučit současný systém %1 se systémem</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (aktuální)</translation>
-    </message>
-    <message>
-      <source>URL is invalid.</source>
-      <translation>Adresa URL je neplatná.</translation>
-    </message>
-    <message>
-      <source>The login cannot be empty.</source>
-      <translation>Přihlášení nemůže být prázdné.</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Testování...</translation>
-    </message>
-    <message>
-      <source>Merge Systems</source>
-      <translation>Sloučení systémů</translation>
-    </message>
-    <message>
-      <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
-    </message>
-    <message>
-      <source>Merge</source>
-      <comment>Merge two Systems together (dialog button text)</comment>
-      <translation>Sloučit</translation>
-    </message>
-    <message>
-      <source>Merging Systems...</source>
-      <translation>Slučování systémů...</translation>
-    </message>
-    <message>
-      <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation>Použijte konkrétní název hosta nebo IP adresu raději než %1.</translation>
-    </message>
-    <message>
-      <source>This is the current System URL.</source>
-      <translation>Toto je aktuální URL adresa systému.</translation>
-    </message>
-    <message>
-      <source>Merge with %1</source>
-      <translation>Sloučit s %1</translation>
-    </message>
-    <message>
-      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Servery z dalších systému se ve stromu zdrojů zobrazí po dokončení synchronizace databáze.</translation>
-    </message>
-    <message>
-      <source>You will be reconnected.</source>
-      <translation>Budete znovu připojen.</translation>
-    </message>
-    <message>
-      <source>Systems will be merged shortly</source>
-      <translation>Systémy budou brzy sloučeny</translation>
-    </message>
-    <message>
-      <source>Failed to merge Systems</source>
-      <translation>Nepodařilo se sloučit systémy</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MergeSystemsTool</name>
-    <message>
-      <source>New System</source>
-      <translation>Nový systém</translation>
-    </message>
-    <message>
-      <source>System was not found.</source>
-      <translation>Systém nebyl nalezen.</translation>
-    </message>
-    <message>
-      <source>The discovered System %1 has an incompatible version %2.</source>
-      <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Nalezený systém %1 má nekompatibilní verzi %2.</translation>
-    </message>
-    <message>
-      <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
-    </message>
-    <message>
-      <source>The password or user name is invalid.</source>
-      <translation>Heslo nebo uživatelské jméno je neplatné.</translation>
-    </message>
-    <message>
-      <source>This user does not have permissions for the requested operation.</source>
-      <translation>Tento uživatel nemá oprávnění k požadované operaci.</translation>
-    </message>
-    <message>
-      <source>Cannot create database backup.</source>
-      <translation>Nelze vytvořit zálohu databáze.</translation>
-    </message>
-    <message>
-      <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Chystáte se sloučit systémy s licencí Starter.</translation>
-    </message>
-    <message>
-      <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Pro každý systém je povolena pouze jedna licence Starter, takže druhá licence bude deaktivována.</translation>
-    </message>
-    <message>
-      <source>Merge anyway?</source>
-      <translation>Sloučit jakkoliv?</translation>
-    </message>
-    <message>
-      <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
-    </message>
-    <message>
-      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
-    </message>
-    <message>
-      <source>Could not configure the remote System %1.</source>
-      <comment>%1 is name of System</comment>
-      <translation>Nelze nakonfigurovat vzdálený systém %1.</translation>
-    </message>
-    <message>
-      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Systém %1 lze sloučit pouze s jinými než %1. Název systému a heslo jsou převzaty ze systému %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Oba systémy jsou připojeny k %1. Sloučení není povoleno.</translation>
-    </message>
-    <message>
-      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>Nelze sloučit systémy, protože mají alespoň jeden server se stejným ID. Odstraňte tento server a zkuste to znovu.</translation>
-    </message>
-    <message>
-      <source>System name is not configured yet.</source>
-      <translation>Ještě není zadán název systému.</translation>
-    </message>
-    <message>
-      <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
-    </message>
-    <message>
-      <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Neznámá chyba.</translation>
-    </message>
-    <message>
-      <source>%1 systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>Pohyb</translation>
-    </message>
-    <message>
-      <source>deleted camera</source>
-      <translation>smazaná kamera</translation>
-    </message>
-    <message>
-      <source>Bookmark it...</source>
-      <translation>Označit to záložkou...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionStreamAlerts</name>
-    <message>
-      <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
-    </message>
-    <message>
-      <source>Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</source>
-      <comment>&quot;
-&quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
-    </message>
-    <message>
-      <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</source>
-      <comment>&quot;
-&quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
-    </message>
-    <message>
-      <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</source>
-      <comment>&quot;
-&quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
-    <message>
-      <source>Release notes</source>
-      <translation>Poznámky k verzi</translation>
-    </message>
-    <message>
-      <source>Download in External Browser</source>
-      <translation>Stahnout v externím prohlížeči</translation>
-    </message>
-    <message>
-      <source>Copy Link to Clipboard</source>
-      <translation>Zkopírovat odkaz do schránky</translation>
-    </message>
-    <message>
-      <source>You have already installed this version.</source>
-      <translation>Tuto verzi jste již nainstalovali.</translation>
-    </message>
-    <message>
-      <source>Build not found</source>
-      <translation>Soubor nenalezen</translation>
-    </message>
-    <message>
-      <source>Cannot update from the selected file</source>
-      <translation>Nelze aktualizovat z vybraného souboru</translation>
-    </message>
-    <message>
-      <source>Invalid update information</source>
-      <translation>Neplatné informace o aktualizaci</translation>
-    </message>
-    <message>
-      <source>Downgrade to earlier versions is not possible</source>
-      <translation>Přechod na předchozí verze není možný</translation>
-    </message>
-    <message>
-      <source>Update file is not found</source>
-      <translation>Aktualizační soubor nebyl nalezen</translation>
-    </message>
-    <message>
-      <source>Upgrade package is broken</source>
-      <translation>Balíček aktualizace je nefunkční</translation>
-    </message>
-    <message>
-      <source>Missing update package for some servers</source>
-      <translation>Chybějící balíček aktualizací pro některé servery</translation>
-    </message>
-    <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Nekompatibilní situace %1. Chcete-li aktualizovat, jako první odpojte systém od %1.</translation>
-    </message>
-    <message>
-      <source>No update package available</source>
-      <translation>Žádné dostupné aktualizace</translation>
-    </message>
-    <message>
-      <source>Select Update File...</source>
-      <translation>Vybrat soubor aktualizace...</translation>
-    </message>
-    <message>
-      <source>Update Files</source>
-      <translation>Aktualizovat soubory</translation>
-    </message>
-    <message>
-      <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation>Některé servery jsou offline a nebudou aktualizovány. Přeskočit je?</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
-        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
-        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
-        <numerusform>Chybí aktualizace pro klienta a %n servery</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Chybí aktualizace pro klienta</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Neexistují žádné online servery pro aktualizaci.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Zrušit aktualizaci a smazat všechna stažená data?</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Verze OS některých součástí již nejsou podporovány. Odstraňte je ze systému nebo aktualizujte jejich operační systém na podporovanou verzi.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Verze OS klienta již není podporována. Aktualizujte prosím svůj operační systém na podporovanou verzi.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Aktualizace se nepodařilo spustit</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Nepodařilo se zrušit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Nepodařilo se spustit instalaci</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation>Některé servery nedokončily proces aktualizace. I přesto dokončit?</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Stahování aktualizačních balíčků do některých součástí se nezdařilo</translation>
-    </message>
-    <message>
-      <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Pokud problém přetrvává, kontaktujte prosím zákaznickou podporu.</translation>
-    </message>
-    <message>
-      <source>Try again</source>
-      <translation>Zkusit znovu</translation>
-    </message>
-    <message>
-      <source>Cancel Update</source>
-      <translation>Zrušit aktualizaci</translation>
-    </message>
-    <message>
-      <source>Update completed</source>
-      <translation>Aktualizace byla dokončena</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Aktualizace byla dokončena, ale některé části se znezdařilo aktualizovat</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Aktualizujte prosím %1 ručně pomocí instalačního balíčku.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
-    </message>
-    <message>
-      <source>OK</source>
-      <translation>OK</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Při instalaci aktualizací došlo k chybě:</translation>
-    </message>
-    <message>
-      <source>Downloading updates...</source>
-      <translation>Stahování aktualizací...</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Dokončete aktualizaci</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Zrušit</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Nainstalována aktuální verze</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Tato verze je již nainstalována</translation>
-    </message>
-    <message>
-      <source>Install update</source>
-      <translation>Instalovat aktualizaci</translation>
-    </message>
-    <message>
-      <source>Upload</source>
-      <translation>Nahrát</translation>
-    </message>
-    <message>
-      <source>Upload &amp;&amp; Install</source>
-      <translation>Nahrát a instalovat</translation>
-    </message>
-    <message>
-      <source>Download</source>
-      <translation>Stáhnout</translation>
-    </message>
-    <message>
-      <source>Download &amp;&amp; Install</source>
-      <translation>Stáhnout a nainstalovat</translation>
-    </message>
-    <message>
-      <source>Browse for Another File...</source>
-      <translation>Vyhledat další soubor...</translation>
-    </message>
-    <message>
-      <source>Select Another Build</source>
-      <translation>Zvolte jinou možnost</translation>
-    </message>
-    <message>
-      <source>Update to Specific Build</source>
-      <translation>Aktualizace na konkrétní sestavení</translation>
-    </message>
-    <message>
-      <source>Downloading client package...</source>
-      <translation>Stahování klientského paketu...</translation>
-    </message>
-    <message>
-      <source>Installing updates...</source>
-      <translation>Instalace aktualizací...</translation>
-    </message>
-    <message>
-      <source>Installing client updates...</source>
-      <translation>Instalace aktualizace klienta...</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Zahájení aktualizace ...</translation>
-    </message>
-    <message>
-      <source>Updating to ...</source>
-      <translation>Aktualizování ...</translation>
-    </message>
-    <message>
-      <source>Ready to update to</source>
-      <translation>Připraveno k aktualizaci na</translation>
-    </message>
-    <message>
-      <source>System updated to</source>
-      <translation>Systém byl aktualizován na</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Některé servery nemají k dispozici žádné aktualizace.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Některé servery zaznamenaly interní chybu.</translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support.</source>
-      <translation>Prosím kontaktujte zákaznickou podporu.</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Některé servery jsou offline. Počkejte prosím, až budou opět připojeny a pokračujte.</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Aktualizace systému právě probíhá</translation>
-    </message>
-    <message>
-      <source>Continue in Background</source>
-      <translation>Pokračovat v pozadí</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Nejnovější dostupná aktualizace</translation>
-    </message>
-    <message>
-      <source>Specific Build</source>
-      <translation>Konkrétní sestavení</translation>
-    </message>
-    <message>
-      <source>Browse for Update File</source>
-      <translation>Procházet soubor aktualizace</translation>
-    </message>
-    <message>
-      <source>Update from mediaservers</source>
-      <translation>Aktualizace z mediálních serverů</translation>
-    </message>
-    <message>
-      <source>Unable to check updates on the Internet</source>
-      <translation>Nelze ověřit aktualizace na Internetu</translation>
-    </message>
-    <message>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Použití systémových aktualizací na konci týdne se nedoporučuje.</translation>
-    </message>
-    <message>
-      <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
-    </message>
-    <message>
-      <source>Uploading client packages to Servers...</source>
-      <translation type="unfinished">Uploading client packages to Servers...</translation>
-    </message>
-    <message>
-      <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
-    <message>
-      <source>You do not have any layouts</source>
-      <translation>Nemáte žádné rozvržení</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::NotificationListModel::Private</name>
-    <message>
-      <source>Alarm: %1</source>
-      <translation>Poplach: %1</translation>
-    </message>
-    <message>
-      <source>Acknowledge</source>
-      <translation>Vzít na vědomí</translation>
-    </message>
-    <message>
-      <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
-    <message numerus="yes">
-      <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Current System</source>
-      <translation type="unfinished">Current System</translation>
-    </message>
-    <message>
-      <source>All Systems</source>
-      <translation>Všechny systémy</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
-    <message>
-      <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation>Nelze se připojit k %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
-    <message>
-      <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation>Žádný z vybraných uživatelů nemá přístup k vybranému rozložení. Akce nebude fungovat.</translation>
-    </message>
-    <message>
-      <source>Select layout...</source>
-      <translation>Vybrat rozložení...</translation>
-    </message>
-    <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>Místní rozložení lze zobrazit pouze jejich majitelům.</translation>
-    </message>
-    <message>
-      <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Žádná z vybraných uživatelských rolí neobsahuje uživatele. Akce nebude fungovat.</translation>
-    </message>
-    <message>
-      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation>Někteří uživatelé nemají přístup k vybranému uspořádání, akce pro ně nebude fungovat.</translation>
-    </message>
-    <message>
-      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
-    <message>
-      <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
-    </message>
-    <message>
-      <source>This tab will be available in future versions</source>
-      <translation type="unfinished">This tab will be available in future versions</translation>
-    </message>
-    <message>
-      <source>Learn more</source>
-      <translation>Zjistit více</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::PasswordDialog</name>
-    <message>
-      <source>Sign In</source>
-      <translation>Přihlásit se</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::PeerStateTracker</name>
-    <message>
-      <source>The server is taking too long to respond</source>
-      <translation>Odezva servru je příliš dlouhá</translation>
-    </message>
-    <message>
-      <source>No update task</source>
-      <translation>Žádná aktualizace</translation>
-    </message>
-    <message>
-      <source>Ready to download update</source>
-      <translation>Připraven ke stažení aktualizace</translation>
-    </message>
-    <message>
-      <source>Downloading update</source>
-      <translation>Stahování aktualizace</translation>
-    </message>
-    <message>
-      <source>Ready to restart to the new version</source>
-      <translation>Připraveno k restartování na novou verzi</translation>
-    </message>
-    <message>
-      <source>Installing update</source>
-      <translation>Instalace aktualizace</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Nainstalováno</translation>
-    </message>
-    <message>
-      <source>Waiting for peer data</source>
-      <translation>Čekání na peer data</translation>
-    </message>
-    <message>
-      <source>There is not enough space to download update files.</source>
-      <translation>Nedostatek místa pro stažení aktualizačních souborů.</translation>
-    </message>
-    <message>
-      <source>There is not enough space to extract update files.</source>
-      <translation>Nedostatek místa pro extrahování aktualizačních souborů.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages.</source>
-      <translation>Nepodařilo se stáhnout balíčky aktualizací.</translation>
-    </message>
-    <message>
-      <source>Update contents are invalid.</source>
-      <translation>Obsah aktualizace je neplatný.</translation>
-    </message>
-    <message>
-      <source>Update archive is corrupted.</source>
-      <translation>Archiv aktualizací je poškozen.</translation>
-    </message>
-    <message>
-      <source>Update files cannot be extracted.</source>
-      <translation>Aktualizační soubory nelze extrahovat.</translation>
-    </message>
-    <message>
-      <source>Internal downloader error.</source>
-      <translation>Interní chyba stahování.</translation>
-    </message>
-    <message>
-      <source>Unknown error.</source>
-      <translation>Neznámá chyba.</translation>
-    </message>
-    <message>
-      <source>Unexpected error code.</source>
-      <translation>Neočekávaný chybový kód.</translation>
-    </message>
-    <message>
-      <source>Ready to install update</source>
-      <translation>Připraven k instalaci aktualizace</translation>
-    </message>
-    <message>
-      <source>Update package is not found.</source>
-      <translation>Aktualizační balíček nebyl nalezen.</translation>
-    </message>
-    <message>
-      <source>There is not enough space to install update.</source>
-      <translation>Není dostatek místa pro instalaci aktualizace.</translation>
-    </message>
-    <message>
-      <source>Internal server error.</source>
-      <translation>Vnitřní chyba serveru.</translation>
-    </message>
-    <message>
-      <source>This OS version is no longer supported.</source>
-      <translation>Tato verze OS již není podporována.</translation>
-    </message>
-    <message>
-      <source>Update installation failed.</source>
-      <translation>Instalace aktualizace se nezdařila.</translation>
-    </message>
-    <message>
-      <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
-    </message>
-    <message>
-      <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::PoeSettingsTableView</name>
-    <message>
-      <source>Disconnected</source>
-      <translation>Odpojeno</translation>
-    </message>
-    <message>
-      <source>Connected</source>
-      <translation>Připojeno</translation>
-    </message>
-    <message>
-      <source>Powered</source>
-      <translation>Napájeno</translation>
-    </message>
-    <message>
-      <source>Unexpected</source>
-      <translation>Neočekávané</translation>
-    </message>
-    <message>
-      <source>Empty</source>
-      <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation>Prázdný</translation>
-    </message>
-    <message>
-      <source>Port</source>
-      <translation>Port</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Consumption</source>
-      <translation>Spotřeba</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Stav</translation>
-    </message>
-    <message>
-      <source>Power</source>
-      <translation>Napájení</translation>
-    </message>
-    <message>
-      <source>Unknown device</source>
-      <translation>Neznámé zařízení</translation>
-    </message>
-    <message>
-      <source>Unknown device %1</source>
-      <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation>Neznámé zařízení %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::PresentedStateDelegate</name>
-    <message>
-      <source>Added</source>
-      <translation>Přidáno</translation>
-    </message>
-    <message>
-      <source>Adding</source>
-      <translation>Přidávání</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Systém není připojen k %1. Mobilní oznámení fungují, pouze pokud je systém připojen k %1.</translation>
-    </message>
-    <message>
-      <source>%1 Settings</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>%1 Nastavení</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols over</source>
-      <translation>
-        <numerusform>%n symbolů</numerusform>
-        <numerusform>%n symbolů</numerusform>
-        <numerusform>%n symbolů</numerusform>
-        <numerusform>%n symbolů</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n symbols left</source>
-      <translation>
-        <numerusform>Zbývá %n symbolů</numerusform>
-        <numerusform>Zbývá %n symbolů</numerusform>
-        <numerusform>Zbývá %n symbolů</numerusform>
-        <numerusform>Zbývá %n symbolů</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::QnWebpageDialog</name>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-    <message>
-      <source>URL</source>
-      <translation>URL</translation>
-    </message>
-    <message>
-      <source>URL cannot be empty.</source>
-      <translation>Adresa URL nemůže být prázdná.</translation>
-    </message>
-    <message>
-      <source>Wrong URL format.</source>
-      <translation>Formát URL adresy je nesprávný.</translation>
-    </message>
-    <message>
-      <source>Web Page</source>
-      <translation>Webová stránka</translation>
-    </message>
-    <message>
-      <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>Upravit webovou stránku</translation>
-    </message>
-    <message>
-      <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
-    </message>
-    <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
-    </message>
-    <message>
-      <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RadassActionFactory</name>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Nízká</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Vysoká</translation>
-    </message>
-    <message>
-      <source>Custom</source>
-      <translation>Vlastní</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RadassActionHandler</name>
-    <message>
-      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>Nastavit rozlišení rozložení na &quot;Auto&quot; pro zvýšení výkonu.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RapidReviewSettingsWidget</name>
-    <message numerus="yes">
-      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation>
-        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
-        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
-        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
-        <numerusform>Pro export jako rychlý náhled by délka videa měla být nejméně %n sekund.</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RecordingStatusHelper</name>
-    <message>
-      <source>Not recording</source>
-      <translation>Bez záznamu</translation>
-    </message>
-    <message>
-      <source>Recording everything</source>
-      <translation>Nahrát vše</translation>
-    </message>
-    <message>
-      <source>Recording motion only</source>
-      <translation>Nahrát pouze pohyb</translation>
-    </message>
-    <message>
-      <source>Recording motion and low quality</source>
-      <translation>Nahrát pohyb nízkou kvalitou</translation>
-    </message>
-    <message>
-      <source>Continuous</source>
-      <translation>Kontinuální</translation>
-    </message>
-    <message>
-      <source>Motion only</source>
-      <translation>Pouze pohyb</translation>
-    </message>
-    <message>
-      <source>Motion + Lo-Res</source>
-      <translation>Pohyb + nízké rozlišení</translation>
-    </message>
-    <message>
-      <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
-    </message>
-    <message>
-      <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
-    </message>
-    <message>
-      <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
-    </message>
-    <message>
-      <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
-    </message>
-    <message>
-      <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
-    </message>
-    <message>
-      <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
-    </message>
-    <message>
-      <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
-    <message>
-      <source>add to current layout</source>
-      <translation>přidat do aktuálního rozložení</translation>
-    </message>
-    <message>
-      <source>open all at a new layout</source>
-      <translation>otevřít vše v novém rozložení</translation>
-    </message>
-    <message>
-      <source>open all</source>
-      <translation>otevřít vše</translation>
-    </message>
-    <message>
-      <source>Health Monitor</source>
-      <translation>Monitor stavu</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RightPanelModelsAdapter</name>
-    <message numerus="yes">
-      <source>%n motion events</source>
-      <translation>
-        <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n události pohybu</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n bookmarks</source>
-      <translation>
-        <numerusform>%n záložky</numerusform>
-        <numerusform>%n záložky</numerusform>
-        <numerusform>%n záložky</numerusform>
-        <numerusform>%n záložky</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n events</source>
-      <translation>
-        <numerusform>%n událostí</numerusform>
-        <numerusform>%n událostí</numerusform>
-        <numerusform>%n událostí</numerusform>
-        <numerusform>%n událostí</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n objects</source>
-      <translation>
-        <numerusform>%n objektů</numerusform>
-        <numerusform>%n objektů</numerusform>
-        <numerusform>%n objektů</numerusform>
-        <numerusform>%n objektů</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>Obecný</translation>
-    </message>
-    <message>
-      <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Jemný spouštěč</translation>
-    </message>
-    <message>
-      <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
-    </message>
-    <message>
-      <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
-    </message>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n hodnot</numerusform>
-        <numerusform>+%n hodnot</numerusform>
-        <numerusform>+%n hodnot</numerusform>
-        <numerusform>+%n hodnot</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ScheduleGridWidget</name>
-    <message>
-      <source>All</source>
-      <translation>Vše</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
-    <message>
-      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>Nastavení kvality určuje pouze rychlost komprese a nemá vliv na rozlišení. Nízká, Střední, Vysoká a Nejlepší jsou přednastavené hodnoty rychlosti přenosu.</translation>
-    </message>
-    <message>
-      <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
-    </message>
-    <message>
-      <source>Less Settings</source>
-      <translation>Méně nastavení</translation>
-    </message>
-    <message>
-      <source>More Settings</source>
-      <translation>Více nastavení</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled or not supported</source>
-      <translation>Detekce pohybu je vypnutá nebo není podporována</translation>
-    </message>
-    <message>
-      <source>Dual-streaming is disabled or not supported</source>
-      <translation>Duální streamování je deaktivováno nebo není podporováno</translation>
-    </message>
-    <message>
-      <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
-    </message>
-    <message>
-      <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
-    </message>
-    <message>
-      <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
-    </message>
-    <message>
-      <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
-    </message>
-    <message>
-      <source>Motion, Objects
- + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
-    </message>
-    <message>
-      <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
-    </message>
-    <message>
-      <source>Objects
- + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
-    </message>
-    <message>
-      <source>Motion Only</source>
-      <translation>Pouze pohyb</translation>
-    </message>
-    <message>
-      <source>Motion
- + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
-    </message>
-    <message>
-      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
-    </message>
-    <message>
-      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
-    </message>
-    <message>
-      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
-    </message>
-    <message>
-      <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
-    </message>
-    <message>
-      <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
-    </message>
-    <message>
-      <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
-    </message>
-    <message>
-      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
-    </message>
-    <message>
-      <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
-    </message>
-    <message>
-      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
-    </message>
-    <message>
-      <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
-    </message>
-    <message>
-      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
-    </message>
-    <message>
-      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
-    </message>
-    <message>
-      <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
-    </message>
-    <message>
-      <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
-    </message>
-    <message>
-      <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
-    </message>
-    <message>
-      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SearchLineEdit</name>
-    <message>
-      <source>Search</source>
-      <translation>Hledat</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
-    <message>
-      <source>Tracks and logs all user actions.</source>
-      <translation>Sledovat a zaznamenávat všechny akce uživatele.</translation>
-    </message>
-    <message>
-      <source>minutes</source>
-      <translation>minuty</translation>
-    </message>
-    <message>
-      <source>hours</source>
-      <translation>hodiny</translation>
-    </message>
-    <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Vodoznaky se budou zobrazovat na živých, archivovaných a exportovaných videích pouze pro neadministrativní uživatele. Vy a další administrátoři je neuvidíte.</translation>
-    </message>
-    <message>
-      <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
-    </message>
-    <message>
-      <source>The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
-    </message>
-    <message>
-      <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
-    </message>
-    <message>
-      <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
-    </message>
-    <message>
-      <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
-    </message>
-    <message>
-      <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <translation>dny</translation>
-    </message>
-    <message>
-      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
-    </message>
-    <message>
-      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
-    </message>
-    <message>
-      <source>Learn more.</source>
-      <translation>Zjistit více.</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
-      <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>The recommended maximum user session lifetime is %1</source>
-      <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerCertificateError</name>
-    <message>
-      <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
-    </message>
-    <message>
-      <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerCertificateViewer</name>
-    <message>
-      <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
-    </message>
-    <message>
-      <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
-    </message>
-    <message>
-      <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
-    </message>
-    <message>
-      <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
-    </message>
-    <message>
-      <source>Pin</source>
-      <translation>Pin</translation>
-    </message>
-    <message>
-      <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
-    </message>
-    <message>
-      <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
-    </message>
-    <message>
-      <source>Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
-    </message>
-    <message>
-      <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
-    </message>
-    <message>
-      <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
-    </message>
-    <message>
-      <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerCertificateWarning</name>
-    <message>
-      <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
-    </message>
-    <message>
-      <source>Continue</source>
-      <translation>Pokračovat</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerSelectionDialog</name>
-    <message numerus="yes">
-      <source>%n cameras</source>
-      <translation>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
-    <message>
-      <source>Library</source>
-      <translation>Knihovna</translation>
-    </message>
-    <message>
-      <source>Version</source>
-      <translation>Verze</translation>
-    </message>
-    <message>
-      <source>Vendor</source>
-      <translation>Výrobce</translation>
-    </message>
-    <message>
-      <source>no error</source>
-      <translation>žádné chyby</translation>
-    </message>
-    <message>
-      <source>library file cannot be loaded</source>
-      <translation>soubor knihovny nelze načíst</translation>
-    </message>
-    <message>
-      <source>invalid or incompatible plugin library</source>
-      <translation>neplatná nebo nekompatibilní knihovna pluginů</translation>
-    </message>
-    <message>
-      <source>plugin library failed to initialize</source>
-      <translation>inicializace knihovny pluginů se nezdařila</translation>
-    </message>
-    <message>
-      <source>plugin returned bad manifest</source>
-      <translation>plugin vrátil špatný manifest</translation>
-    </message>
-    <message>
-      <source>plugin API version is no longer supported</source>
-      <translation>verze pluginu API již není podporována</translation>
-    </message>
-    <message>
-      <source>unknown error</source>
-      <translation>neznámá chyba</translation>
-    </message>
-    <message>
-      <source>Not loaded</source>
-      <translation>Nenačteno</translation>
-    </message>
-    <message>
-      <source>Loaded</source>
-      <translation>Načteno</translation>
-    </message>
-    <message>
-      <source>plugin is in the black list</source>
-      <translation>plugin je na černé listině</translation>
-    </message>
-    <message>
-      <source>Status</source>
-      <translation>Stav</translation>
-    </message>
-    <message>
-      <source>plugin is optional and is not in the white list</source>
-      <translation>plugin je volitelný a není na bílém seznamu</translation>
-    </message>
-    <message>
-      <source>internal error</source>
-      <translation>vnitřní chyba</translation>
-    </message>
-    <message>
-      <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>Přeskočeno</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Nainstalováno</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>Probíhá instalace...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>Staženo</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>Čekání na odpověď serveru...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerUpdateTool</name>
-    <message>
-      <source>No connection to the server.</source>
-      <translation>Žádné připojení k serveru.</translation>
-    </message>
-    <message>
-      <source>Network error.</source>
-      <translation>Chyba sítě.</translation>
-    </message>
-    <message>
-      <source>Server error.</source>
-      <translation>Chyba serveru.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerUpdatesModel</name>
-    <message>
-      <source>Status</source>
-      <translation>Stav</translation>
-    </message>
-    <message>
-      <source>Message</source>
-      <translation>Zpráva</translation>
-    </message>
-    <message>
-      <source>Store Update Files</source>
-      <translation>Uložte aktualizační soubory</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>Klient</translation>
-    </message>
-    <message>
-      <source>Component</source>
-      <translation>Komponenty</translation>
-    </message>
-    <message>
-      <source>Installed Version</source>
-      <translation>Instalovaná verze</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SessionRefreshDialog</name>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Heslo</translation>
-    </message>
-    <message>
-      <source>Unknown error</source>
-      <translation>Neznámá chyba</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
-    <message>
-      <source>Motion</source>
-      <translation>Pohyb</translation>
-    </message>
-    <message>
-      <source>Bookmark it...</source>
-      <translation>Označit to záložkou...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
-    <message>
-      <source>No motion detected</source>
-      <translation>Nebyl zjištěn žádný pohyb</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n motion events</source>
-      <translation>
-        <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n události pohybu</numerusform>
-        <numerusform>%n události pohybu</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation>Přejít na živé video</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
-    <message numerus="yes">
-      <source>Email address is not set for %n users</source>
-      <translation>
-        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
-        <numerusform>Emailová adresa není nastavena pro %n uživatele</numerusform>
-        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
-        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Set Passwords</source>
-      <translation>Nastavit hesla</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
-    </message>
-    <message>
-      <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
-    </message>
-    <message>
-      <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
-    </message>
-    <message>
-      <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
-    </message>
-    <message>
-      <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Export</translation>
-    </message>
-    <message>
-      <source>On-device recordings were found</source>
-      <translation type="unfinished">On-device recordings were found</translation>
-    </message>
-    <message>
-      <source>Import in progress...</source>
-      <translation type="unfinished">Import in progress...</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 completed</source>
-      <translation type="unfinished">Import archive from %1 completed</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 failed</source>
-      <translation type="unfinished">Import archive from %1 failed</translation>
-    </message>
-    <message>
-      <source>Import archive from %1 stopped</source>
-      <translation type="unfinished">Import archive from %1 stopped</translation>
-    </message>
-    <message>
-      <source>Import archive from %1</source>
-      <translation type="unfinished">Import archive from %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>Backup storage is not configured on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
-        <numerusform>Backup storage is not configured on %n Servers</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>System storage is used for analytics data on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n Servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Not imported archive found on device %1</source>
-      <translation type="unfinished">Not imported archive found on device %1</translation>
-    </message>
-    <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation type="unfinished">Not imported archive found on camera %1</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation type="unfinished">The archive stream settings have been changed by the user</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation type="unfinished">The recording settings have been changed by the user</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::TileInteractionHandler</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... a %n dalších</numerusform>
-        <numerusform>... a %n dalších</numerusform>
-        <numerusform>... a %n dalších</numerusform>
-        <numerusform>... a %n dalších</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>No available archive</source>
-      <translation>Žádný dostupný archiv</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Nepodařilo se spustit plugin</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>Kamera</translation>
-    </message>
-    <message>
-      <source>Start time</source>
-      <translation>Čas počátku</translation>
-    </message>
-    <message>
-      <source>Length</source>
-      <translation>Délka</translation>
-    </message>
-    <message>
-      <source>Created</source>
-      <translation>Vytvořeno</translation>
-    </message>
-    <message>
-      <source>Creator</source>
-      <translation>Autor</translation>
-    </message>
-    <message>
-      <source>Tags</source>
-      <translation>Značky</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Popis</translation>
-    </message>
-    <message>
-      <source>Open</source>
-      <translation>Otevřít</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>Otevřít v nové záložce</translation>
-    </message>
-    <message>
-      <source>This action is not supported for notifications from other Systems</source>
-      <translation type="unfinished">This action is not supported for notifications from other Systems</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Time Zone</source>
-      <translation>Časové pásmo</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Server OS Time</source>
-      <translation>Čas OS serveru</translation>
-    </message>
-    <message>
-      <source>VMS Time</source>
-      <translation>Čas VMS</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
-    <message>
-      <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>Čas, společný a synchronizovaný mezi všemi servery. se může lišit od času OS na konkrétním serveru.</translation>
-    </message>
-    <message>
-      <source>Synchronized with the Internet</source>
-      <translation>Synchronizováno s internetem</translation>
-    </message>
-    <message>
-      <source>Synchronized with the local time at the selected server</source>
-      <translation>Synchronizováno s místním časem na vybraném serveru</translation>
-    </message>
-    <message>
-      <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>Nesynchronizováno. Každý server používá svůj vlastní místní čas.</translation>
-    </message>
-    <message>
-      <source>Equal to the server local time</source>
-      <translation>Stejné jako místní čas serveru</translation>
-    </message>
-    <message>
-      <source>No Internet connection. Time is not being synchronized.</source>
-      <translation>Žádné internetové připojení. Čas není synchronizován.</translation>
-    </message>
-    <message>
-      <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation>Time Server je offline. Čas není synchronizován.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
-    <message>
-      <source>Long</source>
-      <translation>Dlouhé</translation>
-    </message>
-    <message>
-      <source>Short</source>
-      <translation>Krátké</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UploadWorker</name>
-    <message>
-      <source>Could not open file &quot;%1&quot;</source>
-      <translation>Nelze otevřít soubor &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>Nelze vypočítat md5 pro soubor &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Could not create upload on the server side: %1</source>
-      <translation>Nahrávání na straně serveru se nepodařilo vytvořit: %1</translation>
-    </message>
-    <message>
-      <source>Could not upload file chunk to the server</source>
-      <translation>Nelze nahrát chunk soubor na server</translation>
-    </message>
-    <message>
-      <source>Could not check uploaded file on the server</source>
-      <translation>Nelze zkontrolovat nahraný soubor na server</translation>
-    </message>
-    <message>
-      <source>File was corrupted while being uploaded to the server</source>
-      <translation>Soubor byl poškozen při nahrávání na server</translation>
-    </message>
-    <message>
-      <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation>Vzdálený soubor &quot;%1&quot; je poškozen</translation>
-    </message>
-    <message>
-      <source>Server already has this file &quot;%1&quot;</source>
-      <translation>Server již tento soubor obsahuje &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserGroupListModel</name>
-    <message>
-      <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
-    </message>
-    <message>
-      <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
-    </message>
-    <message>
-      <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>Popis</translation>
-    </message>
-    <message>
-      <source>Member of</source>
-      <translation type="unfinished">Member of</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Oprávnění</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
-    <message>
-      <source>Delete</source>
-      <translation>Smazat</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListModel</name>
-    <message>
-      <source>Local user</source>
-      <translation>Místní uživatel</translation>
-    </message>
-    <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 uživatel</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>LDAP uživatel</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Přihlásit</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Název</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Email</translation>
-    </message>
-    <message>
-      <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
-    </message>
-    <message>
-      <source>Custom</source>
-      <translation>Vlastní</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
-    <message>
-      <source>Enable</source>
-      <translation>Povolit</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Zakázat</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Smazat</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Všichni uživatelé</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation type="unfinished">Users with Digest Authentication</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserManagementTabWidget</name>
-    <message>
-      <source>Users</source>
-      <translation>Uživatelé</translation>
-    </message>
-    <message>
-      <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
-    </message>
-    <message>
-      <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::VersionSelectionDialog</name>
-    <message>
-      <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
-    </message>
-    <message>
-      <source>Version</source>
-      <translation>Verze</translation>
-    </message>
-    <message>
-      <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Heslo</translation>
-    </message>
-    <message>
-      <source>The password is incorrect.</source>
-      <translation>Heslo je nesprávné.</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::VirtualCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
@@ -11419,6 +12746,71 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>No events</source>
+      <translation>Žádné události</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+        <numerusform>%n událostí</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation type="unfinished">Open this integration?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation type="unfinished">Open this web page?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation type="unfinished">Integration</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webová stránka</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation type="unfinished">Connect anyway</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -11427,6 +12819,25 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Select folder to upload</source>
       <translation>Vyberte soubory k nahrání</translation>
+    </message>
+    <message>
+      <source>Developer Tools</source>
+      <translation>Vývojářské nástroje</translation>
+    </message>
+    <message>
+      <source>Unavailable in dedicated window mode</source>
+      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+    </message>
+    <message>
+      <source>Move this window to the Layout to use this functionality</source>
+      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation type="unfinished">Empty schedule is not allowed</translation>
     </message>
   </context>
   <context>
@@ -11444,8 +12855,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation type="unfinished">Hide</translation>
     </message>
     <message>
-      <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <source>Unable to connect to the site because it has become offline</source>
+      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
     </message>
   </context>
   <context>
@@ -11458,18 +12869,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>%n záložky</numerusform>
         <numerusform>%n záložky</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Exporting video</source>
-      <translation>Exportování videa</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Zastavit export</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimalizovat</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -11509,14 +12908,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Zahájení exportu...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Ukládání rozložení</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Zastavte ukládání</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Uložení selhalo</translation>
     </message>
@@ -11529,8 +12920,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Připrava souborů pro exportní proces. Počkejte prosím několik sekund.</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Je vyžadováno překódování. Export relace restartován.</translation>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation type="unfinished">%1 filename length is more than %2 characters.</translation>
     </message>
   </context>
   <context>
@@ -11540,20 +12932,43 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>%1 verze je dostupná</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>Poznámky k vydání</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>Hlavní problémy byly opraveny. Aktualizace je důrazně doporučena.</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>Aktualizace...</translation>
+      <source>Updates</source>
+      <translation>Aktualizovat</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>Neupozorňovat znovu na tuto aktualizaci</translation>
+      <source>Release Notes...</source>
+      <translation>Poznámky k vydání...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation type="unfinished">%1 Version is available</translation>
+    </message>
+    <message>
+      <source>Skip Version</source>
+      <translation type="unfinished">Skip Version</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Datum/Čas</translation>
+    </message>
+    <message>
+      <source>Title</source>
+      <translation type="unfinished">Title</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Object Type</source>
+      <translation type="unfinished">Object Type</translation>
     </message>
   </context>
   <context>
@@ -11597,8 +13012,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
-      <source>New System</source>
-      <translation>Nový systém</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
@@ -11628,10 +13043,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Uživatelé</translation>
     </message>
     <message>
-      <source>Other Systems</source>
-      <translation>Ostatní systémy</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Místní soubory</translation>
     </message>
@@ -11651,6 +13062,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Shared Layouts</source>
       <translation>Sdílené rozložení</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation type="unfinished">Health Monitors</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Videostěny</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrace</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+    </message>
+    <message>
+      <source>Other Sites</source>
+      <translation type="unfinished">Other Sites</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11661,6 +13092,45 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>New Group %1</source>
       <translation type="unfinished">New Group %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>Žádná data</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation type="unfinished">All imported</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation type="unfinished">In progress... (%1 left)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Zakázáno</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Chyba</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Název</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation type="unfinished">Imported up to</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Stav</translation>
     </message>
   </context>
   <context>
@@ -11713,7 +13183,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Otevřít rozložení</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -11745,6 +13215,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>Resource is not available for the usage with JS API</source>
       <translation type="unfinished">Resource is not available for the usage with JS API</translation>
     </message>
+    <message>
+      <source>Resource not found</source>
+      <translation type="unfinished">Resource not found</translation>
+    </message>
+    <message>
+      <source>Parameter not found</source>
+      <translation type="unfinished">Parameter not found</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
@@ -11770,52 +13248,220 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>
     <message>
-      <source>None</source>
-      <translation>Žádný</translation>
+      <source>No filter</source>
+      <translation type="unfinished">No filter</translation>
     </message>
     <message>
-      <source>Starts</source>
-      <translation>Spustit</translation>
+      <source>Main storage only</source>
+      <translation type="unfinished">Main storage only</translation>
     </message>
     <message>
-      <source>Stops</source>
-      <translation>Zastavit</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Okamžitý</translation>
+      <source>Backup storage only</source>
+      <translation type="unfinished">Backup storage only</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::menu::PtzPresetsToursFactory</name>
     <message>
-      <source>Not saved</source>
-      <translation type="unfinished">Not saved</translation>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (aktivní)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (aktivní)</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <name>nx::vms::client::desktop::menu::RadassActionFactory</name>
     <message>
-      <source>Restore all rules to default?</source>
-      <translation>Obnovit všechna pravidla na výchozí hodnoty?</translation>
+      <source>Auto</source>
+      <translation>Auto</translation>
     </message>
     <message>
-      <source>This action cannot be undone.</source>
-      <translation>Tuto akci nelze vrátit zpět.</translation>
+      <source>Low</source>
+      <translation>Nízká</translation>
     </message>
     <message>
-      <source>Failed to apply changes.</source>
-      <translation>Použití změn se nezdařilo.</translation>
+      <source>High</source>
+      <translation>Vysoká</translation>
     </message>
     <message>
-      <source>Failed to restore rules.</source>
-      <translation type="unfinished">Failed to restore rules.</translation>
+      <source>Custom</source>
+      <translation>Vlastní</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Informace</translation>
     </message>
     <message>
-      <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <source>Objects</source>
+      <translation>Objekty</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Toolbar</source>
+      <translation type="unfinished">Toolbar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>Přepnutí pomocí klávesových zkratek</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>Zapnout časovač</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Zastavit trasu</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Zastavit filmový pás</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Spustit trasu</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Spustit filmový pás</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
+    <message>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>U určitých kamer lze nastavit analytické události.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Chcete-li zobrazit seznam podporovaných událostí, vyberte kamery pomocí tlačítka výše.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
+    <message>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Chcete-li zobrazit seznam podporovaných událostí, vyberte kamery pomocí tlačítka výše.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>Rozvrh</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>WHEN</source>
+      <translation type="unfinished">WHEN</translation>
+    </message>
+    <message>
+      <source>EVENT</source>
+      <translation type="unfinished">EVENT</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation type="unfinished">DO</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation type="unfinished">ACTION</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Povoleno</translation>
+    </message>
+    <message>
+      <source>Add Title or Comment</source>
+      <translation type="unfinished">Add Title or Comment</translation>
+    </message>
+    <message>
+      <source>The rule is not valid and may not work</source>
+      <translation type="unfinished">The rule is not valid and may not work</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
+    <message>
+      <source>Authentication</source>
+      <translation type="unfinished">Authentication</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Přihlásit</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Heslo</translation>
+    </message>
+    <message>
+      <source>Token</source>
+      <translation type="unfinished">Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation type="unfinished">Has attributes</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation type="unfinished">Attributes</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
+    <message>
+      <source>Once in</source>
+      <translation type="unfinished">Once in</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation type="unfinished">Value</translation>
     </message>
   </context>
   <context>
@@ -11827,6 +13473,224 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Action</source>
       <translation>Akce</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Zdroj</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Cíl</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation type="unfinished">Comment</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation type="unfinished">No source</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>Všechny servery</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
+        <numerusform>%n servery</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Zdrojová kamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+        <numerusform>Zdroj a %n dalších kamer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation type="unfinished">No target</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
+        <numerusform>%n rozložení</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Všichni uživatelé</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>Zdrojový server a %1</translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Jakékoliv zařízení</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Jakákoliv kamera</translation>
+    </message>
+    <message>
+      <source>Any Server</source>
+      <translation>Jakýkoli server</translation>
+    </message>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+    <message>
+      <source>Select at least one User</source>
+      <translation type="unfinished">Select at least one User</translation>
+    </message>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation type="unfinished">Manage</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::StatePicker</name>
+    <message>
+      <source>When event occurs</source>
+      <translation type="unfinished">When event occurs</translation>
+    </message>
+    <message>
+      <source>When event starts</source>
+      <translation type="unfinished">When event starts</translation>
+    </message>
+    <message>
+      <source>When event stops</source>
+      <translation type="unfinished">When event stops</translation>
+    </message>
+    <message>
+      <source>Select state</source>
+      <translation type="unfinished">Select state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation type="unfinished">Contains keywords</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation type="unfinished">Contains list entries</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Klíčová slova oddělená mezerou</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation type="unfinished">From</translation>
+    </message>
+    <message>
+      <source>Not contains keywords</source>
+      <translation type="unfinished">Not contains keywords</translation>
+    </message>
+    <message>
+      <source>Not contains list entries</source>
+      <translation type="unfinished">Not contains list entries</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation type="unfinished">Lookup lists network request failed</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error:</source>
+      <translation type="unfinished">Delete rule error:</translation>
+    </message>
+    <message>
+      <source>Save rule error:</source>
+      <translation type="unfinished">Save rule error:</translation>
+    </message>
+    <message>
+      <source>Reset to defaults error:</source>
+      <translation type="unfinished">Reset to defaults error:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VolumePicker</name>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
+    <message>
+      <source>Name</source>
+      <translation>Název</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Typ</translation>
+    </message>
+    <message>
+      <source>Total</source>
+      <translation>Celkem</translation>
+    </message>
+    <message>
+      <source>Used</source>
+      <translation type="unfinished">Used</translation>
+    </message>
+    <message>
+      <source>Number of devices using this service exceeds the available service quantity.</source>
+      <translation type="unfinished">Number of devices using this service exceeds the available service quantity.</translation>
+    </message>
+    <message>
+      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+      <translation type="unfinished">Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::TierUsageModel</name>
+    <message>
+      <source>Limitation</source>
+      <translation type="unfinished">Limitation</translation>
+    </message>
+    <message>
+      <source>Allowed</source>
+      <translation type="unfinished">Allowed</translation>
+    </message>
+    <message>
+      <source>Current</source>
+      <translation type="unfinished">Current</translation>
     </message>
   </context>
   <context>
@@ -11869,13 +13733,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
       <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Rozložení nebo kameru přidáte do filmového pásu jejích přetažením sem</translation>
     </message>
   </context>
   <context>
@@ -11922,64 +13779,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>%1 uživatelů</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>Přepnutí pomocí klávesových zkratek</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>Zapnout časovač</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Zastavit trasu</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Zastavit filmový pás</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Spustit trasu</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>Spustit filmový pás</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (aktivní)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (aktivní)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
-    <message>
-      <source>Info</source>
-      <translation>Informace</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objekty</translation>
-    </message>
-    <message>
-      <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>
@@ -12039,7 +13838,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -12172,32 +13971,8 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>Zpracování obrazu může chvíli trvat. Prosím, buďte trpěliví.</translation>
     </message>
     <message>
-      <source>Image too big</source>
-      <translation>Obrázek je příliš velký</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>Maximální velikost je %1 MB.</translation>
-    </message>
-    <message>
       <source>Failed to upload image</source>
       <translation>Nahrání obrázku se nezdařilo</translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>Komponenty systému mají různé verze:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Prosím aktualizujte všechny komponenty na verzi %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Aktualizace...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Přeskočit</translation>
     </message>
     <message>
       <source>Beta version %1</source>
@@ -12242,16 +14017,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <translation>největší dostupný oddíl</translation>
     </message>
     <message>
-      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation>Analytická databáze by měla být uložena pouze na místní jednotce a může zabírat velké množství místa.
-Jakmile je vybráno místo pro uložení analytických dat, nelze jej snadno změnit bez ztráty stávajících dat. Doporučujeme zvolit umístění pečlivě a vyhnout se použití systémové oblasti, protože by to mohlo způsobit vážnou poruchu systému.
-Ve výchozím nastavení budou analytická data uložena na %1.
-kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru můžete vybrat jiné umístění úložiště.</translation>
-    </message>
-    <message>
       <source>Window configuration saved</source>
       <translation type="unfinished">Window configuration saved</translation>
     </message>
@@ -12293,83 +14058,27 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
       <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>K přepnutí mezi rozloženími použijte šipky na klávesnic. Pro ukončení filmového pásu stiskněte klávesu Esc.</translation>
+      <source>Not enough access rights</source>
+      <translation type="unfinished">Not enough access rights</translation>
     </message>
     <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>Přepnout na</translation>
+      <source>You do not have permissions to open this camera on the layout</source>
+      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
     </message>
     <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>Zobrazit pro</translation>
+      <source>You do not have permissions to open some of selected cameras on the layout</source>
+      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
     </message>
     <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>Zobrazit vybrané pro</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>Filmový pás</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>Filmový pás %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>Smazat filmový pás %1?</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>Uložit rozložení jako</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>Zadejte název rozložení:</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>Nové rozložení</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>Zadejte název rozložení, které chcete vytvořit:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>Nové rozložení %1</translation>
-    </message>
-    <message>
-      <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
-    <message>
-      <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>
@@ -12409,31 +14118,6 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     <message>
       <source>File downloading failed</source>
       <translation>Stažení souboru se nezdařilo</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::workbench::timeline::BookmarkTooltip</name>
-    <message>
-      <source>Zoom timeline
-to view more bookmarks</source>
-      <comment>It is highly recommended to split message in two lines</comment>
-      <translation>Zvětšit časovou osu pro zobrazení více záložek</translation>
-    </message>
-    <message>
-      <source>Play bookmark from the beginning</source>
-      <translation>Přehrát záložku od začátku</translation>
-    </message>
-    <message>
-      <source>Edit bookmark</source>
-      <translation>Upravit záložku</translation>
-    </message>
-    <message>
-      <source>Export bookmark</source>
-      <translation>Exportovat záložku</translation>
-    </message>
-    <message>
-      <source>Delete bookmark</source>
-      <translation>Smazat záložku</translation>
     </message>
   </context>
   <context>
@@ -12520,10 +14204,6 @@ to view more bookmarks</source>
       <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
     </message>
     <message>
-      <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
-    </message>
-    <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
       <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
     </message>
@@ -12542,6 +14222,17 @@ to view more bookmarks</source>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+    </message>
+    <message>
+      <source>Client auto-updates</source>
+      <translation type="unfinished">Client auto-updates</translation>
+    </message>
+  </context>
+  <context>
+    <name>runApplication</name>
+    <message>
+      <source>Would you like to try switching to DirectX?</source>
+      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
     </message>
   </context>
 </TS>

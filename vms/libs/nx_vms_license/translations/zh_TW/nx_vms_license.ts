@@ -49,31 +49,19 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>授權未通過 %1 驗證</translation>
     </message>
     <message>
       <source>Invalid type</source>
       <translation>無效的類型</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>每個系統僅允許啟用一組Starter授權。</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>您已有一組Starter授權啟用中 。</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>每個系統僅允許啟用一組NVR授權。</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>您已有一組NVR授權啟用中。</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>每個系統僅允許使用一組此種類型的授權。</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -86,6 +74,18 @@
     <message>
       <source>Unknown error</source>
       <translation>未知的錯誤</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

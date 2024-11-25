@@ -60,24 +60,12 @@
       <translation>Ongeldig type</translation>
     </message>
     <message>
-      <source>Only one Starter license is allowed per System.</source>
-      <translation>Per systeem is slechts één startlicentie toegestaan.</translation>
-    </message>
-    <message>
       <source>You already have one active Starter license.</source>
       <translation>U heeft al één actieve starter licentie.</translation>
     </message>
     <message>
-      <source>Only one NVR license is allowed per System.</source>
-      <translation>Per systeem is slechts één NVR licentie toegestaan.</translation>
-    </message>
-    <message>
       <source>You already have one active NVR license.</source>
       <translation>U heeft al één actieve NVR licentie.</translation>
-    </message>
-    <message>
-      <source>Only one license of this type is allowed per System.</source>
-      <translation>Per systeem is slechts één licentie van dit type toegestaan.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
@@ -90,6 +78,18 @@
     <message>
       <source>Unknown error</source>
       <translation>Onbekende fout</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per Site.</source>
+      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
     </message>
   </context>
 </TS>

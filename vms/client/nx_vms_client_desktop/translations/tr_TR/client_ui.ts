@@ -24,10 +24,6 @@
       <translation>Destek</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>Sistem Sunucuları</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>Geliştirici</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation>Açık kaynak kitaplıkları</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>Yap</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>Sunucu Hareketleri</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>Sistem Hareketleri</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>Tümünü Seç</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>Olay Kuralları</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>Yedek yok</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Sunucu çevrimdışı. Yedekleme ayarları mevcut değil.</translation>
     </message>
   </context>
   <context>
@@ -538,10 +524,6 @@
       <translation>Varsayılanları Geri Yükle</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Uyarı! Bu ayarları değiştrimeniz önerilmez. Bu değişiklikler olası sistem sorunlarına yol açabilir.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Kamera akış ve profil ayarlarını koru</translation>
     </message>
@@ -622,10 +604,6 @@
       <translation>Medya Bağlantı Noktası</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation>Sistem ön ayarlarını kullan</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ Hızı</translation>
     </message>
@@ -666,20 +644,43 @@
       <translation>Birincil Akış Profili</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation>Cihazdan İçe Aktar</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation>Videoyu otomatik olarak içe aktar</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Web Sayfası</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation>Web Sayfası Bağlantı Noktası</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>PTZ'yi Durdur komutunu göndermeyin</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>Sesi kayıt etme</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation>Cihazdan içe aktar</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation>Videoyu otomatik olarak içe aktar</translation>
+    </message>
+    <message>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Ekle</translation>
     </message>
   </context>
   <context>
@@ -954,6 +955,17 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation>Bağlantı yok</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1027,20 +1039,16 @@
       <translation>Yedekten Geri Yükle...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation>Sistem yönetimi verilerinin yedeğini oluşturun veya Sistem yönetimi verilerini yedekten geri yükleyin</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>İptal</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Mesaj&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Klasör aç</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1161,17 +1169,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Olay Kuralları...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Başlama Zamanı</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Genel olay</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Sunucu Konum Kimliği:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Failover Önceliği...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Hiçbir şey bulunamadı</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Yorum Ekle</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Takvimi Ayarla</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Test Eylemi</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Yorum ekle</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>Başlangıç</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Başlangıçta önceki sisteme bağlan</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Kaydedilen pencere yapılandırmasını otomatik olarak geri yükle</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation>Bilgisayarın boştayken uyku moduna girmesine izin ver</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>Sistem Ayarları</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>Sil</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Giriş kimliği</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Tercihe Bağlı</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Test Ediliyor...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP Ayarları</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Sunucu URL'si</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Parola</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Arama Tabanı</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Arama Filtresi</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Arama zaman aşımı (sn)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Yönetici DN veya CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Kullanıcıları LDAP'den Çek...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Yükleniyor...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Bağlantı Hatası</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>İçeri aktarılan kullanıcılara rol ata</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Içeri aktarılan kullanıcıları devredışı bırak</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>İçe aktarılan kullanıcı için özet kimlik doğrulamasına izin ver</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>Özellikler</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Lisansları Etkinleştir</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Kaldır</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Yeni Lisans</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detaylar...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Yazlım lisansı sahibi</translation>
     </message>
   </context>
   <context>
@@ -1811,7 +1708,7 @@
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation>Maksimum Sesi Sınırla</translation>
+      <translation>Maksimum Alanı Sınırla</translation>
     </message>
   </context>
   <context>
@@ -1835,6 +1732,18 @@
     <message>
       <source>Test</source>
       <translation>Test</translation>
+    </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation>Kimlik Bilgilerini Kullan</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation>Bağlantıyı Kullan</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation>Bağlantı</translation>
     </message>
   </context>
   <context>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>Yeniden dene</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation>İndirme tamamlandı!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation>Günlükler seçilen klasöre kaydedilemedi</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation>PTZ kameralar için hedef katmanını göster</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Sistemleri Birleştir...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>Sunucu URL'si:</translation>
@@ -1954,8 +1855,12 @@
       <translation>Kontrol Et</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Sistem adını ve ayarlarını al:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Sistem adını ve ayarlarını al</translation>
     </message>
   </context>
   <context>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Biçim</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Metin</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>Düzen Seçiniz</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>Cihaz Ekle</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>kime</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>SUNUCU SEÇ</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>İpucu</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Giriş</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Parola</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Arama</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Tüm cihazları ekle</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation>Bağlantı Ayarları</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-posta</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Parola</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Kullanıcı</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>Destek imzası</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>Sistem imzası</translation>
+      <source>Username</source>
+      <translation>Kullanıcı Adı</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation>Tarafından eposta</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Giriş Yap</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Parola</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>Kullanıcı Adı</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation>Web sayfasında oturum açın</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Dikkat! Güç sınırı aşıldı</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>Tüm Bildirimleri Göster</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Sistem Bildirimleri</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>Olaylar</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>Biçim</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Önayar</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>Kime</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>Dil Ayarları</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>Bildirim içeriğini gizle</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Kullanıcıları ara</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Etkinleştir</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Devredışı</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Sil...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Hiçbir şey bulunamadı</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Yeni Kullanıcı...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rolleri Düzenle...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP Ayarları...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Kullanıcıları LDAP'den Çek...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>Ekle</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Bu bağlantıyı kaldırma sistem çökmelerine sebep olabilir.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>Sistem Yönetimi</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Video duvarındaki zaman çizelgesini etkinleştir</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Biçim</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kalite</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Geçici Dosya</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Ek Seçenekler</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Aero'yu Devre Dışı Bırak</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Yakalama İmleci</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>En iyi kalite ve çözünürlük için güçlü bir bilgisayar tavsiye edilir.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Gözat...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Kaynak</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>Kayıt Kalitesi</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kaynak</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>En iyi kalite ve çözünürlük için güçlü bir bilgisayar tavsiye edilir.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Ekran</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Ek Seçenekler</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Yakalama İmleci</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Alarm/Olay Kuralları</translation>
+      <source>No services found</source>
+      <translation>Servis Bulunamadı</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation>Yeni kural</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation>Hizmet eklemek için Kanal Ortağınız ile iletişime geçin</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation>Kuralı Sil</translation>
+      <source>Channel Partner Contact</source>
+      <translation>Kanal Ortağı İletişimi</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation>Bir Kural Seçin</translation>
+      <source>Services Usage</source>
+      <translation>Servislerin Kullanımı</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation>Varsayılan Kuralları Sıfırla</translation>
+      <source>Services state</source>
+      <translation>Hizmetlerin durumu</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation>Kullanıcı Aktivitesi</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Yönetici olmayan kullanıcılar için sunucuları ağaçta görüntüle</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Arşiv şifreleme</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>Arşiv şifreleme CPU kullanımını artırır</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>Parolayı değiştir...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Video trafiğini şifrelemek, CPU kullanımını önemli ölçüde artıracaktır.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>HTTPS'yi desteklemeyen kameralarla bağlantı kesilecek.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>Kullanıcıları Yönet</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation>Yüksek yetki sahibi olmayan kullanıcılar için sunucuları ağaçta görüntüle</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>Uygun</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>Detaylar</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Bu sertifikaya sabitle</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Sabitlenmiş sertifikayı görüntüle</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Failover</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Failover Önceliği...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Yerleşik ve USB web kameralarını otomatik olarak algıla</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Biçim</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Ses</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Yönet</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Biçim</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Durum</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>Yedeklemeyi tekrar indexle</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>USB depolamada kayıt etkinleştirildi</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Analitik verileri büyük miktarda yer kaplayabilir. Bunun için sistem bölümü yerine başka bir konum seçmenizi öneririz.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Analitik ve hareket verileri, devre dışı bırakılan depolama alanında saklanmaya devam edecektir.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Roller</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Tüm kullanıcıları göster</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Aramanızla eşleşen öğe yok.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Gruplar</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Uyarı! Bu Kayıt Takvimindeki Kaliteyi ve FPS Ayarlarını Etkileyebilir.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation>Bulut bildirimleri için özel dil</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>Kullanıcıları ara</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation>+ Grup Ekle</translation>
+      <source>Add Group</source>
+      <translation>Grup Ekle</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation>Grup bulunamadı</translation>
+      <source>Del</source>
+      <translation>Sil</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>Kullanıcıları ara</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Kullanıcı Ekle</translation>
+      <source>Add User</source>
+      <translation>Kullanıcı Ekle</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation>Kullanıcı bulunamadı</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Parolayı değiştir...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>İsim</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Kullanıcılar</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Yetkiyi kaldır</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Kullanıcı Yetkileri</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Yeni yetki</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Henüz kişiselleştirilmiş kullanıcı rolü yok.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Bir tane oluşturmak için &quot;Yeni rol&quot; düğmesini tıklayın.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Bu kullanıcı özet kimlik doğrulamasını kullanabilir.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Güvenli Kimlik Doğrulamayı Zorla</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Kullanıcı Türü</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Yetki</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rolleri Düzenle...</translation>
+      <source>Del</source>
+      <translation>Sil</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Biçim</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Ses</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Genel</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Bu web sayfasını sunucu aracılığıyla proxy'le</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>İstenen tüm içerikleri proxy'le</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>SSL sertifikası kontrolü olmadan web sayfasının açılmasına izin ver</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Not: Takvim sunucu saatine göre ayarlanacaktır.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Lisansları Etkinleştir</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Kaldır</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detaylar...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Yazlım lisansı sahibi</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Yeni Lisans</translation>
     </message>
   </context>
   <context>

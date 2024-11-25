@@ -2,6 +2,137 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
+    <name>AbstractSearchWidget::Private</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Ẩn thông tin</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Hiển thị thông tin</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Ẩn hình thu nhỏ</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Hiển thị hình thu nhỏ</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Ngày cuối</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>7 ngày qua</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>30 ngày trước</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Được chọn trên Dòng thời gian</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Mọi lúc</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Thiết bị trên bố cục</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Các camera trên bố cục</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Thiết bị được chọn</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Camera đã chọn</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Chọn thiết bị...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Chọn máy ảnh...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Mọi thiết bị</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Tất cả camera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Chọn phương tiện</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>không xác định</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n thiết bị được chọn</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n camera được chọn</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Thiết bị được chọn</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Camera được chọn</translation>
+    </message>
+  </context>
+  <context>
+    <name>ActionDurationPickerWidget</name>
+    <message>
+      <source>For the duration of event</source>
+      <translation type="unfinished">For the duration of event</translation>
+    </message>
+    <message>
+      <source>Of fixed duration</source>
+      <translation type="unfinished">Of fixed duration</translation>
+    </message>
+    <message>
+      <source>Event occurs</source>
+      <translation type="unfinished">Event occurs</translation>
+    </message>
+    <message>
+      <source>Event starts</source>
+      <translation type="unfinished">Event starts</translation>
+    </message>
+    <message>
+      <source>Event stops</source>
+      <translation type="unfinished">Event stops</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation>Thời gian</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation>Dành cho</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -38,6 +169,38 @@
     </message>
   </context>
   <context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 được sử dụng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are required</source>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 là bắt buộc</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>CellWidget</name>
+    <message>
+      <source>Canceled</source>
+      <translation type="unfinished">Canceled</translation>
+    </message>
+    <message>
+      <source>Added</source>
+      <translation>Thêm</translation>
+    </message>
+    <message>
+      <source>Adding</source>
+      <translation>Thêm</translation>
+    </message>
+  </context>
+  <context>
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
@@ -50,6 +213,14 @@
     <message>
       <source>Expires</source>
       <translation>Hết hạn</translation>
+    </message>
+  </context>
+  <context>
+    <name>ClipboardButton</name>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Đã sao chép</translation>
     </message>
   </context>
   <context>
@@ -89,21 +260,9 @@
       <source>Verifying update package</source>
       <translation>Đang xác minh gói cập nhật</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Không thể kết nối với Hệ thống</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>
-    <message>
-      <source>Filter...</source>
-      <translation>Lọc...</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>Kết nối với Hệ thống</translation>
-    </message>
     <message>
       <source>Help</source>
       <translation>Sự trông cậy</translation>
@@ -114,7 +273,7 @@
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>Kiểm soát bức tường video</translation>
+      <translation>Điều khiển Tường video</translation>
     </message>
     <message>
       <source>Push my screen</source>
@@ -126,7 +285,7 @@
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>Điền view</translation>
+      <translation>Vừa với Chế độ xem</translation>
     </message>
     <message>
       <source>Main Menu</source>
@@ -149,14 +308,6 @@
       <translation>Hiển thị màn hình chào mừng</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>Thẻ tab</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Tab thêm</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>Cửa sổ</translation>
     </message>
@@ -166,19 +317,11 @@
     </message>
     <message>
       <source>User...</source>
-      <translation>Người sử dụng...</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Người dùng mới...</translation>
+      <translation>Người dùng...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
       <translation>Tường video...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Tường video mới...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -194,15 +337,15 @@
     </message>
     <message>
       <source>Folder...</source>
-      <translation>Table of Contents...</translation>
+      <translation>Thư mục...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Khách hàng web...</translation>
+      <translation>Ứng dụng khách Web...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation>Mở một khách hàng web...</translation>
+      <translation>Mở ứng dụng khách Web...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
@@ -218,11 +361,11 @@
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation>Màn hình khởi quay video</translation>
+      <translation>Bắt đầu ghi màn hình</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation>Dừng Screen Video Capture</translation>
+      <translation>Dừng ghi màn hình</translation>
     </message>
     <message>
       <source>Stop current action</source>
@@ -253,16 +396,8 @@
       <translation>Trong mở trình duyệt...</translation>
     </message>
     <message>
-      <source>System Administration...</source>
-      <translation>Quản trị hệ thống...</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>Cập nhật hệ thống...</translation>
-    </message>
-    <message>
       <source>User Management...</source>
-      <translation>Quản lý người sử dụng...</translation>
+      <translation>Quản lý người dùng...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
@@ -270,7 +405,7 @@
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation>Đường mòn kiểm toán...</translation>
+      <translation>Báo cáo hành vi người dùng...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
@@ -280,12 +415,12 @@
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Đăng xuất từ %1</translation>
+      <translation>Đăng xuất %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Mở Cổng... %1...</translation>
+      <translation>Mở %1...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -308,16 +443,12 @@
       <translation>Danh sách camera</translation>
     </message>
     <message>
-      <source>Merge Systems...</source>
-      <translation>Hợp nhất các hệ thống...</translation>
-    </message>
-    <message>
       <source>About...</source>
       <translation>Đối với...</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Lối ra</translation>
+      <translation>Thoát</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -360,26 +491,6 @@
       <translation>Màn hình</translation>
     </message>
     <message>
-      <source>Open in New Tab</source>
-      <translation>Mở trong một tab mới</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>Màn hình trong tab mới</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>Mở trong Bố cục cảnh báo</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>Mở trong một cửa sổ mới</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>Giám sát trong cửa sổ mới</translation>
-    </message>
-    <message>
       <source>Open Video Wall</source>
       <translation>Mở Video Wall</translation>
     </message>
@@ -417,7 +528,7 @@
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Bức tường video stop</translation>
+      <translation>Dừng Tường video</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -496,10 +607,6 @@
       <translation>Xóa khỏi bố cục</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>Dừng chia sẻ Bố cục</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Đổi tên</translation>
     </message>
@@ -514,14 +621,6 @@
     <message>
       <source>User Settings...</source>
       <translation>Thiết lập người dùng...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>Nhóm người dùng...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>Thiết lập nhóm người dùng...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -593,11 +692,7 @@
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation>Thiết lập bức tường video...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>Thêm thiết bị...</translation>
+      <translation>Cài đặt Tường video...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -622,10 +717,6 @@
     <message>
       <source>Server Settings...</source>
       <translation>Cài đặt máy chủ...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>Hợp nhất để kết nối hệ thống Hiện nay...</translation>
     </message>
     <message>
       <source>None</source>
@@ -705,11 +796,11 @@
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>Hiện Bookmarks</translation>
+      <translation>Hiện dấu trang</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>Ẩn Bookmarks</translation>
+      <translation>Ẩn dấu trang</translation>
     </message>
     <message>
       <source>Show Calendar</source>
@@ -744,10 +835,6 @@
       <translation>Showreel...</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>Showreel mới...</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>Xóa Showreel</translation>
     </message>
@@ -774,14 +861,6 @@
     <message>
       <source>Export Bookmark...</source>
       <translation>Xuất dấu trang...</translation>
-    </message>
-    <message>
-      <source>Resolution...</source>
-      <translation>Độ Phân Giải...</translation>
-    </message>
-    <message>
-      <source>Cell Aspect Ratio...</source>
-      <translation>Tỷ lệ ô khung hình...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -816,10 +895,6 @@
       <translation>Camera ảo...</translation>
     </message>
     <message>
-      <source>New Virtual Camera...</source>
-      <translation>Camera ảo mới...</translation>
-    </message>
-    <message>
       <source>Show Tree</source>
       <translation>Hiện Tree</translation>
     </message>
@@ -849,7 +924,7 @@
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation>Chuyển sang tab Bookmarks</translation>
+      <translation>Chuyển sang tab Dấu trang</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
@@ -858,14 +933,6 @@
     <message>
       <source>Switch to Objects tab</source>
       <translation>Chuyển sang tab Đối tượng</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>Pin Lịch</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Bỏ ghim lịch</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -894,10 +961,6 @@
     <message>
       <source>New</source>
       <translation>Tạo</translation>
-    </message>
-    <message>
-      <source>Welcome Screen</source>
-      <translation>Màn hình chào mừng</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
@@ -966,20 +1029,8 @@
       <translation>Xóa nhóm</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page...</source>
-      <translation>Thêm trang web được ủy quyền...</translation>
-    </message>
-    <message>
       <source>Cell Spacing</source>
       <translation>Khoảng cách ô</translation>
-    </message>
-    <message>
-      <source>Show Panel</source>
-      <translation>Hiển thị bảng điều khiển</translation>
-    </message>
-    <message>
-      <source>Hide Panel</source>
-      <translation>Ẩn bảng điều khiển</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1029,6 +1080,154 @@
       <source>Save Cloud Layout As...</source>
       <translation>Lưu bố cục đám mây dưới dạng...</translation>
     </message>
+    <message>
+      <source>Add</source>
+      <translation>Thêm</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation>Thiết bị...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>Thêm người dùng...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation>Tích hợp...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation>Tích hợp mới...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>Trang web mới...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation>Thêm Showreel...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation>Thêm camera ảo...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation>Cài đặt tích hợp...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation>Tích hợp proxy...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation>Trang web được ủy quyền...</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation>Hiển thị tài nguyên được ủy quyền</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation>Nhập từ thiết bị...</translation>
+    </message>
+    <message>
+      <source>User Manual...</source>
+      <translation>Hướng dẫn sử dụng...</translation>
+    </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation>Chuyển đổi sang bố cục được chia sẻ</translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation>
+        <numerusform>Tắt tiếng các mục</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation>
+        <numerusform>Bỏ tắt tiếng các mục</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Layout Tab</source>
+      <translation type="unfinished">Layout Tab</translation>
+    </message>
+    <message>
+      <source>New Layout Tab</source>
+      <translation type="unfinished">New Layout Tab</translation>
+    </message>
+    <message>
+      <source>Welcome Screen Tab</source>
+      <translation type="unfinished">Welcome Screen Tab</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen Tab</source>
+      <translation type="unfinished">New Welcome Screen Tab</translation>
+    </message>
+    <message>
+      <source>Site Administration...</source>
+      <translation type="unfinished">Site Administration...</translation>
+    </message>
+    <message>
+      <source>Site Update...</source>
+      <translation type="unfinished">Site Update...</translation>
+    </message>
+    <message>
+      <source>Lists Management...</source>
+      <translation type="unfinished">Lists Management...</translation>
+    </message>
+    <message>
+      <source>Open Integrations...</source>
+      <translation type="unfinished">Open Integrations...</translation>
+    </message>
+    <message>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Open in</source>
+      <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
+      <translation type="unfinished">Open in</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation>Tab thêm</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation>Cửa sổ mới được mở ra</translation>
+    </message>
+    <message>
+      <source>Dedicated Window</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation type="unfinished">Dedicated Window</translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Độ Phân Giải</translation>
+    </message>
+    <message>
+      <source>JavaScript API...</source>
+      <translation type="unfinished">JavaScript API...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected Site...</source>
+      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio</source>
+      <translation type="unfinished">Cell Aspect Ratio</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1070,10 +1269,10 @@
     </message>
   </context>
   <context>
-    <name>DropdownTextPickerWidgetStrings</name>
+    <name>DirectParentsModel</name>
     <message>
-      <source>Auto</source>
-      <translation>Tự động</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation>Thành viên nhóm LDAP được quản lý trên máy chủ LDAP</translation>
     </message>
   </context>
   <context>
@@ -1100,45 +1299,6 @@
     </message>
   </context>
   <context>
-    <name>EventSearchWidget::Private</name>
-    <message>
-      <source>Server events</source>
-      <translation>Sự kiện máy chủ</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Sự kiện phân tích</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Bất kỳ sự kiện nào</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Bất kỳ sự cố thiết bị</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Bất kỳ vấn đề camera</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Bất kỳ sự kiện máy chủ</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Sự cố thiết bị</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Sự cố camera</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích</translation>
-    </message>
-  </context>
-  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1152,25 +1312,10 @@
     </message>
   </context>
   <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Hình ảnh</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Tất cả các file</translation>
-    </message>
-  </context>
-  <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Chèn vào file hình ảnh</translation>
+      <translation>Xen kẽ video âm thanh</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1182,7 +1327,7 @@
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1 Tập tin hình ảnh</translation>
+      <translation>%1 tệp đa phương tiện</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
@@ -1220,10 +1365,23 @@
     </message>
   </context>
   <context>
-    <name>LayoutTourTextFactory</name>
+    <name>Groups</name>
     <message>
-      <source>Start Showreel</source>
-      <translation>Bắt đầu Showreel</translation>
+      <source>Delete group?</source>
+      <translation>Xóa nhóm?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups?</source>
+      <translation>
+        <numerusform>Xóa %n nhóm?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>IntercomManager::Private</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>Bố cục %1</translation>
     </message>
   </context>
   <context>
@@ -1281,10 +1439,6 @@
       <translation>Giấy phép đã được kích hoạt trên một máy chủ khác</translation>
     </message>
     <message>
-      <source>You already activated this license</source>
-      <translation>Bạn đã sẵn sàng kích hoạt bản quyền này</translation>
-    </message>
-    <message>
       <source>To activate License Key manually please contact %1.</source>
       <translation>Để kích hoạt Khóa giấy phép theo cách thủ công, vui lòng liên hệ với %1.</translation>
     </message>
@@ -1331,12 +1485,16 @@ Khóa giấy phép: %2</translation>
       <translation>Sao chép thông số</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>Nếu Hệ thống của bạn không có quyền truy cập Internet, vui lòng gửi Khóa giấy phép và ID phần cứng được cung cấp tới %1 để nhận tệp kích hoạt.</translation>
+      <source>License has already been activated</source>
+      <translation>Giấy phép đã được kích hoạt</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>Nếu Hệ thống của bạn không có quyền truy cập Internet, vui lòng gửi Khóa cấp phép và ID phần cứng được cung cấp cho nhóm hỗ trợ Khu vực/Giấy phép của bạn để nhận tệp kích hoạt:</translation>
+      <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+    </message>
+    <message>
+      <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1458,8 +1616,8 @@ Khóa giấy phép: %2</translation>
   <context>
     <name>OauthLoginDialog</name>
     <message>
-      <source>Connect to System</source>
-      <translation>Kết nối với Hệ thống</translation>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
     </message>
   </context>
   <context>
@@ -1473,24 +1631,12 @@ Khóa giấy phép: %2</translation>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation>Không an toàn</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>Kiểm tra</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Email vô hiệu.</translation>
-    </message>
-    <message>
       <source>URL is not valid.</source>
       <translation>URL không hợp lệ.</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation>Nhập mô tả Hệ thống ngắn ở đây.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1532,10 +1678,6 @@ Khóa giấy phép: %2</translation>
       <translation>Sự thành công</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Kết nối đã hết hạn</translation>
-    </message>
-    <message>
       <source>Authentication failed</source>
       <translation>Xác thực không thành công</translation>
     </message>
@@ -1544,13 +1686,53 @@ Khóa giấy phép: %2</translation>
       <translation>Lỗi không xác định</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Không thể kiểm tra cài đặt email do không có kết nối internet trên bất kỳ máy chủ nào đang hoạt động</translation>
-    </message>
-    <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>Người dùng %1 sẽ bắt đầu nhận được email ngay sau khi bạn áp dụng cài đặt</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation>Không thể truy cập máy chủ</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation>Tên đăng nhập hoặc Mật khẩu không chính xác</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation>không an toàn</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Kết nối thất bại</translation>
+    </message>
+    <message>
+      <source>Username cannot be empty</source>
+      <translation>Tên người dùng không được để trống</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Mật khẩu không được để trống</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation>Người dùng đang nhận email</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation>Người dùng sẽ bắt đầu nhận email ngay sau khi áp dụng cài đặt</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation>Không thể kiểm tra máy chủ SMTP</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation>Cần thêm thông tin</translation>
+    </message>
+    <message>
+      <source>Enter a short Site description here.</source>
+      <translation type="unfinished">Enter a short Site description here.</translation>
     </message>
   </context>
   <context>
@@ -1567,10 +1749,6 @@ Khóa giấy phép: %2</translation>
       <source>Weak</source>
       <translation>Yếu</translation>
     </message>
-    <message>
-      <source>Password should contain different types of symbols.</source>
-      <translation>Mật khẩu phải chứa các loại ký tự khác nhau.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1581,73 +1759,57 @@ Khóa giấy phép: %2</translation>
       <source>Short</source>
       <translation>Quá ngắn</translation>
     </message>
-    <message numerus="yes">
-      <source>Password must be at least %n characters long.</source>
-      <translation>
-        <numerusform>Mật khẩu phải có ít nhất %n ký tự.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Long</source>
       <translation>Dài</translation>
-    </message>
-    <message numerus="yes">
-      <source>Password must be no longer than %n characters.</source>
-      <translation>
-        <numerusform>Mật khẩu của bạn có thể không dài quá %n ký tự.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation>
-        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự liên tiếp lại với nhau.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters.</source>
-      <translation>
-        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự lặp lại.</numerusform>
-      </translation>
     </message>
     <message>
       <source>Common</source>
       <translation>Thông thường</translation>
     </message>
     <message>
-      <source>This password is in list of the most popular passwords.</source>
-      <translation>Mật khẩu này nằm trong danh sách các mật khẩu phổ biến nhất.</translation>
-    </message>
-    <message>
       <source>Incorrect</source>
       <translation>Không đúng</translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím %1.</translation>
+      <source>Password should contain different types of symbols</source>
+      <translation>Mật khẩu phải chứa các loại ký tự khác nhau</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long</source>
+      <translation>
+        <numerusform>Mật khẩu phải có ít nhất %n ký tự</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters</source>
+      <translation>
+        <numerusform>Mật khẩu của bạn có thể không dài quá %n ký tự</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <translation>
+        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự liên tiếp lại với nhau</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <translation>
+        <numerusform>Mật khẩu không được chứa %n hoặc nhiều ký tự lặp lại</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Camera &amp; Nguồn</translation>
+      <source>This password is in list of the most popular passwords</source>
+      <translation>Mật khẩu này nằm trong danh sách các mật khẩu phổ biến nhất</translation>
     </message>
     <message>
-      <source>Shared Layouts</source>
-      <translation>Bố cục được chia sẻ</translation>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
+      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím %1</translation>
     </message>
     <message>
-      <source>Permissions</source>
-      <translation>Quyền</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>Tất cả</translation>
+      <source>Only latin letters, numbers and keyboard symbols are allowed</source>
+      <translation>Chỉ cho phép chữ cái, số và ký tự bàn phím</translation>
     </message>
   </context>
   <context>
@@ -1776,6 +1938,50 @@ Khóa giấy phép: %2</translation>
       <source>Regional / License support</source>
       <translation>Bộ phận hỗ trợ khu vực / giấy phép</translation>
     </message>
+    <message>
+      <source>Partner information</source>
+      <translation>Thông tin đối tác</translation>
+    </message>
+    <message>
+      <source>Phones</source>
+      <translation>Số điện thoại</translation>
+    </message>
+    <message>
+      <source>Emails</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>RHI backend</source>
+      <translation>Hỗ trợ RHI</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation>Thiết bị RHI</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation>ID thiết bị RHI</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation>ID nhà cung cấp RHI</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation>Kích thước kết cấu tối đa RHI</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation>API đồ họa</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation>Không thể lấy thông tin GPU cho %1</translation>
+    </message>
+    <message>
+      <source>Platform</source>
+      <translation type="unfinished">Platform</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
@@ -1786,13 +1992,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Saving...</source>
       <translation>Cửa hàng...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Khi cấp quyền truy cập vào một số bố cục, bạn cấp quyền truy cập vào tất cả các camera trên bố cục đó. Ngoài ra, người dùng sẽ có quyền truy cập vào tất cả các camera mới trên các bố cục này.</translation>
     </message>
   </context>
   <context>
@@ -1876,9 +2075,12 @@ Khóa giấy phép: %2</translation>
       <source>Download complete!</source>
       <translation>Tải xuống hoàn tất!</translation>
     </message>
+  </context>
+  <context>
+    <name>QnAttachToVideowallDialog</name>
     <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation>Tăng tốc phần cứng NVIDIA đang ở chế độ beta</translation>
+      <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
+      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -1954,36 +2156,6 @@ Khóa giấy phép: %2</translation>
       <source>No archive for this position</source>
       <translation>Không có lưu trữ cho vị trí này</translation>
     </message>
-    <message numerus="yes">
-      <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>Các thiết bị này được gỡ bỏ khỏi hệ thống</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These cameras are removed from System</source>
-      <translation>
-        <numerusform>Những camera này sẽ được gỡ bỏ khỏi Hệ thống</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These servers are removed from System</source>
-      <translation>
-        <numerusform>Các máy chủ này được xóa khỏi Hệ thống</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from System</source>
-      <translation>
-        <numerusform>Những người dùng này sẽ bị xóa khỏi Hệ thống</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These resources are removed from System</source>
-      <translation>
-        <numerusform>Các tài nguyên này sẽ được xóa khỏi Hệ thống</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Audit trail replay</source>
       <translation>Kiểm toán log replay</translation>
@@ -2000,6 +2172,36 @@ Khóa giấy phép: %2</translation>
       <comment>Total number will be substituted as %1</comment>
       <translation>
         <numerusform>Chi tiết cho camera %n của %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These devices are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These cameras are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These cameras are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These servers are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These servers are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These users are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These users are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These resources are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These resources are removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2019,7 +2221,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation>Người sử dụng cập nhật</translation>
+      <translation>Đã cập nhật người dùng</translation>
     </message>
     <message>
       <source>Watching live</source>
@@ -2032,14 +2234,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Exporting video</source>
       <translation>Xuất ra video</translation>
-    </message>
-    <message>
-      <source>System name changed</source>
-      <translation>Tên hệ thống thay đổi</translation>
-    </message>
-    <message>
-      <source>System merge</source>
-      <translation>Hệ thống hợp nhất</translation>
     </message>
     <message>
       <source>General settings updated</source>
@@ -2075,11 +2269,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>User</source>
-      <translation>Người sử dụng</translation>
-    </message>
-    <message>
-      <source>IP</source>
-      <translation>IP camera</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -2095,7 +2285,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2126,14 +2316,6 @@ Khóa giấy phép: %2</translation>
       <translation>Máy ảnh loại bỏ</translation>
     </message>
     <message>
-      <source>Device name</source>
-      <translation>Tên thiết bị</translation>
-    </message>
-    <message>
-      <source>Camera name</source>
-      <translation>Tên máy ảnh</translation>
-    </message>
-    <message>
       <source>Email settings changed</source>
       <translation>Cài đặt e-mail thay đổi</translation>
     </message>
@@ -2161,7 +2343,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation>Quy tắc sự kiện đặt lại về mặc định</translation>
+      <translation>Đặt lại quy tắc sự kiện về mặc định</translation>
     </message>
     <message>
       <source>Storage added</source>
@@ -2195,13 +2377,63 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation>Đã kết nối với %1 qua %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation>Đã ngắt kết nối từ %1 qua %2</translation>
+    </message>
+    <message>
+      <source>Site name changed</source>
+      <translation type="unfinished">Site name changed</translation>
+    </message>
+    <message>
+      <source>Site merge</source>
+      <translation type="unfinished">Site merge</translation>
+    </message>
+    <message>
+      <source>Server proxy connection</source>
+      <translation type="unfinished">Server proxy connection</translation>
+    </message>
+    <message>
+      <source>Site has been updated to version %1</source>
+      <translation type="unfinished">Site has been updated to version %1</translation>
+    </message>
+    <message>
+      <source>%1 - %2, Duration: %3, Target: %4</source>
+      <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
+      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+    </message>
+    <message>
+      <source>Start time: %1, Target: %2</source>
+      <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
+      <translation type="unfinished">Start time: %1, Target: %2</translation>
+    </message>
+    <message>
+      <source>User IP</source>
+      <translation type="unfinished">User IP</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Thiết bị</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Máy ảnh</translation>
+    </message>
+    <message>
+      <source>Device IP</source>
+      <translation type="unfinished">Device IP</translation>
+    </message>
+    <message>
+      <source>Camera IP</source>
+      <translation type="unfinished">Camera IP</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>Máy chủ</translation>
     </message>
   </context>
   <context>
@@ -2232,10 +2464,6 @@ Khóa giấy phép: %2</translation>
       <translation>6 tháng</translation>
     </message>
     <message>
-      <source>year</source>
-      <translation>năm</translation>
-    </message>
-    <message>
       <source>Name cannot be empty.</source>
       <translation>Tên không thể để trống.</translation>
     </message>
@@ -2243,49 +2471,9 @@ Khóa giấy phép: %2</translation>
       <source>Description cannot be empty</source>
       <translation>Mô tả không thể để trống</translation>
     </message>
-  </context>
-  <context>
-    <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 of %n thiết bị</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 trong số %n camera</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Chọn ít nhất một thiết bị</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Chọn ít nhất một máy ảnh</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 trong tổng số %n mô đun I/O</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Bất kỳ thiết bị nào</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Bất kỳ camera nào</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Quản lý Bookmark</translation>
+      <source>Year</source>
+      <translation>Năm</translation>
     </message>
   </context>
   <context>
@@ -2319,10 +2507,6 @@ Khóa giấy phép: %2</translation>
       <translation>Mỗi %1</translation>
     </message>
     <message>
-      <source>System</source>
-      <translation>Hệ thống</translation>
-    </message>
-    <message>
       <source>Any Server</source>
       <translation>Bất kỳ máy chủ nào</translation>
     </message>
@@ -2332,7 +2516,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Bất kỳ camera nào</translation>
+      <translation>Tất cả camera</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -2342,7 +2526,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>User</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -2373,6 +2557,10 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Source Server and %1</source>
       <translation>Máy chủ nguồn và %1</translation>
+    </message>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
     </message>
   </context>
   <context>
@@ -2409,7 +2597,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Bất kỳ camera nào</translation>
+      <translation>Tất cả camera</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
@@ -2440,7 +2628,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Không có event rules</translation>
+      <translation>Không có quy tắc sự kiện</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2483,7 +2671,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation>Biến cố</translation>
+      <translation>Sự kiện</translation>
     </message>
     <message>
       <source>Source</source>
@@ -2495,18 +2683,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Mục đích</translation>
+      <translation>Đích đến</translation>
     </message>
     <message>
       <source>Interval of Action</source>
       <translation>Khoảng thời gian hành động</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBuzzerPolicy</name>
-    <message>
-      <source>Servers that support buzzer</source>
-      <translation>Máy chủ hỗ trợ buzzer</translation>
     </message>
   </context>
   <context>
@@ -2518,34 +2699,10 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCameraAnalyticsPolicy</name>
-    <message>
-      <source>Analytics is not available for %1</source>
-      <translation>Analytics không khả dụng cho %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAudioTransmitPolicy</name>
-    <message>
-      <source>Select device</source>
-      <translation>Chọn thiết bị</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>Chọn camera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1 không hỗ trợ âm thanh hai chiều</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2617,15 +2774,6 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>automatic</source>
       <translation>tự động</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputPolicy</name>
-    <message numerus="yes">
-      <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 Không có cổng đầu vào</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2735,26 +2883,10 @@ Khóa giấy phép: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCameraMotionPolicy</name>
-    <message>
-      <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 Video bên giám sát hoặc chức năng dịch chuyển không thể được sử dụng</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
       <translation>tự động</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputPolicy</name>
-    <message numerus="yes">
-      <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 không có rơ le đầu ra</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2768,10 +2900,6 @@ Khóa giấy phép: %2</translation>
       <translation>Lặp lại mật khẩu</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Mật khẩu không khớp.</translation>
-    </message>
-    <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Mật khẩu phải có ít nhất 8 ký tự dài và chứa các loại ký tự khác nhau.</translation>
     </message>
@@ -2779,12 +2907,9 @@ Khóa giấy phép: %2</translation>
       <source>Password should not be equal to camera&apos;s user name</source>
       <translation>Mật khẩu không nên giống tên người dùng của camera</translation>
     </message>
-  </context>
-  <context>
-    <name>QnCameraRecordingPolicy</name>
     <message>
-      <source>Recording is disabled for %1</source>
-      <translation>%1 video thể</translation>
+      <source>Passwords do not match</source>
+      <translation>Mật khẩu không trùng nhau</translation>
     </message>
   </context>
   <context>
@@ -2798,102 +2923,92 @@ Khóa giấy phép: %2</translation>
       <translation>Xác nhận mật khẩu</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Mật khẩu không khớp.</translation>
-    </message>
-    <message>
       <source>Current Password</source>
       <translation>Mật khẩu hiện tại</translation>
     </message>
     <message>
-      <source>To modify your password please enter the existing one.</source>
-      <translation>Để sửa đổi mật khẩu của bạn, hãy nhập mật mã hiện tại.</translation>
+      <source>Passwords do not match</source>
+      <translation>Mật khẩu không trùng nhau</translation>
     </message>
     <message>
-      <source>Invalid current password.</source>
-      <translation>Mật khẩu hiện tại không hợp lệ.</translation>
+      <source>To modify your password please enter the existing one</source>
+      <translation>Để sửa đổi mật khẩu của bạn, hãy nhập mật mã hiện tại</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Mật khẩu hiện tại không hợp lệ</translation>
     </message>
   </context>
   <context>
     <name>QnCloudManagementWidget</name>
-    <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>Kết nối với Hệ thống của bạn từ mọi nơi với bất kỳ thiết bị nào</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Hệ thống đã ngắt kết nối từ %1</translation>
-    </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Mở %1 Cổng</translation>
     </message>
     <message>
-      <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối Hệ thống với %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Tạo tài khoản %1</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối Hệ thống với %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Tìm hiểu thêm về %1</translation>
-    </message>
-    <message>
-      <source>Enter your account password to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Nhập mật khẩu tài khoản của bạn để ngắt kết nối Hệ thống khỏi %1</translation>
-    </message>
-    <message>
       <source>Disconnect</source>
       <translation>Ngắt kết nối</translation>
     </message>
     <message>
-      <source>System disconnected from %1</source>
+      <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Hệ thống bị ngắt kết nối khỏi %1</translation>
+      <translation type="unfinished">Disconnect Site from %1</translation>
     </message>
     <message>
-      <source>You are about to disconnect System from %1</source>
+      <source>Connect Site to %1...</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connect Site to %1...</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your site and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+    </message>
+    <message>
+      <source>Enter your account password to disconnect Site from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the Site from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+    </message>
+    <message>
+      <source>Site disconnected from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Site disconnected from %1</translation>
+    </message>
+    <message>
+      <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation>Bạn sắp ngắt kết nối Hệ thống khỏi %1</translation>
+      <translation type="unfinished">Disconnect site from %1?</translation>
     </message>
     <message>
-      <source>All %1 users will be deleted.</source>
+      <source>Recording will stop and all Service Subscriptions will be removed</source>
+      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+    </message>
+    <message>
+      <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Tất cả người dùng %1 sẽ bị xóa.</translation>
+      <translation type="unfinished">All %1 users will be removed from the site</translation>
     </message>
     <message>
-      <source>You will be logged out.</source>
-      <translation>Bạn sẽ bị đăng xuất.</translation>
+      <source>You will be logged out of the site. The site will be accessible only via local network</source>
+      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
     </message>
     <message>
-      <source>System will be accessible through local network with a local administrator account.</source>
-      <translation>Hệ thống sẽ được truy cập thông qua mạng nội bộ với tài khoản quản trị viên.</translation>
+      <source>The site will be accessible only via local network</source>
+      <translation type="unfinished">The site will be accessible only via local network</translation>
     </message>
     <message>
-      <source>Continue</source>
-      <translation>Tiếp tục</translation>
+      <source>Existing data (site settings and archive) will be preserved</source>
+      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
     </message>
     <message>
-      <source>Cannot disconnect the System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Không thể ngắt kết nối Hệ thống khỏi %1</translation>
+      <source>This action cannot be undone</source>
+      <translation>Không thể hoàn tác thao tác này</translation>
     </message>
   </context>
   <context>
@@ -2920,7 +3035,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
+      <translation>Lỗi mạng. Vui lòng kiểm tra kết nối internet của bạn và thử lại.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -2929,7 +3044,7 @@ to %1</source>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 là tạm thời không có. Vui lòng thử lại sau.</translation>
+      <translation>%1 tạm thời không khả dụng. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -2980,22 +3095,22 @@ to %1</source>
       <source>Connect to Server</source>
       <translation>Kết nối với máy chủ</translation>
     </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Đăng nhập %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation>Đăng nhập với tên %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
       <translation>Cài đặt tài khoản</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCloudUsersValidationPolicy</name>
-    <message numerus="yes">
-      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
-      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>
-        <numerusform>%n trên %1 người dùng được chọn không phải là người dùng %2 và sẽ không nhận được thông báo di động.</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -3071,12 +3186,24 @@ to %1</source>
       <translation>Không vào được chế độ tương thích cho phiên bản %1</translation>
     </message>
     <message>
-      <source>System is not compatible with two-factor authentication</source>
-      <translation>Hệ thống không tương thích với xác thực hai yếu tố</translation>
+      <source>Log In...</source>
+      <translation>Đăng nhập...</translation>
     </message>
     <message>
-      <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation>Không đăng nhập được vào Hệ thống &quot;%1&quot;</translation>
+      <source>Your session has expired</source>
+      <translation>Kết nối của bạn đã hết hạn</translation>
+    </message>
+    <message>
+      <source>Please sign in again with your link to continue</source>
+      <translation>Vui lòng đăng nhập lại bằng liên kết của bạn để tiếp tục</translation>
+    </message>
+    <message>
+      <source>Site is not compatible with two-factor authentication</source>
+      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to Site &quot;%1&quot;</source>
+      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3104,6 +3231,21 @@ to %1</source>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>Để tạo Sự kiện chung, vui lòng tham khảo %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Hình ảnh</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Tất cả các file</translation>
     </message>
   </context>
   <context>
@@ -3146,7 +3288,7 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation>Lưu bản sao lưu cơ sở dữ liệu</translation>
+      <translation>Lưu bản sao cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
@@ -3154,167 +3296,38 @@ to %1</source>
     </message>
     <message>
       <source>Create</source>
-      <translation>Tạo</translation>
+      <translation>Tạo mới</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation>Khôi phục từ Sao lưu cơ sở dữ liệu</translation>
-    </message>
-    <message>
-      <source>Enter your account password to restore System from backup</source>
-      <translation>Nhập mật khẩu tài khoản của bạn để khôi phục Hệ thống từ bản sao lưu</translation>
+      <translation>Khôi phục từ bản sao lưu cơ sở dữ liệu</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation>Khôi phục dữ liệu</translation>
+      <translation>Khôi phục</translation>
     </message>
     <message>
       <source>Restore database?</source>
       <translation>Khôi phục cơ sở dữ liệu?</translation>
     </message>
     <message>
-      <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>Cấu hình hệ thống sẽ được khôi phục từ bản sao lưu, ứng dụng trên máy chủ sẽ được khởi động lại.</translation>
-    </message>
-    <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
       <translation>Cơ sở dữ liệu được khôi phục thành công. Ứng dụng máy chủ sẽ sớm khởi động lại.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
     <message>
-      <source>Local user</source>
-      <translation>Người dùng cục bộ</translation>
+      <source>Site configuration will be restored from backup, Server application will be restarted.</source>
+      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
     </message>
     <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 người dùng</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>Người dùng LDAP</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Bật</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Tàn tật</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Đăng nhập</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Vai trò</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>Chủ nhân</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Giám sát viên</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>Xem video trực tiếp</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>Điều chỉnh cài đặt thiết bị</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Điều chỉnh cài đặt camera</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>Sử dụng điều khiển PTZ</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Lưu trữ Xem video</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Video và xuất ra</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Điều khiển màn hình Video Walls</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>Chỉnh sửa</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Tất cả người dùng</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation>Với xác thực thông báo được bật</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Người dùng có thể được chuyển nhập từ một máy chủ LDAP. Họ sẽ có thể đăng nhập vào chỉ khi hệ phục vụ LDAP là trực tuyến và các tài khoản đang hoạt động trên nó.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>Không thể tìm thấy các bộ mã hóa video '%1'.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Không thể khởi tạo bộ mã hóa video.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>Không thể khởi động các thiết bị âm thanh chính.</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>Chiều rộng màn hình phải có một số nhân của 8.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Không thể khởi tạo thiết bị âm thanh &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>Không thể phát hiện độ phân giải chụp</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Thiết bị ghi âm không hỗ trợ các định dạng âm thanh phù hợp. Vui lòng chọn thiết bị âm thanh khác hoặc &quot;không có&quot; trong cài đặt Ghi màn hình.</translation>
+      <source>Enter your account password to restore Site from backup</source>
+      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Chế độ Ghi âm Panic sẽ chuyển cài đặt ghi hình cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
+      <translation>Chế độ Ghi hoảng loạn sẽ chuyển cài đặt ghi cho tất cả các camera thành FPS và chất lượng tối đa.</translation>
     </message>
   </context>
   <context>
@@ -3337,7 +3350,7 @@ to %1</source>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Rõ ràng Lọc</translation>
+      <translation>Xóa bộ lọc</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -3345,7 +3358,7 @@ to %1</source>
     </message>
     <message>
       <source>Any Action</source>
-      <translation>Bất kỳ hành động</translation>
+      <translation>Tất cả hành động</translation>
     </message>
     <message>
       <source>No events</source>
@@ -3367,7 +3380,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -3382,7 +3395,7 @@ to %1</source>
     </message>
     <message>
       <source>Event</source>
-      <translation>Biến cố</translation>
+      <translation>Sự kiện</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3394,11 +3407,11 @@ to %1</source>
     </message>
     <message>
       <source>Target</source>
-      <translation>Mục đích</translation>
+      <translation>Đích đến</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3457,24 +3470,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnExecPtzPresetPolicy</name>
-    <message>
-      <source>Select exactly one camera</source>
-      <translation>Chọn đúng một máy ảnh</translation>
-    </message>
-    <message>
-      <source>%1 has no PTZ presets</source>
-      <translation>%1 không cài đặt sẵn PTZ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFanErrorPolicy</name>
-    <message>
-      <source>Servers that support fan diagnostic</source>
-      <translation>Máy chủ hỗ trợ chẩn đoán quạt</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3494,13 +3489,6 @@ to %1</source>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
       <translation>Camera này hiện không có trên một số bố cục đã chọn. Hành động sẽ được thực hiện nếu camera được thêm vào trước khi kích hoạt.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraPolicy</name>
-    <message>
-      <source>Select exactly one camera</source>
-      <translation>Chọn đúng một máy ảnh</translation>
     </message>
   </context>
   <context>
@@ -3532,6 +3520,10 @@ to %1</source>
       <source>Select Folder...</source>
       <translation>Chọn thư mục...</translation>
     </message>
+    <message>
+      <source>Notifications filters are moved to the right panel</source>
+      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+    </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -3541,11 +3533,11 @@ to %1</source>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Danh sách mở Bookmarks</translation>
+      <translation>Mở danh sách dấu trang</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Event Rules</translation>
+      <translation>Quy tắc sự kiện</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3553,11 +3545,11 @@ to %1</source>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Đường mòn kiểm toán</translation>
+      <translation>Báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Device List</source>
@@ -3569,7 +3561,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>Mở báo / Quy định Quản lý sự kiện</translation>
+      <translation>Mở quản lý quy tắc sự kiện</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
@@ -3582,6 +3574,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Mở danh sách ảnh</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Tích hợp</translation>
+    </message>
+    <message>
+      <source>Open Integrations</source>
+      <translation type="unfinished">Open Integrations</translation>
     </message>
   </context>
   <context>
@@ -3691,92 +3691,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>Thử</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>Thử nghiệm thất bại</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>Kiểm tra đã hoàn thành công: %n người đã được tìm thấy.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Thay đổi bất kỳ cài đặt LDAP nào khác ngoài &quot; Bộ lọc tìm kiếm &quot; sẽ mất kết nối cho tất cả người dùng LDAP.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>Các thiết lập được cung cấp không hợp lệ.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Không thể thực hiện một thử nghiệm.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Giờ nghĩ giảo lao</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>Đăng nhập</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Emai</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>Các thiết lập được cung cấp không hợp lệ.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Không thể thực hiện một thử nghiệm.</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>Không thể tải người sử dụng.</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>Lỗi trong khi tải người sử dụng.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>Không có người dùng mới được tìm thấy.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Giờ nghĩ giảo lao</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>Nhập mục đã chọn</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
@@ -3792,7 +3706,7 @@ to %1</source>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Features</source>
@@ -3835,7 +3749,7 @@ to %1</source>
     </message>
     <message>
       <source>Never</source>
-      <translation>Thường xuyên</translation>
+      <translation>Không hết hạn</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -3843,7 +3757,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -3887,67 +3801,16 @@ to %1</source>
       <source>Channels</source>
       <translation>Kênh</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>Xuất</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>Xuất bản quyền vào một tệp tin</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Hủy kích hoạt giấy phép?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Gỡ bỏ</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>Hủy kích hoạt</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%n kênh.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 hiện đang được sử dụng</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Ít nhất %1 là bắt buộc</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>%n hủy kích hoạt còn lại.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation>Bạn chưa cài đặt giấy phép hợp lệ. Vui lòng kích hoạt giấy phép thương mại hoặc dùng thử của bạn.</translation>
+      <source>Not verified</source>
+      <translation>Chưa xác thực</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Bắt đầu cấp giấy phép thử nghiệm</translation>
+      <translation>Kích hoạt giấy phép dùng thử</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -3970,36 +3833,28 @@ to %1</source>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Vui lòng gửi Khóa giấy phép và ID Phần cứng tới bộ phận hỗ trợ Khu vực/Hỗ trợ giấy phép (%1) để nhận tệp khóa kích hoạt.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation>Tệp văn bản</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Điều chỉnh thị giác</translation>
+      <translation>Giao diện</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Màn hình video</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>Thông báo</translation>
+      <translation>Ghi màn hình</translation>
     </message>
     <message>
       <source>Advanced</source>
       <translation>Nâng cao</translation>
-    </message>
-    <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>File cài đặt ở chế độ chỉ đọc. Xin vui lòng liên hệ với quản trị hệ thống của bạn. Tất cả thay đổi sẽ bị mất sau khi thoát chương trình.</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Không thể lưu cài đặt. Xin vui lòng liên hệ với quản trị hệ thống của bạn. Tất cả thay đổi sẽ bị mất sau khi thoát chương trình.</translation>
     </message>
     <message>
       <source>Restart required</source>
@@ -4017,12 +3872,16 @@ to %1</source>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>Một số thay đổi sẽ có hiệu lực chỉ sau khi %1 khởi động lại</translation>
     </message>
+    <message>
+      <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
+      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+    </message>
   </context>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation>Chuẩn bị hình ảnh...</translation>
+      <translation>Đang chuẩn bị hình ảnh...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
@@ -4038,15 +3897,15 @@ to %1</source>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>Căng ra</translation>
+      <translation>Kéo giãn</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>Phù hợp</translation>
+      <translation>Vừa với màn hình</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation>Trồng trọt</translation>
+      <translation>Cắt khung</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
@@ -4065,12 +3924,12 @@ to %1</source>
       <translation>Đặt thời gian để sử dụng trong máy khách (dòng thời gian, dấu thời gian, vv) khi máy khách và máy chủ ở các múi giờ khác nhau.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Hiển thị địa chỉ IP cho camera và máy chủ và vai trò cho người dùng.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Khoảng thời gian mỗi camera trên bố cục sẽ được hiển thị nếu bạn bắt đầu Tour.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation>Hiển thị địa chỉ IP cho camera và máy chủ.</translation>
     </message>
   </context>
   <context>
@@ -4085,7 +3944,7 @@ to %1</source>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -4104,25 +3963,12 @@ to %1</source>
       <translation>%1 (Tour &quot;%2&quot; đang hoạt động)</translation>
     </message>
     <message>
-      <source>Zoom Window</source>
-      <translation>Phóng to cửa sổ</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation>I/O Module</translation>
     </message>
     <message>
       <source>Lo-Res</source>
       <translation>Lo-Res</translation>
-    </message>
-    <message>
-      <source>press and hold</source>
-      <comment>Soft Trigger</comment>
-      <translation>nhấn và giữ</translation>
-    </message>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Lịch trình bị vô hiêu hóa</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -4141,6 +3987,14 @@ to %1</source>
     <message>
       <source>Object Search</source>
       <translation>Tìm kiếm đối tượng</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>Hotspots</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Tắt tiếng</translation>
     </message>
   </context>
   <context>
@@ -4173,10 +4027,6 @@ to %1</source>
   <context>
     <name>QnNewVirtualCameraDialog</name>
     <message>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Camera ảo&quot; là bộ lưu trữ ảo cho các tệp video, có thể được tải lên bất kỳ máy chủ nào trên Hệ thống của bạn và được truy cập bởi bất kỳ người dùng nào.</translation>
-    </message>
-    <message>
       <source>Virtual Camera</source>
       <translation>Camera ảo</translation>
     </message>
@@ -4191,6 +4041,10 @@ to %1</source>
     <message>
       <source>Name cannot be empty</source>
       <translation>Tên không thể để trống</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -4259,71 +4113,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>Điều chỉnh cài đặt camera</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>Đây cũng là cần thiết để tạo/chỉnh sửa cài đặt trước PTZ và tour.</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>Điều khiển màn hình Video Walls</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>Xem sự kiện</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>Xem lưu trữ</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>Xuất lưu trữ</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>Xem bookmark</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>Tùy chỉnh Bookmark</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>Nhập người dùng</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, đầu ra thiết bị, 2-Way Audio, Soft Triggers.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPoeOverBudgetPolicy</name>
-    <message>
-      <source>Servers that support PoE monitoring</source>
-      <translation>Máy chủ hỗ trợ giám sát PoE</translation>
-    </message>
-  </context>
-  <context>
     <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Quản lý Bookmark</translation>
-    </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Thông báo sẽ được hiển thị cho đến khi người dùng tạo bookmark để mô tả sự kiện</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupSettingsWidget</name>
-    <message>
-      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation>Các cài đặt này chỉ áp dụng cho Hệ thống mà bạn đã đăng nhập và sẽ bị xóa trong các phiên bản sau.</translation>
     </message>
   </context>
   <context>
@@ -4452,7 +4245,7 @@ to %1</source>
     </message>
     <message>
       <source>Normal</source>
-      <translation>Chung</translation>
+      <translation>Bình thường</translation>
     </message>
     <message>
       <source>High</source>
@@ -4481,41 +4274,6 @@ to %1</source>
     <message>
       <source>Invalid</source>
       <translation>Vô hiệu</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>Màn %1 - %2x%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (chìa khóa)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Cao nhất (Hs)</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>Trung bình</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Hiệu suất cao</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>Riêng</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>Quarter Native</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation>Chọn thư mục...</translation>
     </message>
   </context>
   <context>
@@ -4582,43 +4340,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>Role %1 không %2 Cho phép</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Chọn các role không có quyền truy cập %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n trong số %1 chọn các role không có quyền truy cập %2</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Người dùng %1 không có quyền %2</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Chọn người dùng không có quyền truy cập %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n trong số %1 chọn người dùng không có quyền truy cập %2</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
@@ -4647,6 +4368,14 @@ to %1</source>
       <source>Enter Fullscreen</source>
       <translation>Vào chế độ toàn màn hình</translation>
     </message>
+    <message>
+      <source>Zoom Window</source>
+      <translation>Phóng to cửa sổ</translation>
+    </message>
+    <message>
+      <source>Move to a dedicated window</source>
+      <translation type="unfinished">Move to a dedicated window</translation>
+    </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
@@ -4656,7 +4385,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4694,11 +4423,15 @@ to %1</source>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation>Không có bookmark nào</translation>
+      <translation>Không có dấu trang</translation>
     </message>
     <message>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+      <source>N/A</source>
+      <translation>N/A</translation>
     </message>
   </context>
   <context>
@@ -4721,7 +4454,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy ảnh</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>Created</source>
@@ -4733,7 +4466,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
   </context>
   <context>
@@ -4744,7 +4477,7 @@ to %1</source>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Bất kỳ camera nào</translation>
+      <translation>Tất cả camera</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -4761,6 +4494,27 @@ to %1</source>
     <message>
       <source>Select cameras...</source>
       <translation>Chọn camera...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation>Bất kỳ bố cục nào</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation>Tất cả bố cục</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>Chọn bố cục...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>Bố cục %n</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4864,7 +4618,7 @@ to %1</source>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -4906,41 +4660,13 @@ to %1</source>
       <source>Backup</source>
       <translation>Sao lưu</translation>
     </message>
+    <message>
+      <source>Failover</source>
+      <translation>Chuyển đổi dự phòng</translation>
+    </message>
   </context>
   <context>
     <name>QnServerSettingsWidget</name>
-    <message>
-      <source>At least two servers are required for this feature.</source>
-      <translation>Ít nhất hai máy chủ được yêu cầu cho tính năng này.</translation>
-    </message>
-    <message>
-      <source>Max devices on this server:</source>
-      <translation>Thiết bị tối đa trên máy chủ này:</translation>
-    </message>
-    <message>
-      <source>Max cameras on this server:</source>
-      <translation>Camera tối đa trên máy chủ này:</translation>
-    </message>
-    <message>
-      <source>This server already has more than max devices</source>
-      <translation>Máy chủ này đã có nhiều hơn các thiết bị tối đa</translation>
-    </message>
-    <message>
-      <source>This server already has more than max cameras</source>
-      <translation>Máy chủ này đã có hơn camera max</translation>
-    </message>
-    <message>
-      <source>To avoid issues adjust max number of devices</source>
-      <translation>Để tránh các vấn đề điều chỉnh số lượng tối đa của thiết bị</translation>
-    </message>
-    <message>
-      <source>To avoid issues adjust max number of cameras</source>
-      <translation>Để tránh các vấn đề điều chỉnh số lượng tối đa của camera</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Sao lưu</translation>
-    </message>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -4958,23 +4684,20 @@ to %1</source>
       <translation>Chi tiết</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation>Máy chủ được bật chuyển đổi dự phòng sẽ tự động tiếp quản camera từ Máy chủ ngoại tuyến có cùng ID vị trí.</translation>
-    </message>
-    <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
       <translation>Chứng chỉ nhận được từ Máy chủ không khớp với chứng chỉ được ghim.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnSessionAwareTabbedDialog</name>
     <message>
-      <source>Unsaved changes:</source>
-      <translation>Chưa lưu thay đổi:</translation>
+      <source>Certificate details are not available</source>
+      <translation>Chi tiết chứng chỉ không có sẵn</translation>
     </message>
     <message>
-      <source>Save changes before exit?</source>
-      <translation>Lưu thay đổi trước khi thoát?</translation>
+      <source>To access certificate details, enable the Audit Trail feature.</source>
+      <translation>Để truy cập chi tiết chứng chỉ, hãy bật tính năng Báo cáo hành vi người dùng.</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
+      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
     </message>
   </context>
   <context>
@@ -5007,34 +4730,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Nhập người dùng</translation>
-    </message>
-  </context>
-  <context>
     <name>QnStatusOverlayController</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>Không có sẵn</translation>
-    </message>
-    <message>
-      <source>UNAUTHORIZED</source>
-      <translation>KHÔNG ĐƯỢC PHÉP</translation>
-    </message>
-    <message>
-      <source>SERVER UNAVAILABLE</source>
-      <translation>MÁY CHỦ KHÔNG CÓ SẴN</translation>
-    </message>
-    <message>
-      <source>NO ACCESS</source>
-      <translation>KHÔNG TRUY CẬP</translation>
-    </message>
-    <message>
-      <source>DEVICE DISABLED</source>
-      <translation>VÔ HIỆU HÓA THIẾT BỊ</translation>
-    </message>
     <message>
       <source>Device Settings</source>
       <translation>Cài đặt thiết bị</translation>
@@ -5052,37 +4748,28 @@ to %1</source>
       <translation>Chuẩn đoán</translation>
     </message>
     <message>
-      <source>Enable</source>
-      <translation>Cho phép</translation>
-    </message>
-    <message>
       <source>Activate License</source>
-      <translation>Bắt đầu Authorization</translation>
+      <translation>Kích hoạt giấy phép</translation>
     </message>
     <message>
-      <source>Please check authentication information</source>
-      <translation>Vui lòng kiểm tra thông tin xác thực</translation>
+      <source>Unlock</source>
+      <translation>Mở khóa</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation>KHÔNG CÓ LIVE STREAM</translation>
+      <source>Provide</source>
+      <translation>Cung cấp</translation>
     </message>
     <message>
-      <source>TOO MANY CONNECTIONS</source>
-      <translation>QUÁ NHIỀU KẾT NỐI</translation>
+      <source>Authorize</source>
+      <translation>Ủy quyền</translation>
     </message>
     <message>
-      <source>PASSWORD REQUIRED</source>
-      <translation>YÊU CÂU MẬT KHẨU</translation>
+      <source>Setup</source>
+      <translation>Thiết lập</translation>
     </message>
-    <message>
-      <source>Set for this Camera</source>
-      <translation>Đặt cho camera này</translation>
-    </message>
-    <message>
-      <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>PHIÊN BẢN FIRMWARE KHÔNG ĐƯỢC HỖ TRỢ</translation>
-    </message>
+  </context>
+  <context>
+    <name>QnStatusOverlayWidget</name>
     <message>
       <source>NOT ENOUGH LICENSES</source>
       <translation>KHÔNG ĐỦ GIẤY PHÉP</translation>
@@ -5092,28 +4779,68 @@ to %1</source>
       <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
-      <source>ARCHIVE ENCRYPTED</source>
-      <translation>LƯU TRỮ ĐƯỢC MÃ HÓA</translation>
+      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
+      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
     </message>
     <message>
-      <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation>Yêu cầu quản trị viên hệ thống của bạn nhập mật khẩu mã hóa để giải mã kho lưu trữ này</translation>
+      <source>UNAUTHORIZED</source>
+      <translation>KHÔNG ĐƯỢC PHÉP</translation>
     </message>
     <message>
-      <source>Unlock</source>
-      <translation>Mở khóa</translation>
+      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
+      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED</source>
+      <translation type="unfinished">UNSUPPORTED</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>YÊU CÂU MẬT KHẨU</translation>
+    </message>
+    <message>
+      <source>SITE SHUT DOWN</source>
+      <translation type="unfinished">SITE SHUT DOWN</translation>
+    </message>
+    <message>
+      <source>STREAM LIMITATION</source>
+      <translation type="unfinished">STREAM LIMITATION</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>THÔNG TIN BẮT BUỘC</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Cung cấp</translation>
+      <source>AUDIO ONLY</source>
+      <translation type="unfinished">AUDIO ONLY</translation>
     </message>
     <message>
-      <source>ACCESS DENIED</source>
-      <translation>TRUY CẬP BỊ TỪ CHỐI</translation>
+      <source>NO DATA</source>
+      <translation>Không có sẵn</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>KHÔNG TRUY CẬP</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation>KHÔNG CÓ QUYỀN XUẤT VIDEO</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>QUÁ NHIỀU KẾT NỐI</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>KHÔNG CÓ LIVE STREAM</translation>
+    </message>
+    <message>
+      <source>ARCHIVE ENCRYPTED</source>
+      <translation>LƯU TRỮ ĐƯỢC MÃ HÓA</translation>
+    </message>
+    <message>
+      <source>CERTIFICATE ERROR</source>
+      <translation type="unfinished">CERTIFICATE ERROR</translation>
     </message>
   </context>
   <context>
@@ -5239,6 +4966,67 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Insufficient permissions to store analytics data.</source>
       <translation>Không đủ quyền để lưu dữ liệu phân tích.</translation>
     </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn dung lượng. Chúng tôi khuyên bạn nên chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage</source>
+      <translation>Dữ liệu phân tích và chuyển động sẽ tiếp tục được lưu trữ trên bộ nhớ đã bị vô hiệu hóa</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Ghi vào vị trí lưu trữ bị vô hiệu hóa sẽ dừng lại. Tuy nhiên, việc xóa các đoạn phim lỗi thời khỏi nó sẽ tiếp tục.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, các bộ lưu trữ sao lưu khác sẽ bị vô hiệu hóa và tùy chọn &quot;Tất cả lưu trữ&quot; cho các thiết bị đã được định cấu hình sẽ được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot;</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Nếu bộ lưu trữ đám mây được kích hoạt để sao lưu, tùy chọn &quot;Tất cả lưu trữ&quot; cho các thiết bị đã được cấu hình sẽ được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot;</translation>
+    </message>
+    <message>
+      <source>Choose a read-write policy to define how interact with storage directories.</source>
+      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+    </message>
+    <message>
+      <source>Exclusive</source>
+      <translation type="unfinished">Exclusive</translation>
+    </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Isolated</source>
+      <translation type="unfinished">Isolated</translation>
+    </message>
+    <message>
+      <source>The Site Servers have different read-write policies for the storage</source>
+      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+    </message>
+    <message>
+      <source>URL: %1</source>
+      <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
+      <translation type="unfinished">URL: %1</translation>
+    </message>
+    <message>
+      <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
+      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+    </message>
+    <message>
+      <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
+      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
+    <message>
+      <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
+      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5279,10 +5067,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Chính</translation>
     </message>
     <message>
-      <source>%1 GB</source>
-      <translation>%1 Gb</translation>
-    </message>
-    <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>Quá nhỏ và phân vùng hệ thống được dành riêng và không được sử dụng để ghi nếu có đủ không gian lưu trữ khác có sẵn.</translation>
     </message>
@@ -5311,14 +5095,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>mạng</translation>
     </message>
     <message>
-      <source>usb</source>
-      <translation>usb</translation>
-    </message>
-    <message>
-      <source>%1 TB</source>
-      <translation>%1 TB</translation>
-    </message>
-    <message>
       <source>smb</source>
       <translation>smb</translation>
     </message>
@@ -5329,6 +5105,62 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Stores analytics and motion data</source>
       <translation>Lưu trữ dữ liệu phân tích và chuyển động</translation>
+    </message>
+    <message>
+      <source>cloud</source>
+      <translation>đám mây</translation>
+    </message>
+    <message>
+      <source>Path</source>
+      <translation>Đường dẫn</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Kiểu</translation>
+    </message>
+    <message>
+      <source>Purpose</source>
+      <translation>Mục đích</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>Kích thước</translation>
+    </message>
+    <message>
+      <source>Isolated</source>
+      <translation type="unfinished">Isolated</translation>
+    </message>
+    <message>
+      <source>Exclusive</source>
+      <translation type="unfinished">Exclusive</translation>
+    </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Không xác định</translation>
+    </message>
+    <message>
+      <source>removable</source>
+      <translation type="unfinished">removable</translation>
+    </message>
+    <message>
+      <source>Unknown size</source>
+      <translation type="unfinished">Unknown size</translation>
+    </message>
+    <message>
+      <source>The storage has different read-write policies across various Servers in the Site</source>
+      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+    </message>
+    <message>
+      <source>Click on the icon to see Servers list</source>
+      <translation type="unfinished">Click on the icon to see Servers list</translation>
+    </message>
+    <message>
+      <source>Read-Write Policy</source>
+      <translation type="unfinished">Read-Write Policy</translation>
     </message>
   </context>
   <context>
@@ -5393,11 +5225,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation>Ủy quyền</translation>
+      <translation>Giấy phép</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5406,10 +5238,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Updates</source>
       <translation>Cập nhật</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Người sử dụng</translation>
     </message>
     <message>
       <source>Security</source>
@@ -5434,6 +5262,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Advanced</source>
       <translation>Nâng cao</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Tích hợp</translation>
+    </message>
+    <message>
+      <source>Services</source>
+      <translation>Dịch vụ</translation>
+    </message>
+    <message>
+      <source>Failed to save site settings</source>
+      <translation type="unfinished">Failed to save site settings</translation>
     </message>
   </context>
   <context>
@@ -5463,10 +5303,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Xây dựng lại chỉ lưu trữ được hủy bỏ bởi người dùng</translation>
     </message>
     <message>
-      <source>Email address is not set for user %1</source>
-      <translation>Địa chỉ email không được thiết lập cho người dùng %1</translation>
-    </message>
-    <message>
       <source>Email address is not set.</source>
       <translation>Địa chỉ email không được thiết lập.</translation>
     </message>
@@ -5483,14 +5319,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Bạn không có thể ghi lại video từ camera.</translation>
     </message>
     <message>
-      <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>Xây dựng lại chỉ lưu trữ được hoàn thành trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-      <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>Xây dựng lại chỉ lưu trữ been hoàn thành trên máy chủ sau đây:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Tìm hiểu thêm</translation>
     </message>
@@ -5503,46 +5331,16 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Một số người dùng chưa đặt địa chỉ email của họ</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by email.</source>
-      <translation>Bạn không thể nhận Thông báo hệ thống bằng email.</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses.</source>
       <translation>Một số người dùng chưa đặt địa chỉ email của họ.</translation>
-    </message>
-    <message>
-      <source>They cannot receive System notifications by email.</source>
-      <translation>Họ không thể nhận thông báo Hệ thống bằng email.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
       <translation>Lỗi khi gửi email</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>Đồng bộ hoá lưu trữ từ xa đã hoàn tất</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>Đồng bộ hoá lưu trữ từ xa đang được tiến hành</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>Đồng bộ hoá lưu trữ từ xa đã được hoàn tất cho thiết bị sau:</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>Đã phát hiện sự cố về tính toàn vẹn của kho lưu trữ</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối Hệ thống của bạn với %1 &amp;mdash; giúp bạn có thể truy cập từ bất cứ đâu!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Hãy kiểm tra %1 &amp;mdash; kết nối với Hệ thống của bạn từ bất cứ đâu!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -5553,28 +5351,12 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Không có máy chủ nào có quyền truy cập internet để đồng bộ hóa thời gian</translation>
     </message>
     <message>
-      <source>The System has no internet access for time synchronization</source>
-      <translation>Hệ thống không truy cập được internet để đồng bộ hóa thời gian</translation>
-    </message>
-    <message>
-      <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>Không có máy chủ trực tuyến nào trong Hệ thống có quyền truy cập internet để đồng bộ hóa thời gian.</translation>
-    </message>
-    <message>
-      <source>Error occurred during remote archive synchronization</source>
-      <translation>Xảy ra lỗi trong quá trình đồng bộ hóa lưu trữ từ xa</translation>
-    </message>
-    <message>
       <source>Backup storage is not configured</source>
       <translation>Bộ nhớ sao lưu chưa được định cấu hình</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>Lịch biểu ghi camera không hợp lệ</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation>Đồng bộ hóa lưu trữ từ xa đã bị dừng</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
@@ -5589,28 +5371,169 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Dữ liệu phân tích có thể chiếm nhiều dung lượng.</translation>
     </message>
     <message>
-      <source>Remote archive synchronization is available</source>
-      <translation>Đồng bộ hóa lưu trữ từ xa khả dụng</translation>
-    </message>
-    <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
       <translation>Chúng tôi khuyến nghị chọn một vị trí khác thay vì phân vùng hệ thống.</translation>
+    </message>
+    <message>
+      <source>Local recording services overused</source>
+      <translation>Dịch vụ ghi cục bộ bị lạm dụng quá mức</translation>
+    </message>
+    <message>
+      <source>Cloud storage services overused</source>
+      <translation>Dịch vụ lưu trữ đám mây bị lạm dụng quá mức</translation>
+    </message>
+    <message>
+      <source>Paid integrations services overused</source>
+      <translation>Dịch vụ tích hợp trả phí bị sử dụng quá mức</translation>
+    </message>
+    <message>
+      <source>Intercom call</source>
+      <translation>Cuộc gọi Liên lạc nội bộ</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation>Cuộc gọi nhỡ liên lạc nội bộ</translation>
+    </message>
+    <message>
+      <source>The Site has no internet access for time synchronization</source>
+      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>System partition is used for analytics data</source>
+      <translation type="unfinished">System partition is used for analytics data</translation>
+    </message>
+    <message>
+      <source>Site suspended</source>
+      <translation type="unfinished">Site suspended</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>Reject intercom call</source>
+      <translation type="unfinished">Reject intercom call</translation>
+    </message>
+    <message>
+      <source>Email address is not set for your account</source>
+      <translation type="unfinished">Email address is not set for your account</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation>Đang gọi...</translation>
+    </message>
+    <message>
+      <source>Missed call</source>
+      <translation type="unfinished">Missed call</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage is not configured on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Storage is not configured on %n servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule is invalid</source>
+      <translation type="unfinished">Recording schedule is invalid</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid on %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Email address is not set for %n users</source>
+      <translation>
+        <numerusform>Địa chỉ email không được đặt cho %n người dùng</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Check out %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Check out %1</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization failed</source>
+      <translation type="unfinished">Remote archive synchronization failed</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation>
+        <numerusform>Bộ nhớ cho dữ liệu phân tích không được đặt trên Máy chủ %n</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connect to your Site from anywhere!</source>
+      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+    </message>
+    <message>
+      <source>No online server in the site has internet access for time synchronization.</source>
+      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+    </message>
+    <message>
+      <source>You cannot receive Site notifications by email.</source>
+      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+    </message>
+    <message>
+      <source>They cannot receive Site notifications by email.</source>
+      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some cameras are set to record in a mode they do not support.</source>
+      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Site will stop functioning soon</source>
+      <translation type="unfinished">Site will stop functioning soon</translation>
+    </message>
+    <message>
+      <source>Site has stopped functioning</source>
+      <translation type="unfinished">Site has stopped functioning</translation>
+    </message>
+    <message>
+      <source>Site will stop functioning today</source>
+      <translation type="unfinished">Site will stop functioning today</translation>
+    </message>
+    <message>
+      <source>Site will stop functioning tomorrow</source>
+      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+    </message>
+    <message numerus="yes">
+      <source>Site will stop functioning in %n days</source>
+      <translation type="unfinished">
+        <numerusform>Site will stop functioning in %n days</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Notification and interface languages differ</source>
+      <translation type="unfinished">Notification and interface languages differ</translation>
+    </message>
+    <message>
+      <source>Notifications language differs from the interface language</source>
+      <translation type="unfinished">Notifications language differs from the interface language</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Allow System to optimize device settings</source>
-      <translation>Cho phép Hệ thống tối ưu hóa cài đặt thiết bị</translation>
-    </message>
-    <message>
-      <source>Allow System to optimize camera settings</source>
-      <translation>Cho phép Hệ thống tối ưu hóa cài đặt camera</translation>
-    </message>
-    <message>
-      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Bao gồm các thông tin về hệ thống, chẳng hạn như mã camera và các phiên bản firmware, số lượng máy chủ, vv.</translation>
-    </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Không bao gồm bất kỳ thông tin cá nhân nào và hoàn toàn ẩn danh.</translation>
@@ -5624,12 +5547,24 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Bật tính năng tự động phát hiện camera và máy chủ cũng như kiểm tra trạng thái camera tự động</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation>Khi được bật, hệ thống sẽ liên tục phát hiện các camera và máy chủ mới và gửi yêu cầu khám phá tới các camera để cập nhật trạng thái.</translation>
-    </message>
-    <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
       <translation>Nếu Chuyển đổi dự phòng được bật, máy chủ vẫn có thể yêu cầu cập nhật trạng thái camera.</translation>
+    </message>
+    <message>
+      <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
+      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+    </message>
+    <message>
+      <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Allow optimize device settings</source>
+      <translation type="unfinished">Allow optimize device settings</translation>
+    </message>
+    <message>
+      <source>Allow optimize camera settings</source>
+      <translation type="unfinished">Allow optimize camera settings</translation>
     </message>
   </context>
   <context>
@@ -5659,266 +5594,33 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidget::Private</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Input device is not selected</source>
-      <translation>Thiết bị đầu vào không được chọn</translation>
+      <source>Custom</source>
+      <translation>Tùy chỉnh</translation>
     </message>
     <message>
-      <source>Streaming is not ready yet</source>
-      <translation>Luồng dữ liệu chưa sẵn sàng</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Lỗi mạng</translation>
-    </message>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Giữ để nói</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserProfileWidget</name>
-    <message>
-      <source>Login</source>
-      <translation>Đăng nhập</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Vai trò</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Emai</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation>Để kích hoạt xác thực thông báo, yêu cầu đặt lại mật khẩu</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>Tên vai trò không thể để trống.</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>Vai trò có cùng tên đã tồn tại.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>Tên vai trò khả dụng</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>Không được phép tùy chỉnh</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>Người dùng sẽ được phép trừ khi được thay đổi sau.</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>Chỉ định một vai trò mới</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>Xóa người dùng</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Vui lòng chọn hành động để thực hiện trên %n người dùng có vai trò</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>Thông tin về Vai trò</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Quyền</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera &amp; Nguồn</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Bố cục</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>Vai trò mới</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>Vai trò Mới %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>Thông tin người dùng</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Quyền</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera &amp; Nguồn</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Bố cục</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Người dùng mới...</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>Cài đặt Người dùng - %1 (chỉ đọc)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>Cài đặt Người dùng - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Bật</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>Người dùng bị tắt</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>Áp dụng thay đổi trước khi chuyển sang người dùng khác?</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Người dùng này chưa đăng ký %1</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation>Cho phép xác thực thông báo cho người dùng này</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation>Tìm hiểu thêm</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>Cục bộ</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Đăng nhập</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>Đăng nhập không thể để trống.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>Đăng nhập người dùng chỉ định đã tồn tại.</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>Người dùng được đổi tên. Mật khẩu phải được cập nhật.</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>Emai</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>Trường email không thể để trống.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Mật khẩu</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>Xác nhận mật khẩu</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>Mật khẩu không khớp.</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>người dùng %1 có email được chỉ định đã tồn tại.</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>Người dùng cục bộ</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 người dùng</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 thuộc về hệ thống này và được quản trị viên hệ thống quản lý hoàn toàn.</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 có thể truy cập vào nhiều Hệ thống. Quản trị viên chỉ có thể quản lý quyền của họ.</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation>Yêu cầu đặt lại mật khẩu</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>Chỉ cho phép các chữ cái, số và ký hiệu %1.</translation>
+      <source>Custom access rights</source>
+      <translation>Tùy chỉnh Quyền truy cập</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
-      <source>Email cannot be empty.</source>
-      <translation>Trường email không thể để trống.</translation>
+      <source>Email cannot be empty</source>
+      <translation>Trường email không thể để trống</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Email vô hiệu.</translation>
+      <source>Email is not valid</source>
+      <translation>Email vô hiệu</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Password không có sản phẩm nào.</translation>
+      <source>Password cannot be empty</source>
+      <translation>Mật khẩu không được để trống</translation>
     </message>
     <message>
-      <source>Avoid leading and trailing spaces.</source>
-      <translation>Tránh sử dụng dấu Space phía đầu và cuối.</translation>
+      <source>Avoid leading and trailing spaces</source>
+      <translation>Tránh khoảng trống ở đầu và cuối</translation>
     </message>
   </context>
   <context>
@@ -5968,38 +5670,27 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Mở trang web này?</translation>
+      <source>Integration settings...</source>
+      <translation>Cài đặt tích hợp...</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation>Trang Web</translation>
+      <source>Web Page settings...</source>
+      <translation>Cài đặt trang Web...</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Vẫn kết nối</translation>
+      <source>Auto-refresh every %1</source>
+      <translation type="unfinished">Auto-refresh every %1</translation>
     </message>
     <message>
-      <source>Web page settings...</source>
-      <translation>Cài đặt Trang Web...</translation>
-    </message>
-    <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>Bạn cố gắng mở
-%1
-nhưng trang web này hiển thị xác thực chứng chỉ không đáng tin cậy.
-Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn hiểu về các rủi ro, bạn vẫn có thể mở trang web.</translation>
+      <source>Refresh</source>
+      <translation>Làm mới</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bookmark</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -6007,16 +5698,16 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation>Bookmark chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
+      <translation>Dấu trang chỉ có thể được chỉnh sửa trên Máy chủ trực tuyến.</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation>Xóa bookmarks?</translation>
+      <translation>Xóa dấu trang?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
       <translation>
-        <numerusform>Xóa %n Bookmark?</numerusform>
+        <numerusform>Xóa %n dấu trang?</numerusform>
       </translation>
     </message>
   </context>
@@ -6025,13 +5716,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
       <translation>Để chuyển đổi giữa các camera, nhấn Shift + Mũi tên</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchNotificationsHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
     </message>
   </context>
   <context>
@@ -6074,37 +5758,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>
         <numerusform>Không thể xóa %n mục:</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchScreenRecordingHandler</name>
-    <message>
-      <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Chụp màn hình hệ thống con đã không được khởi tạo. Vui lòng thử lại.</translation>
-    </message>
-    <message>
-      <source>Recording in %1...</source>
-      <translation>Đang ghi ở %1...</translation>
-    </message>
-    <message>
-      <source>Recorded Video</source>
-      <translation>Video ghi lại</translation>
-    </message>
-    <message>
-      <source>Save Recording As...</source>
-      <translation>Lưu video cho...</translation>
-    </message>
-    <message>
-      <source>Failed to start recording</source>
-      <translation>Không thể bắt đầu ghi</translation>
-    </message>
-    <message>
-      <source>AVI (Audio/Video Interleaved)</source>
-      <translation>AVI (Tập tin hình ảnh âm thanh)</translation>
-    </message>
-    <message>
-      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation>Không thể mở tệp &quot;%1&quot;. Vui lòng kiểm tra xem thư mục có thể truy cập được không.</translation>
     </message>
   </context>
   <context>
@@ -6158,11 +5811,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Bức tường video</translation>
+      <translation>Tường video</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
-      <translation>Bức tường video %1</translation>
+      <translation>Tường video %1</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -6180,15 +5833,9 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Failed to apply changes</source>
       <translation>Không thể lưu các thay đổi</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Xóa %n mục?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Dừng Video Wall?</translation>
+      <translation>Dừng Tường Video?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -6197,12 +5844,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Stop</source>
       <translation>Dừng lại</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Xóa %n ma trận?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6228,165 +5869,41 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Activate License...</source>
       <translation>Kích hoạt Giấy phép...</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchVirtualCameraHandler</name>
-    <message>
-      <source>Failed to add virtual camera</source>
-      <translation>Không thể thêm camera ảo</translation>
-    </message>
-    <message>
-      <source>Open Virtual Camera Recordings...</source>
-      <translation>Mở bản ghi camera ảo...</translation>
-    </message>
-    <message>
-      <source>No video files found in selected folder</source>
-      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
-    </message>
-    <message>
-      <source>Stop uploading?</source>
-      <translation>Dừng tải lên?</translation>
-    </message>
-    <message>
-      <source>Already uploaded files will be kept.</source>
-      <translation>Các tệp đã tải lên sẽ được lưu giữ.</translation>
-    </message>
     <message numerus="yes">
-      <source>Selected file formats are not supported</source>
+      <source>Failed to open %n devices on the video wall:</source>
       <translation>
-        <numerusform>Định dạng tệp đã chọn không được hỗ trợ</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>Sử dụng .MKV, .AVI, .MP4 hoặc các tệp video khác.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Các tệp được chọn không có dấu thời gian</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files with correct timestamp are supported.</source>
-      <translation>Chỉ các tập tin video với dấu thời gian chính xác được hỗ trợ.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Các tệp đã chọn quá cũ</numerusform>
+        <numerusform>Không mở được %n thiết bị trên tường video:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <source>Failed to open %n cameras on the video wall:</source>
       <translation>
-        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+        <numerusform>Không mở được %n camera trên tường video:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <translation>
-        <numerusform>Tệp đã chọn đã được ghi lại trên %1 và %2, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+        <numerusform>Bạn không thể thêm vào Tường video các thiết bị mà bạn không có quyền Xem trực tiếp.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <translation>
-        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Bạn có thể tải các tệp này lên một phiên bản camera ảo khác.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
+        <numerusform>Bạn không thể thêm vào Tường video các camera mà bạn không có quyền Xem trực tiếp.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation>Không đủ dung lượng lưu trữ trên máy chủ</translation>
+      <source>Screen is locked and cannot be changed</source>
+      <translation>Màn hình bị khóa và không thể thay đổi được</translation>
     </message>
     <message>
-      <source>Selected files will not be uploaded</source>
-      <translation>Các tệp được chọn sẽ không được tải lên</translation>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
     </message>
     <message>
-      <source>Some files will not be uploaded</source>
-      <translation>Các tệp được chọn sẽ không được tải lên</translation>
-    </message>
-    <message>
-      <source>No new files to upload in selected folder</source>
-      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Một số cảnh quay có thể bị xóa sau khi tải lên các tệp này</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Không còn nhiều không gian trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng không gian. Lưu ý rằng nếu tệp tin đã chọn xuất hiện lâu nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>Để ngăn chặn điều này bạn có thể thêm bộ nhớ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa đầu tiên bằng cách thay đổi kho lưu giữ thời gian trong cài đặt máy ảnh.</translation>
-    </message>
-    <message>
-      <source>Upload anyway?</source>
-      <translation>Upload mọi cách?</translation>
-    </message>
-    <message>
-      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Người dùng &quot;%1&quot; hiện đang tải lên cảnh quay cho camera này.</translation>
-    </message>
-    <message>
-      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>Không thể tải lên vì một người dùng khác đang tải lên cho camera này.</translation>
-    </message>
-    <message>
-      <source>Could not finish upload to %1</source>
-      <translation>Không thể hoàn tất tải lên %1</translation>
-    </message>
-    <message>
-      <source>Make sure there is enough space on server storage.</source>
-      <translation>Đảm bảo có đủ dung lượng trên bộ nhớ máy chủ.</translation>
-    </message>
-    <message>
-      <source>Uploading footage</source>
-      <translation>Tải lên đoạn phim</translation>
-    </message>
-    <message>
-      <source>%1 has unsupported format.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 định dạng không được hỗ trợ.</translation>
-    </message>
-    <message>
-      <source>%1 does not have timestamp.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 không có dấu thời gian.</translation>
-    </message>
-    <message>
-      <source>%1 is older than allowed in camera archive settings.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 cũ hơn được cho phép trong cài đặt lưu trữ camera.</translation>
-    </message>
-    <message>
-      <source>%1 covers period for which video has already been uploaded.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
-    </message>
-    <message>
-      <source>%1 covers period for which video is being uploaded.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên.</translation>
+      <source>To add a Video Wall, the Site should be in active state. %1</source>
+      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -6407,32 +5924,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>There is another layout with the same name.</source>
       <translation>Có một bố cục khác có cùng tên.</translation>
     </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Người dùng sẽ vẫn có quyền truy cập vào %n tài nguyên đã xóa:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>Để xóa quyền truy cập, hãy đi tới Cài đặt người dùng.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>Tất cả người dùng với vai trò này sẽ nhận được quyền truy cập vào tài nguyên %n:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>Để xóa quyền truy cập, hãy mở phần Cài đặt vai trò.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Người dùng sẽ vẫn có quyền truy cập vào %n tài nguyên đã xóa:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Changes will affect other users</source>
       <translation>Thay đổi sẽ ảnh hưởng đến người dùng khác</translation>
@@ -6440,30 +5931,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
       <translation>Bố cục này được chia sẻ với những người dùng khác, vì vậy bạn cũng thay đổi nó cho họ.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Người dùng sẽ mất quyền truy cập vào các tài nguyên %n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Tất cả người dùng với vai trò này sẽ nhận được quyền truy cập vào tài nguyên %n:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>Xóa bố cục được chia sẻ %n?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>Những bố cục %n này được chia sẻ với những người dùng khác, vì vậy bạn cũng xóa nó cho họ.</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6482,12 +5949,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>You will lose access to following resources:</source>
       <translation>Bạn sẽ mất quyền truy cập vào các tài nguyên sau:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>Xóa %n người dùng?</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
@@ -6573,7 +6034,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Merge</source>
-      <translation>Gộp lại</translation>
+      <translation>Hợp nhất</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
@@ -6629,6 +6090,75 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
         <numerusform>Bạn sắp chuyển các trang web này sang máy chủ &quot;%1&quot;. Các trang web này ủy quyền tất cả các nội dung được yêu cầu và máy chủ ủy quyền sẽ thay đổi thành máy chủ &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation>
+        <numerusform>Xóa bố cục %n?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation>
+        <numerusform>%n mục chưa bị xóa.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete layout?</source>
+      <translation>Xóa bố cục?</translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>Xóa người dùng?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Xóa %n ma trận?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation>Tất cả thành viên của nhóm %1 và %2 sẽ có quyền truy cập vào bố cục này</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation>Chuyển đổi</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation>
+        <numerusform>Những bố cục này được chia sẻ với những người dùng khác nên chúng cũng sẽ bị xóa trong tài khoản của họ.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation>
+        <numerusform>%n bố cục được chia sẻ với những người dùng khác nên chúng cũng sẽ bị xóa trong tài khoản của họ.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <translation>
+        <numerusform>Xóa %n người dùng?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unable to move device</source>
+      <translation type="unfinished">Unable to move device</translation>
+    </message>
+    <message>
+      <source>Maximum number of devices for this server is reached</source>
+      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Bắt đầu Showreel</translation>
+    </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
@@ -6639,46 +6169,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>In selected area</source>
       <translation>Trong khu vực được chọn</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Camera đã chọn</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Thiết bị được chọn</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Chọn phương tiện</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>không xác định</translation>
-    </message>
-  </context>
-  <context>
-    <name>SourcePickerWidgetStrings</name>
-    <message>
-      <source>Select at least one Server</source>
-      <translation>Chọn ít nhất một Máy chủ</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Chọn ít nhất một người dùng</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Chọn ít nhất một thiết bị</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Chọn ít nhất một máy ảnh</translation>
-    </message>
-    <message>
-      <source>Select at least one I/O module</source>
-      <translation>Chọn ít nhất một mô-đun I/O</translation>
     </message>
   </context>
   <context>
@@ -6743,6 +6233,216 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Nguồn và %n camera khác</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%n Layouts</source>
+      <translation type="unfinished">%n Layouts</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Máy chủ nguồn</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation>
+        <numerusform>Máy chủ nguồn và %n máy chủ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Tất cả người dùng</translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Bất kỳ thiết bị nào</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Tất cả camera</translation>
+    </message>
+    <message>
+      <source>Any Server</source>
+      <translation>Bất kỳ máy chủ nào</translation>
+    </message>
+    <message>
+      <source>Any User</source>
+      <translation>Bất kỳ người dùng</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Lỗi</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Cảnh báo</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Thông tin</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Không xác định</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Tự động</translation>
+    </message>
+    <message>
+      <source>%n Servers</source>
+      <translation type="unfinished">%n Servers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>%n bổ sung</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n Người dùng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n nhóm</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation>Chọn</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Máy ảnh nguồn</translation>
+    </message>
+    <message>
+      <source>Developer Mode Info</source>
+      <translation type="unfinished">Developer Mode Info</translation>
+    </message>
+    <message>
+      <source>Is listed</source>
+      <translation type="unfinished">Is listed</translation>
+    </message>
+    <message>
+      <source>Is not listed</source>
+      <translation type="unfinished">Is not listed</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <translation type="unfinished">In</translation>
+    </message>
+    <message>
+      <source>%n removed subjects</source>
+      <translation type="unfinished">%n removed subjects</translation>
+    </message>
+    <message>
+      <source>%n removed devices</source>
+      <translation type="unfinished">%n removed devices</translation>
+    </message>
+    <message>
+      <source>%n removed cameras</source>
+      <translation type="unfinished">%n removed cameras</translation>
+    </message>
+    <message>
+      <source>%n removed servers</source>
+      <translation type="unfinished">%n removed servers</translation>
+    </message>
+    <message>
+      <source>%n removed layouts</source>
+      <translation type="unfinished">%n removed layouts</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n subjects more</source>
+      <translation type="unfinished">
+        <numerusform>%n subjects more</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%n devices more</source>
+      <translation type="unfinished">%n devices more</translation>
+    </message>
+    <message>
+      <source>%n cameras more</source>
+      <translation type="unfinished">%n cameras more</translation>
+    </message>
+    <message>
+      <source>%n servers more</source>
+      <translation type="unfinished">%n servers more</translation>
+    </message>
+    <message>
+      <source>%n layouts more</source>
+      <translation type="unfinished">%n layouts more</translation>
+    </message>
+  </context>
+  <context>
+    <name>TierUsageStrings</name>
+    <message>
+      <source>Number of servers per Site</source>
+      <translation type="unfinished">Number of servers per Site</translation>
+    </message>
+    <message>
+      <source>Number of devices per server</source>
+      <translation type="unfinished">Number of devices per server</translation>
+    </message>
+    <message>
+      <source>Number of items on layout</source>
+      <translation type="unfinished">Number of items on layout</translation>
+    </message>
+    <message>
+      <source>Number of days of archive</source>
+      <translation type="unfinished">Number of days of archive</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Video Wall</source>
+      <translation>Tường video</translation>
+    </message>
+    <message>
+      <source>Cross-Site features</source>
+      <translation type="unfinished">Cross-Site features</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeDurationWidget</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
+    </message>
+  </context>
+  <context>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
@@ -6764,42 +6464,111 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>UserListModel</name>
+    <name>UserGroupsWidget::Private</name>
     <message>
-      <source>Owner</source>
-      <translation>Chủ nhân</translation>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
     </message>
     <message>
-      <source>Administrator</source>
-      <translation>Giám sát viên</translation>
+      <source>No groups found</source>
+      <translation>Không tìm thấy nhóm nào</translation>
     </message>
     <message>
-      <source>View live video</source>
-      <translation>Xem video trực tiếp</translation>
+      <source>Change search criteria or create a new group</source>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo nhóm mới</translation>
     </message>
     <message>
-      <source>Adjust device settings</source>
-      <translation>Điều chỉnh cài đặt thiết bị</translation>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>Nhiều nhóm có cùng tên, điều này có thể dẫn đến nhầm lẫn. Để duy trì cấu trúc rõ ràng và có tổ chức, khuyến nghị nên đặt tên duy nhất cho mỗi nhóm.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n nhóm LDAP hiện có không được tìm thấy trong cơ sở dữ liệu LDAP.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>Xóa %n nhóm</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Adjust camera settings</source>
-      <translation>Điều chỉnh cài đặt camera</translation>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>Không xóa được nhóm %1.</translation>
     </message>
     <message>
-      <source>Use PTZ controls</source>
-      <translation>Sử dụng điều khiển PTZ</translation>
+      <source>Failed to delete group.</source>
+      <translation>Không xóa được nhóm.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>Không xóa được %n nhóm.</numerusform>
+      </translation>
     </message>
     <message>
-      <source>View video archives</source>
-      <translation>Lưu trữ Xem video</translation>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation>Một số nhóm vừa là nhóm mẹ vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Điều này có thể dẫn đến việc cấp quyền không chính xác.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
     </message>
     <message>
-      <source>Export video</source>
-      <translation>Video và xuất ra</translation>
+      <source>All Users</source>
+      <translation>Tất cả người dùng</translation>
     </message>
     <message>
-      <source>Control Video Walls</source>
-      <translation>Điều khiển màn hình Video Walls</translation>
+      <source>Users with Digest Authentication</source>
+      <translation>Người dùng có xác thực Digest</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>Không tìm thấy người dùng</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>Thay đổi tiêu chí tìm kiếm hoặc tạo người dùng mới</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Chỉnh sửa</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>Nhiều người dùng sử dụng cùng một thông tin đăng nhập, gây ra lỗi đăng nhập. Để giải quyết vấn đề này, hãy cập nhật thông tin đăng nhập của người dùng bị ảnh hưởng hoặc tắt/xóa các thông tin đăng nhập trùng lặp.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Xóa %n người dùng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>Máy chủ LDAP đang ngoại tuyến. Người dùng %n không thể đăng nhập.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>Không xóa được người dùng %1.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>Không thể xóa người dùng %n.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>Không tìm thấy %n người dùng LDAP hiện tại trong cơ sở dữ liệu LDAP</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6830,99 +6599,117 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
+    <name>VmsRulesDialogHelper</name>
     <message>
-      <source>Hide information</source>
-      <translation>Ẩn thông tin</translation>
+      <source>This action cannot be undone</source>
+      <translation>Không thể hoàn tác thao tác này</translation>
     </message>
     <message>
-      <source>Show information</source>
-      <translation>Hiển thị thông tin</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Ẩn hình thu nhỏ</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Hiển thị hình thu nhỏ</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Ngày cuối</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>7 ngày qua</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>30 ngày trước</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Được chọn trên Dòng thời gian</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Mọi lúc</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>không xác định</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Thiết bị trên bố cục</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Các camera trên bố cục</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Mọi thiết bị</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Tất cả camera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Thiết bị được chọn</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Camera đã chọn</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Chọn thiết bị...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Chọn máy ảnh...</translation>
+      <source>Reset all rules to defaults?</source>
+      <translation>Đặt lại tất cả các quy tắc về mặc định?</translation>
     </message>
     <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n thiết bị được chọn</numerusform>
+      <source>Delete %n rules?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n rules?</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n camera được chọn</numerusform>
-      </translation>
+  </context>
+  <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Đang lưu bố cục</translation>
     </message>
     <message>
-      <source>Chosen camera</source>
-      <translation>Camera được chọn</translation>
+      <source>Exporting video</source>
+      <translation>Xuất ra video</translation>
     </message>
     <message>
-      <source>Chosen device</source>
-      <translation>Thiết bị được chọn</translation>
+      <source>Stop Saving</source>
+      <translation>Ngừng lưu</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Dừng xuất file</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Chuyển mã là bắt buộc. Phiên xuất lại được khởi động lại.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Thu nhỏ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Áp dụng</translation>
+    </message>
+    <message>
+      <source>Unsaved changes:</source>
+      <translation>Chưa lưu thay đổi:</translation>
+    </message>
+    <message>
+      <source>Save changes before exit?</source>
+      <translation>Lưu thay đổi trước khi thoát?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>View Archive</source>
+      <translation>Xem lưu trữ</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation>Xuất lưu trữ</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation>Xem dấu trang</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Quản lý Dấu trang</translation>
+    </message>
+    <message>
+      <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
+      <translation>Tùy thuộc vào loại tài nguyên, sẽ cho phép người dùng sửa đổi cài đặt thiết bị hoặc điều khiển tường video.</translation>
+    </message>
+    <message>
+      <source>Allows users to access a resource and view live footage from a camera.</source>
+      <translation>Cho phép người dùng truy cập tài nguyên và xem cảnh quay trực tiếp từ camera.</translation>
+    </message>
+    <message>
+      <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
+      <translation>Cho phép người dùng điều khiển PTZ, sử dụng Âm thanh 2 chiều, Nút kích hoạt mềm và nút I/O.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Xem trực tiếp.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Nhập người dùng.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Chỉnh sửa cài đặt.</translation>
+    </message>
+    <message>
+      <source>Play Audio</source>
+      <translation type="unfinished">Play Audio</translation>
+    </message>
+    <message>
+      <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
+      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
     </message>
   </context>
   <context>
@@ -6951,14 +6738,14 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
-      <source>deleted camera</source>
-      <translation>camera bị xóa</translation>
+      <source>Add To List</source>
+      <translation type="unfinished">Add To List</translation>
     </message>
     <message>
-      <source>Unknown track</source>
-      <translation>Theo dõi không xác định</translation>
+      <source>Create New List...</source>
+      <translation type="unfinished">Create New List...</translation>
     </message>
   </context>
   <context>
@@ -7141,6 +6928,58 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Backup is not supported for this device</source>
       <translation>Sao lưu không được hỗ trợ cho thiết bị này</translation>
     </message>
+    <message>
+      <source>Nothing to backup</source>
+      <translation>Không có gì để sao lưu</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Dịch vụ không đầy đủ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required</source>
+      <translation>
+        <numerusform>Yêu cầu dịch vụ lưu trữ đám mây %n phù hợp</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <translation>
+        <numerusform>%n MP</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Megapixels</source>
+      <translation>
+        <numerusform>%n Megapixel</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unknown resolution</source>
+      <translation>Độ phân giải không xác định</translation>
+    </message>
+    <message>
+      <source>No suitable cloud storage services available</source>
+      <translation>Không có dịch vụ lưu trữ đám mây phù hợp</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services available</source>
+      <translation>
+        <numerusform>%n dịch vụ lưu trữ đám mây phù hợp</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Độ Phân Giải</translation>
+    </message>
+    <message>
+      <source>Setting was changed</source>
+      <translation>Cài đặt đã được thay đổi</translation>
+    </message>
+    <message>
+      <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+      <translation>&quot;Tất cả tùy chọn lưu trữ&quot; đã được thay đổi thành &quot;Chuyển động, Đối tượng, Dấu trang&quot; do tính năng sao lưu bộ nhớ đám mây đã được bật</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7166,8 +7005,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   <context>
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
-      <source>Nothing to backup</source>
-      <translation>Không có gì để sao lưu</translation>
+      <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <translation>Có nhiều camera được sao lưu hơn các dịch vụ có sẵn. Vui lòng tắt sao lưu cho một số camera hoặc thêm các dịch vụ phù hợp hơn. Nếu không, nó sẽ được thực hiện tự động vào %1</translation>
     </message>
   </context>
   <context>
@@ -7185,18 +7024,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Camera mới được thêm vào</translation>
     </message>
     <message>
-      <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation>Cài đặt của camera mới được thêm vào sẽ áp dụng cho tất cả các máy chủ trong hệ thống.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation>Tính năng sao lưu sẽ được bật cho các camera mới được thêm vào trên tất cả các máy chủ trong hệ thống.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation>Tính năng sao lưu sẽ bị tắt cho các camera mới được thêm vào trên tất cả các máy chủ trong hệ thống.</translation>
-    </message>
-    <message>
       <source>Storage Management</source>
       <translation>Quản lý lưu trữ</translation>
     </message>
@@ -7209,6 +7036,30 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
       <translation>Để kích hoạt tính năng sao lưu, hãy thêm nhiều ổ đĩa hơn để sử dụng chúng làm bộ nhớ dự phòng trong %1</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Máy chủ đang ngoại tuyến</translation>
+    </message>
+    <message>
+      <source>Backup settings are not available</source>
+      <translation>Cài đặt sao lưu không có sẵn</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation>Áp dụng cho tất cả các máy chủ</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
+      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -7242,27 +7093,20 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       </translation>
     </message>
     <message>
-      <source>Footage from these cameras is backed up through to %1 %2</source>
-      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation>Cảnh quay từ camera này được sao lưu đến %1 %2</translation>
-    </message>
-    <message>
       <source>The progress will be displayed once the backup process starts</source>
       <translation>Tiến trình sẽ được hiển thị khi quá trình sao lưu bắt đầu</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
-      <source>deleted camera</source>
-      <translation>camera bị xóa</translation>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
+      <translation>Cảnh quay từ camera này được sao lưu đến %1 %2</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation>Không có bookmark nào</translation>
+      <translation>Không có dấu trang</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7276,6 +7120,21 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation>Đang gọi...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Mở</translation>
+    </message>
+    <message>
+      <source>Missed call</source>
+      <translation type="unfinished">Missed call</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
@@ -7285,28 +7144,16 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Applying changes...</source>
       <translation>Áp dụng những thay đổi...</translation>
     </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation>Buộc phát hiện chuyển động</translation>
+    </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <name>nx::vms::client::desktop::CameraButtonManager</name>
     <message>
-      <source>Heater</source>
-      <translation>Sưởi</translation>
-    </message>
-    <message>
-      <source>Wiper</source>
-      <translation>Cần gạt</translation>
-    </message>
-    <message>
-      <source>Mute</source>
-      <translation>Tắt tiếng</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Bật tiếng</translation>
-    </message>
-    <message>
-      <source>Open Door</source>
-      <translation>Mở Cửa</translation>
+      <source>Disabled by schedule</source>
+      <translation>Lịch trình bị vô hiêu hóa</translation>
     </message>
   </context>
   <context>
@@ -7370,10 +7217,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Xoay và Nghiêng</translation>
     </message>
     <message>
-      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Cài đặt chất lượng và tốc độ khung hình (FPS) trong Lịch ghi âm sẽ trở nên không có liên quan.</translation>
-    </message>
-    <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>Máy chủ sẽ không đẩy cài đặt thời gian vào camera.</translation>
     </message>
@@ -7388,12 +7231,99 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Tự động</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation>Video được ghi trên bộ nhớ nội bộ của camera sẽ được tự động tải lên kho lưu trữ chính.</translation>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
+      <translation>Cài đặt chất lượng và tốc độ khung hình (FPS) trong Lịch ghi âm sẽ trở nên không có liên quan</translation>
+    </message>
+    <message>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation>Mở camera</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation>Mở Camera trong Tab mới</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation>Mở Camera tại chỗ</translation>
+    </message>
+    <message>
+      <source>Open Layout in new Tab</source>
+      <translation type="unfinished">Open Layout in new Tab</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation>Chỉ điểm</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation>Đặt điểm Hotspot</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>Không có sẵn</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>KHÔNG TRUY CẬP</translation>
+    </message>
+    <message>
+      <source>Select Target...</source>
+      <translation type="unfinished">Select Target...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation>Màu sắc</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation>Chỉ điểm</translation>
+    </message>
+    <message>
+      <source>Target resource does not exist</source>
+      <translation type="unfinished">Target resource does not exist</translation>
+    </message>
+    <message>
+      <source>Select Camera or Layout...</source>
+      <translation type="unfinished">Select Camera or Layout...</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Đích đến</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Select Hotspot Target</source>
+      <translation type="unfinished">Select Hotspot Target</translation>
     </message>
   </context>
   <context>
@@ -7425,6 +7355,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Use License</source>
       <translation>
         <numerusform>Sử dụng giấy phép</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation>
+        <numerusform>Sử dụng dịch vụ</numerusform>
       </translation>
     </message>
   </context>
@@ -7467,12 +7403,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Buộc phát hiện chuyển động</translation>
     </message>
     <message>
-      <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation>Chọn các khu vực trên bản xem trước để đặt độ nhạy đã chọn.</translation>
+      <source>Select areas on the preview to set chosen sensitivity for</source>
+      <translation>Chọn các khu vực trên bản xem trước để đặt độ nhạy đã chọn</translation>
     </message>
     <message>
-      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation>Chọn độ nhạy phát hiện chuyển động và chọn một số khu vực trên bản xem trước để đặt độ nhạy đó.</translation>
+      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
+      <translation>Chọn độ nhạy phát hiện chuyển động và chọn một số khu vực trên bản xem trước để đặt độ nhạy đó</translation>
     </message>
   </context>
   <context>
@@ -7522,13 +7458,13 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Một số dữ liệu và cài đặt có thể không tương thích với camera mới</translation>
     </message>
     <message>
-      <source>%1 will be removed from the System and replaced by the selected camera</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 sẽ bị xóa khỏi Hệ thống và được thay thế bằng camera đã chọn</translation>
-    </message>
-    <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
       <translation>Không thể thực hiện thao tác Thay thế camera do Máy chủ không khả dụng.</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the Site and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
     </message>
   </context>
   <context>
@@ -7542,24 +7478,24 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>dựa trên thời gian máy chủ</translation>
     </message>
     <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>Lựa chọn vùng trên biểu đồ ghi để áp dụng các thông số chọn.</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>Đặt các thông số ghi và chọn lịch trình ghi trên các ô lưới.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Giá trị tối thiểu cao có thể dẫn đến giảm thời lượng lưu trữ trên các thiết bị khác.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Giá trị tối thiểu cao có thể dẫn đến giảm thời lượng lưu trữ trên các camera khác.</translation>
-    </message>
-    <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
       <translation>Thời gian ghi trước cao sẽ tăng mức sử dụng RAM trên máy chủ</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to</source>
+      <translation>Lựa chọn vùng trên biểu đồ ghi để áp dụng các thông số chọn</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
+      <translation>Đặt các thông số ghi và chọn lịch trình ghi trên các ô lưới</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices</source>
+      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên các thiết bị khác</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras</source>
+      <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera</translation>
     </message>
   </context>
   <context>
@@ -7592,12 +7528,16 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>No cameras available</source>
       <translation>Không có camera nào khả dụng</translation>
     </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Máy ảnh nguồn</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Recording</source>
@@ -7671,7 +7611,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Correction Fish-Eye (Dewarping)</translation>
+      <translation>Làm phẳng</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7708,6 +7648,14 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>Hotspots</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Tích hợp</translation>
     </message>
   </context>
   <context>
@@ -7754,23 +7702,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-      <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 được sử dụng</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 là bắt buộc</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
@@ -7803,21 +7734,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Select</source>
       <translation>Chọn</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
-    <message>
-      <source>No filter</source>
-      <translation>Không lọc</translation>
-    </message>
-    <message>
-      <source>Main storage only</source>
-      <translation>Chỉ bộ nhớ chính</translation>
-    </message>
-    <message>
-      <source>Backup storage only</source>
-      <translation>Chỉ bộ nhớ sao lưu</translation>
     </message>
   </context>
   <context>
@@ -7945,16 +7861,16 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Giới thiệu Bố cục %1</translation>
     </message>
     <message>
-      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation>Bố cục %1 là &lt;b&gt;bố cục xuyên hệ thống&lt;/b&gt; cho phép bạn làm việc với các thiết bị từ các Hệ thống khác nhau. Hiện tại, chỉ có một số tính năng của bố cục thông thường là khả dụng, nhưng chúng tôi sẽ tiếp tục mở rộng khả năng của Bố cục %1 trong các phiên bản sau</translation>
-    </message>
-    <message>
       <source>Read more on the %1</source>
       <translation>Đọc thêm trên %1</translation>
     </message>
     <message>
       <source>help page</source>
       <translation>trang trợ giúp</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
     </message>
   </context>
   <context>
@@ -7971,10 +7887,17 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CommonMessageBar</name>
+    <message>
+      <source>Close</source>
+      <translation>Đóng cửa</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Video Wall bị xóa trên máy chủ và sẽ bị đóng.</translation>
+      <translation>Tường Video bị xóa trên máy chủ và sẽ bị đóng.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
@@ -7986,7 +7909,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation>Không thể kết nối với máy chủ được chọn</translation>
+      <translation>Không thể kết nối với máy chủ đã chọn</translation>
     </message>
     <message>
       <source>Re-authentication required</source>
@@ -8003,52 +7926,78 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>Xác nhận</translation>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Enter access link to continue your session</source>
+      <translation>Nhập liên kết truy cập để tiếp tục phiên của bạn</translation>
+    </message>
+    <message>
+      <source>Your session has expired. Please sign in again with your link to continue.</source>
+      <translation>Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại bằng liên kết của bạn để tiếp tục.</translation>
+    </message>
+    <message>
+      <source>Authentication details are incorrect</source>
+      <translation>Chi tiết xác thực không chính xác</translation>
+    </message>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Đăng nhập vào %1</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to disconnect?</source>
+      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Ngắt kết nối</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
-      <source>Local System owner is absent or disabled.</source>
-      <translation>Chủ sở hữu Hệ thống cục bộ vắng mặt hoặc bị vô hiệu hóa.</translation>
+      <source>Internal error. Please try again later.</source>
+      <translation>Lỗi nội bộ. Vui lòng thử lại sau.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Không có Máy chủ nào của bạn được kết nối với Internet.</translation>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Không có Máy chủ nào của bạn có kết nối với %1.</translation>
     </message>
     <message>
-      <source>System connected to %1</source>
+      <source>Local Site owner is absent or disabled.</source>
+      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+    </message>
+    <message>
+      <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Hệ thống kết nối với %1</translation>
+      <translation type="unfinished">Site connected to %1</translation>
     </message>
     <message>
-      <source>Failed to connect System to %1</source>
+      <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối hệ thống lỗi %1</translation>
+      <translation type="unfinished">Failed to connect Site to %1</translation>
     </message>
     <message>
-      <source>Connect System to %1</source>
+      <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối Hệ thống với %1</translation>
+      <translation type="unfinished">Connect Site to %1</translation>
     </message>
     <message>
-      <source>Connect System to %1?</source>
+      <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kết nối Hệ thống với %1?</translation>
+      <translation type="unfinished">Connect Site to %1?</translation>
     </message>
     <message>
-      <source>Enter your account password to connect System to %1</source>
+      <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Nhập mật khẩu tài khoản của bạn để kết nối Hệ thống với %1</translation>
+      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
     </message>
     <message>
       <source>Connect</source>
-      <comment>Connect current System to cloud</comment>
+      <comment>Connect current Site to cloud</comment>
       <translation>Kết nối</translation>
-    </message>
-    <message>
-      <source>Internal error. Please try again later.</source>
-      <translation>Lỗi bên trong. Vui lòng thử lại sau.</translation>
     </message>
   </context>
   <context>
@@ -8070,18 +8019,18 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Mật khẩu quản trị viên</translation>
     </message>
     <message>
-      <source>Merge Server to the System</source>
+      <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation>Hợp nhất Máy chủ vào Hệ thống</translation>
+      <translation type="unfinished">Merge Server to the Site</translation>
     </message>
     <message>
-      <source>Enter your account password to merge Server to the System</source>
-      <translation>Nhập mật khẩu tài khoản của bạn để hợp nhất Máy chủ với Hệ thống</translation>
+      <source>Enter your account password to merge Server to the Site</source>
+      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
     </message>
     <message>
       <source>Merge</source>
-      <comment>Merge Server to the current System (dialog button text)</comment>
-      <translation>Gộp lại</translation>
+      <comment>Merge Server to the current Site (dialog button text)</comment>
+      <translation>Hợp nhất</translation>
     </message>
   </context>
   <context>
@@ -8107,8 +8056,8 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Yêu cầu thời gian ra</translation>
     </message>
     <message>
-      <source>New System</source>
-      <translation>Hệ thống mới</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
@@ -8129,6 +8078,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Các camera đã chọn không hỗ trợ các chế độ ghi trong Lịch biểu Ghi. Các chế độ ghi không được hỗ trợ sẽ được thay đổi thành &quot;Luôn Ghi&quot;.</translation>
     </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation>Chế độ ghi sẽ không được kích hoạt trên một số camera.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
@@ -8140,20 +8093,59 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>Camera này yêu cầu mật khẩu được thiết lập.</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras require password to be set up.</source>
-      <translation>Một số camera được chọn yêu cầu mật khẩu để được thiết lập.</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>Yêu cầu quản trị viên hệ thống của bạn làm điều đó.</translation>
-    </message>
-    <message>
       <source>Set Password</source>
       <translation>Đặt mật khẩu</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up</source>
+      <translation>Camera này yêu cầu mật khẩu được thiết lập</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up</source>
+      <translation>Một số camera được chọn yêu cầu phải thiết lập mật khẩu</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
+      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>Thiết bị ghi âm không hỗ trợ các định dạng âm thanh phù hợp. Vui lòng chọn thiết bị âm thanh khác hoặc &quot;không có&quot; trong cài đặt Ghi màn hình.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Không thể phát hiện độ phân giải chụp</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>Không thể tìm thấy các bộ mã hóa video '%1'.</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>Chiều rộng màn hình phải có một số nhân của 8.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>Không thể khởi tạo bộ mã hóa video.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>Không thể khởi tạo thiết bị âm thanh &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>Không thể khởi động các thiết bị âm thanh chính.</translation>
     </message>
   </context>
   <context>
@@ -8168,7 +8160,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation>IP / Tên máy chủ / RTSP / UDP</translation>
+      <translation>IP / Hostname / Liên kết RTSP / Liên kết UDP</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -8218,7 +8210,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Searching...</source>
-      <translation>Đang tìm...</translation>
+      <translation>Đang tìm kiếm...</translation>
     </message>
     <message>
       <source>No devices found</source>
@@ -8253,8 +8245,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Tìm kiếm thiết bị trên mạng bị hạn chế đối với camera hỗ trợ kết nối HTTPS. Điều này có thể được thay đổi trong cài đặt %1.</translation>
     </message>
     <message>
-      <source>System Administration</source>
-      <translation>Quản trị hệ thống</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
+    </message>
+    <message>
+      <source>Maximum number of Devices for the Site is reached</source>
+      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
     </message>
   </context>
   <context>
@@ -8276,7 +8272,99 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation>Để sử dụng phần mềm, bạn phải đồng ý với thỏa thuận cấp phép người dùng cuối</translation>
+      <translation>Để sử dụng phần mềm, bạn phải đồng ý với thỏa thuận cấp phép dành cho người dùng cuối</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>Lọc Rows tương tự</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>Sao chép vào clipboard lựa chọn</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>Lựa chọn Export to File...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>Chọn tất cả</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Xóa bộ lọc</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Mô tả</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>Không có sự kiện</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>Tất cả hành động</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>Nhật ký sự kiện trong khoảng thời gian từ %1 đến %2 - %n sự kiện được tìm thấy</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>Nhật ký sự kiện cho %1 - %n sự kiện được tìm thấy</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>Xuất khẩu chọn lọc sự kiện để nộp</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Ngày / thời gian</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>Sự kiện</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Nguồn</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>Hoạt động</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Đích đến</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Mô tả</translation>
+    </message>
+    <message>
+      <source>Open event video</source>
+      <translation type="unfinished">Open event video</translation>
+    </message>
+    <message>
+      <source>Open event device</source>
+      <translation type="unfinished">Open event device</translation>
+    </message>
+    <message>
+      <source>Open event camera</source>
+      <translation type="unfinished">Open event camera</translation>
     </message>
   </context>
   <context>
@@ -8289,12 +8377,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>Events</source>
@@ -8333,10 +8421,14 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   </context>
   <context>
     <name>nx::vms::client::desktop::EventTile</name>
+    <message>
+      <source>UNKNOWN</source>
+      <translation type="unfinished">UNKNOWN</translation>
+    </message>
     <message numerus="yes">
-      <source>...and %n more</source>
-      <translation>
-        <numerusform>... và %n hơn nữa</numerusform>
+      <source> + %n</source>
+      <translation type="unfinished">
+        <numerusform> + %n</numerusform>
       </translation>
     </message>
   </context>
@@ -8355,15 +8447,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Định dạng đã chọn không được hỗ trợ bởi thư viện FFMPEG.</translation>
+      <translation>Định dạng đã chọn không được thư viện FFMPEG hỗ trợ.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>Thư viện FFMPEG.</translation>
+      <translation>Lỗi thư viện FFMPEG.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Video hay mã hóa âm thanh không thể tương thích với các định dạng đã chọn.</translation>
+      <translation>Codec video hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8382,12 +8474,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Yêu cầu chuyển mã video.</translation>
     </message>
     <message>
-      <source>Archive is encrypted.</source>
-      <translation>Lưu trữ được mã hóa.</translation>
-    </message>
-    <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Lưu trữ hiện không có sẵn. Vui lòng thử lại sau.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Mở khóa phần lưu trữ này để xuất nội dung.</translation>
     </message>
   </context>
   <context>
@@ -8450,7 +8542,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation>Xóa bookmarks</translation>
+      <translation>Xóa Dấu trang</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
@@ -8504,6 +8596,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
       <translation>Xuất video không khả dụng: Camera này không có lưu trữ video trong khoảng thời gian đã chọn.</translation>
     </message>
+    <message>
+      <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
+      <translation>Bạn không có quyền xuất bản lưu trữ cho một số camera đã chọn. Video từ những camera đó sẽ không được xuất sang tệp đích.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -8529,7 +8625,46 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>No Failover</source>
-      <translation>Không có chuyển đổi dự phòng</translation>
+      <translation>Không chuyển đổi dự phòng</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FailoverWidget</name>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+      <translation>Máy chủ được bật chuyển đổi dự phòng sẽ tự động tiếp quản camera từ Máy chủ ngoại tuyến có cùng ID vị trí.</translation>
+    </message>
+    <message>
+      <source>Failover</source>
+      <translation>Chuyển đổi dự phòng</translation>
+    </message>
+    <message>
+      <source>Max devices on this server:</source>
+      <translation>Thiết bị tối đa trên máy chủ này:</translation>
+    </message>
+    <message>
+      <source>Max cameras on this server:</source>
+      <translation>Camera tối đa trên máy chủ này:</translation>
+    </message>
+    <message>
+      <source>At least two servers are required for this feature.</source>
+      <translation>Ít nhất hai máy chủ được yêu cầu cho tính năng này.</translation>
+    </message>
+    <message>
+      <source>This server already has more than max devices</source>
+      <translation>Máy chủ này đã có nhiều hơn các thiết bị tối đa</translation>
+    </message>
+    <message>
+      <source>This server already has more than max cameras</source>
+      <translation>Máy chủ này đã có hơn camera max</translation>
+    </message>
+    <message>
+      <source>To avoid issues adjust max number of devices</source>
+      <translation>Để tránh các vấn đề điều chỉnh số lượng tối đa của thiết bị</translation>
+    </message>
+    <message>
+      <source>To avoid issues adjust max number of cameras</source>
+      <translation>Để tránh các vấn đề điều chỉnh số lượng tối đa của camera</translation>
     </message>
   </context>
   <context>
@@ -8598,6 +8733,105 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>Xem sự kiện</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation>Tạo sự kiện</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 nhóm</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 và %n nhóm nữa</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Kế thừa %1 quyền từ</translation>
+    </message>
+    <message>
+      <source>View video without redaction</source>
+      <translation type="unfinished">View video without redaction</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Delete failed</source>
+      <translation>Xóa không thành công</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation>Áp dụng thay đổi?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>loại bỏ</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation>Nhóm mới</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Nhóm mới %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation>Lưu thay đổi</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Nhập mật khẩu tài khoản của bạn</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Lưu</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Không thể lưu các thay đổi</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation>Xóa nhóm</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Group name cannot be empty</source>
+      <translation>Tên nhóm không được để trống</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists</source>
+      <translation>Nhóm có cùng tên đã tồn tại</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes to %1 group</source>
+      <translation>Không thể áp dụng các thay đổi cho nhóm %1</translation>
+    </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation>Nhóm hiện tại là thành viên của tất cả các nhóm được chọn trên thẻ này và kế thừa quyền từ mỗi nhóm.</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation>Chọn một hoặc nhiều nhóm mà nhóm hiện tại sẽ kế thừa quyền</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -8633,48 +8867,28 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
   <context>
     <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
     <message>
-      <source>Systems will be merged shortly</source>
-      <translation>Hệ thống sẽ được sáp nhập ngay</translation>
-    </message>
-    <message>
-      <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>Máy chủ từ Hệ thống khác sẽ thêm vào trong cây tài nguyên.</translation>
-    </message>
-    <message>
-      <source>Connecting to the current System...</source>
-      <translation>Đang kết nối với hệ thống hiện tại...</translation>
-    </message>
-    <message>
-      <source>Server will be connected to System shortly</source>
-      <translation>Máy chủ sẽ được kết nối với Hệ thống ngay</translation>
-    </message>
-    <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
       <translation>Nó sẽ xuất hiện trong tài nguyên hình cây khi đồng bộ hóa cơ sở dữ liệu kết thúc.</translation>
     </message>
     <message>
-      <source>Failed to merge %1 to our system.</source>
-      <translation>Không thể hợp nhất %1 vào hệ thống của chúng tôi.</translation>
+      <source>Sites will be merged shortly</source>
+      <translation type="unfinished">Sites will be merged shortly</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
     <message>
-      <source>Access granted by:</source>
-      <translation>Truy cập được cấp bởi:</translation>
+      <source>Servers from the other Site will appear in the resource tree.</source>
+      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
     </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>và %n nhiều hơn nữa</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
-      <source>%1 Layout</source>
-      <translation>Bố cục %1</translation>
+      <source>Connecting to the current Site...</source>
+      <translation type="unfinished">Connecting to the current Site...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to Site shortly</source>
+      <translation type="unfinished">Server will be connected to Site shortly</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our site.</source>
+      <translation type="unfinished">Failed to merge %1 to our site.</translation>
     </message>
   </context>
   <context>
@@ -8685,7 +8899,30 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation>Sao chép vị trí liên kết</translation>
+      <translation>Sao chép liên kết vị trí</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutActionHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>Lưu bố cục thành</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>Nhập tên bố cục:</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation>Lưu bố cục dưới dạng đám mây</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Bố cục mới</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>Nhập tên của bố cục để tạo:</translation>
     </message>
   </context>
   <context>
@@ -8715,10 +8952,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Không thể đọc được hình ảnh</translation>
     </message>
     <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Hình ảnh quá lớn. Kích thước tối đa là %1 MB</translation>
-    </message>
-    <message>
       <source>Picture cannot be loaded</source>
       <translation>Không thể tải hình ảnh</translation>
     </message>
@@ -8734,15 +8967,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <translation>Dãy số tùy chọn có thể được gán cho bố cục để nhận dạng và truy cập nhanh</translation>
     </message>
     <message>
-      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation>ID này đã được sử dụng trong Hệ thống. Sử dụng nút Tạo để tìm ID miễn phí.</translation>
+      <source>This ID is already in use. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Background</source>
@@ -8766,6 +8999,140 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>OFFLINE</source>
       <translation>OFFLINE</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation>KHÔNG CÓ QUYỀN XUẤT VIDEO</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation>Ngắt kết nối máy chủ LDAP?</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Ngắt kết nối</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation>Phục hồi cài đặt</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Nhập mật khẩu tài khoản của bạn</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Thiết lập lại</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Kết nối thất bại</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation>Xóa người dùng và nhóm LDAP hiện tại?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation>Có vẻ như bạn đã thay đổi máy chủ LDAP. Bạn nên xóa tất cả người dùng và nhóm LDAP hiện có trước khi nhập người dùng và nhóm từ máy chủ LDAP mới.</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Có</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Áp dụng cài đặt</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Áp dụng</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation>Đồng bộ hóa người dùng và nhóm LDAP</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation>Đồng bộ hóa</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation>Kết nối OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Không thể lưu các thay đổi</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Cannot connect to LDAP server</source>
+      <translation>Không thể kết nối với máy chủ LDAP</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kênh.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation>Bạn chưa cài đặt giấy phép hợp lệ. Vui lòng kích hoạt giấy phép thương mại hoặc dùng thử của bạn.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Xuất</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 hiện đang được sử dụng</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Cần có tối thiểu %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>%n hủy kích hoạt còn lại.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>Hủy kích hoạt giấy phép?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>Hủy kích hoạt</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>Xuất bản quyền vào một tệp tin</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Gỡ bỏ</translation>
     </message>
   </context>
   <context>
@@ -8810,10 +9177,10 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
 Nhật ký Cấp độ &quot;%1&quot; sẽ cung cấp cho bạn thông tin chi tiết hơn.</translation>
     </message>
     <message>
-      <source>The selected Logging Level may degrade your system&apos;s performance.
+      <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation>Mức ghi nhật ký đã chọn có thể làm giảm hiệu suất của hệ thống.
-Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau khi bạn đã thu thập đủ nhật ký.</translation>
+      <translation type="unfinished">The selected Logging Level may degrade performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
     </message>
   </context>
   <context>
@@ -8825,6 +9192,10 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     <message>
       <source>Version %1</source>
       <translation>Phiên bản %1</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid or has expired</source>
+      <translation>Liên kết được cung cấp không hợp lệ hoặc đã hết hạn</translation>
     </message>
   </context>
   <context>
@@ -8865,54 +9236,30 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <source>Verbose</source>
       <translation>Chi tiết</translation>
     </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation>Mức ghi nhật ký mặc định</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation>Mức ghi nhật ký không mặc định. Chúng tôi khuyên bạn nên đặt thành &quot;info&quot;</translation>
+    </message>
+    <message>
+      <source>Logging level degrades performance</source>
+      <translation type="unfinished">Logging level degrades performance</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... và %n nhiều hơn nữa</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Downloading file...</source>
-      <translation>Dữ liệu đang tải...</translation>
-    </message>
-    <message>
-      <source>Pending download...</source>
-      <translation>Đang chờ tải xuống...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n Máy chủ</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Logs downloaded</source>
       <translation>Nhật ký đã tải xuống</translation>
-    </message>
-    <message>
-      <source>Logs downloading failed</source>
-      <translation>Tải xuống nhật ký không thành công</translation>
-    </message>
-    <message>
-      <source>Debug logging is enabled on the Client</source>
-      <translation>Ghi nhật ký gỡ lỗi được bật trên Máy khách</translation>
-    </message>
-    <message>
-      <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation>Ghi nhật ký gỡ lỗi được bật, dẫn đến hiệu năng hệ thống bị suy giảm.</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
       <translation>
         <numerusform>Ghi nhật ký gỡ lỗi được bật trên %n Máy chủ</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Logs downloading canceled</source>
-      <translation>Đã hủy tải xuống nhật ký</translation>
     </message>
     <message>
       <source>Apply Settings</source>
@@ -8924,7 +9271,39 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     </message>
     <message>
       <source>Apply</source>
-      <translation>ứng dụng</translation>
+      <translation>Áp dụng</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled on the client</source>
+      <translation type="unfinished">Debug logging is enabled on the client</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled.
+Client performance is degraded.</source>
+      <translation type="unfinished">Debug logging is enabled.
+Client performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled</source>
+      <translation type="unfinished">Debug logging is enabled</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled.
+Site performance is degraded.</source>
+      <translation type="unfinished">Debug logging is enabled.
+Site performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Logs download canceled</source>
+      <translation type="unfinished">Logs download canceled</translation>
+    </message>
+    <message>
+      <source>Downloading logs...</source>
+      <translation type="unfinished">Downloading logs...</translation>
+    </message>
+    <message>
+      <source>Logs download failed</source>
+      <translation type="unfinished">Logs download failed</translation>
     </message>
   </context>
   <context>
@@ -8932,6 +9311,117 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     <message>
       <source>Select Folder...</source>
       <translation>Chọn thư mục...</translation>
+    </message>
+    <message>
+      <source>Downloading...</source>
+      <translation type="unfinished">Downloading...</translation>
+    </message>
+    <message>
+      <source>Download completed with errors</source>
+      <translation type="unfinished">Download completed with errors</translation>
+    </message>
+    <message>
+      <source>Download success</source>
+      <translation type="unfinished">Download success</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Retry (%1)</source>
+      <translation type="unfinished">Retry (%1)</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation>Yêu cầu mạng không thành công</translation>
+    </message>
+    <message>
+      <source>Lookup List save request failed</source>
+      <translation type="unfinished">Lookup List save request failed</translation>
+    </message>
+    <message>
+      <source>Lookup List remove request failed</source>
+      <translation type="unfinished">Lookup List remove request failed</translation>
+    </message>
+    <message>
+      <source>Could not add object to the List</source>
+      <translation type="unfinished">Could not add object to the List</translation>
+    </message>
+    <message>
+      <source>An object doesn&apos;t have attributes that matches selected list</source>
+      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+    </message>
+    <message>
+      <source>Object was added to the List</source>
+      <translation type="unfinished">Object was added to the List</translation>
+    </message>
+    <message>
+      <source>An object has been added to the &quot;%1&quot; successfully</source>
+      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListEntriesModel</name>
+    <message>
+      <source>Yes</source>
+      <translation>Có</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+    <message>
+      <source>Any %1</source>
+      <translation type="unfinished">Any %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListExportProcessor</name>
+    <message>
+      <source>Text files</source>
+      <translation type="unfinished">Text files</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Tất cả</translation>
+    </message>
+    <message>
+      <source>Export List</source>
+      <translation type="unfinished">Export List</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
+    <message>
+      <source>Import Lookup List</source>
+      <translation type="unfinished">Import Lookup List</translation>
+    </message>
+    <message>
+      <source>Text files</source>
+      <translation type="unfinished">Text files</translation>
+    </message>
+    <message>
+      <source>All other text files</source>
+      <translation type="unfinished">All other text files</translation>
     </message>
   </context>
   <context>
@@ -8971,14 +9461,6 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Bạn muốn hợp nhất các hệ thống hiện tại %1 với hệ thống</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (hiện tại)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL không hợp lệ.</translation>
     </message>
@@ -8991,70 +9473,77 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <translation>Thử nghiệm...</translation>
     </message>
     <message>
-      <source>Merge Systems</source>
-      <translation>Hợp nhất hệ thống</translation>
-    </message>
-    <message>
-      <source>Enter your account password to merge Systems</source>
-      <translation>Nhập mật khẩu tài khoản của bạn để hợp nhất Hệ thống</translation>
-    </message>
-    <message>
-      <source>Merge</source>
-      <comment>Merge two Systems together (dialog button text)</comment>
-      <translation>Gộp lại</translation>
-    </message>
-    <message>
-      <source>Merging Systems...</source>
-      <translation>Sáp nhập hệ thống...</translation>
-    </message>
-    <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
       <translation>Sử dụng một tên máy hoặc địa chỉ IP cụ thể chứ không phải là %1.</translation>
-    </message>
-    <message>
-      <source>This is the current System URL.</source>
-      <translation>Đây là URL hệ thống hiện tại.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
       <translation>Kết hợp với %1</translation>
     </message>
     <message>
-      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Các máy chủ từ Hệ thống khác sẽ thêm vào trong cây tài nguyên khi đồng bộ cơ sở dữ liệu kết thúc.</translation>
-    </message>
-    <message>
       <source>You will be reconnected.</source>
       <translation>Bạn sẽ được nối lại.</translation>
     </message>
     <message>
-      <source>Systems will be merged shortly</source>
-      <translation>Hệ thống sẽ được sáp nhập ngay</translation>
+      <source>support</source>
+      <translation>hỗ trợ</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>Không kết hợp được Hệ thống</translation>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation>Khuyến nghị liên hệ với %1 trước khi tiếp tục.</translation>
+    </message>
+    <message>
+      <source>Merge Sites</source>
+      <translation type="unfinished">Merge Sites</translation>
+    </message>
+    <message>
+      <source>Enter your account password to merge Sites</source>
+      <translation type="unfinished">Enter your account password to merge Sites</translation>
+    </message>
+    <message>
+      <source>Merge</source>
+      <comment>Merge two Sites together (dialog button text)</comment>
+      <translation>Hợp nhất</translation>
+    </message>
+    <message>
+      <source>Merging Sites...</source>
+      <translation type="unfinished">Merging Sites...</translation>
+    </message>
+    <message>
+      <source>This is the current Site URL.</source>
+      <translation type="unfinished">This is the current Site URL.</translation>
+    </message>
+    <message>
+      <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>Sites will be merged shortly</source>
+      <translation type="unfinished">Sites will be merged shortly</translation>
+    </message>
+    <message>
+      <source>Failed to merge Sites</source>
+      <translation type="unfinished">Failed to merge Sites</translation>
+    </message>
+    <message>
+      <source>Remote</source>
+      <translation>Từ xa</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation>Hiện tại (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation>Từ xa (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Sự thành công</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
-    <message>
-      <source>New System</source>
-      <translation>Hệ thống mới</translation>
-    </message>
-    <message>
-      <source>System was not found.</source>
-      <translation>Không tìm thấy hệ thống.</translation>
-    </message>
-    <message>
-      <source>The discovered System %1 has an incompatible version %2.</source>
-      <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Hệ thống đã phát hiện %1 có phiên bản không tương thích %2.</translation>
-    </message>
-    <message>
-      <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation>Hệ thống đã chọn có phiên bản phần mềm cũ hơn không tương thích với Hệ thống hiện tại. Cập nhật Hệ thống đã chọn lên bản dựng mới nhất để hợp nhất với hệ thống hiện tại.</translation>
-    </message>
     <message>
       <source>The password or user name is invalid.</source>
       <translation>Mật khẩu hoặc tên người dùng không hợp lệ.</translation>
@@ -9068,47 +9557,8 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <translation>Không thể tạo bản sao lưu cơ sở dữ liệu.</translation>
     </message>
     <message>
-      <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Bạn sắp hợp nhất Hệ thống với giấy phép Khởi đầu.</translation>
-    </message>
-    <message>
-      <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Chỉ cho giấy phép Khởi đầu cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
-    </message>
-    <message>
       <source>Merge anyway?</source>
       <translation>Hợp nhất bằng mọi cách?</translation>
-    </message>
-    <message>
-      <source>You are about to merge Systems with NVR licenses.</source>
-      <translation>Bạn sắp hợp nhất Hệ thống với giấy phép NVR.</translation>
-    </message>
-    <message>
-      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Mỗi Hệ thống chỉ được phép sử dụng một giấy phép NVR, do đó, giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
-    </message>
-    <message>
-      <source>Could not configure the remote System %1.</source>
-      <comment>%1 is name of System</comment>
-      <translation>Không thể định cấu hình Hệ thống từ xa %1.</translation>
-    </message>
-    <message>
-      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Hệ thống điện toán %1 chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán %1. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Cả hai Hệ thống đều được kết nối với %1. Hợp nhất không được phép.</translation>
-    </message>
-    <message>
-      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>Không thể hợp nhất các Hệ thống vì chúng có ít nhất một máy chủ có cùng ID. Vui lòng xóa máy chủ này và thử lại.</translation>
-    </message>
-    <message>
-      <source>System name is not configured yet.</source>
-      <translation>Tên hệ thống chưa được định cấu hình.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
@@ -9123,24 +9573,69 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
       <translation>Lỗi không xác định.</translation>
     </message>
     <message>
-      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+    <message>
+      <source>Site was not found.</source>
+      <translation type="unfinished">Site was not found.</translation>
+    </message>
+    <message>
+      <source>The discovered Site %1 has an incompatible version %2.</source>
+      <comment>%1 is name of Site, %2 is version information</comment>
+      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+    </message>
+    <message>
+      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
+      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Sites with Starter licenses.</source>
+      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Sites with NVR licenses.</source>
+      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+    </message>
+    <message>
+      <source>Could not configure the remote Site %1.</source>
+      <comment>%1 is name of the Site</comment>
+      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+    </message>
+    <message>
+      <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+    </message>
+    <message>
+      <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Hệ thống %1 có các chủ sở hữu khác nhau. Không được phép hợp nhất.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
     </message>
     <message>
-      <source>deleted camera</source>
-      <translation>camera bị xóa</translation>
+      <source>%1 sites have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
     </message>
     <message>
-      <source>Bookmark it...</source>
-      <translation>Đánh dấu...</translation>
+      <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
+    <message>
+      <source>Site name is not configured yet.</source>
+      <translation type="unfinished">Site name is not configured yet.</translation>
+    </message>
+    <message>
+      <source>Maximum number of Servers for the Site is reached.</source>
+      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
     </message>
   </context>
   <context>
@@ -9148,14 +9643,6 @@ Hãy nhớ trả lại Mức ghi nhật ký về cài đặt mặc định sau k
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
       <translation>Luồng hiện tại có độ phân giải cao. Phân tích chuyển động của luồng này làm tăng tải cho CPU.</translation>
-    </message>
-    <message>
-      <source>Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</source>
-      <comment>&quot;
-&quot; is a line break, don&apos;t change it.</comment>
-      <translation>Tính năng phát hiện chuyển động cho camera này hiện không hoạt động do độ phân giải luồng đã thay đổi.
-Bạn có thể buộc buộc tính năng đó hoạt động, nhưng nó có thể làm tăng đáng kể tải CPU.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
@@ -9172,6 +9659,14 @@ You can force it, but it may significantly increase CPU load.</source>
 &quot; is a line break, don&apos;t change it.</comment>
       <translation>Tính năng phát hiện chuyển động đối với một số camera sẽ không hoạt động vì luồng còn lại có độ phân giải quá cao.
 Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể làm tăng đáng kể tải CPU.</translation>
+    </message>
+    <message>
+      <source>Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
+You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
+      <comment>&quot;
+&quot; is a line break, don&apos;t change it.</comment>
+      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
+You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
     </message>
   </context>
   <context>
@@ -9221,11 +9716,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Thiếu gói cập nhật cho một số máy chủ</translation>
     </message>
     <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Trường hợp không tương thích %1. Để cập nhật hay ngắt kêt nối hệ thống %1 trước.</translation>
-    </message>
-    <message>
       <source>No update package available</source>
       <translation>Không có gói cập nhật có sẵn</translation>
     </message>
@@ -9258,10 +9748,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Hủy cập nhật và xóa tất cả dữ liệu đã tải xuống?</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Phiên bản hệ điều hành của một số thành phần không còn được hỗ trợ. Vui lòng xóa chúng khỏi Hệ thống hoặc cập nhật HĐH của chúng lên phiên bản được hỗ trợ.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
@@ -9309,7 +9795,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation>Hãy cập nhật %1 sử dụng gói cài đặt bằng tay.</translation>
+      <translation>Vui lòng cập nhật %1 theo cách thủ công bằng cách sử dụng gói cài đặt.</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
@@ -9317,7 +9803,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>OK</source>
-      <translation>Kác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -9373,7 +9859,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>Cập nhật lên phiên bản riêng biệt</translation>
+      <translation>Cập nhật lên Bản dựng riêng</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
@@ -9400,10 +9886,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Sẵn sàng cập nhật lên</translation>
     </message>
     <message>
-      <source>System updated to</source>
-      <translation>Hệ thống được cập nhật lên</translation>
-    </message>
-    <message>
       <source>Some servers have no update packages available.</source>
       <translation>Một số máy chủ không có gói cập nhật có sẵn.</translation>
     </message>
@@ -9420,10 +9902,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Một số máy chủ đã ngoại tuyến. Xin vui lòng chờ cho đến khi họ trở nên trực tuyến để tiếp tục.</translation>
     </message>
     <message>
-      <source>System update in process</source>
-      <translation>Đang cập nhật hệ thống</translation>
-    </message>
-    <message>
       <source>Continue in Background</source>
       <translation>Tiếp tục trong bối cảnh</translation>
     </message>
@@ -9433,7 +9911,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Specific Build</source>
-      <translation>Phiên bản riêng biệt</translation>
+      <translation>Bản dựng riêng</translation>
     </message>
     <message>
       <source>Browse for Update File</source>
@@ -9448,20 +9926,37 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Không thể kiểm tra cập nhật trên Internet</translation>
     </message>
     <message>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Áp dụng cập nhật hệ thống vào cuối tuần không được khuyến khích.</translation>
-    </message>
-    <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Bạn đang sử dụng một máy khách được tùy chỉnh. Vui lòng liên hệ %1 để nhận hướng dẫn cập nhật.</translation>
     </message>
     <message>
-      <source>Uploading client packages to Servers...</source>
-      <translation>Đang tải các gói ứng dụng khách lên Máy chủ...</translation>
-    </message>
-    <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
       <translation>Không có đủ dung lượng trên máy tính của bạn để tải xuống bản cập nhật Ứng dụng khách. Vui lòng giải phóng một số dung lượng trên ổ cứng của bạn và thử lại.</translation>
+    </message>
+    <message>
+      <source>Uploading offline update packages to Servers...</source>
+      <translation>Đang tải các gói cập nhật ngoại tuyến lên Máy chủ...</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+    </message>
+    <message>
+      <source>Applying updates at the end of the week is not recommended</source>
+      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+    </message>
+    <message>
+      <source>Site updated to</source>
+      <translation type="unfinished">Site updated to</translation>
+    </message>
+    <message>
+      <source>Site update in process</source>
+      <translation type="unfinished">Site update in process</translation>
     </message>
   </context>
   <context>
@@ -9469,6 +9964,139 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>You do not have any layouts</source>
       <translation>Bạn không có bất kỳ bố cục nào</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
+    <message>
+      <source>Possible formats:</source>
+      <translation type="unfinished">Possible formats:</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>Tổ ẩn</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>Tìm kiếm thiết bị trên mạng bị hạn chế đối với camera hỗ trợ kết nối HTTPS. Điều này có thể được thay đổi trong cài đặt %1.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Quản trị hệ thống</translation>
+    </message>
+    <message>
+      <source>Device search failed</source>
+      <translation>Tìm kiếm thiết bị không thành công</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to add %n devices</source>
+      <translation>
+        <numerusform>Không thể thêm thiết bị %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Initializing scan...</source>
+      <translation>Quét ban đầu...</translation>
+    </message>
+    <message>
+      <source>Scanning online hosts...</source>
+      <translation>Tổ dòng quét...</translation>
+    </message>
+    <message>
+      <source>Checking host...</source>
+      <translation>Kiểm tra máy chủ...</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation>Hoàn thành</translation>
+    </message>
+    <message>
+      <source>Aborted</source>
+      <translation>Hủy bỏ</translation>
+    </message>
+    <message>
+      <source>Searching...</source>
+      <translation>Đang tìm kiếm...</translation>
+    </message>
+    <message>
+      <source>No devices found</source>
+      <translation>Không tìm thấy thiết bị</translation>
+    </message>
+    <message>
+      <source>All devices are already added</source>
+      <translation>Tất cả thiết bị đã được thêm vào</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices are being added. You can close this dialog or start a new search</source>
+      <translation>
+        <numerusform>%n thiết bị đang được thêm vào. Bạn có thể đóng hộp thoại này hoặc bắt đầu một tìm kiếm mới</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Thêm tất cả thiết bị</translation>
+    </message>
+    <message numerus="yes">
+      <source>Add %n Devices</source>
+      <translation>
+        <numerusform>Thêm %n thiết bị</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation>Bạn không có quyền chỉnh sửa cài đặt của camera này</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation>Bạn không có quyền chỉnh sửa cài đặt của một số camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>Bạn không có quyền sửa đổi người dùng này</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation>Bạn không thể sửa đổi người dùng bằng thông tin đăng nhập không phải duy nhất</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation>Có thể bạn không có quyền sửa đổi một số thành viên nhất định của nhóm này hoặc nhóm bao gồm những người dùng có thông tin đăng nhập trùng lặp</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation>Bạn không có quyền sửa đổi nhóm này</translation>
+    </message>
+    <message>
+      <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
+      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+    </message>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the site level</source>
+      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationActionExecutor</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
+    </message>
+    <message>
+      <source>Unable to acknowledge event on inaccessible camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationActionHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
     </message>
   </context>
   <context>
@@ -9481,10 +10109,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <source>Acknowledge</source>
       <translation>Công nhận</translation>
     </message>
-    <message>
-      <source>Calling...</source>
-      <translation>Đang gọi...</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9495,12 +10119,45 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       </translation>
     </message>
     <message>
-      <source>Current System</source>
-      <translation>Hệ thống hiện tại</translation>
+      <source>No new notifications</source>
+      <translation>Không có thông báo mới</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Tất cả Hệ thống</translation>
+      <source>Current Site</source>
+      <translation type="unfinished">Current Site</translation>
+    </message>
+    <message>
+      <source>Any Notification</source>
+      <translation type="unfinished">Any Notification</translation>
+    </message>
+    <message>
+      <source>Event Notifications</source>
+      <translation type="unfinished">Event Notifications</translation>
+    </message>
+    <message>
+      <source>System Notifications</source>
+      <translation type="unfinished">System Notifications</translation>
+    </message>
+    <message>
+      <source>Choose Types...</source>
+      <translation type="unfinished">Choose Types...</translation>
+    </message>
+    <message>
+      <source>Any notification</source>
+      <translation type="unfinished">Any notification</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n notification types</source>
+      <translation type="unfinished">
+        <numerusform>%n notification types</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
+    <message>
+      <source>Select Notification Types</source>
+      <translation type="unfinished">Select Notification Types</translation>
     </message>
   </context>
   <context>
@@ -9529,10 +10186,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Chọn bố cục...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>Bố cục cục bộ chỉ có thể được hiển thị cho chủ sở hữu bố cục.</translation>
-    </message>
-    <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Không có vai trò người dùng được chọn nào chứa người dùng. Hành động sẽ không hoạt động.</translation>
     </message>
@@ -9543,6 +10196,10 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation>Tìm kiếm một bố cục cục bộ? Chỉ chọn một người dùng từ danh sách &quot;Hiển thị tới&quot; để hiển thị bố cục cục bộ dưới dạng tùy chọn tại đây.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>Bố cục cục bộ chỉ có thể được hiển thị cho chủ sở hữu bố cục</translation>
     </message>
   </context>
   <context>
@@ -9635,7 +10292,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation>Mã lỗi bất ngờ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
@@ -9671,6 +10328,13 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation>video bị tạm dừng</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
@@ -9682,11 +10346,11 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>Powered</source>
-      <translation>Cung cấp</translation>
+      <translation>Đã cấp nguồn</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation>Bất ngờ</translation>
+      <translation>Không xác định</translation>
     </message>
     <message>
       <source>Empty</source>
@@ -9724,23 +10388,14 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PresentedStateDelegate</name>
+    <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
-      <source>Added</source>
-      <translation>Thêm</translation>
-    </message>
-    <message>
-      <source>Adding</source>
-      <translation>Thêm</translation>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Chú ý! Vượt quá giới hạn công suất</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Hệ thống không được kết nối với %1. Thông báo đẩy chỉ hoạt động khi hệ thống được kết nối với %1.</translation>
-    </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
@@ -9758,6 +10413,11 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
         <numerusform>%n biểu tượng còn lại</numerusform>
       </translation>
     </message>
+    <message>
+      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
@@ -9767,7 +10427,7 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
     <message>
       <source>URL</source>
-      <translation>Nơi</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -9782,22 +10442,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>Trang Web</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page</source>
-      <translation>Thêm trang web được ủy quyền</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation>Thêm trang web</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation>Chỉnh sửa trang web được ủy quyền</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>Chỉnh sửa trang Web</translation>
-    </message>
-    <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>Bật proxy trang web trên tab &lt;b&gt;General&lt;/b&gt;.</translation>
     </message>
@@ -9809,24 +10453,73 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation>Trang web có thể tương tác với Máy khách trên máy tính để bàn và yêu cầu quyền truy cập vào phiên người dùng</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
-      <source>Auto</source>
-      <translation>Tự động</translation>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation>Một tích hợp có thể tương tác với Máy khách và yêu cầu quyền truy cập vào phiên người dùng</translation>
     </message>
     <message>
-      <source>Low</source>
-      <translation>Thấp</translation>
+      <source>Proxy this integration through the server</source>
+      <translation>Ủy quyền việc tích hợp này thông qua máy chủ</translation>
     </message>
     <message>
-      <source>High</source>
-      <translation>Cao</translation>
+      <source>Proxy this web page through the server</source>
+      <translation>Proxy trang web này thông qua máy chủ</translation>
     </message>
     <message>
-      <source>Custom</source>
-      <translation>Tùy chỉnh</translation>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation>Cho phép mở tích hợp này mà không cần kiểm tra chứng chỉ SSL</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation>Cho phép mở trang web này mà không cần kiểm tra chứng chỉ SSL</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>Trang web mới</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>Chỉnh sửa trang Web</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation>Trang web được ủy quyền mới</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation>Chỉnh sửa trang web được ủy quyền</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation>Tích hợp mới</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation>Chỉnh sửa tích hợp</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation>Tích hợp proxy mới</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation>Chỉnh sửa tích hợp proxy</translation>
+    </message>
+    <message>
+      <source>To allow the use of a client API, create a web integration instead. %1</source>
+      <translation>Để cho phép sử dụng API ứng dụng khách, hãy tạo tiện ích tích hợp web. %1</translation>
+    </message>
+    <message>
+      <source>Learn more...</source>
+      <translation>Tìm hiểu thêm...</translation>
+    </message>
+    <message>
+      <source>Auto-refresh integration</source>
+      <translation type="unfinished">Auto-refresh integration</translation>
+    </message>
+    <message>
+      <source>Auto-refresh web page</source>
+      <translation type="unfinished">Auto-refresh web page</translation>
     </message>
   </context>
   <context>
@@ -9843,6 +10536,41 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
       <translation>
         <numerusform>Đối với xuất dưới dạng Xem nhanh, độ dài của video phải là ít nhất %n giây.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>Màn hình %1 - %2x%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (chìa khóa)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>Cao nhất (Hs)</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>Trung bình</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>Hiệu suất cao</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>Riêng</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>Quarter Native</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Chọn thư mục...</translation>
     </message>
   </context>
   <context>
@@ -9909,6 +10637,52 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>%1 layout</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>bố cục %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>
+        <numerusform>%1 và %n bố cục khác</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 video wall</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation>%1 tường video</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation>
+        <numerusform>%1 và %n tường video nữa</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 nhóm</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 và %n nhóm nữa</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourceGroupingActionHandler</name>
+    <message>
+      <source>Maximum level of nesting is reached</source>
+      <translation>Đã đạt đến mức tối đa của việc chồng vào nhau</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
@@ -9925,6 +10699,17 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>Health Monitor</source>
       <translation>Theo dõi tài nguyên hệ thống</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation>Cần xác nhận mật khẩu để áp dụng các thay đổi</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation>Xác nhận</translation>
     </message>
   </context>
   <context>
@@ -9953,39 +10738,26 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
         <numerusform>%n đối tượng</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Analytic</source>
-      <translation>Phân tích</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>Chung</translation>
-    </message>
-    <message>
-      <source>Input Signal</source>
-      <translation>Tín hiệu đầu vào</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Kích hoạt mềm</translation>
-    </message>
-    <message>
-      <source>Stream Issue</source>
-      <translation>Sự cố luồng</translation>
-    </message>
-    <message>
-      <source>Device Disconnect</source>
-      <translation>Ngắt kết nối thiết bị</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict</source>
-      <translation>Thiết bị xung đột IP</translation>
-    </message>
     <message numerus="yes">
-      <source>+%n values</source>
+      <source>%n notifications</source>
       <translation>
-        <numerusform>+%n giá trị</numerusform>
+        <numerusform>%n thông báo</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation>Hoạt động</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Bị tạm ngưng</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation>Tắt nguồn</translation>
     </message>
   </context>
   <context>
@@ -10020,12 +10792,6 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
     <message>
       <source>Dual-streaming is disabled or not supported</source>
       <translation>Truyền phát kép bị vô hiệu hóa hoặc không được hỗ trợ</translation>
-    </message>
-    <message>
-      <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</source>
-      <translation>Cài đặt chất lượng và FPS bị tắt do tùy chọn &quot;Cho phép hệ thống tối ưu hóa cài đặt Cài đặt Camera&quot; trong hộp thoại &quot;Quản trị hệ thống&quot;.
-Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên camera.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
@@ -10147,6 +10913,43 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
       <translation>Tính năng phát hiện chuyển động &amp; đối tượng bị tắt đối với các mô-đun I/O đã chọn</translation>
     </message>
+    <message>
+      <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
+You can still change quality and FPS directly on the camera.</source>
+      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
+You can still change quality and FPS directly on the camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScreenRecordingActionHandler</name>
+    <message>
+      <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
+      <translation>Trình chụp màn hình chưa được khởi tạo. Vui lòng thử lại sau.</translation>
+    </message>
+    <message>
+      <source>Recording in %1...</source>
+      <translation>Bắt đầu ghi sau %1...</translation>
+    </message>
+    <message>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation>Không thể mở tệp &quot;%1&quot;. Vui lòng kiểm tra xem thư mục có thể truy cập được không.</translation>
+    </message>
+    <message>
+      <source>Recorded Video</source>
+      <translation>Video đã ghi</translation>
+    </message>
+    <message>
+      <source>Save Recording As...</source>
+      <translation>Lưu bản ghi dưới dạng...</translation>
+    </message>
+    <message>
+      <source>AVI (Audio/Video Interleaved)</source>
+      <translation>AVI (Tập tin hình ảnh âm thanh)</translation>
+    </message>
+    <message>
+      <source>Failed to start recording</source>
+      <translation>Không thể bắt đầu ghi</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -10162,30 +10965,8 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
       <translation>Theo dõi và ghi lại tất cả các hành động của người dùng.</translation>
     </message>
     <message>
-      <source>minutes</source>
-      <translation>phút</translation>
-    </message>
-    <message>
-      <source>hours</source>
-      <translation>giờ</translation>
-    </message>
-    <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Hình mờ sẽ được hiển thị qua các video trực tiếp, lưu trữ và xuất cho những người dùng không phải là quản trị viên. Bạn và các quản trị viên khác sẽ không nhìn thấy họ.</translation>
-    </message>
-    <message>
       <source>Archive encryption password</source>
       <translation>Lưu trữ mật khẩu mã hóa</translation>
-    </message>
-    <message>
-      <source>The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation>Mật khẩu mã hóa sẽ được yêu cầu để khôi phục kho lưu trữ trên hệ thống khác.
-Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó, kho lưu trữ sẽ không thể khôi phục được.</translation>
-    </message>
-    <message>
-      <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation>Mã hóa dữ liệu lưu trữ để ngăn không bị xem bên ngoài hệ thống. Bạn sẽ không bắt buộc phải nhập mật khẩu mã hóa để xem kho lưu trữ video trong hệ thống này.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -10200,16 +10981,8 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <translation>Bật mã hóa lưu lượng RTSP.</translation>
     </message>
     <message>
-      <source>days</source>
-      <translation>ngày</translation>
-    </message>
-    <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Người dùng cục bộ và LDAP sẽ tự động bị đăng xuất nếu phiên của họ vượt quá thời lượng đã chỉ định.</translation>
-    </message>
-    <message>
-      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation>Thời lượng không giới hạn của phiên người dùng đe dọa đến tính bảo mật chung của Hệ thống và có thể dẫn đến sự suy giảm hiệu suất của Hệ thống</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -10226,6 +10999,57 @@ Chú ý: Không thể đặt lại mật khẩu này. Nếu bạn làm mất nó
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
       <translation>Thời lượng phiên người dùng tối đa được đề xuất là %1</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation>Hình mờ sẽ được hiển thị trên các video trực tiếp, lưu trữ và xuất chỉ dành cho người dùng có quyền thấp. Bạn và những người dùng cấp cao khác sẽ không nhìn thấy chúng.</translation>
+    </message>
+    <message>
+      <source>Encrypting video traffic may significantly increase CPU usage</source>
+      <translation>Mã hóa lưu lượng video có thể làm tăng đáng kể mức sử dụng CPU</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost</source>
+      <translation>Sẽ bị mất kết nối với camera không hỗ trợ HTTPS</translation>
+    </message>
+    <message>
+      <source>Archive encryption increases CPU usage</source>
+      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+    </message>
+    <message>
+      <source>Additional configuration might be required on the server machine.</source>
+      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+    </message>
+    <message>
+      <source>The encryption password will be required to restore the archive.
+Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
+      <translation type="unfinished">The encryption password will be required to restore the archive.
+Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+    </message>
+    <message>
+      <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
+      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
+      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</name>
+    <message>
+      <source>No objects</source>
+      <translation>Không có đối tượng</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects selected</source>
+      <translation type="unfinished">
+        <numerusform>%n objects selected</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All objects</source>
+      <translation type="unfinished">All objects</translation>
     </message>
   </context>
   <context>
@@ -10287,6 +11111,26 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>Unknown Certificate</source>
       <translation>Chứng chỉ không xác định</translation>
     </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Contact a user with Administrators permissions to resolve this issue.</source>
+      <translation>Hãy liên hệ với người dùng có quyền Quản trị viên để giải quyết vấn đề này.</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation>Không phải là một phần của chứng chỉ</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation>Xem chứng chỉ đã ghim</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation>Ghim vào chứng chỉ này</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
@@ -10295,12 +11139,25 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Vẫn kết nối</translation>
     </message>
     <message>
+      <source>Continue</source>
+      <translation>Tiếp tục</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation>
+        <numerusform>Tôi tin tưởng những máy chủ này</numerusform>
+      </translation>
+    </message>
+    <message>
       <source>I trust this server</source>
       <translation>Tôi tin tưởng máy chủ này</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
     <message>
-      <source>Continue</source>
-      <translation>Tiếp tục</translation>
+      <source>Auto</source>
+      <translation>Tự động</translation>
     </message>
   </context>
   <context>
@@ -10466,6 +11323,69 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>Unknown error</source>
       <translation>Lỗi không xác định</translation>
     </message>
+    <message>
+      <source>Access Link</source>
+      <translation>Liên kết truy cập</translation>
+    </message>
+    <message>
+      <source>Invalid Link</source>
+      <translation>Liên kết không hợp lệ</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid</source>
+      <translation>Liên kết được cung cấp không hợp lệ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>Showreels</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Showreel %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>Kéo Bố cục hoặc camera vào đây để thêm vào showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>Sử dụng mũi tên trên bàn phím để chuyển giữu các bố cục. Để thoát khỏi showreel ấn Esc.</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Nhấn Esc để dừng Trình tham quan.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>Chuyển sang</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>Hiển thị cho</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>Hiển thị được chọn cho</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
@@ -10504,25 +11424,9 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
   </context>
   <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
-    <message numerus="yes">
-      <source>Email address is not set for %n users</source>
-      <translation>
-        <numerusform>Địa chỉ email không được đặt cho %n người dùng</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Set Passwords</source>
       <translation>Đặt mật khẩu</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording schedule is invalid for %n cameras</source>
-      <translation>
-        <numerusform>Lịch ghi không hợp lệ cho %n camera</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation>Lịch ghi trên một số camera có các chế độ ghi không được hỗ trợ.</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>
@@ -10541,66 +11445,57 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Hoàn tác thay thế</translation>
     </message>
     <message>
-      <source>Export</source>
-      <translation>Xuất</translation>
+      <source>Add more services or fix overuse by stopping using services for some devices.</source>
+      <translation>Thêm nhiều dịch vụ hơn hoặc khắc phục tình trạng lạm dụng bằng cách ngừng sử dụng dịch vụ cho một số thiết bị.</translation>
     </message>
     <message>
-      <source>On-device recordings were found</source>
-      <translation>Đã tìm thấy bản ghi trên thiết bị</translation>
+      <source>If no action is taken, required number of services will be released automatically on %1.</source>
+      <translation>Nếu không thực hiện hành động nào, số lượng dịch vụ được yêu cầu sẽ tự động được phát hành vào %1.</translation>
     </message>
     <message>
-      <source>Import in progress...</source>
-      <translation>Đang nhập...</translation>
+      <source>Some features may not be available.</source>
+      <translation>Vài tính năng có thể sẽ không khả dụng.</translation>
     </message>
     <message>
-      <source>Import archive from %1 completed</source>
-      <translation>Đã hoàn thành nhập kho lưu trữ từ %1</translation>
+      <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
+      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
     </message>
     <message>
-      <source>Import archive from %1 failed</source>
-      <translation>Nhập kho lưu trữ từ %1 không thành công</translation>
+      <source>Open Settings</source>
+      <translation type="unfinished">Open Settings</translation>
     </message>
     <message>
-      <source>Import archive from %1 stopped</source>
-      <translation>Nhập kho lưu trữ từ %1 đã dừng</translation>
+      <source>Open Services</source>
+      <translation type="unfinished">Open Services</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SystemTabBar</name>
+    <message>
+      <source>Open in New Window</source>
+      <translation>Mở trong một cửa sổ mới</translation>
     </message>
     <message>
-      <source>Import archive from %1</source>
-      <translation>Nhập kho lưu trữ từ %1</translation>
+      <source>Close</source>
+      <translation>Đóng cửa</translation>
     </message>
-    <message numerus="yes">
-      <source>Backup storage is not configured on %n Servers</source>
-      <translation>
-        <numerusform>Bộ nhớ sao lưu không được định cấu hình trên Máy chủ %n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Storage for analytics data is not set on %n Servers</source>
-      <translation>
-        <numerusform>Bộ nhớ cho dữ liệu phân tích không được đặt trên Máy chủ %n</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>System storage is used for analytics data on %n Servers</source>
-      <translation>
-        <numerusform>Bộ nhớ hệ thống được sử dụng cho dữ liệu phân tích trên Máy chủ %n</numerusform>
-      </translation>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TemporaryUserExpirationWatcher</name>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation>và</translation>
     </message>
     <message>
-      <source>Not imported archive found on device %1</source>
-      <translation>Không tìm thấy kho lưu trữ đã nhập trên thiết bị %1</translation>
+      <source>Your access to the Site expires %1</source>
+      <comment>%1 is a date</comment>
+      <translation type="unfinished">Your access to the Site expires %1</translation>
     </message>
     <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation>Không tìm thấy kho lưu trữ đã nhập trên camera %1</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation>Người dùng đã thay đổi cài đặt luồng lưu trữ</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation>Người dùng đã thay đổi cài đặt ghi</translation>
+      <source>Your access to the Site expires in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation type="unfinished">Your access to the Site expires in %1</translation>
     </message>
   </context>
   <context>
@@ -10655,7 +11550,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
       <source>Open</source>
@@ -10666,8 +11561,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Mở trong một tab mới</translation>
     </message>
     <message>
-      <source>This action is not supported for notifications from other Systems</source>
-      <translation>Hành động này không được hỗ trợ cho các thông báo từ Hệ thống khác</translation>
+      <source>This action is not supported for notifications from other Sites</source>
+      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
     </message>
   </context>
   <context>
@@ -10736,6 +11631,21 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::TwoWayAudioButton</name>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Giữ để nói</translation>
+    </message>
+    <message>
+      <source>Input device is not selected</source>
+      <translation>Thiết bị đầu vào không được chọn</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Lỗi mạng</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
@@ -10790,22 +11700,86 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>Mô tả</translation>
     </message>
     <message>
-      <source>Member of</source>
-      <translation>Thành viên của</translation>
+      <source>Group is not found in the LDAP database.</source>
+      <translation>Nhóm không được tìm thấy trong cơ sở dữ liệu LDAP.</translation>
     </message>
     <message>
-      <source>Permissions</source>
-      <translation>Quyền</translation>
+      <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
+      <translation>Nhóm có một nhóm khác vừa là nhóm mẹ, vừa là thành viên con hoặc là một phần của chuỗi tham chiếu vòng tròn. Điều này có thể dẫn đến việc cấp quyền không chính xác.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Các nhóm</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Tùy chỉnh</translation>
+    </message>
+    <message>
+      <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <source>Invalid JSON</source>
+      <translation>JSON không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Invalid request</source>
+      <translation>Yêu cầu không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Method not found</source>
+      <translation>Không tìm thấy phương thức này</translation>
+    </message>
+    <message>
+      <source>Invalid parameters</source>
+      <translation>Tham số không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Lỗi bên trong</translation>
+    </message>
+    <message>
+      <source>Connection failure</source>
+      <translation>Kết nối thất bại</translation>
+    </message>
+    <message>
+      <source>Invalid encoding</source>
+      <translation>Mã hóa không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Invalid encoding charset</source>
+      <translation>Bộ ký tự mã hóa không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Application Error</source>
+      <translation>Lỗi ứng dụng</translation>
+    </message>
+    <message>
+      <source>Transport Error</source>
+      <translation>Lỗi vận chuyển</translation>
+    </message>
+    <message>
+      <source>Server error code %1</source>
+      <translation>Mã lỗi máy chủ %1</translation>
+    </message>
+    <message>
+      <source>Reserved error code %1</source>
+      <translation>Mã lỗi dành riêng %1</translation>
+    </message>
+    <message>
+      <source>Unknown error code %1</source>
+      <translation>Mã lỗi chưa xác định %1</translation>
+    </message>
+    <message>
+      <source>Site Error</source>
+      <translation type="unfinished">Site Error</translation>
     </message>
   </context>
   <context>
@@ -10828,10 +11802,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Đăng nhập</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>Tên</translation>
-    </message>
-    <message>
       <source>Email</source>
       <translation>Emai</translation>
     </message>
@@ -10843,32 +11813,25 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>Custom</source>
       <translation>Tùy chỉnh</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
-      <source>Enable</source>
-      <translation>Cho phép</translation>
+      <source>LDAP server is offline. Users are not able to log in.</source>
+      <translation>Máy chủ LDAP đang ngoại tuyến. Người dùng không thể đăng nhập.</translation>
     </message>
     <message>
-      <source>Disable</source>
-      <translation>Vô hiệu hóa</translation>
+      <source>User is not found in the LDAP database.</source>
+      <translation>Không tìm thấy người dùng trong cơ sở dữ liệu LDAP.</translation>
     </message>
     <message>
-      <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <source>Temporary user</source>
+      <translation>Người dùng tạm thời</translation>
     </message>
     <message>
-      <source>Force Secure Authentication</source>
-      <translation>Bắt buộc xác thực an toàn</translation>
+      <source>Full Name</source>
+      <translation>Họ và tên</translation>
     </message>
     <message>
-      <source>All Users</source>
-      <translation>Tất cả người dùng</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>Người dùng có xác thực Digest</translation>
+      <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
+      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
     </message>
   </context>
   <context>
@@ -10884,6 +11847,137 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>LDAP</source>
       <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>Để sửa đổi mật khẩu của bạn, hãy nhập mật mã hiện tại.</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>người dùng %1 có email được chỉ định đã tồn tại.</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation>Lưu người dùng</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Nhập mật khẩu tài khoản của bạn</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Lưu</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Không thể lưu các thay đổi</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation>Áp dụng thay đổi?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>loại bỏ</translation>
+    </message>
+    <message>
+      <source>Copy Access Link</source>
+      <translation>Sao chép liên kết truy cập</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Mật khẩu hiện tại không hợp lệ</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>Trường email không thể để trống</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty</source>
+      <translation>Đăng nhập không được để trống</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation>Chỉ cho phép chữ cái, số và ký hiệu %1</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation>Người dùng với thông tin đăng nhập này đã tồn tại</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to terminate access link?</source>
+      <translation>Bạn có chắc chắn muốn chấm dứt liên kết truy cập?</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation>Chấm dứt</translation>
+    </message>
+    <message>
+      <source>Terminate access link</source>
+      <translation>Chấm dứt liên kết truy cập</translation>
+    </message>
+    <message>
+      <source>Create access link</source>
+      <translation>Tạo liên kết truy cập</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Tạo mới</translation>
+    </message>
+    <message>
+      <source>New Link - %1</source>
+      <translation>Liên Kết Mới - %1</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation>Liên kết truy cập đã được tạo thành công!</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
+      <translation>Không nên cấp nhiều quyền cho người dùng tạm thời. Một số hành động có thể không hoạt động.</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended.</source>
+      <translation>Không nên cấp nhiều quyền cho người dùng tạm thời.</translation>
+    </message>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation>và</translation>
+    </message>
+    <message>
+      <source>New User</source>
+      <translation>Người dùng mới</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation>Người dùng %1 đã được tạo thành công!</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation>Lấy liên kết...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Đảm bảo rằng máy tính này có thể kết nối với %1</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation>trong %1</translation>
+    </message>
+    <message>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Sao chép Liên kết truy cập và chia sẻ với người dùng mong muốn</translation>
+    </message>
+    <message>
+      <source>This will instantly remove an access to the site for this user</source>
+      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
     </message>
   </context>
   <context>
@@ -10907,6 +12001,166 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>The password is incorrect.</source>
       <translation>Mật khẩu không đúng.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::VirtualCameraActionHandler</name>
+    <message>
+      <source>Failed to add virtual camera</source>
+      <translation>Không thể thêm camera ảo</translation>
+    </message>
+    <message>
+      <source>Open Virtual Camera Recordings...</source>
+      <translation>Mở bản ghi camera ảo...</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation>Không tìm thấy tệp video trong thư mục đã chọn</translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Dừng tải lên?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>Các tệp đã tải lên sẽ được lưu giữ.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>Định dạng tệp đã chọn không được hỗ trợ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>Sử dụng .MKV, .AVI, .MP4 hoặc các tệp video khác.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>Các tệp được chọn không có dấu thời gian</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation>Chỉ các tập tin video với dấu thời gian chính xác được hỗ trợ.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Các tệp đã chọn quá cũ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Tệp đã chọn đã được ghi lại trên %1 và %2, nhưng chỉ có thể tải lên các tệp được ghi lại trong %n ngày qua. Bạn có thể thay đổi điều này trong cài đặt lưu trữ trên camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <translation>
+        <numerusform>Bạn có thể tải các tệp này lên một phiên bản camera ảo khác.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>Các tệp đã chọn bao gồm các khoảng thời gian mà các video đang được tải lên</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation>Không đủ dung lượng lưu trữ trên máy chủ</translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation>Các tệp được chọn sẽ không được tải lên</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation>Các tệp được chọn sẽ không được tải lên</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>Không có tệp mới để tải lên trong thư mục đã chọn</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Một số cảnh quay có thể bị xóa sau khi tải lên các tệp này</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Không còn nhiều dung lượng trống trên bộ nhớ máy chủ. Một số cảnh quay cũ có thể bị xóa để giải phóng dung lượng. Lưu ý rằng nếu các tệp được chọn là tệp cũ nhất trên máy chủ, chúng sẽ bị xóa ngay sau khi được tải lên.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Để ngăn chặn điều này, bạn có thể thêm dung lượng lưu trữ bổ sung. Bạn cũng có thể kiểm soát cảnh quay nào sẽ bị xóa trước bằng cách thay đổi thời gian lưu trữ trong cài đặt camera.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>Vẫn tải lên?</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>Không thể bắt đầu tải lên vì người dùng &quot;%1&quot; hiện đang tải cảnh quay lên camera này.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>Không thể tải lên vì một người dùng khác đang tải lên cho camera này.</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>Không thể hoàn tất tải lên %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Đảm bảo có đủ dung lượng trên bộ nhớ máy chủ.</translation>
+    </message>
+    <message>
+      <source>Uploading footage</source>
+      <translation>Đang tải lên cảnh quay</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 định dạng không được hỗ trợ.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 không có dấu thời gian.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 cũ hơn được cho phép trong cài đặt lưu trữ camera.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 bao gồm khoảng thời gian mà video đã được tải lên.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 bao gồm khoảng thời gian video được tải lên.</translation>
     </message>
   </context>
   <context>
@@ -10954,6 +12208,68 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>No events</source>
+      <translation>Không có sự kiện</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation>Thử thay đổi bộ lọc hoặc tạo Quy tắc sự kiện</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n sự kiện</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation>Mở tích hợp này?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Mở trang web này?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>Tích hợp</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Trang Web</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation>Bạn cố gắng mở
+%1
+nhưng tích hợp này đưa ra chứng chỉ xác thực không đáng tin cậy.
+Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu được rủi ro, bạn có thể mở.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Bạn cố gắng mở
+%1
+nhưng trang web này hiển thị xác thực chứng chỉ không đáng tin cậy.
+Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn hiểu về các rủi ro, bạn vẫn có thể mở trang web.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Vẫn kết nối</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -10962,6 +12278,25 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Select folder to upload</source>
       <translation>Chọn thư mục để tải lên</translation>
+    </message>
+    <message>
+      <source>Developer Tools</source>
+      <translation>Công cụ phát triển</translation>
+    </message>
+    <message>
+      <source>Unavailable in dedicated window mode</source>
+      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+    </message>
+    <message>
+      <source>Move this window to the Layout to use this functionality</source>
+      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation>Không được phép để lịch trống</translation>
     </message>
   </context>
   <context>
@@ -10979,8 +12314,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Ẩn</translation>
     </message>
     <message>
-      <source>Unable to connect to the system because it has become offline</source>
-      <translation>Không thể kết nối với hệ thống vì nó đã ngoại tuyến</translation>
+      <source>Unable to connect to the site because it has become offline</source>
+      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
     </message>
   </context>
   <context>
@@ -10990,18 +12325,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>
         <numerusform>%n dấu trang</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Exporting video</source>
-      <translation>Xuất ra video</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Dừng xuất file</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Thu nhỏ</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -11041,14 +12364,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Bắt đầu xuất khẩu...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Đang lưu bố cục</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Ngừng lưu</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Lưu trữ thất bại</translation>
     </message>
@@ -11061,8 +12376,9 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Chúng tôi đang chuẩn bị các tập tin cho quá trình xuất khẩu. Xin vui lòng chờ trong vài giây.</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Chuyển mã là bắt buộc. Phiên xuất lại được khởi động lại.</translation>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>Độ dài tên tệp %1 dài hơn %2 ký tự.</translation>
     </message>
   </context>
   <context>
@@ -11072,20 +12388,43 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Phiên bản khả dụng %1</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>Ghi chú Phát hành</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>Các vấn đề chính đã được khắc phục. Nên cập nhật ngay.</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>Cập nhật...</translation>
+      <source>Updates</source>
+      <translation>Cập nhật</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>Không thông báo lại về bản cập nhật này</translation>
+      <source>Release Notes...</source>
+      <translation>Ghi chú Phát hành...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation>Phiên bản %1 có sẵn</translation>
+    </message>
+    <message>
+      <source>Skip Version</source>
+      <translation type="unfinished">Skip Version</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Ngày / thời gian</translation>
+    </message>
+    <message>
+      <source>Title</source>
+      <translation type="unfinished">Title</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Máy ảnh</translation>
+    </message>
+    <message>
+      <source>Object Type</source>
+      <translation type="unfinished">Object Type</translation>
     </message>
   </context>
   <context>
@@ -11104,7 +12443,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Bookmarks</translation>
+      <translation>Dấu trang</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -11129,8 +12468,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
-      <source>New System</source>
-      <translation>Hệ thống mới</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
@@ -11160,10 +12499,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Người sử dụng</translation>
     </message>
     <message>
-      <source>Other Systems</source>
-      <translation>Hệ thống khác</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Tập tin cục bộ</translation>
     </message>
@@ -11183,6 +12518,26 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>Shared Layouts</source>
       <translation>Bố cục được chia sẻ</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>Theo dõi tài nguyên hệ thống</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Tường video</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Tích hợp</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation>Trang web &amp; Tích hợp</translation>
+    </message>
+    <message>
+      <source>Other Sites</source>
+      <translation type="unfinished">Other Sites</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11193,6 +12548,45 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>New Group %1</source>
       <translation>Nhóm mới %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>Không có dữ liệu</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation>Tất cả được nhập khẩu</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation>Đang tiến hành... (%1 còn lại)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Tàn tật</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Lỗi</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation>Không thể nhập được. Hãy thử lại sau 1 phút.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation>Được nhập khẩu lên tới</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Trạng thái</translation>
     </message>
   </context>
   <context>
@@ -11277,6 +12671,14 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>Resource is not available for the usage with JS API</source>
       <translation>Tài nguyên không có sẵn để sử dụng với JS API</translation>
     </message>
+    <message>
+      <source>Resource not found</source>
+      <translation type="unfinished">Resource not found</translation>
+    </message>
+    <message>
+      <source>Parameter not found</source>
+      <translation type="unfinished">Parameter not found</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
@@ -11302,63 +12704,440 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>
     <message>
-      <source>None</source>
-      <translation>Không</translation>
+      <source>No filter</source>
+      <translation>Không lọc</translation>
     </message>
     <message>
-      <source>Starts</source>
-      <translation>Bắt đầu</translation>
+      <source>Main storage only</source>
+      <translation>Chỉ bộ nhớ chính</translation>
     </message>
     <message>
-      <source>Stops</source>
-      <translation>Dừng lại</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Ngay</translation>
+      <source>Backup storage only</source>
+      <translation>Chỉ bộ nhớ sao lưu</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::menu::PtzPresetsToursFactory</name>
     <message>
-      <source>Not saved</source>
-      <translation>Chưa lưu</translation>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (sáng kiến)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (sáng kiến)</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <name>nx::vms::client::desktop::menu::RadassActionFactory</name>
     <message>
-      <source>Restore all rules to default?</source>
-      <translation>Khôi phục tất cả các quy tắc về mặc định?</translation>
+      <source>Auto</source>
+      <translation>Tự động</translation>
     </message>
     <message>
-      <source>This action cannot be undone.</source>
-      <translation>Không thể hoàn tác thao tác này.</translation>
+      <source>Low</source>
+      <translation>Thấp</translation>
     </message>
     <message>
-      <source>Failed to apply changes.</source>
-      <translation>Không thể lưu các thay đổi.</translation>
+      <source>High</source>
+      <translation>Cao</translation>
     </message>
     <message>
-      <source>Failed to restore rules.</source>
-      <translation>Không khôi phục được quy tắc.</translation>
+      <source>Custom</source>
+      <translation>Tùy chỉnh</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Thông tin</translation>
     </message>
     <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Áp dụng các thay đổi trước khi thoát?</translation>
+      <source>Objects</source>
+      <translation>Các đối tượng</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation>Khu vực quan tâm</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>Hotspots</translation>
+    </message>
+    <message>
+      <source>Toolbar</source>
+      <translation>Thanh công cụ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>Chuyển bằng phím nóng</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>Bật hẹn giờ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Ngừng nhảy vòng</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Ngừng Showreel</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Bắt đầu bay</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Bắt đầu Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
+    <message>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Phân tích sự kiện có thể được thiết lập trên một camera nhất định.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Chọn camera bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation>Sự kiện sẽ chỉ kích hoạt nếu có bất kỳ thuộc tính nào trùng khớp.</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation>Bạn có thể xem tên của các thuộc tính và giá trị của chúng trên tab Đối tượng.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
+    <message>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation>Tính năng phát hiện đối tượng phân tích có thể được thiết lập trên một số camera nhất định.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Chọn camera bằng cách sử dụng nút ở trên để xem danh sách các sự kiện được hỗ trợ.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>Lịch trình</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>WHEN</source>
+      <translation>KHI</translation>
+    </message>
+    <message>
+      <source>EVENT</source>
+      <translation>SỰ KIỆN</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation>THỰC HIỆN</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation>HÀNH ĐỘNG</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Bật</translation>
+    </message>
+    <message>
+      <source>Add Title or Comment</source>
+      <translation type="unfinished">Add Title or Comment</translation>
+    </message>
+    <message>
+      <source>The rule is not valid and may not work</source>
+      <translation type="unfinished">The rule is not valid and may not work</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
+    <message>
+      <source>Authentication</source>
+      <translation type="unfinished">Authentication</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Đăng nhập</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Mật khẩu</translation>
+    </message>
+    <message>
+      <source>Token</source>
+      <translation type="unfinished">Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation>Có thuộc tính</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Các đặc tính</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
+    <message>
+      <source>Once in</source>
+      <translation>Một lần vào</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation>Dành cho</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Giá trí</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
-      <translation>Biến cố</translation>
+      <translation>Sự kiện</translation>
     </message>
     <message>
       <source>Action</source>
       <translation>Hoạt động</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Nguồn</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Đích đến</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation>Bình luận</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation>Không có nguồn</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>Tất cả Máy chủ</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n Máy chủ</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Máy ảnh nguồn</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Nguồn và %n camera khác</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation>Không có đích đến</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>Bố cục %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Tất cả người dùng</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>Máy chủ nguồn và %1</translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Bất kỳ thiết bị nào</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Tất cả camera</translation>
+    </message>
+    <message>
+      <source>Any Server</source>
+      <translation>Bất kỳ máy chủ nào</translation>
+    </message>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+    <message>
+      <source>Select at least one User</source>
+      <translation type="unfinished">Select at least one User</translation>
+    </message>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Tìm kiếm một bố cục cục bộ? Chỉ chọn một người dùng từ danh sách &quot;Hiển thị tới&quot; để hiển thị bố cục cục bộ dưới dạng tùy chọn tại đây.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation>Quản lý</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::StatePicker</name>
+    <message>
+      <source>When event occurs</source>
+      <translation type="unfinished">When event occurs</translation>
+    </message>
+    <message>
+      <source>When event starts</source>
+      <translation type="unfinished">When event starts</translation>
+    </message>
+    <message>
+      <source>When event stops</source>
+      <translation type="unfinished">When event stops</translation>
+    </message>
+    <message>
+      <source>Select state</source>
+      <translation type="unfinished">Select state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation>Chứa từ khóa</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation>Chứa các mục danh sách</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Từ khóa ngăn cách bởi không gian</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>Từ</translation>
+    </message>
+    <message>
+      <source>Not contains keywords</source>
+      <translation type="unfinished">Not contains keywords</translation>
+    </message>
+    <message>
+      <source>Not contains list entries</source>
+      <translation type="unfinished">Not contains list entries</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation>Tra cứu danh sách yêu cầu mạng không thành công</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error:</source>
+      <translation>Xóa lỗi quy tắc:</translation>
+    </message>
+    <message>
+      <source>Save rule error:</source>
+      <translation>Lưu lỗi quy tắc:</translation>
+    </message>
+    <message>
+      <source>Reset to defaults error:</source>
+      <translation>Lỗi đặt lại về mặc định:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VolumePicker</name>
+    <message>
+      <source>Test</source>
+      <translation>Thử</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
+    <message>
+      <source>Name</source>
+      <translation>Tên</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Kiểu</translation>
+    </message>
+    <message>
+      <source>Total</source>
+      <translation>Tổng cộng</translation>
+    </message>
+    <message>
+      <source>Used</source>
+      <translation>Đã dùng</translation>
+    </message>
+    <message>
+      <source>Number of devices using this service exceeds the available service quantity.</source>
+      <translation>Số lượng thiết bị sử dụng dịch vụ này vượt quá số lượng dịch vụ sẵn có.</translation>
+    </message>
+    <message>
+      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+      <translation>Vui lòng tắt nó cho một số thiết bị hoặc thêm các dịch vụ phù hợp hơn. Nếu không nó sẽ được thực hiện tự động vào %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::TierUsageModel</name>
+    <message>
+      <source>Limitation</source>
+      <translation type="unfinished">Limitation</translation>
+    </message>
+    <message>
+      <source>Allowed</source>
+      <translation type="unfinished">Allowed</translation>
+    </message>
+    <message>
+      <source>Current</source>
+      <translation type="unfinished">Current</translation>
     </message>
   </context>
   <context>
@@ -11404,13 +13183,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Kéo Bố cục hoặc camera vào đây để thêm vào showreel</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
@@ -11444,7 +13216,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Users</source>
-      <translation>Người sử dụng</translation>
+      <translation>Người dùng</translation>
     </message>
     <message>
       <source>Custom Users</source>
@@ -11454,64 +13226,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>%1 người dùng</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>Chuyển bằng phím nóng</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>Bật hẹn giờ</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Ngừng nhảy vòng</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Ngừng Showreel</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Bắt đầu bay</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>Bắt đầu Showreel</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (sáng kiến)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (sáng kiến)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
-    <message>
-      <source>Info</source>
-      <translation>Thông tin</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Các đối tượng</translation>
-    </message>
-    <message>
-      <source>Regions of Interest</source>
-      <translation>Khu vực quan tâm</translation>
     </message>
   </context>
   <context>
@@ -11568,7 +13282,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -11666,7 +13380,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation>Có một người sử dụng có cùng tên</translation>
+      <translation>Có một người dùng khác có cùng tên</translation>
     </message>
     <message>
       <source>Updating Background...</source>
@@ -11677,32 +13391,8 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
     </message>
     <message>
-      <source>Image too big</source>
-      <translation>Hình ảnh quá lớn</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>Kích thước tối đa là %1 MB.</translation>
-    </message>
-    <message>
       <source>Failed to upload image</source>
       <translation>Tải hình ảnh thất bại</translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>Thành phần của hệ thống có phiên bản khác nhau:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Vui lòng cập nhật tất cả các thành phần lên phiên bản %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Cập nhật...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Bỏ qua</translation>
     </message>
     <message>
       <source>Beta version %1</source>
@@ -11733,7 +13423,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>OK</source>
-      <translation>Kác định</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -11742,16 +13432,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>the largest available partition</source>
       <translation>phân vùng có sẵn lớn nhất</translation>
-    </message>
-    <message>
-      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation>Cơ sở dữ liệu phân tích chỉ nên được lưu trữ trên ổ đĩa cục bộ và có thể chiếm nhiều dung lượng.
-Sau khi đã chọn vị trí lưu trữ dữ liệu phân tích, vị trí đó nếu thay đổi sẽ có nguy cơ làm mất dữ liệu hiện có. Chúng tôi khuyến nghị bạn nên chọn vị trí cẩn thận và tránh sử dụng phân vùng hệ thống vì nó có thể gây ra sự cố hệ thống nghiêm trọng.
-Theo mặc định, dữ liệu phân tích sẽ được lưu trữ trên %1.
-Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản lý Lưu trữ&quot; trong hộp thoại Cài đặt Máy chủ.</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
@@ -11795,83 +13475,27 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
       <translation>Không có camera phù hợp để thay thế trên Server &quot;%1&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Sử dụng mũi tên trên bàn phím để chuyển giữu các bố cục. Để thoát khỏi showreel ấn Esc.</translation>
+      <source>Not enough access rights</source>
+      <translation>Không đủ quyền truy cập</translation>
     </message>
     <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation>Nhấn Esc để dừng Trình tham quan.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>Chuyển sang</translation>
+      <source>You do not have permissions to open this camera on the layout</source>
+      <translation>Bạn không có quyền mở camera này trên bố cục</translation>
     </message>
     <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>Hiển thị cho</translation>
+      <source>You do not have permissions to open some of selected cameras on the layout</source>
+      <translation>Bạn không có quyền mở một số camera đã chọn trên bố cục</translation>
     </message>
     <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>Hiển thị được chọn cho</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>Showreels</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>Showreel %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>Lưu bố cục thành</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>Nhập tên bố cục:</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>Bố cục mới</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>Nhập tên của bố cục để tạo:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>Bố cục mới %1</translation>
-    </message>
-    <message>
-      <source>Save Layout As Cloud</source>
-      <translation>Lưu bố cục dưới dạng đám mây</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
-    <message>
-      <source>Maximum level of nesting is reached</source>
-      <translation>Đã đạt đến mức tối đa của việc chồng vào nhau</translation>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>
@@ -11911,31 +13535,6 @@ Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản l
     <message>
       <source>File downloading failed</source>
       <translation>Tải tệp không thành công</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::workbench::timeline::BookmarkTooltip</name>
-    <message>
-      <source>Zoom timeline
-to view more bookmarks</source>
-      <comment>It is highly recommended to split message in two lines</comment>
-      <translation>Phóng to đường thời gian để xem thêm bookmarks</translation>
-    </message>
-    <message>
-      <source>Play bookmark from the beginning</source>
-      <translation>Phát bookmarks ngay từ đầu</translation>
-    </message>
-    <message>
-      <source>Edit bookmark</source>
-      <translation>Chỉnh sửa bookmarks</translation>
-    </message>
-    <message>
-      <source>Export bookmark</source>
-      <translation>Xuất dấu trang</translation>
-    </message>
-    <message>
-      <source>Delete bookmark</source>
-      <translation>Xóa bookmarks</translation>
     </message>
   </context>
   <context>
@@ -12022,10 +13621,6 @@ to view more bookmarks</source>
       <translation>Ứng dụng khách được cập nhật lên phiên bản %1. Khởi động lại %2 để hoàn tất cập nhật.</translation>
     </message>
     <message>
-      <source>Automatic client updates</source>
-      <translation>Cập nhật ứng dụng máy khách tự động</translation>
-    </message>
-    <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
       <translation>Chỉ có bản cập nhật máy khách mới sẽ được cài đặt tự động. Bạn có thể thay đổi điều này trong cài đặt.</translation>
     </message>
@@ -12044,6 +13639,17 @@ to view more bookmarks</source>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation>Không thể kiểm tra tính khả dụng của bản cập nhật máy khách. Kiểm tra kết nối internet của bạn và thử lại.</translation>
+    </message>
+    <message>
+      <source>Client auto-updates</source>
+      <translation type="unfinished">Client auto-updates</translation>
+    </message>
+  </context>
+  <context>
+    <name>runApplication</name>
+    <message>
+      <source>Would you like to try switching to DirectX?</source>
+      <translation>Bạn có muốn thử chuyển sang DirectX không?</translation>
     </message>
   </context>
 </TS>

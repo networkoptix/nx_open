@@ -24,10 +24,6 @@
       <translation>Brukerstøtte</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>System servere</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>Utvikler</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation>Åpen kildekode-biblioteker</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>Gjør</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>Serverhandlinger</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>Systemhandlinger</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>Velg alle</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>Hendelseregler</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>Ingen backup</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Serveren er frakoblet. Sikkerhetskopieringsinnstillinger er ikke tilgjengelige.</translation>
     </message>
   </context>
   <context>
@@ -538,10 +524,6 @@
       <translation>Gjenopprett standardinnstillinger</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Ikke endre disse innstillingene med mindre du er helt sikker på deres potensielle innvirkning på systemets ytelse.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Bruk videostrøm innstillinger satt i kamera</translation>
     </message>
@@ -622,10 +604,6 @@
       <translation>Medieport</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation>Bruk system posisjoner</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ-hastighet</translation>
     </message>
@@ -666,7 +644,23 @@
       <translation>Primær strømmeprofil</translation>
     </message>
     <message>
-      <source>Import From Device</source>
+      <source>Web Page</source>
+      <translation>Nettside</translation>
+    </message>
+    <message>
+      <source>Web Page Port</source>
+      <translation>Nettsideport</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation>Ikke send Stop PTZ-kommandoen</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation>Ikke ta opp lyd</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
       <translation>Importer fra enhet</translation>
     </message>
     <message>
@@ -674,12 +668,19 @@
       <translation>Importer video automatisk</translation>
     </message>
     <message>
-      <source>Web Page</source>
-      <translation>Nettside</translation>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation>Punkter</translation>
     </message>
     <message>
-      <source>Web Page Port</source>
-      <translation>Nettsideport</translation>
+      <source>Add</source>
+      <translation>Legg til</translation>
     </message>
   </context>
   <context>
@@ -954,6 +955,17 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation>Ingen tilkobling</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1027,20 +1039,16 @@
       <translation>Gjenopprett fra sikkerhetskopi...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation>Lag en sikkerhetskopi av systemadministrasjonsdata, eller gjenopprett systemadministrasjonsdata fra en eksisterende sikkerhetskopi</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation>Åpne mappe</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1161,17 +1169,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Hendelseregler...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Når</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation>Generisk hendelse</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation>Serverplasserings-ID:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Failover-prioritering...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Ingenting funnet</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation>Legg til en kommentar</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Sett tidsplan</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation>Test handling</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation>Legg til en kommentar</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>Oppstart</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Koble til det forrige systemet ved oppstart</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Gjenopprett automatisk lagret vindu konfigurasjon</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation>La datamaskinen gå inn i hvilemodus når inaktiv</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>Systeminnstillinger</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>Slett</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Inngangs-ID</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Valgfri</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Tester...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP-innstillinger</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Passord</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Søkebase</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Søkefilter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Tidsavbrudd for søk (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Administrer DN eller CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Henter brukere fra LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laster...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Tilkoblingsfeil</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Rollen som skal tilordnes til importerte brukere</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Deaktiver importerte brukere</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Tillat "digest autentisering" for importert bruker</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>Funksjoner</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Aktive lisenser</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Fjern</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Ny lisens</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Detaljer...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>Programvaren er lisensiert til</translation>
     </message>
   </context>
   <context>
@@ -1836,6 +1733,18 @@
       <source>Test</source>
       <translation>Test</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation type="unfinished">Use Credentials</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation type="unfinished">Use Link</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation type="unfinished">Link</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>Prøv på nytt</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation>Nedlasting ferdig!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation>Kunne ikke lagre logger i den valgte mappen</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation>Vis måloverlegg for PTZ-kameraer</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Slå sammen systemer...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>Server-URL:</translation>
@@ -1954,8 +1855,12 @@
       <translation>Velg</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Ta systemnavn og innstillinger fra:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Ta systemnavn og innstillinger fra</translation>
     </message>
   </context>
   <context>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Tekst</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>Velg visning</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>Legg til enheter</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>til</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>VELG SERVER</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Port</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>Hint</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Logg Inn</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Passord</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Søk</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Legg til alle enheter</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation>Tilkoblingsinnstillinger</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Passord</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Bruker</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>Brukerstøtte signatur</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>Systemsignatur</translation>
+      <source>Username</source>
+      <translation>Brukernavn</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Logg på</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Passord</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>Brukernavn</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation>Logg på nettsiden</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Merk følgende! Effektgrensen overskredet</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>Vis alle varsler</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Systemvarsler</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>Hendelser</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Posisjon</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>Til</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>Språkinnstillinger</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>Egendefinert meldingsinnhold</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Søk blant brukere</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Aktiver</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Deaktiver</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Slett...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Krev sikker autentisering</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Ingenting funnet</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Ny bruker...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rediger roller...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP-innstillinger...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Henter brukere fra LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>Legg til</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Hvis du fjerner dette tilkoblingsalternativet, kan det føre til systemfeil.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>Systemadministrasjon</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Aktiver tidslinje på videovegg</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kvalitet</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Midlertidig mappe</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Ytterligere innstillinger</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Deaktiver Aero</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Fange musepeker</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>En kraftig datamaskin anbefales for &quot;beste&quot; kvalitet og oppløsning.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
-      <translation>Bla gjennom...</translation>
+      <translation>Bla igjennom...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Kilde</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>Opptakskvalitet</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Kilde</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>En kraftig datamaskin anbefales for &quot;beste&quot; kvalitet og oppløsning.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Skjerm</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Ytterligere innstillinger</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Fange musepeker</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation>Alarm/hendelsesregler</translation>
+      <source>No services found</source>
+      <translation type="unfinished">No services found</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation>Ny regel</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation>Slett regel</translation>
+      <source>Channel Partner Contact</source>
+      <translation type="unfinished">Channel Partner Contact</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation>Velg en regel</translation>
+      <source>Services Usage</source>
+      <translation type="unfinished">Services Usage</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation>Tilbakestill standardregler</translation>
+      <source>Services state</source>
+      <translation>Tjenester tilstand</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation>Brukeraktivitet</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Vis servere i treet for ikke-administratorbrukere</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Arkivkryptering</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>Arkivkryptering øker CPU-bruken</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>Bytt passord...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Kryptering av videotrafikk vil øke CPU-bruken betydelig.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Forbindelsen med kameraer som ikke støtter HTTPS vil gå tapt.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>Administrer brukere</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>Tilgjengelig for</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>Detaljer</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Fest til dette sertifikatet</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Vis festet sertifikat</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Failover</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Failover-prioritering...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Oppdag innebygde og USB-webkameraer automatisk</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation>Lyd</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation>Administrer</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Delstat</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>Reindekserer sikkerhetskopi</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Opptak til deaktivert lagringsplass vil stoppe. Men utdaterte opptak vil fremdeles slettes.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Innspilling aktivert på USB-lagringen</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation>Analytics-data kan ta opp store mengder plass. Vi anbefaler å velge en annen plassering for den i stedet for systempartisjonen.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation>Analyse-data vil fortsette å bli lagret på den deaktiverte stasjonen.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Roller</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Vis alle brukere</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Ingenting samsvarer med søket ditt.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Advarsel! Dette vil gjøre innstillingene for kvalitet og bildefrekvens (BPS) i opptaksplanen uten betydning.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation>Egendefinert språk for skyvarsler</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>Søk blant brukere</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation>+ Legg til gruppe</translation>
+      <source>Add Group</source>
+      <translation>Legg til gruppe</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation>Ingen grupper funnet</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>Søk blant brukere</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Legg til bruker</translation>
+      <source>Add User</source>
+      <translation>Legge til bruker</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation>Ingen brukere funnet</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Bytt passord...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Brukere</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Slett rolle</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Brukerroller</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Ny rolle</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Det er ingen tilpassede brukerroller ennå.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klikk på &quot;Ny rolle&quot; knapp for å opprette en.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Denne brukeren kan bruke sammendragsgodkjenning.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Krev sikker autentisering</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Brukertype</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Rolle</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rediger roller...</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Fra</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volum</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Generell</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy denne nettsiden via server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>Fullmakt for alt etterspurt innhold</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Tillat åpning av nettside uten SSL-sertifikatkontroll</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Merk: Tidsplanen er basert på servertid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Aktive lisenser</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Fjern</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Detaljer...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>Programvaren er lisensiert til</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Ny lisens</translation>
     </message>
   </context>
   <context>

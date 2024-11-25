@@ -24,10 +24,6 @@
       <translation>Support</translation>
     </message>
     <message>
-      <source>System Servers</source>
-      <translation>Systeem Servers</translation>
-    </message>
-    <message>
       <source>Developer</source>
       <translation>Ontwikkelaar</translation>
     </message>
@@ -35,12 +31,9 @@
       <source>Open source libraries</source>
       <translation>Open source bibliotheken</translation>
     </message>
-  </context>
-  <context>
-    <name>ActionTypePickerWidget</name>
     <message>
-      <source>Do</source>
-      <translation>Actie</translation>
+      <source>Site Servers</source>
+      <translation type="unfinished">Site Servers</translation>
     </message>
   </context>
   <context>
@@ -243,10 +236,6 @@
       <translation>Server acties</translation>
     </message>
     <message>
-      <source>System actions</source>
-      <translation>Systeemacties</translation>
-    </message>
-    <message>
       <source>Select all</source>
       <translation>Alles selecteren</translation>
     </message>
@@ -277,6 +266,10 @@
     <message>
       <source>Event Rules</source>
       <translation>Event regels</translation>
+    </message>
+    <message>
+      <source>Site actions</source>
+      <translation type="unfinished">Site actions</translation>
     </message>
   </context>
   <context>
@@ -312,13 +305,6 @@
     <message>
       <source>No backup</source>
       <translation>Geen back-up</translation>
-    </message>
-  </context>
-  <context>
-    <name>BackupSettingsWidget</name>
-    <message>
-      <source>Server is offline. Backup settings are not available.</source>
-      <translation>Server is offline. Back-up instellingen zijn niet beschikbaar.</translation>
     </message>
   </context>
   <context>
@@ -538,10 +524,6 @@
       <translation>Herstel standaardwaarden</translation>
     </message>
     <message>
-      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Wijzig deze instellingen niet tenzij u absoluut zeker van hun potentiële impact op de systeemprestaties.</translation>
-    </message>
-    <message>
       <source>Keep camera stream and profile settings</source>
       <translation>Bewaar de camera streams- en profielinstellingen</translation>
     </message>
@@ -622,10 +604,6 @@
       <translation>Media Poort</translation>
     </message>
     <message>
-      <source>Use system presets</source>
-      <translation>Standaard systeem instellingen gebruiken</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ snelheid</translation>
     </message>
@@ -666,20 +644,43 @@
       <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
-      <source>Import From Device</source>
-      <translation type="unfinished">Import From Device</translation>
-    </message>
-    <message>
-      <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
-    </message>
-    <message>
       <source>Web Page</source>
       <translation>Webpagina</translation>
     </message>
     <message>
       <source>Web Page Port</source>
       <translation type="unfinished">Web Page Port</translation>
+    </message>
+    <message>
+      <source>Do not send Stop PTZ command</source>
+      <translation type="unfinished">Do not send Stop PTZ command</translation>
+    </message>
+    <message>
+      <source>Do not record audio</source>
+      <translation type="unfinished">Do not record audio</translation>
+    </message>
+    <message>
+      <source>Import from Device</source>
+      <translation type="unfinished">Import from Device</translation>
+    </message>
+    <message>
+      <source>Import video automatically</source>
+      <translation type="unfinished">Import video automatically</translation>
+    </message>
+    <message>
+      <source>Use site presets</source>
+      <translation type="unfinished">Use site presets</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Hotspots</source>
+      <translation type="unfinished">Hotspots</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Toevoegen</translation>
     </message>
   </context>
   <context>
@@ -954,6 +955,17 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <source>No connection</source>
+      <translation type="unfinished">No connection</translation>
+    </message>
+    <message>
+      <source>This site is connected to</source>
+      <translation type="unfinished">This site is connected to</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
@@ -1027,20 +1039,16 @@
       <translation>Herstellen van backup...</translation>
     </message>
     <message>
-      <source>Create a backup of System management data, or restore System management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of System management data, or restore System management data from an existing backup</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Annuleren</translation>
     </message>
     <message>
-      <source>&lt;Message&gt;</source>
-      <translation>&lt;Message&gt;</translation>
-    </message>
-    <message>
       <source>Open Folder</source>
       <translation type="unfinished">Open Folder</translation>
+    </message>
+    <message>
+      <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
@@ -1161,17 +1169,6 @@
     <message>
       <source>Event Rules...</source>
       <translation>Gebeurtenisregels...</translation>
-    </message>
-  </context>
-  <context>
-    <name>EventTypePickerWidget</name>
-    <message>
-      <source>When</source>
-      <translation>Wanneer</translation>
-    </message>
-    <message>
-      <source>Generic event</source>
-      <translation type="unfinished">Generic event</translation>
     </message>
   </context>
   <context>
@@ -1322,6 +1319,21 @@
     </message>
   </context>
   <context>
+    <name>FailoverWidget</name>
+    <message>
+      <source>Failover</source>
+      <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Server Location ID:</source>
+      <translation type="unfinished">Server Location ID:</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Failover-prioriteit...</translation>
+    </message>
+  </context>
+  <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
@@ -1333,25 +1345,6 @@
     <message>
       <source>Nothing found</source>
       <translation>Niets gevonden</translation>
-    </message>
-  </context>
-  <context>
-    <name>FooterWidget</name>
-    <message>
-      <source>Add Comment</source>
-      <translation type="unfinished">Add Comment</translation>
-    </message>
-    <message>
-      <source>Set Schedule</source>
-      <translation>Schema instellen</translation>
-    </message>
-    <message>
-      <source>Test Action</source>
-      <translation type="unfinished">Test Action</translation>
-    </message>
-    <message>
-      <source>Add a comment</source>
-      <translation type="unfinished">Add a comment</translation>
     </message>
   </context>
   <context>
@@ -1416,10 +1409,6 @@
       <translation>Opstarten</translation>
     </message>
     <message>
-      <source>Connect to the previous system on startup</source>
-      <translation>Bij het opstarten verbinding maken met het vorige systeem</translation>
-    </message>
-    <message>
       <source>Automatically restore saved windows configuration</source>
       <translation>Automatisch opgeslagen vensterconfiguratie herstellen</translation>
     </message>
@@ -1435,12 +1424,16 @@
       <source>Allow the computer to enter sleep mode on idle</source>
       <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
     </message>
+    <message>
+      <source>Connect to the previous site on startup</source>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-      <source>System Settings</source>
-      <translation>Systeeminstellingen</translation>
+      <source>Site Settings</source>
+      <translation type="unfinished">Site Settings</translation>
     </message>
   </context>
   <context>
@@ -1521,13 +1514,6 @@
     <message>
       <source>Delete</source>
       <translation>Verwijder</translation>
-    </message>
-  </context>
-  <context>
-    <name>InputIDPickerWidget</name>
-    <message>
-      <source>Input ID</source>
-      <translation>Ingang ID</translation>
     </message>
   </context>
   <context>
@@ -1623,72 +1609,6 @@
     </message>
   </context>
   <context>
-    <name>LdapSettingsDialog</name>
-    <message>
-      <source>Optional</source>
-      <translation>Optioneel</translation>
-    </message>
-    <message>
-      <source>Testing...</source>
-      <translation>Testen...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings</source>
-      <translation>LDAP instellingen</translation>
-    </message>
-    <message>
-      <source>Server URL</source>
-      <translation>Server URL</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Wachtwoord</translation>
-    </message>
-    <message>
-      <source>Search Base</source>
-      <translation>Zoekbasis</translation>
-    </message>
-    <message>
-      <source>Search Filter</source>
-      <translation>Zoekfilter</translation>
-    </message>
-    <message>
-      <source>Search Timeout (s)</source>
-      <translation>Zoek Timeout (s)</translation>
-    </message>
-    <message>
-      <source>Admin DN or CN</source>
-      <translation>Beheerder DN of CN</translation>
-    </message>
-  </context>
-  <context>
-    <name>LdapUsersDialog</name>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen van LDAP...</translation>
-    </message>
-    <message>
-      <source>Loading...</source>
-      <translation>Laden...</translation>
-    </message>
-    <message>
-      <source>Connection error</source>
-      <translation>Netwerkfout</translation>
-    </message>
-    <message>
-      <source>Role to assign to imported users</source>
-      <translation>Rol om toe te wijzen aan geïmporteerde gebruikers</translation>
-    </message>
-    <message>
-      <source>Disable imported users</source>
-      <translation>Geïmporteerde gebruikers uitschakelen</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for imported user</source>
-      <translation>Sta digest authenticatie toe voor geïmporteerde gebruiker</translation>
-    </message>
-  </context>
-  <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
@@ -1701,29 +1621,6 @@
     <message>
       <source>Features</source>
       <translation>Functies</translation>
-    </message>
-  </context>
-  <context>
-    <name>LicenseManagerWidget</name>
-    <message>
-      <source>Active Licenses</source>
-      <translation>Actieve licenties</translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Verwijder</translation>
-    </message>
-    <message>
-      <source>New License</source>
-      <translation>Nieuwe licentie</translation>
-    </message>
-    <message>
-      <source>Details...</source>
-      <translation>Details...</translation>
-    </message>
-    <message>
-      <source>The software is licensed to</source>
-      <translation>De software is gelicenseerd aan</translation>
     </message>
   </context>
   <context>
@@ -1836,6 +1733,18 @@
       <source>Test</source>
       <translation>Test</translation>
     </message>
+    <message>
+      <source>Use Credentials</source>
+      <translation type="unfinished">Use Credentials</translation>
+    </message>
+    <message>
+      <source>Use Link</source>
+      <translation type="unfinished">Use Link</translation>
+    </message>
+    <message>
+      <source>Link</source>
+      <translation type="unfinished">Link</translation>
+    </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
@@ -1862,14 +1771,6 @@
     <message>
       <source>Retry</source>
       <translation>Opnieuw proberen</translation>
-    </message>
-    <message>
-      <source>Download complete!</source>
-      <translation type="unfinished">Download complete!</translation>
-    </message>
-    <message>
-      <source>Failed to save logs to the selected folder</source>
-      <translation type="unfinished">Failed to save logs to the selected folder</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1930,13 +1831,13 @@
       <source>Show aim overlay for PTZ cameras</source>
       <translation>Doeloverlay weergeven voor PTZ-camera's</translation>
     </message>
+    <message>
+      <source>Show timestamp on LIVE</source>
+      <translation type="unfinished">Show timestamp on LIVE</translation>
+    </message>
   </context>
   <context>
     <name>MergeSystemsDialog</name>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Systemen samenvoegen...</translation>
-    </message>
     <message>
       <source>Server URL:</source>
       <translation>Server URL:</translation>
@@ -1954,8 +1855,12 @@
       <translation>Controleer</translation>
     </message>
     <message>
-      <source>Take system name and settings from:</source>
-      <translation>Neem de systeemnaam en instellingen over van:</translation>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from</source>
+      <translation>Neem de systeemnaam en instellingen over van</translation>
     </message>
   </context>
   <context>
@@ -2014,21 +1919,67 @@
     </message>
   </context>
   <context>
-    <name>MultilineTextPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>Tekst</translation>
-    </message>
-  </context>
-  <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
       <translation>Selecteer Layouts</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewDeviceAdditionDialog</name>
+    <message>
+      <source>Add Devices</source>
+      <translation>Apparaten toevoegen</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>aan</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>SELECTEER SERVER</translation>
+    </message>
+    <message>
+      <source>Address or Subnet Mask</source>
+      <translation type="unfinished">Address or Subnet Mask</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Poort</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>Tip</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Login</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Zoek</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Alle apparaat toevoegen</translation>
+    </message>
+    <message>
+      <source>Find Devices</source>
+      <translation type="unfinished">Find Devices</translation>
+    </message>
+    <message>
+      <source>
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </source>
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
+          </translation>
     </message>
   </context>
   <context>
@@ -2071,16 +2022,8 @@
       <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
-      <source>Email</source>
-      <translation>E-mailadres</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Wachtwoord</translation>
-    </message>
-    <message>
-      <source>User</source>
-      <translation>Gebruiker</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -2099,16 +2042,20 @@
       <translation>Ondersteuning handtekening</translation>
     </message>
     <message>
-      <source>System Signature</source>
-      <translation>Systeem handtekening</translation>
+      <source>Username</source>
+      <translation>Gebruikersnaam</translation>
+    </message>
+    <message>
+      <source>Mail from</source>
+      <translation type="unfinished">Mail from</translation>
+    </message>
+    <message>
+      <source>Signature</source>
+      <translation type="unfinished">Signature</translation>
     </message>
   </context>
   <context>
     <name>PasswordDialog</name>
-    <message>
-      <source>Sign in</source>
-      <translation>Aanmelden</translation>
-    </message>
     <message>
       <source>Password</source>
       <translation>Wachtwoord</translation>
@@ -2116,6 +2063,10 @@
     <message>
       <source>Username</source>
       <translation>Gebruikersnaam</translation>
+    </message>
+    <message>
+      <source>Sign in to web page</source>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
@@ -2173,13 +2124,6 @@
     </message>
   </context>
   <context>
-    <name>PoeSettingsWidget</name>
-    <message>
-      <source>Attention! Power limit exceeded</source>
-      <translation>Opgelet! Stroomlimiet overschreden</translation>
-    </message>
-  </context>
-  <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
@@ -2201,23 +2145,12 @@
       <translation>Toon alle notificaties</translation>
     </message>
     <message>
-      <source>System Notifications</source>
-      <translation>Systeemnotificaties</translation>
-    </message>
-    <message>
       <source>Events</source>
       <translation>Events</translation>
     </message>
-  </context>
-  <context>
-    <name>PresetPickerWidget</name>
     <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Preset</source>
-      <translation>Preset</translation>
+      <source>Site Notifications</source>
+      <translation type="unfinished">Site Notifications</translation>
     </message>
   </context>
   <context>
@@ -2285,10 +2218,6 @@
       <translation>Aan</translation>
     </message>
     <message>
-      <source>Language Settings</source>
-      <translation>Taalinstellingen</translation>
-    </message>
-    <message>
       <source>Custom notification content</source>
       <translation>Aangepaste inhoud van meldingen</translation>
     </message>
@@ -2343,49 +2272,6 @@
     </message>
   </context>
   <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Search users</source>
-      <translation>Zoek gebruikers</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Inschakelen</translation>
-    </message>
-    <message>
-      <source>Disable</source>
-      <translation>Uitschakelen</translation>
-    </message>
-    <message>
-      <source>Delete...</source>
-      <translation>Verwijder...</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Beveiligde authenticatie forceren</translation>
-    </message>
-    <message>
-      <source>Nothing found</source>
-      <translation>Niets gevonden</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Nieuwe gebruiker...</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
-    </message>
-    <message>
-      <source>LDAP Settings...</source>
-      <translation>LDAP-instellingen...</translation>
-    </message>
-    <message>
-      <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen van LDAP...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
@@ -2430,15 +2316,15 @@
       <translation>Toevoegen</translation>
     </message>
     <message>
-      <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>Het verwijderen van deze verbindingsoptie kan leiden tot storingen in het systeem.</translation>
+      <source>Removing this connection option could lead to Site malfunction.</source>
+      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
-      <source>System Administration</source>
-      <translation>Systeem Administratie</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
     </message>
   </context>
   <context>
@@ -2458,17 +2344,6 @@
     <message>
       <source>Enable timeline on video wall</source>
       <translation>Schakel tijdlijn op de videowall in</translation>
-    </message>
-  </context>
-  <context>
-    <name>QualityPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Quality</source>
-      <translation>Kwaliteit</translation>
     </message>
   </context>
   <context>
@@ -2541,30 +2416,18 @@
     </message>
   </context>
   <context>
-    <name>RecordingSettings</name>
+    <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
       <translation>Tijdelijke map</translation>
     </message>
     <message>
-      <source>Additional Options</source>
-      <translation>Extra opties</translation>
-    </message>
-    <message>
-      <source>Disable Aero</source>
-      <translation>Schakel Aero uit</translation>
-    </message>
-    <message>
-      <source>Capture Cursor</source>
-      <translation>Cursor opnemen</translation>
-    </message>
-    <message>
-      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Een krachtige computer wordt aanbevolen voor &quot;Beste&quot; kwaliteit en resolutie.</translation>
-    </message>
-    <message>
       <source>Browse...</source>
       <translation>Bladeren...</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Bron</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2575,12 +2438,20 @@
       <translation>Opnamekwaliteit</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>Bron</translation>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Een krachtige computer wordt aanbevolen voor &quot;Beste&quot; kwaliteit en resolutie.</translation>
     </message>
     <message>
       <source>Screen</source>
       <translation>Scherm</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Extra opties</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Cursor opnemen</translation>
     </message>
   </context>
   <context>
@@ -2625,26 +2496,30 @@
     </message>
   </context>
   <context>
-    <name>RulesDialog</name>
+    <name>SaasInfoWidget</name>
     <message>
-      <source>Alarm/Event Rules</source>
-      <translation type="unfinished">Alarm/Event Rules</translation>
+      <source>No services found</source>
+      <translation type="unfinished">No services found</translation>
     </message>
     <message>
-      <source>New Rule</source>
-      <translation type="unfinished">New Rule</translation>
+      <source>Contact your Channel Partner to add services</source>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
     </message>
     <message>
-      <source>Delete Rule</source>
-      <translation type="unfinished">Delete Rule</translation>
+      <source>Channel Partner Contact</source>
+      <translation type="unfinished">Channel Partner Contact</translation>
     </message>
     <message>
-      <source>Select a Rule</source>
-      <translation type="unfinished">Select a Rule</translation>
+      <source>Services Usage</source>
+      <translation type="unfinished">Services Usage</translation>
     </message>
     <message>
-      <source>Reset Default Rules</source>
-      <translation type="unfinished">Reset Default Rules</translation>
+      <source>Services state</source>
+      <translation type="unfinished">Services state</translation>
+    </message>
+    <message>
+      <source>Organization&apos;s limits violation</source>
+      <translation type="unfinished">Organization&apos;s limits violation</translation>
     </message>
   </context>
   <context>
@@ -2752,28 +2627,12 @@
       <translation>Gebruikersactiviteit</translation>
     </message>
     <message>
-      <source>Display servers in tree for non-administrator users</source>
-      <translation>Servers in boomstructuur weergeven voor niet-beheerders</translation>
-    </message>
-    <message>
       <source>Archive encryption</source>
       <translation>Archief encryptie</translation>
     </message>
     <message>
-      <source>Archive encryption increases CPU usage</source>
-      <translation>Archief encryptie verhoogt het CPU-gebruik</translation>
-    </message>
-    <message>
       <source>Change Password...</source>
       <translation>Wachtwoord wijzigen...</translation>
-    </message>
-    <message>
-      <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Versleuteling van videoverkeer zal het CPU-gebruik aanzienlijk verhogen.</translation>
-    </message>
-    <message>
-      <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation>Verbinding met camera's die geen HTTPS ondersteunen, wordt verbroken.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2786,6 +2645,46 @@
     <message>
       <source>Manage Users</source>
       <translation>Gebruikers beheren</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-power users</source>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
+    </message>
+    <message>
+      <source>Video Redaction</source>
+      <translation type="unfinished">Video Redaction</translation>
+    </message>
+    <message>
+      <source>Configure...</source>
+      <translation type="unfinished">Configure...</translation>
+    </message>
+    <message>
+      <source>Blur</source>
+      <translation type="unfinished">Blur</translation>
+    </message>
+    <message>
+      <source>Exclude Cameras</source>
+      <translation type="unfinished">Exclude Cameras</translation>
+    </message>
+    <message>
+      <source>Apply session duration to Cloud users</source>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
+    </message>
+    <message>
+      <source>Remote Access Tool</source>
+      <translation type="unfinished">Remote Access Tool</translation>
+    </message>
+    <message>
+      <source>Administrators</source>
+      <translation type="unfinished">Administrators</translation>
+    </message>
+    <message>
+      <source>Available to</source>
+      <translation>Beschikbaar voor</translation>
+    </message>
+    <message>
+      <source>Power users</source>
+      <translation type="unfinished">Power users</translation>
     </message>
   </context>
   <context>
@@ -2833,14 +2732,6 @@
       <source>Details</source>
       <translation>Details</translation>
     </message>
-    <message>
-      <source>Pin to this certificate</source>
-      <translation>Dit certificaat vastmaken</translation>
-    </message>
-    <message>
-      <source>View pinned certificate</source>
-      <translation>Vastgezet certificaat weergeven</translation>
-    </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
@@ -2854,14 +2745,6 @@
     <message>
       <source>Ping</source>
       <translation>Ping</translation>
-    </message>
-    <message>
-      <source>Failover</source>
-      <translation>Failover</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Failover-prioriteit...</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2878,6 +2761,14 @@
     <message>
       <source>Autodetect built-in and USB webcams</source>
       <translation>Automatische detectie van ingebouwde en USB-webcams</translation>
+    </message>
+    <message>
+      <source>Remote Access</source>
+      <translation type="unfinished">Remote Access</translation>
+    </message>
+    <message>
+      <source>Enable hardware decoding</source>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
@@ -2941,32 +2832,6 @@
     </message>
   </context>
   <context>
-    <name>SoundPickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
-    </message>
-    <message>
-      <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
-    </message>
-  </context>
-  <context>
-    <name>StatePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>Status</translation>
-    </message>
-  </context>
-  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
@@ -3007,22 +2872,6 @@
       <source>Reindex Backup</source>
       <translation>Backup herindexeren</translation>
     </message>
-    <message>
-      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Opname van de uitgeschakelde opslag zal stoppen. Echter, het overschrijven dan de oudste beelden gaat gewoon door.</translation>
-    </message>
-    <message>
-      <source>Recording was enabled on the USB storage</source>
-      <translation>Opname is ingeschakeld op de USB-opslag</translation>
-    </message>
-    <message>
-      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
-    </message>
-    <message>
-      <source>Analytics and motion data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -3057,10 +2906,6 @@
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
-      <source>Roles</source>
-      <translation>Rollen</translation>
-    </message>
-    <message>
       <source>Show all users</source>
       <translation>Toon alle gebruikers</translation>
     </message>
@@ -3071,6 +2916,10 @@
     <message>
       <source>Nothing matches your search.</source>
       <translation>Geen resultaten overeenkomstig met uw zoekopdracht.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
@@ -3086,10 +2935,6 @@
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Waarschuwing! Hierdoor worden de kwaliteit en de framerate (FPS) instellingen in het opnameschema irrelevant.</translation>
-    </message>
-    <message>
-      <source>Custom language for Cloud notifications</source>
-      <translation type="unfinished">Custom language for Cloud notifications</translation>
     </message>
   </context>
   <context>
@@ -3156,12 +3001,12 @@
       <translation>Zoek gebruikers</translation>
     </message>
     <message>
-      <source>+ Add Group</source>
-      <translation type="unfinished">+ Add Group</translation>
+      <source>Add Group</source>
+      <translation type="unfinished">Add Group</translation>
     </message>
     <message>
-      <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3171,79 +3016,12 @@
       <translation>Zoek gebruikers</translation>
     </message>
     <message>
-      <source>+ Add User</source>
-      <translation>+ Gebruiker toevoegen</translation>
+      <source>Add User</source>
+      <translation>Gebruiker toevoegen</translation>
     </message>
     <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserProfileWidget</name>
-    <message>
-      <source>Change Password...</source>
-      <translation>Wachtwoord wijzigen...</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRoleSettingsWidget</name>
-    <message>
-      <source>Name</source>
-      <translation>Naam</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Gebruikers</translation>
-    </message>
-    <message>
-      <source>Delete Role</source>
-      <translation>Rol verwijderen</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserRolesDialog</name>
-    <message>
-      <source>User Roles</source>
-      <translation>Gebruikersrollen</translation>
-    </message>
-    <message>
-      <source>New role</source>
-      <translation>Nieuwe rol</translation>
-    </message>
-    <message>
-      <source>There are no custom user roles yet.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersprofielen.</translation>
-    </message>
-    <message>
-      <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om er een te maken.</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsDialog</name>
-    <message>
-      <source>This user can use digest authentication.</source>
-      <translation>Deze gebruiker kan digest authenticatie gebruiken.</translation>
-    </message>
-    <message>
-      <source>Force Secure Authentication</source>
-      <translation>Beveiligde authenticatie forceren</translation>
-    </message>
-  </context>
-  <context>
-    <name>UserSettingsWidget</name>
-    <message>
-      <source>User Type</source>
-      <translation>Gebruikerstype</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Rol</translation>
-    </message>
-    <message>
-      <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
+      <source>Del</source>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
@@ -3303,29 +3081,10 @@
     </message>
   </context>
   <context>
-    <name>VolumePickerWidget</name>
-    <message>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>Volume</translation>
-    </message>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-  </context>
-  <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
       <translation>Algemeen</translation>
-    </message>
-    <message>
-      <source>Proxy this webpage via server</source>
-      <translation>Proxy deze webpagina via de server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -3344,8 +3103,12 @@
       <translation>Proxy alle gevraagde inhoud</translation>
     </message>
     <message>
-      <source>Allow opening web page without SSL certificate checking</source>
-      <translation>Webpagina openen zonder SSL-certificaat toestaan</translation>
+      <source>Every</source>
+      <translation type="unfinished">Every</translation>
+    </message>
+    <message>
+      <source>Force open in a dedicated window</source>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -3369,6 +3132,29 @@
     <message>
       <source>Note: Schedule is based on server time.</source>
       <translation>Opmerking: Schema is gebaseerd op de servertijd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Actieve licenties</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Details...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>De software is gelicenseerd aan</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Nieuwe licentie</translation>
     </message>
   </context>
   <context>

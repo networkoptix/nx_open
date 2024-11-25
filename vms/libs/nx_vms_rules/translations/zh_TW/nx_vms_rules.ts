@@ -2,10 +2,277 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_TW" sourcelanguage="en">
   <context>
-    <name>nx::vms::rules::AggregatedEvent</name>
+    <name>BasicAction</name>
     <message>
-      <source>Multiple %1 events have occurred</source>
-      <translation>發生了多個%1事件</translation>
+      <source>Caption</source>
+      <translation>說明</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>&amp;敘述</translation>
+    </message>
+    <message>
+      <source>Tooltip text</source>
+      <translation type="unfinished">Tooltip text</translation>
+    </message>
+  </context>
+  <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n 次, 第一次: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>第一次出現: %2 %1 (共 %n 次)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>時間：%2 %1 </translation>
+    </message>
+    <message>
+      <source>Unknown event</source>
+      <translation>未知的事件</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>原因：%1</translation>
+    </message>
+    <message>
+      <source>Unknown action</source>
+      <translation>未知的動作</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>任何事件</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>任何攝影機問題</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Invalid field type is provided</source>
+      <translation type="unfinished">Invalid field type is provided</translation>
+    </message>
+    <message>
+      <source>Unexpected validation policy</source>
+      <translation type="unfinished">Unexpected validation policy</translation>
+    </message>
+    <message>
+      <source>Select at least one Server</source>
+      <translation type="unfinished">Select at least one Server</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation type="unfinished">Select at least one user</translation>
+    </message>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation type="unfinished">Select exactly one camera</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation type="unfinished">Select at least one device</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation type="unfinished">Select at least one camera</translation>
+    </message>
+    <message>
+      <source>Not all servers are suitable</source>
+      <translation type="unfinished">Not all servers are suitable</translation>
+    </message>
+    <message>
+      <source>There are no suitable servers</source>
+      <translation type="unfinished">There are no suitable servers</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>於</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>發送到</translation>
+    </message>
+    <message>
+      <source>Occurs At</source>
+      <translation>發生於</translation>
+    </message>
+    <message>
+      <source>Begin When</source>
+      <translation>開始時間</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation type="unfinished">Duration</translation>
+    </message>
+    <message>
+      <source>Pre-Recording</source>
+      <translation type="unfinished">Pre-Recording</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation type="unfinished">Post-Recording</translation>
+    </message>
+    <message>
+      <source>Interval of Action</source>
+      <translation>動作間隔時間</translation>
+    </message>
+    <message>
+      <source>State</source>
+      <translation>狀態</translation>
+    </message>
+    <message>
+      <source>Volume</source>
+      <translation>音量</translation>
+    </message>
+    <message>
+      <source>Rewind</source>
+      <translation>倒帶</translation>
+    </message>
+    <message>
+      <source>On Layout</source>
+      <translation>在佈局上</translation>
+    </message>
+    <message>
+      <source>Event Devices</source>
+      <translation type="unfinished">Event Devices</translation>
+    </message>
+    <message>
+      <source>Of Type</source>
+      <translation>類型</translation>
+    </message>
+    <message>
+      <source>And Caption</source>
+      <translation>和標題</translation>
+    </message>
+    <message>
+      <source>And Description</source>
+      <translation>和敘述</translation>
+    </message>
+    <message>
+      <source>Field %1 value must be provided for the given validation policy</source>
+      <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
+      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+    </message>
+    <message>
+      <source>Chosen local layout can only be shown to its owner %1</source>
+      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+    </message>
+    <message>
+      <source>None of selected users have access to the selected layout</source>
+      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation type="unfinished">For</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected devices were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected devices were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected cameras were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected servers were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected servers were removed</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected layouts were removed</source>
+      <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time value cannot be less than zero</source>
+      <translation type="unfinished">Time value cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Duration cannot be less than zero</source>
+      <translation type="unfinished">Duration cannot be less than zero</translation>
+    </message>
+    <message>
+      <source>Value cannot be less than %1</source>
+      <translation type="unfinished">Value cannot be less than %1</translation>
+    </message>
+    <message>
+      <source>Value cannot be more than %1</source>
+      <translation type="unfinished">Value cannot be more than %1</translation>
+    </message>
+    <message>
+      <source>To Users</source>
+      <translation>對使用者</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AcknowledgeAction</name>
+    <message>
+      <source>Acknowledge</source>
+      <translation type="unfinished">Acknowledge</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ActionTextFieldValidator</name>
+    <message>
+      <source>Empty text is not allowed</source>
+      <translation type="unfinished">Empty text is not allowed</translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -19,25 +286,12 @@
       <comment>Analytics Event at some camera</comment>
       <translation>%1 於 %2</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
-      <source>State</source>
-      <translation>狀態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>Event Type</source>
-      <translation>事件類型</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>說明</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;敘述</translation>
+      <source>Analytics event type is not selected</source>
+      <translation type="unfinished">Analytics event type is not selected</translation>
     </message>
   </context>
   <context>
@@ -47,47 +301,46 @@
       <translation>物件偵測</translation>
     </message>
     <message>
-      <source>%1 at camera &apos;%2&apos;</source>
-      <comment> is detected</comment>
-      <translation>在攝影機&apos;%2&apos;上的%1</translation>
-    </message>
-    <message>
       <source>Analytics Object Detected</source>
       <translation>已偵測到分析物件</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
+      <source>And Object</source>
+      <translation>和物件</translation>
     </message>
     <message>
-      <source>Object Type</source>
-      <translation>物件類型</translation>
-    </message>
-    <message>
-      <source>Attributes</source>
-      <translation>屬性</translation>
+      <source>%1 at %2</source>
+      <comment> is detected</comment>
+      <translation>%1 於 %2</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BackupFinishedEvent</name>
+    <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>伺服器 &quot;%1&quot; 已完成錄影資料備份</translation>
-    </message>
-    <message>
-      <source>Backup Finished</source>
-      <translation type="unfinished">Backup Finished</translation>
+      <source>Analytics object type is not selected</source>
+      <translation type="unfinished">Analytics object type is not selected</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::BasicEvent</name>
+    <name>nx::vms::rules::BookmarkAction</name>
     <message>
-      <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <source>Create Bookmark</source>
+      <translation>建立書籤</translation>
     </message>
     <message>
-      <source>%1 event has occurred</source>
-      <translation type="unfinished">%1 event has occurred</translation>
+      <source>Add Tags</source>
+      <translation>增加標籤</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::BuzzerAction</name>
+    <message>
+      <source>Buzzer</source>
+      <translation>蜂鳴器</translation>
+    </message>
+    <message>
+      <source>Action Throttling</source>
+      <translation>動作節流</translation>
     </message>
   </context>
   <context>
@@ -101,35 +354,16 @@
       <translation>%1 輸入</translation>
     </message>
     <message>
+      <source>Input Signal on Device</source>
+      <translation>裝置上的輸入訊號</translation>
+    </message>
+    <message>
+      <source>With ID</source>
+      <translation>帶 ID</translation>
+    </message>
+    <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>狀態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>Input ID</source>
-      <translation>輸入ID</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::rules::DebugEvent</name>
-    <message>
-      <source>Debug Event</source>
-      <translation type="unfinished">Debug Event</translation>
-    </message>
-    <message>
-      <source>Action</source>
-      <translation>動作</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>攝影機上的 DI</translation>
     </message>
   </context>
   <context>
@@ -147,32 +381,25 @@
       <translation>I/O 模組已斷線</translation>
     </message>
     <message>
-      <source>Device %1 was disconnected</source>
-      <translation>裝置 %1 已斷線</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>攝影機 %1 已斷線</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/O 模組 %1 已離線</translation>
-    </message>
-    <message numerus="yes">
       <source>Device Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Device Disconnected</numerusform>
-      </translation>
+      <translation type="unfinished">Device Disconnected</translation>
     </message>
     <message>
-      <source>Device ID</source>
-      <translation type="unfinished">Device ID</translation>
-    </message>
-    <message numerus="yes">
       <source>Camera Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Camera Disconnected</numerusform>
-      </translation>
+      <translation type="unfinished">Camera Disconnected</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>裝置</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>攝影機</translation>
+    </message>
+    <message>
+      <source>%1 was disconnected</source>
+      <comment>Device name will be substituted</comment>
+      <translation type="unfinished">%1 was disconnected</translation>
     </message>
   </context>
   <context>
@@ -183,7 +410,7 @@
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
+      <translation>MAC #%1: %2 </translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -193,19 +420,67 @@
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>%1的攝影機IP衝突</translation>
+      <translation>%1上的的攝影機IP衝突</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Device IP Conflict</source>
-      <translation>
-        <numerusform>設備 IP 衝突</numerusform>
-      </translation>
+      <translation type="unfinished">Device IP Conflict</translation>
     </message>
-    <message numerus="yes">
+    <message>
       <source>Camera IP Conflict</source>
-      <translation>
-        <numerusform>攝影機 IP 衝突</numerusform>
-      </translation>
+      <translation type="unfinished">Camera IP Conflict</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceOutputAction</name>
+    <message>
+      <source>Output ID</source>
+      <translation>輸出 ID</translation>
+    </message>
+    <message>
+      <source>Device Output</source>
+      <translation>裝置輸出</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::DeviceRecordingAction</name>
+    <message>
+      <source>Quality</source>
+      <translation>畫質</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Camera Recording</source>
+      <translation>觸發攝影機錄影</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>開</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::EnterFullscreenAction</name>
+    <message>
+      <source>Camera</source>
+      <translation>攝影機</translation>
+    </message>
+    <message>
+      <source>Set to Fullscreen</source>
+      <translation>切換為全螢幕</translation>
+    </message>
+    <message>
+      <source>Set for</source>
+      <translation>設定為</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ExitFullscreenAction</name>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>離開全螢幕</translation>
     </message>
   </context>
   <context>
@@ -215,12 +490,8 @@
       <translation>%1風扇故障</translation>
     </message>
     <message>
-      <source>Fan Error</source>
+      <source>Fan Failure</source>
       <translation>風扇故障</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>伺服器</translation>
     </message>
   </context>
   <context>
@@ -230,86 +501,123 @@
       <translation>通用事件</translation>
     </message>
     <message>
-      <source>Generic Event at %1</source>
-      <translation>通用事件 %1</translation>
+      <source>Omit logging</source>
+      <translation>省略日誌記錄</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>關鍵字以空白鍵分隔</translation>
+      <source>And Source</source>
+      <translation>及來源</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>狀態</translation>
-    </message>
-    <message>
-      <source>Source</source>
-      <translation>來源</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>說明</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;敘述</translation>
+      <source>Generic Event from %1</source>
+      <translation type="unfinished">Generic Event from %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <source>Content type</source>
+      <translation>內容類型</translation>
     </message>
     <message>
-      <source>Login</source>
-      <translation>登入帳號</translation>
+      <source>HTTP(S) Request</source>
+      <translation>HTTP(S) 請求</translation>
     </message>
     <message>
-      <source>Password</source>
-      <translation>密碼</translation>
+      <source>URL</source>
+      <translation>URL</translation>
     </message>
     <message>
-      <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <source>Content</source>
+      <translation>內容</translation>
     </message>
     <message>
-      <source>HTTP(S) URL</source>
-      <translation type="unfinished">HTTP(S) URL</translation>
+      <source>Method</source>
+      <translation>方式</translation>
     </message>
     <message>
-      <source>HTTP(S) Content</source>
-      <translation type="unfinished">HTTP(S) Content</translation>
+      <source>HTTP authentication</source>
+      <translation type="unfinished">HTTP authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpAuthFieldValidator</name>
+    <message>
+      <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
+      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
     </message>
     <message>
-      <source>Content Type</source>
-      <translation type="unfinished">Content Type</translation>
+      <source>Token field should be filled in case of bearer auth type selected</source>
+      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::HttpMethodFieldValidator</name>
+    <message>
+      <source>HTTP Method should be known</source>
+      <translation type="unfinished">HTTP Method should be known</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LayoutFieldValidator</name>
+    <message>
+      <source>Select layout</source>
+      <translation type="unfinished">Select layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::LdapSyncIssueEvent</name>
+    <message>
+      <source>LDAP Sync Issue Event</source>
+      <translation type="unfinished">LDAP Sync Issue Event</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is a cause of the event</comment>
+      <translation type="unfinished">
+        <numerusform>%1 (%n times)</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Request Method</source>
-      <translation type="unfinished">Request Method</translation>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>伺服器 &quot;%1&quot; 有授權問題</translation>
-    </message>
     <message>
       <source>License Issue</source>
       <translation>授權問題</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>沒有足夠的授權數量，以下裝置的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>沒有足夠的授權數量，以下攝影機的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>沒有足夠的授權數量，以下I/O模組的錄影已被停用:</translation>
+    </message>
+    <message>
+      <source>%1 has a license problem</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 has a license problem</translation>
     </message>
   </context>
   <context>
@@ -317,14 +625,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>%1 位移偵測</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>狀態</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
@@ -398,39 +698,66 @@
       <translation>與裝置的連線無預期中斷.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
-      <source>Show Notification</source>
-      <translation type="unfinished">Show Notification</translation>
-    </message>
-    <message>
-      <source>To</source>
-      <translation>發送到</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
       <source>Force Acknowledgement</source>
-      <translation type="unfinished">Force Acknowledgement</translation>
+      <translation>強制確認</translation>
     </message>
     <message>
-      <source>Caption</source>
-      <translation>說明</translation>
+      <source>Show Desktop Notification</source>
+      <translation>顯示桌面通知</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ObjectLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
     </message>
     <message>
-      <source>Description</source>
-      <translation>&amp;敘述</translation>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
     </message>
     <message>
-      <source>Tooltip</source>
-      <translation type="unfinished">Tooltip</translation>
+      <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OpenLayoutAction</name>
+    <message>
+      <source>Open Layout</source>
+      <translation>開啟佈局</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::OptionalTimeFieldValidator</name>
+    <message>
+      <source>Zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+    </message>
+    <message>
+      <source>Non zero duration cannot be set for the `%1` event state</source>
+      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PanicRecordingAction</name>
+    <message>
+      <source>Panic Recording</source>
+      <translation>緊急錄影</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PlaySoundAction</name>
+    <message>
+      <source>Play Sound</source>
+      <translation>播放聲音</translation>
     </message>
   </context>
   <context>
@@ -440,24 +767,12 @@
       <translation>插件診斷事件</translation>
     </message>
     <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
+      <source>For Plugin</source>
+      <translation>對於插件</translation>
     </message>
     <message>
-      <source>Source</source>
-      <translation>來源</translation>
-    </message>
-    <message>
-      <source>Caption</source>
-      <translation>說明</translation>
-    </message>
-    <message>
-      <source>Description</source>
-      <translation>&amp;敘述</translation>
-    </message>
-    <message>
-      <source>Level</source>
-      <translation>級別</translation>
+      <source>And Level Is</source>
+      <translation>且等級是</translation>
     </message>
   </context>
   <context>
@@ -467,59 +782,165 @@
       <translation>耗電量</translation>
     </message>
     <message>
-      <source>PoE over budget at %1</source>
-      <translation>%1 Poe供電過載</translation>
+      <source>Server</source>
+      <translation>伺服器</translation>
     </message>
     <message>
-      <source>Reason: Power limit exceeded (%1)</source>
-      <comment>%1 is consumption</comment>
-      <translation>原因：超出供電上限（%1）</translation>
-    </message>
-    <message>
-      <source>PoE over Budget</source>
+      <source>PoE Over Budget</source>
       <translation>Poe供電過載</translation>
     </message>
     <message>
-      <source>State</source>
-      <translation>狀態</translation>
+      <source>Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation type="unfinished">Power limit exceeded (%1)</translation>
     </message>
     <message>
-      <source>Server</source>
-      <translation>伺服器</translation>
+      <source>PoE over budget on %1</source>
+      <translation type="unfinished">PoE over budget on %1</translation>
+    </message>
+    <message>
+      <source>Current power consumption: %1 watts</source>
+      <translation type="unfinished">Current power consumption: %1 watts</translation>
+    </message>
+    <message>
+      <source>Upper consumption limit: %1 watts</source>
+      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+    </message>
+    <message>
+      <source>Lower consumption limit: %1 watts</source>
+      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PtzPresetAction</name>
+    <message>
+      <source>Execute PTZ Preset</source>
+      <translation>移動PTZ至預設點</translation>
+    </message>
+    <message>
+      <source>PTZ Preset</source>
+      <translation>PTZ預設點</translation>
+    </message>
+    <message>
+      <source>Execute to users</source>
+      <translation>對使用者執行</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::PushNotificationAction</name>
+    <message>
+      <source>Header</source>
+      <translation>標題</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>內容</translation>
+    </message>
+    <message>
+      <source>Send Mobile Notification</source>
+      <translation>傳送手機通知</translation>
+    </message>
+    <message>
+      <source>Add Source Device name to Body</source>
+      <translation>將來源裝置名稱新增至內容</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::RepeatSoundAction</name>
+    <message>
+      <source>Sound</source>
+      <translation>聲音</translation>
+    </message>
+    <message>
+      <source>Repeat Sound</source>
+      <translation>重複播放聲音</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::Rule</name>
+    <message>
+      <source>`%1` event filter field alerts:</source>
+      <translation type="unfinished">`%1` event filter field alerts:</translation>
+    </message>
+    <message>
+      <source>`%1` action builder field alerts:</source>
+      <translation type="unfinished">`%1` action builder field alerts:</translation>
+    </message>
+    <message>
+      <source>Rule is not completed. One filter and one builder are required</source>
+      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+    </message>
+    <message>
+      <source>The given filter is not compatible with the given builder</source>
+      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SaasIssueEvent</name>
+    <message>
+      <source>License migration issue</source>
+      <translation>授權轉移問題</translation>
+    </message>
+    <message>
+      <source>Recording services disabled</source>
+      <translation>錄影服務已停用</translation>
+    </message>
+    <message>
+      <source>Cloud storage services disabled</source>
+      <translation>雲端儲存服務已停用</translation>
+    </message>
+    <message>
+      <source>Paid integration services disabled</source>
+      <translation>付費整合服務已停用</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數的錄影已停止。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數的雲端備份已停止使用。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數上的付費整合服務已停止使用。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation type="unfinished">Services Issue</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
-      <source>Send email</source>
-      <translation>傳送電子郵件</translation>
-    </message>
-    <message>
-      <source>to</source>
-      <translation>到</translation>
-    </message>
-    <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
-    </message>
-    <message>
-      <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
-    </message>
-    <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>電子郵件訊息</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation>傳送郵件</translation>
+    </message>
+    <message>
+      <source>Additional Recipients</source>
+      <translation>其他收件者</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
-      <source>Server &quot;%1&quot; certificate error</source>
-      <translation>伺服器&quot;%1&quot; 憑證錯誤</translation>
-    </message>
-    <message>
       <source>Server Certificate Error</source>
       <translation>伺服器憑證錯誤</translation>
+    </message>
+    <message>
+      <source>%1 certificate error</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 certificate error</translation>
     </message>
   </context>
   <context>
@@ -539,20 +960,17 @@
       <translation>MAC #%1: %2 {1:?} {2?}</translation>
     </message>
     <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation>伺服器 &quot;%1&quot; 衝突</translation>
-    </message>
-    <message>
       <source>Server Conflict</source>
       <translation>伺服器衝突</translation>
+    </message>
+    <message>
+      <source>%1 Conflict</source>
+      <comment>Server name will be substituted</comment>
+      <translation type="unfinished">%1 Conflict</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation>伺服器 &quot;%1&quot; 故障</translation>
-    </message>
     <message>
       <source>Server Failure</source>
       <translation>伺服器錯誤</translation>
@@ -565,16 +983,35 @@
       <source>Server stopped unexpectedly.</source>
       <translation>伺服器無預警停止。</translation>
     </message>
+    <message>
+      <source>%1 Failure</source>
+      <translation type="unfinished">%1 Failure</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation>伺服器 &quot;%1&quot; 已啟動</translation>
-    </message>
-    <message>
       <source>Server Started</source>
       <translation>伺服器啟動</translation>
+    </message>
+    <message>
+      <source>%1 Started</source>
+      <translation type="unfinished">%1 Started</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>影像彈跳</translation>
+    </message>
+    <message>
+      <source>Alarm: %1</source>
+      <translation>警報: %1</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout Opening</source>
+      <translation>強制彈跳影像</translation>
     </message>
   </context>
   <context>
@@ -584,28 +1021,8 @@
       <translation>觸發事件名稱</translation>
     </message>
     <message>
-      <source>Trigger: %1</source>
-      <translation>觸發器：%1</translation>
-    </message>
-    <message>
-      <source>Soft Trigger %1 at %2</source>
-      <translation>觸發按鈕 %1 在 %2</translation>
-    </message>
-    <message>
       <source>Soft Trigger</source>
       <translation>觸發按鈕</translation>
-    </message>
-    <message>
-      <source>State</source>
-      <translation>狀態</translation>
-    </message>
-    <message>
-      <source>Cameras</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>使用者</translation>
     </message>
     <message>
       <source>Name</source>
@@ -615,6 +1032,25 @@
       <source>Icon</source>
       <translation>圖示</translation>
     </message>
+    <message>
+      <source>By</source>
+      <translation>由</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>來源：%1</translation>
+    </message>
+    <message>
+      <source>User: %1</source>
+      <translation type="unfinished">User: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::SoundFieldValidator</name>
+    <message>
+      <source>Sound is not selected</source>
+      <translation type="unfinished">Sound is not selected</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
@@ -623,24 +1059,19 @@
       <translation>說</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>攝影機</translation>
+      <source>Text</source>
+      <translation>文字</translation>
     </message>
     <message>
-      <source>Interval of action</source>
-      <translation type="unfinished">Interval of action</translation>
+      <source>At Device</source>
+      <translation>於裝置</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::StateFieldValidator</name>
     <message>
-      <source>Speak to users</source>
-      <translation>發話至客戶端</translation>
-    </message>
-    <message>
-      <source>Speak the following</source>
-      <translation>說以下內容</translation>
-    </message>
-    <message>
-      <source>Volume</source>
-      <translation>音量</translation>
+      <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
+      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
     </message>
   </context>
   <context>
@@ -683,83 +1114,85 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>分析儲存裝置 &quot;%1&quot; DB錯誤：掛載點權限不足。</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>寫入時無法初始化 AES 加密。故錄影資料以未加密狀態寫入。</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID錯誤: %1。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetDeviceFieldValidator</name>
+    <message>
+      <source>Failed to get event descriptor</source>
+      <translation type="unfinished">Failed to get event descriptor</translation>
+    </message>
+    <message>
+      <source>Event does not have source camera</source>
+      <translation type="unfinished">Event does not have source camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TargetLayoutFieldValidator</name>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::rules::TextLookupFieldValidator</name>
+    <message>
+      <source>List is not selected</source>
+      <translation type="unfinished">List is not selected</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; does not exist</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+    </message>
+    <message>
+      <source>List with the given id &apos;%1&apos; is not a generic list</source>
+      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
-      <source>Show text overlay</source>
+      <source>Show Text Overlay</source>
       <translation>顯示疊加文字</translation>
     </message>
     <message>
-      <source>Cameras</source>
-      <translation>攝影機</translation>
+      <source>Custom Text</source>
+      <translation>自訂文字</translation>
     </message>
     <message>
-      <source>Also show on source camera</source>
-      <translation>同時顯示來源攝影機</translation>
-    </message>
-    <message>
-      <source>Display text for</source>
-      <translation>顯示字幕</translation>
-    </message>
-    <message>
-      <source>Text</source>
-      <translation>文字</translation>
+      <source>Show To</source>
+      <translation type="unfinished">Show To</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::TextWithFields</name>
+    <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
-      <source>Event: %1</source>
-      <translation>事件：%1</translation>
+      <source>Url cannot be empty</source>
+      <translation type="unfinished">Url cannot be empty</translation>
     </message>
     <message>
-      <source>Source: %1</source>
-      <translation>來源：%1</translation>
+      <source>Url must be valid</source>
+      <translation type="unfinished">Url must be valid</translation>
     </message>
     <message>
-      <source>Plugin: %1</source>
-      <translation>擴充套件: %1</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>說明: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>原因：%1</translation>
+      <source>Url should not contains user or password</source>
+      <translation type="unfinished">Url should not contains user or password</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::rules::utils::StringHelper</name>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n 次, 第一次: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
-      </translation>
-    </message>
+    <name>nx::vms::rules::WriteToLogAction</name>
     <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>時間：%1 在 %2</translation>
+      <source>Write to Log</source>
+      <translation>寫入至日誌</translation>
     </message>
   </context>
 </TS>

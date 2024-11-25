@@ -2,6 +2,41 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_TW" sourcelanguage="en">
   <context>
+    <name>AccessRightHelper</name>
+    <message>
+      <source>View Live</source>
+      <translation>瀏覽即時影像</translation>
+    </message>
+    <message>
+      <source>Play Audio</source>
+      <translation type="unfinished">Play Audio</translation>
+    </message>
+    <message>
+      <source>View Archive</source>
+      <translation>瀏覽錄影資料</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation>匯出錄影資料</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation>瀏覽書籤</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>管理書籤</translation>
+    </message>
+    <message>
+      <source>User Input</source>
+      <translation>使用者輸入</translation>
+    </message>
+    <message>
+      <source>Edit Settings</source>
+      <translation>編輯設定</translation>
+    </message>
+  </context>
+  <context>
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
@@ -17,46 +52,15 @@
     </message>
   </context>
   <context>
-    <name>AuthResultTranslations</name>
+    <name>BookmarkFacadeStrings</name>
     <message>
-      <source>This user does not exist.</source>
-      <translation>此使用者帳號不存在</translation>
+      <source>Removed camera</source>
+      <translation>移除攝影機</translation>
     </message>
     <message>
-      <source>Wrong password.</source>
-      <translation>使用者密碼不正確</translation>
-    </message>
-    <message>
-      <source>The password is expired. Please contact your system administrator.</source>
-      <translation>密碼已過期，請聯繫系統管理員</translation>
-    </message>
-    <message>
-      <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation>無法登入指定的LDAP伺服器。請稍後再試。</translation>
-    </message>
-    <message>
-      <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>無法連線至 %1 或無回應，請稍後再試</translation>
-    </message>
-    <message>
-      <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation>由於嘗試登入錯誤次數過多，此使用者帳號目前已被鎖定。請稍後再試。</translation>
-    </message>
-    <message>
-      <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation>此授權方式不被允許。請聯繫系統管理員。</translation>
-    </message>
-    <message>
-      <source>The session key is invalid or expired.</source>
-      <translation>通訊金鑰無效或已過期</translation>
-    </message>
-    <message>
-      <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>內部伺服器錯誤 (%1)。請聯繫系統管理員。</translation>
-    </message>
-    <message>
-      <source>This user has been disabled by a system administrator.</source>
-      <translation>此用戶已被系統管理員停用.</translation>
+      <source>Site Event</source>
+      <comment>Shows that the bookmark was created by a site event</comment>
+      <translation type="unfinished">Site Event</translation>
     </message>
   </context>
   <context>
@@ -135,11 +139,123 @@
     </message>
   </context>
   <context>
-    <name>QObject</name>
+    <name>PredefinedUserGroups</name>
     <message>
-      <source>System Event</source>
-      <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>系統事件</translation>
+      <source>Administrators</source>
+      <translation>管理者</translation>
+    </message>
+    <message>
+      <source>Power Users</source>
+      <translation>進階使用者</translation>
+    </message>
+    <message>
+      <source>Advanced Viewers</source>
+      <translation>進階瀏覽者</translation>
+    </message>
+    <message>
+      <source>Viewers</source>
+      <translation>瀏覽者</translation>
+    </message>
+    <message>
+      <source>Live Viewers</source>
+      <translation>即時影像瀏覽者</translation>
+    </message>
+    <message>
+      <source>Members of this group can view live videos, I/O modules and web pages.</source>
+      <translation>該群組的成員可以瀏覽即時影像、I/O 模組和網頁。</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
+      <translation>該群組的成員除了瀏覽者群組授予的權限外，還可以查看和啟動 PTZ 位置和 PTZ 巡航、使用雙向語音、操作 I/O 模組按鈕、建立和編輯書籤以及瀏覽事件日誌。</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
+      <translation>該群組的成員除了即時影響瀏覽者群組授予的權限之外，還可以瀏覽和匯出錄影和書籤。</translation>
+    </message>
+    <message>
+      <source>Site Health Viewers</source>
+      <translation type="unfinished">Site Health Viewers</translation>
+    </message>
+    <message>
+      <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+    </message>
+    <message>
+      <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
+      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+    </message>
+    <message>
+      <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
+      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBusinessResourceValidationStrings</name>
+    <message numerus="yes">
+      <source>%1 of %n devices</source>
+      <translation>
+        <numerusform>%n 個裝置中的 %1 個</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n cameras</source>
+      <translation>
+        <numerusform>%n 個攝影機中的 %1 個</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n I/O modules</source>
+      <translation>
+        <numerusform>%n 個 I/O 模組中的 %1 個</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>任何設備</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>任何攝影機</translation>
+    </message>
+    <message>
+      <source>Select at least one device</source>
+      <translation>請選擇至少一個裝置</translation>
+    </message>
+    <message>
+      <source>Select at least one camera</source>
+      <translation>請選擇至少一個攝影機</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBuzzerPolicy</name>
+    <message>
+      <source>Servers that support buzzer</source>
+      <translation>支援蜂鳴器的伺服器</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>分析不可用於 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAudioTransmitPolicy</name>
+    <message>
+      <source>Select device</source>
+      <translation>選擇裝置</translation>
+    </message>
+    <message>
+      <source>Select camera</source>
+      <translation>選取攝影機</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 does not support two-way audio</source>
+      <translation>
+        <numerusform>%1 不支援雙向語音</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -237,14 +353,6 @@
       <translation>未知的攝影機錯誤</translation>
     </message>
     <message>
-      <source>Invalid data was received from the device %1.</source>
-      <translation>從裝置 %1 接收到無效的資料</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the camera %1.</source>
-      <translation>從攝影機 %1 接收到無效的資料</translation>
-    </message>
-    <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
       <translation>串流發生太多錯誤，請開啟事件列表確認裝置問題內容。</translation>
     </message>
@@ -267,10 +375,6 @@
     <message>
       <source>Unknown I/O module issue.</source>
       <translation>未知的 I/O 模組問題</translation>
-    </message>
-    <message>
-      <source>Invalid data was received from the I/O module %1.</source>
-      <translation>從 I/O 模組 %1 接收到無效資料</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -342,7 +446,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>請更新韌體. 至少更新到 %1. 目前版本是 %2</translation>
+      <translation>目前版本是 %2，請更新韌體至 %1或以上版本。 </translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -368,82 +472,99 @@
       <source>If disabled, try to enable Recording in I/O Module Settings (error &quot;%1&quot;).</source>
       <translation>若已停用，請嘗試到I/O模組設定中啟用錄影 (錯誤&quot;%1&quot;)。</translation>
     </message>
-  </context>
-  <context>
-    <name>QnFfmpegAudioTranscoder</name>
     <message>
-      <source>Audio context was not specified.</source>
-      <translation>未指定聲音內容.</translation>
+      <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
+      <translation>從設備收到無效的資料。詳細內容：&quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
+      <translation>從攝影機收到無效的資料。詳細內容：&quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器。</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio decoder.</source>
-      <translation>無法初始化聲音解碼器.</translation>
-    </message>
-    <message>
-      <source>Could not find decoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
-    </message>
-    <message>
-      <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1.</translation>
-    </message>
-    <message>
-      <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
-    </message>
-    <message>
-      <source>Could not allocate sample buffers</source>
-      <translation>無法分配樣本緩衝</translation>
+      <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
+      <translation>從I/O模組收到無效的資料。詳細內容：&quot;%1&quot;</translation>
     </message>
   </context>
   <context>
-    <name>QnFfmpegTranscoder</name>
-    <message>
-      <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>在 FFMPEG 函式庫內找不到容器 %1 。</translation>
-    </message>
-    <message>
-      <source>Could not create output context for format %1.</source>
-      <translation>無法建立格式 %1 的輸出內容。</translation>
-    </message>
-    <message>
-      <source>Could not allocate output stream for recording.</source>
-      <translation>無法分配錄影用的輸出串流。</translation>
-    </message>
-    <message>
-      <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>無法進行直接串流複製，因為未定義圖框尺寸大小。</translation>
-    </message>
-    <message>
-      <source>Could not find codec %1.</source>
-      <translation>找不到 %1 編碼。</translation>
-    </message>
-    <message>
-      <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>影像或聲音編碼與容器 %1 不相容。</translation>
+    <name>QnCameraInputPolicy</name>
+    <message numerus="yes">
+      <source>%1 have no input ports</source>
+      <translation>
+        <numerusform>%1 沒有輸入埠</numerusform>
+      </translation>
     </message>
   </context>
   <context>
-    <name>QnFfmpegVideoTranscoder</name>
+    <name>QnCameraMotionPolicy</name>
     <message>
-      <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <source>Recording or motion detection is disabled for %1</source>
+      <translation>%1 的錄影或位移偵側功能無法使用</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>移除攝影機</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraOutputPolicy</name>
+    <message numerus="yes">
+      <source>%1 have no output relays</source>
+      <translation>
+        <numerusform>%1 沒有輸出繼電器</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraRecordingPolicy</name>
+    <message>
+      <source>Recording is disabled for %1</source>
+      <translation>%1 無法錄影</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudUsersValidationPolicy</name>
+    <message numerus="yes">
+      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
+      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation>
+        <numerusform>%1 所選用戶中的%n 不是 %2使用者，因此不會收到手機通知。</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnExecPtzPresetPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>選擇一支攝影機</translation>
     </message>
     <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>無法初始化編碼器.</translation>
+      <source>%1 has no PTZ presets</source>
+      <translation>%1 沒有 PTZ 預設點</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFanErrorPolicy</name>
+    <message>
+      <source>Servers that support fan diagnostic</source>
+      <translation>支援診斷風扇的伺服器</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>選擇一支攝影機</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on the selected layout</source>
+      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+    </message>
+    <message>
+      <source>This camera is not currently on some of the selected layouts</source>
+      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
     </message>
   </context>
   <context>
@@ -721,57 +842,81 @@
         <numerusform>%n/%1 NVR授權</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Local Recording</source>
+      <translation>本地錄影</translation>
+    </message>
+    <message>
+      <source>Local Recording service</source>
+      <translation>本地錄影服務</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Local Recording Services</source>
+      <translation>
+        <numerusform>%n 本地錄影服務</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Local Recording Services</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1  本地錄影服務</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPoeOverBudgetPolicy</name>
+    <message>
+      <source>Servers that support PoE monitoring</source>
+      <translation>支援PoE監控的伺服器</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnRequiredAccessRightPolicy</name>
+    <message numerus="yes">
+      <source>%n groups</source>
+      <translation>
+        <numerusform>%n 群組</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n 使用者</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
+      <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
+      <translation>%1 和 %2 對某些選取的攝影機沒有 %3 權限</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n groups do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n 群組對某些選取攝影機沒有 %1 權限</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of selected user group, %2 is the permission name</comment>
+      <translation>%1 群組對某些所選攝影機沒有 %2 權限</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n users do not have %1 permission for some of selected cameras</source>
+      <comment>%1 is the permission name</comment>
+      <translation>
+        <numerusform>%n 使用者對某些所選攝影機沒有 %1 權限</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 user does not have %2 permission for some of selected cameras</source>
+      <comment>%1 is the name of the selected user, %2 is the permission name</comment>
+      <translation>%1 使用者對某些所選攝影機沒有 %2 權限</translation>
+    </message>
   </context>
   <context>
     <name>QnResourceNameStrings</name>
-    <message>
-      <source>Cameras</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>cameras</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>camera</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>Devices</source>
-      <translation>裝置</translation>
-    </message>
-    <message>
-      <source>devices</source>
-      <translation>裝置</translation>
-    </message>
-    <message>
-      <source>Device</source>
-      <translation>裝置</translation>
-    </message>
-    <message>
-      <source>device</source>
-      <translation>裝置</translation>
-    </message>
-    <message>
-      <source>I/O Modules</source>
-      <translation>I/O 模組</translation>
-    </message>
-    <message>
-      <source>I/O modules</source>
-      <translation>I/O 模組</translation>
-    </message>
-    <message>
-      <source>I/O Module</source>
-      <translation>I/O 模組</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I/O 模組</translation>
-    </message>
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
@@ -830,6 +975,13 @@
     <message>
       <source>Hardware ID: %1</source>
       <translation>硬體 ID: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSubjectValidationPolicy</name>
+    <message>
+      <source>None of selected user roles contain users</source>
+      <translation type="unfinished">None of selected user roles contain users</translation>
     </message>
   </context>
   <context>
@@ -970,17 +1122,105 @@
         <numerusform>年</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Msec</source>
+      <comment>Capitalized long suffix for displaying milliseconds</comment>
+      <translation>毫秒</translation>
+    </message>
+    <message>
+      <source>Sec</source>
+      <comment>Capitalized long suffix for displaying seconds</comment>
+      <translation>秒</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <comment>Capitalized long suffix for displaying minutes</comment>
+      <translation>至少</translation>
+    </message>
+    <message>
+      <source>Hrs</source>
+      <comment>Capitalized long suffix for displaying hours</comment>
+      <translation>小時</translation>
+    </message>
+    <message>
+      <source>Days</source>
+      <comment>Capitalized long suffix for displaying days</comment>
+      <translation>天</translation>
+    </message>
+    <message>
+      <source>Wks</source>
+      <comment>Capitalized long suffix for displaying weeks</comment>
+      <translation>週</translation>
+    </message>
+    <message>
+      <source>Mos</source>
+      <comment>Capitalized long suffix for displaying months</comment>
+      <translation>月</translation>
+    </message>
+    <message>
+      <source>Yrs</source>
+      <comment>Capitalized long suffix for displaying years</comment>
+      <translation>年</translation>
+    </message>
+    <message numerus="yes">
+      <source>Milliseconds</source>
+      <comment>Capitalized full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>毫秒</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Seconds</source>
+      <comment>Capitalized full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>秒鐘</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Minutes</source>
+      <comment>Capitalized full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>分鐘</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Hours</source>
+      <comment>Capitalized full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>小時</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Days</source>
+      <comment>Capitalized fapitalized full suffix for displaying days</comment>
+      <translation>
+        <numerusform>天</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Weeks</source>
+      <comment>Capitalized full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>週</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Months</source>
+      <comment>Capitalized full suffix for displaying months</comment>
+      <translation>
+        <numerusform>月</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Years</source>
+      <comment>Capitalized full suffix for displaying years</comment>
+      <translation>
+        <numerusform>年</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnTranscoder</name>
-    <message>
-      <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL 轉碼未執行.</translation>
-    </message>
-    <message>
-      <source>Unknown transcoding method.</source>
-      <translation>未知轉碼模式。</translation>
-    </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
       <translation>OpenCL 轉碼未被執行.</translation>
@@ -991,607 +1231,95 @@
     </message>
   </context>
   <context>
-    <name>QnUserRolesManager</name>
-    <message>
-      <source>Owner</source>
-      <translation>所有者</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>管理者</translation>
-    </message>
-    <message>
-      <source>Advanced Viewer</source>
-      <translation>進階瀏覽者</translation>
-    </message>
-    <message>
-      <source>Viewer</source>
-      <translation>瀏覽者</translation>
-    </message>
-    <message>
-      <source>Live Viewer</source>
-      <translation>即時影像瀏覽者</translation>
-    </message>
-    <message>
-      <source>Custom Role</source>
-      <translation>自訂角色</translation>
-    </message>
+    <name>QnUserResource</name>
     <message>
       <source>Custom</source>
       <translation>自訂</translation>
     </message>
     <message>
-      <source>Can manage all cameras and bookmarks.</source>
-      <translation>可以管理所有的攝影機和書籤</translation>
-    </message>
-    <message>
-      <source>Can view all cameras and export video.</source>
-      <translation>可以瀏覽所有的攝影機及匯出影像.</translation>
-    </message>
-    <message>
-      <source>Can view live video from all cameras.</source>
-      <translation>可以瀏覽即時影像.</translation>
-    </message>
-    <message>
-      <source>Custom user role.</source>
-      <translation>自訂使用者角色.</translation>
-    </message>
-    <message>
-      <source>Custom permissions.</source>
-      <translation>自訂權限.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can do everything.</source>
-      <translation>擁有整個系統的權限且可做所有事.</translation>
-    </message>
-    <message>
-      <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>擁有整個系統的權限且可管理系統. 可新增使用者.</translation>
+      <source>Multiple groups</source>
+      <translation>多個群組</translation>
     </message>
   </context>
   <context>
-    <name>Result</name>
+    <name>QnUsersWithEmailValidationPolicy</name>
     <message>
-      <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <source>Email address is not set for all the selected users.</source>
+      <translation type="unfinished">Email address is not set for all the selected users.</translation>
     </message>
     <message>
-      <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <source>Email address is not set for some selected users.</source>
+      <translation type="unfinished">Email address is not set for some selected users.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServiceTypeDisplayStringHelper</name>
+    <message>
+      <source>Local recording</source>
+      <translation>本地錄影</translation>
     </message>
     <message>
-      <source>Forbidden.</source>
-      <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <source>Integration</source>
+      <translation>整合</translation>
     </message>
     <message>
-      <source>Conflict.</source>
-      <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <source>Cloud storage</source>
+      <translation>Cloud儲存空間</translation>
     </message>
     <message>
-      <source>Bad request.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>錯誤的要求.</translation>
+      <source>Live view</source>
+      <translation type="unfinished">Live view</translation>
+    </message>
+  </context>
+  <context>
+    <name>StringsHelper</name>
+    <message>
+      <source>Contact your channel partner for details.</source>
+      <translation>請聯絡您的通路合作夥伴了解細節。</translation>
     </message>
     <message>
-      <source>Not implemented.</source>
-      <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
-    </message>
-    <message>
-      <source>Not found.</source>
-      <comment>Generic HTTP response</comment>
-      <translation>找不到.</translation>
-    </message>
-    <message>
-      <source>Internal error.</source>
-      <translation>內部錯誤.</translation>
-    </message>
-    <message>
-      <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
-    </message>
-    <message>
-      <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
-    </message>
-    <message>
-      <source>Unauthorized.</source>
-      <translation>未驗證.</translation>
-    </message>
-    <message>
-      <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
-    </message>
-    <message>
-      <source>Invalid parameter `%1`: %2.</source>
-      <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2.</translation>
-    </message>
-    <message>
-      <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <source>Check internet connection between VMS and license server.</source>
+      <translation>檢查 VMS 和授權 (license) 伺服器之間的網際網路連線。</translation>
     </message>
   </context>
   <context>
     <name>SystemHelpers</name>
     <message>
-      <source>New System</source>
-      <translation>新系統</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
-    <name>SystemSettings</name>
+    <name>TimeFormat</name>
     <message>
-      <source>SMTP host</source>
-      <translation>SMTP 主機地址</translation>
+      <source>just now</source>
+      <translation>現在</translation>
     </message>
     <message>
-      <source>Email from</source>
-      <translation>Email寄件者</translation>
+      <source>yesterday</source>
+      <translation>昨天</translation>
     </message>
     <message>
-      <source>SMTP user</source>
-      <translation>SMTP 使用者名稱</translation>
+      <source>a week ago</source>
+      <translation>一週前</translation>
     </message>
-    <message>
-      <source>SMTP password</source>
-      <translation>SMTP 密碼</translation>
-    </message>
-    <message>
-      <source>Email signature</source>
-      <translation>電子郵件簽名檔</translation>
-    </message>
-    <message>
-      <source>Email support link</source>
-      <translation type="unfinished">Email support link</translation>
-    </message>
-    <message>
-      <source>SMTP connection type</source>
-      <translation>SMTP 連線類型</translation>
-    </message>
-    <message>
-      <source>SMTP port</source>
-      <translation>SMTP 埠號</translation>
-    </message>
-    <message>
-      <source>SMTP timeout (seconds)</source>
-      <translation type="unfinished">SMTP timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>SMTP name</source>
-      <translation type="unfinished">SMTP name</translation>
-    </message>
-    <message>
-      <source>LDAP URI</source>
-      <translation>LDAP URI</translation>
-    </message>
-    <message>
-      <source>LDAP Admin DN</source>
-      <translation type="unfinished">LDAP Admin DN</translation>
-    </message>
-    <message>
-      <source>LDAP Admin password</source>
-      <translation type="unfinished">LDAP Admin password</translation>
-    </message>
-    <message>
-      <source>LDAP search base</source>
-      <translation>LDAP 搜尋庫</translation>
-    </message>
-    <message>
-      <source>LDAP search filter</source>
-      <translation>LDAP 搜尋篩選</translation>
-    </message>
-    <message>
-      <source>LDAP password expiration (milliseconds)</source>
-      <translation type="unfinished">LDAP password expiration (milliseconds)</translation>
-    </message>
-    <message>
-      <source>LDAP search timeout (seconds)</source>
-      <translation type="unfinished">LDAP search timeout (seconds)</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report allowed</source>
-      <translation type="unfinished">Anonymous statistics report allowed</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last time</source>
-      <translation type="unfinished">Anonymous statistics report last time</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last version</source>
-      <translation type="unfinished">Anonymous statistics report last version</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report last number</source>
-      <translation type="unfinished">Anonymous statistics report last number</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics time cycle</source>
-      <translation type="unfinished">Anonymous statistics time cycle</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report delay after update</source>
-      <translation type="unfinished">Anonymous statistics report delay after update</translation>
-    </message>
-    <message>
-      <source>Anonymous Statistics Report Server URL</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL</translation>
-    </message>
-    <message>
-      <source>Anonymous statistics report Client settings</source>
-      <translation type="unfinished">Anonymous statistics report Client settings</translation>
-    </message>
-    <message>
-      <source>System alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">System alive update interval (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h)</translation>
-    </message>
-    <message>
-      <source>Time synchronization enabled</source>
-      <translation>已啟用時間同步</translation>
-    </message>
-    <message>
-      <source>Primary time synchronization Server ID</source>
-      <translation type="unfinished">Primary time synchronization Server ID</translation>
-    </message>
-    <message>
-      <source>Max difference between local and source time (milliseconds)</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds)</translation>
-    </message>
-    <message>
-      <source>OS time change check period</source>
-      <translation>作業系統時間會變更檢查時段</translation>
-    </message>
-    <message>
-      <source>Sync time synchronization interval for network requests</source>
-      <translation>發送網路校時請求的時間間隔</translation>
-    </message>
-    <message>
-      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
-      <translation>容許誤差。如果時間最小誤差容許值小於目前誤差, 則不更新時間</translation>
-    </message>
-    <message>
-      <source>Cloud owner account</source>
-      <translation>雲端所有者帳號</translation>
-    </message>
-    <message>
-      <source>Cloud System ID</source>
-      <translation type="unfinished">Cloud System ID</translation>
-    </message>
-    <message>
-      <source>Cloud authorization key</source>
-      <translation type="unfinished">Cloud authorization key</translation>
-    </message>
-    <message>
-      <source>System name</source>
-      <translation>系統名稱</translation>
-    </message>
-    <message>
-      <source>Local System ID</source>
-      <translation>本機系統 ID</translation>
-    </message>
-    <message>
-      <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
-    </message>
-    <message>
-      <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
-    </message>
-    <message>
-      <source>Disable Device vendors</source>
-      <translation type="unfinished">Disable Device vendors</translation>
-    </message>
-    <message>
-      <source>Optimize Camera settings</source>
-      <translation type="unfinished">Optimize Camera settings</translation>
-    </message>
-    <message>
-      <source>Thumbnails auto-update</source>
-      <translation type="unfinished">Thumbnails auto-update</translation>
-    </message>
-    <message>
-      <source>Use %1 service to send emails instead of SMTP client</source>
-      <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Use %1 service to send emails instead of SMTP client</translation>
-    </message>
-    <message>
-      <source>Max scene items (0 means default)</source>
-      <translation>最大場景項目 (預設為0)</translation>
-    </message>
-    <message>
-      <source>Send plain-text emails</source>
-      <translation>發送純文字電子郵件</translation>
-    </message>
-    <message>
-      <source>Use Windows line feed in emails</source>
-      <translation>在電子郵件中使用Windows換行字元</translation>
-    </message>
-    <message>
-      <source>Enable audit trail</source>
-      <translation>啟用使用者行為記錄</translation>
-    </message>
-    <message>
-      <source>Audit trail period (days, 14-730)</source>
-      <translation type="unfinished">Audit trail period (days, 14-730)</translation>
-    </message>
-    <message>
-      <source>Event log period (days)</source>
-      <translation>事件日誌天數 (天)</translation>
-    </message>
-    <message>
-      <source>Enforce HTTPS (data traffic encryption)</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption)</translation>
-    </message>
-    <message>
-      <source>Enforce RTSPS (video traffic encryption)</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption)</translation>
-    </message>
-    <message>
-      <source>Enable auto-discovery</source>
-      <translation type="unfinished">Enable auto-discovery</translation>
-    </message>
-    <message>
-      <source>Enable auto-update notifications</source>
-      <translation type="unfinished">Enable auto-update notifications</translation>
-    </message>
-    <message>
-      <source>Enable update notifications</source>
-      <translation type="unfinished">Enable update notifications</translation>
-    </message>
-    <message>
-      <source>Enable UPNP port-mapping</source>
-      <translation type="unfinished">Enable UPNP port-mapping</translation>
-    </message>
-    <message>
-      <source>Backup settings</source>
-      <translation type="unfinished">Backup settings</translation>
-    </message>
-    <message>
-      <source>Cloud host override</source>
-      <translation type="unfinished">Cloud host override</translation>
-    </message>
-    <message>
-      <source>Enable RTSP for Arecont</source>
-      <translation type="unfinished">Enable RTSP for Arecont</translation>
-    </message>
-    <message>
-      <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
-    </message>
-    <message>
-      <source>Max P2P queue size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max P2P all clients size (bytes, 32-512MB)</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (bytes, 6-96MB)</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB)</translation>
-    </message>
-    <message>
-      <source>Max record queue size (elements, 250-4000)</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000)</translation>
-    </message>
-    <message>
-      <source>RTP retry count</source>
-      <translation type="unfinished">RTP retry count</translation>
-    </message>
-    <message>
-      <source>RTP timeout (milliseconds)</source>
-      <translation>RTP 超時時間 (毫秒)</translation>
-    </message>
-    <message>
-      <source>Max RTSP connection duration (seconds)</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds)</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect UDP hole-punching</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching</translation>
-    </message>
-    <message>
-      <source>Enable cloud-connect relays usage</source>
-      <translation type="unfinished">Enable cloud-connect relays usage</translation>
-    </message>
-    <message>
-      <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
-    </message>
-    <message>
-      <source>Enable recording on EDGE</source>
-      <translation type="unfinished">Enable recording on EDGE</translation>
-    </message>
-    <message>
-      <source>Target update information</source>
-      <translation type="unfinished">Target update information</translation>
-    </message>
-    <message>
-      <source>Installed update information</source>
-      <translation type="unfinished">Installed update information</translation>
-    </message>
-    <message>
-      <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
-    </message>
-    <message>
-      <source>Client update settings</source>
-      <translation type="unfinished">Client update settings</translation>
-    </message>
-    <message>
-      <source>Watermark settings</source>
-      <translation>浮水印設定</translation>
-    </message>
-    <message>
-      <source>Authorization Session token lifetime (minutes)</source>
-      <translation type="unfinished">Authorization Session token lifetime (minutes)</translation>
-    </message>
-    <message>
-      <source>Session token count limit on a single Server</source>
-      <translation type="unfinished">Session token count limit on a single Server</translation>
-    </message>
-    <message>
-      <source>Max session token count per user on single Server</source>
-      <translation type="unfinished">Max session token count per user on single Server</translation>
-    </message>
-    <message>
-      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
-    </message>
-    <message>
-      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
-    </message>
-    <message>
-      <source>Default video codec</source>
-      <translation>將影片編碼器還原預設值</translation>
-    </message>
-    <message>
-      <source>Default codec for export video</source>
-      <translation type="unfinished">Default codec for export video</translation>
-    </message>
-    <message>
-      <source>Low quality screen video codec</source>
-      <translation>低質量的螢幕影片編碼器</translation>
-    </message>
-    <message>
-      <source>License server</source>
-      <translation>授權伺服器</translation>
-    </message>
-    <message>
-      <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
-    </message>
-    <message>
-      <source>Meta data storage change policy</source>
-      <translation>Meta數據儲存更改政策</translation>
-    </message>
-    <message>
-      <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
-    </message>
-    <message>
-      <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
-    </message>
-    <message>
-      <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
-    </message>
-    <message>
-      <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
-    </message>
-    <message>
-      <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
-    </message>
-    <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
-    </message>
-    <message>
-      <source>Storage encryption enabled</source>
-      <translation type="unfinished">Storage encryption enabled</translation>
-    </message>
-    <message>
-      <source>Current storage encryption key</source>
-      <translation type="unfinished">Current storage encryption key</translation>
-    </message>
-    <message>
-      <source>HTTP header: Origin</source>
-      <translation type="unfinished">HTTP header: Origin</translation>
-    </message>
-    <message>
-      <source>HTTP header: X-Frame-Options</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options</translation>
-    </message>
-    <message>
-      <source>Show mouse timeline preview</source>
-      <translation type="unfinished">Show mouse timeline preview</translation>
-    </message>
-    <message>
-      <source>Language for Cloud notifications</source>
-      <translation type="unfinished">Language for Cloud notifications</translation>
-    </message>
-    <message>
-      <source>Media buffer size (KB, 10KB-4MB)</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB)</translation>
-    </message>
-    <message>
-      <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
-    </message>
-    <message>
-      <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
-    </message>
-    <message>
-      <source>Show Servers in the Resource Tree for non-admins</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins</translation>
-    </message>
-    <message>
-      <source>Use only HTTPS for cameras</source>
-      <translation type="unfinished">Use only HTTPS for cameras</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions (unsecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (unsecure)</translation>
-    </message>
-    <message>
-      <source>Enable deprecated API functions curently used by %1 software (unsecure)</source>
-      <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions curently used by %1 software (unsecure)</translation>
-    </message>
-    <message>
-      <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
-    </message>
-    <message>
-      <source>Keep IO port state on when Server connects to the device</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device</translation>
-    </message>
-    <message>
-      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB)</translation>
-    </message>
-    <message>
-      <source>Enable 2FA for the System</source>
-      <translation type="unfinished">Enable 2FA for the System</translation>
-    </message>
-    <message>
-      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages)</translation>
-    </message>
-    <message>
-      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+    <message numerus="yes">
+      <source>%n minutes ago</source>
+      <translation>
+        <numerusform>%n 分鐘前</numerusform>
+      </translation>
     </message>
-    <message>
-      <source>Thread count limit for camera archive synchronization</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization</translation>
-    </message>
-    <message>
-      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
-    </message>
-    <message>
-      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
-    </message>
-    <message>
-      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+    <message numerus="yes">
+      <source>%n hours ago</source>
+      <translation>
+        <numerusform>%n 小時前</numerusform>
+      </translation>
     </message>
-    <message>
-      <source>Update releases.json file URL</source>
-      <translation type="unfinished">Update releases.json file URL</translation>
+    <message numerus="yes">
+      <source>%n days ago</source>
+      <translation>
+        <numerusform>%n 天前</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1633,10 +1361,6 @@
       <translation>影片需要重新編碼。</translation>
     </message>
     <message>
-      <source>File write error. Not enough free space.</source>
-      <translation>檔案寫入錯誤(磁碟可用空間不足)</translation>
-    </message>
-    <message>
       <source>Invalid resource type for data export.</source>
       <translation>無效的資料匯出資源類型.</translation>
     </message>
@@ -1644,16 +1368,469 @@
       <source>No data exported.</source>
       <translation>未匯出任何資料.</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::utils::CryptedFileStream</name>
     <message>
-      <source>Wrong crypted stream size.</source>
-      <translation>錯誤的加密串流量。</translation>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>解鎖這一部分的存檔以匯出其內容。</translation>
     </message>
     <message>
-      <source>Damaged crypted stream header.</source>
-      <translation>損壞的加密串流表頭。</translation>
+      <source>Archive is unavailable now. Please try again later.</source>
+      <translation>目前無法取得錄影資料，請稍後再試。</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>檔案寫入錯誤.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::common::SystemSettings</name>
+    <message>
+      <source>Anonymous statistics report allowed</source>
+      <translation>允許匿名統計報告</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report last time</source>
+      <translation>匿名統計報告 - 前次紀錄</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report last version</source>
+      <translation>匿名統計報告 - 最新版本</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report last number</source>
+      <translation>匿名統計報告 - 最後一個數值</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics time cycle</source>
+      <translation>匿名統計報告 - 間隔</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report delay after update</source>
+      <translation>更新後匿名統計報告延遲</translation>
+    </message>
+    <message>
+      <source>Anonymous Statistics Report Server URL</source>
+      <translation>匿名統計報告伺服器 URL</translation>
+    </message>
+    <message>
+      <source>Anonymous statistics report Client settings</source>
+      <translation>匿名統計報告用戶端設定</translation>
+    </message>
+    <message>
+      <source>Proxy connection timeout (seconds, 1s-1h)</source>
+      <translation>代理連接逾時 (秒, 1秒~1小時)</translation>
+    </message>
+    <message>
+      <source>Time synchronization enabled</source>
+      <translation>已啟用時間同步</translation>
+    </message>
+    <message>
+      <source>Primary time synchronization Server ID</source>
+      <translation>主要時間同步伺服器ID</translation>
+    </message>
+    <message>
+      <source>Max difference between local and source time (milliseconds)</source>
+      <translation>本機伺服器與原伺服器校時 - 允許最大秒差 (毫秒)</translation>
+    </message>
+    <message>
+      <source>OS time change check period</source>
+      <translation>作業系統時間會變更檢查時段</translation>
+    </message>
+    <message>
+      <source>Sync time synchronization interval for network requests</source>
+      <translation>發送網路校時請求的時間間隔</translation>
+    </message>
+    <message>
+      <source>Sync time epsilon. New value is not applied if time delta less than epsilon</source>
+      <translation>容許誤差。如果時間最小誤差容許值小於目前誤差, 則不更新時間</translation>
+    </message>
+    <message>
+      <source>Cloud owner account</source>
+      <translation>雲端所有者帳號</translation>
+    </message>
+    <message>
+      <source>Cloud authorization key</source>
+      <translation>Cloud認證金鑰</translation>
+    </message>
+    <message>
+      <source>Disable Device vendors</source>
+      <translation>停用設備供應商</translation>
+    </message>
+    <message>
+      <source>Optimize Camera settings</source>
+      <translation>攝影機設定優化</translation>
+    </message>
+    <message>
+      <source>Thumbnails auto-update</source>
+      <translation>縮圖自動更新</translation>
+    </message>
+    <message>
+      <source>Max scene items (0 means default)</source>
+      <translation>最大場景項目 (預設為0)</translation>
+    </message>
+    <message>
+      <source>Send plain-text emails</source>
+      <translation>發送純文字電子郵件</translation>
+    </message>
+    <message>
+      <source>Use Windows line feed in emails</source>
+      <translation>在電子郵件中使用Windows換行字元</translation>
+    </message>
+    <message>
+      <source>Enable audit trail</source>
+      <translation>啟用使用者行為記錄</translation>
+    </message>
+    <message>
+      <source>Audit trail period (days, 14-730)</source>
+      <translation>使用者行為記錄天數 (天，14-730)</translation>
+    </message>
+    <message>
+      <source>Event log period (days)</source>
+      <translation>事件日誌天數 (天)</translation>
+    </message>
+    <message>
+      <source>Enforce HTTPS (data traffic encryption)</source>
+      <translation>強制使用 HTTPS連線(通訊加密)</translation>
+    </message>
+    <message>
+      <source>Enforce RTSPS (video traffic encryption)</source>
+      <translation>強制使用RTSPS連線(串流傳輸加密)</translation>
+    </message>
+    <message>
+      <source>Enable auto-discovery</source>
+      <translation>啟用裝置自動搜尋</translation>
+    </message>
+    <message>
+      <source>Enable auto-update notifications</source>
+      <translation>啟用自動更新通知</translation>
+    </message>
+    <message>
+      <source>Enable update notifications</source>
+      <translation>啟用更新通知</translation>
+    </message>
+    <message>
+      <source>Enable UPNP port-mapping</source>
+      <translation>啟用 UPNP 連接埠對應</translation>
+    </message>
+    <message>
+      <source>Backup settings</source>
+      <translation>備份設定</translation>
+    </message>
+    <message>
+      <source>Cloud host override</source>
+      <translation>Cloud 主機覆蓋</translation>
+    </message>
+    <message>
+      <source>Enable RTSP for Arecont</source>
+      <translation>使用RTSP協定於Arecont 攝影機 </translation>
+    </message>
+    <message>
+      <source>Enable sequential Flir ONVIF searcher</source>
+      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+    </message>
+    <message>
+      <source>Max P2P queue size (bytes, 32-512MB)</source>
+      <translation>最大P2P佇列 (bytes, 32-512MB)</translation>
+    </message>
+    <message>
+      <source>Max P2P all clients size (bytes, 32-512MB)</source>
+      <translation>最大 P2P 所有用戶端大小 (bytes, 32-512MB)</translation>
+    </message>
+    <message>
+      <source>Max record queue size (bytes, 6-96MB)</source>
+      <translation>最大錄影佇列(bytes, 6-96MB)</translation>
+    </message>
+    <message>
+      <source>Max record queue size (elements, 250-4000)</source>
+      <translation>最大錄影佇列 (元件, 250-4000)</translation>
+    </message>
+    <message>
+      <source>RTP timeout (milliseconds)</source>
+      <translation>RTP 超時時間 (毫秒)</translation>
+    </message>
+    <message>
+      <source>Max RTSP connection duration (seconds)</source>
+      <translation>最大 RTSP 連線持續時間（秒）</translation>
+    </message>
+    <message>
+      <source>Enable cloud-connect UDP hole-punching</source>
+      <translation>啟用雲端連接UDP打洞</translation>
+    </message>
+    <message>
+      <source>Enable cloud-connect relays usage</source>
+      <translation>啟用雲端連線中繼用法</translation>
+    </message>
+    <message>
+      <source>Enforce SSL for cloud-connect relays</source>
+      <translation>強制雲端連線中繼使用 SSL</translation>
+    </message>
+    <message>
+      <source>Enable recording on EDGE</source>
+      <translation>在 EDGE 上啟用錄影</translation>
+    </message>
+    <message>
+      <source>Target update information</source>
+      <translation>目標更新資訊</translation>
+    </message>
+    <message>
+      <source>Installed update information</source>
+      <translation>已安裝的更新資訊</translation>
+    </message>
+    <message>
+      <source>Downloader peers for files</source>
+      <translation type="unfinished">Downloader peers for files</translation>
+    </message>
+    <message>
+      <source>Client update settings</source>
+      <translation>客戶端更新設定</translation>
+    </message>
+    <message>
+      <source>Watermark settings</source>
+      <translation>浮水印設定</translation>
+    </message>
+    <message>
+      <source>Session token count limit on a single Server</source>
+      <translation>單一伺服器限制的session token數</translation>
+    </message>
+    <message>
+      <source>Max session token count per user on single Server</source>
+      <translation>單一伺服器上每個使用者最大的session token數</translation>
+    </message>
+    <message>
+      <source>Update interval for remote session token cache (other Servers and Cloud)</source>
+      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+    </message>
+    <message>
+      <source>Timeout for remote session token cache (other Servers and Cloud)</source>
+      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+    </message>
+    <message>
+      <source>Default video codec</source>
+      <translation>將影像編碼還原為預設值</translation>
+    </message>
+    <message>
+      <source>Default codec for export video</source>
+      <translation>匯出影像的預設串流編碼</translation>
+    </message>
+    <message>
+      <source>Low quality screen video codec</source>
+      <translation>低質量的螢幕影片編碼器</translation>
+    </message>
+    <message>
+      <source>License server</source>
+      <translation>授權伺服器</translation>
+    </message>
+    <message>
+      <source>URI for resource_data.json automatic update</source>
+      <translation>自動更新 resources_data.json 的 URI</translation>
+    </message>
+    <message>
+      <source>Meta data storage change policy</source>
+      <translation>Meta數據儲存更改政策</translation>
+    </message>
+    <message>
+      <source>Persistent Servers for update storage</source>
+      <translation type="unfinished">Persistent Servers for update storage</translation>
+    </message>
+    <message>
+      <source>Persistent Servers where updates are stored</source>
+      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+    </message>
+    <message>
+      <source>VMS Server version specific features</source>
+      <translation>VMS 伺服器版本特定功能</translation>
+    </message>
+    <message>
+      <source>Additional local FS storage types for recording</source>
+      <translation type="unfinished">Additional local FS storage types for recording</translation>
+    </message>
+    <message>
+      <source>Force analytics DB storage mount point permissions in case of failure</source>
+      <translation>失敗時強制授予分析資料庫儲存掛載點權限</translation>
+    </message>
+    <message>
+      <source>Check video stream period (milliseconds)</source>
+      <translation>視訊串流檢查週期（毫秒）</translation>
+    </message>
+    <message>
+      <source>Storage encryption enabled</source>
+      <translation>啟用錄影資料加密</translation>
+    </message>
+    <message>
+      <source>Current storage encryption key</source>
+      <translation>目前儲存裝置的加密金鑰</translation>
+    </message>
+    <message>
+      <source>HTTP header: Origin</source>
+      <translation>HTTP header: Origin</translation>
+    </message>
+    <message>
+      <source>HTTP header: X-Frame-Options</source>
+      <translation>HTTP header: X-Frame-Options</translation>
+    </message>
+    <message>
+      <source>Show mouse timeline preview</source>
+      <translation>於時間軸上啟用鼠標查看縮圖功能</translation>
+    </message>
+    <message>
+      <source>Media buffer size (KB, 10KB-4MB)</source>
+      <translation>媒體緩衝區大小（KB, 10KB-4MB）</translation>
+    </message>
+    <message>
+      <source>Enable cross-domain policy</source>
+      <translation>啟用跨域策略</translation>
+    </message>
+    <message>
+      <source>Enable WebSocket for P2P</source>
+      <translation>對P2P啟用 WebSocket</translation>
+    </message>
+    <message>
+      <source>Show Servers in the Resource Tree for non-admins</source>
+      <translation>允許非管理者亦能於資源樹列表看到伺服器的顯示</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS for cameras</source>
+      <translation>僅使用HTTPS與攝影機連線</translation>
+    </message>
+    <message>
+      <source>Expose IP addresses for autodiscovery</source>
+      <translation>揭露 IP 位址以進行自動搜尋</translation>
+    </message>
+    <message>
+      <source>Keep IO port state on when Server connects to the device</source>
+      <translation>伺服器連接設備時保持IO接口狀態開啟</translation>
+    </message>
+    <message>
+      <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
+      <translation>僅音訊設備的媒體緩衝區大小（KB、1KB-1MB）</translation>
+    </message>
+    <message>
+      <source>Expose device passwords stored in VMS for administrators (for web pages)</source>
+      <translation>向管理員揭露儲存在 VMS 中的設備密碼（針對網頁）</translation>
+    </message>
+    <message>
+      <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
+      <translation>遠端存檔同步的最大執行緒數（&lt;=0 - 自動，最大 32）</translation>
+    </message>
+    <message>
+      <source>Thread count limit for camera archive synchronization</source>
+      <translation>攝影機存檔同步的執行緒數量限制</translation>
+    </message>
+    <message>
+      <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
+      <translation>資料庫中保留的事件日誌記錄數量最大值。實際的未刪除記錄數量可能比指定值高出 20%。</translation>
+    </message>
+    <message>
+      <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
+      <translation>是否緩存一些主串流幀數。數值：&apos;是&apos; - 永遠啟用(可能占用大量RAM)，&apos;否&apos; - 永遠停用，除非重播影片需要(例如HLS)，&apos;自動&apos; - 類似於&apos;否&apos; ，但會在改善使用者體驗時開啟(例如當某些分析插件在攝影機上運作時)。</translation>
+    </message>
+    <message>
+      <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
+      <translation>伺服器使用轉碼 HTTP 連線數的最大值。 Chrome 一次開啟 2 個連線，然後關閉第一個連線。我們建議將此參數&apos;的值設為 2 或更大。</translation>
+    </message>
+    <message>
+      <source>Update releases.json file URL</source>
+      <translation>更新 releases.json檔案的URL位置</translation>
+    </message>
+    <message>
+      <source>LDAP settings</source>
+      <translation>LDAP設定</translation>
+    </message>
+    <message>
+      <source>SMTP settings</source>
+      <translation>SMTP設定</translation>
+    </message>
+    <message>
+      <source>Authorization Session token lifetime (seconds)</source>
+      <translation>工作階段授權Token生命週期（秒）</translation>
+    </message>
+    <message>
+      <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
+      <translation>以分號分隔的Cloud連線指定伺服器清單。清單頂端的伺服器具有更高的優先權。如果清單為空白，則會自動選擇伺服器進行Cloud連線。</translation>
+    </message>
+    <message>
+      <source>Allow Power User editing Security Settings</source>
+      <translation>允許進階使用者編輯安全設定</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions (insecure)</source>
+      <translation>啟用已棄用的 API 函數（不安全）</translation>
+    </message>
+    <message>
+      <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
+      <translation>伺服器重新連接 RTSP session 之前連續 RTP 錯誤的最大數量。</translation>
+    </message>
+    <message>
+      <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
+      <comment>%1 is a company name</comment>
+      <translation>啟用 %1 軟體目前使用的已棄用API 函數（不安全）</translation>
+    </message>
+    <message>
+      <source>Organization Id</source>
+      <translation>組織 Id</translation>
+    </message>
+    <message>
+      <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
+      <translation>Cloud輪詢(polling)同步資料的間隔。</translation>
+    </message>
+    <message>
+      <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
+      <translation>HTTP header：伺服器，支援的變數： $vmsName、 $vmsVersion、 $company、 $compatibility</translation>
+    </message>
+    <message>
+      <source>Device storage information update interval</source>
+      <translation>裝置儲存資訊更新間隔</translation>
+    </message>
+    <message>
+      <source>Site alive update interval (seconds, 1s-1h)</source>
+      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+    </message>
+    <message>
+      <source>Proxy connection access policy</source>
+      <translation type="unfinished">Proxy connection access policy</translation>
+    </message>
+    <message>
+      <source>Cloud Site ID</source>
+      <translation type="unfinished">Cloud Site ID</translation>
+    </message>
+    <message>
+      <source>Enable 2FA for the Site</source>
+      <translation type="unfinished">Enable 2FA for the Site</translation>
+    </message>
+    <message>
+      <source>Site name</source>
+      <translation type="unfinished">Site name</translation>
+    </message>
+    <message>
+      <source>Local Site ID, null means the Site is not set up yet.</source>
+      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+    </message>
+    <message>
+      <source>Last master Site merge ID</source>
+      <translation type="unfinished">Last master Site merge ID</translation>
+    </message>
+    <message>
+      <source>Last slave Site merge ID</source>
+      <translation type="unfinished">Last slave Site merge ID</translation>
+    </message>
+    <message>
+      <source>Pixelation settings</source>
+      <translation type="unfinished">Pixelation settings</translation>
+    </message>
+    <message>
+      <source>Apply session limit for Cloud tokens</source>
+      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+    </message>
+    <message>
+      <source>Enable or disable the creation of new Integration registration requests</source>
+      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+    </message>
+    <message>
+      <source>Anonymous Crash Report Server API URL</source>
+      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+    </message>
+    <message>
+      <source>Default locale for new users</source>
+      <translation type="unfinished">Default locale for new users</translation>
     </message>
   </context>
   <context>
@@ -1982,25 +2159,11 @@
       <source>Trigger Name</source>
       <translation>觸發事件名稱</translation>
     </message>
-    <message>
-      <source>Role</source>
-      <translation>角色</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
         <numerusform>%n 個使用者</numerusform>
       </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n 角色</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation>所有管理者</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -2201,15 +2364,11 @@
     </message>
     <message>
       <source>Failed to backup file %1</source>
-      <translation>檔案備份失敗 %1</translation>
-    </message>
-    <message>
-      <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>%1 檔案備份失敗</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>
-      <translation type="unfinished">Do HTTP(S) request</translation>
+      <translation>發送一則HTTP(S)請求</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -2224,32 +2383,28 @@
       <translation>與裝置的連線無預期中斷.</translation>
     </message>
     <message>
-      <source>Failed to force using camera time, as it lags too much. System time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. System time will be used instead.</translation>
-    </message>
-    <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>分析儲存裝置 &quot;%1&quot; 資料庫錯誤：掛載點權限不足。</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>寫入時無法初始化 AES 加密。故錄影資料以未加密狀態寫入。</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>RAID錯誤: %1。</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
+      <translation>沒有足夠的授權數量，以下裝置的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
+      <translation>沒有足夠的授權數量，以下攝影機的錄影已被停用:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
+      <translation>沒有足夠的授權數量，以下I/O模組的錄影已被停用:</translation>
     </message>
     <message>
       <source>Also show source camera</source>
@@ -2265,26 +2420,119 @@
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>亦顯示於來源攝影機</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>同時在來源攝影機上觸發</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>同時錄製來源攝影機</translation>
     </message>
     <message>
       <source>Also play on source camera</source>
-      <translation type="unfinished">Also play on source camera</translation>
+      <translation>同時於來源攝影機播放</translation>
     </message>
-  </context>
-  <context>
-    <name>utils::QnCameraNamesWatcher</name>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n 群組</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>Removed camera</source>
-      <translation>移除攝影機</translation>
+      <source>LDAP Sync Issue</source>
+      <translation>LDAP 同步問題</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 (%n times)</source>
+      <comment>%1 is description of event. Will be replaced in runtime</comment>
+      <translation>
+        <numerusform>%1 (%n 次)</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to connect to the LDAP server.</source>
+      <translation>連接 LDAP 伺服器失敗。</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a %1 timeout.</source>
+      <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
+      <translation>未能在 %1 等待時間內完成同步。</translation>
+    </message>
+    <message>
+      <source>Failed to complete the sync within a given timeout.</source>
+      <translation>未能在給定的等待時間內完成同步。</translation>
+    </message>
+    <message>
+      <source>No user accounts on LDAP server match the synchronization settings.</source>
+      <translation>LDAP 伺服器上沒有與同步設定相符的使用者帳戶。</translation>
+    </message>
+    <message>
+      <source>Some LDAP users or groups were not found in the LDAP database.</source>
+      <translation>在 LDAP 資料庫中找不到某些 LDAP 使用者或群組。</translation>
+    </message>
+    <message>
+      <source>Services Issue</source>
+      <translation>服務問題</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has license migration issue</source>
+      <translation>伺服器 &quot;%1&quot; 有授權轉移的問題</translation>
+    </message>
+    <message>
+      <source>Service overuse</source>
+      <translation>服務過度使用</translation>
+    </message>
+    <message>
+      <source>The following licenses were not migrated:</source>
+      <translation>以下授權未轉移：</translation>
+    </message>
+    <message>
+      <source>License</source>
+      <translation>授權</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>攝影機</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數的錄影已停止。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數的雲端備份已停止使用。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
+      <translation>
+        <numerusform>由於服務過度使用， %n 授權數上的付費整合服務已停止使用。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to migrate licenses.</source>
+      <translation>轉移授權失敗。</translation>
+    </message>
+    <message>
+      <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
+      <translation>跳過授權匯入。稍後將自動安排另一次轉移嘗試。</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+    </message>
+    <message>
+      <source>Call Request</source>
+      <translation type="unfinished">Call Request</translation>
+    </message>
+    <message>
+      <source>Call Request Missed</source>
+      <translation type="unfinished">Call Request Missed</translation>
     </message>
   </context>
 </TS>

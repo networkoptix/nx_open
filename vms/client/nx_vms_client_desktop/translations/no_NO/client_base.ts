@@ -2,6 +2,139 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="no_NO" sourcelanguage="en">
   <context>
+    <name>AbstractSearchWidget::Private</name>
+    <message>
+      <source>Hide information</source>
+      <translation>Skjul informasjon</translation>
+    </message>
+    <message>
+      <source>Show information</source>
+      <translation>Vis informasjon</translation>
+    </message>
+    <message>
+      <source>Hide thumbnails</source>
+      <translation>Skjul miniatyrbilder</translation>
+    </message>
+    <message>
+      <source>Show thumbnails</source>
+      <translation>Vis miniatyrbilder</translation>
+    </message>
+    <message>
+      <source>Last day</source>
+      <translation>Siste dag</translation>
+    </message>
+    <message>
+      <source>Last 7 days</source>
+      <translation>Siste 7 dager</translation>
+    </message>
+    <message>
+      <source>Last 30 days</source>
+      <translation>Siste 30 dager</translation>
+    </message>
+    <message>
+      <source>Selected on Timeline</source>
+      <translation>Valgt på tidslinjen</translation>
+    </message>
+    <message>
+      <source>Any time</source>
+      <translation>Når som helst</translation>
+    </message>
+    <message>
+      <source>Devices on layout</source>
+      <translation>Enheter på visning</translation>
+    </message>
+    <message>
+      <source>Cameras on layout</source>
+      <translation>Kameraer på visning</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Velg enhet</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valgte kamera</translation>
+    </message>
+    <message>
+      <source>Choose devices...</source>
+      <translation>Velg enheter...</translation>
+    </message>
+    <message>
+      <source>Choose cameras...</source>
+      <translation>Velg kameraer...</translation>
+    </message>
+    <message>
+      <source>Any device</source>
+      <translation>Enhver enhet</translation>
+    </message>
+    <message>
+      <source>Any camera</source>
+      <translation>Hvilket som helst kamera</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Valgte medier</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen devices</source>
+      <translation>
+        <numerusform>%n valgte enheter</numerusform>
+        <numerusform>%n valgte enheter</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n chosen cameras</source>
+      <translation>
+        <numerusform>%n valgte kameraer</numerusform>
+        <numerusform>%n valgte kameraer</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Chosen device</source>
+      <translation>Valgt enhet</translation>
+    </message>
+    <message>
+      <source>Chosen camera</source>
+      <translation>Valgt kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>ActionDurationPickerWidget</name>
+    <message>
+      <source>For the duration of event</source>
+      <translation type="unfinished">For the duration of event</translation>
+    </message>
+    <message>
+      <source>Of fixed duration</source>
+      <translation type="unfinished">Of fixed duration</translation>
+    </message>
+    <message>
+      <source>Event occurs</source>
+      <translation type="unfinished">Event occurs</translation>
+    </message>
+    <message>
+      <source>Event starts</source>
+      <translation type="unfinished">Event starts</translation>
+    </message>
+    <message>
+      <source>Event stops</source>
+      <translation type="unfinished">Event stops</translation>
+    </message>
+    <message>
+      <source>Duration</source>
+      <translation>Varighet</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation>For</translation>
+    </message>
+  </context>
+  <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
@@ -25,9 +158,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 med %n attributter</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 med %n attributter</numerusform>
       </translation>
     </message>
   </context>
@@ -36,6 +169,40 @@
     <message>
       <source>No connection to Server %1.</source>
       <translation>Ingen tilkobling til Server %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsLicenseWatcher::Private</name>
+    <message numerus="yes">
+      <source>%1 are used</source>
+      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 brukes</numerusform>
+        <numerusform>%1 brukes</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are required</source>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 kreves</numerusform>
+        <numerusform>%1 kreves</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>CellWidget</name>
+    <message>
+      <source>Canceled</source>
+      <translation type="unfinished">Canceled</translation>
+    </message>
+    <message>
+      <source>Added</source>
+      <translation>Lagt til</translation>
+    </message>
+    <message>
+      <source>Adding</source>
+      <translation>Legger til</translation>
     </message>
   </context>
   <context>
@@ -51,6 +218,14 @@
     <message>
       <source>Expires</source>
       <translation>Utløper</translation>
+    </message>
+  </context>
+  <context>
+    <name>ClipboardButton</name>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopiert</translation>
     </message>
   </context>
   <context>
@@ -90,21 +265,9 @@
       <source>Verifying update package</source>
       <translation>Bekrefter oppdateringspakken</translation>
     </message>
-    <message>
-      <source>Cannot connect to the System</source>
-      <translation>Kan ikke koble til systemet</translation>
-    </message>
   </context>
   <context>
     <name>ContextMenu</name>
-    <message>
-      <source>Filter...</source>
-      <translation>Filter...</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>Koble til systemet</translation>
-    </message>
     <message>
       <source>Help</source>
       <translation>Hjelp</translation>
@@ -150,14 +313,6 @@
       <translation>Vis velkomstskjerm</translation>
     </message>
     <message>
-      <source>Tab</source>
-      <translation>Fane</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Ny Fane</translation>
-    </message>
-    <message>
       <source>Window</source>
       <translation>Vindu</translation>
     </message>
@@ -170,16 +325,8 @@
       <translation>Brukere...</translation>
     </message>
     <message>
-      <source>New User...</source>
-      <translation>Ny bruker...</translation>
-    </message>
-    <message>
       <source>Video Wall...</source>
       <translation>Videovegg...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Ny Videovegg...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -254,14 +401,6 @@
       <translation>Åpne i nettleser...</translation>
     </message>
     <message>
-      <source>System Administration...</source>
-      <translation>Systemadministrasjon...</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>System oppdatering...</translation>
-    </message>
-    <message>
       <source>User Management...</source>
       <translation>Brukeradministrasjon...</translation>
     </message>
@@ -307,10 +446,6 @@
     <message>
       <source>Cameras List</source>
       <translation>Kameraliste</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Slå sammen systemer...</translation>
     </message>
     <message>
       <source>About...</source>
@@ -359,26 +494,6 @@
     <message>
       <source>Monitor</source>
       <translation>Serverstatus</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>Åpne i en ny fane</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>Serverstatus i ny fane</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>Åpne i alarmvisning</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>Åpne i nytt vindu</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>Serverstatus i nytt vindu</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
@@ -497,10 +612,6 @@
       <translation>Fjern fra Visning</translation>
     </message>
     <message>
-      <source>Stop Sharing Layout</source>
-      <translation>Stopp deling av visning</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Endre navn</translation>
     </message>
@@ -515,14 +626,6 @@
     <message>
       <source>User Settings...</source>
       <translation>Brukerinstillinger...</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>Brukerroller...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>Rollinnstillinger...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -597,10 +700,6 @@
       <translation>Videovegginnstillinger...</translation>
     </message>
     <message>
-      <source>Add Device...</source>
-      <translation>Legg til enhet...</translation>
-    </message>
-    <message>
       <source>Devices List by Server...</source>
       <translation>Enheter Liste etter server...</translation>
     </message>
@@ -623,10 +722,6 @@
     <message>
       <source>Server Settings...</source>
       <translation>Server Innstillinger...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>Slå sammen med systemet du er tilkoblet...</translation>
     </message>
     <message>
       <source>None</source>
@@ -745,10 +840,6 @@
       <translation>Bildesyklus...</translation>
     </message>
     <message>
-      <source>New Showreel...</source>
-      <translation>Ny bildesyklus...</translation>
-    </message>
-    <message>
       <source>Remove from Showreel</source>
       <translation>Fjern fra bildesyklus</translation>
     </message>
@@ -775,14 +866,6 @@
     <message>
       <source>Export Bookmark...</source>
       <translation>Eksporter bokmerke...</translation>
-    </message>
-    <message>
-      <source>Resolution...</source>
-      <translation>Oppløsning...</translation>
-    </message>
-    <message>
-      <source>Cell Aspect Ratio...</source>
-      <translation>Celleformat...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -815,10 +898,6 @@
     <message>
       <source>Virtual Camera...</source>
       <translation>Virtuelt kamera...</translation>
-    </message>
-    <message>
-      <source>New Virtual Camera...</source>
-      <translation>Nytt virtuelt kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -861,14 +940,6 @@
       <translation>Bytt til fanen Objekter</translation>
     </message>
     <message>
-      <source>Pin Calendar</source>
-      <translation>Fest kalender</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Løsne kalenderen</translation>
-    </message>
-    <message>
       <source>Page...</source>
       <translation>Side...</translation>
     </message>
@@ -895,10 +966,6 @@
     <message>
       <source>New</source>
       <translation>Ny</translation>
-    </message>
-    <message>
-      <source>Welcome Screen</source>
-      <translation>Velkomstskjerm</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
@@ -968,20 +1035,8 @@
       <translation>Fjern gruppe</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page...</source>
-      <translation>Legg til proxy-nettside...</translation>
-    </message>
-    <message>
       <source>Cell Spacing</source>
       <translation>Celleavstand</translation>
-    </message>
-    <message>
-      <source>Show Panel</source>
-      <translation>Vis panel</translation>
-    </message>
-    <message>
-      <source>Hide Panel</source>
-      <translation>Skjul panel</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1031,6 +1086,156 @@
       <source>Save Cloud Layout As...</source>
       <translation>Lagre skyoppsett som...</translation>
     </message>
+    <message>
+      <source>Add</source>
+      <translation>Legg til</translation>
+    </message>
+    <message>
+      <source>Device...</source>
+      <translation type="unfinished">Device...</translation>
+    </message>
+    <message>
+      <source>Add User...</source>
+      <translation>Legg til bruker...</translation>
+    </message>
+    <message>
+      <source>Integration...</source>
+      <translation>Integrasjon...</translation>
+    </message>
+    <message>
+      <source>New Integration...</source>
+      <translation>Ny integrasjon...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>Ny webside...</translation>
+    </message>
+    <message>
+      <source>Add Showreel...</source>
+      <translation type="unfinished">Add Showreel...</translation>
+    </message>
+    <message>
+      <source>Add Virtual Camera...</source>
+      <translation type="unfinished">Add Virtual Camera...</translation>
+    </message>
+    <message>
+      <source>Integration Settings...</source>
+      <translation type="unfinished">Integration Settings...</translation>
+    </message>
+    <message>
+      <source>Proxied Integration...</source>
+      <translation type="unfinished">Proxied Integration...</translation>
+    </message>
+    <message>
+      <source>Proxied Web Page...</source>
+      <translation type="unfinished">Proxied Web Page...</translation>
+    </message>
+    <message>
+      <source>Show Proxied Resources</source>
+      <translation>Vis proxy-ressurser</translation>
+    </message>
+    <message>
+      <source>Import From Devices...</source>
+      <translation>Importer fra enheter...</translation>
+    </message>
+    <message>
+      <source>User Manual...</source>
+      <translation>Brukermanual...</translation>
+    </message>
+    <message>
+      <source>Convert to Shared Layout</source>
+      <translation type="unfinished">Convert to Shared Layout</translation>
+    </message>
+    <message numerus="yes">
+      <source>Mute Items</source>
+      <translation type="unfinished">
+        <numerusform>Demp elementer</numerusform>
+        <numerusform>Mute Items</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Unmute Items</source>
+      <translation type="unfinished">
+        <numerusform>Slå på lyden for elementer</numerusform>
+        <numerusform>Unmute Items</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
+    </message>
+    <message>
+      <source>Layout Tab</source>
+      <translation type="unfinished">Layout Tab</translation>
+    </message>
+    <message>
+      <source>New Layout Tab</source>
+      <translation type="unfinished">New Layout Tab</translation>
+    </message>
+    <message>
+      <source>Welcome Screen Tab</source>
+      <translation type="unfinished">Welcome Screen Tab</translation>
+    </message>
+    <message>
+      <source>New Welcome Screen Tab</source>
+      <translation type="unfinished">New Welcome Screen Tab</translation>
+    </message>
+    <message>
+      <source>Site Administration...</source>
+      <translation type="unfinished">Site Administration...</translation>
+    </message>
+    <message>
+      <source>Site Update...</source>
+      <translation type="unfinished">Site Update...</translation>
+    </message>
+    <message>
+      <source>Lists Management...</source>
+      <translation type="unfinished">Lists Management...</translation>
+    </message>
+    <message>
+      <source>Open Integrations...</source>
+      <translation type="unfinished">Open Integrations...</translation>
+    </message>
+    <message>
+      <source>Merge Sites...</source>
+      <translation type="unfinished">Merge Sites...</translation>
+    </message>
+    <message>
+      <source>Open in</source>
+      <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
+      <translation type="unfinished">Open in</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation>Ny Fane</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation>Nytt vindu</translation>
+    </message>
+    <message>
+      <source>Dedicated Window</source>
+      <comment>The &quot;Open in&quot; submenu item</comment>
+      <translation type="unfinished">Dedicated Window</translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Oppløsning</translation>
+    </message>
+    <message>
+      <source>JavaScript API...</source>
+      <translation type="unfinished">JavaScript API...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected Site...</source>
+      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio</source>
+      <translation type="unfinished">Cell Aspect Ratio</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1072,10 +1277,10 @@
     </message>
   </context>
   <context>
-    <name>DropdownTextPickerWidgetStrings</name>
+    <name>DirectParentsModel</name>
     <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
+      <source>LDAP group membership is managed on LDAP server</source>
+      <translation>LDAP-gruppemedlemskap administreres på LDAP-server</translation>
     </message>
   </context>
   <context>
@@ -1102,45 +1307,6 @@
     </message>
   </context>
   <context>
-    <name>EventSearchWidget::Private</name>
-    <message>
-      <source>Server events</source>
-      <translation>Server-hendelser</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analyse-hendelser</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Enhver hendelse</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Ethvert enhetsproblem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Ethvert kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Enhver serverhendelse</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Enhetsproblemer</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraproblemer</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Enhver analysehendelse</translation>
-    </message>
-  </context>
-  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1152,21 +1318,6 @@
         <numerusform>%n visning</numerusform>
         <numerusform>%n visninger</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>FileExtensions</name>
-    <message>
-      <source>Pictures</source>
-      <translation>Bilder</translation>
-    </message>
-    <message>
-      <source>Video</source>
-      <translation>Video</translation>
-    </message>
-    <message>
-      <source>All Files</source>
-      <translation>Alle filer</translation>
     </message>
   </context>
   <context>
@@ -1224,10 +1375,24 @@
     </message>
   </context>
   <context>
-    <name>LayoutTourTextFactory</name>
+    <name>Groups</name>
     <message>
-      <source>Start Showreel</source>
-      <translation>Start bildesyklus</translation>
+      <source>Delete group?</source>
+      <translation>Slette gruppe?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups?</source>
+      <translation>
+        <numerusform>Vil du slette %n grupper?</numerusform>
+        <numerusform>Vil du slette %n grupper?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>IntercomManager::Private</name>
+    <message>
+      <source>%1 Layout</source>
+      <translation>%1 planløsning</translation>
     </message>
   </context>
   <context>
@@ -1285,10 +1450,6 @@
       <translation>Lisensen er allerede aktivert på en annen server</translation>
     </message>
     <message>
-      <source>You already activated this license</source>
-      <translation>Du har allerede aktivert denne lisensen</translation>
-    </message>
-    <message>
       <source>To activate License Key manually please contact %1.</source>
       <translation>For å aktivere lisensnøkkel manuelt må du kontakte %1.</translation>
     </message>
@@ -1335,12 +1496,16 @@ Lisensnøkkel: %2</translation>
       <translation>Kopier parametere</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>Hvis systemet ditt ikke har tilgang til Internett, vennligst send den medfølgende lisensnøkkelen og maskinvare-IDen til %1 for å motta aktiveringsfilen.</translation>
+      <source>License has already been activated</source>
+      <translation>Lisensen er allerede aktivert</translation>
     </message>
     <message>
-      <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>Hvis systemet ditt ikke har tilgang til Internett, vennligst send den medfølgende lisensnøkkelen og maskinvare-IDen til ditt regionale/lisensstøtteteam for å motta aktiveringsfilen:</translation>
+      <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
+      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+    </message>
+    <message>
+      <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
+      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
     </message>
   </context>
   <context>
@@ -1469,8 +1634,8 @@ Lisensnøkkel: %2</translation>
   <context>
     <name>OauthLoginDialog</name>
     <message>
-      <source>Connect to System</source>
-      <translation>Koble til systemet</translation>
+      <source>Connect to Site</source>
+      <translation type="unfinished">Connect to Site</translation>
     </message>
   </context>
   <context>
@@ -1484,24 +1649,12 @@ Lisensnøkkel: %2</translation>
       <translation>SSL</translation>
     </message>
     <message>
-      <source>Unsecure</source>
-      <translation>Usikker</translation>
-    </message>
-    <message>
       <source>Check</source>
       <translation>Velg</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Ugyldig e-post.</translation>
-    </message>
-    <message>
       <source>URL is not valid.</source>
       <translation>URL er ikke gyldig.</translation>
-    </message>
-    <message>
-      <source>Enter a short System description here.</source>
-      <translation>Skriv inn en kort systembeskrivelse her.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1543,10 +1696,6 @@ Lisensnøkkel: %2</translation>
       <translation>Suksess</translation>
     </message>
     <message>
-      <source>Connection timed out</source>
-      <translation>Tilkoblingen gikk ut</translation>
-    </message>
-    <message>
       <source>Authentication failed</source>
       <translation>Autentiseringen mislyktes</translation>
     </message>
@@ -1555,13 +1704,53 @@ Lisensnøkkel: %2</translation>
       <translation>Ukjent feil</translation>
     </message>
     <message>
-      <source>Unable to test email settings due to no internet connection on any of the active servers</source>
-      <translation>Kan ikke teste e-postinnstillinger på grunn av manglende internettforbindelse på de aktive serverne</translation>
-    </message>
-    <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
       <translation>%1 brukere vil begynne å motta e-poster umiddelbart etter at du har brukt disse innstillingene</translation>
+    </message>
+    <message>
+      <source>Cannot reach the server</source>
+      <translation type="unfinished">Cannot reach the server</translation>
+    </message>
+    <message>
+      <source>Username or Password are incorrect</source>
+      <translation type="unfinished">Username or Password are incorrect</translation>
+    </message>
+    <message>
+      <source>Insecure</source>
+      <translation>Utrygg</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Tilkoblingen mislyktes</translation>
+    </message>
+    <message>
+      <source>Username cannot be empty</source>
+      <translation>Brukernavnet kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>Passordet kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>Users are receiving emails</source>
+      <translation>Brukere mottar e-poster</translation>
+    </message>
+    <message>
+      <source>Users will start receiving emails right after you apply settings</source>
+      <translation>Brukere vil begynne å motta e-poster rett etter at du har lagret innstillingene</translation>
+    </message>
+    <message>
+      <source>Unable to test SMTP server</source>
+      <translation>Kan ikke teste SMTP-serveren</translation>
+    </message>
+    <message>
+      <source>Additional info required</source>
+      <translation>Ytterligere informasjon kreves</translation>
+    </message>
+    <message>
+      <source>Enter a short Site description here.</source>
+      <translation type="unfinished">Enter a short Site description here.</translation>
     </message>
   </context>
   <context>
@@ -1578,10 +1767,6 @@ Lisensnøkkel: %2</translation>
       <source>Weak</source>
       <translation>Svakt</translation>
     </message>
-    <message>
-      <source>Password should contain different types of symbols.</source>
-      <translation>Passordet skal inneholde forskjellige typer symboler.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1593,77 +1778,61 @@ Lisensnøkkel: %2</translation>
       <source>Short</source>
       <translation>Kort</translation>
     </message>
-    <message numerus="yes">
-      <source>Password must be at least %n characters long.</source>
-      <translation>
-        <numerusform>Passordet må være minst %n tegn langt.</numerusform>
-        <numerusform>Passordet må være minst %n tegn langt.</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Long</source>
       <translation>Langt</translation>
-    </message>
-    <message numerus="yes">
-      <source>Password must be no longer than %n characters.</source>
-      <translation>
-        <numerusform>Passordet må ikke være mer enn %n tegn.</numerusform>
-        <numerusform>Passordet må ikke være mer enn %n tegn.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation>
-        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen.</numerusform>
-        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Password should not contain %n or more repeating characters.</source>
-      <translation>
-        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn.</numerusform>
-        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn.</numerusform>
-      </translation>
     </message>
     <message>
       <source>Common</source>
       <translation>Vanlig</translation>
     </message>
     <message>
-      <source>This password is in list of the most popular passwords.</source>
-      <translation>Dette passordet er i listen over mest brukte passord.</translation>
-    </message>
-    <message>
       <source>Incorrect</source>
       <translation>Stemmer ikke</translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Bare latinske bokstaver, tall og tastatursymboler %1 er tillatt.</translation>
+      <source>Password should contain different types of symbols</source>
+      <translation>Passord bør inneholde forskjellige typer symboler</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long</source>
+      <translation>
+        <numerusform>Passordet må være på minst %n tegn</numerusform>
+        <numerusform>Passordet må være på minst %n tegn</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters</source>
+      <translation>
+        <numerusform>Passordet må ikke være lengre enn %n tegn</numerusform>
+        <numerusform>Passordet må ikke være lengre enn %n tegn</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together</source>
+      <translation>
+        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen</numerusform>
+        <numerusform>Passordet skal ikke inneholde %n eller flere påfølgende tegn sammen</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters</source>
+      <translation>
+        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn</numerusform>
+        <numerusform>Passordet skal ikke inneholde %n eller flere repeterende tegn</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>Bare latinske bokstaver, tall og tastatur symboler er tillatt.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PermissionsInfoTable</name>
-    <message>
-      <source>Cameras &amp; Resources</source>
-      <translation>Kameraer og ressurser</translation>
+      <source>This password is in list of the most popular passwords</source>
+      <translation>Dette passordet er på listen over de mest populære passordene</translation>
     </message>
     <message>
-      <source>Shared Layouts</source>
-      <translation>Delte visninger</translation>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed</source>
+      <translation>Bare latinske bokstaver, tall og tastatursymboler %1 er tillatt</translation>
     </message>
     <message>
-      <source>Permissions</source>
-      <translation>Rettigheter</translation>
-    </message>
-    <message>
-      <source>All</source>
-      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
-      <translation>Alle</translation>
+      <source>Only latin letters, numbers and keyboard symbols are allowed</source>
+      <translation>Bare latinske bokstaver, tall og tastatur symboler er tillatt</translation>
     </message>
   </context>
   <context>
@@ -1792,6 +1961,50 @@ Lisensnøkkel: %2</translation>
       <source>Regional / License support</source>
       <translation>Regional / lisenssupport</translation>
     </message>
+    <message>
+      <source>Partner information</source>
+      <translation>Partnerinformasjon</translation>
+    </message>
+    <message>
+      <source>Phones</source>
+      <translation>Telefoner</translation>
+    </message>
+    <message>
+      <source>Emails</source>
+      <translation>E-poster</translation>
+    </message>
+    <message>
+      <source>RHI backend</source>
+      <translation>RHI backend</translation>
+    </message>
+    <message>
+      <source>RHI device</source>
+      <translation>RHI enhet</translation>
+    </message>
+    <message>
+      <source>RHI device ID</source>
+      <translation>RHI enhets-ID</translation>
+    </message>
+    <message>
+      <source>RHI vendor ID</source>
+      <translation>RHI leverandør-ID</translation>
+    </message>
+    <message>
+      <source>RHI max texture size</source>
+      <translation>RHI max teksturstørrelse</translation>
+    </message>
+    <message>
+      <source>Graphics API</source>
+      <translation>Grafikk API</translation>
+    </message>
+    <message>
+      <source>Unable to get GPU information for %1</source>
+      <translation>Kan ikke hente GPU-informasjon for %1</translation>
+    </message>
+    <message>
+      <source>Platform</source>
+      <translation type="unfinished">Platform</translation>
+    </message>
   </context>
   <context>
     <name>QnAbstractPtzDialog</name>
@@ -1802,13 +2015,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Saving...</source>
       <translation>Lagrer...</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAccessibleLayoutsWidget</name>
-    <message>
-      <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Ved å gi tilgang til noen visninger gir du tilgang til alle kameraene på dem. Brukeren vil også få tilgang til alle nye kameraer på disse visningene.</translation>
     </message>
   </context>
   <context>
@@ -1892,9 +2098,12 @@ Lisensnøkkel: %2</translation>
       <source>Download complete!</source>
       <translation>Nedlasting ferdig!</translation>
     </message>
+  </context>
+  <context>
+    <name>QnAttachToVideowallDialog</name>
     <message>
-      <source>NVIDIA hardware acceleration is in beta mode</source>
-      <translation>NVIDIA maskinvareakselerasjon er i betamodus</translation>
+      <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
+      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -1970,41 +2179,6 @@ Lisensnøkkel: %2</translation>
       <source>No archive for this position</source>
       <translation>Ingen opptak for denne posisjonen</translation>
     </message>
-    <message numerus="yes">
-      <source>These devices are removed from System</source>
-      <translation>
-        <numerusform>Disse enhetene blir fjernet fra systemet</numerusform>
-        <numerusform>Disse enhetene blir fjernet fra systemet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These cameras are removed from System</source>
-      <translation>
-        <numerusform>Disse kameraene er fjernet fra systemet</numerusform>
-        <numerusform>Disse kameraene er fjernet fra systemet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These servers are removed from System</source>
-      <translation>
-        <numerusform>Disse serverne blir fjernet fra systemet</numerusform>
-        <numerusform>Disse serverne blir fjernet fra systemet</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These users are removed from System</source>
-      <translation>
-        <numerusform>Disse brukerne er fjernet fra System</numerusform>
-        <numerusform>Disse brukerne er fjernet fra System</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These resources are removed from System</source>
-      <translation>
-        <numerusform>Disse ressursene fjernes fra System</numerusform>
-        <numerusform>Disse ressursene fjernes fra System</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Audit trail replay</source>
       <translation>Systemlogg avspilling</translation>
@@ -2023,6 +2197,41 @@ Lisensnøkkel: %2</translation>
       <translation>
         <numerusform>Detaljer for %n kameraer på %1</numerusform>
         <numerusform>Detaljer for %n kameraer på %1</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These cameras are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These servers are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These servers are removed from Site</numerusform>
+        <numerusform>These servers are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These users are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These users are removed from Site</numerusform>
+        <numerusform>These users are removed from Site</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These resources are removed from Site</source>
+      <translation type="unfinished">
+        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2055,14 +2264,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Exporting video</source>
       <translation>Eksporter video</translation>
-    </message>
-    <message>
-      <source>System name changed</source>
-      <translation>Systemnavn endret</translation>
-    </message>
-    <message>
-      <source>System merge</source>
-      <translation>System sammenslåing</translation>
     </message>
     <message>
       <source>General settings updated</source>
@@ -2099,10 +2300,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>User</source>
       <translation>Bruker</translation>
-    </message>
-    <message>
-      <source>IP</source>
-      <translation>IP</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -2147,14 +2344,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Camera removed</source>
       <translation>Kamera er fjernet</translation>
-    </message>
-    <message>
-      <source>Device name</source>
-      <translation>Enhetsnavn</translation>
-    </message>
-    <message>
-      <source>Camera name</source>
-      <translation>Kameranavn</translation>
     </message>
     <message>
       <source>Email settings changed</source>
@@ -2219,13 +2408,63 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation>Koblet til %1 via %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
-      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 5.2.0.0)</comment>
+      <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
       <translation>Koblet fra %1 via %2</translation>
+    </message>
+    <message>
+      <source>Site name changed</source>
+      <translation type="unfinished">Site name changed</translation>
+    </message>
+    <message>
+      <source>Site merge</source>
+      <translation type="unfinished">Site merge</translation>
+    </message>
+    <message>
+      <source>Server proxy connection</source>
+      <translation type="unfinished">Server proxy connection</translation>
+    </message>
+    <message>
+      <source>Site has been updated to version %1</source>
+      <translation type="unfinished">Site has been updated to version %1</translation>
+    </message>
+    <message>
+      <source>%1 - %2, Duration: %3, Target: %4</source>
+      <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
+      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+    </message>
+    <message>
+      <source>Start time: %1, Target: %2</source>
+      <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
+      <translation type="unfinished">Start time: %1, Target: %2</translation>
+    </message>
+    <message>
+      <source>User IP</source>
+      <translation type="unfinished">User IP</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Enhet</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Device IP</source>
+      <translation type="unfinished">Device IP</translation>
+    </message>
+    <message>
+      <source>Camera IP</source>
+      <translation type="unfinished">Camera IP</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>Server</translation>
     </message>
   </context>
   <context>
@@ -2257,10 +2496,6 @@ Lisensnøkkel: %2</translation>
       <translation>6 måneder</translation>
     </message>
     <message>
-      <source>year</source>
-      <translation>år</translation>
-    </message>
-    <message>
       <source>Name cannot be empty.</source>
       <translation>Navn kan ikke være tomt.</translation>
     </message>
@@ -2268,52 +2503,9 @@ Lisensnøkkel: %2</translation>
       <source>Description cannot be empty</source>
       <translation>Beskrivelsen kan ikke være tom</translation>
     </message>
-  </context>
-  <context>
-    <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 av %n enheter</numerusform>
-        <numerusform>%1 av %n enheter</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 av %n kameraer</numerusform>
-        <numerusform>%1 av %n kameraer</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Select at least one device</source>
-      <translation>Velg minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Velg minst ett kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 av %n I/O-moduler</numerusform>
-        <numerusform>%1 av %n I/O-moduler</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Any Device</source>
-      <translation>Enhver enhet</translation>
-    </message>
-    <message>
-      <source>Any Camera</source>
-      <translation>Hvilket som helst kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Administrer bokmerker</translation>
+      <source>Year</source>
+      <translation>År</translation>
     </message>
   </context>
   <context>
@@ -2345,10 +2537,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Every %1</source>
       <translation>Hver %1</translation>
-    </message>
-    <message>
-      <source>System</source>
-      <translation>System</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -2403,6 +2591,10 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>Source Server and %1</source>
       <translation>Kildeserver og %1</translation>
+    </message>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
     </message>
   </context>
   <context>
@@ -2533,43 +2725,11 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnBuzzerPolicy</name>
-    <message>
-      <source>Servers that support buzzer</source>
-      <translation>Servere som støtter buzzer</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCamDisplay</name>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
       <translation>%1 kjører</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAnalyticsPolicy</name>
-    <message>
-      <source>Analytics is not available for %1</source>
-      <translation>Analytics er ikke tilgjengelig for %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraAudioTransmitPolicy</name>
-    <message>
-      <source>Select device</source>
-      <translation>Velg enhet</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>Velg kamera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 does not support two-way audio</source>
-      <translation>
-        <numerusform>%1 støtter ikke toveis lyd</numerusform>
-        <numerusform>%1 støtter ikke toveis lyd</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2648,16 +2808,6 @@ Lisensnøkkel: %2</translation>
     <message>
       <source>automatic</source>
       <translation>automatisk</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraInputPolicy</name>
-    <message numerus="yes">
-      <source>%1 have no input ports</source>
-      <translation>
-        <numerusform>%1 har ingen inngangsporter</numerusform>
-        <numerusform>%1 har ingen inngangsporter</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2770,27 +2920,10 @@ Lisensnøkkel: %2</translation>
     </message>
   </context>
   <context>
-    <name>QnCameraMotionPolicy</name>
-    <message>
-      <source>Recording or motion detection is disabled for %1</source>
-      <translation>Innspilling eller bevegelsesdeteksjon er deaktivert i %1</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
       <translation>automatisk</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCameraOutputPolicy</name>
-    <message numerus="yes">
-      <source>%1 have no output relays</source>
-      <translation>
-        <numerusform>%1 har ingen utgangsreléer</numerusform>
-        <numerusform>%1 har ingen utgangsreléer</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -2804,10 +2937,6 @@ Lisensnøkkel: %2</translation>
       <translation>Gjenta passord</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Passordene samsvarer ikke.</translation>
-    </message>
-    <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Passordet skal være minst 8 symboler langt og inneholde forskjellige typer tegn.</translation>
     </message>
@@ -2815,12 +2944,9 @@ Lisensnøkkel: %2</translation>
       <source>Password should not be equal to camera&apos;s user name</source>
       <translation>Passordet skal ikke være lik kameraets brukernavn</translation>
     </message>
-  </context>
-  <context>
-    <name>QnCameraRecordingPolicy</name>
     <message>
-      <source>Recording is disabled for %1</source>
-      <translation>Innspillingen er deaktivert i %1</translation>
+      <source>Passwords do not match</source>
+      <translation>Passordene er ikke like</translation>
     </message>
   </context>
   <context>
@@ -2834,106 +2960,92 @@ Lisensnøkkel: %2</translation>
       <translation>Bekreft passord</translation>
     </message>
     <message>
-      <source>Passwords do not match.</source>
-      <translation>Passordene samsvarer ikke.</translation>
-    </message>
-    <message>
       <source>Current Password</source>
       <translation>Nåværende passord</translation>
     </message>
     <message>
-      <source>To modify your password please enter the existing one.</source>
-      <translation>For å endre passordet ditt, vennligst skriv inn det eksisterende.</translation>
+      <source>Passwords do not match</source>
+      <translation>Passordene er ikke like</translation>
     </message>
     <message>
-      <source>Invalid current password.</source>
-      <translation>Ugyldig gjeldende passord.</translation>
+      <source>To modify your password please enter the existing one</source>
+      <translation>For å endre passordet ditt, skriv inn det eksisterende</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Ugyldig gjeldende passord</translation>
     </message>
   </context>
   <context>
     <name>QnCloudManagementWidget</name>
-    <message>
-      <source>Connect to your Systems
-from anywhere with any
-devices</source>
-      <translation>Koble til systemene
-fra hvor som helst med
-enhet</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble systemet fra %1</translation>
-    </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Åpne %1 portalen</translation>
     </message>
     <message>
-      <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble systemet til %1...</translation>
-    </message>
-    <message>
-      <source>Create %1
-account</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Opprett %1
-konto</translation>
-    </message>
-    <message>
-      <source>Connect System
-to %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble System
-til %1</translation>
-    </message>
-    <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Lær mer om %1</translation>
-    </message>
-    <message>
-      <source>Enter your account password to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Skriv inn passordet til kontoen din for å koble fra systemet fra %1</translation>
-    </message>
-    <message>
       <source>Disconnect</source>
       <translation>Koble fra</translation>
     </message>
     <message>
-      <source>System disconnected from %1</source>
+      <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Systemet er koblet fra %1</translation>
+      <translation type="unfinished">Disconnect Site from %1</translation>
     </message>
     <message>
-      <source>You are about to disconnect System from %1</source>
+      <source>Connect Site to %1...</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connect Site to %1...</translation>
+    </message>
+    <message>
+      <source>There is currently no connection between your site and %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+    </message>
+    <message>
+      <source>Enter your account password to disconnect Site from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the Site from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+    </message>
+    <message>
+      <source>Site disconnected from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Site disconnected from %1</translation>
+    </message>
+    <message>
+      <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation>Du er i ferd med å koble systemet fra %1</translation>
+      <translation type="unfinished">Disconnect site from %1?</translation>
     </message>
     <message>
-      <source>All %1 users will be deleted.</source>
+      <source>Recording will stop and all Service Subscriptions will be removed</source>
+      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+    </message>
+    <message>
+      <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Alle %1 brukere blir slettet.</translation>
+      <translation type="unfinished">All %1 users will be removed from the site</translation>
     </message>
     <message>
-      <source>You will be logged out.</source>
-      <translation>Du vil bli logget ut.</translation>
+      <source>You will be logged out of the site. The site will be accessible only via local network</source>
+      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
     </message>
     <message>
-      <source>System will be accessible through local network with a local administrator account.</source>
-      <translation>Systemet vil være tilgjengelig via lokalt nettverk med en lokal administratorkonto.</translation>
+      <source>The site will be accessible only via local network</source>
+      <translation type="unfinished">The site will be accessible only via local network</translation>
     </message>
     <message>
-      <source>Continue</source>
-      <translation>Fortsette</translation>
+      <source>Existing data (site settings and archive) will be preserved</source>
+      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
     </message>
     <message>
-      <source>Cannot disconnect the System from %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kan ikke koble systemet fra %1</translation>
+      <source>This action cannot be undone</source>
+      <translation>Denne handlingen kan ikke angres</translation>
     </message>
   </context>
   <context>
@@ -3020,23 +3132,22 @@ til %1</translation>
       <source>Connect to Server</source>
       <translation>Koble til server</translation>
     </message>
+    <message>
+      <source>Log in to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Logg inn på %1</translation>
+    </message>
+    <message>
+      <source>Logged in as %1</source>
+      <comment>%1 is the cloud login name (like user@domain.com</comment>
+      <translation>Logget på som %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
       <translation>Kontoinnstillinger</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnCloudUsersValidationPolicy</name>
-    <message numerus="yes">
-      <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
-      <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>
-        <numerusform>%n av %1 utvalgte brukere er ikke %2 brukere og vil ikke motta mobilvarsler.</numerusform>
-        <numerusform>%n av %1 utvalgte brukere er ikke %2 brukere og vil ikke motta mobilvarsler.</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -3112,12 +3223,24 @@ til %1</translation>
       <translation>Kunne ikke gå inn i kompatibilitetsmodus for versjon %1</translation>
     </message>
     <message>
-      <source>System is not compatible with two-factor authentication</source>
-      <translation>Systemet er ikke kompatibelt med tofaktorautentisering</translation>
+      <source>Log In...</source>
+      <translation type="unfinished">Log In...</translation>
     </message>
     <message>
-      <source>Failed to log in to System &quot;%1&quot;</source>
-      <translation>Kunne ikke logge på System &quot;%1&quot;</translation>
+      <source>Your session has expired</source>
+      <translation>Økten din har utløpt</translation>
+    </message>
+    <message>
+      <source>Please sign in again with your link to continue</source>
+      <translation type="unfinished">Please sign in again with your link to continue</translation>
+    </message>
+    <message>
+      <source>Site is not compatible with two-factor authentication</source>
+      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+    </message>
+    <message>
+      <source>Failed to log in to Site &quot;%1&quot;</source>
+      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3145,6 +3268,21 @@ til %1</translation>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
       <translation>For å generere generisk hendelse, se %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCustomFileDialog</name>
+    <message>
+      <source>Pictures</source>
+      <translation>Bilder</translation>
+    </message>
+    <message>
+      <source>Video</source>
+      <translation>Video</translation>
+    </message>
+    <message>
+      <source>All Files</source>
+      <translation>Alle filer</translation>
     </message>
   </context>
   <context>
@@ -3202,10 +3340,6 @@ til %1</translation>
       <translation>Gjenopprett fra databasesikkerhetskopiering</translation>
     </message>
     <message>
-      <source>Enter your account password to restore System from backup</source>
-      <translation>Skriv inn kontopassordet for å gjenopprette systemet fra sikkerhetskopi</translation>
-    </message>
-    <message>
       <source>Restore</source>
       <translation>Gjenopprett</translation>
     </message>
@@ -3214,141 +3348,16 @@ til %1</translation>
       <translation>Gjenopprette databasen?</translation>
     </message>
     <message>
-      <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>Systemkonfigurasjonen blir gjenopprettet fra sikkerhetskopien, serverprogrammet vil bli startet på nytt.</translation>
-    </message>
-    <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
       <translation>Databasen ble gjenopprettet. Serverapplikasjonen starter snart på nytt.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModel</name>
     <message>
-      <source>Local user</source>
-      <translation>Lokal Bruker</translation>
+      <source>Site configuration will be restored from backup, Server application will be restarted.</source>
+      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
     </message>
     <message>
-      <source>%1 user</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 bruker</translation>
-    </message>
-    <message>
-      <source>LDAP user</source>
-      <translation>LDAP-bruker</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Aktivert</translation>
-    </message>
-    <message>
-      <source>Disabled</source>
-      <translation>Deaktivert</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Logg Inn</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Rolle</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserListModelPrivate</name>
-    <message>
-      <source>Owner</source>
-      <translation>Eier</translation>
-    </message>
-    <message>
-      <source>Administrator</source>
-      <translation>Administrator</translation>
-    </message>
-    <message>
-      <source>View live video</source>
-      <translation>Se livevideo</translation>
-    </message>
-    <message>
-      <source>Adjust device settings</source>
-      <translation>Juster enhetsinnstillinger</translation>
-    </message>
-    <message>
-      <source>Adjust camera settings</source>
-      <translation>Juster kamerainnstillingene</translation>
-    </message>
-    <message>
-      <source>Use PTZ controls</source>
-      <translation>Bruk PTZ-kontroller</translation>
-    </message>
-    <message>
-      <source>View video archives</source>
-      <translation>Se opptak</translation>
-    </message>
-    <message>
-      <source>Export video</source>
-      <translation>Eksporter video</translation>
-    </message>
-    <message>
-      <source>Control Video Walls</source>
-      <translation>Kontroller Videovegg</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDeprecatedUserManagementWidget</name>
-    <message>
-      <source>Edit</source>
-      <translation>Rediger</translation>
-    </message>
-    <message>
-      <source>All users</source>
-      <translation>Alle brukere</translation>
-    </message>
-    <message>
-      <source>With enabled digest authentication</source>
-      <translation>Med aktivert sammendrag-autentisering</translation>
-    </message>
-    <message>
-      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Brukere kan importeres fra en LDAP-server. De kan bare logge på hvis LDAP-serveren er online og kontoene deres er aktive på den.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-      <source>Could not find video encoder %1.</source>
-      <translation>Finner ikke videokoderen %1.</translation>
-    </message>
-    <message>
-      <source>Could not initialize video encoder.</source>
-      <translation>Kunne ikke initialisere video encoder.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio encoder.</source>
-      <translation>Kunne ikke initialisere lydenkoderen.</translation>
-    </message>
-    <message>
-      <source>Could not start primary audio device.</source>
-      <translation>Kunne ikke starte den primære lydenheten.</translation>
-    </message>
-    <message>
-      <source>Screen width must be a multiple of 8.</source>
-      <translation>Skjermbredden må være et multiplum av 8.</translation>
-    </message>
-    <message>
-      <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>Kunne ikke initialisere lydenheten &quot;%1&quot;.</translation>
-    </message>
-    <message>
-      <source>Could not detect capturing resolution</source>
-      <translation>Kunne ikke oppdage opptaks-oppløsningen</translation>
-    </message>
-    <message>
-      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Lydopptaksenheten støtter ingen passende lydformater. Velg en annen lydenhet eller &quot;ingen&quot; i skjermopptaksinnstillingene.</translation>
+      <source>Enter your account password to restore Site from backup</source>
+      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
     </message>
   </context>
   <context>
@@ -3505,24 +3514,6 @@ til %1</translation>
     </message>
   </context>
   <context>
-    <name>QnExecPtzPresetPolicy</name>
-    <message>
-      <source>Select exactly one camera</source>
-      <translation>Velg nøyaktig ett kamera</translation>
-    </message>
-    <message>
-      <source>%1 has no PTZ presets</source>
-      <translation>%1 har ingen PTZ-posisjoner</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFanErrorPolicy</name>
-    <message>
-      <source>Servers that support fan diagnostic</source>
-      <translation>Servere som støtter vifte diagnostikk</translation>
-    </message>
-  </context>
-  <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
@@ -3542,13 +3533,6 @@ til %1</translation>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
       <translation>Dette kameraet er for øyeblikket ikke på noen av de valgte layoutene. Handling vil fungere hvis kameraet blir lagt til før handling utløses.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnFullscreenCameraPolicy</name>
-    <message>
-      <source>Select exactly one camera</source>
-      <translation>Velg nøyaktig ett kamera</translation>
     </message>
   </context>
   <context>
@@ -3579,6 +3563,10 @@ til %1</translation>
     <message>
       <source>Select Folder...</source>
       <translation>Velg mappe...</translation>
+    </message>
+    <message>
+      <source>Notifications filters are moved to the right panel</source>
+      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
     </message>
   </context>
   <context>
@@ -3630,6 +3618,14 @@ til %1</translation>
     <message>
       <source>Open Camera List</source>
       <translation>Åpne kameralisten</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrasjoner</translation>
+    </message>
+    <message>
+      <source>Open Integrations</source>
+      <translation type="unfinished">Open Integrations</translation>
     </message>
   </context>
   <context>
@@ -3736,93 +3732,6 @@ til %1</translation>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>Kunne ikke slå på I/O-port %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialog</name>
-    <message>
-      <source>Test</source>
-      <translation>Test</translation>
-    </message>
-    <message>
-      <source>Test failed</source>
-      <translation>Test mislyktes</translation>
-    </message>
-    <message numerus="yes">
-      <source>Test completed successfully: %n users found.</source>
-      <translation>
-        <numerusform>Test fullført: %n brukere funnet.</numerusform>
-        <numerusform>Test fullført: %n brukere funnet.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Endring av andre LDAP-innstillinger enn &quot;Søkefilter&quot; vil føre til tap av tilkobling for alle LDAP-hentede brukere.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapSettingsDialogPrivate</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>De angitte innstillingene er ikke gyldige.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Kunne ikke utføre en test.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Tidsavbrudd</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUserListModel</name>
-    <message>
-      <source>Login</source>
-      <translation>Logg Inn</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
-      <source>DN</source>
-      <translation>DN</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLdapUsersDialog</name>
-    <message>
-      <source>The provided settings are not valid.</source>
-      <translation>De angitte innstillingene er ikke gyldige.</translation>
-    </message>
-    <message>
-      <source>Could not perform a test.</source>
-      <translation>Kunne ikke utføre en test.</translation>
-    </message>
-    <message>
-      <source>Could not load users.</source>
-      <translation>Kunne ikke laste brukere.</translation>
-    </message>
-    <message>
-      <source>Error while loading users.</source>
-      <translation>Feil under innlasting av brukere.</translation>
-    </message>
-    <message>
-      <source>No new users found.</source>
-      <translation>Ingen nye brukere funnet.</translation>
-    </message>
-    <message>
-      <source>Timed Out</source>
-      <translation>Tidsavbrudd</translation>
-    </message>
-    <message>
-      <source>Import Selected</source>
-      <translation>Importer valgte</translation>
     </message>
   </context>
   <context>
@@ -3937,65 +3846,9 @@ til %1</translation>
       <source>Channels</source>
       <translation>Kanaler</translation>
     </message>
-  </context>
-  <context>
-    <name>QnLicenseManagerWidget</name>
     <message>
-      <source>Export</source>
-      <translation>Eksporter</translation>
-    </message>
-    <message>
-      <source>Export licenses to a file</source>
-      <translation>Eksporter lisenser til en fil</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate licenses?</source>
-      <translation>
-        <numerusform>Deaktivere lisens?</numerusform>
-        <numerusform>Deaktivere lisenser?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Fjern</translation>
-    </message>
-    <message>
-      <source>Deactivate</source>
-      <translation>Deaktiver</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n channels.</source>
-      <translation>
-        <numerusform>%n kanaler.</numerusform>
-        <numerusform>%n kanaler.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are currently in use</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 er for tiden i bruk</numerusform>
-        <numerusform>%1 er for tiden i bruk</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>At least %1 are required</source>
-      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>Minst %1 kreves</numerusform>
-        <numerusform>Minst %1 kreves</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n deactivations remaining.</source>
-      <translation>
-        <numerusform>%n deaktiveringer gjenstår.</numerusform>
-        <numerusform>%n deaktiveringer gjenstår.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation>Du har ikke en gyldig lisens installert. Aktiver din kommersielle eller prøvelisens.</translation>
+      <source>Not verified</source>
+      <translation type="unfinished">Not verified</translation>
     </message>
   </context>
   <context>
@@ -4025,6 +3878,10 @@ til %1</translation>
       <comment>%1 will be substituted by a list of contacts</comment>
       <translation>Send den medfølgende lisensnøkkelen og maskinvare-IDen til din regionale / lisenssupport (%1) for å få en aktiveringsnøkkel-fil.</translation>
     </message>
+    <message>
+      <source>Text Files</source>
+      <translation>Tekstfiler</translation>
+    </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
@@ -4041,20 +3898,8 @@ til %1</translation>
       <translation>Skjermopptak</translation>
     </message>
     <message>
-      <source>Notifications</source>
-      <translation>Varsler</translation>
-    </message>
-    <message>
       <source>Advanced</source>
       <translation>Avansert</translation>
-    </message>
-    <message>
-      <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Innstillingsfilen er skrivebeskyttet. Kontakt systemadministratoren. Alle endringer vil gå tapt etter programmets avslutning.</translation>
-    </message>
-    <message>
-      <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Innstillinger kan ikke lagres. Kontakt systemadministratoren. Alle endringer vil gå tapt etter programmets avslutning.</translation>
     </message>
     <message>
       <source>Restart required</source>
@@ -4071,6 +3916,10 @@ til %1</translation>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
       <translation>Noen endringer trer i kraft først etter %1 omstart</translation>
+    </message>
+    <message>
+      <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
+      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
     </message>
   </context>
   <context>
@@ -4120,12 +3969,12 @@ til %1</translation>
       <translation>Stiller inn tiden som skal brukes i klienten (tidslinje, tidsstempler, etc.) når klient- og servermaskiner er i forskjellige tidssoner.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Viser IP-adresser for kameraer og servere og roller for brukere.</translation>
-    </message>
-    <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
       <translation>Hvor lang tid hvert kamera på oppsettet vil vises hvis du starter en tur.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers.</source>
+      <translation>Viser IP-adresser for kameraer og servere.</translation>
     </message>
   </context>
   <context>
@@ -4159,25 +4008,12 @@ til %1</translation>
       <translation>%1 (Tour &quot;%2&quot; er aktiv)</translation>
     </message>
     <message>
-      <source>Zoom Window</source>
-      <translation>Forstørr til vinduet</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation>I / O-modul</translation>
     </message>
     <message>
       <source>Lo-Res</source>
       <translation>Lo-Res</translation>
-    </message>
-    <message>
-      <source>press and hold</source>
-      <comment>Soft Trigger</comment>
-      <translation>trykk og hold</translation>
-    </message>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Deaktivert etter planen</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -4197,6 +4033,14 @@ til %1</translation>
     <message>
       <source>Object Search</source>
       <translation>Objektsøk</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>Punkter</translation>
+    </message>
+    <message>
+      <source>Mute</source>
+      <translation>Mute</translation>
     </message>
   </context>
   <context>
@@ -4229,10 +4073,6 @@ til %1</translation>
   <context>
     <name>QnNewVirtualCameraDialog</name>
     <message>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Virtual Camera&quot; er en virtuell lagring for videofiler, som kan lastes opp til hvilken som helst server på systemet ditt og få tilgang til av enhver bruker.</translation>
-    </message>
-    <message>
       <source>Virtual Camera</source>
       <translation>Virtuelt kamera</translation>
     </message>
@@ -4247,6 +4087,10 @@ til %1</translation>
     <message>
       <source>Name cannot be empty</source>
       <translation>Navn kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -4315,71 +4159,10 @@ til %1</translation>
     </message>
   </context>
   <context>
-    <name>QnPermissionsWidget</name>
-    <message>
-      <source>Edit camera settings</source>
-      <translation>Rediger kamerainnstillinger</translation>
-    </message>
-    <message>
-      <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>Dette er også nødvendig for å opprette / redigere PTZ posisjoner og turer.</translation>
-    </message>
-    <message>
-      <source>Control video walls</source>
-      <translation>Kontroller Videovegg</translation>
-    </message>
-    <message>
-      <source>View event log</source>
-      <translation>Vis hendelseslogg</translation>
-    </message>
-    <message>
-      <source>View archive</source>
-      <translation>Se opptak</translation>
-    </message>
-    <message>
-      <source>Export archive</source>
-      <translation>Eksportere opptak</translation>
-    </message>
-    <message>
-      <source>View bookmarks</source>
-      <translation>Se bokmerker</translation>
-    </message>
-    <message>
-      <source>Modify bookmarks</source>
-      <translation>Endre bokmerker</translation>
-    </message>
-    <message>
-      <source>User Input</source>
-      <translation>Brukerinndata</translation>
-    </message>
-    <message>
-      <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, enhetsutgang, 2-veis lyd, Soft Knapper.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPoeOverBudgetPolicy</name>
-    <message>
-      <source>Servers that support PoE monitoring</source>
-      <translation>Servere som støtter PoE-overvåking</translation>
-    </message>
-  </context>
-  <context>
     <name>QnPopupBusinessActionWidget</name>
-    <message>
-      <source>Manage Bookmarks</source>
-      <translation>Administrere bokmerker</translation>
-    </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
       <translation>Varsel vises frem til en av brukerne som ser det oppretter et bokmerke med hendelsesbeskrivelse</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPopupSettingsWidget</name>
-    <message>
-      <source>These settings apply only to the System you are logged in to and will be removed in future versions.</source>
-      <translation>Disse innstillingene gjelder kun for systemet du er logget på og vil bli fjernet i fremtidige versjoner.</translation>
     </message>
   </context>
   <context>
@@ -4543,41 +4326,6 @@ til %1</translation>
     </message>
   </context>
   <context>
-    <name>QnRecordingSettingsWidget</name>
-    <message>
-      <source>Screen %1 - %2x%3</source>
-      <translation>Skjerm %1 - %2x%3</translation>
-    </message>
-    <message>
-      <source>%1 (Primary)</source>
-      <translation>%1 (Primær)</translation>
-    </message>
-    <message>
-      <source>Best</source>
-      <translation>Best</translation>
-    </message>
-    <message>
-      <source>Average</source>
-      <translation>Gjennomsnittlig</translation>
-    </message>
-    <message>
-      <source>Performance</source>
-      <translation>Ytelse</translation>
-    </message>
-    <message>
-      <source>Native</source>
-      <translation>Fra kamera</translation>
-    </message>
-    <message>
-      <source>Quarter Native</source>
-      <translation>Kvart Orginal</translation>
-    </message>
-    <message>
-      <source>Select Folder...</source>
-      <translation>Velg mappe...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
@@ -4644,45 +4392,6 @@ til %1</translation>
     </message>
   </context>
   <context>
-    <name>QnRequiredPermissionSubjectPolicy</name>
-    <message>
-      <source>Role %1 has no %2 permission</source>
-      <comment>%1 is the name of selected role, %2 is permission name</comment>
-      <translation>Rolle %1 har ingen %2 tillatelse</translation>
-    </message>
-    <message>
-      <source>Selected roles have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Valgte roller har ingen %1 tillatelse</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no %2 permission</source>
-      <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n av %1 utvalgte roller har ingen %2 tillatelse</numerusform>
-        <numerusform>%n av %1 utvalgte roller har ingen %2 tillatelse</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no %2 permission</source>
-      <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Bruker %1 har ingen %2 tillatelse</translation>
-    </message>
-    <message>
-      <source>Selected users have no %1 permission</source>
-      <comment>%1 is permission name</comment>
-      <translation>Valgte brukere har ingen %1 tillatelse</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no %2 permission</source>
-      <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation>
-        <numerusform>%n av %1 utvalgte roller har ingen %2 tillatelse</numerusform>
-        <numerusform>%n av %1 utvalgte brukere har ingen %2 tillatelse</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
@@ -4710,6 +4419,14 @@ til %1</translation>
     <message>
       <source>Enter Fullscreen</source>
       <translation>Se i fullskjerm</translation>
+    </message>
+    <message>
+      <source>Zoom Window</source>
+      <translation>Forstørr til vinduet</translation>
+    </message>
+    <message>
+      <source>Move to a dedicated window</source>
+      <translation type="unfinished">Move to a dedicated window</translation>
     </message>
   </context>
   <context>
@@ -4763,6 +4480,10 @@ til %1</translation>
     <message>
       <source>Search</source>
       <translation>Søk</translation>
+    </message>
+    <message>
+      <source>N/A</source>
+      <translation>N/A</translation>
     </message>
   </context>
   <context>
@@ -4825,6 +4546,28 @@ til %1</translation>
     <message>
       <source>Select cameras...</source>
       <translation>Velg kameraer...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSelectLayoutsButton</name>
+    <message>
+      <source>Any Layout</source>
+      <translation type="unfinished">Any Layout</translation>
+    </message>
+    <message>
+      <source>All Layouts</source>
+      <translation type="unfinished">All Layouts</translation>
+    </message>
+    <message>
+      <source>Select Layouts...</source>
+      <translation>Velg visning...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Layouts</source>
+      <translation>
+        <numerusform>%n Visninger</numerusform>
+        <numerusform>%n Visninger</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4975,41 +4718,13 @@ til %1</translation>
       <source>Backup</source>
       <translation>Sikkerhetskopi</translation>
     </message>
-  </context>
-  <context>
-    <name>QnServerSettingsWidget</name>
-    <message>
-      <source>At least two servers are required for this feature.</source>
-      <translation>Minst to servere er påkrevd for denne funksjonen.</translation>
-    </message>
-    <message>
-      <source>Max devices on this server:</source>
-      <translation>Maks enheter på denne serveren:</translation>
-    </message>
-    <message>
-      <source>Max cameras on this server:</source>
-      <translation>Max kameraer på denne serveren:</translation>
-    </message>
-    <message>
-      <source>This server already has more than max devices</source>
-      <translation>Denne serveren har allerede mer enn maksimalt utstyr</translation>
-    </message>
-    <message>
-      <source>This server already has more than max cameras</source>
-      <translation>Denne serveren har allerede mer enn maksimalt kameraer</translation>
-    </message>
-    <message>
-      <source>To avoid issues adjust max number of devices</source>
-      <translation>For å unngå problemer, juster maks antall enheter</translation>
-    </message>
-    <message>
-      <source>To avoid issues adjust max number of cameras</source>
-      <translation>For å unngå problemer, juster maksimalt antall kameraer</translation>
-    </message>
     <message>
       <source>Failover</source>
       <translation>Failover</translation>
     </message>
+  </context>
+  <context>
+    <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Certificates</source>
       <translation>
@@ -5029,23 +4744,20 @@ til %1</translation>
       <translation>Detaljer</translation>
     </message>
     <message>
-      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
-      <translation>Servere med failover aktivert vil automatisk ta kameraer fra frakoblede servere med samme steds-ID.</translation>
-    </message>
-    <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
       <translation>Sertifikatet mottatt fra serveren samsvarer ikke med det festede sertifikatet.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnSessionAwareTabbedDialog</name>
     <message>
-      <source>Unsaved changes:</source>
-      <translation>Ikke lagrede endringer:</translation>
+      <source>Certificate details are not available</source>
+      <translation>Sertifikatdetaljer er ikke tilgjengelige</translation>
     </message>
     <message>
-      <source>Save changes before exit?</source>
-      <translation>Lagre endringer før du går videre?</translation>
+      <source>To access certificate details, enable the Audit Trail feature.</source>
+      <translation>For å få tilgang til sertifikatdetaljer, aktiver Audit Trail-funksjonen.</translation>
+    </message>
+    <message>
+      <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
+      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
     </message>
   </context>
   <context>
@@ -5079,34 +4791,7 @@ til %1</translation>
     </message>
   </context>
   <context>
-    <name>QnSoftwareTriggerBusinessEventWidget</name>
-    <message>
-      <source>User Input</source>
-      <translation>Brukerinndata</translation>
-    </message>
-  </context>
-  <context>
     <name>QnStatusOverlayController</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
-    </message>
-    <message>
-      <source>UNAUTHORIZED</source>
-      <translation>UAUTORISERT</translation>
-    </message>
-    <message>
-      <source>SERVER UNAVAILABLE</source>
-      <translation>SERVER UTILGJENGELIG</translation>
-    </message>
-    <message>
-      <source>NO ACCESS</source>
-      <translation>INGEN TILGANG</translation>
-    </message>
-    <message>
-      <source>DEVICE DISABLED</source>
-      <translation>ENHET DEAKTIVERT</translation>
-    </message>
     <message>
       <source>Device Settings</source>
       <translation>Enhetsinnstillinger</translation>
@@ -5124,37 +4809,28 @@ til %1</translation>
       <translation>Diagnostikk</translation>
     </message>
     <message>
-      <source>Enable</source>
-      <translation>Aktiver</translation>
-    </message>
-    <message>
       <source>Activate License</source>
       <translation>Aktiver lisens</translation>
     </message>
     <message>
-      <source>Please check authentication information</source>
-      <translation>Vennligst sjekk autentiseringsinformasjon</translation>
+      <source>Unlock</source>
+      <translation>Lås opp</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation>INGEN LIVE VIDEO</translation>
+      <source>Provide</source>
+      <translation>Oppgi</translation>
     </message>
     <message>
-      <source>TOO MANY CONNECTIONS</source>
-      <translation>FOR MANGE TILKOBLINGER</translation>
+      <source>Authorize</source>
+      <translation>Autorisere</translation>
     </message>
     <message>
-      <source>PASSWORD REQUIRED</source>
-      <translation>PASSORD KREVES</translation>
+      <source>Setup</source>
+      <translation>Oppsett</translation>
     </message>
-    <message>
-      <source>Set for this Camera</source>
-      <translation>Angi for dette kameraet</translation>
-    </message>
-    <message>
-      <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>UNSUPPORTED FIRMWARE VERSION</translation>
-    </message>
+  </context>
+  <context>
+    <name>QnStatusOverlayWidget</name>
     <message>
       <source>NOT ENOUGH LICENSES</source>
       <translation>IKKE NOK LISENSER</translation>
@@ -5164,28 +4840,68 @@ til %1</translation>
       <translation>FRAKOBLET</translation>
     </message>
     <message>
-      <source>ARCHIVE ENCRYPTED</source>
-      <translation>ARKIV KRYPTERT</translation>
+      <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
+      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
     </message>
     <message>
-      <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation>Be systemadministratoren om å angi krypteringspassordet for å dekryptere dette arkivet</translation>
+      <source>UNAUTHORIZED</source>
+      <translation>UAUTORISERT</translation>
     </message>
     <message>
-      <source>Unlock</source>
-      <translation>Lås opp</translation>
+      <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
+      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED</source>
+      <translation type="unfinished">UNSUPPORTED</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>PASSORD KREVES</translation>
+    </message>
+    <message>
+      <source>SITE SHUT DOWN</source>
+      <translation type="unfinished">SITE SHUT DOWN</translation>
+    </message>
+    <message>
+      <source>STREAM LIMITATION</source>
+      <translation type="unfinished">STREAM LIMITATION</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
       <translation>INFORMASJON PÅKREVET</translation>
     </message>
     <message>
-      <source>Provide</source>
-      <translation>Oppgi</translation>
+      <source>AUDIO ONLY</source>
+      <translation type="unfinished">AUDIO ONLY</translation>
     </message>
     <message>
-      <source>ACCESS DENIED</source>
+      <source>NO DATA</source>
+      <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
       <translation>INGEN TILGANG</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation>INGEN EKSPORT TILLATELSE</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>FOR MANGE TILKOBLINGER</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>INGEN LIVE VIDEO</translation>
+    </message>
+    <message>
+      <source>ARCHIVE ENCRYPTED</source>
+      <translation>ARKIV KRYPTERT</translation>
+    </message>
+    <message>
+      <source>CERTIFICATE ERROR</source>
+      <translation type="unfinished">CERTIFICATE ERROR</translation>
     </message>
   </context>
   <context>
@@ -5312,6 +5028,67 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Insufficient permissions to store analytics data.</source>
       <translation>Utilstrekkelige tillatelser til å lagre analysedata.</translation>
     </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
+      <translation>Analytics-data kan ta opp store mengder plass. Vi anbefaler å velge en annen plassering for den i stedet for systempartisjonen.</translation>
+    </message>
+    <message>
+      <source>Analytics and motion data will continue to be stored on the disabled storage</source>
+      <translation>Analyse-data vil fortsette å bli lagret på den deaktiverte stasjonen</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Opptak til deaktivert lagringsplass vil stoppe. Men utdaterte opptak vil fremdeles slettes.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Innspilling aktivert på USB-lagringen</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, other backup storages will be deactivated and the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Hvis skylagring er aktivert for sikkerhetskopiering, vil andre sikkerhetskopieringslagringer bli deaktivert og alternativet &quot;Alle arkiv&quot; for allerede konfigurerte enheter vil bli endret til &quot;Motion, Object, Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>If cloud storage is activated for backup, the &quot;All archive&quot; option for already configured devices will be changed to &quot;Motion, Object, Bookmarks&quot;</source>
+      <translation>Hvis skylagring er aktivert for sikkerhetskopiering, vil alternativet &quot;Alle arkiv&quot; for allerede konfigurerte enheter endres til &quot;Motion, Object, Bookmarks&quot;</translation>
+    </message>
+    <message>
+      <source>Choose a read-write policy to define how interact with storage directories.</source>
+      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+    </message>
+    <message>
+      <source>Exclusive</source>
+      <translation type="unfinished">Exclusive</translation>
+    </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Isolated</source>
+      <translation type="unfinished">Isolated</translation>
+    </message>
+    <message>
+      <source>The Site Servers have different read-write policies for the storage</source>
+      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+    </message>
+    <message>
+      <source>URL: %1</source>
+      <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
+      <translation type="unfinished">URL: %1</translation>
+    </message>
+    <message>
+      <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
+      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+    </message>
+    <message>
+      <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
+      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
+    <message>
+      <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
+      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -5352,10 +5129,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Hoved</translation>
     </message>
     <message>
-      <source>%1 GB</source>
-      <translation>%1 GB</translation>
-    </message>
-    <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
       <translation>For små partisjoner og systempartisjoner er reservert og ikke brukes til skriving hvis det er nok annen lagringsplass tilgjengelig.</translation>
     </message>
@@ -5384,14 +5157,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>nettverk</translation>
     </message>
     <message>
-      <source>usb</source>
-      <translation>usb</translation>
-    </message>
-    <message>
-      <source>%1 TB</source>
-      <translation>%1 TB</translation>
-    </message>
-    <message>
       <source>smb</source>
       <translation>smb</translation>
     </message>
@@ -5402,6 +5167,62 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Stores analytics and motion data</source>
       <translation>Lagrer analyser og bevegelsesdata</translation>
+    </message>
+    <message>
+      <source>cloud</source>
+      <translation>cloud</translation>
+    </message>
+    <message>
+      <source>Path</source>
+      <translation>Sti</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Skriv</translation>
+    </message>
+    <message>
+      <source>Purpose</source>
+      <translation>Hensikt</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>Størrelse</translation>
+    </message>
+    <message>
+      <source>Isolated</source>
+      <translation type="unfinished">Isolated</translation>
+    </message>
+    <message>
+      <source>Exclusive</source>
+      <translation type="unfinished">Exclusive</translation>
+    </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Udefinert</translation>
+    </message>
+    <message>
+      <source>removable</source>
+      <translation type="unfinished">removable</translation>
+    </message>
+    <message>
+      <source>Unknown size</source>
+      <translation type="unfinished">Unknown size</translation>
+    </message>
+    <message>
+      <source>The storage has different read-write policies across various Servers in the Site</source>
+      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+    </message>
+    <message>
+      <source>Click on the icon to see Servers list</source>
+      <translation type="unfinished">Click on the icon to see Servers list</translation>
+    </message>
+    <message>
+      <source>Read-Write Policy</source>
+      <translation type="unfinished">Read-Write Policy</translation>
     </message>
   </context>
   <context>
@@ -5481,10 +5302,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Oppdateringer</translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Brukere</translation>
-    </message>
-    <message>
       <source>Security</source>
       <translation>Sikkerhet</translation>
     </message>
@@ -5507,6 +5324,18 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Advanced</source>
       <translation>Avansert</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrasjoner</translation>
+    </message>
+    <message>
+      <source>Services</source>
+      <translation>Tjenester</translation>
+    </message>
+    <message>
+      <source>Failed to save site settings</source>
+      <translation type="unfinished">Failed to save site settings</translation>
     </message>
   </context>
   <context>
@@ -5536,10 +5365,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Rekonstruksjon av arkivet avbrutt av bruker</translation>
     </message>
     <message>
-      <source>Email address is not set for user %1</source>
-      <translation>E-postadresse er ikke angitt for bruker %1</translation>
-    </message>
-    <message>
       <source>Email address is not set.</source>
       <translation>E-postadressen er ikke angitt.</translation>
     </message>
@@ -5556,14 +5381,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Du kan ikke spille inn video fra kameraer.</translation>
     </message>
     <message>
-      <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation>Rekonstruksjon av arkivet er fullført på følgende server:</translation>
-    </message>
-    <message>
-      <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>Rekonstruksjon av arkivet avbrutt av brukeren på følgende server:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Finn ut mer</translation>
     </message>
@@ -5576,46 +5393,16 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Noen brukere har ikke angitt e-postadressene sine</translation>
     </message>
     <message>
-      <source>You cannot receive System notifications by email.</source>
-      <translation>Du kan ikke motta systemvarsler via e-post.</translation>
-    </message>
-    <message>
       <source>Some users have not set their email addresses.</source>
       <translation>Noen brukere har ikke angitt e-postadressene sine.</translation>
-    </message>
-    <message>
-      <source>They cannot receive System notifications by email.</source>
-      <translation>De kan ikke motta systemvarsler via e-post.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
       <translation>Feil under sending av e-post</translation>
     </message>
     <message>
-      <source>Remote archive synchronization has been finished</source>
-      <translation>Ekstern arkivsynkronisering er fullført</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization is in progress</source>
-      <translation>Ekstern arkivsynkronisering pågår</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>Ekstern arkivsynkronisering er fullført for følgende enhet:</translation>
-    </message>
-    <message>
       <source>Archive integrity problem detected</source>
       <translation>Problemet med arkivintegritet</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble systemet ditt til %1 &amp;mdash; gjør det tilgjengelig hvor som helst!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sjekk ut %1 &amp;mdash; koble til systemet hvor som helst!</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -5626,28 +5413,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Ingen server har internettilgang for tidssynkronisering</translation>
     </message>
     <message>
-      <source>The System has no internet access for time synchronization</source>
-      <translation>Systemet har ingen internettilgang for tidssynkronisering</translation>
-    </message>
-    <message>
-      <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>Ingen online server i systemet har internettilgang for tidssynkronisering.</translation>
-    </message>
-    <message>
-      <source>Error occurred during remote archive synchronization</source>
-      <translation>Det oppsto en feil under synkronisering av eksternt arkiv</translation>
-    </message>
-    <message>
       <source>Backup storage is not configured</source>
       <translation>Lagring er ikke konfigurert</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
       <translation>Kameraopptaksplanen er ugyldig</translation>
-    </message>
-    <message>
-      <source>Remote archive synchronization has been stopped</source>
-      <translation>Ekstern arkivsynkronisering er stoppet</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
@@ -5662,28 +5433,177 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Analysedata kan ta opp store mengder plass.</translation>
     </message>
     <message>
-      <source>Remote archive synchronization is available</source>
-      <translation>Ekstern arkivsynkronisering er tilgjengelig</translation>
-    </message>
-    <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
       <translation>Vi anbefaler å velge en annen plassering for den i stedet for systempartisjonen.</translation>
+    </message>
+    <message>
+      <source>Local recording services overused</source>
+      <translation type="unfinished">Local recording services overused</translation>
+    </message>
+    <message>
+      <source>Cloud storage services overused</source>
+      <translation type="unfinished">Cloud storage services overused</translation>
+    </message>
+    <message>
+      <source>Paid integrations services overused</source>
+      <translation type="unfinished">Paid integrations services overused</translation>
+    </message>
+    <message>
+      <source>Intercom call</source>
+      <translation>Intercom samtale</translation>
+    </message>
+    <message>
+      <source>Intercom missed call</source>
+      <translation>Intercom tapt anrop</translation>
+    </message>
+    <message>
+      <source>The Site has no internet access for time synchronization</source>
+      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+    </message>
+    <message>
+      <source>System partition is used for analytics data</source>
+      <translation type="unfinished">System partition is used for analytics data</translation>
+    </message>
+    <message>
+      <source>Site suspended</source>
+      <translation type="unfinished">Site suspended</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>Reject intercom call</source>
+      <translation type="unfinished">Reject intercom call</translation>
+    </message>
+    <message>
+      <source>Email address is not set for your account</source>
+      <translation type="unfinished">Email address is not set for your account</translation>
+    </message>
+    <message>
+      <source>Calling...</source>
+      <translation>Ringer...</translation>
+    </message>
+    <message>
+      <source>Missed call</source>
+      <translation type="unfinished">Missed call</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage is not configured on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Storage is not configured on %n servers</numerusform>
+        <numerusform>Storage is not configured on %n servers</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Backup storage is not configured on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule is invalid</source>
+      <translation type="unfinished">Recording schedule is invalid</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid on %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Email address is not set for %n users</source>
+      <translation>
+        <numerusform>E-postadresse er ikke angitt for %n bruker</numerusform>
+        <numerusform>E-postadresse er ikke angitt for %n brukere</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Check out %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Check out %1</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization failed</source>
+      <translation type="unfinished">Remote archive synchronization failed</translation>
+    </message>
+    <message numerus="yes">
+      <source>Storage for analytics data is not set on %n Servers</source>
+      <translation>
+        <numerusform>Lagring for analysedata er ikke satt på %n servere</numerusform>
+        <numerusform>Lagring for analysedata er ikke satt på %n servere</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>System storage is used for analytics data on %n servers</source>
+      <translation type="unfinished">
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connect to your Site from anywhere!</source>
+      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+    </message>
+    <message>
+      <source>No online server in the site has internet access for time synchronization.</source>
+      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+    </message>
+    <message>
+      <source>You cannot receive Site notifications by email.</source>
+      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+    </message>
+    <message>
+      <source>They cannot receive Site notifications by email.</source>
+      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+    </message>
+    <message>
+      <source>Some cameras are set to record in a mode they do not support.</source>
+      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>+ %n more</source>
+      <translation type="unfinished">
+        <numerusform>+ %n more</numerusform>
+        <numerusform>+ %n more</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Site will stop functioning soon</source>
+      <translation type="unfinished">Site will stop functioning soon</translation>
+    </message>
+    <message>
+      <source>Site has stopped functioning</source>
+      <translation type="unfinished">Site has stopped functioning</translation>
+    </message>
+    <message>
+      <source>Site will stop functioning today</source>
+      <translation type="unfinished">Site will stop functioning today</translation>
+    </message>
+    <message>
+      <source>Site will stop functioning tomorrow</source>
+      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+    </message>
+    <message numerus="yes">
+      <source>Site will stop functioning in %n days</source>
+      <translation type="unfinished">
+        <numerusform>Site will stop functioning in %n days</numerusform>
+        <numerusform>Site will stop functioning in %n days</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Notification and interface languages differ</source>
+      <translation type="unfinished">Notification and interface languages differ</translation>
+    </message>
+    <message>
+      <source>Notifications language differs from the interface language</source>
+      <translation type="unfinished">Notifications language differs from the interface language</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
-    <message>
-      <source>Allow System to optimize device settings</source>
-      <translation>Tillat system å optimalisere enhetsinnstillinger</translation>
-    </message>
-    <message>
-      <source>Allow System to optimize camera settings</source>
-      <translation>La System optimalisere kamerainnstillingene</translation>
-    </message>
-    <message>
-      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Inkluderer informasjon om system, for eksempel kameramodeller og firmwareversjoner, antall servere, etc.</translation>
-    </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
       <translation>Inkluderer ikke personlig informasjon og er helt anonym.</translation>
@@ -5697,12 +5617,24 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Aktiver autodiscovery av kameraer og servere samt automatisert kamerastatussjekk</translation>
     </message>
     <message>
-      <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation>Når det er aktivert, oppdager systemet kontinuerlig nye kameraer og servere, og sender forespørsler til kameraer for statusoppdatering.</translation>
-    </message>
-    <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
       <translation>Hvis Failover er aktivert, kan det hende at serveren fremdeles ber om kamerastatusoppdateringer uavhengig av denne innstillingen.</translation>
+    </message>
+    <message>
+      <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
+      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+    </message>
+    <message>
+      <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+    </message>
+    <message>
+      <source>Allow optimize device settings</source>
+      <translation type="unfinished">Allow optimize device settings</translation>
+    </message>
+    <message>
+      <source>Allow optimize camera settings</source>
+      <translation type="unfinished">Allow optimize camera settings</translation>
     </message>
   </context>
   <context>
@@ -5732,267 +5664,33 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
-    <name>QnTwoWayAudioWidget::Private</name>
+    <name>QnUserRolesModel</name>
     <message>
-      <source>Input device is not selected</source>
-      <translation>Inndataenhet er ikke valgt</translation>
+      <source>Custom</source>
+      <translation>Tilpasset</translation>
     </message>
     <message>
-      <source>Streaming is not ready yet</source>
-      <translation>Streaming er ikke klar ennå</translation>
-    </message>
-    <message>
-      <source>Network error</source>
-      <translation>Nettverksfeil</translation>
-    </message>
-    <message>
-      <source>Hold to Speak</source>
-      <translation>Hold for å snakke</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserProfileWidget</name>
-    <message>
-      <source>Login</source>
-      <translation>Logg Inn</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation>Rolle</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
-      <source>To enable digest authentication password reset is required</source>
-      <translation>For å aktivere digest-autentisering kreves tilbakestilling av passord</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidget</name>
-    <message>
-      <source>Role name cannot be empty.</source>
-      <translation>Rollenavnet kan ikke være tomt.</translation>
-    </message>
-    <message>
-      <source>Role with same name already exists.</source>
-      <translation>Rollen med samme navn eksisterer allerede.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRoleSettingsWidgetPrivate</name>
-    <message>
-      <source>No users have this role</source>
-      <translation>Ingen brukere har denne rollen</translation>
-    </message>
-    <message>
-      <source>Custom with no permissions</source>
-      <translation>Tilpasset uten tillatelser</translation>
-    </message>
-    <message>
-      <source>Users will have no permissions unless changed later.</source>
-      <translation>Brukere har ingen tillatelser med mindre de blir endret senere.</translation>
-    </message>
-    <message>
-      <source>Assign a new role</source>
-      <translation>Tildel en ny rolle</translation>
-    </message>
-    <message>
-      <source>Delete such users</source>
-      <translation>Slett slike brukere</translation>
-    </message>
-    <message numerus="yes">
-      <source>Please select an action to perform on %n users with this role</source>
-      <translation>
-        <numerusform>Velg en handling for å utføre på %n brukere med denne rollen</numerusform>
-        <numerusform>Velg en handling for å utføre på %n brukere med denne rollen</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserRolesDialog</name>
-    <message>
-      <source>Role Info</source>
-      <translation>Rolleinfo</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Rettigheter</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Kameraer &amp;&amp; ressurser</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Visninger</translation>
-    </message>
-    <message>
-      <source>New Role</source>
-      <translation>Ny rolle</translation>
-    </message>
-    <message>
-      <source>New Role %1</source>
-      <translation>Ny rolle %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsDialog</name>
-    <message>
-      <source>User Information</source>
-      <translation>Brukerinformasjon</translation>
-    </message>
-    <message>
-      <source>Permissions</source>
-      <translation>Rettigheter</translation>
-    </message>
-    <message>
-      <source>Cameras &amp;&amp; Resources</source>
-      <translation>Kameraer &amp;&amp; ressurser</translation>
-    </message>
-    <message>
-      <source>Layouts</source>
-      <translation>Visninger</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Ny bruker...</translation>
-    </message>
-    <message>
-      <source>User Settings - %1 (readonly)</source>
-      <translation>Brukerinnstillinger - %1 (skrivebeskyttet)</translation>
-    </message>
-    <message>
-      <source>User Settings - %1</source>
-      <translation>Brukerinnstillinger - %1</translation>
-    </message>
-    <message>
-      <source>Enabled</source>
-      <translation>Aktivert</translation>
-    </message>
-    <message>
-      <source>User is disabled</source>
-      <translation>Bruker er deaktivert</translation>
-    </message>
-    <message>
-      <source>Apply changes before switching to another user?</source>
-      <translation>Bruke endringer før du bytter til en annen bruker?</translation>
-    </message>
-    <message>
-      <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Denne brukeren har ennå ikke registrert seg for %1</translation>
-    </message>
-    <message>
-      <source>Allow digest authentication for this user</source>
-      <translation>Tillat sammendrag-autentisering for denne brukeren</translation>
-    </message>
-    <message>
-      <source>Learn More</source>
-      <translation>Finn ut mer</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUserSettingsWidget</name>
-    <message>
-      <source>Local</source>
-      <translation>Lokal</translation>
-    </message>
-    <message>
-      <source>Login</source>
-      <translation>Logg Inn</translation>
-    </message>
-    <message>
-      <source>Login cannot be empty.</source>
-      <translation>Feltet kan ikke være tomt.</translation>
-    </message>
-    <message>
-      <source>User with specified login already exists.</source>
-      <translation>Bruker med spesifisert innlogging eksisterer allerede.</translation>
-    </message>
-    <message>
-      <source>User has been renamed. Password must be updated.</source>
-      <translation>Brukeren har fått nytt navn. Passordet må oppdateres.</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>E-post</translation>
-    </message>
-    <message>
-      <source>Email cannot be empty.</source>
-      <translation>E-post kan ikke være tom.</translation>
-    </message>
-    <message>
-      <source>Password</source>
-      <translation>Passord</translation>
-    </message>
-    <message>
-      <source>Confirm Password</source>
-      <translation>Bekreft passord</translation>
-    </message>
-    <message>
-      <source>Passwords do not match.</source>
-      <translation>Passordene samsvarer ikke.</translation>
-    </message>
-    <message>
-      <source>%1 user with specified email already exists.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 bruker med spesifisert e-post eksisterer allerede.</translation>
-    </message>
-    <message>
-      <source>Local users</source>
-      <translation>Lokale brukere</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 brukere</translation>
-    </message>
-    <message>
-      <source>%1 belong to this system only and are fully managed by system administrators.</source>
-      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 tilhører bare dette systemet og administreres fullt ut av systemadministratorer.</translation>
-    </message>
-    <message>
-      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
-      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 kan ha tilgang til mange systemer. Administratorer kan bare administrere rettighetene sine.</translation>
-    </message>
-    <message>
-      <source>Password reset is required</source>
-      <translation>Tilbakestilling av passord er nødvendig</translation>
-    </message>
-    <message>
-      <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation>Bare bokstaver, tall og symboler %1 er tillatt.</translation>
+      <source>Custom access rights</source>
+      <translation>Egendefinerte tilgangsrettigheter</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
-      <source>Email cannot be empty.</source>
-      <translation>E-post kan ikke være tom.</translation>
+      <source>Email cannot be empty</source>
+      <translation>E-post kan ikke være tom</translation>
     </message>
     <message>
-      <source>Email is not valid.</source>
-      <translation>Ugyldig e-post.</translation>
+      <source>Email is not valid</source>
+      <translation>Ugyldig e-post</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Passordet kan ikke være tomt.</translation>
+      <source>Password cannot be empty</source>
+      <translation>Passordet kan ikke være tomt</translation>
     </message>
     <message>
-      <source>Avoid leading and trailing spaces.</source>
-      <translation>Unngå ledende og etterfølgende mellomrom.</translation>
+      <source>Avoid leading and trailing spaces</source>
+      <translation>Unngå ledende og etterfølgende mellomrom</translation>
     </message>
   </context>
   <context>
@@ -6043,31 +5741,20 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   <context>
     <name>QnWebResourceWidget</name>
     <message>
-      <source>Open this web page?</source>
-      <translation>Åpne denne nettsiden?</translation>
+      <source>Integration settings...</source>
+      <translation>Integrasjonsinnstillinger...</translation>
     </message>
     <message>
-      <source>Web page</source>
-      <translation>Nettside</translation>
-    </message>
-    <message>
-      <source>Connect anyway</source>
-      <translation>Koble til likevel</translation>
-    </message>
-    <message>
-      <source>Web page settings...</source>
+      <source>Web Page settings...</source>
       <translation>Nettsideinnstillinger...</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
-      <comment>%1 is the web page address</comment>
-      <translation>Du prøver å åpne
-%1
-men denne nettsiden presenterte en uklarert sertifikatautentisering.
-Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan du åpne nettsiden.</translation>
+      <source>Auto-refresh every %1</source>
+      <translation type="unfinished">Auto-refresh every %1</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Oppdater</translation>
     </message>
   </context>
   <context>
@@ -6101,13 +5788,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
       <translation>For å bytte mellom kameraer, trykk Shift + Pil</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchNotificationsHandler</name>
-    <message>
-      <source>Unable to acknowledge event on removed camera.</source>
-      <translation>Kan ikke behandle hendelsen på fjernet kamera.</translation>
     </message>
   </context>
   <context>
@@ -6152,37 +5832,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
         <numerusform>Kunne ikke slette %n elementer:</numerusform>
         <numerusform>Kunne ikke slette %n elementer:</numerusform>
       </translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchScreenRecordingHandler</name>
-    <message>
-      <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Delsystem for skjermfangst er ikke initialisert ennå. Prøv igjen senere.</translation>
-    </message>
-    <message>
-      <source>Recording in %1...</source>
-      <translation>Opptak til %1...</translation>
-    </message>
-    <message>
-      <source>Recorded Video</source>
-      <translation>Opptak</translation>
-    </message>
-    <message>
-      <source>Save Recording As...</source>
-      <translation>Lagre opptak som...</translation>
-    </message>
-    <message>
-      <source>Failed to start recording</source>
-      <translation>Kan ikke starte opptak</translation>
-    </message>
-    <message>
-      <source>AVI (Audio/Video Interleaved)</source>
-      <translation>AVI (Audio / Video Interleaved)</translation>
-    </message>
-    <message>
-      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation>Kunne ikke åpne filen &quot;%1&quot;. Vennligst sjekk om mappen er tilgjengelig.</translation>
     </message>
   </context>
   <context>
@@ -6258,13 +5907,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Failed to apply changes</source>
       <translation>Kunne ikke bruke endringene</translation>
     </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Vil du slette %n element?</numerusform>
-        <numerusform>Vil du slette %n elementer?</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Stop Video Wall?</source>
       <translation>Stopp videovegg?</translation>
@@ -6276,13 +5918,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Stop</source>
       <translation>Stopp</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n matrices?</source>
-      <translation>
-        <numerusform>Vil du slette %n matriser?</numerusform>
-        <numerusform>Vil du slette %n matriser?</numerusform>
-      </translation>
     </message>
     <message>
       <source>More Video Wall licenses required</source>
@@ -6308,175 +5943,45 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Activate License...</source>
       <translation>Aktiver lisens...</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchVirtualCameraHandler</name>
-    <message>
-      <source>Failed to add virtual camera</source>
-      <translation>Kunne ikke legge til virtuelt kamera</translation>
-    </message>
-    <message>
-      <source>Open Virtual Camera Recordings...</source>
-      <translation>Åpne virtuelle kameraopptak...</translation>
-    </message>
-    <message>
-      <source>No video files found in selected folder</source>
-      <translation>Ingen videofiler funnet i valgt mappe</translation>
-    </message>
-    <message>
-      <source>Stop uploading?</source>
-      <translation>Vil du slutte å laste opp?</translation>
-    </message>
-    <message>
-      <source>Already uploaded files will be kept.</source>
-      <translation>Allerede lastede filer blir beholdt.</translation>
-    </message>
     <message numerus="yes">
-      <source>Selected file formats are not supported</source>
+      <source>Failed to open %n devices on the video wall:</source>
       <translation>
-        <numerusform>Valgte filformater støttes ikke</numerusform>
-        <numerusform>Valgte filformater støttes ikke</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>Bruk .MKV, .AVI, .MP4 eller andre videofiler.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files do not have timestamps</source>
-      <translation>
-        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
-        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files with correct timestamp are supported.</source>
-      <translation>Bare videofiler med riktig tidsstempel støttes.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files are too old</source>
-      <translation>
-        <numerusform>Valgte filer er for gamle</numerusform>
-        <numerusform>Valgte filer er for gamle</numerusform>
+        <numerusform>Kunne ikke åpne %n enheter på videoveggen:</numerusform>
+        <numerusform>Kunne ikke åpne %n enheter på videoveggen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <source>Failed to open %n cameras on the video wall:</source>
       <translation>
-        <numerusform>Valgt fil ble spilt inn %1, men bare filer som ble spilt inn i løpet av de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
-        <numerusform>Valgt fil ble spilt inn %1, men bare filer som ble spilt inn i løpet av de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
+        <numerusform>Kunne ikke åpne %n kameraer på videoveggen:</numerusform>
+        <numerusform>Kunne ikke åpne %n kameraer på videoveggen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <source>You cannot add to the video wall devices for which you do not have View Live permission.</source>
       <translation>
-        <numerusform>Valgte filer ble spilt inn mellom %1 og %2, men bare filer som ble spilt inn de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
-        <numerusform>Valgte filer ble spilt inn mellom %1 og %2, men bare filer som ble spilt inn de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
+        <numerusform>Du kan ikke legge til enheter som du ikke har View Live-tillatelse for, til videoveggen.</numerusform>
+        <numerusform>Du kan ikke legge til enheter som du ikke har View Live-tillatelse for, til videoveggen.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
-      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <translation>
-        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
-        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation>
-        <numerusform>Du kan laste opp disse filene til en annen forekomst av et virtuelt kamera.</numerusform>
-        <numerusform>Du kan laste opp disse filene til en annen forekomst av et virtuelt kamera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
-        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
+        <numerusform>Du kan ikke legge til kameraer på videoveggen du ikke har View Live-tillatelse til.</numerusform>
+        <numerusform>Du kan ikke legge til kameraer på videoveggen du ikke har View Live-tillatelse til.</numerusform>
       </translation>
     </message>
     <message>
-      <source>Not enough space on server storage</source>
-      <translation>Ikke nok plass på serverlagring</translation>
+      <source>Screen is locked and cannot be changed</source>
+      <translation>Oppsettet er låst og kan ikke endres</translation>
     </message>
     <message>
-      <source>Selected files will not be uploaded</source>
-      <translation>Valgte filer blir ikke lastet opp</translation>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
     </message>
     <message>
-      <source>Some files will not be uploaded</source>
-      <translation>Noen filer blir ikke lastet opp</translation>
-    </message>
-    <message>
-      <source>No new files to upload in selected folder</source>
-      <translation>Ingen nye filer å laste opp i valgt mappe</translation>
-    </message>
-    <message numerus="yes">
-      <source>Some footage may be deleted after uploading these files</source>
-      <translation>
-        <numerusform>Noen opptak kan bli slettet etter at du har lastet opp filene</numerusform>
-        <numerusform>Noen opptak kan bli slettet etter at du har lastet opp filene</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation>
-        <numerusform>Det er ikke mye ledig plass igjen på serverlagring. Noen gamle opptak kan bli slettet for å frigjøre plass. Merk at hvis valgte filer tilfeldigvis er de eldste på serveren, vil de bli slettet rett etter at de ble lastet opp.</numerusform>
-        <numerusform>Det er ikke mye ledig plass igjen på serverlagring. Noen gamle opptak kan bli slettet for å frigjøre plass. Merk at hvis valgte filer tilfeldigvis er de eldste på serveren, vil de bli slettet rett etter at de ble lastet opp.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>For å forhindre dette kan du legge til ekstra lagringsplass. Du kan også kontrollere hvilke opptak som blir slettet først ved å endre arkivholdet i kamerainnstillingene.</translation>
-    </message>
-    <message>
-      <source>Upload anyway?</source>
-      <translation>Last opp likevel?</translation>
-    </message>
-    <message>
-      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Kunne ikke starte opplastningen da bruker &quot;%1&quot; laster opp opptak til dette kameraet for øyeblikket.</translation>
-    </message>
-    <message>
-      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>Kunne ikke starte opplastningen da bruker laster opp opptak til dette kameraet for øyeblikket.</translation>
-    </message>
-    <message>
-      <source>Could not finish upload to %1</source>
-      <translation>Kunne ikke fullføre opplastingen til %1</translation>
-    </message>
-    <message>
-      <source>Make sure there is enough space on server storage.</source>
-      <translation>Forsikre deg om at det er nok plass på serverlagring.</translation>
-    </message>
-    <message>
-      <source>Uploading footage</source>
-      <translation>Laster opp opptak</translation>
-    </message>
-    <message>
-      <source>%1 has unsupported format.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 har formatet som ikke støttes.</translation>
-    </message>
-    <message>
-      <source>%1 does not have timestamp.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 har ikke tidsstempel.</translation>
-    </message>
-    <message>
-      <source>%1 is older than allowed in camera archive settings.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 er eldre enn tillatt i kameraarkivinnstillingene.</translation>
-    </message>
-    <message>
-      <source>%1 covers period for which video has already been uploaded.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 dekker periode som videoen allerede er lastet opp.</translation>
-    </message>
-    <message>
-      <source>%1 covers period for which video is being uploaded.</source>
-      <comment>Filename will be substituted</comment>
-      <translation>%1 dekker perioden som videoen lastes opp for.</translation>
+      <source>To add a Video Wall, the Site should be in active state. %1</source>
+      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -6497,35 +6002,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>There is another layout with the same name.</source>
       <translation>Det er en annen visning med samme navn.</translation>
     </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Brukeren vil fortsatt ha tilgang til %n fjernede ressurser:</numerusform>
-        <numerusform>Brukeren vil fortsatt ha tilgang til %n fjernede ressurser:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>For å fjerne tilgang, gå til Brukerinnstillinger.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>Alle brukere med denne rollen vil få tilgang til %n ressurser:</numerusform>
-        <numerusform>Alle brukere med denne rollen vil få tilgang til %n ressurser:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>Gå til rolleinnstillinger for å fjerne tilgang.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Alle brukere med denne rollen vil fortsatt ha tilgang til %n ressurser som er fjernet:</numerusform>
-        <numerusform>Alle brukere med denne rollen vil fortsatt ha tilgang til %n ressurser som er fjernet:</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Changes will affect other users</source>
       <translation>Endringer vil påvirke andre brukere</translation>
@@ -6533,34 +6009,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
       <translation>Denne utformingen deles med andre brukere, så du endrer den for dem også.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Bruker mister tilgangen til %n ressurser:</numerusform>
-        <numerusform>Bruker mister tilgangen til %n ressurser:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Alle brukere med denne rollen vil miste tilgangen til %n ressurser:</numerusform>
-        <numerusform>Alle brukere med denne rollen vil miste tilgangen til %n ressurser:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>Vil du slette %n delte visning?</numerusform>
-        <numerusform>Vil du slette %n delte visninger?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>Denne %n visningen deles med andre brukere, så du sletter det for dem også.</numerusform>
-        <numerusform>Disse %n visningene deles med andre brukere, så du sletter det for dem også.</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
@@ -6580,13 +6028,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>You will lose access to following resources:</source>
       <translation>Du mister tilgangen til følgende ressurser:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>Vil du slette %n brukere?</numerusform>
-        <numerusform>Vil du slette %n brukere?</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
@@ -6738,6 +6179,81 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
         <numerusform>Du er i ferd med å flytte disse nettsidene til Server &quot;%1&quot;. Disse nettsidene gir proxy for alt etterspurt innhold, og deres proxy-server vil endres til Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Delete %n layouts?</source>
+      <translation>
+        <numerusform>Slett %n oppsett?</numerusform>
+        <numerusform>Slett %n oppsett?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n items were not deleted.</source>
+      <translation>
+        <numerusform>%n elementer ble ikke slettet.</numerusform>
+        <numerusform>%n elementer ble ikke slettet.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Delete layout?</source>
+      <translation>Slett layout?</translation>
+    </message>
+    <message>
+      <source>Delete user?</source>
+      <translation>Slett bruker?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n matrices?</source>
+      <translation>
+        <numerusform>Vil du slette %n matriser?</numerusform>
+        <numerusform>Vil du slette %n matriser?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All members of %1 and %2 groups will get access to this layout</source>
+      <comment>%1 and %2 will be substituted with user group names</comment>
+      <translation>Alle medlemmer av %1 og %2 grupper vil få tilgang til denne layouten</translation>
+    </message>
+    <message>
+      <source>Convert</source>
+      <comment>Converting layout to shared</comment>
+      <translation>Konvertere</translation>
+    </message>
+    <message numerus="yes">
+      <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation>
+        <numerusform>Disse layoutene deles med andre brukere, så de blir slettet også for kontoene sine.</numerusform>
+        <numerusform>Disse layoutene deles med andre brukere, så de blir slettet også for kontoene sine.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
+      <translation>
+        <numerusform>%n oppsett deles med andre brukere, så de vil bli slettet for deres kontoer også.</numerusform>
+        <numerusform>%n oppsett deles med andre brukere, så de vil bli slettet for deres kontoer også.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <translation>
+        <numerusform>Vil du slette %n brukere?</numerusform>
+        <numerusform>Vil du slette %n brukere?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unable to move device</source>
+      <translation type="unfinished">Unable to move device</translation>
+    </message>
+    <message>
+      <source>Maximum number of devices for this server is reached</source>
+      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowreelTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Start bildesyklus</translation>
+    </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
@@ -6748,46 +6264,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>In selected area</source>
       <translation>I valgt område</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valgte kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Velg enhet</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Valgte medier</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
-    </message>
-  </context>
-  <context>
-    <name>SourcePickerWidgetStrings</name>
-    <message>
-      <source>Select at least one Server</source>
-      <translation>Velg minst én server</translation>
-    </message>
-    <message>
-      <source>Select at least one user</source>
-      <translation>Velg minst én bruker</translation>
-    </message>
-    <message>
-      <source>Select at least one device</source>
-      <translation>Velg minst en enhet</translation>
-    </message>
-    <message>
-      <source>Select at least one camera</source>
-      <translation>Velg minst ett kamera</translation>
-    </message>
-    <message>
-      <source>Select at least one I/O module</source>
-      <translation>Velg minst én I/O-modul</translation>
     </message>
   </context>
   <context>
@@ -6852,6 +6328,222 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
+    <name>Strings</name>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
+        <numerusform>Kilde og %n kameraer til</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%n Layouts</source>
+      <translation type="unfinished">%n Layouts</translation>
+    </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Kildeserver</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source Server and %n Servers</source>
+      <translation>
+        <numerusform>Kildeserver og %n servere</numerusform>
+        <numerusform>Kildeserver og %n servere</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Alle brukere</translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Enhver enhet</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Hvilket som helst kamera</translation>
+    </message>
+    <message>
+      <source>Any Server</source>
+      <translation>Enhver server</translation>
+    </message>
+    <message>
+      <source>Any User</source>
+      <translation>Enhver bruker</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Feil</translation>
+    </message>
+    <message>
+      <source>Warning</source>
+      <translation>Advarsel</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Undefined</source>
+      <translation>Udefinert</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>%n Servers</source>
+      <translation type="unfinished">%n Servers</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n additional</source>
+      <translation>
+        <numerusform>%n tillegg</numerusform>
+        <numerusform>%n tillegg</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n brukere</numerusform>
+        <numerusform>%n brukere</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Groups</source>
+      <translation>
+        <numerusform>%n Grupper</numerusform>
+        <numerusform>%n Grupper</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation>Velg</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Kildekamera</translation>
+    </message>
+    <message>
+      <source>Developer Mode Info</source>
+      <translation type="unfinished">Developer Mode Info</translation>
+    </message>
+    <message>
+      <source>Is listed</source>
+      <translation type="unfinished">Is listed</translation>
+    </message>
+    <message>
+      <source>Is not listed</source>
+      <translation type="unfinished">Is not listed</translation>
+    </message>
+    <message>
+      <source>In</source>
+      <translation type="unfinished">In</translation>
+    </message>
+    <message>
+      <source>%n removed subjects</source>
+      <translation type="unfinished">%n removed subjects</translation>
+    </message>
+    <message>
+      <source>%n removed devices</source>
+      <translation type="unfinished">%n removed devices</translation>
+    </message>
+    <message>
+      <source>%n removed cameras</source>
+      <translation type="unfinished">%n removed cameras</translation>
+    </message>
+    <message>
+      <source>%n removed servers</source>
+      <translation type="unfinished">%n removed servers</translation>
+    </message>
+    <message>
+      <source>%n removed layouts</source>
+      <translation type="unfinished">%n removed layouts</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n subjects more</source>
+      <translation type="unfinished">
+        <numerusform>%n subjects more</numerusform>
+        <numerusform>%n subjects more</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%n devices more</source>
+      <translation type="unfinished">%n devices more</translation>
+    </message>
+    <message>
+      <source>%n cameras more</source>
+      <translation type="unfinished">%n cameras more</translation>
+    </message>
+    <message>
+      <source>%n servers more</source>
+      <translation type="unfinished">%n servers more</translation>
+    </message>
+    <message>
+      <source>%n layouts more</source>
+      <translation type="unfinished">%n layouts more</translation>
+    </message>
+  </context>
+  <context>
+    <name>TierUsageStrings</name>
+    <message>
+      <source>Number of servers per Site</source>
+      <translation type="unfinished">Number of servers per Site</translation>
+    </message>
+    <message>
+      <source>Number of devices per server</source>
+      <translation type="unfinished">Number of devices per server</translation>
+    </message>
+    <message>
+      <source>Number of items on layout</source>
+      <translation type="unfinished">Number of items on layout</translation>
+    </message>
+    <message>
+      <source>Number of days of archive</source>
+      <translation type="unfinished">Number of days of archive</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Video Wall</source>
+      <translation>Videovegg</translation>
+    </message>
+    <message>
+      <source>Cross-Site features</source>
+      <translation type="unfinished">Cross-Site features</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeDurationWidget</name>
+    <message>
+      <source>Also include</source>
+      <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Also include</translation>
+    </message>
+    <message>
+      <source>Begin</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Begin</translation>
+    </message>
+    <message>
+      <source>Before Event</source>
+      <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
+      <translation type="unfinished">Before Event</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">End</translation>
+    </message>
+    <message>
+      <source>After Event</source>
+      <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
+      <translation type="unfinished">After Event</translation>
+    </message>
+  </context>
+  <context>
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
@@ -6873,42 +6565,118 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
-    <name>UserListModel</name>
+    <name>UserGroupsWidget::Private</name>
     <message>
-      <source>Owner</source>
-      <translation>Eier</translation>
+      <source>Delete</source>
+      <translation>Slett</translation>
     </message>
     <message>
-      <source>Administrator</source>
-      <translation>Administrator</translation>
+      <source>No groups found</source>
+      <translation>Ingen grupper funnet</translation>
     </message>
     <message>
-      <source>View live video</source>
-      <translation>Se livevideo</translation>
+      <source>Change search criteria or create a new group</source>
+      <translation>Endre søkekriterier eller opprett en ny gruppe</translation>
     </message>
     <message>
-      <source>Adjust device settings</source>
-      <translation>Juster enhetsinnstillinger</translation>
+      <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation>Flere grupper deler samme navn, noe som kan føre til forvirring. For å opprettholde en klar og organisert struktur, foreslår vi å gi unike navn for hver gruppe.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP groups are not found in the LDAP database.</source>
+      <translation>
+        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
+        <numerusform>%n eksisterende LDAP-grupper finnes ikke i LDAP-databasen.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n groups</source>
+      <translation>
+        <numerusform>Slett %n grupper</numerusform>
+        <numerusform>Slett %n grupper</numerusform>
+      </translation>
     </message>
     <message>
-      <source>Adjust camera settings</source>
-      <translation>Juster kamerainnstillingene</translation>
+      <source>Failed to delete group &quot;%1&quot;.</source>
+      <translation>Kunne ikke slette gruppe &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>Use PTZ controls</source>
-      <translation>Bruk PTZ-kontroller</translation>
+      <source>Failed to delete group.</source>
+      <translation>Kunne ikke slette gruppen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n groups.</source>
+      <translation>
+        <numerusform>Kunne ikke slette %n grupper.</numerusform>
+        <numerusform>Kunne ikke slette %n grupper.</numerusform>
+      </translation>
     </message>
     <message>
-      <source>View video archives</source>
-      <translation>Se opptak</translation>
+      <source>Some groups have each other as both their parent and child members, or are part of such a circular reference chain. This can lead to incorrect calculations of permissions.</source>
+      <translation>Noen grupper har hverandre som både foreldre- og barnemedlemmer, eller er en del av en slik sirkulær referansekjede. Dette kan føre til feilberegninger av tillatelser.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserListWidget::Private</name>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
     </message>
     <message>
-      <source>Export video</source>
-      <translation>Eksporter video</translation>
+      <source>All Users</source>
+      <translation>Alle brukere</translation>
     </message>
     <message>
-      <source>Control Video Walls</source>
-      <translation>Kontroller Videovegg</translation>
+      <source>Users with Digest Authentication</source>
+      <translation>Brukere med Digest Authentication</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation>Ingen brukere funnet</translation>
+    </message>
+    <message>
+      <source>Change search criteria or create a new user</source>
+      <translation>Endre søkekriterier eller opprett en ny bruker</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Rediger</translation>
+    </message>
+    <message>
+      <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
+      <translation>Flere brukere deler samme pålogging, noe som forårsaker påloggingsfeil. For å løse dette problemet må du enten oppdatere de berørte brukerpåloggingene eller deaktivere/slette duplikater.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users</source>
+      <translation>
+        <numerusform>Slett %n brukere</numerusform>
+        <numerusform>Slett %n brukere</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>LDAP server is offline. %n users are not able to log in.</source>
+      <translation>
+        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
+        <numerusform>LDAP-serveren er frakoblet. %n brukere kan ikke logge på.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to delete user &quot;%1&quot;.</source>
+      <translation>Kunne ikke slette bruker &quot;%1&quot;.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to delete %n users.</source>
+      <translation>
+        <numerusform>Kunne ikke slette %n brukere.</numerusform>
+        <numerusform>Kunne ikke slette %n brukere.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n existing LDAP users are not found in the LDAP database</source>
+      <translation>
+        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen</numerusform>
+        <numerusform>%n eksisterende LDAP-brukere finnes ikke i LDAP-databasen</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6939,101 +6707,118 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
+    <name>VmsRulesDialogHelper</name>
     <message>
-      <source>Hide information</source>
-      <translation>Skjul informasjon</translation>
+      <source>This action cannot be undone</source>
+      <translation>Denne handlingen kan ikke angres</translation>
     </message>
     <message>
-      <source>Show information</source>
-      <translation>Vis informasjon</translation>
-    </message>
-    <message>
-      <source>Hide thumbnails</source>
-      <translation>Skjul miniatyrbilder</translation>
-    </message>
-    <message>
-      <source>Show thumbnails</source>
-      <translation>Vis miniatyrbilder</translation>
-    </message>
-    <message>
-      <source>Last day</source>
-      <translation>Siste dag</translation>
-    </message>
-    <message>
-      <source>Last 7 days</source>
-      <translation>Siste 7 dager</translation>
-    </message>
-    <message>
-      <source>Last 30 days</source>
-      <translation>Siste 30 dager</translation>
-    </message>
-    <message>
-      <source>Selected on Timeline</source>
-      <translation>Valgt på tidslinjen</translation>
-    </message>
-    <message>
-      <source>Any time</source>
-      <translation>Når som helst</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
-    </message>
-    <message>
-      <source>Devices on layout</source>
-      <translation>Enheter på visning</translation>
-    </message>
-    <message>
-      <source>Cameras on layout</source>
-      <translation>Kameraer på visning</translation>
-    </message>
-    <message>
-      <source>Any device</source>
-      <translation>Enhver enhet</translation>
-    </message>
-    <message>
-      <source>Any camera</source>
-      <translation>Hvilket som helst kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Velg enhet</translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valgte kamera</translation>
-    </message>
-    <message>
-      <source>Choose devices...</source>
-      <translation>Velg enheter...</translation>
-    </message>
-    <message>
-      <source>Choose cameras...</source>
-      <translation>Velg kameraer...</translation>
+      <source>Reset all rules to defaults?</source>
+      <translation>Vil du tilbakestille alle regler til standard?</translation>
     </message>
     <message numerus="yes">
-      <source>%n chosen devices</source>
-      <translation>
-        <numerusform>%n valgte enheter</numerusform>
-        <numerusform>%n valgte enheter</numerusform>
+      <source>Delete %n rules?</source>
+      <translation type="unfinished">
+        <numerusform>Delete %n rules?</numerusform>
+        <numerusform>Delete %n rules?</numerusform>
       </translation>
     </message>
-    <message numerus="yes">
-      <source>%n chosen cameras</source>
-      <translation>
-        <numerusform>%n valgte kameraer</numerusform>
-        <numerusform>%n valgte kameraer</numerusform>
-      </translation>
+  </context>
+  <context>
+    <name>nx</name>
+    <message>
+      <source>Saving layout</source>
+      <translation>Lagrer visning</translation>
     </message>
     <message>
-      <source>Chosen camera</source>
-      <translation>Valgt kamera</translation>
+      <source>Exporting video</source>
+      <translation>Eksporter video</translation>
     </message>
     <message>
-      <source>Chosen device</source>
-      <translation>Valgt enhet</translation>
+      <source>Stop Saving</source>
+      <translation>Stopp lagring</translation>
+    </message>
+    <message>
+      <source>Stop Export</source>
+      <translation>Stopp eksport</translation>
+    </message>
+    <message>
+      <source>Transcoding is required. Export session restarted.</source>
+      <translation>Transkoding er nødvendig. Eksporter økten må startes på nytt.</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Bruk</translation>
+    </message>
+    <message>
+      <source>Unsaved changes:</source>
+      <translation>Ikke lagrede endringer:</translation>
+    </message>
+    <message>
+      <source>Save changes before exit?</source>
+      <translation>Lagre endringer før du går videre?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::AccessRightsList</name>
+    <message>
+      <source>View Archive</source>
+      <translation>Vis arkiv</translation>
+    </message>
+    <message>
+      <source>Export Archive</source>
+      <translation>Eksporter arkiv</translation>
+    </message>
+    <message>
+      <source>View Bookmarks</source>
+      <translation>Vis bokmerker</translation>
+    </message>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Administrer bokmerker</translation>
+    </message>
+    <message>
+      <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
+      <translation>Avhengig av ressurstypen lar brukeren enten endre innstillingene eller kontrollere videoveggen.</translation>
+    </message>
+    <message>
+      <source>Allows users to access a resource and view live footage from a camera.</source>
+      <translation>Lar brukere få tilgang til en ressurs og se live-opptak fra et kamera.</translation>
+    </message>
+    <message>
+      <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
+      <translation>Lar brukeren kontrollere PTZ, bruke 2-veis lyd, myke triggere og I/O-knapper.</translation>
+    </message>
+    <message>
+      <source>View Live.</source>
+      <translation>Se live.</translation>
+    </message>
+    <message>
+      <source>User Input.</source>
+      <translation>Brukerinndata.</translation>
+    </message>
+    <message>
+      <source>Edit Settings.</source>
+      <translation>Endre innstillinger.</translation>
+    </message>
+    <message>
+      <source>Play Audio</source>
+      <translation type="unfinished">Play Audio</translation>
+    </message>
+    <message>
+      <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
+      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
     </message>
   </context>
   <context>
@@ -7062,14 +6847,14 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
+    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
-      <source>deleted camera</source>
-      <translation>slettet kamera</translation>
+      <source>Add To List</source>
+      <translation type="unfinished">Add To List</translation>
     </message>
     <message>
-      <source>Unknown track</source>
-      <translation>Ukjent spor</translation>
+      <source>Create New List...</source>
+      <translation type="unfinished">Create New List...</translation>
     </message>
   </context>
   <context>
@@ -7253,6 +7038,62 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Backup is not supported for this device</source>
       <translation>Sikkerhetskopiering støttes ikke for denne enheten</translation>
     </message>
+    <message>
+      <source>Nothing to backup</source>
+      <translation>Ingenting å sikkerhetskopiere</translation>
+    </message>
+    <message>
+      <source>Insufficient services</source>
+      <translation>Utilstrekkelige tjenester</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services are required</source>
+      <translation>
+        <numerusform>%n egnede sky-lagringstjenester er nødvendig</numerusform>
+        <numerusform>%n egnede sky-lagringstjenester er nødvendig</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n MP</source>
+      <translation>
+        <numerusform>%n MP</numerusform>
+        <numerusform>%n MP</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Megapixels</source>
+      <translation>
+        <numerusform>%n Megapixler</numerusform>
+        <numerusform>%n Megapixler</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Unknown resolution</source>
+      <translation>Ukjent oppløsning</translation>
+    </message>
+    <message>
+      <source>No suitable cloud storage services available</source>
+      <translation>Ingen passende skylagringstjenester tilgjengelig</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n suitable cloud storage services available</source>
+      <translation>
+        <numerusform>%n passende skylagringstjenester tilgjengelig</numerusform>
+        <numerusform>%n passende skylagringstjenester tilgjengelig</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Oppløsning</translation>
+    </message>
+    <message>
+      <source>Setting was changed</source>
+      <translation>Innstillingen ble endret</translation>
+    </message>
+    <message>
+      <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
+      <translation>&quot;Alt arkiv&quot; -alternativet ble endret til &quot;Motion, Objects, Bookmarks&quot; på grunn av at sikkerhetskopiering av skylagring ble aktivert</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7279,8 +7120,8 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
   <context>
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
-      <source>Nothing to backup</source>
-      <translation>Ingenting å sikkerhetskopiere</translation>
+      <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
+      <translation>Det er flere kamera som er sikkerhetskopiert enn tilgjengelige tjenester. Deaktiver sikkerhetskopi av noen kameraer eller legg til flere egnede tjenester. Ellers vil det gjøres automatisk på %1</translation>
     </message>
   </context>
   <context>
@@ -7298,18 +7139,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Nye tillagte kamera</translation>
     </message>
     <message>
-      <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation>Nye ekstra kamerainnstillinger vil gjelde for alle servere i systemet.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation>Sikkerhetskopiering vil bli slått på for nye ekstra kameraer på alle servere i systemet.</translation>
-    </message>
-    <message>
-      <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation>Sikkerhetskopiering vil bli slått av for nye ekstra kameraer på alle servere i systemet.</translation>
-    </message>
-    <message>
       <source>Storage Management</source>
       <translation>Lagringshåndtering</translation>
     </message>
@@ -7322,6 +7151,30 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
       <translation>For å aktivere sikkerhetskopiering, legg til flere stasjoner for å bruke dem som backuplagring i %1</translation>
+    </message>
+    <message>
+      <source>Server is offline</source>
+      <translation>Server frakoblet</translation>
+    </message>
+    <message>
+      <source>Backup settings are not available</source>
+      <translation>Sikkerhetskopiinnstillinger er ikke tilgjengelige</translation>
+    </message>
+    <message>
+      <source>Applies to all servers</source>
+      <translation>Gjelder alle servere</translation>
+    </message>
+    <message>
+      <source>Site shut down</source>
+      <translation type="unfinished">Site shut down</translation>
+    </message>
+    <message>
+      <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
+      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+    </message>
+    <message>
+      <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
+      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
     </message>
   </context>
   <context>
@@ -7357,20 +7210,13 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       </translation>
     </message>
     <message>
-      <source>Footage from these cameras is backed up through to %1 %2</source>
-      <comment>%1 and %2 will be replaced respectively by the date and time in the system format.</comment>
-      <translation>Opptak fra disse kameraene sikkerhetskopieres til %1 %2</translation>
-    </message>
-    <message>
       <source>The progress will be displayed once the backup process starts</source>
       <translation>Fremdriften vil vises når sikkerhetskopieringsprosessen starter</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
-      <source>deleted camera</source>
-      <translation>slettet kamera</translation>
+      <source>Footage from these cameras is backed up through to %1 %2</source>
+      <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
+      <translation>Opptak fra disse kameraene sikkerhetskopieres til %1 %2</translation>
     </message>
   </context>
   <context>
@@ -7392,6 +7238,21 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CallNotificationsListModel::Private</name>
+    <message>
+      <source>Calling...</source>
+      <translation>Ringer...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Åpen</translation>
+    </message>
+    <message>
+      <source>Missed call</source>
+      <translation type="unfinished">Missed call</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraAdvancedParamsWidget</name>
     <message>
       <source>Loading values...</source>
@@ -7401,28 +7262,16 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Applying changes...</source>
       <translation>Bruker endringer...</translation>
     </message>
+    <message>
+      <source>Force Motion Detection</source>
+      <translation>Aktiver bevegelsesdeteksjon</translation>
+    </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <name>nx::vms::client::desktop::CameraButtonManager</name>
     <message>
-      <source>Heater</source>
-      <translation>Varmeapparat</translation>
-    </message>
-    <message>
-      <source>Wiper</source>
-      <translation>Vindusvisker</translation>
-    </message>
-    <message>
-      <source>Mute</source>
-      <translation>Demp</translation>
-    </message>
-    <message>
-      <source>Unmute</source>
-      <translation>Skru av demping</translation>
-    </message>
-    <message>
-      <source>Open Door</source>
-      <translation>Åpen dør</translation>
+      <source>Disabled by schedule</source>
+      <translation>Deaktivert etter planen</translation>
     </message>
   </context>
   <context>
@@ -7487,10 +7336,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Pan &amp; Tilt</translation>
     </message>
     <message>
-      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Innstillinger for kvalitet og bildefrekvens (FPS) i opptaksplanen blir irrelevante.</translation>
-    </message>
-    <message>
       <source>Server will not push time settings to the camera.</source>
       <translation>Server vil ikke sende tidsinnstillinger til kameraet.</translation>
     </message>
@@ -7505,12 +7350,99 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Auto</source>
-      <comment>Let server determine if Media2 should be used to fetch profiles</comment>
       <translation>Auto</translation>
     </message>
     <message>
-      <source>Video recorded on the internal camera&apos;s storage will be automatically uploaded to the main archive.</source>
-      <translation>Video tatt opp på det interne kameraet&apos; lagring vil ikke automatisk lastes opp til hovedarkivet.</translation>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
+      <translation>Innstillinger for kvalitet og bildefrekvens (FPS) i opptaksplanen blir irrelevante</translation>
+    </message>
+    <message>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+    </message>
+    <message>
+      <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
+      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotItem</name>
+    <message>
+      <source>Open Camera</source>
+      <translation>Åpne kamera</translation>
+    </message>
+    <message>
+      <source>Open Camera in new Tab</source>
+      <translation>Åpne Kamera i ny fane</translation>
+    </message>
+    <message>
+      <source>Open Camera in place</source>
+      <translation>Åpne kamera på plass</translation>
+    </message>
+    <message>
+      <source>Open Layout in new Tab</source>
+      <translation type="unfinished">Open Layout in new Tab</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation>Punkt</translation>
+    </message>
+    <message>
+      <source>Place Hotspot</source>
+      <translation>Plasser Wi-Fi-sone</translation>
+    </message>
+    <message>
+      <source>NO DATA</source>
+      <translation>TIDSPUNKTET HAR INGEN OPPAK</translation>
+    </message>
+    <message>
+      <source>NO ACCESS</source>
+      <translation>INGEN TILGANG</translation>
+    </message>
+    <message>
+      <source>Select Target...</source>
+      <translation type="unfinished">Select Target...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>Color</source>
+      <translation>Farge</translation>
+    </message>
+    <message>
+      <source>Pointed</source>
+      <translation>Punkt</translation>
+    </message>
+    <message>
+      <source>Target resource does not exist</source>
+      <translation type="unfinished">Target resource does not exist</translation>
+    </message>
+    <message>
+      <source>Select Camera or Layout...</source>
+      <translation type="unfinished">Select Camera or Layout...</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Mål</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
+    <message>
+      <source>Select Hotspot Target</source>
+      <translation type="unfinished">Select Hotspot Target</translation>
     </message>
   </context>
   <context>
@@ -7543,6 +7475,13 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>
         <numerusform>Bruk lisens</numerusform>
         <numerusform>Bruk lisens</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use Service</source>
+      <translation>
+        <numerusform>Bruk tjeneste</numerusform>
+        <numerusform>Bruk tjeneste</numerusform>
       </translation>
     </message>
   </context>
@@ -7585,12 +7524,12 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Aktiver bevegelsesdeteksjon</translation>
     </message>
     <message>
-      <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation>Velg områder på forhåndsvisningen du vil angi valgt følsomhet for.</translation>
+      <source>Select areas on the preview to set chosen sensitivity for</source>
+      <translation>Velg områder på forhåndsvisningen du vil angi valgt følsomhet for</translation>
     </message>
     <message>
-      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation>Velg en følsomhet for bevegelsesdeteksjon og velg noen områder på forhåndsvisningen du vil angi den for.</translation>
+      <source>Choose a motion detection sensitivity and select some areas on the preview to set it for</source>
+      <translation>Velg en følsomhet for bevegelsesdeteksjon og velg noen områder på forhåndsvisningen du vil angi den for</translation>
     </message>
   </context>
   <context>
@@ -7640,13 +7579,13 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Noen data og innstillinger er kanskje ikke kompatible med det nye kameraet</translation>
     </message>
     <message>
-      <source>%1 will be removed from the System and replaced by the selected camera</source>
-      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 vil bli fjernet fra systemet og erstattet av det valgte kameraet</translation>
-    </message>
-    <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
       <translation>Kamerabytteoperasjonen er ikke mulig da serveren ikke er tilgjengelig.</translation>
+    </message>
+    <message>
+      <source>%1 will be removed from the Site and replaced by the selected camera</source>
+      <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
+      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
     </message>
   </context>
   <context>
@@ -7660,24 +7599,24 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>basert på servertid</translation>
     </message>
     <message>
-      <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>Velg områder på timeplanen du vil bruke valgte parametere til.</translation>
-    </message>
-    <message>
-      <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>Angi innspillingsparametere og velg områder i rutetabellen for å bruke dem på.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Høy minimumsverdi kan føre til reduksjon av arkivlengde på andre enheter.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Høy minimumsverdi kan føre til redusert arkivlengde på andre kameraer.</translation>
-    </message>
-    <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
       <translation>Høy forhåndsopptakstid vil øke RAM-utnyttelsen på serveren</translation>
+    </message>
+    <message>
+      <source>Select areas on the schedule to apply chosen parameters to</source>
+      <translation>Velg områder på timeplanen du vil bruke valgte parametere til</translation>
+    </message>
+    <message>
+      <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
+      <translation>Angi innspillingsparametere og velg områder i rutetabellen for å bruke dem på</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices</source>
+      <translation>Høy minimumsverdi kan føre til reduksjon av arkivlengde på andre enheter</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras</source>
+      <translation>Høy minimumsverdi kan føre til redusert arkivlengde på andre kameraer</translation>
     </message>
   </context>
   <context>
@@ -7709,6 +7648,10 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>No cameras available</source>
       <translation>Ingen kameraer tilgjengelig</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Kildekamera</translation>
     </message>
   </context>
   <context>
@@ -7830,14 +7773,22 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Plugins</source>
       <translation>Plugins</translation>
     </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>Punkter</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrasjoner</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Kunne ikke aktivere lyd på %n enheter</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7879,25 +7830,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
-    <message numerus="yes">
-      <source>%1 are used</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 brukes</numerusform>
-        <numerusform>%1 brukes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 are required</source>
-      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation>
-        <numerusform>%1 kreves</numerusform>
-        <numerusform>%1 kreves</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
@@ -7930,21 +7862,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Select</source>
       <translation>Velg</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ChunksFilterActionFactory</name>
-    <message>
-      <source>No filter</source>
-      <translation>Ingen filter</translation>
-    </message>
-    <message>
-      <source>Main storage only</source>
-      <translation>Kun hovedlager</translation>
-    </message>
-    <message>
-      <source>Backup storage only</source>
-      <translation>Kun sikkerhetskopieringslagring</translation>
     </message>
   </context>
   <context>
@@ -8072,16 +7989,16 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Introduserer %1 oppsett</translation>
     </message>
     <message>
-      <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation>%1 Oppsett er &lt;b&gt;kryss-systemoppsettet&lt;/b&gt; slik at du kan jobbe med enheter fra forskjellige systemer. Foreløpig er bare noen funksjoner for vanlig oppsett tilgjengelig, men vi vil fortsette å utvide funksjonaliteten til %1 Oppsett i fremtidige versjoner</translation>
-    </message>
-    <message>
       <source>Read more on the %1</source>
       <translation>Les mer på %1</translation>
     </message>
     <message>
       <source>help page</source>
       <translation>hjelpeside</translation>
+    </message>
+    <message>
+      <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
+      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
     </message>
   </context>
   <context>
@@ -8095,6 +8012,13 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>%1 (Copy %2)</source>
       <comment>Original name will be substituted as %1, counter as %2</comment>
       <translation>%1 (Kopi %2)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CommonMessageBar</name>
+    <message>
+      <source>Close</source>
+      <translation>Lukk</translation>
     </message>
   </context>
   <context>
@@ -8132,50 +8056,76 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <comment>Dialog button text.</comment>
       <translation>OK</translation>
     </message>
+    <message>
+      <source>Enter access link to continue your session</source>
+      <translation>Skriv inn tilgangslinken for å fortsette økten</translation>
+    </message>
+    <message>
+      <source>Your session has expired. Please sign in again with your link to continue.</source>
+      <translation>Økten er utløpt. Vennligst logg på nytt med lenken for å fortsette.</translation>
+    </message>
+    <message>
+      <source>Authentication details are incorrect</source>
+      <translation>Godkjenningsdetaljer er feil</translation>
+    </message>
+    <message>
+      <source>Login to %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Logg inn på %1</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to disconnect?</source>
+      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Koble fra</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
-      <source>Local System owner is absent or disabled.</source>
-      <translation>Lokal systemeier er fraværende eller deaktivert.</translation>
+      <source>Internal error. Please try again later.</source>
+      <translation>Intern feil. Prøv igjen senere.</translation>
     </message>
     <message>
-      <source>None of your Servers is connected to the Internet.</source>
-      <translation>Ingen av serverne dine er koblet til Internett.</translation>
+      <source>None of your Servers has connection to %1.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Ingen av dine servere har tilkobling til %1.</translation>
     </message>
     <message>
-      <source>System connected to %1</source>
+      <source>Local Site owner is absent or disabled.</source>
+      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+    </message>
+    <message>
+      <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>System koblet til %1</translation>
+      <translation type="unfinished">Site connected to %1</translation>
     </message>
     <message>
-      <source>Failed to connect System to %1</source>
+      <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Kunne ikke koble systemet til %1</translation>
+      <translation type="unfinished">Failed to connect Site to %1</translation>
     </message>
     <message>
-      <source>Connect System to %1</source>
+      <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble systemet til %1</translation>
+      <translation type="unfinished">Connect Site to %1</translation>
     </message>
     <message>
-      <source>Connect System to %1?</source>
+      <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Koble systemet til %1?</translation>
+      <translation type="unfinished">Connect Site to %1?</translation>
     </message>
     <message>
-      <source>Enter your account password to connect System to %1</source>
+      <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Skriv inn kontopassordet ditt for å koble System til %1</translation>
+      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
     </message>
     <message>
       <source>Connect</source>
-      <comment>Connect current System to cloud</comment>
+      <comment>Connect current Site to cloud</comment>
       <translation>Koble til</translation>
-    </message>
-    <message>
-      <source>Internal error. Please try again later.</source>
-      <translation>Intern feil. Prøv igjen senere.</translation>
     </message>
   </context>
   <context>
@@ -8197,17 +8147,17 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Administratorpassord</translation>
     </message>
     <message>
-      <source>Merge Server to the System</source>
+      <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation>Slå sammen server til systemet</translation>
+      <translation type="unfinished">Merge Server to the Site</translation>
     </message>
     <message>
-      <source>Enter your account password to merge Server to the System</source>
-      <translation>Skriv inn kontopassordet for å slå sammen serveren til systemet</translation>
+      <source>Enter your account password to merge Server to the Site</source>
+      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
     </message>
     <message>
       <source>Merge</source>
-      <comment>Merge Server to the current System (dialog button text)</comment>
+      <comment>Merge Server to the current Site (dialog button text)</comment>
       <translation>Slå sammen</translation>
     </message>
   </context>
@@ -8234,8 +8184,8 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Request timeout</translation>
     </message>
     <message>
-      <source>New System</source>
-      <translation>Nytt system</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
@@ -8256,6 +8206,10 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
       <translation>Opptaksplan inneholder opptaksmoduser som ikke støttes av de valgte kameraene. Ustøttede opptaksmoduser vil bli endret til &quot;Ta opp alltid&quot;.</translation>
     </message>
+    <message>
+      <source>Recording will not be enabled on some cameras.</source>
+      <translation>Opptak vil ikke være aktivert på enkelte kameraer.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CrossSystemCameraResource</name>
@@ -8267,20 +8221,59 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
   <context>
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
-      <source>This camera requires password to be set up.</source>
-      <translation>Dette kameraet krever passord for å bli satt opp.</translation>
-    </message>
-    <message>
-      <source>Some of selected cameras require password to be set up.</source>
-      <translation>Noen av valgte kameraer krever passord for å bli satt opp.</translation>
-    </message>
-    <message>
-      <source>Ask your system administrator to do it.</source>
-      <translation>Be systemadministratoren om å gjøre det.</translation>
-    </message>
-    <message>
       <source>Set Password</source>
       <translation>Angi passord</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up</source>
+      <translation>Dette kameraet krever passord for å bli satt opp</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up</source>
+      <translation>Noen av valgte kameraer krever passord for å bli satt opp</translation>
+    </message>
+    <message>
+      <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
+      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
+      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::DesktopDataProvider</name>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>Lydopptaksenheten støtter ingen passende lydformater. Velg en annen lydenhet eller &quot;ingen&quot; i skjermopptaksinnstillingene.</translation>
+    </message>
+    <message>
+      <source>Could not detect capturing resolution</source>
+      <translation>Kunne ikke oppdage opptaks-oppløsningen</translation>
+    </message>
+    <message>
+      <source>Could not find video encoder %1.</source>
+      <translation>Finner ikke videokoderen %1.</translation>
+    </message>
+    <message>
+      <source>Screen width must be a multiple of 8.</source>
+      <translation>Skjermbredden må være et multiplum av 8.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>Kunne ikke initialisere video encoder.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>Kunne ikke initialisere lydenkoderen.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio device &quot;%1&quot;.</source>
+      <translation>Kunne ikke initialisere lydenheten &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Could not start primary audio device.</source>
+      <translation>Kunne ikke starte den primære lydenheten.</translation>
     </message>
   </context>
   <context>
@@ -8383,8 +8376,12 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Søking etter enheter på nettverket er begrenset til kameraer som støtter HTTPS-tilkoblinger. Dette kan endres i %1 -innstillinger.</translation>
     </message>
     <message>
-      <source>System Administration</source>
-      <translation>Systemadministrasjon</translation>
+      <source>Site Administration</source>
+      <translation type="unfinished">Site Administration</translation>
+    </message>
+    <message>
+      <source>Maximum number of Devices for the Site is reached</source>
+      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
     </message>
   </context>
   <context>
@@ -8407,6 +8404,100 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
       <translation>For å bruke programvaren må du godta lisensavtalen for sluttbrukere</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogDialog</name>
+    <message>
+      <source>Filter Similar Rows</source>
+      <translation>Filtrer lignende rader</translation>
+    </message>
+    <message>
+      <source>Copy Selection to Clipboard</source>
+      <translation>Kopier utvalg til utklippstavle</translation>
+    </message>
+    <message>
+      <source>Export Selection to File...</source>
+      <translation>Eksporter utvalg til fil...</translation>
+    </message>
+    <message>
+      <source>Select All</source>
+      <translation>Velg alle</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Tøm filter</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivelse</translation>
+    </message>
+    <message>
+      <source>No events</source>
+      <translation>Ingen hendelser</translation>
+    </message>
+    <message>
+      <source>Any Action</source>
+      <translation>Enhver handling</translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for period from %1 to %2 - %n events found</source>
+      <comment>Dates are substituted</comment>
+      <translation>
+        <numerusform>Hendelseslogg for periode fra %1 til %2 - %n hendelser funnet</numerusform>
+        <numerusform>Hendelseslogg for periode fra %1 til %2 - %n hendelser funnet</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Event log for %1 - %n events found</source>
+      <comment>Date is substituted</comment>
+      <translation>
+        <numerusform>Hendelseslogg for %1 - %n hendelser funnet</numerusform>
+        <numerusform>Hendelseslogg for %1 - %n hendelser funnet</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Export selected events to file</source>
+      <translation>Eksporter valgte hendelser til fil</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::EventLogModel</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Dato/klokkeslett</translation>
+    </message>
+    <message>
+      <source>Event</source>
+      <translation>Hendelse</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Kilde</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>Handling</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Mål</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Beskrivelse</translation>
+    </message>
+    <message>
+      <source>Open event video</source>
+      <translation type="unfinished">Open event video</translation>
+    </message>
+    <message>
+      <source>Open event device</source>
+      <translation type="unfinished">Open event device</translation>
+    </message>
+    <message>
+      <source>Open event camera</source>
+      <translation type="unfinished">Open event camera</translation>
     </message>
   </context>
   <context>
@@ -8464,11 +8555,15 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
   </context>
   <context>
     <name>nx::vms::client::desktop::EventTile</name>
+    <message>
+      <source>UNKNOWN</source>
+      <translation type="unfinished">UNKNOWN</translation>
+    </message>
     <message numerus="yes">
-      <source>...and %n more</source>
-      <translation>
-        <numerusform>...og %n mer</numerusform>
-        <numerusform>...og %n mer</numerusform>
+      <source> + %n</source>
+      <translation type="unfinished">
+        <numerusform> + %n</numerusform>
+        <numerusform> + %n</numerusform>
       </translation>
     </message>
   </context>
@@ -8514,12 +8609,12 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Videotranskoding kreves.</translation>
     </message>
     <message>
-      <source>Archive is encrypted.</source>
-      <translation>Arkivet er kryptert.</translation>
-    </message>
-    <message>
       <source>Archive is unavailable now. Please try again later.</source>
       <translation>Arkivet er utilgjengelig nå. Prøv igjen senere.</translation>
+    </message>
+    <message>
+      <source>Unlock this portion of the archive to export its contents.</source>
+      <translation>Lås opp denne delen av arkivet for å eksportere innholdet.</translation>
     </message>
   </context>
   <context>
@@ -8636,6 +8731,10 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
       <translation>Eksport er ikke tilgjengelig: Dette kameraet har ikke et videoarkiv for den valgte tidsperioden.</translation>
     </message>
+    <message>
+      <source>You do not have a permission to export archive for some of the selected cameras. Video from those cameras will not be exported to the resulting file.</source>
+      <translation>Du har ikke tillatelse til å eksportere arkiv for noen av de valgte kameraene. Video fra disse kameraene blir ikke eksportert til resultatfilen.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ExportSettingsDialog::Private</name>
@@ -8662,6 +8761,45 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>No Failover</source>
       <translation>Ingen failover</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::FailoverWidget</name>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline Servers with the same Location ID.</source>
+      <translation>Servere med failover aktivert vil automatisk ta kameraer fra frakoblede servere med samme steds-ID.</translation>
+    </message>
+    <message>
+      <source>Failover</source>
+      <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Max devices on this server:</source>
+      <translation>Maks enheter på denne serveren:</translation>
+    </message>
+    <message>
+      <source>Max cameras on this server:</source>
+      <translation>Max kameraer på denne serveren:</translation>
+    </message>
+    <message>
+      <source>At least two servers are required for this feature.</source>
+      <translation>Minst to servere er påkrevd for denne funksjonen.</translation>
+    </message>
+    <message>
+      <source>This server already has more than max devices</source>
+      <translation>Denne serveren har allerede mer enn maksimalt utstyr</translation>
+    </message>
+    <message>
+      <source>This server already has more than max cameras</source>
+      <translation>Denne serveren har allerede mer enn maksimalt kameraer</translation>
+    </message>
+    <message>
+      <source>To avoid issues adjust max number of devices</source>
+      <translation>For å unngå problemer, juster maks antall enheter</translation>
+    </message>
+    <message>
+      <source>To avoid issues adjust max number of cameras</source>
+      <translation>For å unngå problemer, juster maksimalt antall kameraer</translation>
     </message>
   </context>
   <context>
@@ -8732,6 +8870,106 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::GlobalPermissionsModel</name>
+    <message>
+      <source>View event log</source>
+      <translation>Vis hendelseslogg</translation>
+    </message>
+    <message>
+      <source>Generate events</source>
+      <translation>Generer hendelser</translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 gruppe</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>
+        <numerusform>%1 og %n grupper til</numerusform>
+        <numerusform>%1 og %n grupper til</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Inherits %1 permission from</source>
+      <comment>%1 will be substituted with a permission name</comment>
+      <translation>Arver %1 tillatelse fra</translation>
+    </message>
+    <message>
+      <source>View video without redaction</source>
+      <translation type="unfinished">View video without redaction</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::GroupSettingsDialog</name>
+    <message>
+      <source>Delete failed</source>
+      <translation>Sletting mislyktes</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation>Bruke endringer?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>Forkast</translation>
+    </message>
+    <message>
+      <source>New Group</source>
+      <translation>Ny gruppe</translation>
+    </message>
+    <message>
+      <source>New Group %1</source>
+      <translation>Ny gruppe %1</translation>
+    </message>
+    <message>
+      <source>Save changes</source>
+      <translation>Lagre endringer</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Skriv inn kontopassordet ditt</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Lagre</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Kunne ikke bruke endringene</translation>
+    </message>
+    <message>
+      <source>Delete groups</source>
+      <translation>Slette grupper</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>Group name cannot be empty</source>
+      <translation>Gruppenavn kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>Group with the same name already exists</source>
+      <translation>Gruppe med samme navn finnes fra før</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes to %1 group</source>
+      <translation>Kunne ikke legge til endringer i %1 -gruppen</translation>
+    </message>
+    <message>
+      <source>Current group is a member of all groups selected on this tab and inherits permissions from each of them.</source>
+      <translation>Gjeldende gruppe er medlem av alle valgte grupper på denne fanen og arver tillatelser fra hver av dem.</translation>
+    </message>
+    <message>
+      <source>Select one or multiple groups from which the current group will inherit permissions</source>
+      <translation>Velg én eller flere grupper som den gjeldende gruppen vil arve tillatelser</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
@@ -8767,49 +9005,28 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
   <context>
     <name>nx::vms::client::desktop::IncompatibleServersActionHandler</name>
     <message>
-      <source>Systems will be merged shortly</source>
-      <translation>Systemer vil bli slått sammen innen kort tid</translation>
-    </message>
-    <message>
-      <source>Servers from the other System will appear in the resource tree.</source>
-      <translation>Servere fra det andre systemet vises i ressurstreet.</translation>
-    </message>
-    <message>
-      <source>Connecting to the current System...</source>
-      <translation>Kobler til det nåværende systemet...</translation>
-    </message>
-    <message>
-      <source>Server will be connected to System shortly</source>
-      <translation>Server vil være koblet til System innen kort tid</translation>
-    </message>
-    <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
       <translation>Det vil vises i ressurstreet når databasesynkroniseringen er fullført.</translation>
     </message>
     <message>
-      <source>Failed to merge %1 to our system.</source>
-      <translation>Kunne ikke slå sammen %1 til systemet vårt.</translation>
+      <source>Sites will be merged shortly</source>
+      <translation type="unfinished">Sites will be merged shortly</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IndirectAccessDecoratorModel</name>
     <message>
-      <source>Access granted by:</source>
-      <translation>Tilgang gitt av:</translation>
+      <source>Servers from the other Site will appear in the resource tree.</source>
+      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
     </message>
-    <message numerus="yes">
-      <source>and %n more</source>
-      <translation>
-        <numerusform>og %n mer</numerusform>
-        <numerusform>og %n mer</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::IntercomManager</name>
     <message>
-      <source>%1 Layout</source>
-      <translation>%1 planløsning</translation>
+      <source>Connecting to the current Site...</source>
+      <translation type="unfinished">Connecting to the current Site...</translation>
+    </message>
+    <message>
+      <source>Server will be connected to Site shortly</source>
+      <translation type="unfinished">Server will be connected to Site shortly</translation>
+    </message>
+    <message>
+      <source>Failed to merge %1 to our site.</source>
+      <translation type="unfinished">Failed to merge %1 to our site.</translation>
     </message>
   </context>
   <context>
@@ -8821,6 +9038,29 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Copy Link Location</source>
       <translation>Kopier koblingsplassering</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LayoutActionHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>Lagre visning som</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>Angi navn på visning:</translation>
+    </message>
+    <message>
+      <source>Save Layout As Cloud</source>
+      <translation>Lagre layout som sky</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Ny visning</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>Angi navnet på visningen du vil opprette:</translation>
     </message>
   </context>
   <context>
@@ -8850,10 +9090,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Bilde kan ikke leses</translation>
     </message>
     <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Bildet er for stort. Maksimal størrelse er %1 MB</translation>
-    </message>
-    <message>
       <source>Picture cannot be loaded</source>
       <translation>Bilde kan ikke lastes</translation>
     </message>
@@ -8869,8 +9105,8 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       <translation>Egendefinert nummer som kan tilordnes en visning for rask identifisering og tilgang</translation>
     </message>
     <message>
-      <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation>Denne IDen er allerede brukt i systemet. Bruk Generer-knappen for å finne en ledig ID.</translation>
+      <source>This ID is already in use. Use Generate button to find a free ID.</source>
+      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
     </message>
   </context>
   <context>
@@ -8901,6 +9137,145 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>OFFLINE</source>
       <translation>FRAKOBLET</translation>
+    </message>
+    <message>
+      <source>NO EXPORT PERMISSION</source>
+      <translation>INGEN EKSPORT TILLATELSE</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LdapSettingsWidget</name>
+    <message>
+      <source>Disconnect LDAP server?</source>
+      <translation>Koble fra LDAP-tjener?</translation>
+    </message>
+    <message>
+      <source>Disconnect</source>
+      <translation>Koble fra</translation>
+    </message>
+    <message>
+      <source>Reset Settings</source>
+      <translation>Tilbakestill innstillinger</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Skriv inn kontopassordet ditt</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Tilbakestill</translation>
+    </message>
+    <message>
+      <source>Connection failed</source>
+      <translation>Tilkoblingen mislyktes</translation>
+    </message>
+    <message>
+      <source>Remove existing LDAP users and groups?</source>
+      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+    </message>
+    <message>
+      <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
+      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+    </message>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
+    <message>
+      <source>Apply Settings</source>
+      <translation>Bruk innstillinger</translation>
+    </message>
+    <message>
+      <source>Apply</source>
+      <translation>Bruk</translation>
+    </message>
+    <message>
+      <source>Synchronize LDAP Users and Groups</source>
+      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+    </message>
+    <message>
+      <source>Synchronize</source>
+      <translation type="unfinished">Synchronize</translation>
+    </message>
+    <message>
+      <source>Connection OK</source>
+      <translation type="unfinished">Connection OK</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Kunne ikke bruke endringene</translation>
+    </message>
+    <message>
+      <source>LDAP</source>
+      <translation>LDAP</translation>
+    </message>
+    <message>
+      <source>Cannot connect to LDAP server</source>
+      <translation>Kan ikke koble til LDAP-server</translation>
+    </message>
+    <message>
+      <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
+      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LicenseManagerWidget</name>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation>
+        <numerusform>%n kanaler.</numerusform>
+        <numerusform>%n kanaler.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
+      <translation>Du har ikke en gyldig lisens installert. Aktiver din kommersielle eller prøvelisens.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Eksporter</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 are currently in use</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 er for tiden i bruk</numerusform>
+        <numerusform>%1 er for tiden i bruk</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>At least %1 are required</source>
+      <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>Minst %1 kreves</numerusform>
+        <numerusform>Minst %1 kreves</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n deactivations remaining.</source>
+      <translation>
+        <numerusform>%n deaktiveringer gjenstår.</numerusform>
+        <numerusform>%n deaktiveringer gjenstår.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation>
+        <numerusform>Deaktivere lisens?</numerusform>
+        <numerusform>Deaktivere lisenser?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation>Deaktiver</translation>
+    </message>
+    <message>
+      <source>Export licenses to a file</source>
+      <translation>Eksporter lisenser til en fil</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Fjern</translation>
     </message>
   </context>
   <context>
@@ -8946,10 +9321,10 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
 Loggingsnivået &quot;%1&quot; vil gi deg mer detaljert informasjon.</translation>
     </message>
     <message>
-      <source>The selected Logging Level may degrade your system&apos;s performance.
+      <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation>Det valgte loggingsnivået kan forringe systemets ytelse.
-Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har samlet inn nok logger.</translation>
+      <translation type="unfinished">The selected Logging Level may degrade performance.
+Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
     </message>
   </context>
   <context>
@@ -8961,6 +9336,10 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
     <message>
       <source>Version %1</source>
       <translation>Versjon %1</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid or has expired</source>
+      <translation type="unfinished">The provided link is not valid or has expired</translation>
     </message>
   </context>
   <context>
@@ -9001,46 +9380,24 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <source>Verbose</source>
       <translation>Utførlig</translation>
     </message>
+    <message>
+      <source>Default Logging level</source>
+      <translation>Standard loggingsnivå</translation>
+    </message>
+    <message>
+      <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
+      <translation>Ikke-standard loggingsnivå. Vi anbefaler å sette den til &quot;info&quot;</translation>
+    </message>
+    <message>
+      <source>Logging level degrades performance</source>
+      <translation type="unfinished">Logging level degrades performance</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
-    <message numerus="yes">
-      <source>... and %n more</source>
-      <translation>
-        <numerusform>... og %n mer</numerusform>
-        <numerusform>... og %n mer</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Downloading file...</source>
-      <translation>Laster ned fil...</translation>
-    </message>
-    <message>
-      <source>Pending download...</source>
-      <translation>Venter på nedlasting...</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Servers</source>
-      <translation>
-        <numerusform>%n server</numerusform>
-        <numerusform>%n servere</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Logs downloaded</source>
       <translation>Logger lastet ned</translation>
-    </message>
-    <message>
-      <source>Logs downloading failed</source>
-      <translation>Nedlasting av logger mislyktes</translation>
-    </message>
-    <message>
-      <source>Debug logging is enabled on the Client</source>
-      <translation>Feilsøkingslogging er aktivert på klienten</translation>
-    </message>
-    <message>
-      <source>Debug logging is enabled, resulting in degraded system performance.</source>
-      <translation>Feilsøkingslogging er aktivert, noe som resulterer i redusert systemytelse.</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
@@ -9048,10 +9405,6 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
         <numerusform>Feilsøkingslogging er aktivert på %n servere</numerusform>
         <numerusform>Feilsøkingslogging er aktivert på %n servere</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Logs downloading canceled</source>
-      <translation>Loggnedlasting avbrutt</translation>
     </message>
     <message>
       <source>Apply Settings</source>
@@ -9065,12 +9418,156 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <source>Apply</source>
       <translation>Bruk</translation>
     </message>
+    <message>
+      <source>Debug logging is enabled on the client</source>
+      <translation type="unfinished">Debug logging is enabled on the client</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled.
+Client performance is degraded.</source>
+      <translation type="unfinished">Debug logging is enabled.
+Client performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled</source>
+      <translation type="unfinished">Debug logging is enabled</translation>
+    </message>
+    <message>
+      <source>Debug logging is enabled.
+Site performance is degraded.</source>
+      <translation type="unfinished">Debug logging is enabled.
+Site performance is degraded.</translation>
+    </message>
+    <message>
+      <source>Logs download canceled</source>
+      <translation type="unfinished">Logs download canceled</translation>
+    </message>
+    <message>
+      <source>Downloading logs...</source>
+      <translation type="unfinished">Downloading logs...</translation>
+    </message>
+    <message>
+      <source>Logs download failed</source>
+      <translation type="unfinished">Logs download failed</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
       <translation>Velg mappe...</translation>
+    </message>
+    <message>
+      <source>Downloading...</source>
+      <translation type="unfinished">Downloading...</translation>
+    </message>
+    <message>
+      <source>Download completed with errors</source>
+      <translation type="unfinished">Download completed with errors</translation>
+    </message>
+    <message>
+      <source>Download success</source>
+      <translation type="unfinished">Download success</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n selected:</source>
+      <comment>number of selected rows</comment>
+      <translation type="unfinished">
+        <numerusform>%n selected:</numerusform>
+        <numerusform>%n selected:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Retry (%1)</source>
+      <translation type="unfinished">Retry (%1)</translation>
+    </message>
+    <message>
+      <source>Retry</source>
+      <translation type="unfinished">Retry</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListActionHandler</name>
+    <message>
+      <source>Network request failed</source>
+      <translation type="unfinished">Network request failed</translation>
+    </message>
+    <message>
+      <source>Lookup List save request failed</source>
+      <translation type="unfinished">Lookup List save request failed</translation>
+    </message>
+    <message>
+      <source>Lookup List remove request failed</source>
+      <translation type="unfinished">Lookup List remove request failed</translation>
+    </message>
+    <message>
+      <source>Could not add object to the List</source>
+      <translation type="unfinished">Could not add object to the List</translation>
+    </message>
+    <message>
+      <source>An object doesn&apos;t have attributes that matches selected list</source>
+      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+    </message>
+    <message>
+      <source>Object was added to the List</source>
+      <translation type="unfinished">Object was added to the List</translation>
+    </message>
+    <message>
+      <source>An object has been added to the &quot;%1&quot; successfully</source>
+      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListEntriesModel</name>
+    <message>
+      <source>Yes</source>
+      <translation>Ja</translation>
+    </message>
+    <message>
+      <source>No</source>
+      <translation type="unfinished">No</translation>
+    </message>
+    <message>
+      <source>Present</source>
+      <translation type="unfinished">Present</translation>
+    </message>
+    <message>
+      <source>Absent</source>
+      <translation type="unfinished">Absent</translation>
+    </message>
+    <message>
+      <source>Any %1</source>
+      <translation type="unfinished">Any %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListExportProcessor</name>
+    <message>
+      <source>Text files</source>
+      <translation type="unfinished">Text files</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <translation>Alle</translation>
+    </message>
+    <message>
+      <source>Export List</source>
+      <translation type="unfinished">Export List</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
+    <message>
+      <source>Import Lookup List</source>
+      <translation type="unfinished">Import Lookup List</translation>
+    </message>
+    <message>
+      <source>Text files</source>
+      <translation type="unfinished">Text files</translation>
+    </message>
+    <message>
+      <source>All other text files</source>
+      <translation type="unfinished">All other text files</translation>
     </message>
   </context>
   <context>
@@ -9110,14 +9607,6 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
   <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-      <source>You are about to merge the current System %1 with System</source>
-      <translation>Du er i ferd med å slå sammen det nåværende System %1 med System</translation>
-    </message>
-    <message>
-      <source>%1 (current)</source>
-      <translation>%1 (nåværende)</translation>
-    </message>
-    <message>
       <source>URL is invalid.</source>
       <translation>URL er ugyldig.</translation>
     </message>
@@ -9130,70 +9619,77 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <translation>Tester...</translation>
     </message>
     <message>
-      <source>Merge Systems</source>
-      <translation>Slå sammen systemer</translation>
-    </message>
-    <message>
-      <source>Enter your account password to merge Systems</source>
-      <translation>Skriv inn kontopassordet ditt for å slå sammen Systemer</translation>
-    </message>
-    <message>
-      <source>Merge</source>
-      <comment>Merge two Systems together (dialog button text)</comment>
-      <translation>Slå sammen</translation>
-    </message>
-    <message>
-      <source>Merging Systems...</source>
-      <translation>Slår sammen systemer...</translation>
-    </message>
-    <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
       <translation>Bruk et spesifikt vertsnavn eller IP-adresse i stedet for %1.</translation>
-    </message>
-    <message>
-      <source>This is the current System URL.</source>
-      <translation>Dette er den gjeldende system-URL-en.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
       <translation>Slå sammen med %1</translation>
     </message>
     <message>
-      <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Servere fra det andre systemet vises i ressurstreet når databasesynkroniseringen er fullført.</translation>
-    </message>
-    <message>
       <source>You will be reconnected.</source>
       <translation>Du blir koblet på nytt.</translation>
     </message>
     <message>
-      <source>Systems will be merged shortly</source>
-      <translation>Systemer vil bli slått sammen innen kort tid</translation>
+      <source>support</source>
+      <translation>brukerstøtte</translation>
     </message>
     <message>
-      <source>Failed to merge Systems</source>
-      <translation>Kunne ikke slå sammen systemer</translation>
+      <source>It is recommended to contact %1 before proceeding.</source>
+      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+    </message>
+    <message>
+      <source>Merge Sites</source>
+      <translation type="unfinished">Merge Sites</translation>
+    </message>
+    <message>
+      <source>Enter your account password to merge Sites</source>
+      <translation type="unfinished">Enter your account password to merge Sites</translation>
+    </message>
+    <message>
+      <source>Merge</source>
+      <comment>Merge two Sites together (dialog button text)</comment>
+      <translation>Slå sammen</translation>
+    </message>
+    <message>
+      <source>Merging Sites...</source>
+      <translation type="unfinished">Merging Sites...</translation>
+    </message>
+    <message>
+      <source>This is the current Site URL.</source>
+      <translation type="unfinished">This is the current Site URL.</translation>
+    </message>
+    <message>
+      <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
+      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>Sites will be merged shortly</source>
+      <translation type="unfinished">Sites will be merged shortly</translation>
+    </message>
+    <message>
+      <source>Failed to merge Sites</source>
+      <translation type="unfinished">Failed to merge Sites</translation>
+    </message>
+    <message>
+      <source>Remote</source>
+      <translation>Ekstern</translation>
+    </message>
+    <message>
+      <source>Current (%1)</source>
+      <translation>Gjeldende (%1)</translation>
+    </message>
+    <message>
+      <source>Remote (%1)</source>
+      <translation>Ekstern (%1)</translation>
+    </message>
+    <message>
+      <source>Success</source>
+      <translation>Suksess</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
-    <message>
-      <source>New System</source>
-      <translation>Nytt system</translation>
-    </message>
-    <message>
-      <source>System was not found.</source>
-      <translation>System ble ikke funnet.</translation>
-    </message>
-    <message>
-      <source>The discovered System %1 has an incompatible version %2.</source>
-      <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Det oppdagede System %1 har en inkompatibel versjon %2.</translation>
-    </message>
-    <message>
-      <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation>Valgt system har en eldre programvareversjon som er inkompatibel med gjeldende system. Oppdater det valgte systemet til det siste versjon for å slå det sammen med det gjeldende.</translation>
-    </message>
     <message>
       <source>The password or user name is invalid.</source>
       <translation>Passordet eller brukernavnet er ugyldig.</translation>
@@ -9207,47 +9703,8 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <translation>Kan ikke opprette sikkerhetskopi av database.</translation>
     </message>
     <message>
-      <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Du er i ferd med å slå sammen systemer med Starter-lisenser.</translation>
-    </message>
-    <message>
-      <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Bare ett Starter-lisens er tillatt per System, så den andre lisensen blir deaktivert.</translation>
-    </message>
-    <message>
       <source>Merge anyway?</source>
       <translation>Slå sammen uansett?</translation>
-    </message>
-    <message>
-      <source>You are about to merge Systems with NVR licenses.</source>
-      <translation>Du er i ferd med å slå sammen Systemer med NVR-lisenser.</translation>
-    </message>
-    <message>
-      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Bare én NVR-lisens er tillatt per system, så den andre lisensen vil bli deaktivert.</translation>
-    </message>
-    <message>
-      <source>Could not configure the remote System %1.</source>
-      <comment>%1 is name of System</comment>
-      <translation>Kunne ikke konfigurere det eksterne systemet %1.</translation>
-    </message>
-    <message>
-      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
-      <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Systemet kan bare slås sammen med ikke%1. Systemnavn og passord er hentet fra %1 System.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Begge systemene er koblet til %1. Sammenslåing er ikke tillatt.</translation>
-    </message>
-    <message>
-      <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>Kan ikke slå sammen systemer fordi de har minst én server med samme ID. Fjern denne serveren og prøv igjen.</translation>
-    </message>
-    <message>
-      <source>System name is not configured yet.</source>
-      <translation>Systemnavn er ikke konfigurert ennå.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
@@ -9262,24 +9719,69 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
       <translation>Ukjent feil.</translation>
     </message>
     <message>
-      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
+    </message>
+    <message>
+      <source>Site was not found.</source>
+      <translation type="unfinished">Site was not found.</translation>
+    </message>
+    <message>
+      <source>The discovered Site %1 has an incompatible version %2.</source>
+      <comment>%1 is name of Site, %2 is version information</comment>
+      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+    </message>
+    <message>
+      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
+      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Sites with Starter licenses.</source>
+      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+    </message>
+    <message>
+      <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Sites with NVR licenses.</source>
+      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+    </message>
+    <message>
+      <source>Could not configure the remote Site %1.</source>
+      <comment>%1 is name of the Site</comment>
+      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+    </message>
+    <message>
+      <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+    </message>
+    <message>
+      <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 systemer har forskjellige eiere. Sammenslåing er ikke tillatt.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
-    <message>
-      <source>Motion</source>
-      <translation>Motion</translation>
+      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
     </message>
     <message>
-      <source>deleted camera</source>
-      <translation>slettet kamera</translation>
+      <source>%1 sites have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
     </message>
     <message>
-      <source>Bookmark it...</source>
-      <translation>Legg til bokmerke...</translation>
+      <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
+      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+    </message>
+    <message>
+      <source>Site name is not configured yet.</source>
+      <translation type="unfinished">Site name is not configured yet.</translation>
+    </message>
+    <message>
+      <source>Maximum number of Servers for the Site is reached.</source>
+      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
     </message>
   </context>
   <context>
@@ -9287,14 +9789,6 @@ Husk å tilbakestille loggingsnivået til standardinnstillingen etter at du har 
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
       <translation>Gjeldende strøm har høy oppløsning. Å analysere den for bevegelse øker CPU-belastningen.</translation>
-    </message>
-    <message>
-      <source>Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</source>
-      <comment>&quot;
-&quot; is a line break, don&apos;t change it.</comment>
-      <translation>Bevegelsesdeteksjon for dette kameraet fungerer ikke for øyeblikket på grunn av endret strømmeoppløsning.
-Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
@@ -9311,6 +9805,14 @@ You can force it, but it may significantly increase CPU load.</source>
 &quot; is a line break, don&apos;t change it.</comment>
       <translation>Bevegelsesdeteksjon for dette kameraet vil ikke fungere fordi den gjenværende strømmingen har for høy oppløsning.
 Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation>
+    </message>
+    <message>
+      <source>Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
+You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
+      <comment>&quot;
+&quot; is a line break, don&apos;t change it.</comment>
+      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
+You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
     </message>
   </context>
   <context>
@@ -9360,11 +9862,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <translation>Mangler oppdateringspakke for noen servere</translation>
     </message>
     <message>
-      <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Inkompatibel %1 forekomst. For å oppdatere koble fra systemet fra %1 først.</translation>
-    </message>
-    <message>
       <source>No update package available</source>
       <translation>Ingen oppdateringspakke tilgjengelig</translation>
     </message>
@@ -9398,10 +9895,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>Cancel update and delete all downloaded data?</source>
       <translation>Vil du avbryte oppdateringen og slette alle nedlastede data?</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>OS-versjoner av enkelte komponenter støttes ikke lenger. Vennligst fjern dem fra systemet eller oppdatere operativsystemet til en støttet versjon.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
@@ -9540,10 +10033,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <translation>Klar til å oppdatere til</translation>
     </message>
     <message>
-      <source>System updated to</source>
-      <translation>Systemet er oppdatert til</translation>
-    </message>
-    <message>
       <source>Some servers have no update packages available.</source>
       <translation>Noen servere har ingen oppdateringspakker tilgjengelig.</translation>
     </message>
@@ -9558,10 +10047,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
       <translation>Noen servere har gått offline. Vent til de blir online for å fortsette.</translation>
-    </message>
-    <message>
-      <source>System update in process</source>
-      <translation>Systemoppdatering pågår</translation>
     </message>
     <message>
       <source>Continue in Background</source>
@@ -9588,20 +10073,37 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <translation>Kan ikke sjekke oppdateringer på internett</translation>
     </message>
     <message>
-      <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>Det anbefales ikke å utføre systemoppdateringer mot slutten av uken.</translation>
-    </message>
-    <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
       <translation>Du bruker en tilpasset klient. Ta kontakt med %1 for å få oppdateringsinstruksjonene.</translation>
     </message>
     <message>
-      <source>Uploading client packages to Servers...</source>
-      <translation>Laster opp klientpakker til servere...</translation>
-    </message>
-    <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
       <translation>Det er ikke nok plass på datamaskinen til å laste ned klientoppdateringen. Frigjør litt plass på harddisken og prøv igjen.</translation>
+    </message>
+    <message>
+      <source>Uploading offline update packages to Servers...</source>
+      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+    </message>
+    <message>
+      <source>Applying updates at the end of the week is not recommended</source>
+      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+    </message>
+    <message>
+      <source>Site updated to</source>
+      <translation type="unfinished">Site updated to</translation>
+    </message>
+    <message>
+      <source>Site update in process</source>
+      <translation type="unfinished">Site update in process</translation>
     </message>
   </context>
   <context>
@@ -9609,6 +10111,142 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>You do not have any layouts</source>
       <translation>Du har ingen oppsett</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
+    <message>
+      <source>Possible formats:</source>
+      <translation type="unfinished">Possible formats:</translation>
+    </message>
+    <message>
+      <source>Server offline</source>
+      <translation>Server frakoblet</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>Søking etter enheter på nettverket er begrenset til kameraer som støtter HTTPS-tilkoblinger. Dette kan endres i %1 -innstillinger.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Systemadministrasjon</translation>
+    </message>
+    <message>
+      <source>Device search failed</source>
+      <translation>Enhetssøk mislyktes</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to add %n devices</source>
+      <translation>
+        <numerusform>Kunne ikke legge til %n enhet</numerusform>
+        <numerusform>Kunne ikke legge til %n enheter</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Initializing scan...</source>
+      <translation>Starter søkeprosessen...</translation>
+    </message>
+    <message>
+      <source>Scanning online hosts...</source>
+      <translation>Søker etter enheter...</translation>
+    </message>
+    <message>
+      <source>Checking host...</source>
+      <translation>Sjekker vert...</translation>
+    </message>
+    <message>
+      <source>Finished</source>
+      <translation>Fullført</translation>
+    </message>
+    <message>
+      <source>Aborted</source>
+      <translation>Avbrutt</translation>
+    </message>
+    <message>
+      <source>Searching...</source>
+      <translation>Søker...</translation>
+    </message>
+    <message>
+      <source>No devices found</source>
+      <translation>Fant ingen enheter</translation>
+    </message>
+    <message>
+      <source>All devices are already added</source>
+      <translation>Alle enheter er allerede lagt til</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices are being added. You can close this dialog or start a new search</source>
+      <translation>
+        <numerusform>%n enhet blir lagt til. Du kan lukke denne dialogboksen eller starte et nytt søk</numerusform>
+        <numerusform>%n enheter blir lagt til. Du kan lukke denne dialogboksen eller starte et nytt søk</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Legg til alle enheter</translation>
+    </message>
+    <message numerus="yes">
+      <source>Add %n Devices</source>
+      <translation>
+        <numerusform>Legg til %n enhet</numerusform>
+        <numerusform>Legg til %n enheter</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
+    <message>
+      <source>You do not have permission to edit settings of this camera</source>
+      <translation>Du har ikke tillatelse til å redigere innstillingene for dette kameraet</translation>
+    </message>
+    <message>
+      <source>You do not have permission to edit settings of some cameras</source>
+      <translation>Du har ikke tillatelse til å redigere innstillingene for enkelte kameraer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
+    <message>
+      <source>You do not have permissions to modify this user</source>
+      <translation>Du har ikke tillatelse til å endre denne brukeren</translation>
+    </message>
+    <message>
+      <source>You cannot modify a user with a non-unique login</source>
+      <translation>Du kan ikke endre en bruker med en ikke-unik pålogging</translation>
+    </message>
+    <message>
+      <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
+      <translation>Du har kanskje ikke tillatelser til å endre enkelte medlemmer av denne gruppen, eller den inkluderer brukere med dupliserte pålogginger</translation>
+    </message>
+    <message>
+      <source>You do not have permissions to modify this group</source>
+      <translation>Du har ikke tillatelse til å endre denne gruppen</translation>
+    </message>
+    <message>
+      <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
+      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+    </message>
+    <message>
+      <source>User management for organization users is available only at the organization level, not the site level</source>
+      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationActionExecutor</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Kan ikke behandle hendelsen på fjernet kamera.</translation>
+    </message>
+    <message>
+      <source>Unable to acknowledge event on inaccessible camera.</source>
+      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationActionHandler</name>
+    <message>
+      <source>Unable to acknowledge event on removed camera.</source>
+      <translation>Kan ikke behandle hendelsen på fjernet kamera.</translation>
     </message>
   </context>
   <context>
@@ -9621,10 +10259,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <source>Acknowledge</source>
       <translation>Behandle</translation>
     </message>
-    <message>
-      <source>Calling...</source>
-      <translation>Ringer...</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
@@ -9636,12 +10270,46 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       </translation>
     </message>
     <message>
-      <source>Current System</source>
-      <translation>Nåværende system</translation>
+      <source>No new notifications</source>
+      <translation>Ingen nye varsler</translation>
     </message>
     <message>
-      <source>All Systems</source>
-      <translation>Alle systemer</translation>
+      <source>Current Site</source>
+      <translation type="unfinished">Current Site</translation>
+    </message>
+    <message>
+      <source>Any Notification</source>
+      <translation type="unfinished">Any Notification</translation>
+    </message>
+    <message>
+      <source>Event Notifications</source>
+      <translation type="unfinished">Event Notifications</translation>
+    </message>
+    <message>
+      <source>System Notifications</source>
+      <translation type="unfinished">System Notifications</translation>
+    </message>
+    <message>
+      <source>Choose Types...</source>
+      <translation type="unfinished">Choose Types...</translation>
+    </message>
+    <message>
+      <source>Any notification</source>
+      <translation type="unfinished">Any notification</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n notification types</source>
+      <translation type="unfinished">
+        <numerusform>%n notification types</numerusform>
+        <numerusform>%n notification types</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
+    <message>
+      <source>Select Notification Types</source>
+      <translation type="unfinished">Select Notification Types</translation>
     </message>
   </context>
   <context>
@@ -9670,10 +10338,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <translation>Velg visning...</translation>
     </message>
     <message>
-      <source>Local layouts can only be shown to their owners.</source>
-      <translation>Lokale oppsett kan bare vises for eierne deres.</translation>
-    </message>
-    <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Ingen av de valgte brukerrollene inneholder brukere. Handling vil ikke fungere.</translation>
     </message>
@@ -9684,6 +10348,10 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
       <translation>Leter du etter en lokal layout? Velg bare én bruker fra &quot;Vis til&quot; -listen for å vise deres lokale oppsett som et alternativ her.</translation>
+    </message>
+    <message>
+      <source>Local layouts can only be shown to their owners</source>
+      <translation>Lokale oppsett kan bare vises for eierne deres</translation>
     </message>
   </context>
   <context>
@@ -9812,6 +10480,13 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::PlaybackPositionItem</name>
+    <message>
+      <source>video is paused</source>
+      <translation type="unfinished">video is paused</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
@@ -9865,23 +10540,14 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::PresentedStateDelegate</name>
+    <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
-      <source>Added</source>
-      <translation>Lagt til</translation>
-    </message>
-    <message>
-      <source>Adding</source>
-      <translation>Legger til</translation>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Merk følgende! Effektgrensen overskredet</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PushNotificationBusinessActionWidget</name>
-    <message>
-      <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
-      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>Systemet er ikke koblet til %1. Mobilvarsler fungerer bare når systemet er koblet til %1.</translation>
-    </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
@@ -9900,6 +10566,11 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
         <numerusform>%n symboler igjen</numerusform>
         <numerusform>%n symboler igjen</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
+      <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
     </message>
   </context>
   <context>
@@ -9925,22 +10596,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <translation>Nettside</translation>
     </message>
     <message>
-      <source>Add Proxied Web Page</source>
-      <translation>Legg til proxy-nettside</translation>
-    </message>
-    <message>
-      <source>Add Web Page</source>
-      <translation>Legg til nettside</translation>
-    </message>
-    <message>
-      <source>Edit Proxied Web Page</source>
-      <translation>Rediger proxy-nettside</translation>
-    </message>
-    <message>
-      <source>Edit Web Page</source>
-      <translation>Rediger webside</translation>
-    </message>
-    <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>Slå på proxy for nettsider på fanen &lt;b&gt;Generelt&lt;/b&gt;.</translation>
     </message>
@@ -9952,24 +10607,73 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
       <translation>Nettsiden kan samhandle med skrivebordsklienten og be om tilgang til brukerøkten</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
+      <source>An integration may interact with the Desktop Client and request access to the user session</source>
+      <translation>En integrasjon kan samhandle med skrivebordsklienten og be om tilgang til brukerøkten</translation>
     </message>
     <message>
-      <source>Low</source>
-      <translation>Lav</translation>
+      <source>Proxy this integration through the server</source>
+      <translation>Proxy denne integrasjonen gjennom serveren</translation>
     </message>
     <message>
-      <source>High</source>
-      <translation>Høy</translation>
+      <source>Proxy this web page through the server</source>
+      <translation>Proxy denne nettsiden gjennom serveren</translation>
     </message>
     <message>
-      <source>Custom</source>
-      <translation>Tilpasset</translation>
+      <source>Allow opening this integration without SSL certificate checking</source>
+      <translation>Tillat åpning av denne integrasjonen uten SSL-sertifikatkontroll</translation>
+    </message>
+    <message>
+      <source>Allow opening this web page without SSL certificate checking</source>
+      <translation>Tillat å åpne denne nettsiden uten SSL-sertifikatkontroll</translation>
+    </message>
+    <message>
+      <source>New Web Page</source>
+      <translation>Ny webside</translation>
+    </message>
+    <message>
+      <source>Edit Web Page</source>
+      <translation>Rediger webside</translation>
+    </message>
+    <message>
+      <source>New Proxied Web Page</source>
+      <translation>Ny proxy-nettside</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Web Page</source>
+      <translation>Rediger proxy-nettside</translation>
+    </message>
+    <message>
+      <source>New Integration</source>
+      <translation>Ny integrasjon</translation>
+    </message>
+    <message>
+      <source>Edit Integration</source>
+      <translation>Rediger integrasjon</translation>
+    </message>
+    <message>
+      <source>New Proxied Integration</source>
+      <translation>Ny proxy-integrasjon</translation>
+    </message>
+    <message>
+      <source>Edit Proxied Integration</source>
+      <translation>Rediger proxy-integrasjon</translation>
+    </message>
+    <message>
+      <source>To allow the use of a client API, create a web integration instead. %1</source>
+      <translation>For å tillate bruk av et klient-API, lag en nettintegrering i stedet. %1</translation>
+    </message>
+    <message>
+      <source>Learn more...</source>
+      <translation>Finn ut mer...</translation>
+    </message>
+    <message>
+      <source>Auto-refresh integration</source>
+      <translation type="unfinished">Auto-refresh integration</translation>
+    </message>
+    <message>
+      <source>Auto-refresh web page</source>
+      <translation type="unfinished">Auto-refresh web page</translation>
     </message>
   </context>
   <context>
@@ -9987,6 +10691,41 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
         <numerusform>For eksport som Timelapse, bør videolengden være minst %n sekunder.</numerusform>
         <numerusform>For eksport som Timelapse, bør videolengden være minst %n sekunder.</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
+    <message>
+      <source>Screen %1 - %2x%3</source>
+      <translation>Skjerm %1 - %2x%3</translation>
+    </message>
+    <message>
+      <source>%1 (Primary)</source>
+      <translation>%1 (Primær)</translation>
+    </message>
+    <message>
+      <source>Best</source>
+      <translation>Best</translation>
+    </message>
+    <message>
+      <source>Average</source>
+      <translation>Gjennomsnittlig</translation>
+    </message>
+    <message>
+      <source>Performance</source>
+      <translation>Ytelse</translation>
+    </message>
+    <message>
+      <source>Native</source>
+      <translation>Fra kamera</translation>
+    </message>
+    <message>
+      <source>Quarter Native</source>
+      <translation>Kvart Orginal</translation>
+    </message>
+    <message>
+      <source>Select Folder...</source>
+      <translation>Velg mappe...</translation>
     </message>
   </context>
   <context>
@@ -10053,6 +10792,55 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ResourceAccessRightsModel</name>
+    <message>
+      <source>%1 layout</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>%1 planløsning</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more layouts</source>
+      <comment>%1 will be substituted with a layout name</comment>
+      <translation>
+        <numerusform>%1 og %n oppsett til</numerusform>
+        <numerusform>%1 og %n oppsett til</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 video wall</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation>%1 videovegg</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more video walls</source>
+      <comment>%1 will be substituted with a video wall name</comment>
+      <translation>
+        <numerusform>%1 og %n videovegger til</numerusform>
+        <numerusform>%1 og %n videovegger til</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 group</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation>%1 gruppe</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 and %n more groups</source>
+      <comment>%1 will be substituted with a user group name</comment>
+      <translation type="unfinished">
+        <numerusform>%1 og %n grupper til</numerusform>
+        <numerusform>%1 and %n more groups</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ResourceGroupingActionHandler</name>
+    <message>
+      <source>Maximum level of nesting is reached</source>
+      <translation>Maksimalt nivå for nesting er nådd</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
@@ -10069,6 +10857,17 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>Health Monitor</source>
       <translation>Helse Monitor</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RestApiHelper</name>
+    <message>
+      <source>Password confirmation is required to apply changes</source>
+      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+    </message>
+    <message>
+      <source>Confirm</source>
+      <translation>Bekreft</translation>
     </message>
   </context>
   <context>
@@ -10101,40 +10900,27 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
         <numerusform>%n objekter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Analytic</source>
-      <translation>Analyse</translation>
-    </message>
-    <message>
-      <source>Generic</source>
-      <translation>Generisk</translation>
-    </message>
-    <message>
-      <source>Input Signal</source>
-      <translation>Innkommende signaler</translation>
-    </message>
-    <message>
-      <source>Soft Trigger</source>
-      <translation>Program-knapp</translation>
-    </message>
-    <message>
-      <source>Stream Issue</source>
-      <translation>Strømproblem</translation>
-    </message>
-    <message>
-      <source>Device Disconnect</source>
-      <translation>Enhet frakoblet</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict</source>
-      <translation>Enhets IP-konflikt</translation>
-    </message>
     <message numerus="yes">
-      <source>+%n values</source>
+      <source>%n notifications</source>
       <translation>
-        <numerusform>+%n verdier</numerusform>
-        <numerusform>+%n verdier</numerusform>
+        <numerusform>%n varsler</numerusform>
+        <numerusform>%n varsler</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SaasInfoWidget</name>
+    <message>
+      <source>Active</source>
+      <translation>Aktiv</translation>
+    </message>
+    <message>
+      <source>Suspended</source>
+      <translation>Suspendert</translation>
+    </message>
+    <message>
+      <source>Shut down</source>
+      <translation>Skru av</translation>
     </message>
   </context>
   <context>
@@ -10169,12 +10955,6 @@ Du kan fremtvinge det, men det kan øke CPU-belastningen betydelig.</translation
     <message>
       <source>Dual-streaming is disabled or not supported</source>
       <translation>Dobbeltstrømming er deaktivert eller støttes ikke</translation>
-    </message>
-    <message>
-      <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</source>
-      <translation>Kvalitets- og FPS-innstillinger er deaktivert på grunn av &quot;Tillat systemet å optimalisere kamerainnstillinger&quot; valg i &quot;Systemadministrasjon&quot; dialog.
-Du kan fortsatt endre kvalitet og FPS direkte på kameraet.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
@@ -10293,6 +11073,43 @@ Du kan fortsatt endre kvalitet og FPS direkte på kameraet.</translation>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
       <translation>Bevegelses- og objektdeteksjon er deaktivert for noen av de valgte I/O-modulene</translation>
     </message>
+    <message>
+      <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
+You can still change quality and FPS directly on the camera.</source>
+      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
+You can still change quality and FPS directly on the camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ScreenRecordingActionHandler</name>
+    <message>
+      <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
+      <translation>Delsystem for skjermfangst er ikke initialisert ennå. Prøv igjen senere.</translation>
+    </message>
+    <message>
+      <source>Recording in %1...</source>
+      <translation>Opptak til %1...</translation>
+    </message>
+    <message>
+      <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
+      <translation>Kunne ikke åpne filen &quot;%1&quot;. Vennligst sjekk om mappen er tilgjengelig.</translation>
+    </message>
+    <message>
+      <source>Recorded Video</source>
+      <translation>Opptak</translation>
+    </message>
+    <message>
+      <source>Save Recording As...</source>
+      <translation>Lagre opptak som...</translation>
+    </message>
+    <message>
+      <source>AVI (Audio/Video Interleaved)</source>
+      <translation>AVI (Audio / Video Interleaved)</translation>
+    </message>
+    <message>
+      <source>Failed to start recording</source>
+      <translation>Kan ikke starte opptak</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -10308,30 +11125,8 @@ Du kan fortsatt endre kvalitet og FPS direkte på kameraet.</translation>
       <translation>Sporer og logger alle brukerhandlinger.</translation>
     </message>
     <message>
-      <source>minutes</source>
-      <translation>minutter</translation>
-    </message>
-    <message>
-      <source>hours</source>
-      <translation>timer</translation>
-    </message>
-    <message>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Vannmerker vises bare over live, arkiverte og eksporterte videoer for brukere som ikke er administratorer. Du og andre administratorer vil ikke se dem.</translation>
-    </message>
-    <message>
       <source>Archive encryption password</source>
       <translation>Arkivkrypteringspassord</translation>
-    </message>
-    <message>
-      <source>The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation>Krypteringspassordet vil være nødvendig for å gjenopprette arkivet på et annet system.
-Advarsel: Dette passordet kan ikke tilbakestilles. Hvis du mister det, vil arkivet ikke kunne gjenopprettes.</translation>
-    </message>
-    <message>
-      <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation>Krypterer arkivdata for å forhindre at de vises utenfor systemet. Du trenger ikke å angi krypteringspassordet for å se videoarkivet i dette systemet.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
@@ -10346,16 +11141,8 @@ Advarsel: Dette passordet kan ikke tilbakestilles. Hvis du mister det, vil arkiv
       <translation>Aktiverer RTSP-trafikkryptering.</translation>
     </message>
     <message>
-      <source>days</source>
-      <translation>dager</translation>
-    </message>
-    <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Lokale og LDAP-brukere vil automatisk logges ut hvis økten deres overskrider den angitte varigheten.</translation>
-    </message>
-    <message>
-      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation>Ubegrenset levetid for brukerøkter truer den generelle systemsikkerheten og kan føre til forringelse av systemytelsen</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -10373,6 +11160,58 @@ Advarsel: Dette passordet kan ikke tilbakestilles. Hvis du mister det, vil arkiv
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
       <translation>Anbefalt maksimal levetid for brukerøkter er %1</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
+      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+    </message>
+    <message>
+      <source>Encrypting video traffic may significantly increase CPU usage</source>
+      <translation>Kryptering av videotrafikk kan øke CPU-bruken betydelig</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost</source>
+      <translation>Forbindelsen med kameraer som ikke støtter HTTPS vil gå tapt</translation>
+    </message>
+    <message>
+      <source>Archive encryption increases CPU usage</source>
+      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+    </message>
+    <message>
+      <source>Additional configuration might be required on the server machine.</source>
+      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+    </message>
+    <message>
+      <source>The encryption password will be required to restore the archive.
+Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
+      <translation type="unfinished">The encryption password will be required to restore the archive.
+Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+    </message>
+    <message>
+      <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
+      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
+      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SelectAnalyticsObjectTypesButton</name>
+    <message>
+      <source>No objects</source>
+      <translation>Ingen gjenstander</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n objects selected</source>
+      <translation type="unfinished">
+        <numerusform>%n objects selected</numerusform>
+        <numerusform>%n objects selected</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All objects</source>
+      <translation type="unfinished">All objects</translation>
     </message>
   </context>
   <context>
@@ -10434,6 +11273,26 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>Unknown Certificate</source>
       <translation>Ukjent sertifikat</translation>
     </message>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Contact a user with Administrators permissions to resolve this issue.</source>
+      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+    </message>
+    <message>
+      <source>Not Part Of Certificate</source>
+      <translation>Ikke en del av sertifikatet</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation>Vis festet sertifikat</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation>Fest til dette sertifikatet</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
@@ -10442,12 +11301,26 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Koble til uansett</translation>
     </message>
     <message>
+      <source>Continue</source>
+      <translation>Fortsette</translation>
+    </message>
+    <message numerus="yes">
+      <source>I trust these servers</source>
+      <translation type="unfinished">
+        <numerusform>Jeg stoler på disse serverne</numerusform>
+        <numerusform>I trust these servers</numerusform>
+      </translation>
+    </message>
+    <message>
       <source>I trust this server</source>
       <translation>Jeg stoler på denne serveren</translation>
     </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ServerListModel</name>
     <message>
-      <source>Continue</source>
-      <translation>Fortsette</translation>
+      <source>Auto</source>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -10614,6 +11487,69 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>Unknown error</source>
       <translation>Ukjent feil</translation>
     </message>
+    <message>
+      <source>Access Link</source>
+      <translation>Tilgangslink</translation>
+    </message>
+    <message>
+      <source>Invalid Link</source>
+      <translation type="unfinished">Invalid Link</translation>
+    </message>
+    <message>
+      <source>The provided link is not valid</source>
+      <translation type="unfinished">The provided link is not valid</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
+    <message>
+      <source>Showreel</source>
+      <translation>Bildesyklus</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Bildesyklus %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Vil du slette bildesyklus %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>Dra layout eller kamera hit for å legge det til i showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>Bruk tastaturpiler for å bytte visning. For å gå ut av bildesyklus, trykk Esc.</translation>
+    </message>
+    <message>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Trykk Esc for å stoppe turen.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ShowreelItemWidget</name>
+    <message>
+      <source>Switch by</source>
+      <comment>Arrows will follow</comment>
+      <translation>Bytt ved</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <comment>Time selector will follow</comment>
+      <translation>Vis i</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <comment>Time will follow</comment>
+      <translation>Skjerm valgt for</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
@@ -10653,27 +11589,9 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
   </context>
   <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
-    <message numerus="yes">
-      <source>Email address is not set for %n users</source>
-      <translation>
-        <numerusform>E-postadresse er ikke angitt for %n bruker</numerusform>
-        <numerusform>E-postadresse er ikke angitt for %n brukere</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Set Passwords</source>
       <translation>Angi passord</translation>
-    </message>
-    <message numerus="yes">
-      <source>Recording schedule is invalid for %n cameras</source>
-      <translation>
-        <numerusform>Opptaksplanen er ugyldig for %n kameraer</numerusform>
-        <numerusform>Opptaksplanen er ugyldig for %n kameraer</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation>Opptaksplan på enkelte kameraer inneholder opptaksmoduser som ikke støttes.</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>
@@ -10692,69 +11610,57 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Angre Erstatt</translation>
     </message>
     <message>
-      <source>Export</source>
-      <translation>Eksporter</translation>
+      <source>Add more services or fix overuse by stopping using services for some devices.</source>
+      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
     </message>
     <message>
-      <source>On-device recordings were found</source>
-      <translation>Det ble funnet opptak på enheten</translation>
+      <source>If no action is taken, required number of services will be released automatically on %1.</source>
+      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
     </message>
     <message>
-      <source>Import in progress...</source>
-      <translation>Import pågår...</translation>
+      <source>Some features may not be available.</source>
+      <translation>Noen funksjoner er kanskje ikke tilgjengelige.</translation>
     </message>
     <message>
-      <source>Import archive from %1 completed</source>
-      <translation>Import av arkiv fra %1 fullført</translation>
+      <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
+      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
     </message>
     <message>
-      <source>Import archive from %1 failed</source>
-      <translation>Import av arkiv fra %1 mislyktes</translation>
+      <source>Open Settings</source>
+      <translation type="unfinished">Open Settings</translation>
     </message>
     <message>
-      <source>Import archive from %1 stopped</source>
-      <translation>Import av arkiv fra %1 stoppet</translation>
+      <source>Open Services</source>
+      <translation type="unfinished">Open Services</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::SystemTabBar</name>
+    <message>
+      <source>Open in New Window</source>
+      <translation>Åpne i nytt vindu</translation>
     </message>
     <message>
-      <source>Import archive from %1</source>
-      <translation>Importer arkiv fra %1</translation>
+      <source>Close</source>
+      <translation>Lukk</translation>
     </message>
-    <message numerus="yes">
-      <source>Backup storage is not configured on %n Servers</source>
-      <translation>
-        <numerusform>Sikkerhetskopieringslagring er ikke konfigurert på %n servere</numerusform>
-        <numerusform>Sikkerhetskopieringslagring er ikke konfigurert på %n servere</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Storage for analytics data is not set on %n Servers</source>
-      <translation>
-        <numerusform>Lagring for analysedata er ikke satt på %n servere</numerusform>
-        <numerusform>Lagring for analysedata er ikke satt på %n servere</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>System storage is used for analytics data on %n Servers</source>
-      <translation>
-        <numerusform>Systemlageret brukes til analysedata på %n servere</numerusform>
-        <numerusform>Systemlagring brukes til analysedata på %n servere</numerusform>
-      </translation>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::TemporaryUserExpirationWatcher</name>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation>og</translation>
     </message>
     <message>
-      <source>Not imported archive found on device %1</source>
-      <translation>Ikke importert arkiv funnet på enhet %1</translation>
+      <source>Your access to the Site expires %1</source>
+      <comment>%1 is a date</comment>
+      <translation type="unfinished">Your access to the Site expires %1</translation>
     </message>
     <message>
-      <source>Not imported archive found on camera %1</source>
-      <translation>Ikke importert arkiv funnet på kamera %1</translation>
-    </message>
-    <message>
-      <source>The archive stream settings have been changed by the user</source>
-      <translation>Innstillingene for arkivstrøm er endret av brukeren</translation>
-    </message>
-    <message>
-      <source>The recording settings have been changed by the user</source>
-      <translation>Opptaksinnstillingene er endret av brukeren</translation>
+      <source>Your access to the Site expires in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation type="unfinished">Your access to the Site expires in %1</translation>
     </message>
   </context>
   <context>
@@ -10822,8 +11728,8 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Åpne i en ny fane</translation>
     </message>
     <message>
-      <source>This action is not supported for notifications from other Systems</source>
-      <translation>Denne handlingen støttes ikke for varsler fra andre systemer</translation>
+      <source>This action is not supported for notifications from other Sites</source>
+      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
     </message>
   </context>
   <context>
@@ -10892,6 +11798,21 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::TwoWayAudioButton</name>
+    <message>
+      <source>Hold to Speak</source>
+      <translation>Hold for å snakke</translation>
+    </message>
+    <message>
+      <source>Input device is not selected</source>
+      <translation>Inndataenhet er ikke valgt</translation>
+    </message>
+    <message>
+      <source>Network error</source>
+      <translation>Nettverksfeil</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
@@ -10949,19 +11870,83 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Beskrivelse</translation>
     </message>
     <message>
-      <source>Member of</source>
-      <translation>Medlem av</translation>
+      <source>Group is not found in the LDAP database.</source>
+      <translation>Finner ikke gruppen i LDAP-databasen.</translation>
     </message>
     <message>
-      <source>Permissions</source>
-      <translation>Rettigheter</translation>
+      <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
+      <translation>Gruppen har en annen gruppe som både sin overordnede og som et underordnet medlem, eller er en del av en slik sirkulær referansekjede. Dette kan føre til feilberegning av tillatelser.</translation>
+    </message>
+    <message>
+      <source>Groups</source>
+      <translation>Grupper</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Tilpasset</translation>
+    </message>
+    <message>
+      <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
+      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::UserGroupsWidget</name>
+    <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
-      <source>Delete</source>
-      <translation>Slett</translation>
+      <source>Invalid JSON</source>
+      <translation>Ugyldig JSON</translation>
+    </message>
+    <message>
+      <source>Invalid request</source>
+      <translation>Ugyldig forespørsel</translation>
+    </message>
+    <message>
+      <source>Method not found</source>
+      <translation>Metoden ble ikke funnet</translation>
+    </message>
+    <message>
+      <source>Invalid parameters</source>
+      <translation>Ikke gyldige parametere</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Intern feil</translation>
+    </message>
+    <message>
+      <source>Connection failure</source>
+      <translation>Tilkoblingsfeil</translation>
+    </message>
+    <message>
+      <source>Invalid encoding</source>
+      <translation type="unfinished">Invalid encoding</translation>
+    </message>
+    <message>
+      <source>Invalid encoding charset</source>
+      <translation type="unfinished">Invalid encoding charset</translation>
+    </message>
+    <message>
+      <source>Application Error</source>
+      <translation type="unfinished">Application Error</translation>
+    </message>
+    <message>
+      <source>Transport Error</source>
+      <translation type="unfinished">Transport Error</translation>
+    </message>
+    <message>
+      <source>Server error code %1</source>
+      <translation type="unfinished">Server error code %1</translation>
+    </message>
+    <message>
+      <source>Reserved error code %1</source>
+      <translation type="unfinished">Reserved error code %1</translation>
+    </message>
+    <message>
+      <source>Unknown error code %1</source>
+      <translation type="unfinished">Unknown error code %1</translation>
+    </message>
+    <message>
+      <source>Site Error</source>
+      <translation type="unfinished">Site Error</translation>
     </message>
   </context>
   <context>
@@ -10984,10 +11969,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Logg Inn</translation>
     </message>
     <message>
-      <source>Name</source>
-      <translation>Navn</translation>
-    </message>
-    <message>
       <source>Email</source>
       <translation>E-post</translation>
     </message>
@@ -10999,32 +11980,25 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>Custom</source>
       <translation>Tilpasset</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::UserListWidget</name>
     <message>
-      <source>Enable</source>
-      <translation>Aktiver</translation>
+      <source>LDAP server is offline. Users are not able to log in.</source>
+      <translation>LDAP-serveren er frakoblet. Brukere kan ikke logge på.</translation>
     </message>
     <message>
-      <source>Disable</source>
-      <translation>Deaktiver</translation>
+      <source>User is not found in the LDAP database.</source>
+      <translation>Brukeren finnes ikke i LDAP-databasen.</translation>
     </message>
     <message>
-      <source>Delete</source>
-      <translation>Slett</translation>
+      <source>Temporary user</source>
+      <translation>Midlertidig bruker</translation>
     </message>
     <message>
-      <source>Force Secure Authentication</source>
-      <translation>Krev sikker autentisering</translation>
+      <source>Full Name</source>
+      <translation>Fullt navn</translation>
     </message>
     <message>
-      <source>All Users</source>
-      <translation>Alle brukere</translation>
-    </message>
-    <message>
-      <source>Users with Digest Authentication</source>
-      <translation>Brukere med Digest Authentication</translation>
+      <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
+      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
     </message>
   </context>
   <context>
@@ -11040,6 +12014,137 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>LDAP</source>
       <translation>LDAP</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::UserSettingsDialog</name>
+    <message>
+      <source>To modify your password please enter the existing one.</source>
+      <translation>For å endre passordet ditt, vennligst skriv inn det eksisterende.</translation>
+    </message>
+    <message>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 bruker med spesifisert e-post eksisterer allerede.</translation>
+    </message>
+    <message>
+      <source>Save user</source>
+      <translation type="unfinished">Save user</translation>
+    </message>
+    <message>
+      <source>Enter your account password</source>
+      <translation>Skriv inn kontopassordet ditt</translation>
+    </message>
+    <message>
+      <source>Save</source>
+      <translation>Lagre</translation>
+    </message>
+    <message>
+      <source>Failed to apply changes</source>
+      <translation>Kunne ikke bruke endringene</translation>
+    </message>
+    <message>
+      <source>Apply changes?</source>
+      <translation>Bruke endringer?</translation>
+    </message>
+    <message>
+      <source>Discard</source>
+      <translation>Forkast</translation>
+    </message>
+    <message>
+      <source>Copy Access Link</source>
+      <translation>Kopier tilgangskobling</translation>
+    </message>
+    <message>
+      <source>Invalid current password</source>
+      <translation>Ugyldig gjeldende passord</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>E-post kan ikke være tom</translation>
+    </message>
+    <message>
+      <source>Login cannot be empty</source>
+      <translation>Feltet kan ikke være tomt</translation>
+    </message>
+    <message>
+      <source>Only letters, numbers and symbols %1 are allowed</source>
+      <translation>Bare bokstaver, tall og symboler %1 er tillatt</translation>
+    </message>
+    <message>
+      <source>User with specified login already exists</source>
+      <translation>Bruker med spesifisert innlogging eksisterer allerede</translation>
+    </message>
+    <message>
+      <source>Are you sure you want to terminate access link?</source>
+      <translation>Er du sikker på at du vil avslutte tilgangskoblingen?</translation>
+    </message>
+    <message>
+      <source>Terminate</source>
+      <translation>Terminere</translation>
+    </message>
+    <message>
+      <source>Terminate access link</source>
+      <translation type="unfinished">Terminate access link</translation>
+    </message>
+    <message>
+      <source>Create access link</source>
+      <translation type="unfinished">Create access link</translation>
+    </message>
+    <message>
+      <source>Create</source>
+      <translation>Opprett</translation>
+    </message>
+    <message>
+      <source>New Link - %1</source>
+      <translation>Ny lenke - %1</translation>
+    </message>
+    <message>
+      <source>Access link has been successfully created!</source>
+      <translation type="unfinished">Access link has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
+      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+    </message>
+    <message>
+      <source>Granting broad permissions to the temporary user is not recommended.</source>
+      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+    </message>
+    <message>
+      <source>and</source>
+      <comment>Example: 1 month and 2 days</comment>
+      <translation>og</translation>
+    </message>
+    <message>
+      <source>New User</source>
+      <translation type="unfinished">New User</translation>
+    </message>
+    <message>
+      <source>User %1 has been successfully created!</source>
+      <translation type="unfinished">User %1 has been successfully created!</translation>
+    </message>
+    <message>
+      <source>Obtaining Link...</source>
+      <translation>Skaffer lenke...</translation>
+    </message>
+    <message>
+      <source>Ensure that this computer is able to connect to the %1</source>
+      <comment>%1 is the cloud name</comment>
+      <translation>Sørg for at denne datamaskinen er i stand til å koble til %1</translation>
+    </message>
+    <message>
+      <source>in %1</source>
+      <comment>%1 is a duration</comment>
+      <translation>i %1</translation>
+    </message>
+    <message>
+      <source>Copy the Access Link and share it with intended user</source>
+      <translation>Kopier tilgangslenken og del den med tiltenkt bruker</translation>
+    </message>
+    <message>
+      <source>This will instantly remove an access to the site for this user</source>
+      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
     </message>
   </context>
   <context>
@@ -11063,6 +12168,176 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>The password is incorrect.</source>
       <translation>Passordet er feil.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::VirtualCameraActionHandler</name>
+    <message>
+      <source>Failed to add virtual camera</source>
+      <translation>Kunne ikke legge til virtuelt kamera</translation>
+    </message>
+    <message>
+      <source>Open Virtual Camera Recordings...</source>
+      <translation>Åpne virtuelle kameraopptak...</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation>Ingen videofiler funnet i valgt mappe</translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Vil du slutte å laste opp?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>Allerede lastede filer blir beholdt.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>Valgte filformater støttes ikke</numerusform>
+        <numerusform>Valgte filformater støttes ikke</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>Bruk .MKV, .AVI, .MP4 eller andre videofiler.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
+        <numerusform>Valgte filer har ikke tidsstempler</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation>Bare videofiler med riktig tidsstempel støttes.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Valgte filer er for gamle</numerusform>
+        <numerusform>Valgte filer er for gamle</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Valgt fil ble spilt inn %1, men bare filer som ble spilt inn i løpet av de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
+        <numerusform>Valgt fil ble spilt inn %1, men bare filer som ble spilt inn i løpet av de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Valgte filer ble spilt inn mellom %1 og %2, men bare filer som ble spilt inn de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
+        <numerusform>Valgte filer ble spilt inn mellom %1 og %2, men bare filer som ble spilt inn de siste %n dagene kan lastes opp. Du kan endre dette i innstillingene for kameraarkiv.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
+        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Virtual Camera.</source>
+      <translation>
+        <numerusform>Du kan laste opp disse filene til en annen forekomst av et virtuelt kamera.</numerusform>
+        <numerusform>Du kan laste opp disse filene til en annen forekomst av et virtuelt kamera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
+        <numerusform>Valgte filer dekker perioder som videoer allerede lastes opp for</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation>Ikke nok plass på serverlagring</translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation>Valgte filer blir ikke lastet opp</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation>Noen filer blir ikke lastet opp</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>Ingen nye filer å laste opp i valgt mappe</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Noen opptak kan bli slettet etter at du har lastet opp filene</numerusform>
+        <numerusform>Noen opptak kan bli slettet etter at du har lastet opp filene</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Det er ikke mye ledig plass igjen på serverlagring. Noen gamle opptak kan bli slettet for å frigjøre plass. Merk at hvis valgte filer tilfeldigvis er de eldste på serveren, vil de bli slettet rett etter at de ble lastet opp.</numerusform>
+        <numerusform>Det er ikke mye ledig plass igjen på serverlagring. Noen gamle opptak kan bli slettet for å frigjøre plass. Merk at hvis valgte filer tilfeldigvis er de eldste på serveren, vil de bli slettet rett etter at de ble lastet opp.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>For å forhindre dette kan du legge til ekstra lagringsplass. Du kan også kontrollere hvilke opptak som blir slettet først ved å endre arkivholdet i kamerainnstillingene.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>Last opp likevel?</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>Kunne ikke starte opplastningen da bruker &quot;%1&quot; laster opp opptak til dette kameraet for øyeblikket.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>Kunne ikke starte opplastningen da bruker laster opp opptak til dette kameraet for øyeblikket.</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>Kunne ikke fullføre opplastingen til %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Forsikre deg om at det er nok plass på serverlagring.</translation>
+    </message>
+    <message>
+      <source>Uploading footage</source>
+      <translation>Laster opp opptak</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 har formatet som ikke støttes.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 har ikke tidsstempel.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 er eldre enn tillatt i kameraarkivinnstillingene.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 dekker periode som videoen allerede er lastet opp.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <comment>Filename will be substituted</comment>
+      <translation>%1 dekker perioden som videoen lastes opp for.</translation>
     </message>
   </context>
   <context>
@@ -11110,6 +12385,68 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
+    <message>
+      <source>No events</source>
+      <translation>Ingen hendelser</translation>
+    </message>
+    <message>
+      <source>Try changing the filters or create an Event Rule</source>
+      <translation>Prøv å endre filtrene eller opprett en hendelsesregel</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n events</source>
+      <translation>
+        <numerusform>%n hendelse</numerusform>
+        <numerusform>%n hendelser</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
+    <message>
+      <source>Open this integration?</source>
+      <translation>Åpne denne integrasjonen?</translation>
+    </message>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Åpne denne nettsiden?</translation>
+    </message>
+    <message>
+      <source>Integration</source>
+      <translation>Integrasjon</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Nettside</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this integration presented an untrusted certificate auth.
+We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <comment>%1 is the integration address</comment>
+      <translation>Du prøver å åpne
+%1, men denne integrasjonen presenterte en uklarert sertifikatautentisering.
+Vi anbefaler at du ikke åpner denne integrasjonen. Hvis du forstår risikoen, kan du åpne integrasjonen.</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Du prøver å åpne
+%1
+men denne nettsiden presenterte en uklarert sertifikatautentisering.
+Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan du åpne nettsiden.</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Koble til likevel</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
@@ -11118,6 +12455,25 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Select folder to upload</source>
       <translation>Velg mappe du vil laste opp</translation>
+    </message>
+    <message>
+      <source>Developer Tools</source>
+      <translation>Utviklerverktøy</translation>
+    </message>
+    <message>
+      <source>Unavailable in dedicated window mode</source>
+      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+    </message>
+    <message>
+      <source>Move this window to the Layout to use this functionality</source>
+      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
+    <message>
+      <source>Empty schedule is not allowed</source>
+      <translation>Tom timeplan er ikke tillatt</translation>
     </message>
   </context>
   <context>
@@ -11135,8 +12491,8 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Skjul</translation>
     </message>
     <message>
-      <source>Unable to connect to the system because it has become offline</source>
-      <translation>Kan ikke koble til systemet fordi det har blitt frakoblet</translation>
+      <source>Unable to connect to the site because it has become offline</source>
+      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
     </message>
   </context>
   <context>
@@ -11147,18 +12503,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
         <numerusform>%n bokmerker</numerusform>
         <numerusform>%n bokmerker</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Exporting video</source>
-      <translation>Eksporter video</translation>
-    </message>
-    <message>
-      <source>Stop Export</source>
-      <translation>Stopp eksport</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimer</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -11198,14 +12542,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Starter eksport...</translation>
     </message>
     <message>
-      <source>Saving layout</source>
-      <translation>Lagrer visning</translation>
-    </message>
-    <message>
-      <source>Stop Saving</source>
-      <translation>Stopp lagring</translation>
-    </message>
-    <message>
       <source>Saving failed</source>
       <translation>Lagring mislyktes</translation>
     </message>
@@ -11218,8 +12554,9 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Vi forbereder filer for eksportprosessen. Vent noen sekunder.</translation>
     </message>
     <message>
-      <source>Transcoding is required. Export session restarted.</source>
-      <translation>Transkoding er nødvendig. Eksporter økten må startes på nytt.</translation>
+      <source>%1 filename length is more than %2 characters.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 filnavnlengden er mer enn %2 tegn.</translation>
     </message>
   </context>
   <context>
@@ -11229,20 +12566,43 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>%1 versjon tilgjengelig</translation>
     </message>
     <message>
-      <source>Release Notes</source>
-      <translation>Utgivelsesnotater</translation>
-    </message>
-    <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
       <translation>Store problemer er fikset. Oppdatering anbefales på det sterkeste.</translation>
     </message>
     <message>
-      <source>Update...</source>
-      <translation>Oppdater...</translation>
+      <source>Updates</source>
+      <translation>Oppdateringer</translation>
     </message>
     <message>
-      <source>Do not notify again about this update</source>
-      <translation>Ikke varsl igjen om denne oppdateringen</translation>
+      <source>Release Notes...</source>
+      <translation>Utgivelsesnotater...</translation>
+    </message>
+    <message>
+      <source>%1 Version is available</source>
+      <translation type="unfinished">%1 Version is available</translation>
+    </message>
+    <message>
+      <source>Skip Version</source>
+      <translation type="unfinished">Skip Version</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager</name>
+    <message>
+      <source>Date/Time</source>
+      <translation>Dato/klokkeslett</translation>
+    </message>
+    <message>
+      <source>Title</source>
+      <translation type="unfinished">Title</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>Object Type</source>
+      <translation type="unfinished">Object Type</translation>
     </message>
   </context>
   <context>
@@ -11286,8 +12646,8 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
-      <source>New System</source>
-      <translation>Nytt system</translation>
+      <source>New Site</source>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
@@ -11317,10 +12677,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Brukere</translation>
     </message>
     <message>
-      <source>Other Systems</source>
-      <translation>Andre systemer</translation>
-    </message>
-    <message>
       <source>Local Files</source>
       <translation>Lokale filer</translation>
     </message>
@@ -11340,6 +12696,26 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>Shared Layouts</source>
       <translation>Delte visninger</translation>
     </message>
+    <message>
+      <source>Health Monitors</source>
+      <translation>Statusmonitorer</translation>
+    </message>
+    <message>
+      <source>Video Walls</source>
+      <translation>Videovegger</translation>
+    </message>
+    <message>
+      <source>Integrations</source>
+      <translation>Integrasjoner</translation>
+    </message>
+    <message>
+      <source>Web Pages &amp; Integrations</source>
+      <translation>Nettsider og integrasjoner</translation>
+    </message>
+    <message>
+      <source>Other Sites</source>
+      <translation type="unfinished">Other Sites</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
@@ -11350,6 +12726,45 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>New Group %1</source>
       <translation>Ny gruppe %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
+    <message>
+      <source>No data</source>
+      <translation>Ingen opptak</translation>
+    </message>
+    <message>
+      <source>All imported</source>
+      <translation>Alt importert</translation>
+    </message>
+    <message>
+      <source>In progress... (%1 left)</source>
+      <translation>Pågår... (%1 igjen)</translation>
+    </message>
+    <message>
+      <source>Disabled</source>
+      <translation>Deaktivert</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Feil</translation>
+    </message>
+    <message>
+      <source>Failed to import. Retry in 1 minute.</source>
+      <translation>Kunne ikke importere. Prøv igjen om 1 minutt.</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Navn</translation>
+    </message>
+    <message>
+      <source>Imported up to</source>
+      <translation>Importert opp til</translation>
+    </message>
+    <message>
+      <source>Status</source>
+      <translation>Status</translation>
     </message>
   </context>
   <context>
@@ -11434,6 +12849,14 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>Resource is not available for the usage with JS API</source>
       <translation>Ressursen er ikke tilgjengelig for bruk med JS API</translation>
     </message>
+    <message>
+      <source>Resource not found</source>
+      <translation type="unfinished">Resource not found</translation>
+    </message>
+    <message>
+      <source>Parameter not found</source>
+      <translation type="unfinished">Parameter not found</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
@@ -11459,52 +12882,220 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::EventTypePickerWidget</name>
+    <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>
     <message>
-      <source>None</source>
-      <translation>Ingen</translation>
+      <source>No filter</source>
+      <translation>Ingen filter</translation>
     </message>
     <message>
-      <source>Starts</source>
-      <translation>Starter</translation>
+      <source>Main storage only</source>
+      <translation>Kun hovedlager</translation>
     </message>
     <message>
-      <source>Stops</source>
-      <translation>Stopper</translation>
-    </message>
-    <message>
-      <source>Instant</source>
-      <translation>Umiddelbar</translation>
+      <source>Backup storage only</source>
+      <translation>Kun sikkerhetskopieringslagring</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::ModificationMarkItemDelegate</name>
+    <name>nx::vms::client::desktop::menu::PtzPresetsToursFactory</name>
     <message>
-      <source>Not saved</source>
-      <translation>Ikke lagret</translation>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (aktiv)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (aktiv)</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::rules::RulesDialog</name>
+    <name>nx::vms::client::desktop::menu::RadassActionFactory</name>
     <message>
-      <source>Restore all rules to default?</source>
-      <translation>Gjenopprett alle regler til standard?</translation>
+      <source>Auto</source>
+      <translation>Auto</translation>
     </message>
     <message>
-      <source>This action cannot be undone.</source>
-      <translation>Denne handlingen kan ikke angres.</translation>
+      <source>Low</source>
+      <translation>Lav</translation>
     </message>
     <message>
-      <source>Failed to apply changes.</source>
-      <translation>Kunne ikke bruke endringene.</translation>
+      <source>High</source>
+      <translation>Høy</translation>
     </message>
     <message>
-      <source>Failed to restore rules.</source>
-      <translation>Kunne ikke gjenopprette regler.</translation>
+      <source>Custom</source>
+      <translation>Tilpasset</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
     <message>
-      <source>Apply changes before exiting?</source>
-      <translation>Lagreendring er før du avslutter?</translation>
+      <source>Objects</source>
+      <translation>Objekter</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation>Regioner av interesse</translation>
+    </message>
+    <message>
+      <source>Hotspots</source>
+      <translation>Punkter</translation>
+    </message>
+    <message>
+      <source>Toolbar</source>
+      <translation type="unfinished">Toolbar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowreelSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>Bytt med hurtigtaster</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>Bytt på tidsinterval</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::menu::ShowreelTextFactory</name>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Stopp tur</translation>
+    </message>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Stopp bildesyklus</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Start tur</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Start bildesyklus</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
+    <message>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Analytics-hendelser kan settes opp på et bestemt kamera.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Velg kameraer ved å bruke knappen over for å se listen over støttede hendelser.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
+    <message>
+      <source>Event will trigger only if there are matches any of attributes.</source>
+      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+    </message>
+    <message>
+      <source>You can see the names of the attributes and their values on the Objects tab.</source>
+      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
+    <message>
+      <source>Analytics object detection can be set up on a certain cameras.</source>
+      <translation>Analytics-objektdeteksjon kan settes opp på enkelte kameraer.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Velg kameraer ved å bruke knappen over for å se listen over støttede hendelser.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::EditVmsRuleDialog</name>
+    <message>
+      <source>Schedule</source>
+      <translation>Tidsplan</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>WHEN</source>
+      <translation>NÅR</translation>
+    </message>
+    <message>
+      <source>EVENT</source>
+      <translation>BEGIVENHET</translation>
+    </message>
+    <message>
+      <source>DO</source>
+      <translation>GJØR</translation>
+    </message>
+    <message>
+      <source>ACTION</source>
+      <translation>HANDLING</translation>
+    </message>
+    <message>
+      <source>Enabled</source>
+      <translation>Aktivert</translation>
+    </message>
+    <message>
+      <source>Add Title or Comment</source>
+      <translation type="unfinished">Add Title or Comment</translation>
+    </message>
+    <message>
+      <source>The rule is not valid and may not work</source>
+      <translation type="unfinished">The rule is not valid and may not work</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
+    <message>
+      <source>Authentication</source>
+      <translation type="unfinished">Authentication</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Logg Inn</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Passord</translation>
+    </message>
+    <message>
+      <source>Token</source>
+      <translation type="unfinished">Token</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
+    <message>
+      <source>Has attributes</source>
+      <translation>Har attributter</translation>
+    </message>
+    <message>
+      <source>Attributes</source>
+      <translation>Egenskaper</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
+    <message>
+      <source>Once in</source>
+      <translation>Engang i</translation>
+    </message>
+    <message>
+      <source>For</source>
+      <translation>For</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>Verdi</translation>
     </message>
   </context>
   <context>
@@ -11516,6 +13107,218 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Action</source>
       <translation>Handling</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Kilde</translation>
+    </message>
+    <message>
+      <source>Target</source>
+      <translation>Mål</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation>Kommentar</translation>
+    </message>
+    <message>
+      <source>No source</source>
+      <translation>Ingen kilde</translation>
+    </message>
+    <message>
+      <source>All Servers</source>
+      <translation>Alle servere</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Servers</source>
+      <translation>
+        <numerusform>%n server</numerusform>
+        <numerusform>%n servere</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Kildekamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>Source and %n more Cameras</source>
+      <translation>
+        <numerusform>Kilde og %n flere kameraer</numerusform>
+        <numerusform>Kilde og %n kameraer til</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>No target</source>
+      <translation>Ingen mål</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n visning</numerusform>
+        <numerusform>%n visninger</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Alle brukere</translation>
+    </message>
+    <message>
+      <source>Source Server and %1</source>
+      <translation>Kildeserver og %1</translation>
+    </message>
+    <message>
+      <source>Any Device</source>
+      <translation>Enhver enhet</translation>
+    </message>
+    <message>
+      <source>Any Camera</source>
+      <translation>Hvilket som helst kamera</translation>
+    </message>
+    <message>
+      <source>Any Server</source>
+      <translation>Enhver server</translation>
+    </message>
+    <message>
+      <source>Select at least one layout</source>
+      <translation type="unfinished">Select at least one layout</translation>
+    </message>
+    <message>
+      <source>Select at least one User</source>
+      <translation type="unfinished">Select at least one User</translation>
+    </message>
+    <message>
+      <source>Site</source>
+      <translation type="unfinished">Site</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
+    <message>
+      <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
+      <translation>Leter du etter en lokal layout? Velg bare én bruker fra &quot;Vis til&quot; -listen for å vise deres lokale oppsett som et alternativ her.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::SoundPicker</name>
+    <message>
+      <source>Manage</source>
+      <translation>Administrer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::StatePicker</name>
+    <message>
+      <source>When event occurs</source>
+      <translation type="unfinished">When event occurs</translation>
+    </message>
+    <message>
+      <source>When event starts</source>
+      <translation type="unfinished">When event starts</translation>
+    </message>
+    <message>
+      <source>When event stops</source>
+      <translation type="unfinished">When event stops</translation>
+    </message>
+    <message>
+      <source>Select state</source>
+      <translation type="unfinished">Select state</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
+    <message>
+      <source>Contains keywords</source>
+      <translation>Inneholder nøkkelord</translation>
+    </message>
+    <message>
+      <source>Contains list entries</source>
+      <translation>Inneholder listeoppføringer</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Søkeord skilt av plass</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>Fra</translation>
+    </message>
+    <message>
+      <source>Not contains keywords</source>
+      <translation type="unfinished">Not contains keywords</translation>
+    </message>
+    <message>
+      <source>Not contains list entries</source>
+      <translation type="unfinished">Not contains list entries</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
+    <message>
+      <source>Lookup lists network request failed</source>
+      <translation>Nettverksforespørselen for oppslagslister mislyktes</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
+    <message>
+      <source>Delete rule error:</source>
+      <translation>Slett regelfeil:</translation>
+    </message>
+    <message>
+      <source>Save rule error:</source>
+      <translation>Lagre regelfeil:</translation>
+    </message>
+    <message>
+      <source>Reset to defaults error:</source>
+      <translation>Tilbakestill til standardfeil:</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::rules::VolumePicker</name>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
+    <message>
+      <source>Name</source>
+      <translation>Navn</translation>
+    </message>
+    <message>
+      <source>Type</source>
+      <translation>Skriv</translation>
+    </message>
+    <message>
+      <source>Total</source>
+      <translation>Total</translation>
+    </message>
+    <message>
+      <source>Used</source>
+      <translation type="unfinished">Used</translation>
+    </message>
+    <message>
+      <source>Number of devices using this service exceeds the available service quantity.</source>
+      <translation>Antall enheter som bruker denne tjenesten, overstiger tilgjengelig tjenestemengde.</translation>
+    </message>
+    <message>
+      <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
+      <translation>Vennligst deaktiver den for enkelte enheter eller legg til flere passende tjenester. Ellers vil det gjøres automatisk på %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::saas::TierUsageModel</name>
+    <message>
+      <source>Limitation</source>
+      <translation type="unfinished">Limitation</translation>
+    </message>
+    <message>
+      <source>Allowed</source>
+      <translation type="unfinished">Allowed</translation>
+    </message>
+    <message>
+      <source>Current</source>
+      <translation type="unfinished">Current</translation>
     </message>
   </context>
   <context>
@@ -11558,13 +13361,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
       <translation>Hendelsen utløses bare hvis det er samsvar med noen av attributtene. Du kan se navnene på attributtene og deres verdier på fanen Objekter.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Dra layout eller kamera hit for å legge det til i showreel</translation>
     </message>
   </context>
   <context>
@@ -11611,64 +13407,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>%1 brukere</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation>Bytt med hurtigtaster</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation>Bytt på tidsinterval</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::LayoutTourTextFactory</name>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Stopp tur</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Stopp bildesyklus</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Start tur</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation>Start bildesyklus</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::PtzPresetsToursFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (aktiv)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (aktiv)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
-    <message>
-      <source>Info</source>
-      <translation>Info</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objekter</translation>
-    </message>
-    <message>
-      <source>Regions of Interest</source>
-      <translation>Regioner av interesse</translation>
     </message>
   </context>
   <context>
@@ -11726,7 +13464,7 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
+    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -11843,32 +13581,8 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <translation>Bildebehandling kan ta litt tid. Vær tålmodig.</translation>
     </message>
     <message>
-      <source>Image too big</source>
-      <translation>Bildet er for stort</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>Maksimal størrelse er %1 MB.</translation>
-    </message>
-    <message>
       <source>Failed to upload image</source>
       <translation>Kunne ikke laste opp bildet</translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>Komponenter i systemet har forskjellige versjoner:</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Oppdater alle komponentene til versjon %1</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Oppdater...</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Hopp over</translation>
     </message>
     <message>
       <source>Beta version %1</source>
@@ -11909,16 +13623,6 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
     <message>
       <source>the largest available partition</source>
       <translation>den største tilgjengelige partisjonen</translation>
-    </message>
-    <message>
-      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation>Analysedatabasen bør bare lagres på en lokal stasjon og kan ta store mengder plass.
-Når et sted å lagre analysedata er valgt, kan det ikke endres uten å miste eksisterende data. Vi anbefaler å velge et egnet lagrinssted og unngå å bruke systempartisjonen, da det kan føre til alvorlig funksjonsfeil i systemet.
-Som standard lagres analysedata på %1.
-Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dialogboksen Serverinnstillinger.</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
@@ -11962,83 +13666,27 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
       <translation>Det er ingen egnede kameraer for erstatning på Server &quot;%1&quot;</translation>
     </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Bruk tastaturpiler for å bytte visning. For å gå ut av bildesyklus, trykk Esc.</translation>
+      <source>Not enough access rights</source>
+      <translation>Ikke nok tilgangsrettigheter</translation>
     </message>
     <message>
-      <source>Press Esc to stop the tour.</source>
-      <translation>Trykk Esc for å stoppe turen.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutTourItemWidget</name>
-    <message>
-      <source>Switch by</source>
-      <comment>Arrows will follow</comment>
-      <translation>Bytt ved</translation>
+      <source>You do not have permissions to open this camera on the layout</source>
+      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
     </message>
     <message>
-      <source>Display for</source>
-      <comment>Time selector will follow</comment>
-      <translation>Vis i</translation>
+      <source>You do not have permissions to open some of selected cameras on the layout</source>
+      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
     </message>
     <message>
-      <source>Display selected for</source>
-      <comment>Time will follow</comment>
-      <translation>Skjerm valgt for</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
-    <message>
-      <source>Showreel</source>
-      <translation>Bildesyklus</translation>
-    </message>
-    <message>
-      <source>Showreel %1</source>
-      <translation>Bildesyklus %1</translation>
-    </message>
-    <message>
-      <source>Delete Showreel %1?</source>
-      <translation>Vil du slette bildesyklus %1?</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::LayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>Lagre visning som</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>Angi navn på visning:</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>Ny visning</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>Angi navnet på visningen du vil opprette:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>Ny visning %1</translation>
-    </message>
-    <message>
-      <source>Save Layout As Cloud</source>
-      <translation>Lagre layout som sky</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
-    <message>
-      <source>Maximum level of nesting is reached</source>
-      <translation>Maksimalt nivå for nesting er nådd</translation>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>
@@ -12078,32 +13726,6 @@ Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dial
     <message>
       <source>File downloading failed</source>
       <translation>Nedlasting av fil mislyktes</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::workbench::timeline::BookmarkTooltip</name>
-    <message>
-      <source>Zoom timeline
-to view more bookmarks</source>
-      <comment>It is highly recommended to split message in two lines</comment>
-      <translation>Zoom tidslinje
-å vise flere bokmerker</translation>
-    </message>
-    <message>
-      <source>Play bookmark from the beginning</source>
-      <translation>Spill bokmerke fra begynnelsen</translation>
-    </message>
-    <message>
-      <source>Edit bookmark</source>
-      <translation>Rediger bokmerke</translation>
-    </message>
-    <message>
-      <source>Export bookmark</source>
-      <translation>Eksporter bokmerke</translation>
-    </message>
-    <message>
-      <source>Delete bookmark</source>
-      <translation>Slett bokmerke</translation>
     </message>
   </context>
   <context>
@@ -12190,10 +13812,6 @@ to view more bookmarks</source>
       <translation>Klienten er oppdatert til versjon %1. Start %2 på nytt for å fullføre oppdateringen.</translation>
     </message>
     <message>
-      <source>Automatic client updates</source>
-      <translation>Automatiske klientoppdateringer</translation>
-    </message>
-    <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
       <translation>Nye klientoppdateringer vil bli installert automatisk. Du kan endre dette i innstillingene.</translation>
     </message>
@@ -12212,6 +13830,17 @@ to view more bookmarks</source>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
       <translation>Kan ikke sjekke tilgjengeligheten av klientoppdatering. Sjekk Internett-tilkoblingen din og prøv igjen.</translation>
+    </message>
+    <message>
+      <source>Client auto-updates</source>
+      <translation type="unfinished">Client auto-updates</translation>
+    </message>
+  </context>
+  <context>
+    <name>runApplication</name>
+    <message>
+      <source>Would you like to try switching to DirectX?</source>
+      <translation>Vil du prøve å bytte til DirectX?</translation>
     </message>
   </context>
 </TS>
