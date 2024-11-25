@@ -1176,7 +1176,7 @@
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation>Członkostwo w grupie LDAP jest zarządzane na serwerze LDAP</translation>
+      <translation>Członkostwo grupy LDAP jest zarządzane na serwerze LDAP</translation>
     </message>
   </context>
   <context>
@@ -1771,7 +1771,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation>Użytkownicy zaczną otrzymywać e-maile zaraz po zastosowaniu ustawień</translation>
+      <translation>Użytkownicy zaczną otrzymywać wiadomości e-mail zaraz po zastosowaniu ustawień</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
@@ -7025,7 +7025,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
       <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+        <numerusform>Serwer LDAP jest offline. %n użytkowników nie może się zalogować.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
@@ -7033,7 +7033,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to delete user &quot;%1&quot;.</source>
-      <translation type="unfinished">Failed to delete user &quot;%1&quot;.</translation>
+      <translation>Nie udało się usunąć użytkownika &quot;%1&quot;.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
@@ -7047,7 +7047,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+        <numerusform>%n istniejących użytkowników LDAP nie znaleziono w bazie danych LDAP</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
@@ -7314,15 +7314,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Depending on the resource type it either allows user to modify device settings or to control video wall.</source>
-      <translation type="unfinished">Depending on the resource type it either allows user to modify device settings or to control video wall.</translation>
+      <translation>W zależności od typu zasobu umożliwia użytkownikowi modyfikację ustawień urządzenia lub sterowanie ścianą wideo.</translation>
     </message>
     <message>
       <source>Allows users to access a resource and view live footage from a camera.</source>
-      <translation type="unfinished">Allows users to access a resource and view live footage from a camera.</translation>
+      <translation>Umożliwia użytkownikom dostęp do zasobu i oglądanie na żywo obrazu z kamery.</translation>
     </message>
     <message>
       <source>Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</source>
-      <translation type="unfinished">Allows user to control PTZ, use 2-Way Audio, Soft Triggers and I/O buttons.</translation>
+      <translation>Umożliwia użytkownikowi sterowanie PTZ, korzystanie z dwukierunkowej transmisji dźwięku, miękkich wyzwalaczy i przycisków I/O.</translation>
     </message>
     <message>
       <source>View Live.</source>
@@ -7562,13 +7562,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Niewystarczające usługi</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+        <numerusform>%n wymagane są odpowiednie usługi przechowywania w chmurze</numerusform>
+        <numerusform>%n wymagane są odpowiednie usługi przechowywania w chmurze</numerusform>
         <numerusform>%n suitable cloud storage services are required</numerusform>
         <numerusform>%n suitable cloud storage services are required</numerusform>
       </translation>
@@ -7585,7 +7585,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n Megapixels</source>
       <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+        <numerusform>%n Megapiksele</numerusform>
         <numerusform>%n Megapixels</numerusform>
         <numerusform>%n Megapixels</numerusform>
         <numerusform>%n Megapixels</numerusform>
@@ -7597,12 +7597,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No suitable cloud storage services available</source>
-      <translation type="unfinished">No suitable cloud storage services available</translation>
+      <translation>Brak odpowiednich usług przechowywania w chmurze</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
+        <numerusform>%n dostępne są odpowiednie usługi przechowywania w chmurze</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
@@ -7614,11 +7614,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Ustawienie zostało zmienione</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
-      <translation type="unfinished">&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</translation>
+      <translation>&quot;Wszystkie opcje archiwum&quot; zostały zmienione na &quot;Ruch, Obiekty, Zakładki&quot; z powodu włączenia kopii zapasowej w chmurze</translation>
     </message>
   </context>
   <context>
@@ -7649,7 +7649,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
-      <translation type="unfinished">There are more cameras being backed up than available services. Please disable backup for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Kopie zapasowe są tworzone w większej liczbie kamer niż dostępnych usług. Wyłącz kopie zapasowe dla niektórych kamer lub dodaj więcej odpowiednich usług. W przeciwnym razie kopie zapasowe zostaną wykonane automatycznie w %1</translation>
     </message>
   </context>
   <context>
@@ -7694,15 +7694,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the System should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the System should be in active state. %1</translation>
+      <translation>Aby wykonać kopię zapasową w chmurze, system musi być w stanie aktywnym. %1</translation>
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation type="unfinished">System suspended. To make changes to backup configuration, the System should be in active state. %1</translation>
+      <translation>System zawieszony. Aby dokonać zmian w konfiguracji kopii zapasowej, system powinien być w stanie aktywnym. %1</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
-      <translation type="unfinished">Applies to all servers</translation>
+      <translation>Dotyczy wszystkich serwerów</translation>
     </message>
   </context>
   <context>
@@ -7901,7 +7901,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+      <translation>Automatycznie zaimportowane zostaną tylko te okresy, w których kamera lub serwer były niedostępne po pierwszym dodaniu do systemu.</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
@@ -8631,7 +8631,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>Szczegóły uwierzytelniania są nieprawidłowe</translation>
     </message>
   </context>
   <context>
@@ -9680,7 +9680,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>Resetuj ustawienia</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -9696,11 +9696,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>Usunąć istniejących użytkowników i grupy LDAP?</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>Wygląda na to, że zmieniłeś serwer LDAP. Zaleca się usunięcie wszystkich istniejących użytkowników i grup LDAP przed zaimportowaniem użytkowników i grup z nowego serwera LDAP.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -9716,7 +9716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+      <translation>Synchronizuj użytkowników i grupy LDAP</translation>
     </message>
     <message>
       <source>Synchronize</source>
@@ -9919,11 +9919,11 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>Logging level degrades the performance of the system</source>
-      <translation type="unfinished">Logging level degrades the performance of the system</translation>
+      <translation>Poziom logowania obniża wydajność systemu</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+      <translation>Poziom logowania inny niż domyślny. Zalecamy ustawienie go na &quot;info&quot;</translation>
     </message>
   </context>
   <context>
@@ -10109,7 +10109,7 @@ Pamiętaj, aby zwrócić poziom logowania do ustawień domyślnych po zebraniu w
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Zaleca się kontakt z %1 przed kontynuowaniem.</translation>
     </message>
     <message>
       <source>Current (%1)</source>
@@ -12251,7 +12251,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Nie znaleziono metody</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -12263,11 +12263,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Błąd połączenia</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Nieprawidłowe kodowanie</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
@@ -12873,7 +12873,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Monitor stanu technicznego</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -12907,11 +12907,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>All imported</source>
-      <translation type="unfinished">All imported</translation>
+      <translation>Wszystkie zaimportowane</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>W toku... (pozostało %1)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -12923,7 +12923,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Failed to import. Retry in 1 minute.</source>
-      <translation type="unfinished">Failed to import. Retry in 1 minute.</translation>
+      <translation>Nie udało się zaimportować. Spróbuj ponownie za 1 minutę.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -13059,11 +13059,11 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
       <source>Event will trigger only if there are matches any of attributes.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+      <translation>Zdarzenie zostanie wyzwolone tylko w przypadku dopasowania któregokolwiek z atrybutów.</translation>
     </message>
     <message>
       <source>You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Nazwy atrybutów i ich wartości można zobaczyć na karcie Obiekty.</translation>
     </message>
   </context>
   <context>
