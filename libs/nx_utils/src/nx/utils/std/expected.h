@@ -39,6 +39,9 @@ template<typename T, typename E>
 class expected
 {
 public:
+    template<typename V = T, typename = std::enable_if_t<std::is_default_constructible_v<V>>>
+    expected(): m_t() {}
+
     expected(T t): m_t(std::move(t)) {}
     expected(unexpected<E> e): m_e(std::move(e)) {}
 
