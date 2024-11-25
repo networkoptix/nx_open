@@ -25,6 +25,7 @@
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
 #include <nx/vms/rules/action_builder_fields/target_devices_field.h>
+#include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/action_builder_fields/target_users_field.h>
@@ -673,26 +674,40 @@ QVariant RulesTableModel::targetCameraData(const vms::rules::ActionBuilder* acti
     return {};
 }
 
-QVariant RulesTableModel::targetLayoutData(const vms::rules::ActionBuilder* actionBuilder, int role) const
+QVariant RulesTableModel::targetLayoutData(
+    const vms::rules::ActionBuilder* actionBuilder, int role) const
 {
-    const auto targetLayoutField = actionBuilder->fieldByType<vms::rules::TargetLayoutsField>();
-    if (!targetLayoutField)
+    QSet<Uuid> ids;
+    bool allowEmptySelection{false};
+    if (auto targetLayoutsField = actionBuilder->fieldByType<vms::rules::TargetLayoutsField>())
+    {
+        ids = targetLayoutsField->value();
+        allowEmptySelection = targetLayoutsField->properties().allowEmptySelection;
+    }
+    else if (auto targetLayoutField = actionBuilder->fieldByType<vms::rules::TargetLayoutField>())
+    {
+        ids = {targetLayoutField->value()};
+    }
+    else
+    {
         return {};
+    }
 
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-
-    const auto ids = targetLayoutField->value();
     if (role == ResourceIdsRole)
         return QVariant::fromValue(ids);
 
+    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
     const auto layouts = resourcePool->getResourcesByIds<QnLayoutResource>(ids);
-    const auto properties = targetLayoutField->properties();
-    const bool isValidSelection = !layouts.isEmpty() || properties.allowEmptySelection;
+    const bool isValidSelection = !layouts.isEmpty() || allowEmptySelection;
 
     if (role == Qt::DisplayRole)
     {
         if (!isValidSelection)
-            return tr("Select at least one layout");
+        {
+            return ids.empty()
+                ? tr("Select at least one layout")
+                : vms::rules::Strings::layoutsWereRemoved(ids.size());
+        }
 
         if (layouts.isEmpty())
             return tr("No target");

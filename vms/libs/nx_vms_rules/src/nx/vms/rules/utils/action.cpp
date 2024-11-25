@@ -49,7 +49,8 @@ bool hasTargetLayout(const vms::rules::ItemDescriptor& actionDescriptor)
         actionDescriptor.fields.end(),
         [](const vms::rules::FieldDescriptor& fieldDescriptor)
         {
-            return fieldDescriptor.fieldName == vms::rules::utils::kLayoutIdsFieldName;
+            return fieldDescriptor.fieldName == vms::rules::utils::kLayoutIdsFieldName
+                || fieldDescriptor.fieldName == vms::rules::utils::kLayoutIdFieldName;
         });
 }
 
