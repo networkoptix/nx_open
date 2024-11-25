@@ -261,6 +261,8 @@ public:
 
     QnTimePeriodList periods;
 
+    bool allowSoftwareDecoderFallback = true;
+
 public:
     Private(Player* parent);
 
@@ -838,6 +840,7 @@ bool Player::Private::initDataProvider()
     dataConsumer->setPlaySpeed(speed);
     dataConsumer->setAllowOverlay(allowOverlay);
     dataConsumer->setAllowHardwareAcceleration(allowHardwareAcceleration);
+    dataConsumer->setAllowSoftwareDecoderFallback(allowSoftwareDecoderFallback);
     updateAudio();
 
     dataConsumer->setVideoGeometryAccessor(
@@ -1583,6 +1586,23 @@ void Player::invalidateServer()
     if (!delegate)
         return;
     delegate->invalidateServer();
+}
+
+bool Player::allowSoftwareDecoderFallback() const
+{
+    return d->allowSoftwareDecoderFallback;
+}
+
+void Player::setAllowSoftwareDecoderFallback(bool value)
+{
+    if (d->allowSoftwareDecoderFallback == value)
+        return;
+
+    if (d->dataConsumer)
+        d->dataConsumer->setAllowSoftwareDecoderFallback(value);
+
+    d->allowSoftwareDecoderFallback = value;
+    emit allowSoftwareDecoderFallbackChanged();
 }
 
 } // namespace media

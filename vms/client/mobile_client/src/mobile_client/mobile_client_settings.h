@@ -54,10 +54,12 @@ public:
 
         IgnoreCustomization,
 
-        // Beta features flags.
+        // Beta features and settings flags.
         UseDownloadVideoFeature,
 
         UseMaxHardwareDecodersCount,
+
+        EnableSoftwareDecoderFallback,
 
         VariableCount
     };
@@ -146,6 +148,11 @@ private:
             bool,
             useMaxHardwareDecodersCount, setUseMaxHardwareDecodersCount,
             UseMaxHardwareDecodersCount, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            enableSoftwareDecoderFallback, setEnableSoftwareDecoderFallback,
+            EnableSoftwareDecoderFallback, true)
 
     QN_END_PROPERTY_STORAGE()
 
