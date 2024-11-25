@@ -62,10 +62,13 @@ int pixelRatio()
         : qApp->devicePixelRatio();
 }
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme =
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconTheme =
     {{QnIcon::Normal, {.primary = "light10"}}};
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme =
+    {{QnIcon::Normal, {.primary = "light1"}}};
 
 NX_DECLARE_COLORIZED_ICON(kAddIcon, "20x20/Outline/add.svg", kIconTheme)
+NX_DECLARE_COLORIZED_ICON(kMoveIcon, "48x48/Solid/move.svg", kLight1Theme)
 
 } // namespace
 
@@ -222,7 +225,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
         }
         #endif
-        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png"));
+        paintPixmap(painter, body, qnSkin->icon(kMoveIcon).pixmap(48, 48));
         paintDeleteButton(painter);
 
         QPainterPath anchorPath;
