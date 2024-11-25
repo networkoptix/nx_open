@@ -56,6 +56,8 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
                     emit useMaxHardwareDecodersCountChanged();
                     break;
 
+                case QnMobileClientSettings::EnableSoftwareDecoderFallback:
+                    emit enableSoftwareDecoderFallbackChanged();
                 default:
                     break;
             }
@@ -209,6 +211,17 @@ bool QmlSettingsAdaptor::useMaxHardwareDecodersCount() const
 void QmlSettingsAdaptor::setUseMaxHardwareDecodersCount(bool value)
 {
     qnSettings->setUseMaxHardwareDecodersCount(value);
+    qnSettings->save();
+}
+
+bool QmlSettingsAdaptor::enableSoftwareDecoderFallback() const
+{
+    return qnSettings->enableSoftwareDecoderFallback();
+}
+
+void QmlSettingsAdaptor::setEnableSoftwareDecoderFallback(bool value)
+{
+    qnSettings->setEnableSoftwareDecoderFallback(value);
     qnSettings->save();
 }
 
