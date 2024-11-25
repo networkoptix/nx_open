@@ -3783,7 +3783,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation>Chung</translation>
+      <translation>Tổng quan</translation>
     </message>
     <message>
       <source>Features</source>
