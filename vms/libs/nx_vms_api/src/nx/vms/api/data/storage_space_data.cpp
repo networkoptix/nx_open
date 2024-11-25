@@ -52,6 +52,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     StorageSpaceDataWithDbInfoV3, (ubjson)(json), StorageSpaceDataWithDbInfoV3_Fields)
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    StorageCheckFilter, (json), StorageCheckFilter_Fields)
+
 StorageSpaceDataV1 StorageSpaceDataV3::toV1() const
 {
     StorageSpaceDataV1 result(static_cast<const StorageSpaceDataBase&>(*this));

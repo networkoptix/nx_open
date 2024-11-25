@@ -23,6 +23,7 @@ QString Result::errorToString(Result::Error value)
         case Result::NotFound: return "notFound";
         case Result::UnsupportedMediaType: return "unsupportedMediaType";
         case Result::ServiceUnavailable: return "serviceUnavailable";
+        case Result::ServiceUnauthorized: return "serviceUnauthorized";
         case Result::Unauthorized: return "unauthorized";
         case Result::SessionExpired: return "sessionExpired";
         case Result::SessionRequired: return "sessionRequired";
@@ -50,6 +51,7 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
         case Error::SessionExpired:
         case Error::SessionRequired:
         case Error::SessionTruncated:
+        case Error::ServiceUnauthorized:
             return http::StatusCode::forbidden;
 
         case Error::Conflict:
@@ -206,6 +208,11 @@ Result Result::unsupportedMediaType(std::optional<QString> customMessage)
 Result Result::serviceUnavailable(std::optional<QString> customMessage)
 {
     return Result{ServiceUnavailable, customMessage ? *customMessage : tr("Service unavailable.")};
+}
+
+Result Result::serviceUnauthorized(std::optional<QString> customMessage)
+{
+    return Result{ServiceUnauthorized, customMessage ? *customMessage : tr("Service unauthorized.")};
 }
 
 Result Result::unauthorized(std::optional<QString> customMessage)

@@ -25,9 +25,13 @@ namespace nx::network::rest {
  *     %value notFound
  *     %value unsupportedMediaType
  *     %value serviceUnavailable
+ *     %value serviceUnauthorized
  *     %value unauthorized
  *     %value sessionExpired
+ *     %value sessionRequired
+ *     %value sessionTruncated
  *     %value gone
+ *     %value notAllowed
  *
  * %// The typical apidoc comment for the result of a function looks like (without `//`):
  * %//return
@@ -135,6 +139,11 @@ public:
          * %caption 17
          */
         NotAllowed = 17,
+
+        /**%apidoc
+         * %caption 18
+         */
+        ServiceUnauthorized = 18,
     };
 
     static QString errorToString(Result::Error value);
@@ -163,6 +172,7 @@ public:
     static Result internalServerError(std::optional<QString> customMessage = std::nullopt);
     static Result unsupportedMediaType(std::optional<QString> customMessage = std::nullopt);
     static Result serviceUnavailable(std::optional<QString> customMessage = std::nullopt);
+    static Result serviceUnauthorized(std::optional<QString> customMessage = std::nullopt);
     static Result unauthorized(std::optional<QString> customMessage = std::nullopt);
     static Result sessionExpired(std::optional<QString> customMessage = std::nullopt);
     static Result sessionRequired(std::optional<QString> customMessage = std::nullopt);

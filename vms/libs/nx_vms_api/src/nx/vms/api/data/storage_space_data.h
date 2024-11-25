@@ -119,4 +119,19 @@ using StorageSpaceDataWithDbInfoList = StorageSpaceDataWithDbInfoListV3;
 
 constexpr const char* const kCloudStorageType = "cloud";
 
+struct NX_VMS_API StorageCheckFilter
+{
+    /**%apidoc:string
+     * Can be obtained from "id" field via `GET /rest/v{1-}/servers` or be `this` to refer to the
+     * current Server.
+     * %example this
+     */
+    nx::Uuid serverId;
+
+    QString path;
+};
+#define StorageCheckFilter_Fields (serverId)(path)
+QN_FUSION_DECLARE_FUNCTIONS(StorageCheckFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageCheckFilter, StorageCheckFilter_Fields)
+
 } // namespace nx::vms::api

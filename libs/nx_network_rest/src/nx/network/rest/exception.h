@@ -35,6 +35,7 @@ public:
     NX_REST_EXCEPTION_METHOD(internalServerError)
     NX_REST_EXCEPTION_METHOD(unsupportedMediaType)
     NX_REST_EXCEPTION_METHOD(serviceUnavailable)
+    NX_REST_EXCEPTION_METHOD(serviceUnauthorized)
     // NX_REST_EXCEPTION_METHOD(unauthorized) - Use UnauthorizedException with appropriate AuthResult.
     // NX_REST_EXCEPTION_METHOD(sessionExpired) - Use UnauthorizedException::sessionExpired.
     NX_REST_EXCEPTION_METHOD(sessionRequired)
