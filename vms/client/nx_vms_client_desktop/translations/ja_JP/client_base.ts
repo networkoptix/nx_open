@@ -7726,7 +7726,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be removed from the System and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 はシステムから削除され、選択したカメラに置き換えられます</translation>
+      <translation>%1 はシステムから削除され、選択したカメラに置き換えられます。</translation>
     </message>
     <message>
       <source>The Camera Replacement operation is not possible as the Server is unavailable.</source>
@@ -8140,7 +8140,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-system layouts&lt;/b&gt; that allow you to work with devices from different Systems. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
       <translation>%1 レイアウトは&lt;b&gt;クロスシステムレイアウト&lt;/b&gt;であり、異なるシステムのデバイスを扱うことができます。現在、通常レイアウトと比べて
-機能が限定されていますが、今後のバージョンで %1 のレイアウトの機能を拡張し続ける予定です</translation>
+機能が限定されていますが、今後のバージョンで %1 のレイアウトの機能を拡張し続ける予定です。</translation>
     </message>
     <message>
       <source>Read more on the %1</source>

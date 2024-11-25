@@ -207,7 +207,7 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs avancés, contrôler la plupart de la configuration du système, mais ne sont pas autorisés à modifier les paramètres liés à l'administrateur, comme supprimer ou modifier leurs propres groupes et permissions, et ne peut pas créer ou modifier d'autres utilisateurs expérimentés</translation>
+      <translation>Les membres de ce groupe peuvent, en plus des autorisations accordées par le groupe Visionneurs avancés, contrôler la plupart de la configuration du système, mais ne sont pas autorisés à modifier les paramètres liés à l'administrateur, comme supprimer ou modifier leurs propres groupes et permissions, et ne peut pas créer ou modifier d'autres utilisateurs expérimentés.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
