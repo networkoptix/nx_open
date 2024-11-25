@@ -247,6 +247,9 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
                 if (!NX_ASSERT(connection))
                     return;
 
+                if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::UpdatingCredentials)
+                    return;
+
                 const bool isTemporaryUser = connection->connectionInfo().isTemporary();
                 executeDelayedParented(
                     [this, isTemporaryUser, reason]()
