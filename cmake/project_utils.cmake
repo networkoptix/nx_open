@@ -53,7 +53,9 @@ function(nx_add_target name type)
         SIGNED
         GDI #< Requires Windows GDI headers to compile
         MACOS_ARG_MAX_WORKAROUND
-        NO_API_MACROS)
+        NO_API_MACROS
+        ROOT_FOLDER #< One of the the most important projects, placed in the root of targets list.
+    )
     set(oneValueArgs LIBRARY_TYPE RC_FILE FOLDER SOURCE_DIR)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES ADDITIONAL_MOCABLES ADDITIONAL_MOC_INCLUDE_DIRS
@@ -224,10 +226,21 @@ function(nx_add_target name type)
         target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
     endif()
 
-    if(NX_FOLDER)
-        set_target_properties(${name} PROPERTIES FOLDER ${NX_FOLDER})
-    elseif("${type}" STREQUAL "LIBRARY")
-        set_target_properties(${name} PROPERTIES FOLDER libs)
+    # Folders functionality is available in the Visual Studio and XCode
+    if(WINDOWS OR MACOSX)
+        if(NX_FOLDER)
+            set_target_properties(${name} PROPERTIES FOLDER ${NX_FOLDER})
+        elseif(NX_ROOT_FOLDER)
+            # One of the the most important projects, placed in the root of targets list.
+        else()
+            message(FATAL_ERROR
+                " FOLDER property is not set for the target ${name}\n"
+                " Valid examples are:\n"
+                " - client/libs for the client-side libraries\n"
+                " - common/libs for the general purpose libraries\n"
+                " - utils for the standalone utilities\n"
+            )
+        endif()
     endif()
 
     if(WINDOWS)

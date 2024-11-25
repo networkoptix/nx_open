@@ -144,6 +144,7 @@ if(NOT EXISTS ${customization_resources_dir})
 endif()
 
 set(target_args
+    ROOT_FOLDER
     ADDITIONAL_SOURCES
         ${ios_sources}
         ${build_info_target_file}

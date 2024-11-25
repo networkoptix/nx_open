@@ -5,6 +5,7 @@ nx_add_target(desktop_client EXECUTABLE SIGNED
         "desktop_client.rc"
     NO_MOC
     NO_PCH
+    ROOT_FOLDER
     PRIVATE_LIBS
         nx_vms_client_desktop)
 
