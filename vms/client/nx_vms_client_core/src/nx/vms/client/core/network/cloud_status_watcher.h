@@ -49,8 +49,8 @@ public:
     {
         LoggedOut,
         Online,
-        Offline,        //< User is logged in with "stay connected" checked
-                        // but internet connection is lost
+        Offline, //< User is logged in with "stay connected" checked but internet connection is lost
+        UpdatingCredentials, //< User credentials are being updated without requiring logout
     };
     Q_ENUM(Status)
 
@@ -76,6 +76,9 @@ public:
 
         /** Change credentials forcefully, logout from the current session. */
         forced,
+
+        /** Change credentials, without logout from the current session. */
+        update,
     };
     bool setAuthData(const CloudAuthData& authData, AuthMode mode);
 

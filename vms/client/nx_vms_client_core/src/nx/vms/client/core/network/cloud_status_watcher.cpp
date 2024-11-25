@@ -464,6 +464,9 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
             }
 
             hasUpdateSystemsRequest = false;
+            if (status == CloudStatusWatcher::UpdatingCredentials && result != ResultCode::ok)
+                return;
+
             updateStatusFromResultCode(result);
         });
 
@@ -499,6 +502,9 @@ void CloudStatusWatcher::Private::updateConnection(AuthMode mode)
 
         case AuthMode::login:
             setStatus(CloudStatusWatcher::LoggedOut, CloudStatusWatcher::NoError);
+
+        case AuthMode::update:
+            setStatus(CloudStatusWatcher::UpdatingCredentials, CloudStatusWatcher::NoError);
             break;
     }
 
@@ -516,7 +522,7 @@ void CloudStatusWatcher::Private::updateConnection(AuthMode mode)
     }
 
     ensureCloudConnection();
-    if (credentials.authToken.empty() || mode == AuthMode::forced)
+    if (credentials.authToken.empty() || mode == AuthMode::forced || mode == AuthMode::update)
     {
         issueAccessToken();
     }

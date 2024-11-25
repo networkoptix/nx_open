@@ -241,6 +241,7 @@ void QnCloudStatusPanelPrivate::updateUi()
                     .arg(nx::branding::cloudName()));
             break;
         case CloudStatusWatcher::Online:
+        case CloudStatusWatcher::UpdatingCredentials:
             q->setText(effectiveUserName);
             q->setIcon(loggedInIcon);
             q->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);

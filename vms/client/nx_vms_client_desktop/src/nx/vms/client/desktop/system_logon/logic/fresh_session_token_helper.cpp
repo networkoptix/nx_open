@@ -5,8 +5,11 @@
 #include <QtCore/QThread>
 #include <QtWidgets/QApplication>
 
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
 
@@ -101,7 +104,7 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
 
     if (connection->userType() == nx::vms::api::UserType::cloud)
     {
-        const auto cloudAuthData = OauthLoginDialog::login(
+        auto cloudAuthData = OauthLoginDialog::login(
             m_parent,
             m_title,
             info(m_actionType).clientType,
@@ -110,11 +113,17 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
             Qt::WindowStaysOnTopHint
         );
 
-        if (cloudAuthData.needValidateToken
-            && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials))
+        if (cloudAuthData.empty() || (cloudAuthData.needValidateToken
+            && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials)))
         {
             return {};
         }
+
+        cloudAuthData.credentials.username = qnCloudStatusWatcher->credentials().username;
+        qnCloudStatusWatcher->setAuthData(cloudAuthData,
+            core::CloudStatusWatcher::AuthMode::update);
+        if (auto session = this->session(); session && session->connection())
+            session->updateCloudSessionToken();
 
         token = cloudAuthData.credentials.authToken;
     }
