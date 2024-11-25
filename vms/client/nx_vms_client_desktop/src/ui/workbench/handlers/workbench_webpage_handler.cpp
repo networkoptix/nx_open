@@ -257,9 +257,15 @@ void QnWorkbenchWebPageHandler::openInDedicatedWindow(const QnWebPageResourcePtr
     auto webDialog =
         new QnSessionAware<WebViewDialog>(mainWindowWidget(), QDialogButtonBox::NoButton);
 
-    webDialog->setWindowFlag(Qt::Tool);
     webDialog->setAttribute(Qt::WA_DeleteOnClose);
-    webDialog->setAttribute(Qt::WA_MacAlwaysShowToolWindow);
+    webDialog->setWindowFlags(
+        Qt::Dialog
+        | Qt::CustomizeWindowHint
+        | Qt::WindowTitleHint
+        | Qt::WindowMinimizeButtonHint
+        | Qt::WindowMaximizeButtonHint
+        | Qt::WindowCloseButtonHint);
+
     webDialog->init(
         webPage->getUrl(),
         /*enableClientApi*/ webPage->getOptions().testFlag(QnWebPageResource::Integration),
