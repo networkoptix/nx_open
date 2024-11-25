@@ -65,6 +65,11 @@ class QmlSettingsAdaptor: public QObject
         READ useMaxHardwareDecodersCount
         NOTIFY useMaxHardwareDecodersCountChanged)
 
+    Q_PROPERTY(bool enableSoftwareDecoderFallback
+        READ enableSoftwareDecoderFallback
+        WRITE setEnableSoftwareDecoderFallback
+        NOTIFY enableSoftwareDecoderFallbackChanged)
+
 public:
     explicit QmlSettingsAdaptor(QObject* parent = nullptr);
 
@@ -105,6 +110,9 @@ public:
     bool useMaxHardwareDecodersCount() const;
     void setUseMaxHardwareDecodersCount(bool value);
 
+    bool enableSoftwareDecoderFallback() const;
+    void setEnableSoftwareDecoderFallback(bool value);
+
 signals:
     void liveVideoPreviewsChanged();
     void lastUsedQualityChanged();
@@ -118,6 +126,7 @@ signals:
     void localeChanged();
     void useVideoDownloadFeatureChanged();
     void useMaxHardwareDecodersCountChanged();
+    void enableSoftwareDecoderFallbackChanged();
 };
 
 } // namespace mobile

@@ -584,5 +584,21 @@ void PlayerDataConsumer::setAllowHardwareAcceleration(bool value)
     m_allowHardwareAcceleration = value;
 }
 
+void PlayerDataConsumer::setAllowSoftwareDecoderFallback(bool value)
+{
+    if (m_allowSoftwareDecoderFallback == value)
+        return;
+
+    NX_MUTEX_LOCKER lock(&m_decoderMutex);
+    for (auto& videoDecoder: m_videoDecoders)
+        videoDecoder->setAllowSoftwareDecoderFallback(value);
+    m_allowSoftwareDecoderFallback = value;
+}
+
+bool PlayerDataConsumer::allowSoftwareDecoderFallback() const
+{
+    return m_allowSoftwareDecoderFallback;
+}
+
 } // namespace media
 } // namespace nx

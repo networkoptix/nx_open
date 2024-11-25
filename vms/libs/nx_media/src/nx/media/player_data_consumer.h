@@ -91,6 +91,9 @@ public:
     void setAllowOverlay(bool value);
     void setAllowHardwareAcceleration(bool value);
 
+    void setAllowSoftwareDecoderFallback(bool value);
+    bool allowSoftwareDecoderFallback() const;
+
     void setPlaySpeed(double value);
 
     nx::media::StreamEventPacket mediaEvent() const;
@@ -202,6 +205,7 @@ private:
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowOverlay;
     std::atomic<bool> m_allowHardwareAcceleration {false};
+    std::atomic<bool> m_allowSoftwareDecoderFallback {true};
     std::atomic<double> m_speed;
     nx::media::StreamEventPacket m_mediaEvent;
     RenderContextSynchronizerPtr m_renderContextSynchronizer;

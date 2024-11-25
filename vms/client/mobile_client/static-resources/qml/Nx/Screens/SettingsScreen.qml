@@ -135,6 +135,18 @@ Page
 
             LabeledSwitch
             {
+                width: parent.width
+                text: qsTr("Enable software decoder fallback")
+                extraText: qsTr("Decode some rare video formats using software decoder")
+                icon: lp("/images/decoder_fallback.svg")
+                checkState:
+                    settings.enableSoftwareDecoderFallback ? Qt.Checked : Qt.Unchecked
+                onCheckStateChanged:
+                    settings.enableSoftwareDecoderFallback = checkState != Qt.Unchecked
+            }
+
+            LabeledSwitch
+            {
                 id: notificationsSwitch
 
                 width: parent.width

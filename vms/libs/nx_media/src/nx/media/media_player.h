@@ -124,6 +124,11 @@ class NX_MEDIA_API Player: public QObject
     /** Human-readable tag for logging and debugging purposes. */
     Q_PROPERTY(QString tag READ tag WRITE setTag NOTIFY tagChanged)
 
+    Q_PROPERTY(bool allowSoftwareDecoderFallback
+        READ allowSoftwareDecoderFallback
+        WRITE setAllowSoftwareDecoderFallback
+        NOTIFY allowSoftwareDecoderFallbackChanged)
+
 public:
     enum class State
     {
@@ -288,6 +293,9 @@ public:
 
     Q_INVOKABLE void invalidateServer();
 
+    void setAllowSoftwareDecoderFallback(bool value);
+    bool allowSoftwareDecoderFallback() const;
+
 public slots:
     void play();
     void pause();
@@ -320,6 +328,7 @@ signals:
     void autoJumpPolicyChanged();
     void cannotDecryptMediaErrorChanged();
     void audioOnlyModeChanged();
+    void allowSoftwareDecoderFallbackChanged();
 
 protected:
     virtual void setResourceInternal(const QnResourcePtr& resource);
