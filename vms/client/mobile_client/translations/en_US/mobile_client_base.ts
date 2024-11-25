@@ -74,6 +74,17 @@
     </message>
 </context>
 <context>
+    <name>nx::vms::client::mobile::MediaDownloadBackend</name>
+    <message>
+        <source>Can&apos;t download video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please check a network connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
         <source>Cannot change push notifications settings</source>

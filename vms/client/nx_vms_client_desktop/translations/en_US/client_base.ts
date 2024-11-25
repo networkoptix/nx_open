@@ -191,6 +191,21 @@
     </message>
 </context>
 <context>
+    <name>CellWidget</name>
+    <message>
+        <source>Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adding</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CertificatesModel</name>
     <message>
         <source>Subject</source>
@@ -250,17 +265,9 @@
         <source>Verifying update package</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Cannot connect to the Site</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ContextMenu</name>
-    <message>
-        <source>Filter...</source>
-        <translation></translation>
-    </message>
     <message>
         <source>Help</source>
         <translation></translation>
@@ -486,22 +493,6 @@
     </message>
     <message>
         <source>Monitor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open in New Tab</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Monitor in New Tab</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open in New Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Monitor in New Window</source>
         <translation></translation>
     </message>
     <message>
@@ -1227,10 +1218,6 @@
     <message>
         <source>Dedicated Window</source>
         <comment>The &quot;Open in&quot; submenu item</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in Dedicated Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2013,6 +2000,10 @@ License Key: %2</source>
         <source>Unable to get GPU information for %1</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Platform</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAbstractPtzDialog</name>
@@ -2310,10 +2301,6 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>IP</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Activity</source>
         <translation></translation>
     </message>
@@ -2355,14 +2342,6 @@ License Key: %2</source>
     </message>
     <message>
         <source>Camera removed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device name</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera name</source>
         <translation></translation>
     </message>
     <message>
@@ -2460,6 +2439,30 @@ License Key: %2</source>
     <message>
         <source>Start time: %1, Target: %2</source>
         <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3019,12 +3022,28 @@ License Key: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All %1 users will be deleted from the site.</source>
+        <source>Recording will stop and all Service Subscriptions will be removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All %1 users will be removed from the site</source>
         <comment>%1 is the short cloud name (like Cloud)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Site will be accessible only through local network.</source>
+        <source>You will be logged out of the site. The site will be accessible only via local network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The site will be accessible only via local network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Existing data (site settings and archive) will be preserved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action cannot be undone</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3111,6 +3130,16 @@ License Key: %2</source>
     <message>
         <source>Connect to Server</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Log in to %1</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logged in as %1</source>
+        <comment>%1 is the cloud login name (like user@domain.com</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3534,6 +3563,10 @@ License Key: %2</source>
         <source>Select Folder...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Notifications filters are moved to the right panel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
@@ -3864,10 +3897,6 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Notifications</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Advanced</source>
         <translation></translation>
     </message>
@@ -4008,6 +4037,10 @@ License Key: %2</source>
         <source>Hotspots</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMessageBox</name>
@@ -4129,25 +4162,6 @@ License Key: %2</source>
     <message>
         <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnPopupSettingsWidget</name>
-    <message>
-        <source>Save user</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter your account password</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>These settings apply only to the site you are logged in. They will be removed in future versions.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4740,6 +4754,10 @@ License Key: %2</source>
         <source>To access certificate details, enable the Audit Trail feature.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnShowTextOverlayActionWidget</name>
@@ -4773,22 +4791,6 @@ License Key: %2</source>
 <context>
     <name>QnStatusOverlayController</name>
     <message>
-        <source>NO DATA</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>UNAUTHORIZED</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>NO ACCESS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>DEVICE DISABLED</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Device Settings</source>
         <translation></translation>
     </message>
@@ -4805,47 +4807,7 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>Enable</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Activate License</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please check authentication information</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>NO LIVE STREAM</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>TOO MANY CONNECTIONS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>PASSWORD REQUIRED</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set for this Camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>UNSUPPORTED FIRMWARE VERSION</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>NOT ENOUGH LICENSES</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>OFFLINE</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>ARCHIVE ENCRYPTED</source>
         <translation></translation>
     </message>
     <message>
@@ -4853,19 +4815,7 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
-        <source>INFORMATION REQUIRED</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Provide</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>NO EXPORT PERMISSION</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>RESTRICTED</source>
         <translation></translation>
     </message>
     <message>
@@ -4873,11 +4823,82 @@ License Key: %2</source>
         <translation></translation>
     </message>
     <message>
+        <source>Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnStatusOverlayWidget</name>
+    <message>
+        <source>NOT ENOUGH LICENSES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UNAUTHORIZED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UNSUPPORTED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PASSWORD REQUIRED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>SITE SHUT DOWN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ask your site administrator to enter the encryption password to decrypt this archive</source>
+        <source>STREAM LIMITATION</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INFORMATION REQUIRED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AUDIO ONLY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO DATA</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO ACCESS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO EXPORT PERMISSION</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TOO MANY CONNECTIONS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NO LIVE STREAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ARCHIVE ENCRYPTED</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CERTIFICATE ERROR</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5033,18 +5054,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Exclusive - server reads and writes all folders.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shared - server reads all folders, but writes only its own folder.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Isolated - server reads and writes only its own folder.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Exclusive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5063,6 +5072,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>URL: %1</source>
         <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5546,6 +5567,37 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>Site will stop functioning soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Site has stopped functioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Site will stop functioning today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Site will stop functioning tomorrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Site will stop functioning in %n days</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Notification and interface languages differ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notifications language differs from the interface language</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
@@ -5605,25 +5657,6 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTimeSlider</name>
     <message>
         <source>No thumbnails available</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnTwoWayAudioWidget::Private</name>
-    <message>
-        <source>Input device is not selected</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Streaming is not ready yet</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Network error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hold to Speak</source>
         <translation></translation>
     </message>
 </context>
@@ -6203,6 +6236,14 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>Delete %n users?</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Unable to move device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of devices for this server is reached</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ShowreelTextFactory</name>
@@ -6292,12 +6333,9 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>Source and %n more Cameras</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>%n Layouts</source>
-        <translation type="unfinished">
-            <numerusform>%n Layout</numerusform>
-            <numerusform>%n Layouts</numerusform>
-        </translation>
+        <translation type="unfinished">%n Layout</translation>
     </message>
     <message>
         <source>Source Server</source>
@@ -6331,34 +6369,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Also set on source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Also trigger on source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Also record source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Also play on source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Also show on source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use event source camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6378,12 +6388,9 @@ If you intended to move analytics data to another storage location, please conta
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>%n Servers</source>
-        <translation type="unfinished">
-            <numerusform>%n Server</numerusform>
-            <numerusform>%n Servers</numerusform>
-        </translation>
+        <translation type="unfinished">%n Server</translation>
     </message>
     <message numerus="yes">
         <source>%n additional</source>
@@ -6418,32 +6425,118 @@ If you intended to move analytics data to another storage location, please conta
         <source>Developer Mode Info</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Is listed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Is not listed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n removed subjects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n removed devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n removed cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n removed servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n removed layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n subjects more</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%n devices more</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n cameras more</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n servers more</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n layouts more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TierUsageStrings</name>
+    <message>
+        <source>Number of servers per Site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of devices per server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of items on layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of days of archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LDAP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cross-Site features</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TimeDurationWidget</name>
     <message>
         <source>Also include</source>
-        <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event Starts</comment>
+        <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Begin</source>
-        <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event Starts</comment>
+        <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Before Event Starts</source>
-        <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event Starts</comment>
+        <source>Before Event</source>
+        <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>End</source>
-        <comment>Part of the text, action duration: End &lt;time&gt; After Event Stops</comment>
+        <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>After Event Stops</source>
-        <comment>Part of the text, action duration: End &lt;time&gt; After Event Stops</comment>
+        <source>After Event</source>
+        <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7148,11 +7241,11 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Missed Call</source>
-        <translation></translation>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open</source>
+        <source>Missed call</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7552,6 +7645,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>No cameras available</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Source camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8279,6 +8376,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Site Administration</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Maximum number of Devices for the Site is reached</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
@@ -8382,6 +8483,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Description</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Open event video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open event device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open event camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9373,10 +9486,6 @@ Site performance is degraded.</source>
         <translation></translation>
     </message>
     <message>
-        <source>Lookup List save request failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Lookup List remove request failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9390,6 +9499,10 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>Object was added to the List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An object has been added to the &quot;%1&quot; successfully</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9483,10 +9596,6 @@ Site performance is degraded.</source>
 <context>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
-        <source>%1 (current)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>URL is invalid.</source>
         <translation></translation>
     </message>
@@ -9519,10 +9628,6 @@ Site performance is degraded.</source>
         <translation></translation>
     </message>
     <message>
-        <source>You are about to merge the current Site %1 with Site</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Merge Sites</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9553,6 +9658,22 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>Failed to merge Sites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9645,6 +9766,10 @@ Site performance is degraded.</source>
     </message>
     <message>
         <source>Site name is not configured yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of Servers for the Site is reached.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10135,11 +10260,41 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <translation></translation>
     </message>
     <message>
-        <source>Notifications Settings</source>
-        <translation></translation>
+        <source>Current Site</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Current Site</source>
+        <source>Any Notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose Types...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n notification types</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
+    <message>
+        <source>Select Notification Types</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10374,17 +10529,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
         <source>Attention! Power limit exceeded</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::PresentedStateDelegate</name>
-    <message>
-        <source>Added</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Adding</source>
         <translation></translation>
     </message>
 </context>
@@ -11459,15 +11603,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
         <source>Some features may not be available.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Services</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::SystemTabBar</name>
     <message>
-        <source>Disconnect</source>
+        <source>Open in New Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in New Window</source>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11621,6 +11777,21 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
         <source>Short</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::TwoWayAudioButton</name>
+    <message>
+        <source>Hold to Speak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input device is not selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12266,6 +12437,14 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Developer Tools</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Unavailable in dedicated window mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move this window to the Layout to use this functionality</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
@@ -12871,36 +13050,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::rules::KeywordsPicker</name>
-    <message>
-        <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>If the field is empty, event will always trigger.</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
     <message>
         <source>Has attributes</source>
         <translation></translation>
     </message>
     <message>
-        <source>Listed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Not listed</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Attributes</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>From</source>
         <translation></translation>
     </message>
 </context>
@@ -12982,20 +13138,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>All Users</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>%n Users</source>
-        <translation>
-            <numerusform>%n User</numerusform>
-            <numerusform>%n Users</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Groups</source>
-        <translation>
-            <numerusform>%n Group</numerusform>
-            <numerusform>%n Groups</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Source Server and %1</source>
         <translation></translation>
@@ -13065,15 +13207,7 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Does not contain keywords</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Contains list entries</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Does not contain list entries</source>
         <translation></translation>
     </message>
     <message>
@@ -13083,6 +13217,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>From</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Not contains keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not contains list entries</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13139,6 +13281,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Please disable it for some devices or add more suitable services. Otherwise it will be done automatically on %1</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::saas::TierUsageModel</name>
+    <message>
+        <source>Limitation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13405,18 +13562,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Please update all components to the version %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Skip</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Beta version %1</source>
         <translation></translation>
     </message>
@@ -13511,10 +13656,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Components of Site have different versions:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
@@ -13559,35 +13700,6 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
         <source>File downloading failed</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::workbench::timeline::BookmarkTooltip</name>
-    <message>
-        <source>Zoom timeline
-to view more bookmarks</source>
-        <comment>It is highly recommended to split message in two lines</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Play bookmark from the beginning</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edit bookmark</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Export bookmark</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete bookmark</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Shared by link</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -63,13 +63,16 @@
         <translation></translation>
     </message>
     <message>
-        <source>Proxy LDAP requests %1 via server</source>
-        <comment>%1 is a line break</comment>
+        <source>Group Members Attribute</source>
         <translation></translation>
     </message>
     <message>
-        <source>Group Members Attribute</source>
-        <translation></translation>
+        <source>Proxy LDAP requests via server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notification Language</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -219,17 +222,6 @@
     </message>
     <message>
         <source>Any plugin</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n new results</source>
-        <translation>
-            <numerusform>%n new result</numerusform>
-            <numerusform>%n new results</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>new results</source>
         <translation></translation>
     </message>
     <message>
@@ -700,16 +692,19 @@ Select an Integration to begin configuring its parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This list is associated with %1 Event Rules. Are you sure you want to delete it?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Deleting the list will erase all the data inside it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Delete List?</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -912,13 +907,13 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
-    <name>FixLookupListImportDialog</name>
+    <name>FixLookupListImportPage</name>
     <message>
-        <source>Import List</source>
+        <source>Some values could not be automatically matched. Please map them manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some values could not be automatically matched. Please map them manually.</source>
+        <source>Back</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1515,6 +1510,18 @@ Select an Integration to begin configuring its parameters.</source>
         <source>Fixing imported entries</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Could not import selected file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file appears to be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please ensure the selected file exists and you have access.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LookupListsDialog</name>
@@ -1566,6 +1573,10 @@ Select an Integration to begin configuring its parameters.</source>
         <source>Export failed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Export Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MotionAreaSelector</name>
@@ -1606,6 +1617,14 @@ Select an Integration to begin configuring its parameters.</source>
     <message>
         <source>Nothing found</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more</source>
+        <comment>%n is the number of remaining groups</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1949,6 +1968,14 @@ Select an Integration to begin configuring its parameters.</source>
         <source>Preview is not available for the selected object</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter by</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviewTableView</name>
@@ -2076,10 +2103,6 @@ Press Alt + Click to follow object</source>
 <context>
     <name>RemoteAccess</name>
     <message>
-        <source>No services</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Disabled</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2117,6 +2140,10 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
         <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote access is unavailable</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2939,6 +2966,10 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
         <source>Notification Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface Language</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

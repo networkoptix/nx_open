@@ -1333,6 +1333,10 @@
         <source>Cloud storage</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Live view</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StringsHelper</name>
@@ -1427,10 +1431,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>File write error. Not enough free space.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Invalid resource type for data export.</source>
         <translation></translation>
     </message>
@@ -1445,6 +1445,10 @@
     <message>
         <source>Archive is unavailable now. Please try again later.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>File write error.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1714,10 +1718,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Check video stream period (milliseconds)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Storage encryption enabled</source>
         <translation></translation>
     </message>
@@ -1735,10 +1735,6 @@
     </message>
     <message>
         <source>Show mouse timeline preview</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Language for Cloud notifications</source>
         <translation></translation>
     </message>
     <message>
@@ -1892,6 +1888,18 @@
     </message>
     <message>
         <source>Enable or disable the creation of new Integration registration requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anonymous Crash Report Server API URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default locale for new users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check video stream permissions on VMS server period (milliseconds)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2602,6 +2610,14 @@
     </message>
     <message>
         <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call Request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call Request Missed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

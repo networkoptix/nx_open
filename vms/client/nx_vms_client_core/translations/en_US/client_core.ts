@@ -12,16 +12,16 @@
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Owner: %1</source>
-        <comment>%1 is a user name</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>New Site</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Your Site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Owner: %1</source>
+        <comment>%1 is a user/company name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -191,16 +191,6 @@
     </message>
 </context>
 <context>
-    <name>nx::vms::client::core::AbstractAttributedEventModel</name>
-    <message numerus="yes">
-        <source>+%n values</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::core::AnalyticsSearchListModel</name>
     <message>
         <source>Unknown track</source>
@@ -262,7 +252,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This might be due to an expired server certificate or someone trying Contact your site administrator for further investigation.</source>
+        <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

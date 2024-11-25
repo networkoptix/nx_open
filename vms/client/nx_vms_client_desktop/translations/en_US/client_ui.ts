@@ -1859,7 +1859,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Take site name and settings from:</source>
+        <source>Take system name and settings from</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2215,10 +2215,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Language Settings</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Custom notification content</source>
         <translation></translation>
     </message>
@@ -2518,6 +2514,10 @@
         <source>Services state</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Organization&apos;s limits violation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SayTextBusinessActionWidget</name>
@@ -2763,6 +2763,10 @@
         <source>Remote Access</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable hardware decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
@@ -2927,10 +2931,6 @@
     </message>
     <message>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Custom language for Cloud notifications</source>
         <translation></translation>
     </message>
 </context>

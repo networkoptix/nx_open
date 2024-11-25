@@ -27,6 +27,41 @@
     </message>
 </context>
 <context>
+    <name>BetaFeaturesScreen</name>
+    <message>
+        <source>Beta Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ability to download video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speedup connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Improve network performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum decoders count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Improve video decoding perfomance using maximum hardware decoders count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please restart the app to apply the changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BooleanSelector</name>
     <message>
         <source>Yes</source>
@@ -661,23 +696,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Speedup connections</source>
+        <source>Notifications are turned off in the device settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Improve network performance</source>
+        <source>Beta Features</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please restart the app to apply the changes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>BETA</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Push notifications are turned off in site settings</source>
+        <source>Early access to new features</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
