@@ -12,6 +12,8 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QScrollBar>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QWidgetAction>
 
@@ -21,6 +23,24 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
+class MenuItemDelegate: public QStyledItemDelegate
+{
+    using base_type = QStyledItemDelegate;
+
+public:
+    explicit MenuItemDelegate(QObject* parent = nullptr): base_type(parent)
+    {
+    }
+
+    virtual void initStyleOption(
+        QStyleOptionViewItem* option, const QModelIndex& index) const override
+    {
+        base_type::initStyleOption(option, index);
+        if (!option->state.testFlag(QStyle::State_MouseOver))
+            option->state.setFlag(QStyle::State_Selected, false);
+    }
+};
 
 class MenuTreeView: public QTreeView
 {
@@ -32,6 +52,7 @@ public:
         setUniformRowHeights(true);
         setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         setHeaderHidden(true);
+        setItemDelegate(new MenuItemDelegate(this));
         header()->setSectionResizeMode(QHeaderView::ResizeToContents);
         header()->setStretchLastSection(false);
     }
@@ -103,7 +124,6 @@ ItemModelMenu::ItemModelMenu(QWidget* parent):
 
             auto palette = this->palette();
             palette.setBrush(QPalette::Midlight, palette.highlight());
-            palette.setBrush(QPalette::Text, palette.highlightedText());
             palette.setBrush(QPalette::Highlight, Qt::transparent);
             d->view->setPalette(palette);
             d->view->setMaximumSize(screen()->size() / 2);
