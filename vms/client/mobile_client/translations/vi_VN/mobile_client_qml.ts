@@ -413,15 +413,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Tất cả Chi nhánh</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Chi nhánh được chọn</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Phải chọn ít nhất một Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -621,7 +621,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>Không tìm thấy Chi nhánh nào</translation>
     </message>
   </context>
   <context>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Thông báo đã bị tắt trong cài đặt thiết bị</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -868,7 +868,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Nhập mật khẩu mã hóa trên Desktop Client để giải mã kho lưu trữ này hoặc yêu cầu quản trị viên Chi nhánh trợ giúp.</translation>
     </message>
   </context>
   <context>
