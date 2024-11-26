@@ -894,7 +894,7 @@ size_t Engine::processEvent(const EventPtr& event)
         }
     }
 
-    NX_DEBUG(this, "Matched with %1 rules", triggeredRules.size());
+    NX_VERBOSE(this, "Matched with %1 rules", triggeredRules.size());
 
     if (!triggeredRules.empty())
         m_router->routeEvent(event, triggeredRules);
