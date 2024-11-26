@@ -55,7 +55,7 @@ private:
         nx::cloud::db::api::ResultCode result,
         nx::cloud::db::api::SystemData systemData);
     void onBindFinished(nx::cloud::db::api::SystemData systemData);
-    void requestLocalSessionToken();
+    void requestLocalSessionTokenIfReady();
     void onLocalSessionTokenReady();
     void bindSystemToCloud(
         nx::network::http::Credentials credentials,

@@ -181,6 +181,8 @@ void ConnectToCloudTool::onCloudTokensReady()
     m_cloudAuthData.credentials.authToken =
         network::http::BearerAuthToken{m_oauthLoginDialog->cloudTokens().accessToken.toStdString()};
     m_cloudAuthData.refreshToken = m_oauthLoginDialog->cloudTokens().refreshToken.toStdString();
+
+    requestLocalSessionTokenIfReady();
 }
 
 void ConnectToCloudTool::onCloudAuthDataReady()
@@ -259,14 +261,17 @@ void ConnectToCloudTool::onBindFinished(nx::cloud::db::api::SystemData systemDat
     m_cloudAuthData.credentials.username = systemData.ownerAccountEmail();
     m_systemData = std::move(systemData);
 
+    requestLocalSessionTokenIfReady();
+}
+
+void ConnectToCloudTool::requestLocalSessionTokenIfReady()
+{
+    if (m_systemData == nx::cloud::db::api::SystemData{} || m_cloudAuthData.empty())
+        return;
+
     m_oauthLoginDialog->accept();
     m_oauthLoginDialog->deleteLater();
 
-    requestLocalSessionToken();
-}
-
-void ConnectToCloudTool::requestLocalSessionToken()
-{
     const QString title = tr("Connect Site to %1?", "%1 is the cloud name (like Nx Cloud)")
         .arg(nx::branding::cloudName());
     const QString mainText = tr(
