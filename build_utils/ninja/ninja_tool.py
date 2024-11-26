@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
@@ -24,15 +24,19 @@ NINJA_PREBUILD_FILE_NAME = 'pre_build.ninja_tool'
 KNOWN_FILES_FILE_NAME = "known_files.txt"
 PERSISTENT_KNOWN_FILES_FILE_NAME = "persistent_known_files.txt"
 ALLOWED_COMMANDS = [
-    "strengthen", "run", "clean", "list_unknown_files", "substitute_verify_globs",
-    "generate_affected_targets_list", "add_directories_to_known_files"]
+    "strengthen",
+    "run",
+    "clean",
+    "list_unknown_files",
+    "generate_affected_targets_list",
+    "add_directories_to_known_files",
+]
 
 class ParsedScriptData(NamedTuple):
     strengthened_targets: Set[str] = set()
     commands_to_run: List[List[str]] = list()
     do_clean: bool = None
     do_list_unknown: bool = None
-    verify_globs_path: Path = None
     known_file_names: Set[str] = set()
     changed_files_list_file_name: str = None
     affected_targets_list_file_name: str = None
@@ -54,7 +58,6 @@ class ParsedScriptData(NamedTuple):
             commands_to_run=[c for s in sources for c in s.commands_to_run],
             do_clean=any([s for s in sources if s.do_clean]),
             do_list_unknown=any([s for s in sources if s.do_list_unknown]),
-            verify_globs_path=_last_value_or_none("verify_globs_path"),
             known_file_names={n for s in sources for n in s.known_file_names},
             changed_files_list_file_name=_last_value_or_none("changed_files_list_file_name"),
             affected_targets_list_file_name=_last_value_or_none("affected_targets_list_file_name"),
@@ -249,7 +252,6 @@ def _execute(
             strengthened_targets=script_data.strengthened_targets,
             script_timestamp=script_timestamp,
             build_file_processor=build_file_processor,
-            verify_globs_path=script_data.verify_globs_path,
             force_patch=force_patch)
 
     for command in script_data.commands_to_run:
@@ -284,13 +286,7 @@ def update_persistent_known_files_file(build_dir: Path, directories: Set[str]):
 
 
 def _has_data_for_patching(script_data: ParsedScriptData):
-    if script_data.strengthened_targets:
-        return True
-
-    if script_data.verify_globs_path:
-        return True
-
-    return False
+    return bool(script_data.strengthened_targets)
 
 
 def _parse_script_data(script_file_name: str) -> ParsedScriptData:
@@ -327,12 +323,6 @@ def _parse_splitted_command_line(command: str, args: List[str]) -> ParsedScriptD
 
     if command == "list_unknown_files":
         return ParsedScriptData(do_list_unknown=True)
-
-    if command == "substitute_verify_globs":
-        if len(args) != 1:
-            print("There must be exactly one argument for \"substitute_verify_globs\" command.")
-            return ParsedScriptData()
-        return ParsedScriptData(verify_globs_path=Path(args[0]))
 
     if command == "generate_affected_targets_list":
         if len(args) != 3:
@@ -399,7 +389,6 @@ def patch_ninja_build(
         file_name: Path,
         strengthened_targets: set,
         build_file_processor: BuildNinjaFileProcessor,
-        verify_globs_path: Path,
         script_timestamp: float = None,
         force_patch: bool = False) -> None:
     """Do patching of build.ninja. Also searches for the "include" directive for rules.ninja, and
@@ -414,9 +403,6 @@ def patch_ninja_build(
     :type script_timestamp: float
     :param build_file_processor: The instance of BuildNinjaFileProcessor class.
     :type build_file_processor: BuildNinjaFileProcessor
-    :param verify_globs_path: Path to verify_globs tool if it should be use instead of cmake
-        VerifyGlobs checker; `None` otherwise.
-    :type verify_globs_path: Path
     :param force_patch: Whether to force-patch the file, regardless of the script modification time,
         defaults to False
     :type force_patch: bool, optional
@@ -435,8 +421,7 @@ def patch_ninja_build(
 
     print("Patching build.ninja...")
     patch_rules_file(
-        build_file_processor, verify_globs_path,
-        script_timestamp=script_timestamp, force_patch=force_patch)
+        build_file_processor, script_timestamp=script_timestamp, force_patch=force_patch)
     if strengthened_targets:
         build_file_processor.strengthen_dependencies(strengthened_targets)
     build_file_processor.save_data()
@@ -445,7 +430,6 @@ def patch_ninja_build(
 
 def patch_rules_file(
         build_file_processor: BuildNinjaFileProcessor,
-        verify_globs_path: Path,
         script_timestamp: float = None,
         force_patch: bool = False) -> None:
 
@@ -462,8 +446,6 @@ def patch_rules_file(
 
     print("Patching rules.ninja...")
     rules_file_processor.patch_cmake_rerun()
-    if verify_globs_path:
-        rules_file_processor.patch_verify_globs(verify_globs_path)
     rules_file_processor.save_data()
     print("Done")
 

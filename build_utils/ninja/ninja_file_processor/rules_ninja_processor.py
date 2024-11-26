@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
@@ -26,8 +26,6 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
         pass
 
     _RERUN_CMAKE_RULE = "RERUN_CMAKE"
-    _VERIFY_GLOBS_RULE = "VERIFY_GLOBS"
-    _VERIFY_GLOBS_TOOL_NAME = "verify_globs"
     _SELF_RUN_OPTIONS = "--log-output --stack-trace"
 
     # Universal regex for parsing specific rules.ninja syntax.
@@ -101,25 +99,3 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
 
         raise NinjaFileProcessorParseError(
             self, f'No command found for rule "{rule}"')
-
-    def patch_verify_globs(self, verify_globs_path: Path) -> None:
-        """Use custom script to verify globs."""
-
-        try:
-            command_line_index, command = self._find_command_by_rule(
-                self._VERIFY_GLOBS_RULE)
-        except self.RuleLookupError:
-            print(f"Can't find {self._VERIFY_GLOBS_RULE} in rules.ninja file.")
-            return
-
-        verify_globs_full_path = verify_globs_path.joinpath(self._VERIFY_GLOBS_TOOL_NAME)
-        verify_globs_run_string = (
-            f"{verify_globs_full_path.as_posix()} {self.build_directory.as_posix()}")
-        if verify_globs_run_string == command:  # verify_globs is already added.
-            return
-
-        updated_line = f"  command = {verify_globs_run_string}\n"
-        self._lines[command_line_index] = Line(
-            raw=updated_line, parsed=None, type=LineType.COMMAND)
-
-        self._is_patch_applied = True  # pylint:disable=attribute-defined-outside-init
