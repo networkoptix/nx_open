@@ -72,6 +72,7 @@ struct NX_VMS_API FullInfoData
     (analyticsPlugins) \
     (analyticsEngines)
 NX_VMS_API_DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
+NX_REFLECTION_INSTRUMENT(FullInfoData, FullInfoData_Fields)
 
 } // namespace api
 } // namespace vms

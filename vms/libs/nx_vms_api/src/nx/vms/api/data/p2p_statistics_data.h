@@ -5,6 +5,9 @@
 #include <QtCore/QMap>
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
+
 #include "data_macros.h"
 
 namespace nx::vms::api {
@@ -18,5 +21,6 @@ struct NX_VMS_API P2pStatisticsData
 #define P2pStatisticsData_Fields \
     (totalBytesSent)(totalDbData)(p2pCounters)
 NX_VMS_API_DECLARE_STRUCT(P2pStatisticsData)
+NX_REFLECTION_INSTRUMENT(P2pStatisticsData, P2pStatisticsData_Fields);
 
 } // namespace nx::vms::api

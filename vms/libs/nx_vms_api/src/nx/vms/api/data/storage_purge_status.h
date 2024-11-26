@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api {
@@ -55,5 +56,7 @@ using StoragePurgeStatusDataList = std::vector<StoragePurgeStatusData>;
 
 QN_FUSION_DECLARE_FUNCTIONS(StoragePurgeStatusData::LastPurgeData, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(StoragePurgeStatusData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StoragePurgeStatusData::LastPurgeData, LastPurgeData_Fields)
+NX_REFLECTION_INSTRUMENT(StoragePurgeStatusData, StoragePurgeStatusData_Fields)
 
 } // namespace nx::vms::api

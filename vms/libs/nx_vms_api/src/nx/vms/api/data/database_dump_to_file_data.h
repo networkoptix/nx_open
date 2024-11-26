@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
+
 #include "data_macros.h"
 
 namespace nx {
@@ -15,6 +17,7 @@ struct NX_VMS_API DatabaseDumpToFileData
 };
 #define DatabaseDumpToFileData_Fields (size)
 NX_VMS_API_DECLARE_STRUCT(DatabaseDumpToFileData)
+NX_REFLECTION_INSTRUMENT(DatabaseDumpToFileData, DatabaseDumpToFileData_Fields)
 
 } // namespace api
 } // namespace vms

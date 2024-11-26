@@ -17,8 +17,8 @@
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/type_utils.h>
 
-#include "utils.h"
 #include "../tags.h"
+#include "utils.h"
 
 namespace nx::reflect {
 
@@ -157,7 +157,8 @@ template<typename C>
 DeserializationResult deserialize(
     const DeserializationContext& ctx,
     C* data,
-    std::enable_if_t<IsSequenceContainerV<C>
+    std::enable_if_t<IsArrayV<C>
+        || IsSequenceContainerV<C>
         || IsSetContainerV<C>
         || IsUnorderedSetContainerV<C>
     >* = nullptr)

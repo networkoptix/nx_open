@@ -25,6 +25,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 ResourceParamWithRefDataList ResourceWithParameters::asList(const nx::Uuid& id) const
 {
+    // TODO: Use nx_reflect here.
+
     ResourceParamWithRefDataList list;
     if (!parameters.empty())
     {
@@ -68,9 +70,18 @@ void ResourceWithParameters::extractFromList(const nx::Uuid& id, ResourceParamWi
 
 void ResourceWithParameters::setFromParameter(const ResourceParamData& parameter)
 {
-    QJsonValue& value = parameters[parameter.name];
-    if (!QJson::deserialize(parameter.value, &value))
-        value = parameter.value;
+    // TODO: Use nx_reflect here.
+
+    QJsonValue value;
+    if (QJson::deserialize(parameter.value, &value))
+    {
+        if (!value.isUndefined())
+            parameters[parameter.name] = value;
+    }
+    else
+    {
+        parameters[parameter.name] = parameter.value;
+    }
 }
 
 std::optional<QJsonValue> ResourceWithParameters::parameter(const QString& key) const

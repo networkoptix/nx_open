@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include <rapidjson/document.h>
+
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+
+#include <nx/utils/std/algorithm.h>
 
 #include "csv.h"
 #include "lexical.h"
@@ -153,6 +157,167 @@ inline void serialize(
         writeCommas(field.value(), stream, needComma);
         ++field;
     }
+}
+
+struct ReflectFields
+{
+    std::list<std::pair<const rapidjson::Value*, ReflectFields>> nested;
+};
+
+inline void collectHeader(const rapidjson::Value& value, ReflectFields* fields)
+{
+    if (value.IsArray())
+    {
+        for (auto it = value.Begin(); it != value.End(); ++it)
+            collectHeader(*it, fields);
+        return;
+    }
+
+    if (!value.IsObject())
+        return;
+
+    for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
+    {
+        auto nested = nx::utils::find_if(
+            fields->nested, [&it](const auto& item) { return *item.first == it->name; });
+        if (it->value.IsObject())
+        {
+            if (!nested)
+                nested = &fields->nested.emplace_back(&it->name, ReflectFields{});
+            collectHeader(it->value, &nested->second);
+        }
+        else if (!it->value.IsArray())
+        {
+            if (!nested)
+                nested = &fields->nested.emplace_back(&it->name, ReflectFields{});
+            NX_ASSERT(nested->second.nested.empty());
+        }
+    }
+}
+
+template<class Output>
+inline void writeHeader(
+    const std::string& name,
+    const ReflectFields& fields,
+    QnCsvStreamWriter<Output>* stream,
+    bool* needComma)
+{
+    for (auto it = fields.nested.begin(); it != fields.nested.end(); ++it)
+    {
+        const std::string nestedName =
+            name.empty() ? it->first->GetString() : name + '.' + it->first->GetString();
+        if (it->second.nested.empty())
+        {
+            if (*needComma)
+                stream->writeComma();
+            *needComma = true;
+            QnCsv::serialize(nestedName, stream);
+        }
+        else
+        {
+            writeHeader(nestedName, it->second, stream, needComma);
+        }
+    }
+}
+
+template<class Output>
+inline void writeCommas(
+    const ReflectFields& fields, QnCsvStreamWriter<Output>* stream, bool* needComma)
+{
+    if (fields.nested.empty())
+    {
+        if (*needComma)
+            stream->writeComma();
+        *needComma = true;
+    }
+    else
+    {
+        for (auto field = fields.nested.begin(); field != fields.nested.end(); ++field)
+            writeCommas(field->second, stream, needComma);
+    }
+}
+
+template<class Output>
+inline void serialize(
+    const rapidjson::Value& value,
+    const ReflectFields& fields,
+    QnCsvStreamWriter<Output>* stream,
+    bool* needComma)
+{
+    if (!value.IsObject() && !value.IsArray())
+    {
+        if (*needComma)
+            stream->writeComma();
+        *needComma = true;
+    }
+    switch (value.GetType())
+    {
+        case rapidjson::kArrayType:
+            break;
+        case rapidjson::kFalseType:
+        case rapidjson::kTrueType:
+            QnCsv::serialize(value.GetBool(), stream);
+            break;
+        case rapidjson::kNumberType:
+            QnCsv::serialize(value.GetDouble(), stream);
+            break;
+        case rapidjson::kObjectType:
+        {
+            auto it = value.MemberBegin();
+            for (auto field = fields.nested.begin(); field != fields.nested.end();)
+            {
+                if (it == value.MemberEnd())
+                {
+                    for (; field != fields.nested.end(); ++field)
+                        writeCommas(field->second, stream, needComma);
+                    break;
+                }
+                if (it->value.IsArray())
+                {
+                    ++it;
+                    continue;
+                }
+                if (*field->first == it->name)
+                {
+                    serialize(it->value, field->second, stream, needComma);
+                    ++it;
+                }
+                else
+                {
+                    writeCommas(field->second, stream, needComma);
+                }
+                ++field;
+            }
+            break;
+        }
+        case rapidjson::kNullType:
+            QnCsv::serialize(QByteArray{"null"}, stream);
+            break;
+        case rapidjson::kStringType:
+            QnCsv::serialize(
+                QString::fromUtf8(value.GetString(), value.GetStringLength()), stream);
+            break;
+    }
+}
+
+template<class Output>
+inline void serialize(
+    const rapidjson::Value& value, const ReflectFields& fields, QnCsvStreamWriter<Output>* stream)
+{
+    if (value.IsArray())
+    {
+        for (auto it = value.Begin(); it != value.End(); ++it)
+        {
+            bool needComma = false;
+            serialize(*it, fields, stream, &needComma);
+            stream->writeEndline();
+        }
+        return;
+    }
+
+    bool needComma = false;
+    serialize(value, fields, stream, &needComma);
+    stream->writeEndline();
 }
 
 } // namespace QnCsvDetail

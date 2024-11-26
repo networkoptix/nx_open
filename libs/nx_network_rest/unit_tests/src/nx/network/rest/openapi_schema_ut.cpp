@@ -14,29 +14,31 @@
 #include <nx/utils/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/rest_api_versions.h>
 
 namespace nx::network::rest::json::test {
 
 NX_REFLECTION_INSTRUMENT(NestedTestData, (id)(name))
-NX_REFLECTION_INSTRUMENT(TestData, (id)(name)(list))
+NX_REFLECTION_INSTRUMENT(TestData, (id)(list)(name))
 
 using namespace nx::vms::api;
 using GlobalPermission = HandlerPool::GlobalPermission;
 
-class OpenApiSchemaTest: public ::testing::Test
+class OpenApiSchemaTest: public ::testing::TestWithParam<std::string_view>
 {
 public:
     virtual void SetUp() override
     {
         m_schemas = std::make_shared<OpenApiSchemas>(std::vector<std::shared_ptr<OpenApiSchema>>{
-            OpenApiSchema::load(":/openapi.json")});
+            OpenApiSchema::load(":/openapi_v4.json"), OpenApiSchema::load(":/openapi_v3.json")});
     }
 
-    std::unique_ptr<Request> restRequest(const QStringList& text, QByteArray body = {})
+    std::unique_ptr<Request> restRequest(QStringList text, QByteArray body = {})
     {
+        text.front().replace("/rest/{version}/", NX_FMT("/rest/%1/", GetParam()));
         http::Request httpRequest;
         httpRequest.parse(text.join("\r\n").toUtf8());
-        const QString path = httpRequest.requestLine.url.path();
+        QString path = httpRequest.requestLine.url.path();
 
         m_requests.push_front(httpRequest);
         std::optional<rest::Content> content;
@@ -65,7 +67,13 @@ public:
     class MockCrudHandler: public CrudHandler<MockCrudHandler<Model>>
     {
     public:
-        std::vector<Model> read(IdData, const Request&) { return {{}}; }
+        std::vector<Model> read(IdData, const Request&)
+        {
+            Model model;
+            model.name = "\u0414\u043e\u043c";
+            return {std::move(model)};
+        }
+
         void create(Model, const Request&) {}
     };
 
@@ -159,19 +167,19 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
 [[maybe_unused]] static void dummyRegisterFunction()
 {
     const auto reg = [](auto&&...) {};
-    /**%apidoc GET /rest/v1/test
+    /**%apidoc GET /rest/v{3-}/test
      * %ingroup Test
      * %return List of test data items.
      *     %struct TestDataList
      */
     reg("rest/test/:id?");
 
-    /**%apidoc GET /rest/v1/devices
+    /**%apidoc GET /rest/v{3-}/devices
      * %ingroup Test
      * %return List of all device information objects.
      *     %struct TestDeviceModelList
      *
-     * %apidoc POST /rest/v1/devices
+     * %apidoc POST /rest/v{3-}/devices
      * Create a device.
      * %ingroup Test
      * %struct TestDeviceModel
@@ -179,92 +187,92 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
      * %return Device information object that was created.
      *     %struct TestDeviceModel
      *
-     * %apidoc GET /rest/v1/devices/{id}
+     * %apidoc GET /rest/v{3-}/devices/{id}
      * Read the device specified by {id}. The device must be created before.
      * %ingroup Test
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via GET on /rest/v1/devices) or MAC address (not supported for certain cameras).
+     *     field via GET on /rest/v{3-}/devices) or MAC address (not supported for certain cameras).
      * %return Device information object.
      *     %struct TestDeviceModel
      *
-     * %apidoc PUT /rest/v1/devices/{id}
+     * %apidoc PUT /rest/v{3-}/devices/{id}
      * Completely replace the device specified by {id} with new data provided.
      * The device must be created before.
      * %ingroup Test
      * %struct TestDeviceModel
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via GET on /rest/v1/devices) or MAC address (not supported for certain devices).
+     *     field via GET on /rest/v{3-}/devices) or MAC address (not supported for certain devices).
      * %return Device information object.
      *     %struct TestDeviceModel
      *
-     * %apidoc PATCH /rest/v1/devices/{id}
+     * %apidoc PATCH /rest/v{3-}/devices/{id}
      * Patch the device specified by {id} with new data provided.
      * The device must be created before.
      * %ingroup Test
      * %struct [opt] TestDeviceModel
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via GET on /rest/v1/devices) or MAC address (not supported for certain cameras).
+     *     field via GET on /rest/v{3-}/devices) or MAC address (not supported for certain cameras).
      * %return Device information object.
      *     %struct TestDeviceModel
      *
-     * %apidoc DELETE /rest/v1/devices/{id}
+     * %apidoc DELETE /rest/v{3-}/devices/{id}
      * Delete the device specified by {id}. The device must be created before.
      * %ingroup Test
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via GET on /rest/v1/devices) or MAC address (not supported for certain cameras).
+     *     field via GET on /rest/v{3-}/devices) or MAC address (not supported for certain cameras).
      */
-    reg("rest/v1/devices/:id?");
+    reg("rest/v{3-}/devices/:id?");
 
-    /**%apidoc GET /rest/v1/layouts
+    /**%apidoc GET /rest/v{3-}/layouts
      * %ingroup Test
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_pretty,_with
      * %return List of all layout information objects.
      *     %struct LayoutDataList
      *
-     * %apidoc POST /rest/v1/layouts
+     * %apidoc POST /rest/v{3-}/layouts
      * Create a layout.
      * %ingroup Test
      * %struct LayoutData
      * %return Layout information object created.
      *     %struct LayoutData
      *
-     * %apidoc GET /rest/v1/layouts/{id}
+     * %apidoc GET /rest/v{3-}/layouts/{id}
      * Read the layout specified by {id}. The layout must be created before.
      * %ingroup Test
      * %param:string id Layout unique id or logical id.
      * %return Layout information object.
      *     %struct LayoutData
      */
-    reg("rest/v1/layouts/:id?");
+    reg("rest/v{3-}/layouts/:id?");
 
-    /**%apidoc POST /rest/v1/settings
+    /**%apidoc POST /rest/v{3-}/settings
      * %ingroup Test
      * %struct KeyValueData
      * %param:any value
      */
-    reg("rest/v1/settings");
+    reg("rest/v{3-}/settings");
 
-    /**%apidoc GET /rest/v1/base64/{param}/echo
+    /**%apidoc GET /rest/v{3-}/base64/{param}/echo
      * %ingroup Test
      * %param:base64 param
      * %return
      *     %struct Base64Model
      */
-    reg("rest/v1/base64/:param/echo");
+    reg("rest/v{3-}/base64/:param/echo");
 
-    /**%apidoc GET /rest/v1/map
+    /**%apidoc GET /rest/v{3-}/map
      * %ingroup Test
      * %param[ref] _with
      * %return:{std::map<nx::Uuid, TestData>}
      *     %param[unused] *.id
      *
-     **%apidoc:{std::map<nx::Uuid, TestData>} PUT /rest/v1/map
+     **%apidoc:{std::map<nx::Uuid, TestData>} PUT /rest/v{3-}/map
      * %ingroup Test
      * %param[unused] *.id
      * %return:{std::map<nx::Uuid, TestData>}
      *     %param[unused] *.id
      */
-    reg("rest/v1/map");
+    reg("rest/v{3-}/map");
 
     /**%apidoc PATCH /rest/v{3-}/devices/{deviceId}/bookmarks/{id}
      * Modifies certain fields of the particular Bookmark record stored in the Site.
@@ -276,16 +284,16 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
      * %return:{BookmarkV3} Bookmark record.
      *     %param[unused] password
      */
-    reg("rest/v3/bookmarks");
+    reg("rest/v{3-}/bookmarks");
 
-    /**%apidoc GET /rest/v3/orderer
+    /**%apidoc GET /rest/v{3-}/orderer
      * %ingroup Test
      * %return:{ArrayOrdererTestResponse}
      */
-    reg("rest/v3/orderer");
+    reg("rest/v{3-}/orderer");
 }
 
-TEST_F(OpenApiSchemaTest, Validate)
+TEST_P(OpenApiSchemaTest, Validate)
 {
     QJsonObject keyValue({{QString("name"), QJsonValue("name")}});
 
@@ -293,7 +301,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         keyValue["value"] = QJsonValue(1);
         keyValue["unused"] = QJsonValue(815);
         std::unique_ptr<Request> request =
-            restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue));
+            restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue));
         http::HttpHeaders headers{};
         m_schemas->validateOrThrow(request.get(), &headers);
         EXPECT_TRUE(headers.contains("Warning"));
@@ -308,34 +316,34 @@ TEST_F(OpenApiSchemaTest, Validate)
 
     keyValue["value"] = QJsonValue(1);
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
+        restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
     keyValue["value"] = QJsonValue("1");
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
+        restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
     keyValue["value"] = QJsonArray({QJsonValue(1)});
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
+        restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
     keyValue["value"] = QJsonObject({{QString("value"), QJsonValue(1)}});
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
+        restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
     keyValue["value"] = QJsonValue(true);
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
+        restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
     keyValue["value"] = QJsonValue();
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
+        restRequest({"POST /rest/{version}/settings HTTP/1.1"}, QJson::serialized(keyValue)).get());
 
     m_schemas->validateOrThrow(
-        restRequest({"POST /rest/v1/devices HTTP/1.1"}, QJson::serialized(TestDeviceModel())).get());
+        restRequest({"POST /rest/{version}/devices HTTP/1.1"}, QJson::serialized(TestDeviceModel())).get());
     m_schemas->validateOrThrow(
-        restRequest({"GET /rest/v1/layouts?_format=json&_keepDefault HTTP/1.1"}).get());
-    m_schemas->validateOrThrow(restRequest({"PATCH /rest/v1/devices/{id} HTTP/1.1"},
+        restRequest({"GET /rest/{version}/layouts?_format=json&_keepDefault HTTP/1.1"}).get());
+    m_schemas->validateOrThrow(restRequest({"PATCH /rest/{version}/devices/{id} HTTP/1.1"},
         R"json({"_orderBy": "attributes.scheduleTasks[].startTime", "id": "id"})json").get());
     ASSERT_THROW(
         try
         {
             m_schemas->validateOrThrow(
-                restRequest({"GET /rest/v1/layouts?_keepDefault&_unknown HTTP/1.1"}).get());
+                restRequest({"GET /rest/{version}/layouts?_keepDefault&_unknown HTTP/1.1"}).get());
         }
         catch (const Exception& e)
         {
@@ -347,7 +355,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         try
         {
             m_schemas->validateOrThrow(restRequest(
-                {"POST /rest/v1/devices HTTP/1.1"},
+                {"POST /rest/{version}/devices HTTP/1.1"},
                 R"json({
                     "general": {
                         "name": 1
@@ -364,7 +372,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         try
         {
             m_schemas->validateOrThrow(restRequest(
-                {"POST /rest/v1/devices HTTP/1.1"},
+                {"POST /rest/{version}/devices HTTP/1.1"},
                 R"json({
                     "general": {
                         "name": null
@@ -380,7 +388,7 @@ TEST_F(OpenApiSchemaTest, Validate)
     ASSERT_THROW(
         try
         {
-            m_schemas->validateOrThrow(restRequest({"PATCH /rest/v1/devices/{id} HTTP/1.1"},
+            m_schemas->validateOrThrow(restRequest({"PATCH /rest/{version}/devices/{id} HTTP/1.1"},
                 R"json({"_orderBy": "invalid", "id": "id"})json").get());
         }
         catch (const Exception& e)
@@ -393,7 +401,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         try
         {
             m_schemas->validateOrThrow(
-                restRequest({"PUT /rest/v1/map HTTP/1.1"}, "{\"1\":{\"name\":1}}").get());
+                restRequest({"PUT /rest/{version}/map HTTP/1.1"}, "{\"1\":{\"name\":1}}").get());
         }
         catch (const Exception& e)
         {
@@ -405,7 +413,7 @@ TEST_F(OpenApiSchemaTest, Validate)
         try
         {
             m_schemas->validateOrThrow(
-                restRequest({"PUT /rest/v1/map HTTP/1.1"}, "{\"2\":{\"list\":[]}}").get());
+                restRequest({"PUT /rest/{version}/map HTTP/1.1"}, "{\"2\":{\"list\":[]}}").get());
         }
         catch (const Exception& e)
         {
@@ -415,14 +423,14 @@ TEST_F(OpenApiSchemaTest, Validate)
         Exception);
 }
 
-TEST_F(OpenApiSchemaTest, Postprocess)
+TEST_P(OpenApiSchemaTest, Postprocess)
 {
     std::vector<TestDeviceModel> devices(1);
     devices[0].attributes = nx::vms::api::CameraAttributesData();
     devices[0].attributes->cameraId = nx::Uuid::createUuid();
     QJsonValue json;
     QJson::serialize(devices, &json);
-    m_schemas->postprocessResponse(*restRequest({"GET /rest/v1/devices HTTP/1.1"}), &json);
+    m_schemas->postprocessResponse(*restRequest({"GET /rest/{version}/devices HTTP/1.1"}), &json);
     ASSERT_TRUE(json.isArray());
     ASSERT_EQ(json.toArray().size(), 1);
     QJsonValue device = json.toArray()[0];
@@ -432,13 +440,13 @@ TEST_F(OpenApiSchemaTest, Postprocess)
     ASSERT_FALSE(attributes.toObject().contains("cameraId"));
 }
 
-TEST_F(OpenApiSchemaTest, ArrayOrdererVariant)
+TEST_P(OpenApiSchemaTest, ArrayOrdererVariant)
 {
     ArrayOrdererTestResponse data{{{"key", {{{2}, {1}}}}}};
     QJsonValue json;
     QJson::serialize(data, &json);
     m_schemas->postprocessResponse(
-        *restRequest({"GET /rest/v3/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"}), &json);
+        *restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"}), &json);
     ASSERT_TRUE(json.isObject());
     ASSERT_EQ(json.toObject().size(), 1);
     QJsonValue map = json.toObject()["map"];
@@ -458,14 +466,14 @@ TEST_F(OpenApiSchemaTest, ArrayOrdererVariant)
     ASSERT_EQ(item2.toObject()["id"], 2);
 }
 
-TEST_F(OpenApiSchemaTest, ArrayOrdererVariantNested)
+TEST_P(OpenApiSchemaTest, ArrayOrdererVariantNested)
 {
     ArrayOrdererTestResponse data{
         {{"key", {{{ArrayOrderedTestNested{"2"}}, {ArrayOrderedTestNested{"1"}}}}}}};
     QJsonValue json;
     QJson::serialize(data, &json);
     m_schemas->postprocessResponse(
-        *restRequest({"GET /rest/v3/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"}), &json);
+        *restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"}), &json);
     ASSERT_TRUE(json.isObject());
     ASSERT_EQ(json.toObject().size(), 1);
     QJsonValue map = json.toObject()["map"];
@@ -491,11 +499,12 @@ TEST_F(OpenApiSchemaTest, ArrayOrdererVariantNested)
     ASSERT_EQ(nested2.toObject()["name"], "2");
 }
 
-TEST_F(OpenApiSchemaTest, EmptyOrderBy)
+TEST_P(OpenApiSchemaTest, EmptyOrderBy)
 {
     using namespace nx::utils::json;
     auto json = testJson();
-    m_schemas->postprocessResponse(*restRequest({ "GET /rest/v1/test?_orderBy= HTTP/1.1" }), &json);
+    m_schemas->postprocessResponse(
+        *restRequest({"GET /rest/{version}/test?_orderBy= HTTP/1.1"}), &json);
     ASSERT_EQ(asArray(json).size(), 2);
     EXPECT_EQ(getString(asObject(asArray(json)[0]), "name"), "4");
     ASSERT_EQ(getArray(asObject(asArray(json)[0]), "list").size(), 2);
@@ -503,12 +512,12 @@ TEST_F(OpenApiSchemaTest, EmptyOrderBy)
     EXPECT_EQ(getString(asObject(asArray(json)[1]), "name"), "3");
 }
 
-TEST_F(OpenApiSchemaTest, OrderByNameAndListName)
+TEST_P(OpenApiSchemaTest, OrderByNameAndListName)
 {
     using namespace nx::utils::json;
     auto json = testJson();
     m_schemas->postprocessResponse(
-        *restRequest({"GET /rest/v1/test?_orderBy=name&_orderBy=list[].name HTTP/1.1"}), &json);
+        *restRequest({"GET /rest/{version}/test?_orderBy=name&_orderBy=list[].name HTTP/1.1"}), &json);
     ASSERT_EQ(asArray(json).size(), 2);
     EXPECT_EQ(getString(asObject(asArray(json)[0]), "name"), "3");
     ASSERT_EQ(getArray(asObject(asArray(json)[1]), "list").size(), 2);
@@ -522,47 +531,47 @@ static const QByteArray kPostLayoutDataJson = R"json({
     "fixedHeight": 0
 })json";
 
-TEST_F(OpenApiSchemaTest, PerformancePost)
+TEST_P(OpenApiSchemaTest, PerformancePost)
 {
     HandlerPool pool;
     pool.registerHandler("ec2/saveLayout", new MockHandler<LayoutData>());
     testPerformance(&pool, {"POST /ec2/saveLayout HTTP/1.1"}, kPostLayoutDataJson);
 }
 
-TEST_F(OpenApiSchemaTest, PerformanceGet)
+TEST_P(OpenApiSchemaTest, PerformanceGet)
 {
     HandlerPool pool;
     pool.registerHandler("ec2/getLayouts", new MockHandler<LayoutData>());
     testPerformance(&pool, {"GET /ec2/getLayouts HTTP/1.1"});
 }
 
-TEST_F(OpenApiSchemaTest, PerformanceCrudPost)
+TEST_P(OpenApiSchemaTest, PerformanceCrudPost)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler("rest/v1/layouts/:id?", GlobalPermission::none,
-        std::make_unique<MockCrudHandler<LayoutData>>());
-    testPerformance(&pool, {"POST /rest/v1/layouts HTTP/1.1"}, kPostLayoutDataJson);
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts/:id?"),
+        GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
+    testPerformance(&pool, {"POST /rest/{version}/layouts HTTP/1.1"}, kPostLayoutDataJson);
 }
 
-TEST_F(OpenApiSchemaTest, PerformanceCrudGet)
+TEST_P(OpenApiSchemaTest, PerformanceCrudGet)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler("rest/v1/layouts/:id?", GlobalPermission::none,
-        std::make_unique<MockCrudHandler<LayoutData>>());
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts/:id?"),
+        GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
     testPerformance(
-        &pool, {lit("GET /rest/v1/layouts/%1 HTTP/1.1").arg(nx::Uuid::createUuid().toString())});
+        &pool, {lit("GET /rest/{version}/layouts/%1 HTTP/1.1").arg(nx::Uuid::createUuid().toString())});
 }
 
-TEST_F(OpenApiSchemaTest, XmlResponse)
+TEST_P(OpenApiSchemaTest, XmlResponse)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler("rest/v1/layouts", GlobalPermission::none,
-        std::make_unique<MockCrudHandler<LayoutData>>());
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts"),
+        GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
     std::unique_ptr<Request> request =
-        restRequest({"GET /rest/v1/layouts?_keepDefault HTTP/1.1", "Accept: application/xml"});
+        restRequest({"GET /rest/{version}/layouts?_keepDefault HTTP/1.1", "Accept: application/xml"});
     ASSERT_EQ(request->responseFormatOrThrow(), Qn::SerializationFormat::xml);
     auto handler = pool.findHandlerOrThrow(request.get());
     ASSERT_TRUE(handler);
@@ -570,37 +579,58 @@ TEST_F(OpenApiSchemaTest, XmlResponse)
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(Qn::serializationFormatFromHttpContentType(response.content->type.toString()),
         Qn::SerializationFormat::xml);
-    const QByteArray expected(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            "<reply>"
-                "<element>"
-                    "<backgroundHeight>0</backgroundHeight>"
-                    "<backgroundImageFilename></backgroundImageFilename>"
-                    "<backgroundOpacity>0.69999998807907104</backgroundOpacity>"
-                    "<backgroundWidth>0</backgroundWidth>"
-                    "<cellAspectRatio>0</cellAspectRatio>"
-                    "<cellSpacing>0.05000000074505806</cellSpacing>"
-                    "<fixedHeight>0</fixedHeight>"
-                    "<fixedWidth>0</fixedWidth>"
-                    "<id>{00000000-0000-0000-0000-000000000000}</id>"
-                    "<items/>"
-                    "<locked>false</locked>"
-                    "<logicalId>0</logicalId>"
-                    "<name></name>"
-                    "<parentId>{00000000-0000-0000-0000-000000000000}</parentId>"
-                "</element>"
-            "</reply>\n");
+    const QByteArray expected = GetParam() == *kRestApiV3
+        ?
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<reply>"
+                    "<element>"
+                        "<backgroundHeight>0</backgroundHeight>"
+                        "<backgroundImageFilename></backgroundImageFilename>"
+                        "<backgroundOpacity>0.69999998807907104</backgroundOpacity>"
+                        "<backgroundWidth>0</backgroundWidth>"
+                        "<cellAspectRatio>0</cellAspectRatio>"
+                        "<cellSpacing>0.05000000074505806</cellSpacing>"
+                        "<fixedHeight>0</fixedHeight>"
+                        "<fixedWidth>0</fixedWidth>"
+                        "<id>{00000000-0000-0000-0000-000000000000}</id>"
+                        "<items/>"
+                        "<locked>false</locked>"
+                        "<logicalId>0</logicalId>"
+                        "<name>\u0414\u043e\u043c</name>"
+                        "<parentId>{00000000-0000-0000-0000-000000000000}</parentId>"
+                    "</element>"
+                "</reply>\n"
+        :
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<reply>"
+                    "<element>"
+                        "<id>{00000000-0000-0000-0000-000000000000}</id>"
+                        "<parentId>{00000000-0000-0000-0000-000000000000}</parentId>"
+                        "<name>\u0414\u043e\u043c</name>"
+                        "<cellAspectRatio>0</cellAspectRatio>"
+                        "<cellSpacing>0.05000000074505806</cellSpacing>"
+                        "<items/>"
+                        "<locked>false</locked>"
+                        "<backgroundImageFilename></backgroundImageFilename>"
+                        "<backgroundWidth>0</backgroundWidth>"
+                        "<backgroundHeight>0</backgroundHeight>"
+                        "<backgroundOpacity>0.69999998807907104</backgroundOpacity>"
+                        "<fixedWidth>0</fixedWidth>"
+                        "<fixedHeight>0</fixedHeight>"
+                        "<logicalId>0</logicalId>"
+                    "</element>"
+                "</reply>\n";
     ASSERT_EQ(response.content->body, expected);
 }
 
-TEST_F(OpenApiSchemaTest, CsvResponse)
+TEST_P(OpenApiSchemaTest, CsvResponse)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler("rest/v1/layouts", GlobalPermission::none,
-        std::make_unique<MockCrudHandler<LayoutData>>());
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts"),
+        GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
     std::unique_ptr<Request> request =
-        restRequest({"GET /rest/v1/layouts?_keepDefault HTTP/1.1", "Accept: text/csv"});
+        restRequest({"GET /rest/{version}/layouts?_keepDefault HTTP/1.1", "Accept: text/csv"});
     ASSERT_EQ(request->responseFormatOrThrow(), Qn::SerializationFormat::csv);
     auto handler = pool.findHandlerOrThrow(request.get());
     ASSERT_TRUE(handler);
@@ -608,55 +638,85 @@ TEST_F(OpenApiSchemaTest, CsvResponse)
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(Qn::serializationFormatFromHttpContentType(response.content->type.toString()),
         Qn::SerializationFormat::csv);
-    const QByteArray expected(
-        "backgroundHeight,"
-        "backgroundImageFilename,"
-        "backgroundOpacity,"
-        "backgroundWidth,"
-        "cellAspectRatio,"
-        "cellSpacing,"
-        "fixedHeight,"
-        "fixedWidth,"
-        "id,"
-        "locked,"
-        "logicalId,"
-        "name,"
-        "parentId"
-        "\r\n"
-        "0,"
-        ","
-        "0.69999998807907104,"
-        "0,"
-        "0,"
-        "0.05000000074505806,"
-        "0,"
-        "0,"
-        "{00000000-0000-0000-0000-000000000000},"
-        "false,"
-        "0,"
-        ","
-        "{00000000-0000-0000-0000-000000000000}"
-        "\r\n");
+    const QByteArray expected = GetParam() == *kRestApiV3
+        ?
+            "backgroundHeight,"
+            "backgroundImageFilename,"
+            "backgroundOpacity,"
+            "backgroundWidth,"
+            "cellAspectRatio,"
+            "cellSpacing,"
+            "fixedHeight,"
+            "fixedWidth,"
+            "id,"
+            "locked,"
+            "logicalId,"
+            "name,"
+            "parentId"
+            "\r\n"
+            "0,"
+            ","
+            "0.69999998807907104,"
+            "0,"
+            "0,"
+            "0.05000000074505806,"
+            "0,"
+            "0,"
+            "{00000000-0000-0000-0000-000000000000},"
+            "false,"
+            "0,"
+            "\u0414\u043e\u043c,"
+            "{00000000-0000-0000-0000-000000000000}"
+            "\r\n"
+        :
+            "id,"
+            "parentId,"
+            "name,"
+            "cellAspectRatio,"
+            "cellSpacing,"
+            "locked,"
+            "backgroundImageFilename,"
+            "backgroundWidth,"
+            "backgroundHeight,"
+            "backgroundOpacity,"
+            "fixedWidth,"
+            "fixedHeight,"
+            "logicalId"
+            "\r\n"
+            "{00000000-0000-0000-0000-000000000000},"
+            "{00000000-0000-0000-0000-000000000000},"
+            "\u0414\u043e\u043c,"
+            "0,"
+            "0.05000000074505806,"
+            "false,"
+            ","
+            "0,"
+            "0,"
+            "0.69999998807907104,"
+            "0,"
+            "0,"
+            "0"
+            "\r\n";
     ASSERT_EQ(response.content->body, expected);
 }
 
-TEST_F(OpenApiSchemaTest, PrettyResponse)
+TEST_P(OpenApiSchemaTest, PrettyResponse)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler("rest/v1/layouts", GlobalPermission::none,
-        std::make_unique<MockCrudHandler<LayoutData>>());
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts"),
+        GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
     std::unique_ptr<Request> request = restRequest(
-        {"GET /rest/v1/layouts?_keepDefault&_pretty HTTP/1.1", "Accept: application/json"});
+        {"GET /rest/{version}/layouts?_keepDefault&_pretty HTTP/1.1", "Accept: application/json"});
     auto handler = pool.findHandlerOrThrow(request.get());
     ASSERT_TRUE(handler);
     Response response = handler->executeRequestOrThrow(request.get());
     ASSERT_TRUE(response.content);
     ASSERT_EQ(
         response.content->body.toStdString(),
-        /*suppress newline*/ 1 + (const char*)
-R"json(
-[
+        GetParam() == *kRestApiV3
+            ?
+                R"json([
     {
         "backgroundHeight": 0,
         "backgroundImageFilename": "",
@@ -670,20 +730,40 @@ R"json(
         "items": [],
         "locked": false,
         "logicalId": 0,
-        "name": "",
+        "name": ")json" "\u0414\u043e\u043c" R"json(",
         "parentId": "{00000000-0000-0000-0000-000000000000}"
     }
-])json");
+])json"
+            :
+                R"json([
+    {
+        "id": "{00000000-0000-0000-0000-000000000000}",
+        "parentId": "{00000000-0000-0000-0000-000000000000}",
+        "name": ")json" "\u0414\u043e\u043c" R"json(",
+        "cellAspectRatio": 0.0,
+        "cellSpacing": 0.05000000074505806,
+        "items": [],
+        "locked": false,
+        "backgroundImageFilename": "",
+        "backgroundWidth": 0,
+        "backgroundHeight": 0,
+        "backgroundOpacity": 0.699999988079071,
+        "fixedWidth": 0,
+        "fixedHeight": 0,
+        "logicalId": 0
+    }
+])json"
+    );
 }
 
-TEST_F(OpenApiSchemaTest, Base64)
+TEST_P(OpenApiSchemaTest, Base64)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler(
-        "rest/v1/base64/:param/echo", GlobalPermission::none, std::make_unique<MockBase64Handler>());
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/base64/:param/echo"),
+        GlobalPermission::none, std::make_unique<MockBase64Handler>());
     std::unique_ptr<Request> request =
-        restRequest({"GET /rest/v1/base64/h4%2FdspcBduhE3AAkLjK9Jg%3D%3D/echo HTTP/1.1"});
+        restRequest({"GET /rest/{version}/base64/h4%2FdspcBduhE3AAkLjK9Jg%3D%3D/echo HTTP/1.1"});
     auto handler = pool.findHandlerOrThrow(request.get());
     ASSERT_TRUE(handler);
     Response response = handler->executeRequestOrThrow(request.get());
@@ -691,13 +771,14 @@ TEST_F(OpenApiSchemaTest, Base64)
     ASSERT_EQ(response.content->body, "{\"param\":\"h4/dspcBduhE3AAkLjK9Jg==\"}");
 }
 
-TEST_F(OpenApiSchemaTest, Map)
+TEST_P(OpenApiSchemaTest, Map)
 {
     HandlerPool pool;
     pool.setSchemas(m_schemas);
-    pool.registerHandler("rest/v1/map", GlobalPermission::none, std::make_unique<MockMapHandler>());
+    pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/map"),
+        GlobalPermission::none, std::make_unique<MockMapHandler>());
     std::unique_ptr<Request> requestPut = restRequest(
-        {"PUT /rest/v1/map?_orderBy=*.list[].name HTTP/1.1"},
+        {"PUT /rest/{version}/map"},
         /*suppress newline*/ 1 + (const char*)
 R"json(
 {
@@ -719,6 +800,10 @@ R"json(
     ASSERT_TRUE(handler);
     Response response = handler->executeRequestOrThrow(requestPut.get());
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
+    std::unique_ptr<Request> requestGet =
+        restRequest({"GET /rest/{version}/map?_orderBy=*.list[].name HTTP/1.1"});
+    response = handler->executeRequestOrThrow(requestGet.get());
+    ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(
         nx::utils::formatJsonString(response.content->body).toStdString(),
         /*suppress newline*/ 1 + (const char*)
@@ -739,8 +824,7 @@ R"json(
     }
 })json");
 
-    std::unique_ptr<Request> requestGet =
-        restRequest({"GET /rest/v1/map?_with=*.list.name HTTP/1.1"});
+    requestGet = restRequest({"GET /rest/{version}/map?_with=*.list.name HTTP/1.1"});
     handler = pool.findHandlerOrThrow(requestGet.get());
     ASSERT_TRUE(handler);
     response = handler->executeRequestOrThrow(requestGet.get());
@@ -763,7 +847,7 @@ R"json(
 })json");
 
     std::unique_ptr<Request> requestGetFiltered = restRequest(
-        {"GET /rest/v1/map?{00000000-0000-0000-0000-000000000000}.list.name=1 HTTP/1.1"});
+        {"GET /rest/{version}/map?{00000000-0000-0000-0000-000000000000}.list.name=1 HTTP/1.1"});
     handler = pool.findHandlerOrThrow(requestGetFiltered.get());
     ASSERT_TRUE(handler);
     response = handler->executeRequestOrThrow(requestGetFiltered.get());
@@ -784,5 +868,8 @@ R"json(
     }
 })json");
 }
+
+INSTANTIATE_TEST_SUITE_P(Rest, OpenApiSchemaTest, ::testing::ValuesIn(kRestApiV3, kRestApiEnd),
+    [](auto info) { return std::string(info.param); });
 
 } // namespace nx::network::rest::json::test

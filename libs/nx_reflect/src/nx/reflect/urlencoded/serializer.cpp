@@ -1,10 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "serializer.h"
+
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-
-#include "serializer.h"
 
 namespace nx::reflect::urlencoded::detail {
 
@@ -21,7 +21,7 @@ void UrlencodedComposer::startArray()
     m_stateStack.push(ComposerState::array);
 }
 
-void UrlencodedComposer::endArray()
+void UrlencodedComposer::endArray(int /*items*/)
 {
     if (!m_stateStack.empty())
         m_stateStack.pop();
@@ -45,7 +45,7 @@ void UrlencodedComposer::startObject()
     m_stateStack.push(ComposerState::object);
 }
 
-void UrlencodedComposer::endObject()
+void UrlencodedComposer::endObject(int /*members*/)
 {
     if (!m_stateStack.empty())
         m_stateStack.pop();

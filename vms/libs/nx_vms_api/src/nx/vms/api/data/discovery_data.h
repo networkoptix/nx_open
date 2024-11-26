@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/resource_types.h>
 
 #include "id_data.h"
@@ -45,6 +46,9 @@ struct NX_VMS_API DiscoveredServerData: ModuleInformationWithAddresses
 NX_VMS_API_DECLARE_STRUCT_EX(DiscoverPeerData, (ubjson)(json)(xml)(csv_record))
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DiscoveryData, (ubjson)(json)(xml)(csv_record)(sql_record))
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DiscoveredServerData, (ubjson)(json)(xml)(csv_record))
+NX_REFLECTION_INSTRUMENT(DiscoverPeerData, DiscoverPeerData_Fields);
+NX_REFLECTION_INSTRUMENT(DiscoveryData, DiscoveryData_Fields);
+NX_REFLECTION_INSTRUMENT(DiscoveredServerData, DiscoveredServerData_Fields);
 
 } // namespace api
 } // namespace vms

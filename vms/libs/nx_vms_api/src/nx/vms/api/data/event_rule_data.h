@@ -51,6 +51,7 @@ struct NX_VMS_API EventRuleData: IdData
     (eventState)(actionType)(actionResourceIds)(actionParams) \
     (aggregationPeriod)(disabled)(comment)(schedule)(system)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(EventRuleData)
+NX_REFLECTION_INSTRUMENT(EventRuleData, EventRuleData_Fields);
 
 struct NX_VMS_API EventActionData
 {
@@ -68,6 +69,7 @@ struct NX_VMS_API EventActionData
 #define EventActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resourceIds) \
     (params)(runtimeParams)(ruleId)(aggregationCount)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(EventActionData)
+NX_REFLECTION_INSTRUMENT(EventActionData, EventActionData_Fields);
 
 struct NX_VMS_API ResetEventRulesData
 {
@@ -77,6 +79,7 @@ struct NX_VMS_API ResetEventRulesData
 };
 #define ResetEventRulesData_Fields (defaultRules)
 NX_VMS_API_DECLARE_STRUCT(ResetEventRulesData)
+NX_REFLECTION_INSTRUMENT(ResetEventRulesData, ResetEventRulesData_Fields);
 
 } // namespace api
 } // namespace vms

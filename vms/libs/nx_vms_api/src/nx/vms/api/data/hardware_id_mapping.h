@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -21,6 +22,7 @@ struct HardwareIdMapping
 
 #define HardwareIdMapping_Fields (hardwareId)(physicalId)(physicalIdGuid)
 NX_VMS_API_DECLARE_STRUCT(HardwareIdMapping)
+NX_REFLECTION_INSTRUMENT(HardwareIdMapping, HardwareIdMapping_Fields)
 
 using HardwareIdMappingList = std::vector<HardwareIdMapping>;
 

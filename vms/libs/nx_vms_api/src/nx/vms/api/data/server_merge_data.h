@@ -4,8 +4,10 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/data_macros.h>
+
+#include "data_macros.h"
 
 namespace nx::vms::api {
 
@@ -38,5 +40,6 @@ struct NX_VMS_API ServerMergeData
 };
 #define ServerMergeData_Fields (serverId)(serverName)(status)(errorMessage)
 NX_VMS_API_DECLARE_STRUCT(ServerMergeData)
+NX_REFLECTION_INSTRUMENT(ServerMergeData, ServerMergeData_Fields)
 
 } // namespace nx::vms::api

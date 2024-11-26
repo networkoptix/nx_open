@@ -5,6 +5,7 @@
 #include <map>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 #include "id_data.h"
 
@@ -20,6 +21,7 @@ struct NX_VMS_API StorageForecastData: IdData
 };
 #define StorageForecastData_Fields (id)(bitrateAnalyzePeriodMs)(additionalSpaceB)
 QN_FUSION_DECLARE_FUNCTIONS(StorageForecastData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageForecastData, StorageForecastData_Fields)
 
 struct NX_VMS_API StorageForecast
 {
@@ -58,6 +60,7 @@ struct NX_VMS_API StorageForecast
     (deviceId)(recordedBytes) \
     (recordedS)(archiveDurationForecastS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
 QN_FUSION_DECLARE_FUNCTIONS(StorageForecast, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageForecast, StorageForecast_Fields)
 
 using StorageForecastValues = std::map<nx::Uuid /*id*/, std::vector<api::StorageForecast> /*forecast*/>;
 

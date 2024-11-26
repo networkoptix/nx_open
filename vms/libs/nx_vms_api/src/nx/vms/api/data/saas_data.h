@@ -30,6 +30,7 @@ public:
 
 bool NX_VMS_API fromString(const std::string& value, SaasDateTime* target);
 NX_REFLECTION_TAG_TYPE(SaasDateTime, useStringConversionForSerialization)
+QN_FUSION_DECLARE_FUNCTIONS(SaasDateTime, (json), NX_VMS_API)
 
 NX_REFLECTION_ENUM_CLASS(SaasServiceState,
     /**%apidoc active */
@@ -319,6 +320,7 @@ struct NX_VMS_API SaasSecurity
 #define SaasSecurity_Fields (checkPeriodS)(lastCheck)(tmpExpirationDate)(status)
 NX_REFLECTION_INSTRUMENT(SaasSecurity, SaasSecurity_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasSecurity, (json), NX_VMS_API)
+NX_REFLECTION_TAG_TYPE(SaasSecurity, jsonSerializeChronoDurationAsNumber)
 
 /**%apidoc SaasData from license server. */
 struct NX_VMS_API SaasData

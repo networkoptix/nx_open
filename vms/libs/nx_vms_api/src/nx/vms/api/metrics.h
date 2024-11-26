@@ -11,8 +11,9 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/flags.h>
+#include <nx/utils/serialization/qjson.h>
 
 namespace nx::vms::api::metrics {
 
@@ -22,6 +23,13 @@ public:
     using QJsonValue::QJsonValue;
     Value(std::chrono::milliseconds duration): QJsonValue(double(duration.count()) / 1000) {}
 };
+
+template<typename SerializationContext>
+requires std::is_member_object_pointer_v<decltype(&SerializationContext::composer)>
+void serialize(SerializationContext* context, const Value& data)
+{
+    return serialize(context, static_cast<const QJsonValue&>(data));
+}
 
 NX_VMS_API void PrintTo(const Value& v, ::std::ostream* s);
 NX_VMS_API void merge(Value* destination, Value* source);
@@ -89,6 +97,7 @@ struct NX_VMS_API ValueManifest: Label
 };
 #define ValueManifest_Fields (id)(name)(description)(format)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ValueManifest, ValueManifest_Fields)
 
 /**%apidoc
  * %param id Parameter group id.
@@ -103,6 +112,7 @@ struct NX_VMS_API ValueGroupManifest: Label
 };
 #define ValueGroupManifest_Fields (id)(name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupManifest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ValueGroupManifest, ValueGroupManifest_Fields)
 
 /**%apidoc
  * %param id Resource group id.
@@ -120,6 +130,7 @@ struct NX_VMS_API ResourceManifest: Label
 };
 #define ResourceManifest_Fields (id)(name)(resource)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceManifest, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ResourceManifest, ResourceManifest_Fields)
 
 using SiteManifest
     = std::vector<ResourceManifest>;
@@ -153,6 +164,7 @@ struct NX_VMS_API AlarmRule
 };
 #define AlarmRule_Fields (level)(condition)(text)
 QN_FUSION_DECLARE_FUNCTIONS(AlarmRule, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(AlarmRule, AlarmRule_Fields)
 
 struct NX_VMS_API ValueRule
 {
@@ -167,6 +179,7 @@ struct NX_VMS_API ValueRule
 };
 #define ValueRule_Fields (name)(description)(isOptional)(display)(format)(calculate)(insert)(alarms)
 QN_FUSION_DECLARE_FUNCTIONS(ValueRule, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ValueRule, ValueRule_Fields)
 
 struct NX_VMS_API ValueGroupRules
 {
@@ -175,6 +188,7 @@ struct NX_VMS_API ValueGroupRules
 };
 #define ValueGroupRules_Fields (name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupRules, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ValueGroupRules, ValueGroupRules_Fields)
 
 struct NX_VMS_API ResourceRules
 {
@@ -184,6 +198,7 @@ struct NX_VMS_API ResourceRules
 };
 #define ResourceRules_Fields (name)(resource)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ResourceRules, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(ResourceRules, ResourceRules_Fields)
 
 using SiteRules
     = std::map<QString /*resourceGroupId*/, ResourceRules>;
@@ -197,6 +212,7 @@ struct NX_VMS_API Alarm
 };
 #define Alarm_Fields (level)(text)
 QN_FUSION_DECLARE_FUNCTIONS(Alarm, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(Alarm, Alarm_Fields)
 
 using ValueAlarms
     = std::vector<Alarm>;

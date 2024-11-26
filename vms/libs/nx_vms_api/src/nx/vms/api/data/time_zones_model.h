@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx::vms::api {
 
@@ -37,5 +38,6 @@ struct NX_VMS_API TimeZonesData
     (isDaylightTime) \
     (comment)
 QN_FUSION_DECLARE_FUNCTIONS(TimeZonesData, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(TimeZonesData, TimeZonesData_Fields)
 
 } // namespace nx::vms::api

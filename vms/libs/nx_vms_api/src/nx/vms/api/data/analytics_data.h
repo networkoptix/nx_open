@@ -10,6 +10,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/rect_as_string.h>
 #include <nx/vms/api/data/resource_data.h>
@@ -26,6 +27,7 @@ struct NX_VMS_API AnalyticsPluginData: ResourceData
 };
 #define AnalyticsPluginData_Fields ResourceData_Fields
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsPluginData)
+NX_REFLECTION_INSTRUMENT(AnalyticsPluginData, AnalyticsPluginData_Fields)
 
 struct NX_VMS_API AnalyticsEngineData: ResourceData
 {
@@ -34,6 +36,7 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 };
 #define AnalyticsEngineData_Fields ResourceData_Fields
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AnalyticsEngineData)
+NX_REFLECTION_INSTRUMENT(AnalyticsEngineData, AnalyticsEngineData_Fields)
 
 /**%apidoc
  * Information about a Server Integration that resides in a plugin (dynamic library). If the
@@ -213,6 +216,7 @@ struct NX_VMS_API PluginInfo
     (instanceIndex) \
     (instanceId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfo)
+NX_REFLECTION_INSTRUMENT(PluginInfo, PluginInfo_Fields)
 
 /**%apidoc
  * Information about bound resources. For Analytics Plugins contains information about the
@@ -252,6 +256,7 @@ struct NX_VMS_API PluginResourceBindingInfo
     (boundResourceCount) \
     (onlineBoundResourceCount)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginResourceBindingInfo)
+NX_REFLECTION_INSTRUMENT(PluginResourceBindingInfo, PluginResourceBindingInfo_Fields)
 
 /**%apidoc Extended information about a Server Plugin. */
 struct NX_VMS_API PluginInfoEx: PluginInfo
@@ -276,6 +281,7 @@ struct NX_VMS_API PluginInfoEx: PluginInfo
 };
 #define PluginInfoEx_Fields PluginInfo_Fields (resourceBindingInfo)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PluginInfoEx)
+NX_REFLECTION_INSTRUMENT(PluginInfoEx, PluginInfoEx_Fields)
 
 using ExtendedPluginInfoByServer = std::map<nx::Uuid, PluginInfoExList>;
 

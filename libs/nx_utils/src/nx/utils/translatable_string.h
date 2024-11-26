@@ -78,8 +78,11 @@ NX_UTILS_API nx::reflect::DeserializationResult deserialize(
     const nx::reflect::json::DeserializationContext& ctx,
     TranslatableString* data);
 
-NX_UTILS_API void serialize(
-    nx::reflect::json::SerializationContext* ctx,
-    const TranslatableString& value);
+template<typename SerializationContext>
+requires std::is_member_object_pointer_v<decltype(&SerializationContext::composer)>
+void serialize(SerializationContext* context, const TranslatableString& value)
+{
+    context->composer.writeString(value.value().toStdString());
+}
 
 } // namespace nx

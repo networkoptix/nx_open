@@ -27,10 +27,10 @@ public:
     virtual ~AbstractComposer() = default;
 
     virtual void startArray() = 0;
-    virtual void endArray() = 0;
+    virtual void endArray(int items) = 0;
 
     virtual void startObject() = 0;
-    virtual void endObject() = 0;
+    virtual void endObject(int members) = 0;
 
     virtual void writeBool(bool val) = 0;
     virtual void writeInt(const std::int64_t& val) = 0;
@@ -160,7 +160,8 @@ template<
 void serialize(
     SerializationContext* ctx,
     const Container& data,
-    std::enable_if_t<IsSequenceContainerV<Container>
+    std::enable_if_t<IsArrayV<Container>
+        || IsSequenceContainerV<Container>
         || IsSetContainerV<Container>
         || IsUnorderedSetContainerV<Container>
     >* = nullptr)
@@ -168,7 +169,7 @@ void serialize(
     ctx->composer.startArray();
     for (auto it = data.begin(); it != data.end(); ++it)
         serializeAdl(ctx, *it);
-    ctx->composer.endArray();
+    ctx->composer.endArray(data.size());
 }
 
 template<
@@ -189,7 +190,7 @@ void serialize(
         ctx->composer.writeAttributeName(nx::reflect::toString(it->first));
         serializeAdl(ctx, it->second);
     }
-    ctx->composer.endObject();
+    ctx->composer.endObject(data.size());
 }
 
 template<typename SerializationContext>
@@ -303,10 +304,7 @@ public:
         m_ctx->composer.startObject();
     }
 
-    ~Visitor()
-    {
-        m_ctx->composer.endObject();
-    }
+    ~Visitor() { m_ctx->composer.endObject(m_attributes); }
 
     template<typename WrappedField>
     void visitField(const WrappedField& field)
@@ -317,6 +315,7 @@ public:
 private:
     SerializationContext* m_ctx = nullptr;
     const Data& m_data;
+    int m_attributes = 0;
 
     template<typename Value>
     void writeAttribute(const char* name, const std::optional<Value>& value)
@@ -330,6 +329,7 @@ private:
     {
         m_ctx->composer.writeAttributeName(name);
         BasicSerializer::serializeAdl(m_ctx, value);
+        ++m_attributes;
     }
 };
 

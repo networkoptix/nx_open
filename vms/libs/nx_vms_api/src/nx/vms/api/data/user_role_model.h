@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 #include "global_permission_deprecated.h"
 #include "user_group_data.h"

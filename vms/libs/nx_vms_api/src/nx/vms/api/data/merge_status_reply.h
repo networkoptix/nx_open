@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/data_macros.h>
 
+#include "data_macros.h"
 #include "server_merge_data.h"
 
 namespace nx::vms::api {
@@ -24,5 +25,6 @@ struct NX_VMS_API MergeStatusReply
 };
 #define MergeStatusReply_Fields (mergeId)(mergeInProgress)(unmergedServers)(warnings)
 NX_VMS_API_DECLARE_STRUCT(MergeStatusReply)
+NX_REFLECTION_INSTRUMENT(MergeStatusReply, MergeStatusReply_Fields)
 
 } // namespace nx::vms::api

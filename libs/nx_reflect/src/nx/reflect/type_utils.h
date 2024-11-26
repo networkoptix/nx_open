@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <optional>
 #include <set>
@@ -33,17 +34,22 @@ inline constexpr bool IsStringAlikeV = detail::HasTrimmedV<T>
     || std::is_convertible_v<T, std::string_view>;
 
 template<typename T>
-struct IsOptional: std::false_type
-{
-};
+struct IsOptional: std::false_type {};
 
 template<typename T>
-struct IsOptional<std::optional<T>>: std::true_type
-{
-};
+struct IsOptional<std::optional<T>>: std::true_type {};
 
 template<typename T>
 inline constexpr bool IsOptionalV = IsOptional<T>::value;
+
+template<typename T>
+struct IsArray: std::false_type {};
+
+template<typename V, auto N>
+struct IsArray<std::array<V, N>>: std::true_type {};
+
+template<typename... Args>
+inline constexpr bool IsArrayV = IsArray<Args...>::value;
 
 //-------------------------------------------------------------------------------------------------
 

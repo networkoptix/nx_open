@@ -317,8 +317,22 @@ NX_REFLECTION_INSTRUMENT(SiteSettings, SiteSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeChronoDurationAsNumber)
 NX_REFLECTION_TAG_TYPE(SiteSettings, jsonSerializeInt64AsString)
 
-NX_VMS_API void serialize(
-    nx::reflect::json::SerializationContext* context, const SiteSettings& data);
+template<typename SerializationContext>
+requires std::is_member_object_pointer_v<decltype(&SerializationContext::composer)>
+void serialize(SerializationContext* context, const SiteSettings& data)
+{
+    switch (data.name)
+    {
+        #define VALUE(R, VALUE, ITEM) \
+            case SiteSettingName::ITEM: \
+                return nx::reflect::BasicSerializer::serializeAdl(context, VALUE.ITEM);
+        BOOST_PP_SEQ_FOR_EACH(VALUE, data, SiteSettings_Fields)
+        #undef VALUE
+
+        case SiteSettingName::none:
+            nx::reflect::BasicSerializer::serialize(context, data);
+    }
+}
 
 struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSettings
 {

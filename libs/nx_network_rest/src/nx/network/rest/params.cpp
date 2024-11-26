@@ -2,6 +2,9 @@
 
 #include "params.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -161,6 +164,49 @@ void Params::rename(const QString& oldName, const QString& newName)
         m_values.erase(it);
         m_values.insert(newName, value);
     }
+}
+
+Params Params::fromJson(const rapidjson::Value& value)
+{
+    Params params;
+    for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
+        params.insert(it->name.GetString(), valueToString(it->value));
+
+    return params;
+}
+
+QString Params::valueToString(const rapidjson::Value& value)
+{
+    static const QString kTrue("true");
+    static const QString kFalse("false");
+    switch (value.GetType())
+    {
+        case rapidjson::kNullType:
+            return QString();
+        case rapidjson::kFalseType:
+            return kFalse;
+        case rapidjson::kTrueType:
+            return kTrue;
+        case rapidjson::kNumberType:
+            return QString::number(value.GetDouble());
+        case rapidjson::kStringType:
+            return value.GetString();
+        case rapidjson::kArrayType:
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer{buffer};
+            NX_ASSERT(value.Accept(writer), "Failed to stringify JSON array");
+            return buffer.GetString();
+        }
+        case rapidjson::kObjectType:
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer{buffer};
+            NX_ASSERT(value.Accept(writer), "Failed to stringify JSON object");
+            return buffer.GetString();
+        }
+    }
+    return {};
 }
 
 // TODO: Fix or refactor. This function disregards possible content errors. For example,

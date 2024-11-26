@@ -77,6 +77,7 @@ struct NX_VMS_API SiteInformation
     (cloudOwnerId)(organizationId)(endpoint)(servers)(edgeServerCount)(devices)(status)(ldapSyncId) \
     (synchronizedTimeMs)
 NX_VMS_API_DECLARE_STRUCT_EX(SiteInformation, (json))
+NX_REFLECTION_INSTRUMENT(SiteInformation, SiteInformation_Fields)
 
 struct NX_VMS_API OtherSiteRequest
 {

@@ -29,6 +29,17 @@ struct NX_VMS_API ResolutionData
     std::string toStdString() const;
     QString toString() const;
 
+    bool operator==(const ResolutionData&) const = default;
+
+    constexpr inline bool operator<(const ResolutionData& rhs) const
+    {
+        const auto lhsSquare = size.width() * size.height();
+        const auto rhsSquare = rhs.size.width() * rhs.size.height();
+        return lhsSquare != rhsSquare
+            ? lhsSquare < rhsSquare
+            : std::max(size.width(), size.height()) < std::max(rhs.size.width(), rhs.size.height());
+    }
+
     /**%apidoc[unused] */
     QSize size;
 };

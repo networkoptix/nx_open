@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include <nx/utils/serialization/qjson.h>
 
@@ -52,13 +52,13 @@ TEST_F(Json, qjson_array_support)
 {
     QString jsonStr = R"([1.0,2.0,3.0,4.0,[1.0,2.0]])";
     Foo f{10, QJsonDocument::fromJson(jsonStr.toUtf8()).array()};
-    checkSerializationDeserealization(f, R"({"num":10,"qJson":[1.0,2.0,3.0,4.0,[1.0,2.0]]})");
+    checkSerializationDeserealization(f, R"({"num":10,"qJson":[1,2,3,4,[1,2]]})");
 }
 
 TEST_F(Json, qjson_int_support)
 {
     Foo f{12, QJsonValue(12)};
-    checkSerializationDeserealization(f, R"({"num":12,"qJson":12.0})");
+    checkSerializationDeserealization(f, R"({"num":12,"qJson":12})");
 }
 
 TEST_F(Json, qjson_double_support)

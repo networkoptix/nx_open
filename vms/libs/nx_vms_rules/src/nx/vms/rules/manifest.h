@@ -12,6 +12,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/translatable_string.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/resource_types.h>
@@ -98,6 +99,7 @@ struct ResourceDescriptor
     (type)(readPermissions)(createPermissions)(flags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ResourceDescriptor& value, QJsonValue* target);
+NX_REFLECTION_INSTRUMENT(ResourceDescriptor, nx_vms_rules_ResourceDescriptor_Fields)
 
 /** Description of event or action field. */
 struct FieldDescriptor
@@ -122,9 +124,9 @@ struct FieldDescriptor
     QVariantMap properties; //< TODO: #mmalofeev should properties required for the field initialisation be separated from the supportive properties?
 };
 #define nx_vms_rules_FieldDescriptor_Fields (id)(fieldName)(displayName)(description)(properties)
-
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const FieldDescriptor& value, QJsonValue* target);
+NX_REFLECTION_INSTRUMENT(FieldDescriptor, nx_vms_rules_FieldDescriptor_Fields)
 
 /** Description of event or action with default field set. */
 struct ItemDescriptor
@@ -178,6 +180,7 @@ struct ItemDescriptor
     (resources)(readPermissions)(createPermissions)(emailTemplateName)(serverFlags)
 NX_VMS_RULES_API void serialize(
     QnJsonContext* ctx, const ItemDescriptor& value, QJsonValue* target);
+NX_REFLECTION_INSTRUMENT(ItemDescriptor, nx_vms_rules_ItemDescriptor_Fields)
 
 } // namespace nx::vms::rules
 

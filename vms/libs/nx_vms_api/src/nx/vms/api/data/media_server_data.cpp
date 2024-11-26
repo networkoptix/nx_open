@@ -27,26 +27,6 @@ const QString MediaServerData::kResourceTypeName = lit("Server");
 const nx::Uuid MediaServerData::kResourceTypeId =
     ResourceData::getFixedTypeId(MediaServerData::kResourceTypeName);
 
-void serialize(
-    nx::reflect::json::SerializationContext* context,
-    const BackupBitrateBytesPerSecond& value)
-{
-    context->composer.startArray();
-    for (auto it = value.begin(); it != value.end(); ++it)
-    {
-        context->composer.startObject();
-
-        context->composer.writeAttributeName(kKeyAttributeName);
-        nx::reflect::json::serialize(context, it.key());
-
-        context->composer.writeAttributeName(kValueAttributeName);
-        nx::reflect::json::serialize(context, it.value());
-
-        context->composer.endObject();
-    }
-    context->composer.endArray();
-}
-
 nx::reflect::DeserializationResult deserialize(
     const nx::reflect::json::DeserializationContext& context,
     BackupBitrateBytesPerSecond* value)

@@ -6,6 +6,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+
 #include "id_data.h"
 
 namespace nx {
@@ -22,6 +24,7 @@ struct NX_VMS_API PropertyTypeData
 };
 #define PropertyTypeData_Fields (resourceTypeId)(name)(defaultValue)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(PropertyTypeData)
+NX_REFLECTION_INSTRUMENT(PropertyTypeData, PropertyTypeData_Fields)
 
 struct NX_VMS_API ResourceTypeData: IdData
 {
@@ -34,6 +37,7 @@ struct NX_VMS_API ResourceTypeData: IdData
 };
 #define ResourceTypeData_Fields IdData_Fields (name)(vendor)(parentId)(propertyTypes)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceTypeData)
+NX_REFLECTION_INSTRUMENT(ResourceTypeData, ResourceTypeData_Fields)
 
 } // namespace api
 } // namespace vms

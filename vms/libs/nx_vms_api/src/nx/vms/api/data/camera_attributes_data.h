@@ -188,6 +188,7 @@ NX_VMS_API void serialize(
     QnJsonContext* ctx, const CameraAttributesData& value, QJsonValue* target);
 NX_VMS_API bool deserialize(
     QnJsonContext* ctx, const QJsonValue& value, CameraAttributesData* target);
+NX_REFLECTION_INSTRUMENT(CameraAttributesData, CameraAttributesData_Fields)
 
 } // namespace api
 } // namespace vms

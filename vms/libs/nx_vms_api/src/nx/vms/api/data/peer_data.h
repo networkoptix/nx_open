@@ -5,6 +5,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/format.h>
 #include <nx/vms/api/types/connection_types.h>
 
@@ -29,10 +30,9 @@ struct NX_VMS_API PersistentIdData: IdData
     bool operator<(const PersistentIdData& other) const;
     bool operator>(const PersistentIdData& other) const { return other < *this; }
 };
-#define PersistentIdData_Fields \
-    IdData_Fields \
-    (persistentId)
+#define PersistentIdData_Fields IdData_Fields(persistentId)
 NX_VMS_API_DECLARE_STRUCT(PersistentIdData)
+NX_REFLECTION_INSTRUMENT(PersistentIdData, PersistentIdData_Fields)
 
 struct NX_VMS_API PeerData: PersistentIdData
 {
@@ -87,12 +87,9 @@ struct NX_VMS_API PeerData: PersistentIdData
      */
     Qn::SerializationFormat dataFormat = Qn::SerializationFormat::ubjson;
 };
-#define PeerData_Fields \
-    PersistentIdData_Fields \
-    (instanceId) \
-    (peerType) \
-    (dataFormat)
+#define PeerData_Fields PersistentIdData_Fields(instanceId)(peerType)(dataFormat)
 NX_VMS_API_DECLARE_STRUCT(PeerData)
+NX_REFLECTION_INSTRUMENT(PeerData, PeerData_Fields)
 
 using PeerSet = QSet<nx::Uuid>;
 
@@ -117,6 +114,7 @@ struct PeerDataEx: public PeerData
     (protoVersion) \
     (connectionGuid)
 NX_VMS_API_DECLARE_STRUCT(PeerDataEx)
+NX_REFLECTION_INSTRUMENT(PeerDataEx, PeerDataEx_Fields)
 
 } // namespace api
 } // namespace vms

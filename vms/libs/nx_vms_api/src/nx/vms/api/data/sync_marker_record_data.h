@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -18,6 +19,7 @@ struct NX_VMS_API SyncMarkerRecordData
 };
 #define SyncMarkerRecordData_Fields (peerID)(dbID)(sequence)
 NX_VMS_API_DECLARE_STRUCT(SyncMarkerRecordData)
+NX_REFLECTION_INSTRUMENT(SyncMarkerRecordData, SyncMarkerRecordData_Fields)
 
 } // namespace api
 } // namespace vms

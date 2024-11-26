@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 #include <QtCore/QtGlobal>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/latin1_array.h>
 
 #include "data_macros.h"
@@ -44,6 +45,7 @@ struct NX_VMS_API SystemMergeHistoryRecord
     (username) \
     (signature)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(SystemMergeHistoryRecord)
+NX_REFLECTION_INSTRUMENT(SystemMergeHistoryRecord, SystemMergeHistoryRecord_Fields)
 
 } // namespace api
 } // namespace vms

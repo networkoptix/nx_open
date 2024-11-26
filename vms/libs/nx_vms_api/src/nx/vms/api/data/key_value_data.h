@@ -4,6 +4,8 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/reflect/instrument.h>
+
 #include "data_macros.h"
 
 namespace nx {
@@ -18,10 +20,9 @@ struct NX_VMS_API KeyValueData
     QByteArray name;
     QByteArray value;
 };
-
-#define KeyValueData_Fields \
-    (name)(value)
+#define KeyValueData_Fields (name)(value)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(KeyValueData)
+NX_REFLECTION_INSTRUMENT(KeyValueData, KeyValueData_Fields)
 
 } // namespace api
 } // namespace vms

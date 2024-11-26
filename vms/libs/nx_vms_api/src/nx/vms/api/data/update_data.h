@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 #include <QtCore/QtGlobal>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
@@ -194,6 +195,7 @@ struct NX_VMS_API StartUpdateReply
 };
 #define StartUpdateReply_Fields (updateInformation)(persistentStorageServers)
 NX_VMS_API_DECLARE_STRUCT_EX(StartUpdateReply, (json))
+NX_REFLECTION_INSTRUMENT(StartUpdateReply, StartUpdateReply_Fields)
 
 struct NX_VMS_API InstallUpdateRequest
 {
@@ -237,6 +239,7 @@ struct NX_VMS_API DownloadStatus
 };
 #define DownloadStatus_Fields (file)(status)(sizeB)(downloadedSizeB)
 NX_VMS_API_DECLARE_STRUCT_EX(DownloadStatus, (json))
+NX_REFLECTION_INSTRUMENT(DownloadStatus, DownloadStatus_Fields)
 
 struct NX_VMS_API UpdateStatusInfo
 {
@@ -281,6 +284,7 @@ struct NX_VMS_API UpdateStatusInfo
 #define UpdateStatusInfo_Fields (serverId)(state)(error)(message)(progress)(downloads)\
     (mainUpdatePackage)
 NX_VMS_API_DECLARE_STRUCT_EX(UpdateStatusInfo, (json))
+NX_REFLECTION_INSTRUMENT(UpdateStatusInfo, UpdateStatusInfo_Fields)
 
 struct NX_VMS_API PersistentUpdateStorageInfo: PersistentUpdateStorage
 {
@@ -309,6 +313,7 @@ struct NX_VMS_API UpdateUploadData
     (data) \
     (offset)
 NX_VMS_API_DECLARE_STRUCT(UpdateUploadData)
+NX_REFLECTION_INSTRUMENT(UpdateUploadData, UpdateUploadData_Fields)
 
 struct NX_VMS_API UpdateUploadResponseData
 {
@@ -318,6 +323,7 @@ struct NX_VMS_API UpdateUploadResponseData
 };
 #define UpdateUploadResponseData_Fields (id)(updateId)(chunks)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UpdateUploadResponseData)
+NX_REFLECTION_INSTRUMENT(UpdateUploadResponseData, UpdateUploadResponseData_Fields)
 
 struct NX_VMS_API UpdateInstallData
 {
@@ -325,5 +331,6 @@ struct NX_VMS_API UpdateInstallData
 };
 #define UpdateInstallData_Fields (updateId)
 NX_VMS_API_DECLARE_STRUCT(UpdateInstallData)
+NX_REFLECTION_INSTRUMENT(UpdateInstallData, UpdateInstallData_Fields)
 
 } // namespace nx::vms::api

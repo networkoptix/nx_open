@@ -112,7 +112,7 @@ template<typename T>
 constexpr bool isInternalDeserializable()
 {
     constexpr bool isContainer =
-        IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>;
+        IsArrayV<T> || IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>;
 
     constexpr bool isAssociativeContainer =
         (IsAssociativeContainerV<T> && !IsSetContainerV<T>) ||

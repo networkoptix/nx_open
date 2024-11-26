@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+
 #include "data_macros.h"
 
 namespace nx {
@@ -16,12 +18,9 @@ struct NX_VMS_API CleanupDatabaseData
     bool cleanupTransactionLog = false;
     QString reserved;
 };
-
-#define CleanupDatabaseData_Fields \
-    (cleanupDbObjects) \
-    (cleanupTransactionLog) \
-    (reserved)
+#define CleanupDatabaseData_Fields (cleanupDbObjects)(cleanupTransactionLog)(reserved)
 NX_VMS_API_DECLARE_STRUCT(CleanupDatabaseData)
+NX_REFLECTION_INSTRUMENT(CleanupDatabaseData, CleanupDatabaseData_Fields)
 
 } // namespace api
 } // namespace vms

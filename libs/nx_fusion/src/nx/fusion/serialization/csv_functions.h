@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_SERIALIZATION_CSV_FUNCTIONS_H
-#define QN_SERIALIZATION_CSV_FUNCTIONS_H
+#pragma once
 
 #include <iterator> /* For std::iterator_traits. */
 #include <map>
@@ -196,4 +195,16 @@ inline void serialize(const QJsonValue& value, QnCsvStreamWriter<Output>* stream
     }
 }
 
-#endif // QN_SERIALIZATION_CSV_FUNCTIONS_H
+template<class Output>
+inline void serialize(const rapidjson::Value& value, QnCsvStreamWriter<Output>* stream)
+{
+    QnCsvDetail::ReflectFields fields;
+    if (value.IsArray() || value.IsObject())
+    {
+        bool needComma = false;
+        QnCsvDetail::collectHeader(value, &fields);
+        QnCsvDetail::writeHeader({}, fields, stream, &needComma);
+        stream->writeEndline();
+    }
+    QnCsvDetail::serialize(value, fields, stream);
+}

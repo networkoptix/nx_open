@@ -105,7 +105,11 @@ bool filter(T* data, const Filter& filter_)
     if (!filter_.values.empty() && !Matcher::matches(*data, filter_.values))
         return true;
 
-    if constexpr (IsOptionalV<T>)
+    if constexpr (std::is_same_v<std::nullptr_t, T>)
+    {
+        return true;
+    }
+    else if constexpr (IsOptionalV<T>)
     {
         return data->has_value() && filter<Matcher>(&data->value(), filter_);
     }
@@ -124,9 +128,15 @@ bool filter(T* data, const Filter& filter_)
         if (data->empty())
             return true;
 
-        if constexpr (IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>)
+        if constexpr (IsArrayV<T>)
         {
-            std::erase_if(*data, [&filter_](auto& v) { return filter<Matcher>(&v, filter_); });
+            return std::all_of(data->begin(), data->end(),
+                [&filter_](auto& v) { return filter<Matcher>(&v, filter_); });
+        }
+        else if constexpr (IsSequenceContainerV<T> || IsSetContainerV<T> || IsUnorderedSetContainerV<T>)
+        {
+            using std::erase_if; //< To use both std and QT erase_if.
+            erase_if(*data, [&filter_](auto& v) { return filter<Matcher>(&v, filter_); });
             return data->empty();
         }
         else if constexpr (IsAssociativeContainerV<T> || IsUnorderedAssociativeContainerV<T>)
@@ -135,8 +145,8 @@ bool filter(T* data, const Filter& filter_)
             {
                 if (field.name == "*")
                 {
-                    for (auto it = data->begin(); it != data->end();)
-                        it = filter<Matcher>(&it->second, field) ? data->erase(it) : std::next(it);
+                    std::erase_if(
+                        *data, [&field](auto& it) { return filter<Matcher>(&it.second, field); });
                     if (data->empty())
                         return true;
                 }
@@ -144,14 +154,11 @@ bool filter(T* data, const Filter& filter_)
                 {
                     auto key = keyFromName<typename T::key_type>(field.name);
                     auto it = data->find(key);
-                    if (it != data->end())
+                    if (it != data->end() && filter<Matcher>(&it->second, field))
                     {
-                        if (filter<Matcher>(&it->second, field))
-                        {
-                            data->erase(it);
-                            if (data->empty())
-                                return true;
-                        }
+                        data->erase(it);
+                        if (data->empty())
+                            return true;
                     }
                 }
             }

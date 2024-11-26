@@ -4,8 +4,10 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/filter.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/serialization/json.h>
 #include <nx/vms/api/types/day_of_week.h>
 #include <nx/vms/api/types/resource_types.h>
 
@@ -118,12 +120,80 @@ NX_REFLECTION_INSTRUMENT(BackupBitrateKey, BackupBitrateKey_Fields)
 using BackupBitrateBytesPerSecond = QMap<BackupBitrateKey, qint64>;
 constexpr int64_t kNoRecordingBitrateBps = 0L;
 
-void NX_VMS_API serialize(
-    nx::reflect::json::SerializationContext* context,
-    const BackupBitrateBytesPerSecond& value);
+template<typename SerializationContext>
+void serialize(
+    SerializationContext* context,
+    const BackupBitrateBytesPerSecond& value)
+{
+    context->composer.startArray();
+    for (auto it = value.begin(); it != value.end(); ++it)
+    {
+        context->composer.startObject();
+
+        context->composer.writeAttributeName("key");
+        nx::reflect::BasicSerializer::serializeAdl(context, it.key());
+
+        context->composer.writeAttributeName("value");
+        nx::reflect::BasicSerializer::serializeAdl(context, it.value());
+
+        context->composer.endObject(/*members*/ 2);
+    }
+    context->composer.endArray(value.size());
+}
+
 nx::reflect::DeserializationResult NX_VMS_API deserialize(
     const nx::reflect::json::DeserializationContext& context,
     BackupBitrateBytesPerSecond* value);
+
+template<typename Matcher>
+bool filter(BackupBitrateBytesPerSecond* data, const nx::reflect::Filter& filter_)
+{
+    if (data->empty())
+        return false;
+
+    for (const auto& field: filter_.fields)
+    {
+        if (field.name == "key")
+        {
+            if (!filter_.values.empty())
+            {
+                data->removeIf(
+                    [&filter_](BackupBitrateBytesPerSecond::Iterator& it)
+                    {
+                        return !Matcher::matches(it.key(), filter_.values);
+                    });
+            }
+            for (const auto& nested: field.fields)
+            {
+                if (nested.name == "day")
+                {
+                    data->removeIf(
+                        [&nested](BackupBitrateBytesPerSecond::Iterator& it)
+                        {
+                            return !Matcher::matches(it.key().day, nested.values);
+                        });
+                }
+                else if (NX_ASSERT(nested.name == "hour", "Unknown filter field %1", nested.name))
+                {
+                    data->removeIf(
+                        [&nested](BackupBitrateBytesPerSecond::Iterator& it)
+                        {
+                            return !Matcher::matches(it.key().hour, nested.values);
+                        });
+                }
+            }
+        }
+        else if (NX_ASSERT(field.name == "value", "Unknown filter field %1", field.name))
+        {
+            data->removeIf(
+                [&filter_](BackupBitrateBytesPerSecond::Iterator& it)
+                {
+                    return !Matcher::matches(it.value(), filter_.values);
+                });
+        }
+    }
+    return data->empty();
+}
 
 /**%apidoc
  * %param[opt]:array backupBitrateBytesPerSecond

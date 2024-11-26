@@ -134,6 +134,9 @@ struct NX_VMS_API AuditRecord
 private:
     AuditRecord(): authSession{{{nx::Uuid{}}}} {}
 
+    template<typename SerializationContext, typename Data>
+    friend class nx::reflect::Visitor;
+
     template<typename T>
     friend QJsonValue nx::network::rest::json::defaultValue();
 

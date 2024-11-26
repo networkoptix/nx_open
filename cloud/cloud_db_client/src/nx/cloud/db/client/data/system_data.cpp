@@ -192,24 +192,28 @@ static void serializeFlattenningAttrs(
     const T& value)
 {
     ctx->composer.startObject();
-
+    int attributes = 0;
     nx::reflect::forEachField<T>(
-        [ctx, &value](const auto& field)
+        [ctx, &value, &attributes](const auto& field)
         {
             if (nx::reflect::isSameField(field, &SystemData::attributes))
             {
                 // Serializing "attributes" values on the top level of the JSON document.
                 for (const auto& attr: value.attributes)
+                {
                     writeJsonAttribute(ctx, attr.name, attr.value);
+                    ++attributes;
+                }
             }
             else
             {
                 // Serializing each field but "attributes" as usual.
                 writeJsonAttribute(ctx, field.name(), field.get(value));
+                ++attributes;
             }
         });
 
-    ctx->composer.endObject();
+    ctx->composer.endObject(attributes);
 }
 
 template<typename T>

@@ -286,6 +286,14 @@ TEST(Json, KeepDefault)
     ASSERT_TRUE(getArray(mapWithKeepDefault, "a").isEmpty());
 }
 
+TEST(Json, ReflectStripDefault)
+{
+    std::vector<nx::vms::api::DeviceModel> list{{}};
+    ASSERT_EQ(nx::reflect::json_detail::getStringRepresentation(
+            nx::utils::serialization::json::serialized(list, /*stripDefault*/ true)),
+        "[]");
+}
+
 TEST(Json, KeepDefaultWithVariant)
 {
     using namespace nx::utils::json;

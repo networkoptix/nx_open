@@ -90,11 +90,4 @@ nx::reflect::DeserializationResult deserialize(
     return nx::reflect::DeserializationResult(true);
 }
 
-void serialize(
-    nx::reflect::json::SerializationContext* ctx,
-    const TranslatableString& value)
-{
-    ctx->composer.writeString(value.value().toStdString());
-}
-
 } // namespace nx

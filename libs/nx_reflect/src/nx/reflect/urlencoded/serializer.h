@@ -22,9 +22,9 @@ class NX_REFLECT_API UrlencodedComposer: public AbstractComposer<std::string>
 
 public:
     virtual void startArray() override;
-    virtual void endArray() override;
+    virtual void endArray(int items) override;
     virtual void startObject() override;
-    virtual void endObject() override;
+    virtual void endObject(int members) override;
     virtual void writeBool(bool val) override;
     virtual void writeInt(const std::int64_t& val) override;
     virtual void writeFloat(const double& val) override;

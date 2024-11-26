@@ -7,6 +7,7 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/reflect/instrument.h>
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
 
 #include "data_macros.h"
 
@@ -38,7 +39,7 @@ struct CloudNotification
     QMap<QString, QJsonValue> notification;
 };
 #define CloudNotification_Fields (type)(systemId)(notification)
-
 NX_VMS_API_DECLARE_STRUCT_EX(CloudNotification, (json))
+NX_REFLECTION_INSTRUMENT(CloudNotification, CloudNotification_Fields)
 
 } // namespace nx::vms::api

@@ -333,6 +333,62 @@ void filterToItems(QString key, QString value, QMap<QString, FilterItems>* items
         nested.value = std::move(value);
 }
 
+void filterAny(const utils::DotNotationString& items, rapidjson::Value* result);
+
+void filterArray(const utils::DotNotationString& items, rapidjson::Value* result)
+{
+    for (auto it = result->Begin(); it != result->End(); ++it)
+        filterAny(items, &(*it));
+}
+
+void filterObject(const utils::DotNotationString& items, rapidjson::Value* result)
+{
+    auto wildcardFilter = items.find("*");
+    const bool wildcard = wildcardFilter != items.end();
+
+    auto field = result->MemberBegin();
+    while (field != result->MemberEnd())
+    {
+        auto it = items.find(field->name.GetString());
+        auto& filter = it != items.end() ? it : wildcardFilter;
+        if (filter != items.end())
+        {
+            if (const auto& nested = filter.value(); !nested.empty())
+            {
+                if (wildcard)
+                {
+                    utils::DotNotationString merged;
+                    merged = wildcardFilter.value();
+                    merged.add(nested);
+                    filterAny(merged, &field->value);
+                }
+                else
+                {
+                    filterAny(nested, &field->value);
+                }
+            }
+            if (field->value.IsObject() && field->value.ObjectEmpty())
+                field = result->EraseMember(field);
+            else
+                ++field;
+        }
+        else
+        {
+            field = result->EraseMember(field);
+        }
+    }
+}
+
+void filterAny(const utils::DotNotationString& items, rapidjson::Value* value)
+{
+    if (value->IsArray())
+        return filterArray(items, value);
+    if (value->IsObject())
+        return filterObject(items, value);
+    if (!items.empty())
+        throw Exception::badRequest(NX_FMT("Unknown _with item(s): %1", items.keys().join(", ")));
+}
+
 bool processDefaultValue(
     const QJsonValue& defaultValue, QJsonValue* value, DefaultValueAction action);
 
@@ -602,6 +658,69 @@ void filter(
     }
 }
 
+void filter(rapidjson::Document* value, nx::utils::DotNotationString with)
+{
+    if (!with.isEmpty())
+        filterAny(with, value);
+}
+
 } // namespace details
+
+QByteArray serialized(const QJsonValue& value, Qn::SerializationFormat format)
+{
+    if (format == Qn::SerializationFormat::urlEncoded
+        || format == Qn::SerializationFormat::urlQuery)
+    {
+        if (!value.isObject())
+        {
+            throw Exception::unsupportedMediaType(
+                NX_FMT("Unsupported format for non-object data: %1", format));
+        }
+
+        const auto encode = format == Qn::SerializationFormat::urlEncoded
+            ? QUrl::FullyEncoded
+            : QUrl::PrettyDecoded;
+        return Params::fromJson(value.toObject()).toUrlQuery().query(encode).toUtf8();
+    }
+    auto serializedData = trySerialize(value, format);
+    if (!serializedData.has_value())
+    {
+        throw nx::network::rest::Exception::unsupportedMediaType(
+            NX_FMT("Unsupported format: %1", format));
+    }
+    return *serializedData;
+}
+
+QByteArray serialized(const rapidjson::Value& value, Qn::SerializationFormat format)
+{
+    switch (format)
+    {
+        case Qn::SerializationFormat::urlEncoded:
+        case Qn::SerializationFormat::urlQuery:
+            if (!value.IsObject())
+            {
+                throw Exception::unsupportedMediaType(
+                    NX_FMT("Unsupported format for non-object data: %1", format));
+            }
+            return Params::fromJson(value).toUrlQuery().query(
+                format == Qn::SerializationFormat::urlEncoded
+                    ? QUrl::FullyEncoded
+                    : QUrl::PrettyDecoded).toUtf8();
+
+        case Qn::SerializationFormat::json:
+        case Qn::SerializationFormat::unsupported:
+            return QByteArray::fromStdString(
+                nx::reflect::json_detail::getStringRepresentation(value));
+
+        case Qn::SerializationFormat::csv:
+            return QnCsv::serialized(value);
+
+        case Qn::SerializationFormat::xml:
+            return QnXml::serialized(value, "reply");
+
+        default:
+            throw Exception::unsupportedMediaType();
+    }
+}
 
 } // namespace nx::network::rest::json

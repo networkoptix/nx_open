@@ -8,6 +8,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/log/log_writers.h>

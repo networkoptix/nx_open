@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"

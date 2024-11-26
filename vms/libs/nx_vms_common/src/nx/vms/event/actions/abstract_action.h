@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
@@ -98,6 +99,7 @@ struct NX_VMS_COMMON_API ActionData
 #define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
 
 QN_FUSION_DECLARE_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record), NX_VMS_COMMON_API)
+NX_REFLECTION_INSTRUMENT(ActionData, ActionData_Fields)
 
 // Helper function for log data sorting & merging.
 inline qint64 getTimestamp(const ActionData& data) { return data.eventParams.eventTimestampUsec; }

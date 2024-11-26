@@ -6,6 +6,8 @@
 #include <string>
 #include <string_view>
 
+#include <nx/reflect/instrument.h>
+
 #include "data_macros.h"
 
 constexpr std::array<std::string_view, 4> kRestApiVersions{"v1", "v2", "v3", "v4"};
@@ -29,5 +31,6 @@ struct NX_VMS_API RestApiVersions
 };
 #define RestApiVersions_Fields (min)(max)
 NX_VMS_API_DECLARE_STRUCT_EX(RestApiVersions, (json));
+NX_REFLECTION_INSTRUMENT(RestApiVersions, RestApiVersions_Fields)
 
 } // namespace nx::vms::api

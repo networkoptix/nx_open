@@ -5,6 +5,7 @@
 #include <map>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/rebuild_state.h>
 

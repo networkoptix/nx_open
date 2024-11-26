@@ -70,5 +70,6 @@ struct NX_VMS_API CameraData: ResourceData
     (mac)(physicalId)(manuallyAdded)(model)(groupId)(groupName)(statusFlags)(vendor)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraData)
+NX_REFLECTION_INSTRUMENT(CameraData, CameraData_Fields)
 
 } // namespace nx::vms::api

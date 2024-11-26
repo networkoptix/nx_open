@@ -8,7 +8,9 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/array_orderer.h>
 #include <nx/reflect/field_enumerator.h>
+#include <nx/reflect/json/filter.h>
 #include <nx/reflect/merge.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/member_detector.h>
@@ -40,6 +42,23 @@ auto front(Container&& c)
         return c.front();
     else
         return *c.begin();
+}
+
+NX_NETWORK_REST_API nx::reflect::ArrayOrder orderFromParams(const Params& params);
+NX_NETWORK_REST_API nx::reflect::Filter filterFromParams(const Params& params);
+
+template<typename T>
+void filter(T* data, const Params& params)
+{
+    // TODO: Validate filter against data type.
+    nx::reflect::json::filter(data, filterFromParams(params));
+}
+
+template<typename T>
+void orderBy(T* data, const Params& params)
+{
+    // TODO: Validate fields against data type.
+    nx::reflect::order(data, orderFromParams(params));
 }
 
 template<typename... T>
@@ -155,32 +174,6 @@ protected:
         const QString& id, const Request& request, SubscriptionCallback callback) override;
     virtual QString idParamName() const override { return m_idParamName; }
 
-    template<typename OutputData>
-    QByteArray serializeOrThrow(const OutputData& outputData, Qn::SerializationFormat format)
-    {
-        if (format == Qn::SerializationFormat::urlEncoded
-            || format == Qn::SerializationFormat::urlQuery)
-        {
-            if (!outputData.isObject())
-            {
-                throw nx::network::rest::Exception::unsupportedMediaType(
-                    NX_FMT("Unsupported format for non-object data: %1", format));
-            }
-
-            const auto encode = format == Qn::SerializationFormat::urlEncoded
-                ? QUrl::FullyEncoded
-                : QUrl::PrettyDecoded;
-            return Params::fromJson(outputData.toObject()).toUrlQuery().query(encode).toUtf8();
-        }
-        auto serializedData = trySerialize(outputData, format);
-        if (!serializedData.has_value())
-        {
-            throw nx::network::rest::Exception::unsupportedMediaType(
-                NX_FMT("Unsupported format: %1", format));
-        }
-        return *serializedData;
-    }
-
     template<typename T>
     struct ArgumentCount;
 
@@ -202,16 +195,33 @@ protected:
 
     template<typename Data>
     Response response(
-        Data&& data, const Request& request, ResponseAttributes responseAttributes = {},
-        Params filters = {}, json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing)
+        Data&& data,
+        const Request& request,
+        ResponseAttributes responseAttributes = {},
+        Params filters = {},
+        json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing)
     {
-        auto json = json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction);
-        if (NX_ASSERT(m_schemas))
-            m_schemas->postprocessResponse(request, &json);
         const auto format = request.responseFormatOrThrow();
-        Response response(responseAttributes.statusCode, std::move(responseAttributes.httpHeaders));
-        response.content = {
-            {Qn::serializationFormatToHttpContentType(format)}, serializeOrThrow(json, format)};
+        const auto contentType = Qn::serializationFormatToHttpContentType(format);
+        Response response{
+            responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
+        if (useReflect(request))
+        {
+            detail::filter(&data, filters);
+            detail::orderBy(&data, filters);
+            auto json = json::serialize(data, std::move(filters), defaultValueAction);
+            if (NX_ASSERT(m_schemas))
+                m_schemas->postprocessResponse(request, &json);
+            response.content = {{contentType}, json::serialized(json, format)};
+        }
+        else
+        {
+            auto json =
+                json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction);
+            if (NX_ASSERT(m_schemas))
+                m_schemas->postprocessResponse(request, &json);
+            response.content = {{contentType}, json::serialized(json, format)};
+        }
         return response;
     }
 

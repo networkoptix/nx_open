@@ -14,53 +14,41 @@
 
 namespace nx::reflect {
 
-struct ArrayOrderField
+struct ArrayOrder
 {
     std::string name;
     bool reverse = false;
     std::optional<std::size_t> variantIndex;
-    std::vector<ArrayOrderField> fields;
+    std::vector<ArrayOrder> fields;
 };
 
 namespace array_orderer_details {
 
 template<typename T>
-std::function<int(const T&, const T&)> makeComparator(const std::vector<ArrayOrderField>& fields);
-
-template<typename T, typename F>
-std::function<int(const T&, const T&)> makeComparator(F field, bool reverse);
+std::function<int(const T&, const T&)> makeComparator(const ArrayOrder& order);
 
 template<typename T>
 class Comparator: public nx::reflect::GenericVisitor<Comparator<T>>
 {
 public:
-    Comparator(const std::vector<ArrayOrderField>& fields): m_fields{fields}
+    Comparator(const ArrayOrder& order): m_order{order}
     {
-        m_comparators.resize(m_fields.size());
+        m_comparators.resize(m_order.fields.size());
     }
 
     template<typename WrappedField>
     void visitField(const WrappedField& field)
     {
-        for (size_t i = 0; i < m_fields.size(); ++i)
+        for (size_t i = 0; i < m_order.fields.size(); ++i)
         {
-            if (m_fields[i].name == field.name())
+            if (m_order.fields[i].name == field.name())
             {
-                using Field = typename WrappedField::Type;
-                if (m_fields[i].fields.empty())
+                if (auto c = makeComparator<typename WrappedField::Type>(m_order.fields[i]))
                 {
-                    m_comparators[i] = makeComparator<T>(field, m_fields[i].reverse);
-                }
-                else
-                {
-                    auto comparator = makeComparator<Field>(m_fields[i].fields);
-                    if (!comparator)
-                        break;
-
                     m_comparators[i] =
-                        [field, comparator = std::move(comparator)](const T& lhs, const T& rhs)
+                        [field, c = std::move(c)](const T& lhs, const T& rhs)
                         {
-                            return comparator(field.get(lhs), field.get(rhs));
+                            return c(field.get(lhs), field.get(rhs));
                         };
                 }
                 break;
@@ -70,14 +58,15 @@ public:
 
     std::function<int(const T&, const T&)> finish()
     {
+        std::erase_if(m_comparators, [](const auto& c) { return !c; });
+        if (m_comparators.empty())
+            return {};
+
         return
             [comparators = std::move(m_comparators)](const T& lhs, const T& rhs)
             {
                 for (const auto& c: comparators)
                 {
-                    if (!c)
-                        continue;
-
                     if (int r = c(lhs, rhs); r != 0)
                         return r;
                 }
@@ -86,99 +75,47 @@ public:
     }
 
 private:
-    const std::vector<ArrayOrderField>& m_fields;
+    const ArrayOrder& m_order;
     std::vector<std::function<int(const T&, const T&)>> m_comparators;
 };
 
-template<typename T>
-int compare(const T& lhs, const T& rhs, bool reverse)
-{
-    if constexpr (IsOptionalV<T>)
-    {
-        using Value = typename T::value_type;
-        return compare(lhs.value_or(Value{}), rhs.value_or(Value{}), reverse);
-    }
-    else if constexpr (IsVariantV<T>)
-    {
-        if (lhs.index() != rhs.index() || lhs.valueless_by_exception())
-            return 0;
-
-        return std::visit(
-            [reverse, &rhs](const auto& lhs)
-            {
-                return compare(lhs, std::get<std::decay_t<decltype(lhs)>>(rhs), reverse);
-            },
-            lhs);
-    }
-    else
-    {
-        if (reverse)
-            return rhs < lhs ? -1 : lhs < rhs ? 1 : 0;
-        return lhs < rhs ? -1 : rhs < lhs ? 1 : 0;
-    }
-}
-
-template<typename T, typename F>
-std::function<int(const T&, const T&)> makeComparator(F field, bool reverse)
-{
-    using Field = typename F::Type;
-    if constexpr (!IsInstrumentedV<Field> && !IsContainerV<Field>)
-    {
-        return
-            [field = std::move(field), reverse](const T& lhs, const T& rhs)
-            {
-                return compare(field.get(lhs), field.get(rhs), reverse);
-            };
-    }
-    else
-    {
-        return {};
-    }
-}
-
 template<typename Variant, std::size_t Index>
 void makeVariantComparator(
-    std::array<std::function<int(const Variant&, const Variant&)>, std::variant_size_v<Variant>>*
-        comparators,
-    std::array<std::vector<ArrayOrderField>, std::variant_size_v<Variant>>* fieldsPerIndex)
+    std::vector<std::function<int(const Variant&, const Variant&)>>* comparators,
+    const std::array<ArrayOrder, std::variant_size_v<Variant>>& orderPerIndex)
 {
-    if ((*fieldsPerIndex)[Index].empty())
-        return;
-
-    auto comparator = makeComparator<std::variant_alternative_t<Index, Variant>>(
-        std::move((*fieldsPerIndex)[Index]));
-    if (!comparator)
-        return;
-
-    (*comparators)[Index] =
-        [comparator = std::move(comparator)](const Variant& lhs, const Variant& rhs)
-        {
-            return lhs.index() == Index && rhs.index() == Index
-                ? comparator(std::get<Index>(lhs), std::get<Index>(rhs))
-                : 0;
-        };
+    if (auto c = makeComparator<std::variant_alternative_t<Index, Variant>>(orderPerIndex[Index]))
+    {
+        comparators->emplace_back(
+            [c = std::move(c)](const Variant& lhs, const Variant& rhs)
+            {
+                return lhs.index() == Index && rhs.index() == Index
+                    ? c(std::get<Index>(lhs), std::get<Index>(rhs))
+                    : 0;
+            });
+    }
 }
 
 template<typename Variant, std::size_t... Index>
 void makeVariantComparators(
-    std::array<std::function<int(const Variant&, const Variant&)>, std::variant_size_v<Variant>>*
-        comparators,
-    std::array<std::vector<ArrayOrderField>, std::variant_size_v<Variant>> fieldsPerIndex,
+    std::vector<std::function<int(const Variant&, const Variant&)>>* comparators,
+    const std::array<ArrayOrder, std::variant_size_v<Variant>>& orderPerIndex,
     std::index_sequence<Index...>)
 {
-    (makeVariantComparator<Variant, Index>(comparators, &fieldsPerIndex), ...);
+    (makeVariantComparator<Variant, Index>(comparators, orderPerIndex), ...);
 }
 
 template<typename T>
-std::function<int(const T&, const T&)> makeComparator(const std::vector<ArrayOrderField>& fields)
+std::function<int(const T&, const T&)> makeComparator(const ArrayOrder& order)
 {
-    if (fields.empty())
+    if constexpr (std::is_same_v<std::nullptr_t, T>)
+    {
         return {};
-
-    if constexpr (IsOptionalV<T>)
+    }
+    else if constexpr (IsOptionalV<T>)
     {
         using Value = typename T::value_type;
-        auto comparator = makeComparator<Value>(fields);
+        auto comparator = makeComparator<Value>(order);
         if (!comparator)
             return {};
 
@@ -190,24 +127,24 @@ std::function<int(const T&, const T&)> makeComparator(const std::vector<ArrayOrd
     }
     else if constexpr (IsVariantV<T>)
     {
-        std::array<std::vector<ArrayOrderField>, std::variant_size_v<T>> fieldsPerIndex;
-        for (const auto& f: fields)
+        std::array<ArrayOrder, std::variant_size_v<T>> orderPerIndex;
+        for (const auto& f: order.fields)
         {
             if (f.variantIndex < std::variant_size_v<T>)
-                fieldsPerIndex[*f.variantIndex].emplace_back(f);
+                orderPerIndex[*f.variantIndex].fields.emplace_back(f);
         }
-
-        std::array<std::function<int(const T&, const T&)>, std::variant_size_v<T>> comparators;
-        makeVariantComparators(&comparators, std::move(fieldsPerIndex),
+        std::vector<std::function<int(const T&, const T&)>> comparators;
+        comparators.reserve(std::variant_size_v<T>);
+        makeVariantComparators(&comparators, orderPerIndex,
             std::make_index_sequence<std::variant_size_v<T>>());
+        if (comparators.empty())
+            return {};
+
         return
             [comparators = std::move(comparators)](const T& lhs, const T& rhs)
             {
                 for (const auto& c: comparators)
                 {
-                    if (!c)
-                        continue;
-
                     if (int r = c(lhs, rhs); r != 0)
                         return r;
                 }
@@ -216,11 +153,21 @@ std::function<int(const T&, const T&)> makeComparator(const std::vector<ArrayOrd
     }
     else if constexpr (IsInstrumentedV<T>)
     {
-        return visitAllFields<T>(Comparator<T>{fields});
+        return visitAllFields<T>(Comparator<T>{order});
+    }
+    else if constexpr (IsContainerV<T>)
+    {
+        return {};
     }
     else
     {
-        return {};
+        return
+            [reverse = order.reverse](const T& lhs, const T& rhs)
+            {
+                if (reverse)
+                    return std::less<T>{}(rhs, lhs) ? -1 : std::less<T>{}(lhs, rhs) ? 1 : 0;
+                return std::less<T>{}(lhs, rhs) ? -1 : std::less<T>{}(rhs, lhs) ? 1 : 0;
+            };
     }
 }
 
@@ -228,23 +175,23 @@ template<typename T>
 class Orderer: public nx::reflect::GenericVisitor<Orderer<T>>
 {
 public:
-    Orderer(T* data, const std::vector<ArrayOrderField>& fields): m_data{data}, m_fields{fields} {}
+    Orderer(T* data, const ArrayOrder& order): m_data{data}, m_order{order} {}
 
     template<typename WrappedField>
     void visitField(const WrappedField& field)
     {
-        for (const auto& orderField: m_fields)
+        for (const auto& f: m_order.fields)
         {
-            if (!orderField.fields.empty() && orderField.name == field.name())
+            if (f.name == field.name())
             {
                 if constexpr (HasRef<WrappedField>::value)
                 {
-                    order(&field.ref(m_data), orderField.fields);
+                    order(&field.ref(m_data), f);
                 }
                 else
                 {
                     auto data = field.get(*m_data);
-                    order(&data, orderField.fields);
+                    order(&data, f);
                     field.set(m_data, std::move(data));
                 }
             }
@@ -260,53 +207,51 @@ private:
 
 private:
     T* m_data;
-    const std::vector<ArrayOrderField>& m_fields;
+    const ArrayOrder& m_order;
 };
 
 } // namespace array_orderer_details
 
 template<typename T>
-void order(T* data, const std::vector<ArrayOrderField>& fields)
+void order(T* data, const ArrayOrder& order_)
 {
     using namespace array_orderer_details;
-
-    if (fields.empty())
-        return;
 
     if constexpr (IsOptionalV<T>)
     {
         if (data->has_value())
-            order(&data->value(), fields);
+            order(&data->value(), order_);
     }
     else if constexpr (IsVariantV<T>)
     {
-        std::visit([&fields](auto& v) { order(&v, fields); }, *data);
+        std::visit([&order_](auto& v) { order(&v, order_); }, *data);
     }
     else if constexpr (IsInstrumentedV<T>)
     {
-        visitAllFields<T>(Orderer<T>{data, fields});
+        if (!order_.fields.empty())
+            visitAllFields<T>(Orderer<T>{data, order_});
     }
     else if constexpr (IsContainerV<T>)
     {
-        if constexpr (IsSequenceContainerV<T>)
+        if constexpr (IsArrayV<T> || IsSequenceContainerV<T>)
         {
-            if (auto c = makeComparator<typename T::value_type>(fields))
+            if (auto c = makeComparator<typename T::value_type>(order_))
             {
                 std::stable_sort(data->begin(), data->end(),
                     [&c](const auto& lhs, const auto& rhs) { return c(lhs, rhs) < 0; });
             }
             for (auto& value: *data)
-                order(&value, fields);
+                order(&value, order_);
         }
         else if constexpr (IsSetContainerV<T> || IsUnorderedSetContainerV<T>)
         {
             for (auto& value: *data)
-                order(&value, fields);
+                order(&value, order_);
         }
         else if constexpr (IsAssociativeContainerV<T> || IsUnorderedAssociativeContainerV<T>)
         {
             for (auto& [_, value]: *data)
-                order(&value, fields);
+                order(&value, order_);
         }
     }
 }

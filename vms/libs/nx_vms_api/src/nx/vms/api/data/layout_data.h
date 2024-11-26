@@ -188,6 +188,7 @@ struct NX_VMS_API LayoutItemFilter: IdData
 };
 #define LayoutItemFilter_Fields (id)(layoutId)
 QN_FUSION_DECLARE_FUNCTIONS(LayoutItemFilter, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(LayoutItemFilter, LayoutItemFilter_Fields)
 
 struct NX_VMS_API LayoutItemModel: LayoutItemData
 {

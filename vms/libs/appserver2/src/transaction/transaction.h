@@ -1903,6 +1903,7 @@ struct TransactionModel
 };
 #define TransactionModel_Fields (id)(info)(binaryDataSizeB)(data)(_error)
 QN_FUSION_DECLARE_FUNCTIONS(TransactionModel, (json))
+NX_REFLECTION_INSTRUMENT(TransactionModel, TransactionModel_Fields)
 
 enum ApiObjectType
 {

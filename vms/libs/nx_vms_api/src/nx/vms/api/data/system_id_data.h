@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -22,6 +23,7 @@ struct NX_VMS_API SystemIdData
 };
 #define SystemIdData_Fields (systemId)(sysIdTime)(tranLogTime)
 NX_VMS_API_DECLARE_STRUCT(SystemIdData)
+NX_REFLECTION_INSTRUMENT(SystemIdData, SystemIdData_Fields)
 
 } // namespace api
 } // namespace vms

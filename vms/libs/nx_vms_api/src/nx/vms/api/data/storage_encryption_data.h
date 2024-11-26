@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -45,5 +46,6 @@ struct NX_VMS_API AesKeyData
 #define AesKeyData_Fields (ivVect)(issueDateUs)(isCurrent)
 
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(AesKeyData)
+NX_REFLECTION_INSTRUMENT(AesKeyData, AesKeyData_Fields);
 
 } // namespace nx::vms::api

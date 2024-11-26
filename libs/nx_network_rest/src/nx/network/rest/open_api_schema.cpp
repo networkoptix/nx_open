@@ -227,6 +227,154 @@ private:
     nx::network::rest::json::ArrayOrderer m_orderer;
 };
 
+class PostprocessorV4
+{
+public:
+    PostprocessorV4(const QString& pathPrefix): m_pathPrefix(pathPrefix) {}
+
+    bool operator()(rapidjson::Value* origin, const QJsonObject& schema)
+    {
+        if (schema.isEmpty())
+            return false;
+
+        const auto originType = origin->GetType();
+        if (originType != rapidjson::kArrayType && originType != rapidjson::kObjectType)
+            return false;
+
+        const auto type = schema.find("type");
+        if (type == schema.end())
+        {
+            const auto oneOf = schema.find("oneOf");
+            if (oneOf == schema.end())
+                return false;
+
+            for (auto item: asArray(oneOf.value(), pathString(schema)))
+            {
+                const auto itemSchema = asObject(item, pathString(schema));
+                if (itemSchema.isEmpty())
+                    continue;
+
+                const auto itemType = optString(itemSchema, "type", pathString(itemSchema));
+                //Do not process oneOf objects as fields can be erased mistakenly.
+                if (originType == rapidjson::kObjectType && itemType == "object")
+                    return false;
+
+                if ((itemType.isEmpty() && itemSchema.contains("oneOf"))
+                    || (originType == rapidjson::kArrayType && itemType == "array"))
+                {
+                    return (*this)(origin, itemSchema);
+                }
+            }
+
+            NX_ASSERT(false, "No %1 in oneOf %2",
+                originType == rapidjson::kArrayType ? "array" : "object", pathString(schema));
+            return false;
+        }
+
+        if (originType == rapidjson::kArrayType)
+        {
+            if (!NX_ASSERT(type->toString() == "array", pathString(schema)))
+                return false;
+
+            const auto items = schema.find("items");
+            if (!NX_ASSERT(items != schema.end(), pathString(schema)))
+                return false;
+            return postprocessArray(origin, items->toObject());
+        }
+        else
+        {
+            if (!NX_ASSERT(type->toString() == "object", pathString(schema)))
+                return false;
+
+            if (const auto additionalSchema = optObject(schema, "additionalProperties", pathString(schema));
+                !additionalSchema.isEmpty())
+            {
+                bool postprocessed = false;
+                for (auto it = origin->MemberBegin(); it != origin->MemberEnd(); ++it)
+                {
+                    const QString fieldName = it->value.IsArray() ? "*[]" : "*";
+                    const FieldScope scope(fieldName, this);
+                    if ((*this)(&it->value, additionalSchema))
+                        postprocessed = true;
+                }
+                return postprocessed;
+            }
+
+            const auto properties = schema.find("properties");
+            if (properties == schema.end())
+                return false;
+            const auto& propertiesObject = properties->toObject();
+            if (!NX_ASSERT(!propertiesObject.isEmpty(), pathString(schema)))
+                return false;
+            return postprocessObject(origin, propertiesObject);
+        }
+    }
+
+private:
+    struct FieldScope
+    {
+        FieldScope(const QString& name, PostprocessorV4* p): parent(p) { p->beginField(name); }
+        ~FieldScope() { parent->endField(); }
+
+        PostprocessorV4* parent;
+    };
+
+    struct ArrayItemScope
+    {
+        ArrayItemScope(size_t index, PostprocessorV4* p): parent(p) { p->beginItem(index); }
+        ~ArrayItemScope() { parent->endItem(); }
+
+        PostprocessorV4* parent;
+    };
+
+    void beginItem(size_t index) { m_path.push_back(QString::number(index)); }
+    void endItem() { m_path.pop_back(); }
+    void beginField(const QString& name) { m_path.push_back(name); }
+    void endField() { m_path.pop_back(); }
+    QString pathString(const QJsonObject& schema) const
+    {
+        return NX_FMT("%1 %2 %3", m_pathPrefix, containerString(m_path), QJson::serialized(schema));
+    }
+
+    bool postprocessArray(rapidjson::Value* origin, const QJsonObject& items)
+    {
+        bool postprocessed = false;
+        for (rapidjson::SizeType i = 0; i < origin->Size(); ++i)
+        {
+            const ArrayItemScope scope(i, this);
+            if ((*this)(&(*origin)[i], items))
+                postprocessed = true;
+        }
+        return postprocessed;
+    }
+
+    bool postprocessObject(rapidjson::Value* origin, const QJsonObject& properties)
+    {
+        bool postprocessed = false;
+        for (auto it = origin->MemberBegin(); it != origin->MemberEnd();)
+        {
+            const QString fieldName{it->name.GetString()};
+            const FieldScope scope(fieldName + (it->value.IsArray() ? "[]" : ""), this);
+            if (const auto property = properties.find(fieldName); property != properties.end())
+            {
+                if ((*this)(&it->value, property->toObject()))
+                    postprocessed = true;
+                ++it;
+            }
+            else
+            {
+                postprocessed = true;
+                it = origin->EraseMember(it);
+            }
+        }
+        return postprocessed;
+    }
+
+private:
+    const QString m_pathPrefix;
+    std::deque<QString> m_path;
+};
+
 void validateParameters(const QJsonObject& schema,
     const QJsonValue& value,
     const QString& name,
@@ -523,6 +671,34 @@ void OpenApiSchema::postprocessResponse(
         response, getObject(getObject(content, "application/json"), "schema"));
 }
 
+void OpenApiSchema::postprocessResponse(const Request& request, rapidjson::Value* response)
+{
+    if (response->IsNull())
+        return;
+
+    const auto schemaMethod = QString::fromStdString(request.method().toString()).toLower();
+    const auto [path, method] = getJsonPathAndMethod(schemaMethod, request.decodedPath());
+    postprocessResponse(path, method, schemaMethod, response);
+}
+
+void OpenApiSchema::postprocessResponse(
+    const QJsonObject& path,
+    const QJsonObject& method,
+    const QString& decodedPath,
+    rapidjson::Value* response)
+{
+    if (path.isEmpty() || method.isEmpty())
+        return;
+
+    const auto content =
+        optObject(optObject(optObject(method, "responses"), "default"), "content");
+    if (content.isEmpty())
+        return;
+
+    PostprocessorV4{decodedPath}(
+        response, getObject(getObject(content, "application/json"), "schema"));
+}
+
 void OpenApiSchema::validateOrThrow(Request* request, http::HttpHeaders* headers)
 {
     NX_CRITICAL(request);
@@ -778,6 +954,7 @@ void OpenApiSchema::validateParameters(const QJsonObject& pathOrMethod, const Re
     if (!NX_ASSERT(paramsValue.isArray()))
         return;
 
+    // TODO: Use nx_reflect here.
     auto content = request.params().isEmpty() ? QJsonObject() : request.params().toJson();
     for (const auto& param: paramsValue.toArray())
     {
@@ -889,6 +1066,19 @@ void OpenApiSchemas::postprocessResponse(
     auto [schema, path, method_] = findSchema(decodedPath, method);
     if (schema)
         schema->postprocessResponse(path, method_, params, decodedPath, response);
+}
+
+void OpenApiSchemas::postprocessResponse(
+    const nx::network::http::Method& method,
+    const QString& decodedPath,
+    rapidjson::Value* response)
+{
+    if (!NX_ASSERT(!decodedPath.isEmpty()))
+        return;
+
+    auto [schema, path, method_] = findSchema(decodedPath, method);
+    if (schema)
+        schema->postprocessResponse(path, method_, decodedPath, response);
 }
 
 std::tuple<std::shared_ptr<OpenApiSchema>, QJsonObject, QJsonObject> OpenApiSchemas::findSchema(

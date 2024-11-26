@@ -23,9 +23,9 @@ public:
     JsonComposer();
 
     virtual void startArray() override;
-    virtual void endArray() override;
+    virtual void endArray(int items) override;
     virtual void startObject() override;
-    virtual void endObject() override;
+    virtual void endObject(int members) override;
     virtual void writeBool(bool val) override;
     virtual void writeInt(const std::int64_t& val) override;
     virtual void writeFloat(const double& val) override;
@@ -92,7 +92,7 @@ template<typename Data>
 std::string serialize(const Data& data)
 {
     SerializationContext ctx;
-    serialize(&ctx, data);
+    nx::reflect::json::serialize(&ctx, data);
     return ctx.composer.take();
 }
 

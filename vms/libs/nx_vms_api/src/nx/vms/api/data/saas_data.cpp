@@ -21,6 +21,8 @@ QString SaasDateTime::toString() const
     return QDateTime::toString(kSaasDateTimeFormat);
 }
 
+QN_FUSION_DEFINE_FUNCTIONS(SaasDateTime, (json_lexical))
+
 const QString SaasService::kLocalRecordingServiceType("local_recording");
 const QString SaasService::kAnalyticsIntegrationServiceType("analytics");
 const QString SaasService::kCloudRecordingType("cloud_storage");

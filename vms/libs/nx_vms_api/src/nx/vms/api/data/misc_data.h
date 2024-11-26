@@ -12,10 +12,9 @@ struct NX_VMS_API MiscData: KeyValueData
 {
     using KeyValueData::KeyValueData; //< Forward constructors.
 };
-
-#define MiscData_Fields \
-    KeyValueData_Fields
+#define MiscData_Fields KeyValueData_Fields
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(MiscData)
+NX_REFLECTION_INSTRUMENT(MiscData, MiscData_Fields)
 
 } // namespace api
 } // namespace vms

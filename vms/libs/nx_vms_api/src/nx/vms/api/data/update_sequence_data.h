@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include <nx/reflect/instrument.h>
+
 #include "sync_marker_record_data.h"
 
 namespace nx {
@@ -16,6 +18,7 @@ struct NX_VMS_API UpdateSequenceData
 };
 #define UpdateSequenceData_Fields (markers)
 NX_VMS_API_DECLARE_STRUCT(UpdateSequenceData)
+NX_REFLECTION_INSTRUMENT(UpdateSequenceData, UpdateSequenceData_Fields)
 
 } // namespace api
 } // namespace vms

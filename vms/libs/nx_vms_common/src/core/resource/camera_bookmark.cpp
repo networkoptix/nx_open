@@ -307,36 +307,6 @@ bool CameraBookmark::isValid() const
     return !isNull() && !name.isEmpty() && !cameraId.isNull() && durationMs > 0ms;
 }
 
-void serialize(nx::reflect::json::SerializationContext* ctx, const CameraBookmarkTags& value)
-{
-    ctx->composer.startArray();
-    for (const auto& it: value)
-        nx::reflect::BasicSerializer::serializeAdl(ctx, it);
-    ctx->composer.endArray();
-}
-
-nx::reflect::DeserializationResult deserialize(
-    const nx::reflect::json::DeserializationContext& ctx, CameraBookmarkTags* data)
-{
-    using namespace nx::reflect::json_detail;
-    *data = CameraBookmarkTags();
-    if (!ctx.value.IsArray())
-        return false;
-
-    for (rapidjson::SizeType i = 0; i < ctx.value.Size(); ++i)
-    {
-        QString element;
-        const auto deserializationResult =
-            deserializeValue(DeserializationContext{ctx.value[i], ctx.flags}, &element);
-        if (!deserializationResult.success)
-        {
-            return false;
-        }
-        data->insert(element);
-    }
-    return true;
-}
-
 bool operator<(const CameraBookmark& first, const CameraBookmark& other)
 {
     if (first.startTimeMs == other.startTimeMs)

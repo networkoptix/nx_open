@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 namespace nx {
 namespace vms {
@@ -39,10 +40,10 @@ public:
     static Q_INVOKABLE QString currentSystemRuntime();
 };
 #define OsInformation_Fields (arch)(platform)(modification)
-
 QN_FUSION_DECLARE_FUNCTIONS(OsInformation,
     (hash)(ubjson)(json)(xml)(csv_record),
     NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(OsInformation, OsInformation_Fields);
 
 } // namespace api
 } // namespace vms

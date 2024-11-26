@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParamValue
 {
@@ -124,6 +125,7 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParameterCondition
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterCondition::ConditionType, (lexical))
 
 #define QnCameraAdvancedParameterCondition_Fields (type)(paramId)(value)
+NX_REFLECTION_INSTRUMENT(QnCameraAdvancedParameterCondition, QnCameraAdvancedParameterCondition_Fields)
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParameterDependency
 {
@@ -183,7 +185,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameterDependency::DependencyType,
     (valuesToAddToRange)\
     (valuesToRemoveFromRange)\
     (internalRange)\
-    (conditions)\
+    (conditions)
+NX_REFLECTION_INSTRUMENT(QnCameraAdvancedParameterDependency, QnCameraAdvancedParameterDependency_Fields)
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParameter
 {
@@ -276,6 +279,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical), NX_V
     (resync)\
     (group)\
     (availableInOffline)
+NX_REFLECTION_INSTRUMENT(QnCameraAdvancedParameter, QnCameraAdvancedParameter_Fields)
 
 struct NX_VMS_COMMON_API QnCameraAdvancedParamGroup
 {
@@ -294,6 +298,7 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParamGroup
     QnCameraAdvancedParamGroup filtered(const QSet<QString> &allowedIds) const;
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(aux)(groups)(params)
+NX_REFLECTION_INSTRUMENT(QnCameraAdvancedParamGroup, QnCameraAdvancedParamGroup_Fields)
 
 struct QnCameraAdvancedParameterOverload
 {
@@ -330,6 +335,7 @@ struct NX_VMS_COMMON_API QnCameraAdvancedParams
     bool hasItemsAvailableInOffline() const;
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(pluginUniqueId)(packet_mode)(groups)
+NX_REFLECTION_INSTRUMENT(QnCameraAdvancedParams, QnCameraAdvancedParams_Fields)
 
 using QnCameraAdvancedParamsMap = std::map<nx::Uuid, QnCameraAdvancedParams>;
 

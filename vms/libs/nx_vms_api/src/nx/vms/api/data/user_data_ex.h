@@ -17,5 +17,6 @@ struct NX_VMS_API UserDataEx: UserData
 };
 #define UserDataEx_Fields UserData_Fields (password)
 NX_VMS_API_DECLARE_STRUCT(UserDataEx)
+NX_REFLECTION_INSTRUMENT(UserDataEx, UserDataEx_Fields)
 
 } // namespace nx::vms::api

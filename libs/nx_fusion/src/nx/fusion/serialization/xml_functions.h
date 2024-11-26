@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef QN_SERIALIZATION_XML_FUNCTIONS_H
-#define QN_SERIALIZATION_XML_FUNCTIONS_H
+#pragma once
 
 #include <map>
 #include <set>
@@ -13,6 +12,8 @@
 #endif
 
 #include <collection.h>
+
+#include <rapidjson/document.h>
 
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
@@ -213,4 +214,38 @@ inline void serialize(const QJsonObject& object, QXmlStreamWriter* stream)
     }
 }
 
-#endif // QN_SERIALIZATION_XML_FUNCTIONS_H
+inline void serialize(const rapidjson::Value& value, QXmlStreamWriter* stream)
+{
+    switch (value.GetType())
+    {
+        case rapidjson::kArrayType:
+            for (auto it = value.Begin(); it != value.End(); ++it)
+            {
+                stream->writeStartElement("element");
+                serialize(*it, stream);
+                stream->writeEndElement();
+            }
+            break;
+        case rapidjson::kFalseType:
+        case rapidjson::kTrueType:
+            serialize(value.GetBool(), stream);
+            break;
+        case rapidjson::kNumberType:
+            serialize(value.GetDouble(), stream);
+            break;
+        case rapidjson::kObjectType:
+            for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
+            {
+                QnXmlDetail::writeStartElement(it->name.GetString(), stream);
+                serialize(it->value, stream);
+                stream->writeEndElement();
+            }
+            break;
+        case rapidjson::kNullType:
+            serialize(QByteArray{"null"}, stream);
+            break;
+        case rapidjson::kStringType:
+            serialize(QString::fromUtf8(value.GetString(), value.GetStringLength()), stream);
+            break;
+    }
+}

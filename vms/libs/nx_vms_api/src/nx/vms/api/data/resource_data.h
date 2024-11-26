@@ -26,8 +26,6 @@ const QString kCloudUserAuthenticationInfo{"cloudUserAuthenticationInfo"};
 
 struct NX_VMS_API ResourceData: IdData
 {
-    using base_type = IdData;
-
     nx::Uuid parentId;
     QString name;
     QString url;
@@ -40,7 +38,7 @@ struct NX_VMS_API ResourceData: IdData
 
     static nx::Uuid getFixedTypeId(const QString& typeName);
 };
-#define ResourceData_Fields IdData_Fields (parentId)(name)(url)(typeId)
+#define ResourceData_Fields IdData_Fields(parentId)(name)(url)(typeId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceData)
 NX_REFLECTION_INSTRUMENT(ResourceData, ResourceData_Fields);
 
@@ -55,6 +53,7 @@ struct NX_VMS_API ResourceStatusData: IdData
 };
 #define ResourceStatusData_Fields IdData_Fields (status)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceStatusData)
+NX_REFLECTION_INSTRUMENT(ResourceStatusData, ResourceStatusData_Fields)
 
 struct NX_VMS_API ResourceParamData
 {
@@ -105,6 +104,7 @@ struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
 };
 #define ResourceParamWithRefData_Fields ResourceParamData_Fields (resourceId)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ResourceParamWithRefData)
+NX_REFLECTION_INSTRUMENT(ResourceParamWithRefData, ResourceParamWithRefData_Fields)
 
 // This can and should be done by QueryProcessor.
 std::unordered_map<nx::Uuid, std::vector<ResourceParamData>> NX_VMS_API toParameterMap(

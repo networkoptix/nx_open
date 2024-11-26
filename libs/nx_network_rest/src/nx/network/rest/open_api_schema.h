@@ -25,6 +25,13 @@ public:
         const QString& decodedPath,
         QJsonValue* response);
 
+    void postprocessResponse(const Request& request, rapidjson::Value* response);
+    void postprocessResponse(
+        const QJsonObject& path,
+        const QJsonObject& method,
+        const QString& decodedPath,
+        rapidjson::Value* response);
+
     void validateOrThrow(Request* request, nx::network::http::HttpHeaders* = nullptr);
     void validateOrThrow(const QJsonObject& path,
         const QJsonObject& method,
@@ -69,6 +76,16 @@ public:
     void postprocessResponse(const Request& request, QJsonValue* response)
     {
         postprocessResponse(request.method(), request.params(), request.decodedPath(), response);
+    }
+
+    void postprocessResponse(
+        const nx::network::http::Method& method,
+        const QString& decodedPath,
+        rapidjson::Value* response);
+
+    void postprocessResponse(const Request& request, rapidjson::Value* response)
+    {
+        postprocessResponse(request.method(), request.decodedPath(), response);
     }
 
 private:

@@ -7,11 +7,33 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/dot_notation_string.h>
+#include <nx/utils/serialization/json.h>
 
 #include "params.h"
 
-namespace nx::network::rest::json
+namespace std {
+
+template<>
+struct less<QJsonValue>
 {
+    bool operator()(const QJsonValue& lhs, const QJsonValue& rhs) const
+    {
+        return QJson::serialized(lhs) < QJson::serialized(rhs);
+    }
+};
+
+template<>
+struct less<QJsonObject>
+{
+    bool operator()(const QJsonObject& lhs, const QJsonObject& rhs) const
+    {
+        return QJson::serialized(lhs) < QJson::serialized(rhs);
+    }
+};
+
+} // namespace std
+
+namespace nx::network::rest::json {
 
 enum class DefaultValueAction: bool
 {
@@ -35,6 +57,7 @@ NX_NETWORK_REST_API void filter(
     nx::utils::DotNotationString with = {});
 
 NX_NETWORK_REST_API nx::utils::DotNotationString extractWithParam(Params* filters);
+NX_NETWORK_REST_API void filter(rapidjson::Document* value, nx::utils::DotNotationString with);
 
 } // namespace details
 
@@ -98,5 +121,21 @@ QJsonValue filter(
     details::filter(&value, &defaultJson, defaultValueAction, std::move(filters), std::move(with));
     return value;
 }
+
+template<typename T>
+rapidjson::Document serialize(const T& data, Params params, DefaultValueAction defaultValueAction)
+{
+    // TODO: Validate with against data type.
+    auto json = nx::utils::serialization::json::serialized(
+        data, defaultValueAction == DefaultValueAction::removeEqual);
+    details::filter(&json, details::extractWithParam(&params));
+    return json;
+}
+
+NX_NETWORK_REST_API QByteArray serialized(
+    const QJsonValue& value, Qn::SerializationFormat format);
+
+NX_NETWORK_REST_API QByteArray serialized(
+    const rapidjson::Value& value, Qn::SerializationFormat format);
 
 } // namespace nx::network::rest::json

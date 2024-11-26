@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -18,6 +19,7 @@ struct NX_VMS_API ReverseConnectionData
 };
 #define ReverseConnectionData_Fields (targetServer)(socketCount)
 NX_VMS_API_DECLARE_STRUCT(ReverseConnectionData)
+NX_REFLECTION_INSTRUMENT(ReverseConnectionData, ReverseConnectionData_Fields)
 
 } // namespace api
 } // namespace vms

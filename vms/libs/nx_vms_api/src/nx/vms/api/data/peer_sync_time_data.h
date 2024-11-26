@@ -4,6 +4,7 @@
 
 #include <QtCore/QtGlobal>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -18,6 +19,7 @@ struct NX_VMS_API PeerSyncTimeData
 };
 #define PeerSyncTimeData_Fields (syncTimeMs)
 NX_VMS_API_DECLARE_STRUCT(PeerSyncTimeData)
+NX_REFLECTION_INSTRUMENT(PeerSyncTimeData, PeerSyncTimeData_Fields)
 
 } // namespace api
 } // namespace vms

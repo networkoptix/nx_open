@@ -69,6 +69,9 @@ public:
     static Params fromJson(const QJsonObject& value);
     static QString valueToString(QJsonValue value);
 
+    static Params fromJson(const rapidjson::Value& value);
+    static QString valueToString(const rapidjson::Value& value);
+
     QUrlQuery toUrlQuery() const;
     QList<QPair<QString, QString>> toList() const;
     QMultiMap<QString, QString> toMap() const;
@@ -170,6 +173,9 @@ Params::Fields Params::deserializeOrThrow(T* data) const
     {
         for (auto it = m_values.begin(); it != m_values.end(); ++it)
         {
+            if (it.key().startsWith('_'))
+                continue;
+
             typename T::mapped_type value;
             auto result = deserializeValue(it.key(), it.value(), &value);
             std::string name{it.key().toStdString()};

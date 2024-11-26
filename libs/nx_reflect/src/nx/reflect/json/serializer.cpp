@@ -14,9 +14,9 @@ void JsonComposer::startArray()
     m_writer.StartArray();
 }
 
-void JsonComposer::endArray()
+void JsonComposer::endArray(int items)
 {
-    m_writer.EndArray();
+    m_writer.EndArray(items);
 }
 
 void JsonComposer::startObject()
@@ -24,9 +24,9 @@ void JsonComposer::startObject()
     m_writer.StartObject();
 }
 
-void JsonComposer::endObject()
+void JsonComposer::endObject(int members)
 {
-    m_writer.EndObject();
+    m_writer.EndObject(members);
 }
 
 void JsonComposer::writeBool(bool val)

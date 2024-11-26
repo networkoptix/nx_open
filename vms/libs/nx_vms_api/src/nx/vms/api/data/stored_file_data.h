@@ -5,6 +5,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+#include <nx/reflect/instrument.h>
+
 #include "data_macros.h"
 
 namespace nx {

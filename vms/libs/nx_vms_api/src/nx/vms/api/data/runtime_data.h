@@ -7,6 +7,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QtGlobal>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/connection_types.h>

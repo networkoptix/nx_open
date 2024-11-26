@@ -13,7 +13,7 @@ void serialize(nx::reflect::json::SerializationContext* ctx,
     ctx->composer.startArray();
     for (const auto& item: data)
         ctx->composer.writeInt(item);
-    ctx->composer.endArray();
+    ctx->composer.endArray(data.size());
 }
 
 namespace nx::vms::client::desktop {

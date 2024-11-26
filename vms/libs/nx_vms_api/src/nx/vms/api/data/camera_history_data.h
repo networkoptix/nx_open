@@ -6,6 +6,7 @@
 
 #include <QtCore/QtGlobal>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 #include "data_macros.h"
@@ -30,6 +31,7 @@ struct NX_VMS_API ServerFootageData
 };
 #define ServerFootageData_Fields (serverGuid)(archivedCameras)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(ServerFootageData)
+NX_REFLECTION_INSTRUMENT(ServerFootageData, ServerFootageData_Fields)
 
 /**
  * History item of camera movement from server to server. Server and timestamp when the camera
@@ -50,6 +52,7 @@ struct NX_VMS_API CameraHistoryItemData
 };
 #define CameraHistoryItemData_Fields (serverGuid)(timestampMs)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraHistoryItemData)
+NX_REFLECTION_INSTRUMENT(CameraHistoryItemData, CameraHistoryItemData_Fields)
 
 /** Full history of the movement for the given camera. */
 struct NX_VMS_API CameraHistoryData
@@ -59,6 +62,7 @@ struct NX_VMS_API CameraHistoryData
 };
 #define CameraHistoryData_Fields (cameraId)(items)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraHistoryData)
+NX_REFLECTION_INSTRUMENT(CameraHistoryData, CameraHistoryData_Fields)
 
 } // namespace api
 } // namespace vms

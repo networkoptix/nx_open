@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/reflect/compare.h>
+#include <nx/reflect/instrument.h>
 
 #include "data_macros.h"
 

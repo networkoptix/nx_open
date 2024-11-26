@@ -71,10 +71,8 @@ std::optional<QByteArray> trySerialize(
             return QnCsv::serialized(outputData);
 
         case Qn::SerializationFormat::xml:
-        {
-            QByteArray result = QnXml::serialized(outputData, QStringLiteral("reply"));
-            return result;
-        }
+            return QnXml::serialized(outputData, QStringLiteral("reply"));
+
         default:
             return {};
     }

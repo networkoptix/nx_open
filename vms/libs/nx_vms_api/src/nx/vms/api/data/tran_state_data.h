@@ -25,6 +25,7 @@ struct NX_VMS_API TranState
 };
 #define TranState_Fields (values)
 NX_VMS_API_DECLARE_STRUCT(TranState)
+NX_REFLECTION_INSTRUMENT(TranState, TranState_Fields)
 
 struct NX_VMS_API TranStateResponse
 {
@@ -32,6 +33,7 @@ struct NX_VMS_API TranStateResponse
 };
 #define TranStateResponse_Fields (result)
 NX_VMS_API_DECLARE_STRUCT(TranStateResponse)
+NX_REFLECTION_INSTRUMENT(TranStateResponse, TranStateResponse_Fields)
 
 struct NX_VMS_API TranSyncDoneData
 {
@@ -39,6 +41,7 @@ struct NX_VMS_API TranSyncDoneData
 };
 #define TranSyncDoneData_Fields (result)
 NX_VMS_API_DECLARE_STRUCT(TranSyncDoneData)
+NX_REFLECTION_INSTRUMENT(TranSyncDoneData, TranSyncDoneData_Fields)
 
 struct NX_VMS_API SyncRequestData
 {
@@ -47,6 +50,7 @@ struct NX_VMS_API SyncRequestData
 };
 #define SyncRequestData_Fields (persistentState)(runtimeState)
 NX_VMS_API_DECLARE_STRUCT(SyncRequestData)
+NX_REFLECTION_INSTRUMENT(SyncRequestData, SyncRequestData_Fields)
 
 } // namespace api
 } // namespace vms

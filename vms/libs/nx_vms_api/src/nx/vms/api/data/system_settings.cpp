@@ -116,22 +116,6 @@ void serialize(QnJsonContext* context, const SiteSettings& value, QJsonValue* ta
     }
 }
 
-void serialize(
-    nx::reflect::json::SerializationContext* context, const SiteSettings& data)
-{
-    switch (data.name)
-    {
-        #define VALUE(R, VALUE, ITEM) \
-            case SiteSettingName::ITEM: \
-                return nx::reflect::json::serialize(context, VALUE.ITEM);
-        BOOST_PP_SEQ_FOR_EACH(VALUE, data, SiteSettings_Fields)
-        #undef VALUE
-
-        case SiteSettingName::none:
-            nx::reflect::BasicSerializer::serialize(context, data);
-    }
-}
-
 bool deserialize(QnJsonContext* context, const QJsonValue& value, SiteSettings* target)
 {
     return QnFusion::deserialize(context, value, target);

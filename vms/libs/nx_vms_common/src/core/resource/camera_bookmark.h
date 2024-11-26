@@ -9,6 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/bookmark_models.h>
 
@@ -147,12 +148,6 @@ struct NX_VMS_COMMON_API CameraBookmarkWithRecordId: CameraBookmark
 #define CameraBookmarkWithRowId_Fields CameraBookmark_Fields (recordId)
 
 NX_REFLECTION_INSTRUMENT(CameraBookmarkWithRecordId, CameraBookmarkWithRowId_Fields)
-
-void NX_VMS_COMMON_API serialize(
-    nx::reflect::json::SerializationContext* ctx, const QnCameraBookmarkTags& value);
-
-nx::reflect::DeserializationResult NX_VMS_COMMON_API deserialize(
-    const nx::reflect::json::DeserializationContext& ctx, QnCameraBookmarkTags* data);
 
 /**
  * Bookmarks search request parameters. Used for loading bookmarks for the fixed time period with

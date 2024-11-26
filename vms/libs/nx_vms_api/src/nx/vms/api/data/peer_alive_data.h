@@ -26,6 +26,7 @@ struct NX_VMS_API PeerAliveData
     (persistentState) \
     (runtimeState)
 NX_VMS_API_DECLARE_STRUCT(PeerAliveData)
+NX_REFLECTION_INSTRUMENT(PeerAliveData, PeerAliveData_Fields)
 
 } // namespace api
 } // namespace vms
