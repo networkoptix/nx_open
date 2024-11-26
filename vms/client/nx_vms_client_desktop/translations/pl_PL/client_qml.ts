@@ -65,7 +65,7 @@
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation type="unfinished">Proxy LDAP requests %1 via server</translation>
+      <translation>Żądania proxy LDAP %1 za pośrednictwem serwera</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>

@@ -3057,7 +3057,7 @@ License Key: %2</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>システムを %1から切断できません</translation>
+      <translation>システムを %1 から切断できません</translation>
     </message>
     <message>
       <source>System will be accessible only through local network.</source>
