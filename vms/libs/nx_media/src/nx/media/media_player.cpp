@@ -1537,7 +1537,8 @@ void Player::setPlaybackMask(const QnTimePeriodList& periods)
 
     const auto lastPosition = position();
     d->archiveReader->setPlaybackMask(periods);
-    setPosition(lastPosition); //< Tries to update position according to the new playback mask.
+    if (!periods.empty() && !periods.containTime(lastPosition))
+        setPosition(lastPosition); //< Tries to update position according to the new playback mask.
 }
 
 void Player::setPlaybackMask(qint64 startTimeMs, qint64 durationMs)
