@@ -33,11 +33,6 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(const QnCompressedAudioDataPtr& data)
     else
         NX_ASSERT(false, "Audio packets without codec is deprecated!");
 
-    // MP3 is always decoded into AV_SAMPLE_FMT_FLTP (planar float), but this format isn't accessible to plugins
-    // created using the camera SDK. So we just work it around here.
-    if (m_codec == AV_CODEC_ID_MP3)
-        data->context->getAvCodecParameters()->format = AV_SAMPLE_FMT_FLTP;
-
     m_initialized = avcodec_open2(m_audioDecoderCtx, codec, nullptr) >= 0;
 
     if (m_audioDecoderCtx && !m_initialized)
