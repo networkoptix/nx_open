@@ -77,15 +77,15 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>Mỗi Chi nhánh chỉ được phép có một giấy phép Khởi đầu.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>Mỗi Chi nhánh chỉ được phép sử dụng một giấy phép NVR.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>Mỗi Chi nhánh chỉ được phép có một giấy phép loại này.</translation>
     </message>
   </context>
 </TS>

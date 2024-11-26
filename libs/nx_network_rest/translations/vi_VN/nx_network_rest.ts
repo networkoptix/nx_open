@@ -9,148 +9,152 @@
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Loại nội dung không được hỗ trợ.</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Người dùng này không tồn tại hoặc không thể đăng nhập.</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Sai mật khẩu</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>Mật khẩu đã hết hạn. Vui lòng liên hệ với quản trị viên Chi nhánh của bạn.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>Không thể truy cập máy chủ LDAP. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 hiện không thể truy cập được. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>Người dùng này đã bị quản trị viên Chi nhánh vô hiệu hóa.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Người dùng bị khóa do nhiều lần thử không thành công. Vui lòng thử lại sau.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Phương pháp ủy quyền này bị cấm. Vui lòng liên hệ với quản trị viên Chi nhánh.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Khóa phiên không hợp lệ hoặc đã hết hạn.</translation>
     </message>
     <message>
       <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
+      <translation>Khóa phiên đã quá cũ đối với Chi nhánh này.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Mã vé không hợp lệ hoặc đã hết hạn.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Hiển thị nhiều hơn một người dùng có cùng thông tin đăng nhập.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Không thể xác minh chứng chỉ SSL/TLS của máy chủ LDAP.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Lỗi máy chủ nội bộ (%1). Vui lòng liên hệ với quản trị viên Chi nhánh.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>Yêu cầu không được phép do có lỗi không xác định.</translation>
     </message>
   </context>
   <context>
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Thiếu tham số bắt buộc: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Không xử lý được yêu cầu.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Bị cấm.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Xung đột.</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Yêu cầu lỗi.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Không được thực hiện.</translation>
     </message>
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Không tìm thấy.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Lỗi nội bộ.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Loại đa phương tiện không được hỗ trợ.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Dịch vụ không khả dụng.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Không được phép.</translation>
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Phiên hết hạn.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Yêu cầu xác thực phiên.</translation>
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>Phiên quá cũ theo cấu hình Chi nhánh.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>Tài nguyên không còn tồn tại trên máy chủ.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>Không được phép.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+      <translation>Tham số không hợp lệ `%1`: %2</translation>
+    </message>
+    <message>
+      <source>Service unauthorized.</source>
+      <translation>Dịch vụ không được phép.</translation>
     </message>
   </context>
 </TS>

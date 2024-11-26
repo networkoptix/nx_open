@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Văn bản chú giải công cụ</translation>
     </message>
   </context>
   <context>
@@ -55,19 +55,19 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Sự kiện phân tích</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Bất kỳ sự kiện phân tích nào</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Sự cố camera</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Sự cố thiết bị</translation>
     </message>
     <message>
       <source>Any camera issue</source>
@@ -75,35 +75,35 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Bất kỳ sự cố thiết bị nào</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Sự kiện máy chủ</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Bất kỳ sự kiện máy chủ nào</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Đã cung cấp trường không hợp lệ</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Chính sách xác thực không mong đợi</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Chọn ít nhất một Máy chủ</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Chọn ít nhất một người dùng</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Chọn chính xác một camera</translation>
     </message>
     <message>
       <source>Select at least one device</source>

@@ -1648,10 +1648,6 @@
       <translation>障害が発生した場合に、分析DBストレージのマウントポイントの権限取得を強制する</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>映像ストリームの確認間隔 (ミリ秒)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>ストレージ暗号化有効</translation>
     </message>
@@ -1830,7 +1826,11 @@
     </message>
     <message>
       <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <translation>新規ユーザーのデフォルトロケール</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation>VMS サーバーでの映像ストリーム権限の確認間隔 (ミリ秒)</translation>
     </message>
   </context>
   <context>

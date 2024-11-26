@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Geçersiz JSON içeriği.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Desteklenmeyen içerik türü.</translation>
     </message>
   </context>
   <context>
@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Yanlış şifre</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -151,6 +151,10 @@
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
       <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+    </message>
+    <message>
+      <source>Service unauthorized.</source>
+      <translation>Yetkisiz servis.</translation>
     </message>
   </context>
 </TS>

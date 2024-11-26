@@ -189,7 +189,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>キャンセルしました</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1154,7 +1154,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>サイトに接続</translation>
     </message>
     <message>
       <source>Layout Tab</source>
@@ -1210,7 +1210,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>専用ウィンドウ</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1226,7 +1226,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>セルのアスペクト比</translation>
     </message>
   </context>
   <context>
@@ -1617,7 +1617,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>サイトに接続</translation>
     </message>
   </context>
   <context>
@@ -2429,7 +2429,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>カメラ IP</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2958,7 +2958,7 @@ License Key: %2</source>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>サイトを %1 に接続...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
@@ -2973,7 +2973,7 @@ License Key: %2</source>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>サイトを %1 から切断できません</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
@@ -4813,7 +4813,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
+      <translation>音声のみ</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4841,7 +4841,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>証明書エラー</translation>
     </message>
   </context>
   <context>
@@ -4993,7 +4993,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>読み取り/書き込みポリシーを選択して、ストレージディレクトリへの操作内容を定義してください。</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -5157,7 +5157,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>アイコンをクリックすると、サーバーリストが表示されます。</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
@@ -5435,8 +5435,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>%n サーバーでバックアップストレージが構成されていません</numerusform>
       </translation>
     </message>
     <message>
@@ -5458,7 +5458,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>要チェック: %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
@@ -5478,7 +5478,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>どこからでもサイトに接続できます。</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
@@ -5680,7 +5680,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>%1 ごとに自動更新</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6327,7 +6327,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
+      <translation>開発者モード情報</translation>
     </message>
     <message>
       <source>Is listed</source>
@@ -6412,7 +6412,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>クロスサイト機能</translation>
     </message>
   </context>
   <context>
@@ -6611,8 +6611,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>%n ルールを削除しますか?</numerusform>
       </translation>
     </message>
   </context>
@@ -6746,7 +6746,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>新しいリストを作成...</translation>
     </message>
   </context>
   <context>
@@ -7949,7 +7949,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>切断してもよろしいですか?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -7984,12 +7984,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>サイトを %1 に接続</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>サイトを %1 に接続しますか?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
@@ -8882,7 +8882,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>現在のサイトに接続しています...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
@@ -9277,23 +9277,23 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>クライアントでデバッグログが有効になっています</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>デバッグログが有効になっています。
+クライアントのパフォーマンスが低下します。</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>デバッグログが有効になっています</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>デバッグログが有効になっています。
+サイトのパフォーマンスが低下します。</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
@@ -9349,16 +9349,12 @@ Site performance is degraded.</translation>
       <translation>ネットワークリクエストに失敗しました</translation>
     </message>
     <message>
-      <source>Lookup List save request failed</source>
-      <translation type="unfinished">Lookup List save request failed</translation>
-    </message>
-    <message>
       <source>Lookup List remove request failed</source>
       <translation type="unfinished">Lookup List remove request failed</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>リストにオブジェクトを追加できませんでした</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
@@ -9610,7 +9606,7 @@ Site performance is degraded.</translation>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>リモートサイト%1 を構成できませんでした。</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
@@ -9620,7 +9616,7 @@ Site performance is degraded.</translation>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>両方のサイトが %1 に接続されています。統合は許容されません。</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
@@ -9629,7 +9625,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>同じ Server GUID を持つサーバーが1つ以上存在するため、サイトを統合できません。このサーバーを削除してやり直してください。</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
@@ -9950,7 +9946,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>週末に更新プログラムを適用することは推奨されません</translation>
     </message>
     <message>
       <source>Site updated to</source>
@@ -10126,7 +10122,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>現在のサイト</translation>
     </message>
     <message>
       <source>Any Notification</source>
@@ -10142,7 +10138,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>タイプを選択...</translation>
     </message>
     <message>
       <source>Any notification</source>
@@ -10517,11 +10513,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>インテグレーションの自動再読み込み</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Webページの自動再読み込み</translation>
     </message>
   </context>
   <context>
@@ -11016,7 +11012,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>アーカイブの暗号化によりCPU使用率が増加します</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12879,7 +12875,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>認証</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13642,7 +13638,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>クライアントの自動更新</translation>
     </message>
   </context>
   <context>

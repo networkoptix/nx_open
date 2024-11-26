@@ -152,5 +152,9 @@
       <comment>%1 is name, %2 is value.</comment>
       <translation>Nieprawidłowy parametr `%1`: %2</translation>
     </message>
+    <message>
+      <source>Service unauthorized.</source>
+      <translation type="unfinished">Service unauthorized.</translation>
+    </message>
   </context>
 </TS>

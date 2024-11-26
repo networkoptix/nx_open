@@ -253,7 +253,7 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>このプラグインを構成するには、サイト管理設定を確認してください。</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
@@ -398,6 +398,13 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>keep current value</source>
       <translation>現在の値を維持</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkView</name>
+    <message>
+      <source>Shared by link</source>
+      <translation>リンクで共有</translation>
     </message>
   </context>
   <context>
@@ -605,7 +612,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>コピー完了</translation>
     </message>
   </context>
   <context>
@@ -694,11 +701,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>リストを削除すると、リスト内のすべてのデータが消去されます。</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>リストを削除しますか?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
@@ -914,7 +921,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>戻る</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -932,11 +939,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>グループメンバーには以下のサイトレベルの行動を許可します:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>当ユーザーには以下のサイトレベルの行動を許可します:</translation>
     </message>
   </context>
   <context>
@@ -1388,11 +1395,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>サイトを LDAP サーバーに接続すると、ユーザー管理が容易になります</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>このサイトでは、LDAP サーバーからの継続的なインポートが無効になっています。グループ、ユーザーおよびグループのメンバーシップの更新は、手動同期によってのみ反映されます。</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
@@ -1469,7 +1476,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>参照...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1477,7 +1484,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>データにヘッダーが含まれています</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1497,7 +1504,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>ファイルを開けませんでした</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
@@ -1509,7 +1516,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>選択したファイルをインポートできませんでした</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
@@ -1560,7 +1567,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>ファイルを保存できませんでした</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
@@ -1963,7 +1970,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>コピー</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2109,35 +2116,35 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>サーバーはリモートアクセス機能用に設定されていません</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>リモートアクセスツールは現在無効になっています。有効化する権限がない場合は、管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>不明</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>%1 クライアントアプリケーションを localhost:%2 に接続</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>ローカルポート</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation>エラーが発生しました。</translation>
+      <translation>エラーが発生しました</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>ユーザー名</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2145,7 +2152,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>リモートアクセスは利用できません</translation>
     </message>
   </context>
   <context>

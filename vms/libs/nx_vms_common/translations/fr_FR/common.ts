@@ -1720,10 +1720,6 @@
       <translation>Forcer les permissions du point de montage de la base de données analytique en cas d'échec</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Vérifier la période du flux vidéo (en millisecondes)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Chiffrement du stockage activé</translation>
     </message>
@@ -1903,6 +1899,10 @@
     <message>
       <source>Default locale for new users</source>
       <translation type="unfinished">Default locale for new users</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation>Vérifier les autorisations de flux vidéo sur la période du serveur VMS (millisecondes)</translation>
     </message>
   </context>
   <context>

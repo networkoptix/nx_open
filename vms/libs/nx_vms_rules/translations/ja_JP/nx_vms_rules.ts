@@ -63,7 +63,7 @@
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>カメラ障害</translation>
     </message>
     <message>
       <source>Device issues</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>選択したローカルレイアウトは、その所有者 %1 にのみ表示されます。</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
@@ -386,7 +386,7 @@
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>カメラ切断</translation>
     </message>
     <message>
       <source>Device</source>
@@ -428,7 +428,7 @@
     </message>
     <message>
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">Camera IP Conflict</translation>
+      <translation>カメラのIP競合</translation>
     </message>
   </context>
   <context>
@@ -800,7 +800,7 @@
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>現在の消費電力: %1 ワット</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>

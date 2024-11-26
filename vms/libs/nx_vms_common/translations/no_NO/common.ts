@@ -1718,10 +1718,6 @@
       <translation>Tving analytics DB-lagringsmonteringspunkttillatelser i tilfelle feil</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Sjekk videostrømperiode (millisekunder)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Lagringskryptering aktivert</translation>
     </message>
@@ -1901,6 +1897,10 @@
     <message>
       <source>Default locale for new users</source>
       <translation type="unfinished">Default locale for new users</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation>Kontroller videostrøm rettigheter på VMS server perioden (millisekunder)</translation>
     </message>
   </context>
   <context>

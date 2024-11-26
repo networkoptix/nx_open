@@ -1718,10 +1718,6 @@
       <translation>Tvinga tillstånd för monteringspunkt för analytics DB-lagring vid fel</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Kontrollera videoströmningsperioden (millisekunder)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Lagringskryptering aktiverad</translation>
     </message>
@@ -1901,6 +1897,10 @@
     <message>
       <source>Default locale for new users</source>
       <translation type="unfinished">Default locale for new users</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation>Kontrollera videoströmningsbehörigheter på VMS-serverperioden (millisekunder)</translation>
     </message>
   </context>
   <context>

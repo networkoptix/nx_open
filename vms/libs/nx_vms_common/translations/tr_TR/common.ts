@@ -1718,10 +1718,6 @@
       <translation>Hata durumunda analitik DB depolama bağlama noktası izinlerini zorunlu kıl</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Video akış süresini kontrol et (milisaniye)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Depolama şifrelemesi etkin</translation>
     </message>
@@ -1901,6 +1897,10 @@
     <message>
       <source>Default locale for new users</source>
       <translation type="unfinished">Default locale for new users</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

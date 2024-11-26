@@ -1648,10 +1648,6 @@
       <translation>Paksa izin titik pemasangan penyimpanan DB analitik jika terjadi kegagalan</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Periksa periode streaming video (milidetik)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Enkripsi penyimpanan diaktifkan</translation>
     </message>
@@ -1831,6 +1827,10 @@
     <message>
       <source>Default locale for new users</source>
       <translation type="unfinished">Default locale for new users</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
     </message>
   </context>
   <context>

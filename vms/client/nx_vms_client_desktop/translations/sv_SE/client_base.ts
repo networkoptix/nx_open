@@ -9493,10 +9493,6 @@ Site performance is degraded.</translation>
       <translation>Nätverksbegäran misslyckades</translation>
     </message>
     <message>
-      <source>Lookup List save request failed</source>
-      <translation type="unfinished">Lookup List save request failed</translation>
-    </message>
-    <message>
       <source>Lookup List remove request failed</source>
       <translation type="unfinished">Lookup List remove request failed</translation>
     </message>

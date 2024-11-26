@@ -93,12 +93,12 @@
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>競合。</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Bad request</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -151,6 +151,10 @@
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
       <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+    </message>
+    <message>
+      <source>Service unauthorized.</source>
+      <translation>サービスの権限がありません。</translation>
     </message>
   </context>
 </TS>

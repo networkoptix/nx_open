@@ -1648,10 +1648,6 @@
       <translation>Trao quyền đối với điểm gắn kết lưu trữ của Cơ sở dữ liệu phân tích đề phòng trường hợp bị lỗi</translation>
     </message>
     <message>
-      <source>Check video stream period (milliseconds)</source>
-      <translation>Kiểm tra khoảng thời gian luồng video (mili giây)</translation>
-    </message>
-    <message>
       <source>Storage encryption enabled</source>
       <translation>Mã hóa bộ nhớ đã được bật</translation>
     </message>
@@ -1831,6 +1827,10 @@
     <message>
       <source>Default locale for new users</source>
       <translation type="unfinished">Default locale for new users</translation>
+    </message>
+    <message>
+      <source>Check video stream permissions on VMS server period (milliseconds)</source>
+      <translation>Kiểm tra quyền phát video trên máy chủ VMS theo chu kỳ (mili giây)</translation>
     </message>
   </context>
   <context>

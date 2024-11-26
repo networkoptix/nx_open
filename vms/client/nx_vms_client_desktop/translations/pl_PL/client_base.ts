@@ -1186,19 +1186,19 @@
     </message>
     <message>
       <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
+      <translation>Nowa zakładka układu</translation>
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>Karta ekranu powitalnego</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
+      <translation>Nowa karta ekranu powitalnego</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Zarządzanie witryną...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -3074,31 +3074,31 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Obecnie nie ma połączenia pomiędzy Twoją witryną i %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Wprowadź hasło do swojego konta, aby odłączyć witrynę od %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Nie można odłączyć witryny od %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Witryna odłączona od %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Odłączyć witrynę od %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>Nagrywanie zostanie zatrzymane, a wszystkie subskrypcje usług zostaną usunięte</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
@@ -3427,11 +3427,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>Konfiguracja witryny zostanie przywrócona z kopii zapasowej, a aplikacja serwera zostanie uruchomiona ponownie.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Wprowadź hasło konta, aby przywrócić witrynę z kopii zapasowej</translation>
     </message>
   </context>
   <context>
@@ -3654,7 +3654,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>Filtry powiadomień zostały przeniesione do prawego panelu</translation>
     </message>
   </context>
   <context>
@@ -3713,7 +3713,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Otwarte integracje</translation>
     </message>
   </context>
   <context>
@@ -4009,7 +4009,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>Ustawienia są tylko do odczytu. Skontaktuj się z administratorem witryny. Wszystkie zmiany zostaną utracone po wyjściu z programu.</translation>
     </message>
   </context>
   <context>
@@ -4182,7 +4182,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;Wirtualna Kamera&quot; to wirtualna przestrzeń dostępna dla plików wideo, które można przesłać na dowolny z serwerów w systemie i udostępnić je dowolnym użytkownikom.</translation>
     </message>
   </context>
   <context>
@@ -4530,7 +4530,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Przejdź do dedykowanego okna</translation>
     </message>
   </context>
   <context>
@@ -4877,7 +4877,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>Aby dostęp zdalny był możliwy, należy wyłączyć dla Twojego konta niezabezpieczone (skrótowe) uwierzytelnianie.</translation>
     </message>
   </context>
   <context>
@@ -4961,7 +4961,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
+      <translation>Nie można uzyskać dostępu do tej kamery. Wykonaj diagnostykę kamery w kliencie Nx Witness Desktop, aby uzyskać dodatkowe informacje.</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4969,11 +4969,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+      <translation>Ta kamera wymaga ustawienia autoryzowanych danych uwierzytelniających w ustawieniach urządzenia na portalu Cloud lub na komputerze stacjonarnym.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>NIEOBSŁUGIWANE</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4981,11 +4981,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>ZAMKNIĘCIE WITRYNY</translation>
     </message>
     <message>
       <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
+      <translation>OGRANICZENIE STRUMIENIOWANIA</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4993,7 +4993,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
+      <translation>TYLKO AUDIO</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -5021,7 +5021,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>BŁĄD CERTYFIKATU</translation>
     </message>
   </context>
   <context>
@@ -9780,10 +9780,6 @@ Site performance is degraded.</translation>
     <message>
       <source>Network request failed</source>
       <translation>Błąd połączenia sieciowego</translation>
-    </message>
-    <message>
-      <source>Lookup List save request failed</source>
-      <translation type="unfinished">Lookup List save request failed</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>

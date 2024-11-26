@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>サイト管理データのバックアップを作成、または既存のバックアップからサイト管理データを復元します。</translation>
     </message>
   </context>
   <context>
@@ -1426,7 +1426,7 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>起動後、直前に使用したサイトに接続する</translation>
     </message>
   </context>
   <context>
@@ -2656,11 +2656,11 @@
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>設定...</translation>
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>ぼかし</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
