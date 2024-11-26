@@ -418,9 +418,8 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
 
     if (hasNodeType(index, NodeType::customResourceGroup))
     {
-        const auto cameras = data.resources().filtered<QnVirtualCameraResource>();
-        const auto webPages = data.resources().filtered<QnWebPageResource>();
-        const auto layouts = data.resources().filtered<QnLayoutResource>();
+        QnVirtualCameraResourceList cameras;
+        QnLayoutResourceList layouts;
 
         // Parent server as displayed, i.e it will be null if server nodes aren't displayed in the
         // resource tree.
@@ -430,7 +429,22 @@ bool ResourceTreeDragDropDecoratorModel::dropMimeData(const QMimeData* mimeData,
         const auto dropParentServer = parentServer(index);
         const auto dropGroupId = index.data(Qn::ResourceTreeCustomGroupIdRole).toString();
 
-        moveResources(cameras, webPages, layouts, dragGroupId, dropGroupId, dropParentServer);
+        // Dropping cameras or web pages into group within "Layouts" node has no effect.
+        if (hasTopLevelNodeType(index, NodeType::layouts))
+            layouts = data.resources().filtered<QnLayoutResource>();
+
+        // Dropping layouts or web pages into group within "Cameras & Devices" or server node has
+        // no effect.
+        if (hasTopLevelNodeType(index, NodeType::camerasAndDevices)
+            || hasTopLevelNodeType(index, NodeType::servers)
+            || hasResourceFlags(topLevelParent(index), Qn::server))
+        {
+            cameras = data.resources().filtered<QnVirtualCameraResource>();
+        }
+
+        moveResources(
+            cameras, /*webPages*/ {}, layouts, dragGroupId, dropGroupId, dropParentServer);
+
         return true;
     }
 
