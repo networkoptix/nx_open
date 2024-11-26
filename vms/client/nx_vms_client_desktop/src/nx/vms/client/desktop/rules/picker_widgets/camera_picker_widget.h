@@ -71,15 +71,30 @@ protected:
         auto selectedCameras = m_field->ids();
         bool useSource = m_field->useSource();
 
-        if (CameraSelectionDialog::selectCameras<Policy>(
-            systemContext(),
-            selectedCameras,
-            useSource,
-            this))
+        if (hasSourceCamera(getEventDescriptor().value()))
         {
-            m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
-            m_field->setIds(selectedCameras);
-            m_field->setUseSource(useSource);
+            if (CameraSelectionDialog::selectCameras<Policy>(
+                systemContext(),
+                selectedCameras,
+                useSource,
+                this))
+            {
+                m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
+                m_field->setIds(selectedCameras);
+                m_field->setUseSource(useSource);
+            }
+        }
+        else
+        {
+            if (CameraSelectionDialog::selectCameras<Policy>(
+                systemContext(),
+                selectedCameras,
+                this))
+            {
+                m_field->setAcceptAll(Policy::emptyListIsValid() && selectedCameras.empty());
+                m_field->setIds(selectedCameras);
+                m_field->setUseSource(false);
+            }
         }
 
         CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::onSelectButtonClicked();
@@ -89,6 +104,7 @@ private:
     using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::m_field;
     using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::systemContext;
     using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::parentParamsWidget;
+    using CameraPickerWidgetBase<vms::rules::TargetDevicesField, Policy>::getEventDescriptor;
 };
 
 } // namespace nx::vms::client::desktop::rules
