@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>Kiểm tra quyền phát video trên máy chủ VMS theo chu kỳ (mili giây)</translation>
     </message>
   </context>
   <context>

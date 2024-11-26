@@ -1808,7 +1808,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>Vérifier les autorisations de flux vidéo sur la période du serveur VMS (millisecondes)</translation>
     </message>
   </context>
   <context>
