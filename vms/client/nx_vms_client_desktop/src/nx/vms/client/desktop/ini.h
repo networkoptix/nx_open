@@ -276,10 +276,10 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, enableMultiSystemTabBar,
         "[Feature] Enable double layer tab bar.");
 
-    NX_INI_FLAG(false, perItemMute,
+    NX_INI_FLAG(true, perItemMute,
         "[Feature] Show per-item mute buttons in 'play audio from all cameras' mode.");
 
-    NX_INI_FLAG(false, audioVisualization,
+    NX_INI_FLAG(true, audioVisualization,
         "[Feature] Show audio visualizers on audio-only items.");
 
     // ---------------------------------------------------------------------------------------------
