@@ -67,7 +67,7 @@
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>デバイス障害</translation>
     </message>
     <message>
       <source>Any camera issue</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>無効なフィールドタイプが指定されました</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>適していないサーバーが存在します。</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -139,7 +139,7 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>動作継続時間</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>イベントデバイス</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -188,7 +188,7 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>指定された検証ポリシーに対して、フィールド %1 の値を指定する必要があります。</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
@@ -196,7 +196,7 @@
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>選択したレイアウトにアクセスできるユーザーが選択されていません。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
@@ -204,7 +204,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>対象</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
@@ -236,7 +236,7 @@
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>動作継続時間は0未満にできません。</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
@@ -262,11 +262,11 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>空のテキストは許可されません。</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>無効なメールアドレス %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
@@ -382,7 +382,7 @@
     </message>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>デバイス切断</translation>
     </message>
     <message>
       <source>Camera Disconnected</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>デバイスのIP競合</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <translation>%1 からの汎用イベント</translation>
     </message>
   </context>
   <context>
@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>HTTP 認証</translation>
     </message>
   </context>
   <context>
@@ -555,7 +555,7 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
-      <translation type="unfinished">HTTP Method should be known</translation>
+      <translation>HTTP メソッドは既知である必要があります</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
+      <translation>LDAP 同期障害イベント</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -580,16 +580,16 @@
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>LDAP サーバーへの接続に失敗しました。</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>%1 のタイムアウト以内に同期を完了できませんでした。</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>同期設定に一致するユーザーアカウントが LDAP サーバー上に存在しません。</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。代わりにサイト時刻が使用されます。</translation>
     </message>
   </context>
   <context>
@@ -717,15 +717,15 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>リストが選択されていません</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>指定された ID &apos;%1&apos; のリストは存在しません。</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>指定された ID &apos;%1&apos; のリストには、無効なオブジェクトタイプ &apos;%2&apos; が含まれています。期待されるオブジェクトタイプは &apos;%3&apos; です。</translation>
     </message>
   </context>
   <context>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>`%1` イベント状態に対して、0 以外の動作継続時間を設定することはできません</translation>
     </message>
   </context>
   <context>
@@ -808,7 +808,7 @@
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>消費下限: %1 ワット</translation>
     </message>
   </context>
   <context>
@@ -1129,11 +1129,11 @@
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>イベント記述子の取得に失敗しました</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>イベントにソースカメラがありません</translation>
     </message>
   </context>
   <context>
@@ -1147,15 +1147,15 @@
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>リストが選択されていません</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>指定された ID &apos;%1&apos; のリストは存在しません。</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>指定された ID &apos;%1&apos; のリストは汎用リストではありません。</translation>
     </message>
   </context>
   <context>

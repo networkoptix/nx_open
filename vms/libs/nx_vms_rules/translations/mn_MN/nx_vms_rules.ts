@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="vi_VN" sourcelanguage="en">
+<TS version="2.1" language="mn_MN" sourcelanguage="en">
   <context>
     <name>BasicAction</name>
     <message>
       <source>Caption</source>
-      <translation>Chú thích</translation>
+      <translation type="unfinished">Caption</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Mô tả</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation>Văn bản chú giải công cụ</translation>
+      <translation type="unfinished">Tooltip text</translation>
     </message>
   </context>
   <context>
@@ -21,89 +21,91 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>%n lần, lần đầu tiên: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>Lần xuất hiện đầu tiên: %1 trên %2 ( tổng cộng%n lần)</numerusform>
+      <translation type="unfinished">
+        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>Thời gian：%1 trong %2</translation>
+      <translation type="unfinished">Time: %1 on %2</translation>
     </message>
     <message>
       <source>Unknown event</source>
-      <translation>Sự kiện không xác định</translation>
+      <translation type="unfinished">Unknown event</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation>Lý do: %1</translation>
+      <translation type="unfinished">Reason: %1</translation>
     </message>
     <message>
       <source>Unknown action</source>
-      <translation>Hành động không xác định</translation>
+      <translation type="unfinished">Unknown action</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation>Bất kỳ sự kiện nào</translation>
+      <translation type="unfinished">Any event</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation>Sự kiện phân tích</translation>
+      <translation type="unfinished">Analytics events</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích nào</translation>
+      <translation type="unfinished">Any analytics event</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation>Sự cố camera</translation>
+      <translation type="unfinished">Camera issues</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation>Sự cố thiết bị</translation>
+      <translation type="unfinished">Device issues</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>Bất kỳ vấn đề camera</translation>
+      <translation type="unfinished">Any camera issue</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation>Bất kỳ sự cố thiết bị nào</translation>
+      <translation type="unfinished">Any device issue</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation>Sự kiện máy chủ</translation>
+      <translation type="unfinished">Server events</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation>Bất kỳ sự kiện máy chủ nào</translation>
+      <translation type="unfinished">Any server event</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation>Đã cung cấp trường không hợp lệ</translation>
+      <translation type="unfinished">Invalid field type is provided</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation>Chính sách xác thực không mong đợi</translation>
+      <translation type="unfinished">Unexpected validation policy</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
-      <translation>Chọn ít nhất một Máy chủ</translation>
+      <translation type="unfinished">Select at least one Server</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>Chọn ít nhất một người dùng</translation>
+      <translation type="unfinished">Select at least one user</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation>Chọn chính xác một camera</translation>
+      <translation type="unfinished">Select exactly one camera</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -123,19 +125,19 @@
     </message>
     <message>
       <source>At</source>
-      <translation>Tại camera</translation>
+      <translation type="unfinished">At</translation>
     </message>
     <message>
       <source>To</source>
-      <translation>Đến</translation>
+      <translation type="unfinished">To</translation>
     </message>
     <message>
       <source>Occurs At</source>
-      <translation>Xảy ra tại</translation>
+      <translation type="unfinished">Occurs At</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation>Bắt đầu khi nào</translation>
+      <translation type="unfinished">Begin When</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -151,23 +153,23 @@
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Khoảng thời gian hành động</translation>
+      <translation type="unfinished">Interval of Action</translation>
     </message>
     <message>
       <source>State</source>
-      <translation>Trạng thái</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
     <message>
       <source>Volume</source>
-      <translation>Âm lượng</translation>
+      <translation type="unfinished">Volume</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation>Tua lại</translation>
+      <translation type="unfinished">Rewind</translation>
     </message>
     <message>
       <source>On Layout</source>
-      <translation>Trên Bố cục</translation>
+      <translation type="unfinished">On Layout</translation>
     </message>
     <message>
       <source>Event Devices</source>
@@ -175,15 +177,15 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation>Thuộc loại</translation>
+      <translation type="unfinished">Of Type</translation>
     </message>
     <message>
       <source>And Caption</source>
-      <translation>Và chú thích</translation>
+      <translation type="unfinished">And Caption</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation>Và mô tả</translation>
+      <translation type="unfinished">And Description</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
@@ -210,11 +212,13 @@
       <source>Selected devices were removed</source>
       <translation type="unfinished">
         <numerusform>Selected devices were removed</numerusform>
+        <numerusform>Selected devices were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <translation type="unfinished">
+        <numerusform>Selected cameras were removed</numerusform>
         <numerusform>Selected cameras were removed</numerusform>
       </translation>
     </message>
@@ -222,11 +226,13 @@
       <source>Selected servers were removed</source>
       <translation type="unfinished">
         <numerusform>Selected servers were removed</numerusform>
+        <numerusform>Selected servers were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <translation type="unfinished">
+        <numerusform>Selected layouts were removed</numerusform>
         <numerusform>Selected layouts were removed</numerusform>
       </translation>
     </message>
@@ -248,7 +254,7 @@
     </message>
     <message>
       <source>To Users</source>
-      <translation>Đến người dùng</translation>
+      <translation type="unfinished">To Users</translation>
     </message>
   </context>
   <context>
@@ -272,6 +278,7 @@
       <source>%n of %1 additional email addresses are invalid</source>
       <translation type="unfinished">
         <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
       </translation>
     </message>
   </context>
@@ -279,12 +286,12 @@
     <name>nx::vms::rules::AnalyticsEvent</name>
     <message>
       <source>Analytics Event</source>
-      <translation>Sự kiện phân tích</translation>
+      <translation type="unfinished">Analytics Event</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation>%1 tại %2</translation>
+      <translation type="unfinished">%1 at %2</translation>
     </message>
   </context>
   <context>
@@ -298,20 +305,20 @@
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation>Phát hiện đối tượng</translation>
+      <translation>Объект илэрсэн</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation>Phân tích phát hiện đối tượng</translation>
+      <translation type="unfinished">Analytics Object Detected</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation>Và đối tượng</translation>
+      <translation type="unfinished">And Object</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment> is detected</comment>
-      <translation>%1 tại %2</translation>
+      <translation type="unfinished">%1 at %2</translation>
     </message>
   </context>
   <context>
@@ -325,60 +332,60 @@
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation>Tạo dấu trang</translation>
+      <translation type="unfinished">Create Bookmark</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation>Thêm thẻ</translation>
+      <translation type="unfinished">Add Tags</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation>Buzzer</translation>
+      <translation>Дуут дохио</translation>
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation>Điều chỉnh hành động</translation>
+      <translation type="unfinished">Action Throttling</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation>Cổng đầu vào: %1</translation>
+      <translation type="unfinished">Input Port: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>Đầu vào %1</translation>
+      <translation type="unfinished">Input on %1</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation>Tín hiệu đầu vào trên thiết bị</translation>
+      <translation type="unfinished">Input Signal on Device</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation>Với ID</translation>
+      <translation type="unfinished">With ID</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation>Tín hiệu đầu vào trên camera</translation>
+      <translation type="unfinished">Input Signal on Camera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device was disconnected</source>
-      <translation>Thiết bị đã được ngắt kết nối</translation>
+      <translation type="unfinished">Device was disconnected</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation>Camera bị ngắt kết nối</translation>
+      <translation type="unfinished">Camera was disconnected</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation>Mô-đun I/O bị ngắt kết nối</translation>
+      <translation type="unfinished">I/O Module was disconnected</translation>
     </message>
     <message>
       <source>Device Disconnected</source>
@@ -390,11 +397,11 @@
     </message>
     <message>
       <source>Device</source>
-      <translation>Thiết bị</translation>
+      <translation>Төхөөрөмж</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>%1 was disconnected</source>
@@ -406,21 +413,21 @@
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>Xung đột địa chỉ: %1</translation>
+      <translation type="unfinished">Conflicting Address: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation type="unfinished">MAC #%1: %2</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Xung đột IP thiết bị tại %1</translation>
+      <translation>%1 төхөөрөмжийн IP холбогдсонгүй</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>Camera IP xung đột tại %1</translation>
+      <translation>%1 камерын IP холбогдсонгүй</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -435,78 +442,78 @@
     <name>nx::vms::rules::DeviceOutputAction</name>
     <message>
       <source>Output ID</source>
-      <translation>ID đầu ra</translation>
+      <translation type="unfinished">Output ID</translation>
     </message>
     <message>
       <source>Device Output</source>
-      <translation>Đầu ra thiết bị</translation>
+      <translation type="unfinished">Device Output</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation>Hình ảnh</translation>
+      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation>FPS</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation>Ghi hình camera</translation>
+      <translation type="unfinished">Camera Recording</translation>
     </message>
     <message>
       <source>On</source>
-      <translation>Mở</translation>
+      <translation type="unfinished">On</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::EnterFullscreenAction</name>
     <message>
       <source>Camera</source>
-      <translation>Camera</translation>
+      <translation>Камер</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation>Đặt thành Toàn màn hình</translation>
+      <translation type="unfinished">Set to Fullscreen</translation>
     </message>
     <message>
       <source>Set for</source>
-      <translation>Đặt cho</translation>
+      <translation type="unfinished">Set for</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Thoát toàn màn hình</translation>
+      <translation type="unfinished">Exit Fullscreen</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan error at %1</source>
-      <translation>Lỗi quạt tại %1</translation>
+      <translation type="unfinished">Fan error at %1</translation>
     </message>
     <message>
       <source>Fan Failure</source>
-      <translation>Lỗi quạt</translation>
+      <translation type="unfinished">Fan Failure</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation>Sự kiện chung</translation>
+      <translation type="unfinished">Generic Event</translation>
     </message>
     <message>
       <source>Omit logging</source>
-      <translation>Bỏ qua ghi nhật ký</translation>
+      <translation type="unfinished">Omit logging</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation>Và Nguồn</translation>
+      <translation type="unfinished">And Source</translation>
     </message>
     <message>
       <source>Generic Event from %1</source>
@@ -517,23 +524,23 @@
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Content type</source>
-      <translation>Kiểu Nội dung</translation>
+      <translation type="unfinished">Content type</translation>
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation>Yêu cầu HTTP(S)</translation>
+      <translation type="unfinished">HTTP(S) Request</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation type="unfinished">URL</translation>
     </message>
     <message>
       <source>Content</source>
-      <translation>Nội Dung</translation>
+      <translation type="unfinished">Content</translation>
     </message>
     <message>
       <source>Method</source>
-      <translation>Phương thức</translation>
+      <translation type="unfinished">Method</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -576,6 +583,7 @@
       <comment>%1 is a cause of the event</comment>
       <translation type="unfinished">
         <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n times)</numerusform>
       </translation>
     </message>
     <message>
@@ -600,19 +608,19 @@
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>License Issue</source>
-      <translation>Vấn đề giấy phép</translation>
+      <translation>Лицензийн алдаа</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following devices:</source>
-      <translation>Không đủ giấy phép. Trình ghi đã bị tắt trên các thiết bị sau:</translation>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following devices:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following cameras:</source>
-      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các camera sau:</translation>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following cameras:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on the following I/O modules:</source>
-      <translation>Không đủ giấy phép. Tính năng ghi đã bị tắt trên các mô-đun I/O sau:</translation>
+      <translation type="unfinished">Not enough licenses. Recording has been disabled on the following I/O modules:</translation>
     </message>
     <message>
       <source>%1 has a license problem</source>
@@ -624,78 +632,79 @@
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation>%1 phát hiện chuyển động</translation>
+      <translation>%1 дээр хөдөлгөөн илэрлээ</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation>Chuyển động trên camera</translation>
+      <translation type="unfinished">Motion on Camera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue at %1</source>
-      <translation>%1 lỗi mạng</translation>
+      <translation>%1 дээр сүлжээний алдаа гарлаа</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>Vấn đề về mạng</translation>
+      <translation>Сүлжээний алдаа</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>Không nhận được dữ liệu nào trong %n giây qua.</numerusform>
+      <translation type="unfinished">
+        <numerusform>No data received during last %n seconds.</numerusform>
+        <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation>Lỗi RTP trong luồng chính (%1).</translation>
+      <translation type="unfinished">RTP error in primary stream (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation>Lỗi RTP trong luồng phụ (%1).</translation>
+      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>Phát hiện mất gói RTP.</translation>
+      <translation type="unfinished">RTP packet loss detected.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation>Thời gian camera trở lại bình thường.</translation>
+      <translation>Камерын цаг хэвийн ажиллаж эхэллээ.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>Thiết bị không phản hồi yêu cầu mạng.</translation>
+      <translation>Төхөөрөмж сүлжээнд хариу өгөхгүй байна.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng chính.</translation>
+      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation>Địa chỉ %1 đã được sử dụng bởi %2 trên luồng phụ.</translation>
+      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation>Đã phát hiện xung đột địa chỉ multicast.</translation>
+      <translation type="unfinished">Multicast address conflict detected.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast.</translation>
+      <translation>%1 сүлжээнд multicast хаяг дэмжигдээгүй байна.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng chính) đã bị đóng đột ngột.</translation>
+      <translation>Камерын холболт (үндсэн дамжуулалт) саллаа.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>Kết nối với camera (luồng thứ cấp) đã bị đóng đột ngột.</translation>
+      <translation>Камерын холболт (хоёрдогч дамжуулалт) саллаа.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>Kết nối với thiết bị đã bị đóng đột ngột.</translation>
+      <translation>Төхөөрөмжийн холболт саллаа.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
@@ -706,11 +715,11 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Force Acknowledgement</source>
-      <translation>Buộc xác nhận</translation>
+      <translation type="unfinished">Force Acknowledgement</translation>
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation>Hiển thị thông báo trên màn hình</translation>
+      <translation type="unfinished">Show Desktop Notification</translation>
     </message>
   </context>
   <context>
@@ -732,7 +741,7 @@
     <name>nx::vms::rules::OpenLayoutAction</name>
     <message>
       <source>Open Layout</source>
-      <translation>Mở bố cục</translation>
+      <translation type="unfinished">Open Layout</translation>
     </message>
   </context>
   <context>
@@ -743,456 +752,459 @@
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation>Không thể thiết lập thời lượng khác không cho trạng thái sự kiện `%1`</translation>
+      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation>Ghi khẩn cấp</translation>
+      <translation type="unfinished">Panic Recording</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Play Sound</source>
-      <translation>Phát âm thanh</translation>
+      <translation type="unfinished">Play Sound</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PluginDiagnosticEvent</name>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>Sự kiện chẩn đoán plugin</translation>
+      <translation type="unfinished">Plugin Diagnostic Event</translation>
     </message>
     <message>
       <source>For Plugin</source>
-      <translation>Dành cho plugin</translation>
+      <translation type="unfinished">For Plugin</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation>Và cấp độ là</translation>
+      <translation type="unfinished">And Level Is</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
-      <translation>Tiêu dùng</translation>
+      <translation type="unfinished">Consumption</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation>Máy chủ</translation>
+      <translation type="unfinished">Server</translation>
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation>Quá tải PoE</translation>
+      <translation type="unfinished">PoE Over Budget</translation>
     </message>
     <message>
       <source>Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation>Vượt quá giới hạn điện năng (%1)</translation>
+      <translation type="unfinished">Power limit exceeded (%1)</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation>Quá tải PoE tại %1</translation>
+      <translation type="unfinished">PoE over budget on %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation>Tiêu thụ điện năng hiện tại: %1 watt</translation>
+      <translation type="unfinished">Current power consumption: %1 watts</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation>Mức giới hạn tiêu thụ trên: %1 watt</translation>
+      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation>Mức giới hạn tiêu thụ thấp hơn: %1 watt</translation>
+      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation>Thực thi PTZ cài sẵn</translation>
+      <translation type="unfinished">Execute PTZ Preset</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation>PTZ cài sẵn</translation>
+      <translation type="unfinished">PTZ Preset</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation>Thực thi cho người dùng</translation>
+      <translation type="unfinished">Execute to users</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>Header</source>
-      <translation>Đầu trang</translation>
+      <translation type="unfinished">Header</translation>
     </message>
     <message>
       <source>Body</source>
-      <translation>Nội dung</translation>
+      <translation type="unfinished">Body</translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation>Gửi thông báo di động</translation>
+      <translation type="unfinished">Send Mobile Notification</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation>Thêm tên thiết bị nguồn trong phần nội dung</translation>
+      <translation type="unfinished">Add Source Device name to Body</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation>Âm thanh</translation>
+      <translation type="unfinished">Sound</translation>
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation>Lặp lại âm thanh</translation>
+      <translation type="unfinished">Repeat Sound</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation>`%1` cảnh báo trường bộ lọc sự kiện:</translation>
+      <translation type="unfinished">`%1` event filter field alerts:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation>`%1` cảnh báo trường xây dựng hành động:</translation>
+      <translation type="unfinished">`%1` action builder field alerts:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation>Quy tắc chưa hoàn thành. Cần có một bộ lọc và một trình xây dựng</translation>
+      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation>Bộ lọc được cung cấp không tương thích với trình tạo được cung cấp</translation>
+      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation>Vấn đề di chuyển giấy phép</translation>
+      <translation type="unfinished">License migration issue</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
-      <translation>Dịch vụ ghi bị vô hiệu hóa</translation>
+      <translation type="unfinished">Recording services disabled</translation>
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation>Dịch vụ lưu trữ đám mây bị vô hiệu hóa</translation>
+      <translation type="unfinished">Cloud storage services disabled</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation>Dịch vụ tích hợp trả phí đã bị vô hiệu hóa</translation>
+      <translation type="unfinished">Paid integration services disabled</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Quá trình ghi trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Sao lưu bộ nhớ đám mây trên %n kênh đã bị dừng do sử dụng dịch vụ quá mức.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation>
-        <numerusform>Việc sử dụng dịch vụ tích hợp trả phí trên %n kênh đã bị ngừng do sử dụng dịch vụ quá mức.</numerusform>
+      <translation type="unfinished">
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message>
       <source>Services Issue</source>
-      <translation>Sự cố dịch vụ</translation>
+      <translation type="unfinished">Services Issue</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
-      <translation>Nội dung email</translation>
+      <translation type="unfinished">Email Message</translation>
     </message>
     <message>
       <source>Send Email</source>
-      <translation>Gửi Email</translation>
+      <translation type="unfinished">Send Email</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation>Người nhận bổ sung</translation>
+      <translation type="unfinished">Additional Recipients</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
       <source>Server Certificate Error</source>
-      <translation>Lỗi chứng chỉ máy chủ</translation>
+      <translation type="unfinished">Server Certificate Error</translation>
     </message>
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation>%1 lỗi chứng chỉ</translation>
+      <translation type="unfinished">%1 certificate error</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>Mâu thuẫn Server: %1</translation>
+      <translation type="unfinished">Conflicting Server: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Mâu thuẫn máy chủ #%1:%2</translation>
+      <translation type="unfinished">Conflicting Server #%1: %2</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation type="unfinished">MAC #%1: %2</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>Xung đột máy chủ</translation>
+      <translation type="unfinished">Server Conflict</translation>
     </message>
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation>%1 Xung đột</translation>
+      <translation type="unfinished">%1 Conflict</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server Failure</source>
-      <translation>Máy chủ thất bại</translation>
+      <translation>Серверийн алдаа</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation>Kết nối đến máy chủ bị mất.</translation>
+      <translation>Серверийн холболт саллаа.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>Máy chủ dừng đột ngột.</translation>
+      <translation>Сервер ажиллагаагүй боллоо.</translation>
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation>%1 Thất bại</translation>
+      <translation type="unfinished">%1 Failure</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server Started</source>
-      <translation>Máy chủ bắt đầu</translation>
+      <translation>Сервер ажиллаа</translation>
     </message>
     <message>
       <source>%1 Started</source>
-      <translation>%1 Bắt đầu</translation>
+      <translation type="unfinished">%1 Started</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Hiển thị trên diện cảnh báo</translation>
+      <translation type="unfinished">Show on Alarm Layout</translation>
     </message>
     <message>
       <source>Alarm: %1</source>
-      <translation>Báo động: %1</translation>
+      <translation type="unfinished">Alarm: %1</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation>Buộc mở bố cục cảnh báo</translation>
+      <translation type="unfinished">Force Alarm Layout Opening</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Trigger Name</source>
-      <translation>Tên kích hoạt</translation>
+      <translation type="unfinished">Trigger Name</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation>Kích hoạt mềm</translation>
+      <translation type="unfinished">Soft Trigger</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Tên</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Icon</source>
-      <translation>Biểu tượng</translation>
+      <translation type="unfinished">Icon</translation>
     </message>
     <message>
       <source>By</source>
-      <translation>Bởi</translation>
+      <translation type="unfinished">By</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>Nguồn：%1</translation>
+      <translation type="unfinished">Source: %1</translation>
     </message>
     <message>
       <source>User: %1</source>
-      <translation>Người dùng: %1</translation>
+      <translation type="unfinished">User: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation>Âm thanh không được chọn</translation>
+      <translation type="unfinished">Sound is not selected</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation>Nói</translation>
+      <translation type="unfinished">Speak</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation>Văn bản</translation>
+      <translation type="unfinished">Text</translation>
     </message>
     <message>
       <source>At Device</source>
-      <translation>Tại thiết bị</translation>
+      <translation type="unfinished">At Device</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation>Trạng thái `%1` không hợp lệ đối với sự kiện `%2` và hành động `%3` với các tham số đã cho</translation>
+      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>Vấn đề lưu trữ tại %1</translation>
+      <translation>%1 дээр хадгалалтын асуудал</translation>
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>Vấn đề lưu trữ</translation>
+      <translation>Хадгалалтын асуудал</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation>I/O lỗi tại %1.</translation>
+      <translation>%1 дээр I/O-н алдаа заалаа.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>Không đủ tốc độ HDD/SSD để ghi về %1.</translation>
+      <translation>%1 дээр бичилт хийхэд HDD/SSD-н хурд хүрэлцэхгүй байна.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Ổ HDD/SSD &quot;%1&quot; đã đầy. Ổ chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
+      <translation>&quot;%1&quot; HDD/SSD диск дүүрсэн байна. Уг диск дээр VMS-тэй хамааралгүй хэт их дата хадгалагдсан байна.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>Ổ hệ thống &quot;%1&quot; gần đầy.</translation>
+      <translation>&quot;%1&quot; дискийн багтаамж дүүрч байна.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>Lưu trữ phân tích &quot;%1&quot; đang ngoại tuyến.</translation>
+      <translation>&quot;%1&quot; аналитикын хадгалалт унтарсан байна.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>Lưu trữ phân tích &quot;%1&quot; gần đầy.</translation>
+      <translation>&quot;%1&quot; аналитикын хадгалалт дүүрч байна.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation>Sao lưu lưu trữ không thành công. Không sao lưu được tệp %1.</translation>
+      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation>Bộ nhớ Phân tích &quot;%1&quot; lỗi cơ sở dữ liệu: Không đủ quyền tại điểm gắn kết.</translation>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation>Không thể khởi tạo mã hóa AES khi trình ghi được bật trên kho lưu trữ phương tiện. Dữ liệu ghi không được mã hóa.</translation>
+      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation>Lỗi RAID. %1.</translation>
+      <translation type="unfinished">RAID error: %1.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation>Không lấy được mô tả sự kiện</translation>
+      <translation type="unfinished">Failed to get event descriptor</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation>Sự kiện không có camera nguồn</translation>
+      <translation type="unfinished">Event does not have source camera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation>Chọn ít nhất một bố cục</translation>
+      <translation type="unfinished">Select at least one layout</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation>Danh sách không được chọn</translation>
+      <translation type="unfinished">List is not selected</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation>Danh sách có id được chỉ định &apos;%1&apos; không tồn tại</translation>
+      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation>Danh sách có id được chỉ định &apos;%1&apos; không phải là danh sách chung</translation>
+      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation>Hiển thị lớp phủ văn bản</translation>
+      <translation type="unfinished">Show Text Overlay</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation>Tuỳ chỉnh văn bản</translation>
+      <translation type="unfinished">Custom Text</translation>
     </message>
     <message>
       <source>Show To</source>
-      <translation>Hiển thị cho</translation>
+      <translation type="unfinished">Show To</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation>URL không thể để trống</translation>
+      <translation type="unfinished">Url cannot be empty</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation>Url phải hợp lệ</translation>
+      <translation type="unfinished">Url must be valid</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation>Url không được chứa tên người dùng hoặc mật khẩu</translation>
+      <translation type="unfinished">Url should not contains user or password</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation>Ghi vào nhật ký</translation>
+      <translation type="unfinished">Write to Log</translation>
     </message>
   </context>
 </TS>

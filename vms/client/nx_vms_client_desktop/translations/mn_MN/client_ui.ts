@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP" sourcelanguage="en">
+<TS version="2.1" language="mn_MN" sourcelanguage="en">
   <context>
     <name>AboutDialog</name>
     <message>
       <source>About</source>
-      <translation>本製品について</translation>
+      <translation>Тухай</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation>情報</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Credits</source>
-      <translation>クレジット</translation>
+      <translation type="unfinished">Credits</translation>
     </message>
     <message>
       <source>GPU Information</source>
-      <translation>GPU情報</translation>
+      <translation type="unfinished">GPU Information</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation>サポート</translation>
+      <translation>Тусламж</translation>
     </message>
     <message>
       <source>Developer</source>
-      <translation>開発者</translation>
+      <translation>Хөгжүүлэгч</translation>
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation>オープンソースライブラリ</translation>
+      <translation type="unfinished">Open source libraries</translation>
     </message>
     <message>
       <source>Site Servers</source>
@@ -40,232 +40,232 @@
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>画像補正</translation>
+      <translation type="unfinished">Image Enhancement</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation>画像補正を有効化</translation>
+      <translation type="unfinished">Enable image enhancement</translation>
     </message>
     <message>
       <source>Gamma</source>
-      <translation>ガンマ</translation>
+      <translation type="unfinished">Gamma</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation>自動</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Black level</source>
-      <translation>ブラックレベル</translation>
+      <translation type="unfinished">Black level</translation>
     </message>
     <message>
       <source>White level</source>
-      <translation>ホワイトレベル</translation>
+      <translation type="unfinished">White level</translation>
     </message>
   </context>
   <context>
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>音声を 5.1ch から 2.1ch にダウンミックスする</translation>
+      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
-      <translation>ダブルバッファリングを行う</translation>
+      <translation type="unfinished">Double Buffering</translation>
     </message>
     <message>
       <source>Maximum Live Buffer Length</source>
-      <translation>ライブバッファー上限値</translation>
+      <translation type="unfinished">Maximum Live Buffer Length</translation>
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation>ローカルキャッシュをクリア</translation>
+      <translation type="unfinished">Clear Local Cache</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
-      <translation>すべての警告設定をリセット</translation>
+      <translation type="unfinished">Reset All Warnings</translation>
     </message>
     <message>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>ぼかしが有効になっている場合、Intel HD Graphics ディスプレイで問題が発生する可能性があります。オプションは変更しないことを強くお勧めします。</translation>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
     </message>
     <message>
       <source>Disable blur</source>
-      <translation>ぼかし効果を無効にする</translation>
+      <translation type="unfinished">Disable blur</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
-      <translation>フレームレートを制限してCPUを節約する</translation>
+      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation>ハードウェアビデオデコーディングを使用する</translation>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation>サーバー証明書の検証</translation>
+      <translation type="unfinished">Server certificate validation</translation>
     </message>
     <message>
       <source>Logs Management</source>
-      <translation>ログ管理</translation>
+      <translation type="unfinished">Logs Management</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>ダウンロード</translation>
+      <translation>Татаж авах</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>設定</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>完了</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation>ファイルフォルダーを開く</translation>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
     <name>AggregationWidget</name>
     <message>
       <source>Check to set aggregation period</source>
-      <translation>集計期間を設定する場合はチェックを入れてください</translation>
+      <translation type="unfinished">Check to set aggregation period</translation>
     </message>
     <message>
       <source>Interval of action :</source>
-      <translation>実行間隔:</translation>
+      <translation type="unfinished">Interval of action :</translation>
     </message>
     <message>
       <source>No more than once per</source>
-      <translation>前回実行から</translation>
+      <translation type="unfinished">No more than once per</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation>即時</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkEventWidget</name>
     <message>
       <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>キャプションに次の内容を含む:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation>説明に次の内容を含む:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <source>Event Type:</source>
-      <translation>イベントタイプ:</translation>
+      <translation type="unfinished">Event Type:</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation>属性:</translation>
+      <translation type="unfinished">Attributes:</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation>オブジェクトタイプ:</translation>
+      <translation type="unfinished">Object Type:</translation>
     </message>
   </context>
   <context>
     <name>ArchiveLengthWidget</name>
     <message>
       <source>Auto</source>
-      <translation>自動</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation>アーカイブ保持時間</translation>
+      <translation type="unfinished">Keep Archive For...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation>最長</translation>
+      <translation type="unfinished">Max</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation>最短</translation>
+      <translation type="unfinished">Min</translation>
     </message>
   </context>
   <context>
     <name>AudioRedirectPickerWidget</name>
     <message>
       <source>Form</source>
-      <translation>フォーム</translation>
+      <translation type="unfinished">Form</translation>
     </message>
   </context>
   <context>
     <name>AuditLogDialog</name>
     <message>
       <source>Refresh</source>
-      <translation>再読み込み</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>User actions</source>
-      <translation>ユーザーアクション</translation>
+      <translation type="unfinished">User actions</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>アーカイブ表示</translation>
+      <translation type="unfinished">Watching archive</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>映像のエクスポート</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>ライブ表示</translation>
+      <translation type="unfinished">Watching live</translation>
     </message>
     <message>
       <source>Login/logout</source>
-      <translation>ログイン／ログアウト</translation>
+      <translation type="unfinished">Login/logout</translation>
     </message>
     <message>
       <source>Server actions</source>
-      <translation>サーバーアクション</translation>
+      <translation type="unfinished">Server actions</translation>
     </message>
     <message>
       <source>Select all</source>
-      <translation>すべて選択</translation>
+      <translation type="unfinished">Select all</translation>
     </message>
     <message>
       <source>Sessions</source>
-      <translation>セッション</translation>
+      <translation type="unfinished">Sessions</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>詳細</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>操作履歴</translation>
+      <translation type="unfinished">Audit Trail</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルターを解除</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Email settings</source>
-      <translation>メール設定</translation>
+      <translation type="unfinished">Email settings</translation>
     </message>
     <message>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>すべてのサーバーがオフラインです。監査データは利用できません。</translation>
+      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>イベントルール</translation>
+      <translation type="unfinished">Event Rules</translation>
     </message>
     <message>
       <source>Site actions</source>
@@ -276,276 +276,276 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation>制限なし</translation>
+      <translation type="unfinished">No Limit</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation>固定</translation>
+      <translation type="unfinished">Fixed</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation>スケジュール</translation>
+      <translation type="unfinished">Scheduled</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation>帯域幅を固定:</translation>
+      <translation type="unfinished">Fix bandwidth to</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <source>Unlimited</source>
-      <translation>無制限</translation>
+      <translation type="unfinished">Unlimited</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation>制限値:</translation>
+      <translation type="unfinished">Limited to</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation>バックアップなし</translation>
+      <translation type="unfinished">No backup</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation>バックアップはまだ設定されていません。</translation>
+      <translation type="unfinished">Backup is not configured yet.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation>バックアップを開始するには、対象のカメラのバックアップを有効にし、設定を適用してください。</translation>
+      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>再読み込み</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation>現在のキューをスキップ</translation>
+      <translation type="unfinished">Skip Current Queue</translation>
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation>すべてのファイルが正常にバックアップされました。新しいファイルは自動的にバックアップされます。</translation>
+      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation>ストレージの問題が発生したため、バックアップは停止しています。ストレージの問題が解決された後、バックアップは自動的に再開されます。</translation>
+      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
     </message>
   </context>
   <context>
     <name>BookmarkBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <source>Tags:</source>
-      <translation>タグ:</translation>
+      <translation>Шошго:</translation>
     </message>
     <message>
       <source>Pre-recording:</source>
-      <translation>プレ録画:</translation>
+      <translation type="unfinished">Pre-recording:</translation>
     </message>
     <message>
       <source>Post-recording:</source>
-      <translation>ポスト録画:</translation>
+      <translation type="unfinished">Post-recording:</translation>
     </message>
   </context>
   <context>
     <name>BookmarkOverlaySettingsWidget</name>
     <message>
       <source>Bookmark Info</source>
-      <translation>ブックマーク情報</translation>
+      <translation type="unfinished">Bookmark Info</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Area Width</source>
-      <translation>領域の幅</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>フォントサイズ</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Include description</source>
-      <translation>説明を含める</translation>
+      <translation type="unfinished">Include description</translation>
     </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
     <message>
       <source>Popular tags</source>
-      <translation>よく使われるタグ</translation>
+      <translation type="unfinished">Popular tags</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>名前</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>説明</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Timeout</source>
-      <translation>タイムアウト</translation>
+      <translation type="unfinished">Timeout</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation>タグ</translation>
+      <translation>Шошго</translation>
     </message>
     <message>
       <source>List of tags divided by commas</source>
-      <translation>タグのリスト (カンマ区切り)</translation>
+      <translation type="unfinished">List of tags divided by commas</translation>
     </message>
   </context>
   <context>
     <name>BookmarksLog</name>
     <message>
       <source>Refresh</source>
-      <translation>再読み込み</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation>ブックマークログ</translation>
+      <translation type="unfinished">Bookmark Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルターを解除</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
   </context>
   <context>
     <name>BusinessRuleWidget</name>
     <message>
       <source>Event</source>
-      <translation>イベント</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <source>Schedule...</source>
-      <translation>スケジュール...</translation>
+      <translation type="unfinished">Schedule...</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation>アクション</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <source>Comments:</source>
-      <translation>コメント:</translation>
+      <translation type="unfinished">Comments:</translation>
     </message>
     <message>
       <source>When</source>
-      <translation>トリガー</translation>
+      <translation type="unfinished">When</translation>
     </message>
     <message>
       <source>Do</source>
-      <translation>動作</translation>
+      <translation type="unfinished">Do</translation>
     </message>
     <message>
       <source>At</source>
-      <translation>デバイス</translation>
+      <translation type="unfinished">At</translation>
     </message>
     <message>
       <source>Use event source server</source>
-      <translation>イベントソースサーバーを使用する</translation>
+      <translation type="unfinished">Use event source server</translation>
     </message>
     <message>
       <source>Use event source camera</source>
-      <translation>イベントソースのカメラを使用</translation>
+      <translation type="unfinished">Use event source camera</translation>
     </message>
   </context>
   <context>
     <name>BusinessRulesDialog</name>
     <message>
       <source>Add</source>
-      <translation>追加</translation>
+      <translation>Нэмэх</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>イベントルール</translation>
+      <translation type="unfinished">Event Rules</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>イベントログ...</translation>
+      <translation type="unfinished">Event Log...</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation>テスト</translation>
+      <translation type="unfinished">Test</translation>
     </message>
   </context>
   <context>
     <name>BuzzerBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
   </context>
   <context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
       <source>Category</source>
-      <translation>カテゴリー</translation>
+      <translation type="unfinished">Category</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>再読み込み</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
   </context>
   <context>
     <name>CameraCredentialsDialog</name>
     <message>
       <source>Authentication credentials</source>
-      <translation>認証資格情報</translation>
+      <translation type="unfinished">Authentication credentials</translation>
     </message>
   </context>
   <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation>自動</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>デフォルトに戻す</translation>
+      <translation>Үндсэн тохиргооруу буцаах</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
-      <translation>カメラのストリームおよびプロファイル設定を保持する</translation>
+      <translation type="unfinished">Keep camera stream and profile settings</translation>
     </message>
     <message>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>1秒あたりのビットレートの代わりに、GOPあたりのビットレートを計算する</translation>
+      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
     </message>
     <message>
       <source>It will increase bitrate for camera.</source>
-      <translation>カメラのビットレートが増加します。</translation>
+      <translation type="unfinished">It will increase bitrate for camera.</translation>
     </message>
     <message>
       <source>Disable secondary stream</source>
-      <translation>セカンダリストリームを無効にする</translation>
+      <translation type="unfinished">Disable secondary stream</translation>
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation>モーション検知</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <source>Media Streaming</source>
-      <translation>メディアストリーム</translation>
+      <translation type="unfinished">Media Streaming</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -553,119 +553,119 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation>生成</translation>
+      <translation type="unfinished">Generate</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>リセット</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>自定義ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
       <source>Trust camera timestamp</source>
-      <translation>カメラのタイムスタンプを信頼する</translation>
+      <translation type="unfinished">Trust camera timestamp</translation>
     </message>
     <message>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>カメラのネイティブプリセットは利用できません。</translation>
+      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
     </message>
     <message>
       <source>This camera supports pan and tilt</source>
-      <translation>このカメラはパンとチルトを使うことが出来ます</translation>
+      <translation type="unfinished">This camera supports pan and tilt</translation>
     </message>
     <message>
       <source>This camera supports zoom</source>
-      <translation>このカメラはズームを使うことが出来ます</translation>
+      <translation type="unfinished">This camera supports zoom</translation>
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation>アーカイブのインポート中にモーションを検出する</translation>
+      <translation type="unfinished">Detect motion during archive import</translation>
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation>ストリーム設定</translation>
+      <translation type="unfinished">Stream Settings</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation>Media2を使用してプロファイルを取得</translation>
+      <translation type="unfinished">Use Media2 to fetch profiles</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation>パンとチルトに異なる値を使用する</translation>
+      <translation type="unfinished">Use different values for pan and tilt</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation>チルト</translation>
+      <translation type="unfinished">Tilt</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation>メディアポート</translation>
+      <translation type="unfinished">Media Port</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation>PTZ速度</translation>
+      <translation type="unfinished">PTZ Speed</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation>RTPトランスポート</translation>
+      <translation type="unfinished">RTP Transport</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation>カメラのネイティブプリセットを使用</translation>
+      <translation type="unfinished">Use camera native presets</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation>時刻設定</translation>
+      <translation type="unfinished">Time Settings</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation>カメラの時刻設定を保持する</translation>
+      <translation type="unfinished">Keep camera time settings</translation>
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation>ONVIF設定</translation>
+      <translation type="unfinished">ONVIF Settings</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation>プライマリストリームを録画しない</translation>
+      <translation type="unfinished">Do not record primary stream</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation>セカンダリストリームを録画しない</translation>
+      <translation type="unfinished">Do not record secondary stream</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation>セカンダリストリームのプロファイル</translation>
+      <translation type="unfinished">Secondary Stream Profile</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation>プライマリストリームのプロファイル</translation>
+      <translation type="unfinished">Primary Stream Profile</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Webページ</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation>Webページポート</translation>
+      <translation type="unfinished">Web Page Port</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation>PTZ 停止コマンドを送信しない</translation>
+      <translation type="unfinished">Do not send Stop PTZ command</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation>音声を録音しない</translation>
+      <translation type="unfinished">Do not record audio</translation>
     </message>
     <message>
       <source>Import from Device</source>
-      <translation>デバイスからインポート</translation>
+      <translation type="unfinished">Import from Device</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation>映像を自動的にインポート</translation>
+      <translation type="unfinished">Import video automatically</translation>
     </message>
     <message>
       <source>Use site presets</source>
@@ -676,250 +676,250 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation>ホットスポット</translation>
+      <translation type="unfinished">Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation>追加</translation>
+      <translation>Нэмэх</translation>
     </message>
   </context>
   <context>
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation>モデル</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ベンダー</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation>IPアドレス</translation>
+      <translation type="unfinished">IP Address</translation>
     </message>
     <message>
       <source>Ping</source>
-      <translation>Ping</translation>
+      <translation type="unfinished">Ping</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>ファームウェア</translation>
+      <translation type="unfinished">Firmware</translation>
     </message>
     <message>
       <source>Camera ID</source>
-      <translation>カメラID</translation>
+      <translation type="unfinished">Camera ID</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Webページ</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation>プライマリストリーム</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation>セカンダリストリーム</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <source>MAC Address</source>
-      <translation>MAC アドレス</translation>
+      <translation type="unfinished">MAC Address</translation>
     </message>
     <message>
       <source>Show on layout</source>
-      <translation>レイアウトに表示する</translation>
+      <translation type="unfinished">Show on layout</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation>イベントログ</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <source>Camera rules</source>
-      <translation>カメラルール</translation>
+      <translation type="unfinished">Camera rules</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>自定義ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <source>Input ID</source>
-      <translation>入力ID</translation>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスの有効化...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
     <name>CameraListDialog</name>
     <message>
       <source>Add Device...</source>
-      <translation>デバイス追加...</translation>
+      <translation type="unfinished">Add Device...</translation>
     </message>
   </context>
   <context>
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation>モーション検知</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation>感度:</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>リセット</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation>使用:</translation>
+      <translation type="unfinished">in</translation>
     </message>
   </context>
   <context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
       <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <source>Output ID:</source>
-      <translation>出力ID:</translation>
+      <translation type="unfinished">Output ID:</translation>
     </message>
   </context>
   <context>
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation>カメラ交換</translation>
+      <translation type="unfinished">Camera Replacement</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>名前</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation>戻る</translation>
+      <translation>Буцах</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>再読み込み</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation>次へ</translation>
+      <translation type="unfinished">Next</translation>
     </message>
     <message>
       <source>New Device</source>
-      <translation>新しいデバイス</translation>
+      <translation type="unfinished">New Device</translation>
     </message>
   </context>
   <context>
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
-      <translation>録画</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスの有効化...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
-      <translation>スケジュールのコピー</translation>
+      <translation type="unfinished">Copying Schedule</translation>
     </message>
     <message>
       <source>Copy Schedule to...</source>
-      <translation>スケジュールをコピー...</translation>
+      <translation type="unfinished">Copy Schedule to...</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation>モーション &amp;&amp; オブジェクト検知録画</translation>
+      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
     </message>
   </context>
   <context>
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation>すべてのカメラ</translation>
+      <translation>Бүх камерууд</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>カメラ選択</translation>
+      <translation type="unfinished">Select Cameras</translation>
     </message>
   </context>
   <context>
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
       <source>Authentication</source>
-      <translation>認証</translation>
+      <translation type="unfinished">Authentication</translation>
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation>認証情報を編集</translation>
+      <translation type="unfinished">Edit Credentials</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation>音声</translation>
+      <translation>Аудио</translation>
     </message>
     <message>
       <source>Enable audio</source>
-      <translation>音声を有効にする</translation>
+      <translation type="unfinished">Enable audio</translation>
     </message>
     <message>
       <source>Edit Streams...</source>
-      <translation>ストリームを編集...</translation>
+      <translation type="unfinished">Edit Streams...</translation>
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation>双方向音声を有効にする</translation>
+      <translation type="unfinished">Enable 2-way audio</translation>
     </message>
   </context>
   <context>
     <name>CameraStreamsDialog</name>
     <message>
       <source>Streams Addresses</source>
-      <translation>ストリームアドレス</translation>
+      <translation type="unfinished">Streams Addresses</translation>
     </message>
   </context>
   <context>
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation>Webサイトには証明書が必要です</translation>
+      <translation type="unfinished">Web site requires a certificate</translation>
     </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <source>Change password</source>
-      <translation>パスワードの変更</translation>
+      <translation>Нууц үг солих</translation>
     </message>
   </context>
   <context>
     <name>CloudLayoutsIntroDialog</name>
     <message>
       <source>BETA</source>
-      <translation>ベータ</translation>
+      <translation type="unfinished">BETA</translation>
     </message>
     <message>
       <source>Available Actions</source>
-      <translation>利用可能なアクション</translation>
+      <translation type="unfinished">Available Actions</translation>
     </message>
     <message>
       <source>Video Export</source>
-      <translation>映像のエクスポート</translation>
+      <translation type="unfinished">Video Export</translation>
     </message>
     <message>
       <source>Live Video and Archive</source>
-      <translation>ライブ映像とアーカイブ</translation>
+      <translation type="unfinished">Live Video and Archive</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -927,38 +927,38 @@
     </message>
     <message>
       <source>Showreels</source>
-      <translation>シーケンシャル表示</translation>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
       <source>Read more on the help page</source>
-      <translation>詳しくはヘルプページをご覧ください</translation>
+      <translation type="unfinished">Read more on the help page</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation>今後このウィンドウを表示しない</translation>
+      <translation type="unfinished">Do not show this window again</translation>
     </message>
     <message>
       <source>Introducing Cloud Layouts</source>
-      <translation>クラウドレイアウトのご紹介</translation>
+      <translation type="unfinished">Introducing Cloud Layouts</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation>モーション検索</translation>
+      <translation type="unfinished">Motion Search</translation>
     </message>
     <message>
       <source>Searching Bookmarks, Objects, Events</source>
-      <translation>ブックマーク、オブジェクト、イベントの検索</translation>
+      <translation type="unfinished">Searching Bookmarks, Objects, Events</translation>
     </message>
     <message>
       <source>In the Future</source>
-      <translation>将来</translation>
+      <translation type="unfinished">In the Future</translation>
     </message>
   </context>
   <context>
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
-      <translation>接続していません</translation>
+      <translation type="unfinished">No connection</translation>
     </message>
     <message>
       <source>This site is connected to</source>
@@ -969,464 +969,464 @@
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
-      <translation>接続中...</translation>
+      <translation>Холбогдож байна...</translation>
     </message>
   </context>
   <context>
     <name>ConnectionTestingDialog</name>
     <message>
       <source>Connection Test</source>
-      <translation>接続テスト</translation>
+      <translation type="unfinished">Connection Test</translation>
     </message>
     <message>
       <source>Testing connection...</source>
-      <translation>接続をテストしています...</translation>
+      <translation type="unfinished">Testing connection...</translation>
     </message>
   </context>
   <context>
     <name>ContinuousActionAlertWidget</name>
     <message>
       <source>Form</source>
-      <translation>フォーム</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <source>This action can be set only for instant events</source>
-      <translation>このアクションはインスタントイベントにのみ設定できます</translation>
+      <translation type="unfinished">This action can be set only for instant events</translation>
     </message>
     <message>
       <source>Select another event or action</source>
-      <translation>別のイベントまたはアクションを選択してください</translation>
+      <translation type="unfinished">Select another event or action</translation>
     </message>
   </context>
   <context>
     <name>CustomBusinessEventWidget</name>
     <message>
       <source>Source contains:</source>
-      <translation>ソースに次の内容を含む:</translation>
+      <translation type="unfinished">Source contains:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>キャプションに次の内容を含む:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation>説明に次の内容を含む:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <source>Omit Logging</source>
-      <translation>ログ書込みを省略</translation>
+      <translation type="unfinished">Omit Logging</translation>
     </message>
   </context>
   <context>
     <name>CustomSettingsWidget</name>
     <message>
       <source>Category</source>
-      <translation>カテゴリー</translation>
+      <translation type="unfinished">Category</translation>
     </message>
   </context>
   <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <source>Create Backup...</source>
-      <translation>バックアップを作成...</translation>
+      <translation type="unfinished">Create Backup...</translation>
     </message>
     <message>
       <source>Restore from Backup...</source>
-      <translation>バックアップから復元...</translation>
+      <translation type="unfinished">Restore from Backup...</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Open Folder</source>
-      <translation>フォルダーを開く</translation>
+      <translation type="unfinished">Open Folder</translation>
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation>サイト管理データのバックアップを作成、または既存のバックアップからサイト管理データを復元します。</translation>
+      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
     </message>
   </context>
   <context>
     <name>DeviceAdditionDialog</name>
     <message>
       <source>to</source>
-      <translation>追加先</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation>サーバーを選択</translation>
+      <translation type="unfinished">SELECT SERVER</translation>
     </message>
     <message>
       <source>Known Address</source>
-      <translation>既知のアドレス</translation>
+      <translation type="unfinished">Known Address</translation>
     </message>
     <message>
       <source>Subnet Scan</source>
-      <translation>サブネット検索</translation>
+      <translation type="unfinished">Subnet Scan</translation>
     </message>
     <message>
       <source>Address</source>
-      <translation>アドレス</translation>
+      <translation>Хаяг</translation>
     </message>
     <message>
       <source>Hint</source>
-      <translation>ヒント</translation>
+      <translation type="unfinished">Hint</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>ポート</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>End IP</source>
-      <translation>終了 IP</translation>
+      <translation type="unfinished">End IP</translation>
     </message>
     <message>
       <source>Start IP</source>
-      <translation>開始 IP</translation>
+      <translation type="unfinished">Start IP</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>検索</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>停止</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation>すべてのデバイスを追加</translation>
+      <translation type="unfinished">Add all Devices</translation>
     </message>
     <message>
       <source>Add Devices</source>
-      <translation>デバイス追加</translation>
+      <translation type="unfinished">Add Devices</translation>
     </message>
     <message>
       <source>Default</source>
-      <translation>デフォルト</translation>
+      <translation type="unfinished">Default</translation>
     </message>
   </context>
   <context>
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation>暗号化されたアーカイブ</translation>
+      <translation type="unfinished">Encrypted archive</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation>アーカイブを表示するには暗号化パスワードを入力してください</translation>
+      <translation type="unfinished">Enter your encryption password to view the archive</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
   </context>
   <context>
     <name>EulaDialog</name>
     <message>
       <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
+      <translation type="unfinished">Copy to Clipboard</translation>
     </message>
     <message>
       <source>I Do Not Agree</source>
-      <translation>同意しない</translation>
+      <translation type="unfinished">I Do Not Agree</translation>
     </message>
     <message>
       <source>I Agree</source>
-      <translation>同意する</translation>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
     <name>EventLogDialog</name>
     <message>
       <source>Event Log</source>
-      <translation>イベントログ</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>フィルターを解除</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>再読み込み</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>すべてのサーバーがオフラインです。ログは利用できません。</translation>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>イベントルール...</translation>
+      <translation type="unfinished">Event Rules...</translation>
     </message>
   </context>
   <context>
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
-      <translation>認証のためにログイン（オプション）</translation>
+      <translation type="unfinished">Login to authenticate (optional)</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
-      <translation>認証用パスワード (オプション)</translation>
+      <translation type="unfinished">Password to authenticate (optional)</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>HTTP(S) URL</source>
-      <translation>HTTP(S) URL</translation>
+      <translation type="unfinished">HTTP(S) URL</translation>
     </message>
     <message>
       <source>HTTP(S) Content</source>
-      <translation>HTTP(S) コンテンツ</translation>
+      <translation type="unfinished">HTTP(S) Content</translation>
     </message>
     <message>
       <source>Content Type</source>
-      <translation>コンテンツタイプ</translation>
+      <translation type="unfinished">Content Type</translation>
     </message>
     <message>
       <source>Authentication Type</source>
-      <translation>認証タイプ</translation>
+      <translation type="unfinished">Authentication Type</translation>
     </message>
     <message>
       <source>Request Method</source>
-      <translation>リクエストメソッド</translation>
+      <translation type="unfinished">Request Method</translation>
     </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
       <source>PTZ preset:</source>
-      <translation>PTZ プリセット:</translation>
+      <translation type="unfinished">PTZ preset:</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation>レイアウト</translation>
+      <translation type="unfinished">On layout</translation>
     </message>
   </context>
   <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation>エクスポート設定</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Make read-only</source>
-      <translation>読み取り専用にする</translation>
+      <translation type="unfinished">Make read-only</translation>
     </message>
   </context>
   <context>
     <name>ExportMediaSettingsWidget</name>
     <message>
       <source>Export Settings</source>
-      <translation>エクスポート設定</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Apply Filters</source>
-      <translation>フィルターを適用する</translation>
+      <translation type="unfinished">Apply Filters</translation>
     </message>
     <message>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>回転、歪み補正、画像補正など</translation>
+      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
     </message>
     <message>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>フィルターの適用とオーバーレイの追加にはトランスコーディングが必要です。これにより CPU 使用率が増加し、長い時間がかかる場合があります。</translation>
+      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
     </message>
   </context>
   <context>
     <name>ExportPasswordWidget</name>
     <message>
       <source>Protect with password</source>
-      <translation>パスワードで保護する</translation>
+      <translation type="unfinished">Protect with password</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
   </context>
   <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation>映像のエクスポート</translation>
+      <translation type="unfinished">Export Video</translation>
     </message>
     <message>
       <source>Single Camera</source>
-      <translation>単一カメラ</translation>
+      <translation type="unfinished">Single Camera</translation>
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>エクスポート設定</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <source>Multi Video</source>
-      <translation>複数映像</translation>
+      <translation type="unfinished">Multi Video</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>フェイルオーバー優先度</translation>
+      <translation type="unfinished">Failover Priority</translation>
     </message>
   </context>
   <context>
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation>優先度:</translation>
+      <translation type="unfinished">Set priority:</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>低</translation>
+      <translation>Бага</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>中</translation>
+      <translation>Дунд</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>高</translation>
+      <translation>Сайн</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation>デバイスを選択してフェイルオーバーの優先度を設定してください。</translation>
+      <translation type="unfinished">Select some devices to setup failover priority</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation>フェイルオーバーなし</translation>
+      <translation type="unfinished">No Failover</translation>
     </message>
   </context>
   <context>
     <name>FailoverWidget</name>
     <message>
       <source>Failover</source>
-      <translation>フェイルオーバー</translation>
+      <translation type="unfinished">Failover</translation>
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation>サーバー所在地ID:</translation>
+      <translation type="unfinished">Server Location ID:</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation>フェイルオーバー優先度...</translation>
+      <translation type="unfinished">Failover Priority...</translation>
     </message>
   </context>
   <context>
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
-      <translation>参照...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
     <name>FilteredResourceViewWidget</name>
     <message>
       <source>Nothing found</source>
-      <translation>見つかりません</translation>
+      <translation>Олдсонгүй</translation>
     </message>
   </context>
   <context>
     <name>FullscreenCameraActionWidget</name>
     <message>
       <source>On layout</source>
-      <translation>レイアウト</translation>
+      <translation type="unfinished">On layout</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>カメラ</translation>
+      <translation>Камер</translation>
     </message>
   </context>
   <context>
     <name>GeneralPreferencesWidget</name>
     <message>
       <source>Misc</source>
-      <translation>その他</translation>
+      <translation type="unfinished">Misc</translation>
     </message>
     <message>
       <source>Auto Pause Video</source>
-      <translation>映像を自動的に一時停止する</translation>
+      <translation type="unfinished">Auto Pause Video</translation>
     </message>
     <message>
       <source>after</source>
-      <translation>非アクティブ状態</translation>
+      <translation type="unfinished">after</translation>
     </message>
     <message>
       <source>Minutes of Inactivity</source>
-      <translation>分継続後</translation>
+      <translation type="unfinished">Minutes of Inactivity</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation>追加...</translation>
+      <translation type="unfinished">Add...</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>削除</translation>
+      <translation>Хасах</translation>
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation>ローカルメディアフォルダー</translation>
+      <translation type="unfinished">Local Media Folders</translation>
     </message>
     <message>
       <source>Audio Input</source>
-      <translation>音声入力</translation>
+      <translation type="unfinished">Audio Input</translation>
     </message>
     <message>
       <source>First Source</source>
-      <translation>入力1</translation>
+      <translation type="unfinished">First Source</translation>
     </message>
     <message>
       <source>Second Source</source>
-      <translation>入力2</translation>
+      <translation type="unfinished">Second Source</translation>
     </message>
     <message>
       <source>Run Application when PC Boots up</source>
-      <translation>PC の起動時にアプリケーションを実行する</translation>
+      <translation type="unfinished">Run Application when PC Boots up</translation>
     </message>
     <message>
       <source>Startup</source>
-      <translation>スタートアップ</translation>
+      <translation type="unfinished">Startup</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation>保存されたウィンドウ構成を自動的に復元する</translation>
+      <translation type="unfinished">Automatically restore saved windows configuration</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation>レイアウト上のすべてのカメラから音声を再生する</translation>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation>マイクがアクティブなときに音声をミュートする</translation>
+      <translation type="unfinished">Mute audio when the mic is active</translation>
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation>アイドル時にコンピューターがスリープモードに入ることを許可する</translation>
+      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation>起動後、直前に使用したサイトに接続する</translation>
+      <translation type="unfinished">Connect to the previous site on startup</translation>
     </message>
   </context>
   <context>
@@ -1440,396 +1440,396 @@
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation>画像コントロール</translation>
+      <translation type="unfinished">Image Control</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation>アスペクト比</translation>
+      <translation type="unfinished">Aspect ratio</translation>
     </message>
     <message>
       <source>Default rotation</source>
-      <translation>デフォルトの回転</translation>
+      <translation type="unfinished">Default rotation</translation>
     </message>
   </context>
   <context>
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation>画像</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation>サイズ</translation>
+      <translation>Хэмжээ</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation>不透明度</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <source>Default</source>
-      <translation>デフォルト</translation>
+      <translation type="unfinished">Default</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>参照...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
     <name>ImagePreviewDialog</name>
     <message>
       <source>Image View</source>
-      <translation>イメージ表示</translation>
+      <translation type="unfinished">Image View</translation>
     </message>
     <message>
       <source>Loading Image...Please Wait.</source>
-      <translation>画像を読み込んでいます... しばらくお待ちください。</translation>
+      <translation type="unfinished">Loading Image...Please Wait.</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation>画像なし</translation>
+      <translation type="unfinished">No image</translation>
     </message>
   </context>
   <context>
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation>情報</translation>
+      <translation>Мэдээлэл</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation>カメラ名</translation>
+      <translation type="unfinished">Camera name</translation>
     </message>
     <message>
       <source>Export date</source>
-      <translation>エクスポート日</translation>
+      <translation type="unfinished">Export date</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>文字サイズ</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
   </context>
   <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
-      <translation>フォーム</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation>タイル状インターフェースを有効化</translation>
+      <translation type="unfinished">Enable tile interface</translation>
     </message>
   </context>
   <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
       <source>Processing Image...Please Wait.</source>
-      <translation>画像を処理しています... しばらくお待ちください。</translation>
+      <translation type="unfinished">Processing Image...Please Wait.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>参照...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>Clear</source>
-      <translation>クリア</translation>
+      <translation type="unfinished">Clear</translation>
     </message>
     <message>
       <source>View...</source>
-      <translation>表示...</translation>
+      <translation type="unfinished">View...</translation>
     </message>
     <message>
       <source>Width:</source>
-      <translation>幅:</translation>
+      <translation type="unfinished">Width:</translation>
     </message>
     <message>
       <source>Keep Aspect Ratio</source>
-      <translation>アスペクト比を維持</translation>
+      <translation type="unfinished">Keep Aspect Ratio</translation>
     </message>
     <message>
       <source>Opacity:</source>
-      <translation>不透明度:</translation>
+      <translation type="unfinished">Opacity:</translation>
     </message>
     <message>
       <source>Height:</source>
-      <translation>高さ:</translation>
+      <translation type="unfinished">Height:</translation>
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation>モニターのアスペクト比に合わせてトリミング</translation>
+      <translation type="unfinished">Crop to monitor aspect ratio</translation>
     </message>
   </context>
   <context>
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation>ロック</translation>
+      <translation type="unfinished">Locked</translation>
     </message>
     <message>
       <source>Width</source>
-      <translation>幅</translation>
+      <translation type="unfinished">Width</translation>
     </message>
     <message>
       <source>Height</source>
-      <translation>高さ</translation>
+      <translation type="unfinished">Height</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>自定義ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
       <source>Generate</source>
-      <translation>生成</translation>
+      <translation type="unfinished">Generate</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation>リセット</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation>最小グリッドサイズ</translation>
+      <translation type="unfinished">Minimum Grid Size</translation>
     </message>
   </context>
   <context>
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>レイアウトを選択</translation>
+      <translation type="unfinished">Select layout</translation>
     </message>
     <message>
       <source>Shared layouts</source>
-      <translation>共有レイアウト</translation>
+      <translation type="unfinished">Shared layouts</translation>
     </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
-      <translation>ライセンス詳細</translation>
+      <translation type="unfinished">License Details</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation>全般</translation>
+      <translation type="unfinished">Generic</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation>機能</translation>
+      <translation type="unfinished">Features</translation>
     </message>
   </context>
   <context>
     <name>LicenseNotificationDialog</name>
     <message>
       <source>Warning</source>
-      <translation>警告</translation>
+      <translation>Анхааруулга</translation>
     </message>
     <message>
       <source>License issues:</source>
-      <translation>ライセンス障害:</translation>
+      <translation type="unfinished">License issues:</translation>
     </message>
   </context>
   <context>
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation>オフラインでの有効化</translation>
+      <translation type="unfinished">Manual Activation</translation>
     </message>
     <message>
       <source>Select License File...</source>
-      <translation>ライセンスファイルを選択...</translation>
+      <translation type="unfinished">Select License File...</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>参照...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>License will be bound to the current server</source>
-      <translation>ライセンスは現在のサーバーに紐づけされます</translation>
+      <translation type="unfinished">License will be bound to the current server</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>無料ライセンスを有効化</translation>
+      <translation type="unfinished">Activate Free License</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>ライセンスを有効化</translation>
+      <translation type="unfinished">Activate License</translation>
     </message>
     <message>
       <source>Internet Activation</source>
-      <translation>インターネット経由での有効化</translation>
+      <translation type="unfinished">Internet Activation</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>ライセンスキー</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>ライセンスキーが無効です。</translation>
+      <translation type="unfinished">Invalid License Key</translation>
     </message>
     <message>
       <source>Activation Key File</source>
-      <translation>ライセンスファイル</translation>
+      <translation type="unfinished">Activation Key File</translation>
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation>ハードウェアID</translation>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation>ローカル設定</translation>
+      <translation type="unfinished">Local Settings</translation>
     </message>
   </context>
   <context>
     <name>LogSettingsDialog</name>
     <message>
       <source>Enable</source>
-      <translation>有効化</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <source>Logging Level</source>
-      <translation>ログレベル</translation>
+      <translation type="unfinished">Logging Level</translation>
     </message>
     <message>
       <source>Split File by Size</source>
-      <translation>ファイルをサイズで分割</translation>
+      <translation type="unfinished">Split File by Size</translation>
     </message>
     <message>
       <source>Split File by Time</source>
-      <translation>ファイルを時間で分割</translation>
+      <translation type="unfinished">Split File by Time</translation>
     </message>
     <message>
       <source>Limit Max Volume</source>
-      <translation>合計容量制限</translation>
+      <translation type="unfinished">Limit Max Volume</translation>
     </message>
   </context>
   <context>
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
-      <translation>ホスト</translation>
+      <translation type="unfinished">Host</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>ポート</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation>テスト</translation>
+      <translation type="unfinished">Test</translation>
     </message>
     <message>
       <source>Use Credentials</source>
-      <translation>認証情報を使用</translation>
+      <translation type="unfinished">Use Credentials</translation>
     </message>
     <message>
       <source>Use Link</source>
-      <translation>リンクを使用</translation>
+      <translation type="unfinished">Use Link</translation>
     </message>
     <message>
       <source>Link</source>
-      <translation>リンク</translation>
+      <translation type="unfinished">Link</translation>
     </message>
   </context>
   <context>
     <name>LogsManagementWidget</name>
     <message>
       <source>Download</source>
-      <translation>ダウンロード</translation>
+      <translation>Татаж авах</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>設定</translation>
+      <translation>Тохиргоо</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation>初期設定にリセット</translation>
+      <translation type="unfinished">Reset to Default</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>完了</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>再試行</translation>
+      <translation>Дахин оролдох</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation>ファイルフォルダーを開く</translation>
+      <translation type="unfinished">Open Files Folder</translation>
     </message>
   </context>
   <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
       <source>Look and Feel</source>
-      <translation>表示</translation>
+      <translation type="unfinished">Look and Feel</translation>
     </message>
     <message>
       <source>Background Image</source>
-      <translation>背景画像</translation>
+      <translation type="unfinished">Background Image</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>参照...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>Language</source>
-      <translation>言語 / Language</translation>
+      <translation type="unfinished">Language</translation>
     </message>
     <message>
       <source>Time Mode</source>
-      <translation>タイムモード</translation>
+      <translation type="unfinished">Time Mode</translation>
     </message>
     <message>
       <source>Image</source>
-      <translation>画像</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <source>Mode</source>
-      <translation>モード</translation>
+      <translation>Горим</translation>
     </message>
     <message>
       <source>Intensity</source>
-      <translation>不透明度</translation>
+      <translation type="unfinished">Intensity</translation>
     </message>
     <message>
       <source>Show additional info in tree</source>
-      <translation>リソースツリーに追加情報を表示する</translation>
+      <translation type="unfinished">Show additional info in tree</translation>
     </message>
     <message>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <source>Tour cycle</source>
-      <translation>ツアー間隔</translation>
+      <translation type="unfinished">Tour cycle</translation>
     </message>
     <message>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>カメラやサーバーのIPアドレス、ユーザーのグループなど</translation>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
     <message>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation>PTZ カメラに照準オーバーレイを表示する</translation>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
@@ -1840,145 +1840,145 @@
     <name>MergeSystemsDialog</name>
     <message>
       <source>Server URL:</source>
-      <translation>サーバー URL:</translation>
+      <translation>Серверийн URL:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation>パスワード:</translation>
+      <translation>Нууц үг:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation>ログイン:</translation>
+      <translation>Нэвтрэх:</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation>チェック</translation>
+      <translation type="unfinished">Check</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation>サイト統合...</translation>
+      <translation type="unfinished">Merge Sites...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
-      <translation>次のシステム名および設定を使用</translation>
+      <translation type="unfinished">Take system name and settings from</translation>
     </message>
   </context>
   <context>
     <name>MultiServerUpdatesWidget</name>
     <message>
       <source>Updating to...</source>
-      <translation>更新しています...</translation>
+      <translation type="unfinished">Updating to...</translation>
     </message>
     <message>
       <source>You have the latest version installed</source>
-      <translation>最新バージョンがインストールされています</translation>
+      <translation type="unfinished">You have the latest version installed</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>ダウンロード</translation>
+      <translation>Татаж авах</translation>
     </message>
     <message>
       <source>Browse</source>
-      <translation>参照</translation>
+      <translation type="unfinished">Browse</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>ダウンロードしてインストール</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Link copied</source>
-      <translation>リンクをコピーしました</translation>
+      <translation type="unfinished">Link copied</translation>
     </message>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>更新の詳細設定</translation>
+      <translation type="unfinished">Advanced Update Settings</translation>
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>更新処理に通常より時間がかかっているようです。そのままお待ちください。</translation>
+      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation>詳細設定</translation>
+      <translation type="unfinished">Advanced settings</translation>
     </message>
     <message>
       <source>Get Update File</source>
-      <translation>更新ファイルを取得</translation>
+      <translation type="unfinished">Get Update File</translation>
     </message>
     <message>
       <source>Check Again</source>
-      <translation>再確認</translation>
+      <translation type="unfinished">Check Again</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation>再試行</translation>
+      <translation>Дахин оролдоно уу</translation>
     </message>
   </context>
   <context>
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation>レイアウト選択</translation>
+      <translation type="unfinished">Select Layouts</translation>
     </message>
   </context>
   <context>
     <name>NewDeviceAdditionDialog</name>
     <message>
       <source>Add Devices</source>
-      <translation>デバイス追加</translation>
+      <translation type="unfinished">Add Devices</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>追加先</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation>サーバーを選択</translation>
+      <translation type="unfinished">SELECT SERVER</translation>
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation>アドレスまたはサブネットマスク</translation>
+      <translation type="unfinished">Address or Subnet Mask</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>ポート</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Hint</source>
-      <translation>ヒント</translation>
+      <translation type="unfinished">Hint</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>Нэвтрэх</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>検索</translation>
+      <translation>Хайх</translation>
     </message>
     <message>
       <source>Add all Devices</source>
-      <translation>すべてのデバイスを追加</translation>
+      <translation type="unfinished">Add all Devices</translation>
     </message>
     <message>
       <source>Find Devices</source>
-      <translation>デバイスを検索</translation>
+      <translation type="unfinished">Find Devices</translation>
     </message>
     <message>
       <source>
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation>
-              アドレス、サブネット範囲またはサブネットマスク、ログイン名、パスワードを入力し、
-              「検索」ボタンをクリックしてください。
+      <translation type="unfinished">
+              Enter address, subnet range or subnet mask, login and password
+              and click on the &quot;Search&quot; button
           </translation>
     </message>
   </context>
@@ -1986,68 +1986,68 @@
     <name>NewVirtualCameraDialog</name>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>新規仮想カメラ...</translation>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
     <message>
       <source>To server</source>
-      <translation>サーバー</translation>
+      <translation type="unfinished">To server</translation>
     </message>
   </context>
   <context>
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation>再試行</translation>
+      <translation>Дахин оролдоно уу</translation>
     </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
     <message>
       <source>Layout</source>
-      <translation>レイアウト</translation>
+      <translation type="unfinished">Layout</translation>
     </message>
     <message>
       <source>Show to</source>
-      <translation>対象ユーザー</translation>
+      <translation type="unfinished">Show to</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>レイアウトを選択してください...</translation>
+      <translation type="unfinished">Select layout...</translation>
     </message>
   </context>
   <context>
     <name>OutgoingMailSettingsWidget</name>
     <message>
       <source>Connection Settings</source>
-      <translation>接続設定</translation>
+      <translation type="unfinished">Connection Settings</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Server Address</source>
-      <translation>サーバーアドレス</translation>
+      <translation type="unfinished">Server Address</translation>
     </message>
     <message>
       <source>Security Protocol</source>
-      <translation>セキュリティプロトコル</translation>
+      <translation type="unfinished">Security Protocol</translation>
     </message>
     <message>
       <source>Email Settings</source>
-      <translation>Eメール設定</translation>
+      <translation type="unfinished">Email Settings</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>サポート署名</translation>
+      <translation type="unfinished">Support Signature</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation>ユーザー名</translation>
+      <translation type="unfinished">Username</translation>
     </message>
     <message>
       <source>Mail from</source>
-      <translation>Eメール差出人</translation>
+      <translation type="unfinished">Mail from</translation>
     </message>
     <message>
       <source>Signature</source>
@@ -2058,95 +2058,95 @@
     <name>PasswordDialog</name>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation>ユーザー名</translation>
+      <translation type="unfinished">Username</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation>Web ページにサインイン</translation>
+      <translation type="unfinished">Sign in to web page</translation>
     </message>
   </context>
   <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <source>Manage...</source>
-      <translation>管理...</translation>
+      <translation type="unfinished">Manage...</translation>
     </message>
     <message>
       <source>Volume:</source>
-      <translation>ボリューム:</translation>
+      <translation type="unfinished">Volume:</translation>
     </message>
     <message>
       <source>Test...</source>
-      <translation>テスト...</translation>
+      <translation type="unfinished">Test...</translation>
     </message>
     <message>
       <source>Play to users</source>
-      <translation>対象ユーザー</translation>
+      <translation type="unfinished">Play to users</translation>
     </message>
   </context>
   <context>
     <name>PluginDiagnosticEventWidget</name>
     <message>
       <source>Source:</source>
-      <translation>ソース:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <source>Caption contains:</source>
-      <translation>キャプションに次の内容を含む:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <source>Description contains:</source>
-      <translation>説明に次の内容を含む:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <source>Level:</source>
-      <translation>レベル:</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <source>ERROR</source>
-      <translation>エラー</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <source>WARNING</source>
-      <translation>警告</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <source>INFO</source>
-      <translation>情報</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <source>Force Acknowledgment</source>
-      <translation>要確認</translation>
+      <translation type="unfinished">Force Acknowledgment</translation>
     </message>
     <message>
       <source>Use custom text:</source>
-      <translation>カスタムテキストを使用:</translation>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>対象ユーザー</translation>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation>すべての通知を表示する</translation>
+      <translation type="unfinished">Show all notifications</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation>イベント</translation>
+      <translation type="unfinished">Events</translation>
     </message>
     <message>
       <source>Site Notifications</source>
@@ -2157,163 +2157,163 @@
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation>現在のポジションを保存</translation>
+      <translation type="unfinished">Save Current Position</translation>
     </message>
     <message>
       <source>Go To Position</source>
-      <translation>ポジションに移動</translation>
+      <translation type="unfinished">Go To Position</translation>
     </message>
     <message>
       <source>Create Tour</source>
-      <translation>ツアー作成</translation>
+      <translation type="unfinished">Create Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>ツアー開始</translation>
+      <translation type="unfinished">Start Tour</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>詳細</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>No Tour Selected</source>
-      <translation>ツアーが選択されていません</translation>
+      <translation type="unfinished">No Tour Selected</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation>プレビュー</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>No preview available</source>
-      <translation>プレビューは利用できません</translation>
+      <translation type="unfinished">No preview available</translation>
     </message>
     <message>
       <source>Get Preview</source>
-      <translation>プレビュー取得</translation>
+      <translation type="unfinished">Get Preview</translation>
     </message>
   </context>
   <context>
     <name>PtzPresetDialog</name>
     <message>
       <source>Save Position</source>
-      <translation>ポジション保存</translation>
+      <translation type="unfinished">Save Position</translation>
     </message>
     <message>
       <source>Name:</source>
-      <translation>名前:</translation>
+      <translation>Нэр:</translation>
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation>ホットキー:</translation>
+      <translation type="unfinished">Hotkey:</translation>
     </message>
   </context>
   <context>
     <name>PushNotificationBusinessActionWidget</name>
     <message>
       <source>To</source>
-      <translation>対象ユーザー</translation>
+      <translation type="unfinished">To</translation>
     </message>
     <message>
       <source>Custom notification content</source>
-      <translation>通知内容を変更</translation>
+      <translation type="unfinished">Custom notification content</translation>
     </message>
     <message>
       <source>Header</source>
-      <translation>ヘッダー</translation>
+      <translation type="unfinished">Header</translation>
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
-      <translation>空の場合、デフォルトの通知タイトルが使用されます</translation>
+      <translation type="unfinished">Default notification title will be used if left empty</translation>
     </message>
     <message>
       <source>Body</source>
-      <translation>本文</translation>
+      <translation type="unfinished">Body</translation>
     </message>
     <message>
       <source>Default text will be used if this field is empty</source>
-      <translation>このフィールドが空の場合、デフォルトのテキストが使用されます</translation>
+      <translation type="unfinished">Default text will be used if this field is empty</translation>
     </message>
     <message>
       <source>Add source device name in body</source>
-      <translation>本文にソースデバイス名を追加</translation>
+      <translation type="unfinished">Add source device name in body</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールに割り当て...</translation>
+      <translation type="unfinished">Attach to Video Wall...</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation>プレビュー</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
   </context>
   <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Bookmark</source>
-      <translation>ブックマーク</translation>
+      <translation>Тэмдэглэл</translation>
     </message>
   </context>
   <context>
     <name>QnCompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing Compatibility Version...</source>
-      <translation>互換バージョンをインストールしています...</translation>
+      <translation type="unfinished">Installing Compatibility Version...</translation>
     </message>
     <message>
       <source>Restart to the updated version when ready</source>
-      <translation>準備ができたら更新版に再起動</translation>
+      <translation type="unfinished">Restart to the updated version when ready</translation>
     </message>
   </context>
   <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
-      <translation>今後このメッセージを表示しない</translation>
+      <translation type="unfinished">Do not show this message again</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Notification Sounds</source>
-      <translation>通知音</translation>
+      <translation type="unfinished">Notification Sounds</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>再生</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation>追加...</translation>
+      <translation type="unfinished">Add...</translation>
     </message>
     <message>
       <source>Rename...</source>
-      <translation>名前の変更...</translation>
+      <translation>Нэр өөрчлөх...</translation>
     </message>
     <message>
       <source>Delete...</source>
-      <translation>削除...</translation>
+      <translation>Устгах...</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Add URL</source>
-      <translation>URL追加</translation>
+      <translation type="unfinished">Add URL</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>削除</translation>
+      <translation>Хасах</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation>追加</translation>
+      <translation>Нэмэх</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
@@ -2331,191 +2331,191 @@
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation>ビデオウォール設定</translation>
+      <translation type="unfinished">Video Wall Settings</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation>Windows の起動時にビデオウォールを開始する</translation>
+      <translation type="unfinished">Launch video wall when Windows starts.</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation>デスクトップにショートカットを作成する</translation>
+      <translation type="unfinished">Place shortcut on desktop.</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>
-      <translation>ビデオウォールでタイムラインを有効にする</translation>
+      <translation type="unfinished">Enable timeline on video wall</translation>
     </message>
   </context>
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
-      <translation>ラピッドレビュー</translation>
+      <translation type="unfinished">Rapid Review</translation>
     </message>
     <message>
       <source>Initial video length</source>
-      <translation>元の映像の長さ</translation>
+      <translation type="unfinished">Initial video length</translation>
     </message>
     <message>
       <source>Exported video length</source>
-      <translation>エクスポート後の映像の長さ</translation>
+      <translation type="unfinished">Exported video length</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation>スピード</translation>
+      <translation type="unfinished">Speed</translation>
     </message>
     <message>
       <source>Frames interval</source>
-      <translation>フレーム間隔</translation>
+      <translation type="unfinished">Frames interval</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation>スピードをリセット</translation>
+      <translation type="unfinished">Reset Speed</translation>
     </message>
   </context>
   <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <source>Reconnecting...</source>
-      <translation>再接続中...</translation>
+      <translation type="unfinished">Reconnecting...</translation>
     </message>
     <message>
       <source>Please wait while the connection is being restored...</source>
-      <translation>接続が復旧するまでお待ちください...</translation>
+      <translation type="unfinished">Please wait while the connection is being restored...</translation>
     </message>
     <message>
       <source>Server name</source>
-      <translation>サーバー名</translation>
+      <translation type="unfinished">Server name</translation>
     </message>
   </context>
   <context>
     <name>RecordingBusinessActionWidget</name>
     <message>
       <source>Quality:</source>
-      <translation>映像品質:</translation>
+      <translation type="unfinished">Quality:</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation>FPS</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <source>s</source>
-      <translation>秒</translation>
+      <translation>с</translation>
     </message>
     <message>
       <source>Pre-Recording:</source>
-      <translation>プレ録画:</translation>
+      <translation type="unfinished">Pre-Recording:</translation>
     </message>
     <message>
       <source>Post-Recording:</source>
-      <translation>ポスト録画:</translation>
+      <translation type="unfinished">Post-Recording:</translation>
     </message>
     <message>
       <source>Fixed duration:</source>
-      <translation>固定期間:</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
   </context>
   <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
-      <translation>一時フォルダー</translation>
+      <translation type="unfinished">Temporary Folder</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation>参照...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation>ソース</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <source>Resolution</source>
-      <translation>解像度</translation>
+      <translation type="unfinished">Resolution</translation>
     </message>
     <message>
       <source>Recording Quality</source>
-      <translation>録画品質</translation>
+      <translation type="unfinished">Recording Quality</translation>
     </message>
     <message>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>高解像度で&quot;最高&quot;品質の録画を行う場合、スペックの高いPCを推奨します。</translation>
+      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
     </message>
     <message>
       <source>Screen</source>
-      <translation>スクリーン</translation>
+      <translation type="unfinished">Screen</translation>
     </message>
     <message>
       <source>Additional Options</source>
-      <translation>追加オプション</translation>
+      <translation type="unfinished">Additional Options</translation>
     </message>
     <message>
       <source>Capture Cursor</source>
-      <translation>カーソルを録画に含める</translation>
+      <translation type="unfinished">Capture Cursor</translation>
     </message>
   </context>
   <context>
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation>プレ録画</translation>
+      <translation type="unfinished">Pre-Recording</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation>ポスト録画</translation>
+      <translation type="unfinished">Post-Recording</translation>
     </message>
   </context>
   <context>
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation>パスワード(確認用)</translation>
+      <translation type="unfinished">Repeat Password</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation>パスワードが一致しません</translation>
+      <translation type="unfinished">Passwords do not match</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>パスワード</translation>
+      <translation>Нууц үг</translation>
     </message>
   </context>
   <context>
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation>再生時間 :</translation>
+      <translation type="unfinished">Playback time :</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation>巻き戻し</translation>
+      <translation type="unfinished">rewind for</translation>
     </message>
     <message>
       <source>Live</source>
-      <translation>ライブ</translation>
+      <translation type="unfinished">Live</translation>
     </message>
   </context>
   <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation>サービスが見つかりません</translation>
+      <translation type="unfinished">No services found</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation>サービスを追加するには、チャネルパートナーにお問い合わせください</translation>
+      <translation type="unfinished">Contact your Channel Partner to add services</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation>チャネルパートナーの連絡先</translation>
+      <translation type="unfinished">Channel Partner Contact</translation>
     </message>
     <message>
       <source>Services Usage</source>
-      <translation>サービス利用状況</translation>
+      <translation type="unfinished">Services Usage</translation>
     </message>
     <message>
       <source>Services state</source>
-      <translation>サービスの状態</translation>
+      <translation type="unfinished">Services state</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
@@ -2526,129 +2526,129 @@
     <name>SayTextBusinessActionWidget</name>
     <message>
       <source>Speak the following:</source>
-      <translation>読み上げる内容:</translation>
+      <translation type="unfinished">Speak the following:</translation>
     </message>
     <message>
       <source>Type any text here</source>
-      <translation>テキストを入力してください (英数字)</translation>
+      <translation type="unfinished">Type any text here</translation>
     </message>
     <message>
       <source>Volume:</source>
-      <translation>ボリューム:</translation>
+      <translation type="unfinished">Volume:</translation>
     </message>
     <message>
       <source>Test...</source>
-      <translation>テスト...</translation>
+      <translation type="unfinished">Test...</translation>
     </message>
     <message>
       <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
+      <translation type="unfinished">Speak to users</translation>
     </message>
   </context>
   <context>
     <name>ScheduleSettingsWidget</name>
     <message>
       <source>Schedule Settings</source>
-      <translation>スケジュール設定</translation>
+      <translation type="unfinished">Schedule Settings</translation>
     </message>
     <message>
       <source>Record Always</source>
-      <translation>常時録画</translation>
+      <translation type="unfinished">Record Always</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation>モーションのみ</translation>
+      <translation type="unfinished">Motion Only</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>モーション + 低解像度</translation>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
     <message>
       <source>Do Not Record</source>
-      <translation>録画しない</translation>
+      <translation type="unfinished">Do Not Record</translation>
     </message>
     <message>
       <source>Bitrate</source>
-      <translation>ビットレート</translation>
+      <translation type="unfinished">Bitrate</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation>FPS</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <source>Quality</source>
-      <translation>映像品質</translation>
+      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>モーション</translation>
+      <translation>Хөдөлгөөн</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>オブジェクト</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation>モーション＆オブジェクト</translation>
+      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
     </message>
   </context>
   <context>
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation>操作履歴を有効にする</translation>
+      <translation type="unfinished">Enable audit trail</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
-      <translation>映像上にユーザー名のウォーターマークを表示する</translation>
+      <translation type="unfinished">Display watermark with username over video</translation>
     </message>
     <message>
       <source>Watermark Preview</source>
-      <translation>ウォーターマークのプレビュー</translation>
+      <translation type="unfinished">Watermark Preview</translation>
     </message>
     <message>
       <source>to</source>
-      <translation>上限</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <source>Limit session duration</source>
-      <translation>セッション期間を制限する</translation>
+      <translation type="unfinished">Limit session duration</translation>
     </message>
     <message>
       <source>Data protection</source>
-      <translation>データ保護</translation>
+      <translation type="unfinished">Data protection</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation>HTTPSのみを使用してカメラに接続する</translation>
+      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation>ユーザーアクティビティ</translation>
+      <translation type="unfinished">User Activity</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation>アーカイブの暗号化</translation>
+      <translation type="unfinished">Archive encryption</translation>
     </message>
     <message>
       <source>Change Password...</source>
-      <translation>パスワードの変更...</translation>
+      <translation>Нууц үг солих...</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation>暗号化された接続のみを受け入れるようサーバーに強制する</translation>
+      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation>デスクトップおよびモバイルクライアントへの映像トラフィックを暗号化する</translation>
+      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation>ユーザー管理</translation>
+      <translation type="unfinished">Manage Users</translation>
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation>パワーユーザー以外のツリーにもサーバーを表示する</translation>
+      <translation type="unfinished">Display servers in tree for non-power users</translation>
     </message>
     <message>
       <source>Video Redaction</source>
@@ -2656,19 +2656,19 @@
     </message>
     <message>
       <source>Configure...</source>
-      <translation>設定...</translation>
+      <translation type="unfinished">Configure...</translation>
     </message>
     <message>
       <source>Blur</source>
-      <translation>ぼかし</translation>
+      <translation type="unfinished">Blur</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation>カメラを除外</translation>
+      <translation type="unfinished">Exclude Cameras</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation>クラウドユーザーにセッション期間を適用する</translation>
+      <translation type="unfinished">Apply session duration to Cloud users</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
@@ -2676,11 +2676,11 @@
     </message>
     <message>
       <source>Administrators</source>
-      <translation>管理者</translation>
+      <translation type="unfinished">Administrators</translation>
     </message>
     <message>
       <source>Available to</source>
-      <translation>ユーザー</translation>
+      <translation type="unfinished">Available to</translation>
     </message>
     <message>
       <source>Power users</source>
@@ -2691,76 +2691,76 @@
     <name>SendmailBusinessActionWidget</name>
     <message>
       <source>Additional Recipients:</source>
-      <translation>追加の受信者:</translation>
+      <translation type="unfinished">Additional Recipients:</translation>
     </message>
     <message>
       <source>Global Email Settings...</source>
-      <translation>メールサーバー設定...</translation>
+      <translation type="unfinished">Global Email Settings...</translation>
     </message>
   </context>
   <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation>サーバー証明書</translation>
+      <translation type="unfinished">Server certificate</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>全般</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>発行者</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation>自己署名ルート証明書</translation>
+      <translation type="unfinished">Self-signed root certificate</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>有効期限</translation>
+      <translation>Дуусах</translation>
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation>証明書の有効期限が切れています</translation>
+      <translation type="unfinished">Certificate is expired</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>フィンガープリント</translation>
+      <translation>Хурууны хээ</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>詳細</translation>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
     <message>
       <source>Select Servers</source>
-      <translation>サーバー選択</translation>
+      <translation type="unfinished">Select Servers</translation>
     </message>
   </context>
   <context>
     <name>ServerSettingsWidget</name>
     <message>
       <source>Ping</source>
-      <translation>Ping</translation>
+      <translation type="unfinished">Ping</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>名前</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation>IPアドレス</translation>
+      <translation type="unfinished">IP Address</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation>ポート</translation>
+      <translation>Порт</translation>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation>内蔵およびUSB Webカメラの自動検出</translation>
+      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
     </message>
     <message>
       <source>Remote Access</source>
@@ -2768,408 +2768,408 @@
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation>ハードウェアデコードを有効にする</translation>
+      <translation type="unfinished">Enable hardware decoding</translation>
     </message>
   </context>
   <context>
     <name>ShowOnAlarmLayoutActionWidget</name>
     <message>
       <source>for</source>
-      <translation>ユーザー</translation>
+      <translation type="unfinished">for</translation>
     </message>
     <message>
       <source>Force Alarm Layout opening</source>
-      <translation>強制的にアラームレイアウトを開く</translation>
+      <translation type="unfinished">Force Alarm Layout opening</translation>
     </message>
   </context>
   <context>
     <name>ShowTextOverlayActionWidget</name>
     <message>
       <source>seconds</source>
-      <translation>秒</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <source>Display text for:</source>
-      <translation>テキスト表示期間:</translation>
+      <translation type="unfinished">Display text for:</translation>
     </message>
     <message>
       <source>Use custom text:</source>
-      <translation>カスタムテキストを使用:</translation>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
     <message>
       <source>Rule will work only for prolonged events</source>
-      <translation>ルールは期間が定義されるイベントでのみ機能します</translation>
+      <translation type="unfinished">Rule will work only for prolonged events</translation>
     </message>
   </context>
   <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
-      <translation>ウォーターマーク確認</translation>
+      <translation type="unfinished">Watermark Check</translation>
     </message>
     <message>
       <source>Checked File:</source>
-      <translation>チェックしたファイル:</translation>
+      <translation type="unfinished">Checked File:</translation>
     </message>
     <message>
       <source>Check Result:</source>
-      <translation>チェック結果:</translation>
+      <translation type="unfinished">Check Result:</translation>
     </message>
   </context>
   <context>
     <name>SoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>Available to</source>
-      <translation>ユーザー</translation>
+      <translation type="unfinished">Available to</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>名前</translation>
+      <translation>Нэр</translation>
     </message>
     <message>
       <source>Icon</source>
-      <translation>アイコン</translation>
+      <translation type="unfinished">Icon</translation>
     </message>
   </context>
   <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
-      <translation>現在の統計</translation>
+      <translation type="unfinished">Current Statistics</translation>
     </message>
     <message>
       <source>Forecast for Full Storage Usage</source>
-      <translation>ストレージ使用量の予測</translation>
+      <translation type="unfinished">Forecast for Full Storage Usage</translation>
     </message>
     <message>
       <source>Server is offline. Statistics are not available.</source>
-      <translation>サーバーがオフラインです。統計情報は利用できません。</translation>
+      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
     </message>
     <message>
       <source>Additional storage</source>
-      <translation>追加ストレージ</translation>
+      <translation type="unfinished">Additional storage</translation>
     </message>
     <message>
       <source>Base forecast on data recorded during</source>
-      <translation>次の期間内の録画データに基づく予測</translation>
+      <translation type="unfinished">Base forecast on data recorded during</translation>
     </message>
   </context>
   <context>
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation>外部ストレージの追加...</translation>
+      <translation>Хадгалах сан нэмэх...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation>保存先</translation>
+      <translation type="unfinished">Storage Locations</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation>アーカイブの再インデックス</translation>
+      <translation type="unfinished">Reindex Archive</translation>
     </message>
     <message>
       <source>Reindex Backup</source>
-      <translation>バックアップの再インデックス</translation>
+      <translation type="unfinished">Reindex Backup</translation>
     </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation>外部ストレージの追加...</translation>
+      <translation>Хадгалах сан нэмэх...</translation>
     </message>
     <message>
       <source>Protocol:</source>
-      <translation>プロトコル:</translation>
+      <translation type="unfinished">Protocol:</translation>
     </message>
     <message>
       <source>URL:</source>
-      <translation>URL:</translation>
+      <translation type="unfinished">URL:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation>ログイン:</translation>
+      <translation>Нэвтрэх:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation>パスワード:</translation>
+      <translation>Нууц үг:</translation>
     </message>
   </context>
   <context>
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Show all users</source>
-      <translation>すべてのユーザーを表示</translation>
+      <translation type="unfinished">Show all users</translation>
     </message>
     <message>
       <source>Select Users</source>
-      <translation>ユーザー選択</translation>
+      <translation type="unfinished">Select Users</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>
-      <translation>検索に一致するものはありません。</translation>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation>グループ</translation>
+      <translation type="unfinished">Groups</translation>
     </message>
   </context>
   <context>
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation>(推奨)</translation>
+      <translation>(санал болгож буй)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>匿名の使用状況とクラッシュ統計をソフトウェア開発者に送信する</translation>
+      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>警告! これにより、録画スケジュール内の映像品質およびフレームレート (FPS) の項目は、カメラに設定されなくなります。</translation>
+      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
     </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
     <message>
       <source>Text</source>
-      <translation>テキスト</translation>
+      <translation type="unfinished">Text</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>フォントサイズ</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Enter plain text or HTML</source>
-      <translation>プレーンテキストまたはHTMLを入力</translation>
+      <translation type="unfinished">Enter plain text or HTML</translation>
     </message>
     <message>
       <source>Area Width</source>
-      <translation>領域の幅</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
   </context>
   <context>
     <name>TimeSynchronizationWidget</name>
     <message>
       <source>Sync Time with the Internet</source>
-      <translation>インターネットで時刻同期</translation>
+      <translation type="unfinished">Sync Time with the Internet</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation>VMS時刻</translation>
+      <translation type="unfinished">VMS Time</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>
-      <translation>サーバー間で時刻を同期しない</translation>
+      <translation type="unfinished">Do not sync time among servers</translation>
     </message>
   </context>
   <context>
     <name>TimestampOverlaySettingsWidget</name>
     <message>
       <source>Timestamp</source>
-      <translation>タイムスタンプ</translation>
+      <translation type="unfinished">Timestamp</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation>フォントサイズ</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <source>Format</source>
-      <translation>フォーマット</translation>
+      <translation type="unfinished">Format</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>削除</translation>
+      <translation>Устгах</translation>
     </message>
   </context>
   <context>
     <name>UserGroupsWidget</name>
     <message>
       <source>Search users</source>
-      <translation>ユーザーを検索</translation>
+      <translation type="unfinished">Search users</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation>グループを追加</translation>
+      <translation type="unfinished">Add Group</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation>Del</translation>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
     <name>UserListWidget</name>
     <message>
       <source>Search users</source>
-      <translation>ユーザーを検索</translation>
+      <translation type="unfinished">Search users</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation>ユーザーを追加</translation>
+      <translation type="unfinished">Add User</translation>
     </message>
     <message>
       <source>Del</source>
-      <translation>Del</translation>
+      <translation type="unfinished">Del</translation>
     </message>
   </context>
   <context>
     <name>VersionSelectionDialog</name>
     <message>
       <source>Choose a specific build</source>
-      <translation>特定のビルドを選択</translation>
+      <translation type="unfinished">Choose a specific build</translation>
     </message>
   </context>
   <context>
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation>モーション検知</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <source>Detect motion</source>
-      <translation>モーション検知を行う</translation>
+      <translation type="unfinished">Detect motion</translation>
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation>感度:</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
   </context>
   <context>
     <name>VirtualCameraTimeZoneWidget</name>
     <message>
       <source>Form</source>
-      <translation>フォーム</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation>時刻</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
-      <translation>アップロードされたファイルのタイムゾーンを無視する</translation>
+      <translation type="unfinished">Ignore timezone in uploaded files</translation>
     </message>
   </context>
   <context>
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation>キャンセル</translation>
+      <translation>Цуцлах</translation>
     </message>
     <message>
       <source>Upload Footage</source>
-      <translation>映像のアップロード</translation>
+      <translation type="unfinished">Upload Footage</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード...</translation>
+      <translation type="unfinished">Upload File...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>フォルダーをアップロード...</translation>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation>全般</translation>
+      <translation>Ерөнхий</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
-      <translation>サーバーを選択</translation>
+      <translation type="unfinished">SELECT SERVER</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation>上級設定</translation>
+      <translation type="unfinished">Advanced</translation>
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation>クライアント API の使用を許可する</translation>
+      <translation type="unfinished">Allow using Client API</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation>要求されたすべてのコンテンツをプロキシする</translation>
+      <translation type="unfinished">Proxy all requested contents</translation>
     </message>
     <message>
       <source>Every</source>
-      <translation>毎</translation>
+      <translation type="unfinished">Every</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation>強制的に専用ウィンドウで開く</translation>
+      <translation type="unfinished">Force open in a dedicated window</translation>
     </message>
   </context>
   <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
       <source>Schedule Settings</source>
-      <translation>スケジュール設定</translation>
+      <translation type="unfinished">Schedule Settings</translation>
     </message>
     <message>
       <source>On</source>
-      <translation>On</translation>
+      <translation type="unfinished">On</translation>
     </message>
     <message>
       <source>Off</source>
-      <translation>Off</translation>
+      <translation type="unfinished">Off</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation>スケジュール</translation>
+      <translation type="unfinished">Schedule</translation>
     </message>
     <message>
       <source>Note: Schedule is based on server time.</source>
-      <translation>注: スケジュールはサーバー時刻に依存します。</translation>
+      <translation type="unfinished">Note: Schedule is based on server time.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
     <message>
       <source>Active Licenses</source>
-      <translation>アクティブライセンス</translation>
+      <translation type="unfinished">Active Licenses</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>削除</translation>
+      <translation>Хасах</translation>
     </message>
     <message>
       <source>Details...</source>
-      <translation>詳細...</translation>
+      <translation type="unfinished">Details...</translation>
     </message>
     <message>
       <source>The software is licensed to</source>
-      <translation>ソフトウェアのライセンス</translation>
+      <translation type="unfinished">The software is licensed to</translation>
     </message>
     <message>
       <source>New License</source>
-      <translation>新規ライセンス</translation>
+      <translation>Шинэ лиценз</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
     <message>
       <source>Watermark preview</source>
-      <translation>ウォーターマークのプレビュー</translation>
+      <translation type="unfinished">Watermark preview</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation>不透明度</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <source>Frequency</source>
-      <translation>頻度</translation>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
 </TS>

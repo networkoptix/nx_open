@@ -5,7 +5,7 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Nội dung JSON không hợp lệ.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>

@@ -50,11 +50,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Số lượng bộ giải mã tối đa</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Cải thiện hiệu suất giải mã video bằng cách sử dụng số lượng bộ giải mã phần cứng tối đa</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -231,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Nhập mật khẩu tài khoản %1 của bạn để kết nối với Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -332,7 +332,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>Bạn không kết nối với bất kỳ Chi nhánh nào</translation>
     </message>
   </context>
   <context>

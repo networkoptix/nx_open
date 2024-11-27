@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP" sourcelanguage="en">
+<TS version="2.1" language="ar_SA" sourcelanguage="en">
   <context>
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation>無効な JSON コンテンツです。</translation>
+      <translation type="unfinished">Invalid JSON content.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 にアクセスできません。後でもう一度お試しください。</translation>
+      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation>同一のログイン名を持つ複数のユーザーが存在します。</translation>
+      <translation type="unfinished">More than one user with the same login are presented.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation>内部サーバーエラー (%1) 。サイト管理者にお問い合わせください。</translation>
+      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
@@ -79,40 +79,40 @@
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation>必須パラメーター %1 が存在しません。</translation>
+      <translation type="unfinished">Missing required parameter: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation>リクエストの処理に失敗しました。</translation>
+      <translation type="unfinished">Failed to process request.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation>Forbidden</translation>
+      <translation type="unfinished">Forbidden.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation>競合。</translation>
+      <translation type="unfinished">Conflict.</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation>Bad request</translation>
+      <translation type="unfinished">Bad request.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation>実装されていません。</translation>
+      <translation type="unfinished">Not implemented.</translation>
     </message>
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation>見つかりません。</translation>
+      <translation type="unfinished">Not found.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>内部エラー。</translation>
+      <translation type="unfinished">Internal error.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -145,16 +145,16 @@
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation>許可されていません。</translation>
+      <translation type="unfinished">Not allowed.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation>無効なパラメーター `%1`: %2。</translation>
+      <translation type="unfinished">Invalid parameter `%1`: %2</translation>
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation>サービスの権限がありません。</translation>
+      <translation type="unfinished">Service unauthorized.</translation>
     </message>
   </context>
 </TS>

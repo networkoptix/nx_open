@@ -1268,7 +1268,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>ライブ映像</translation>
     </message>
   </context>
   <context>
