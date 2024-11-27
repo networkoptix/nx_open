@@ -1084,6 +1084,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
             else
             {
                 m_eof = true;
+                NX_DEBUG(this, "EOF from delegate");
                 return createEmptyPacket(isReverseMode());
             }
         }

@@ -118,6 +118,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
     m_rtpLogTag(rtpLogTag),
     m_sleepIfEmptySocket(sleepIfEmptySocket)
 {
+    m_lastReceivedTime = qnSyncTime->currentMSecsSinceEpoch();
     m_rtspSession->setPlayNowModeAllowed(true); //< Default value.
     m_footageUpToDate.test_and_set();
     m_currentServerUpToDate.test_and_set();
@@ -1052,7 +1053,7 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
         ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000 * 10;
     if (longNoData || m_quality == MEDIA_Quality_Low || m_quality == MEDIA_Quality_LowIframesOnly)
     {
-        beforeClose();
+        m_rtspSession->shutdown();
     }
 }
 
