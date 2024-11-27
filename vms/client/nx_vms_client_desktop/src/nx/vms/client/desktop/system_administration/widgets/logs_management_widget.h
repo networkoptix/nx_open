@@ -32,6 +32,7 @@ public:
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void hideEvent(QHideEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
     void setupUi();

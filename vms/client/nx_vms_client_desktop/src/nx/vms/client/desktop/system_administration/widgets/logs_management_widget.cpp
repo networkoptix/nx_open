@@ -10,6 +10,7 @@
 #include <QtGui/QColor>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
+#include <QtGui/QResizeEvent>
 #include <QtWidgets/QFileDialog>
 
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -30,6 +31,8 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
+constexpr double kServerNameWidthPart = 0.53;
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16Theme = {
     {QIcon::Normal, {.primary = "light16"}},
@@ -156,8 +159,6 @@ void LogsManagementWidget::setupUi()
         LogsManagementModel::Columns::CheckBoxColumn, QHeaderView::ResizeToContents);
     header->setSectionResizeMode(
         LogsManagementModel::Columns::StatusColumn, QHeaderView::ResizeToContents);
-    header->resizeSection(LogsManagementModel::Columns::NameColumn,
-        std::max(235, header->sectionSize(LogsManagementModel::Columns::NameColumn)));
     connect(m_watcher, &LogsManagementWatcher::stateChanged,
         [header](LogsManagementWatcher::State state)
         {
@@ -465,6 +466,13 @@ void LogsManagementWidget::updateData()
 nx::vms::client::desktop::TableView* LogsManagementWidget::unitsTable()
 {
     return ui->unitsTable;
+}
+
+void LogsManagementWidget::resizeEvent(QResizeEvent* event)
+{
+    ui->unitsTable->setColumnWidth(
+        LogsManagementModel::Columns::NameColumn, event->size().width() * kServerNameWidthPart);
+    base_type::resizeEvent(event);
 }
 
 } // namespace nx::vms::client::desktop
