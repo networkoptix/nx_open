@@ -34,7 +34,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Chi nhánh của bạn</translation>
     </message>
   </context>
   <context>
@@ -46,7 +46,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Không thể kết nối tới Chi nhánh &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Session duration limit can be changed by the site administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the site administrators</translation>
+      <translation>Giới hạn thời lượng phiên có thể được thay đổi bởi người quản trị Chi nhánh</translation>
     </message>
   </context>
   <context>

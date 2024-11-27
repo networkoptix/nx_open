@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Votre Site</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -151,7 +151,7 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Si cette erreur persiste, veuillez contacter l'administrateur de votre site.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
