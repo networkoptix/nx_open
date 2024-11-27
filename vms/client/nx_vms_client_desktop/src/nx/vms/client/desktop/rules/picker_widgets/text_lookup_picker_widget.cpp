@@ -179,9 +179,6 @@ void TextLookupPicker::updateUi()
     {
         case LookupCheckType::containsKeywords:
         case LookupCheckType::doesNotContainKeywords:
-            if (nx::Uuid::isUuidString(m_field->value()))
-                m_field->setValue({});
-
             m_stackedWidget->setCurrentIndex(0);
             m_lineEdit->setText(m_field->value());
             return;
