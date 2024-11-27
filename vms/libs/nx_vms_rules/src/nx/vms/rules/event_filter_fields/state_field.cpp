@@ -6,11 +6,13 @@ namespace nx::vms::rules {
 
 bool StateField::match(const QVariant& eventValue) const
 {
-    // Accept any event if filter value is not set.
-    if (value() == State::none)
-        return true;
+    const auto state = eventValue.value<State>();
 
-    return value() == eventValue.value<State>();
+    // Filter value State::none is used for actions with a duration equal to the event duration.
+    if (value() == State::none)
+        return state == State::started || state == State::stopped;
+
+    return value() == state;
 }
 
 } // namespace nx::vms::rules
