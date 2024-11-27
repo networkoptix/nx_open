@@ -139,11 +139,8 @@ int runUi(QGuiApplication* application)
     const auto context = qnMobileClientModule->context();
 
     QScopedPointer<QnMobileClientUriHandler> uriHandler(new QnMobileClientUriHandler(context));
-    for (const auto& scheme: uriHandler->supportedSchemes())
-        QDesktopServices::setUrlHandler(scheme, uriHandler.data(), uriHandler->handlerMethodName());
 
     QStringList selectors;
-
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(selectors);
 

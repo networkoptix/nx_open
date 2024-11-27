@@ -404,10 +404,14 @@ QnMobileClientUriHandler::QnMobileClientUriHandler(QnContext* context, QObject* 
     base_type(parent),
     d(new Private(context))
 {
+    for (const auto& scheme: supportedSchemes())
+        QDesktopServices::setUrlHandler(scheme, this, handlerMethodName());
 }
 
 QnMobileClientUriHandler::~QnMobileClientUriHandler()
 {
+    for (const auto& scheme: supportedSchemes())
+        QDesktopServices::unsetUrlHandler(scheme);
 }
 
 QStringList QnMobileClientUriHandler::supportedSchemes()
