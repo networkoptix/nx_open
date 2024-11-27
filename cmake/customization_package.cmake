@@ -4,7 +4,7 @@ include_guard(GLOBAL)
 
 include(${open_source_root}/cmake/utils.cmake)
 
-set(customizationPackageFile "" CACHE STRING "Customization package archive")
+set(customizationPackageFile "${CMAKE_SOURCE_DIR}/default.zip")
 
 function(_unpack_customization_package source_file target_directory log_file)
     message(STATUS "Unpacking customization package from ${source_file} to ${target_directory}")
@@ -41,33 +41,6 @@ function(_store_customization_package target_directory)
 
     string(REPLACE "\n" ";" listed_files ${listed_files})
     nx_store_known_files(${listed_files})
-endfunction()
-
-function(_set_customization_from_file)
-    if(NOT customizationPackageFile)
-        return()
-    endif()
-
-    message(WARNING
-        "-Dcustomization=... parameter is ignored: -DcustomizationPackageFile=... is specified")
-
-    message(STATUS "Getting customization id from ${customizationPackageFile}")
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE}
-            ${open_build_utils_dir}/customization/pack.py get_value
-            ${customizationPackageFile}
-            id
-        OUTPUT_VARIABLE customization_id
-        ERROR_VARIABLE get_value_error
-        RESULT_VARIABLE get_value_resilt
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-
-    if(NOT get_value_resilt STREQUAL "0")
-        message(FATAL_ERROR "Customization listing failed: ${get_value_error}.")
-    endif()
-
-    set(customization ${customization_id} PARENT_SCOPE)
 endfunction()
 
 macro(nx_load_customization_package)
@@ -120,5 +93,3 @@ macro(nx_load_customization_package)
         )
     endif()
 endmacro()
-
-_set_customization_from_file()
