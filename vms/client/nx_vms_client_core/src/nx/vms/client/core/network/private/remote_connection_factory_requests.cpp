@@ -26,6 +26,7 @@
 #include <nx/vms/api/data/global_permission_deprecated.h>
 #include <nx/vms/api/data/server_model.h>
 #include <nx/vms/api/data/user_data_deprecated.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx_ec/ec_api_common.h>
@@ -769,16 +770,18 @@ std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
 
     auto promise = std::make_unique<std::promise<Context::CloudTokenInfo>>();
     auto future = promise->get_future();
-    d->cloudConnection->oauthManager()->issueTokenLegacy(
-        request,
-        [promise = std::move(promise)](ResultCode resultCode, IssueTokenResponse response)
+    auto handler = [promise = std::move(promise)](ResultCode resultCode, IssueTokenResponse response)
         {
             NX_DEBUG(NX_SCOPE_TAG, "Issue token result: %1", resultCode);
             Context::CloudTokenInfo tokenInfo{.response = response};
             if (resultCode != ResultCode::ok)
                 tokenInfo.error = toConnectionErrorCode(resultCode);
             promise->set_value(tokenInfo);
-        });
+        };
+    if (ini().useShortLivedCloudTokens)
+        d->cloudConnection->oauthManager()->issueTokenV1(request, std::move(handler));
+    else
+        d->cloudConnection->oauthManager()->issueTokenLegacy(request, std::move(handler));
 
     return future;
 }

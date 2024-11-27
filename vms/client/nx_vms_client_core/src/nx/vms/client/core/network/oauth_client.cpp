@@ -12,6 +12,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/to_string.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -106,7 +107,10 @@ void OauthClient::Private::issueAccessToken()
     if (!cloudSystem.isEmpty())
         request.scope = nx::format("cloudSystemId=%1", cloudSystem).toStdString();
 
-    m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
+    if (ini().useShortLivedCloudTokens)
+        m_connection->oauthManager()->issueTokenV1(request, std::move(handler));
+    else
+        m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
 }
 
 
@@ -156,7 +160,10 @@ void OauthClient::Private::issueTokensWithoutScope()
     if (refreshTokenLifetime.count())
         request.refresh_token_lifetime = refreshTokenLifetime;
 
-    m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
+    if (ini().useShortLivedCloudTokens)
+        m_connection->oauthManager()->issueTokenV1(request, std::move(handler));
+    else
+        m_connection->oauthManager()->issueTokenLegacy(request, std::move(handler));
 }
 
 std::string OauthClient::Private::email() const

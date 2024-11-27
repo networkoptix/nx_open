@@ -93,6 +93,11 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
 
     // VMS-52886
     NX_INI_FLAG(false, cslObjectsTabVisible, "[Feature] Show Objects tab for cross site layouts.");
+
+    // VMS-55962
+    NX_INI_FLAG(false, useShortLivedCloudTokens,
+        "[Feature] Short-lived tokens improve security by reducing the time a token remains valid.\n"
+        "It can be removed once the required functionality is available on all cloud instances.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();
