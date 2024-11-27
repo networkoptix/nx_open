@@ -721,7 +721,7 @@
     </message>
     <message>
       <source>Filters help control access to the system and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation>フィルターは、ベース DN のどのユーザーやグループを許可するかを指定することにより、システムへのアクセスと同期を制御するのに役立ちます。</translation>
+      <translation>ベース DN 内のユーザーやグループをフィルターで指定することにより、システムへのアクセスと同期を制御するのに役立ちます。</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
@@ -1275,7 +1275,7 @@
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the system DB. Make sure LDAP server parameters and search bases are configured correctly.</source>
-      <translation>同期設定に一致するユーザーまたはグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターと検索ベースが正しく構成されていることを確認してください。</translation>
+      <translation>同期設定に一致するユーザーやグループが存在しないため、システムの DB には追加されません。 LDAP サーバーのパラメーターと検索ベースが正しく構成されていることを確認してください。</translation>
     </message>
   </context>
   <context>
