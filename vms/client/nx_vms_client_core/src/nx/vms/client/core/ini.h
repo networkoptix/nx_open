@@ -90,6 +90,11 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, delayRightPanelLiveAnalytics,
         "[Support] Prohibits showing right panel live analytics before the corresponding frame\n"
         "appears on the camera if the camera is playing live");
+
+    // VMS-55962
+    NX_INI_FLAG(false, useShortLivedCloudTokens,
+        "[Feature] Short-lived tokens improve security by reducing the time a token remains valid.\n"
+        "It can be removed once the required functionality is available on all cloud instances.");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();
