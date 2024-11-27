@@ -12,7 +12,7 @@ StackView
     property int transitionDuration: 200
 
 
-    function safePush(url: url, properties: variant) : NxObject
+    function safePush(url: url, properties: variant) : QtObject
     {
         var item = d.safeCreatePageComponent(url, properties)
         return item
