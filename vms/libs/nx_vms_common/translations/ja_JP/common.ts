@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation>内部サーバーエラー (%1) 。システム管理者に連絡してください。</translation>
+      <translation>内部サーバーエラー (%1) 。システム管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
