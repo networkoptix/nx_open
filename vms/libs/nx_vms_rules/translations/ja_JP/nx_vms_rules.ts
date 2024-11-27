@@ -218,7 +218,7 @@
     <message numerus="yes">
       <source>Device Disconnected</source>
       <translation>
-        <numerusform>デバイスが切断されました</numerusform>
+        <numerusform>デバイス切断</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -255,7 +255,7 @@
     <message numerus="yes">
       <source>Device IP Conflict</source>
       <translation>
-        <numerusform>デバイスの IP競合</numerusform>
+        <numerusform>デバイスのIP競合</numerusform>
       </translation>
     </message>
     <message numerus="yes">
