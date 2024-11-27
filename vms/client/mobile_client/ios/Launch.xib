@@ -11,7 +11,7 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="6iw-0Y-3Wy">
+                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="logo_new.png" translatesAutoresizingMaskIntoConstraints="NO" id="6iw-0Y-3Wy">
                     <rect key="frame" x="112" y="112" width="256" height="256"/>
                 </imageView>
             </subviews>
@@ -28,6 +28,6 @@
         </view>
     </objects>
     <resources>
-        <image name="logo.png" width="256" height="256"/>
+        <image name="logo_new.png" width="256" height="256"/>
     </resources>
 </document>

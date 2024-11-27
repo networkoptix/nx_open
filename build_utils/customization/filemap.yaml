@@ -116,9 +116,9 @@ mobile: {
     icon_appstore.png: 'icons/ios/ios/images/icon_appstore.png', # 1024x1024.
 
     # Logos are transparent.
-    logo.png: 'icons/ios/ios/images/logo.png', # 256x256.
-    logo@2x.png: 'icons/ios/ios/images/logo@2x.png',
-    logo@3x.png: 'icons/ios/ios/images/logo@3x.png',
+    logo.png: 'icons/ios/ios/images/logo_new.png', # 256x256.
+    logo@2x.png: 'icons/ios/ios/images/logo_new@2x.png',
+    logo@3x.png: 'icons/ios/ios/images/logo_new@3x.png',
   },
 
 
