@@ -6,6 +6,7 @@
 
 #include "../action_builder.h"
 #include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/sound_field.h"
 #include "../action_builder_fields/target_device_field.h"
 #include "../action_builder_fields/target_devices_field.h"
 #include "../action_builder_fields/time_field.h"
@@ -306,10 +307,15 @@ void CompatibilityManager::replaceActionBuilder(
     std::unique_ptr<vms::rules::ActionBuilder>&& actionBuilder)
 {
     auto oldActionBuilder = m_rule->takeActionBuilder(0);
+
     if (auto targetDeviceField = oldActionBuilder->fieldByType<vms::rules::TargetDeviceField>())
         m_lastActionCamerasSelection = {targetDeviceField->id()};
-    else if (auto targetDevicesField = oldActionBuilder->fieldByType<vms::rules::TargetDevicesField>())
+
+    if (auto targetDevicesField = oldActionBuilder->fieldByType<vms::rules::TargetDevicesField>())
         m_lastActionCamerasSelection = targetDevicesField->ids();
+
+    if (auto soundField = oldActionBuilder->fieldByType<vms::rules::SoundField>())
+        m_lastSoundSelection = soundField->value();
 
     if (m_lastActionCamerasSelection)
     {
@@ -323,6 +329,12 @@ void CompatibilityManager::replaceActionBuilder(
         {
             targetDevicesField->setIds(m_lastActionCamerasSelection.value());
         }
+    }
+
+    if (m_lastSoundSelection)
+    {
+        if (auto newSoundField = actionBuilder->fieldByType<vms::rules::SoundField>())
+            newSoundField->setValue(m_lastSoundSelection.value());
     }
 
     m_rule->addActionBuilder(std::move(actionBuilder));

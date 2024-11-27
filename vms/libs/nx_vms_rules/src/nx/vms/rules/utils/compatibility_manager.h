@@ -36,6 +36,7 @@ private:
 
     std::optional<UuidSet> m_lastEventCamerasSelection;
     std::optional<UuidSet> m_lastActionCamerasSelection;
+    std::optional<QString> m_lastSoundSelection;
 
     QString m_defaultActionType;
 
