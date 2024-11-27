@@ -1478,11 +1478,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を %1 に送信してアクティベーションファイルを取得してください。</translation>
+      <translation>システムがインターネットにアクセスできない場合は、ライセンスキーとハードウェア ID を %1 に送信し、ライセンスファイルを取得してください。</translation>
     </message>
     <message>
       <source>If your System does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>システムがインターネットにアクセスできない場合は、提供されたライセンス キーとハードウェア ID を 地域/ライセンスサポートチーム に送信してアクティベーションファイルを取得してください。</translation>
+      <translation>システムがインターネットにアクセスできない場合は、ライセンスキーとハードウェア ID を地域/ライセンスサポートチームに送信し、ライセンスファイルを取得してください。</translation>
     </message>
     <message>
       <source>License has already been activated</source>
@@ -3017,7 +3017,7 @@ License Key: %2</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 からシステムを切断するには、このアカウントのパスワードを入力してください。</translation>
+      <translation>%1 からシステムを切断するには、アカウントのパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -3356,7 +3356,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation>バックアップを作成するにはアカウントのパスワードを入力してください</translation>
+      <translation>バックアップを作成するには、アカウントのパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3368,7 +3368,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation>バックアップからシステムを復元するには、アカウントのパスワードを入力してください</translation>
+      <translation>バックアップからシステムを復元するには、アカウントのパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -5922,7 +5922,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>ビデオウォールを停止しますか？</translation>
+      <translation>ビデオウォールを停止しますか?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -6268,7 +6268,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation>
-        <numerusform>一部の映像ファイルが %n 仮想カメラにアップロードされています:</numerusform>
+        <numerusform>一部の映像ファイルは、まだ %n 仮想カメラにアップロード中です:</numerusform>
       </translation>
     </message>
     <message>
@@ -6739,11 +6739,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
-      <translation>同名の異なるビデオウォールが存在します</translation>
+      <translation>同じ名前を持つ別のビデオウォールが存在します。</translation>
     </message>
     <message>
       <source>Close %1 before starting Video Wall?</source>
-      <translation>ビデオウォールを開始する前に %1 を閉じますか？</translation>
+      <translation>ビデオウォールを開始する前に %1 を閉じますか?</translation>
     </message>
     <message>
       <source>Close</source>
@@ -8244,7 +8244,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1にシステムを接続するには、アカウントのパスワードを入力してください</translation>
+      <translation>%1 にシステムを接続するには、アカウントのパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8286,7 +8286,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation>サーバーをシステムに統合するには、アカウントのパスワードを入力してください</translation>
+      <translation>サーバーをシステムに統合するには、アカウントのパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9121,7 +9121,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation>このシステムに %1 を統合することに失敗しました。</translation>
+      <translation>このシステムに %1 を統合できませんでした。</translation>
     </message>
   </context>
   <context>
@@ -9588,7 +9588,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation>システムを統合するにはアカウントのパスワードを入力してください</translation>
+      <translation>システムを統合するには、アカウントのパスワードを入力してください。</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -10765,7 +10765,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation>デバイスの IP競合</translation>
+      <translation>デバイスのIP競合</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
