@@ -68,7 +68,8 @@ ShaderEffect
     readonly property matrix4x4 textureMatrix: // maps hemispere projection coords into texture coords
     {
         var sourceAspectRatio = sourceSize.width / sourceSize.height
-        var textureCoordsScale = Qt.vector2d(1.0, fieldStretch / sourceAspectRatio).times(1.0 / fieldRadius)
+        const stretch = isNaN(fieldStretch) ? 1.0 : fieldStretch
+        const textureCoordsScale = Qt.vector2d(1.0, stretch / sourceAspectRatio).times(1.0 / fieldRadius)
         var textureCoordsCenter = Qt.vector2d(0.5, 0.5).minus(fieldOffset)
 
         return Utils3D.translation(textureCoordsCenter.x, textureCoordsCenter.y, 0.0).times(
