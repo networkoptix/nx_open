@@ -36,6 +36,7 @@
 #include <nx/reflect/urlencoded/serializer.h>
 #include <nx/utils/buffer.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/i18n/translation_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/serialization/qjson.h>
@@ -2022,6 +2023,24 @@ Handle ServerConnection::getStorageStatus(
     return executeGet("/api/storageStatus", params, callback, targetThread, serverId);
 }
 
+Handle ServerConnection::checkStoragePath(
+    const QString& path,
+    Result<ErrorOrData<nx::vms::api::StorageSpaceDataWithDbInfoV3>>::type&& callback,
+    QThread* targetThread)
+{
+    nx::network::rest::Params params;
+    // Method prepareUrl calls params.toUrlQuery() which uses QUrlQuery::setQueryItems()
+    // which has requirement: `The keys and values are expected to be in percent-encoded form.`
+    // So it is required to encode path manually because it can be a url with many
+    // symbols like '@', ':', '%' and others or even be a path with utf-8 symbols.
+    params.insert("path", nx::reflect::urlencoded::serialize(path));
+    return executeGet(
+        "/rest/v4/servers/this/storages/*/check",
+        params,
+        std::move(callback),
+        targetThread);
+}
+
 Handle ServerConnection::setStorageEncryptionPassword(
     const QString& password,
     bool makeCurrent,
@@ -3485,8 +3504,10 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     request.method = method;
     request.contentType = contentType;
     request.messageBody = messageBody;
-    request.headers.emplace(nx::network::http::header::kAcceptLanguage,
-        nx::vms::common::appContext()->locale().toStdString());
+    QString locale = nx::i18n::TranslationManager::getCurrentThreadLocale();
+    if (locale.isEmpty())
+        locale = nx::vms::common::appContext()->locale();
+    request.headers.emplace(nx::network::http::header::kAcceptLanguage, locale.toStdString());
     return request;
 }
 

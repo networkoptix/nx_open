@@ -686,6 +686,11 @@ public:
         Result<RestResultWithData<StorageStatusReply>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle checkStoragePath(
+        const QString& path,
+        Result<ErrorOrData<nx::vms::api::StorageSpaceDataWithDbInfoV3>>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle setStorageEncryptionPassword(
         const QString& password,
         bool makeCurrent,
