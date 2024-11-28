@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <variant>
-
 #include <QtGui/QValidator>
 
 #include <nx/vms/common/system_context.h>

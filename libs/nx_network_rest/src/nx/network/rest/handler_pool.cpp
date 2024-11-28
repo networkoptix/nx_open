@@ -4,6 +4,8 @@
 
 #include <nx/network/url/url_parse_helper.h>
 
+#include "audit.h"
+
 namespace nx::network::rest {
 
 const nx::network::http::Method HandlerPool::kAnyHttpMethod = "";

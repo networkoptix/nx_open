@@ -6,17 +6,18 @@
 #include <nx/reflect/json.h>
 #include <nx/reflect/merge.h>
 #include <nx/reflect/urlencoded/deserializer.h>
-#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/void.h>
 
-#include "audit.h"
 #include "exception.h"
 #include "nx_network_rest_ini.h"
 #include "params.h"
+#include "user_access_data.h"
 
 namespace nx::json_rpc { class WebSocketConnection; }
 
 namespace nx::network::rest {
+
+namespace audit { struct Record; }
 
 // TODO: Either make it movable, or `enable_shared_from_this`.
 struct NX_NETWORK_REST_API Request
@@ -483,9 +484,8 @@ std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() 
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
         // TODO: Switch JSON RPC to rapidjson.
-        return {std::move(data),
-            deserializeWithMerge(
-                nx::reflect::json::serialize(m_jsonRpcContext->request.params.value()))};
+        return {
+            std::move(data), deserializeWithMerge(m_jsonRpcContext->request.serializedParams())};
     }
     return {std::move(data), std::move(fields)};
 }

@@ -4,6 +4,8 @@
 
 #include <QtCore/QJsonArray>
 
+#include <nx/network/http/http_types.h>
+
 namespace nx::vms::rules {
 
 const QSet<QString>& HttpMethodField::allowedValues()

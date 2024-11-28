@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <network/system_helpers.h>
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
 namespace nx::vms::client::desktop {

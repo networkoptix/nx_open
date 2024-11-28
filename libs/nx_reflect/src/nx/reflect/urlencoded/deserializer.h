@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json/deserializer.h>
@@ -40,6 +38,7 @@ inline constexpr bool hasFromStringV = hasFromString<T>::value;
 namespace detail {
 
 NX_REFLECT_API std::tuple<std::string, DeserializationResult> decode(const std::string_view& str);
+NX_REFLECT_API std::string toLower(const std::string_view& value);
 
 /**
  * Cuts enclosing [], {} or () if present.
@@ -155,8 +154,7 @@ template<typename T>
 std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<std::is_same_v<T, bool>>* = nullptr)
 {
-    std::string strCopy(str);
-    boost::algorithm::to_lower(strCopy);
+    std::string strCopy{detail::toLower(str)};
     if (strCopy == "true")
         return {true, true};
     else if (strCopy == "false")

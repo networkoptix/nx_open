@@ -19,9 +19,6 @@
 
 #include "handler.h"
 #include "json.h"
-#include "params.h"
-#include "request.h"
-#include "response.h"
 
 namespace nx::network::rest {
 
@@ -46,6 +43,16 @@ auto front(Container&& c)
 
 NX_NETWORK_REST_API nx::reflect::ArrayOrder orderFromParams(const Params& params);
 NX_NETWORK_REST_API nx::reflect::Filter filterFromParams(const Params& params);
+
+NX_NETWORK_REST_API QByteArray responseContentBody(QJsonValue value,
+    Qn::SerializationFormat format,
+    const json::OpenApiSchemas* schemas,
+    const Request& request);
+
+NX_NETWORK_REST_API QByteArray responseContentBody(rapidjson::Document value,
+    Qn::SerializationFormat format,
+    const json::OpenApiSchemas* schemas,
+    const Request& request);
 
 template<typename T>
 void filter(T* data, const Params& params)
@@ -218,18 +225,18 @@ protected:
         {
             detail::filter(&data, filters);
             detail::orderBy(&data, filters);
-            auto json = json::serialize(data, std::move(filters), defaultValueAction);
-            if (NX_ASSERT(m_schemas))
-                m_schemas->postprocessResponse(request, &json);
-            response.content = {{contentType}, json::serialized(json, format)};
+            response.content = {{contentType},
+                detail::responseContentBody(
+                    json::serialize(
+                        std::forward<Data>(data), std::move(filters), defaultValueAction),
+                    format, m_schemas.get(), request)};
         }
         else
         {
-            auto json =
-                json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction);
-            if (NX_ASSERT(m_schemas))
-                m_schemas->postprocessResponse(request, &json);
-            response.content = {{contentType}, json::serialized(json, format)};
+            response.content = {{contentType},
+                detail::responseContentBody(
+                    json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction),
+                    format, m_schemas.get(), request)};
         }
         return response;
     }

@@ -6,6 +6,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/log/log.h>
 
+#include "audit.h"
+#include "open_api_schema.h"
+
 namespace nx::network::rest {
 
 void Handler::validateAndAmend(Request* request, http::HttpHeaders* headers)

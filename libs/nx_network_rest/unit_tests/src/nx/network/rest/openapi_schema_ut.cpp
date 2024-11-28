@@ -149,6 +149,17 @@ public:
         return json;
     }
 
+    void postprocessResponse(const Request& request, QJsonValue* json)
+    {
+        m_schemas->postprocessResponse(
+            request.method(), request.params(), request.decodedPath(), json);
+    }
+
+    void postprocessResponse(const Request& request, rapidjson::Document* json)
+    {
+        m_schemas->postprocessResponse(request.method(), request.decodedPath(), json);
+    }
+
     std::shared_ptr<OpenApiSchemas> m_schemas;
 
 private:
@@ -430,7 +441,7 @@ TEST_P(OpenApiSchemaTest, Postprocess)
     devices[0].attributes->cameraId = nx::Uuid::createUuid();
     QJsonValue json;
     QJson::serialize(devices, &json);
-    m_schemas->postprocessResponse(*restRequest({"GET /rest/{version}/devices HTTP/1.1"}), &json);
+    postprocessResponse(*restRequest({"GET /rest/{version}/devices HTTP/1.1"}), &json);
     ASSERT_TRUE(json.isArray());
     ASSERT_EQ(json.toArray().size(), 1);
     QJsonValue device = json.toArray()[0];
@@ -445,7 +456,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariant)
     ArrayOrdererTestResponse data{{{"key", {{{2}, {1}}}}}};
     QJsonValue json;
     QJson::serialize(data, &json);
-    m_schemas->postprocessResponse(
+    postprocessResponse(
         *restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"}), &json);
     ASSERT_TRUE(json.isObject());
     ASSERT_EQ(json.toObject().size(), 1);
@@ -472,7 +483,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariantNested)
         {{"key", {{{ArrayOrderedTestNested{"2"}}, {ArrayOrderedTestNested{"1"}}}}}}};
     QJsonValue json;
     QJson::serialize(data, &json);
-    m_schemas->postprocessResponse(
+    postprocessResponse(
         *restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"}), &json);
     ASSERT_TRUE(json.isObject());
     ASSERT_EQ(json.toObject().size(), 1);
@@ -503,7 +514,7 @@ TEST_P(OpenApiSchemaTest, EmptyOrderBy)
 {
     using namespace nx::utils::json;
     auto json = testJson();
-    m_schemas->postprocessResponse(
+    postprocessResponse(
         *restRequest({"GET /rest/{version}/test?_orderBy= HTTP/1.1"}), &json);
     ASSERT_EQ(asArray(json).size(), 2);
     EXPECT_EQ(getString(asObject(asArray(json)[0]), "name"), "4");
@@ -516,7 +527,7 @@ TEST_P(OpenApiSchemaTest, OrderByNameAndListName)
 {
     using namespace nx::utils::json;
     auto json = testJson();
-    m_schemas->postprocessResponse(
+    postprocessResponse(
         *restRequest({"GET /rest/{version}/test?_orderBy=name&_orderBy=list[].name HTTP/1.1"}), &json);
     ASSERT_EQ(asArray(json).size(), 2);
     EXPECT_EQ(getString(asObject(asArray(json)[0]), "name"), "3");

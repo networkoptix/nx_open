@@ -2,6 +2,8 @@
 
 #include "crud_handler.h"
 
+#include "open_api_schema.h"
+
 namespace nx::network::rest::detail {
 
 static auto popFront(QString hierarchicalName)
@@ -157,6 +159,29 @@ nx::reflect::ArrayOrder orderFromParams(const Params& params)
     for (auto v: orderByValues)
         fillOrder(v, &order.fields);
     return order;
+}
+
+QByteArray responseContentBody(QJsonValue value,
+    Qn::SerializationFormat format,
+    const json::OpenApiSchemas* schemas,
+    const Request& request)
+{
+    if (NX_ASSERT(schemas))
+    {
+        schemas->postprocessResponse(
+            request.method(), request.params(), request.decodedPath(), &value);
+    }
+    return json::serialized(value, format);
+}
+
+QByteArray responseContentBody(rapidjson::Document value,
+    Qn::SerializationFormat format,
+    const json::OpenApiSchemas* schemas,
+    const Request& request)
+{
+    if (NX_ASSERT(schemas))
+        schemas->postprocessResponse(request.method(), request.decodedPath(), &value);
+    return json::serialized(value, format);
 }
 
 } // namespace nx::network::rest::detail

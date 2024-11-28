@@ -17,12 +17,13 @@
 #include <nx/utils/url.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/media_server_data.h>
-#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/api/data/port_forwarding_configuration.h>
 
 namespace nx::network::http { class AsyncHttpClientPtr; }
 namespace nx::core::resource::edge { class EdgeServerStateTracker; }
+namespace nx::vms::api { struct ModuleInformation; }
+namespace nx::vms::api { struct ModuleInformationWithAddresses; }
 
 class NX_VMS_COMMON_API QnMediaServerResource:
     public QnResource,

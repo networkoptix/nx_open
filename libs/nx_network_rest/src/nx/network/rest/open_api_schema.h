@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <rapidjson/document.h>
+
 #include <QtCore/QJsonObject>
 
 #include <nx/network/http/http_types.h>
 
-#include "request.h"
+namespace nx::network::rest { class Params; }
+namespace nx::network::rest { struct Request; }
 
 namespace nx::network::rest::json {
 
@@ -21,10 +24,10 @@ public:
         const QJsonObject& path,
         const QJsonObject& method,
         const Params& params,
-        QJsonValue* response);
+        QJsonValue* response) const;
 
     void postprocessResponse(
-        const QJsonObject& path, const QJsonObject& method, rapidjson::Value* response);
+        const QJsonObject& path, const QJsonObject& method, rapidjson::Value* response) const;
 
     void validateOrThrow(const QJsonObject& path,
         const QJsonObject& method,
@@ -64,28 +67,18 @@ public:
         const nx::network::http::Method& method,
         const Params& params,
         const QString& decodedPath,
-        QJsonValue* response);
-
-    void postprocessResponse(const Request& request, QJsonValue* response)
-    {
-        postprocessResponse(request.method(), request.params(), request.decodedPath(), response);
-    }
+        QJsonValue* response) const;
 
     void postprocessResponse(
         const nx::network::http::Method& method,
         const QString& decodedPath,
-        rapidjson::Value* response);
-
-    void postprocessResponse(const Request& request, rapidjson::Value* response)
-    {
-        postprocessResponse(request.method(), request.decodedPath(), response);
-    }
+        rapidjson::Value* response) const;
 
 private:
     std::tuple<std::shared_ptr<OpenApiSchema>, QJsonObject, QJsonObject> findSchema(
         const QString& requestPath,
         const nx::network::http::Method& method,
-        bool throwIfNotFound = false);
+        bool throwIfNotFound = false) const;
 
 private:
     std::vector<std::shared_ptr<OpenApiSchema>> m_schemas;

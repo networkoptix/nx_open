@@ -66,6 +66,9 @@ struct NX_JSON_RPC_API Request
         }
         return result;
     }
+
+    // TODO: Switch to nx_reflect and remove.
+    std::string serializedParams() const;
 };
 #define JsonRpcRequest_Fields (jsonrpc)(method)(params)(id)
 QN_FUSION_DECLARE_FUNCTIONS(Request, (json), NX_JSON_RPC_API)

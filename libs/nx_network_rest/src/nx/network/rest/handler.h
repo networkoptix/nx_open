@@ -2,14 +2,12 @@
 
 #pragma once
 
+#include <nx/json_rpc/messages.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/auth/global_permission.h>
 #include <nx/utils/exception.h>
 #include <nx/utils/scope_guard.h>
 
-#include "audit.h"
-#include "open_api_schema.h"
-#include "params.h"
 #include "path_router.h"
 #include "request.h"
 #include "response.h"
@@ -17,6 +15,10 @@
 namespace nx::network { class AbstractStreamSocket; }
 
 namespace nx::network::rest {
+
+namespace audit { class Manager; }
+namespace audit { struct Record; }
+namespace json { class OpenApiSchemas; }
 
 using DeviceIdRetriever = std::function<QString(const nx::network::http::Request&)>;
 

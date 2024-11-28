@@ -5,8 +5,6 @@
 #include <optional>
 
 #include "handler.h"
-#include "open_api_schema.h"
-#include "path_router.h"
 #include "user_access_data.h"
 
 namespace nx::network::rest {

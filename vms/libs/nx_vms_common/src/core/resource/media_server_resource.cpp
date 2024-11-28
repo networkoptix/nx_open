@@ -26,6 +26,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/system_context.h>

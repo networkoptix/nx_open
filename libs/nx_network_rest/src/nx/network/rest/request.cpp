@@ -8,7 +8,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/serialization/qjson.h>
 
-#include "nx_network_rest_ini.h"
+#include "audit.h"
 
 namespace nx::network::rest {
 

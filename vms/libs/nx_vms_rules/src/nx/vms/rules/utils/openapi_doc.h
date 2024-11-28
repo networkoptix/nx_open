@@ -8,7 +8,7 @@
 
 #include <QtCore/QJsonObject>
 
-#include <nx/network/rest/handler_pool.h>
+#include <nx/utils/lockable.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/utils/api_renamer.h>
 

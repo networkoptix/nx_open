@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/rest/handler.h>
 #include <nx/network/rest/handler_pool.h>
 
 namespace nx::network::rest::test {

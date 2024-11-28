@@ -9,8 +9,7 @@
 #include <nx/utils/json.h>
 
 #include "array_orderer.h"
-#include "exception.h"
-#include "params.h"
+#include "request.h"
 
 namespace nx::network::rest::json {
 
@@ -574,7 +573,10 @@ void removeUnused(const std::vector<QString>& unused, QJsonValue* from)
 } // anonymous namespace
 
 void OpenApiSchema::postprocessResponse(
-    const QJsonObject& path, const QJsonObject& method, const Params& params, QJsonValue* response)
+    const QJsonObject& path,
+    const QJsonObject& method,
+    const Params& params,
+    QJsonValue* response) const
 {
     if (path.isEmpty() || method.isEmpty())
         return;
@@ -591,7 +593,7 @@ void OpenApiSchema::postprocessResponse(
 }
 
 void OpenApiSchema::postprocessResponse(
-    const QJsonObject& path, const QJsonObject& method, rapidjson::Value* response)
+    const QJsonObject& path, const QJsonObject& method, rapidjson::Value* response) const
 {
     if (path.isEmpty() || method.isEmpty())
         return;
@@ -955,7 +957,7 @@ void OpenApiSchemas::postprocessResponse(
     const nx::network::http::Method& method,
     const Params& params,
     const QString& decodedPath,
-    QJsonValue* response)
+    QJsonValue* response) const
 {
     if (!NX_ASSERT(!decodedPath.isEmpty()))
         return;
@@ -968,7 +970,7 @@ void OpenApiSchemas::postprocessResponse(
 void OpenApiSchemas::postprocessResponse(
     const nx::network::http::Method& method,
     const QString& decodedPath,
-    rapidjson::Value* response)
+    rapidjson::Value* response) const
 {
     if (!NX_ASSERT(!decodedPath.isEmpty()))
         return;
@@ -979,7 +981,7 @@ void OpenApiSchemas::postprocessResponse(
 }
 
 std::tuple<std::shared_ptr<OpenApiSchema>, QJsonObject, QJsonObject> OpenApiSchemas::findSchema(
-    const QString& requestPath, const nx::network::http::Method& method_, bool throwIfNotFound)
+    const QString& requestPath, const nx::network::http::Method& method_, bool throwIfNotFound) const
 {
     const QString schemaMethod = QString::fromStdString(method_.toString()).toLower();
     for (std::size_t version = 0; version < m_schemas.size(); ++version)
