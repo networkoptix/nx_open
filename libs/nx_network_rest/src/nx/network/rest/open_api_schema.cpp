@@ -46,10 +46,7 @@ void merge(QJsonObject* to, QJsonObject from)
 class Postprocessor
 {
 public:
-    Postprocessor(const QString& pathPrefix, nx::network::rest::json::ArrayOrderer&& orderer):
-        m_pathPrefix(pathPrefix), m_orderer(std::move(orderer))
-    {
-    }
+    Postprocessor(ArrayOrderer&& orderer): m_orderer(std::move(orderer)) {}
 
     bool operator()(QJsonValue* origin, const QJsonObject& schema)
     {
@@ -67,13 +64,13 @@ public:
             if (oneOf == schema.end())
                 return false;
 
-            for (auto item: asArray(oneOf.value(), pathString(schema)))
+            for (auto item: asArray(oneOf.value()))
             {
-                const auto itemSchema = asObject(item, pathString(schema));
+                const auto itemSchema = asObject(item);
                 if (itemSchema.isEmpty())
                     continue;
 
-                const auto itemType = optString(itemSchema, "type", pathString(itemSchema));
+                const auto itemType = optString(itemSchema, "type");
                 //Do not process oneOf objects as fields can be erased mistakenly.
                 if (originType == QJsonValue::Object && itemType == "object")
                     return false;
@@ -86,26 +83,26 @@ public:
             }
 
             NX_ASSERT(false, "No %1 in oneOf %2",
-                originType == QJsonValue::Array ? "array" : "object", pathString(schema));
+                originType == QJsonValue::Array ? "array" : "object");
             return false;
         }
 
         if (originType == QJsonValue::Array)
         {
-            if (!NX_ASSERT(type->toString() == "array", pathString(schema)))
+            if (!NX_ASSERT(type->toString() == "array"))
                 return false;
 
             const auto items = schema.find("items");
-            if (!NX_ASSERT(items != schema.end(), pathString(schema)))
+            if (!NX_ASSERT(items != schema.end()))
                 return false;
             return postprocessArray(origin, items->toObject());
         }
         else
         {
-            if (!NX_ASSERT(type->toString() == "object", pathString(schema)))
+            if (!NX_ASSERT(type->toString() == "object"))
                 return false;
 
-            if (const auto additionalSchema = optObject(schema, "additionalProperties", pathString(schema));
+            if (const auto additionalSchema = optObject(schema, "additionalProperties");
                 !additionalSchema.isEmpty())
             {
                 bool postprocessed = false;
@@ -113,8 +110,7 @@ public:
                 for (auto field = originObject.begin(); field != originObject.end(); ++field)
                 {
                     const QString fieldName = field->isArray() ? "*[]" : "*";
-                    const FieldScope scope1(fieldName, this);
-                    const ArrayOrderer::FieldScope scope2(fieldName, &m_orderer);
+                    const ArrayOrderer::FieldScope scope(fieldName, &m_orderer);
                     QJsonValue value = field.value();
                     if ((*this)(&value, additionalSchema))
                     {
@@ -131,38 +127,13 @@ public:
             if (properties == schema.end())
                 return false;
             const auto& propertiesObject = properties->toObject();
-            if (!NX_ASSERT(!propertiesObject.isEmpty(), pathString(schema)))
+            if (!NX_ASSERT(!propertiesObject.isEmpty()))
                 return false;
             return postprocessObject(origin, propertiesObject);
         }
     }
 
 private:
-    struct FieldScope
-    {
-        FieldScope(const QString& name, Postprocessor* p): parent(p) { p->beginField(name); }
-        ~FieldScope() { parent->endField(); }
-
-        Postprocessor* parent;
-    };
-
-    struct ArrayItemScope
-    {
-        ArrayItemScope(size_t index, Postprocessor* p): parent(p) { p->beginItem(index); }
-        ~ArrayItemScope() { parent->endItem(); }
-
-        Postprocessor* parent;
-    };
-
-    void beginItem(size_t index) { m_path.push_back(QString::number(index)); }
-    void endItem() { m_path.pop_back(); }
-    void beginField(const QString& name) { m_path.push_back(name); }
-    void endField() { m_path.pop_back(); }
-    QString pathString(const QJsonObject& schema) const
-    {
-        return NX_FMT("%1 %2 %3", m_pathPrefix, containerString(m_path), QJson::serialized(schema));
-    }
-
     bool postprocessArray(QJsonValue* origin, const QJsonObject& items)
     {
         bool postprocessed = false;
@@ -170,7 +141,6 @@ private:
         QJsonArray originArray = origin->toArray();
         for (QJsonValue value: originArray)
         {
-            const ArrayItemScope scope(output.size(), this);
             if ((*this)(&value, items))
                 postprocessed = true;
             output.append(value);
@@ -198,8 +168,7 @@ private:
         for (auto field = originObject.begin(); field != originObject.end();)
         {
             const QString fieldName = field->isArray() ? (field.key() + "[]") : field.key();
-            const FieldScope scope1(fieldName, this);
-            const nx::network::rest::json::ArrayOrderer::FieldScope scope2(fieldName, &m_orderer);
+            const ArrayOrderer::FieldScope scope(fieldName, &m_orderer);
             if (const auto property = properties.find(field.key()); property != properties.end())
             {
                 QJsonValue value = field.value();
@@ -222,16 +191,12 @@ private:
     }
 
 private:
-    const QString m_pathPrefix;
-    std::deque<QString> m_path;
     nx::network::rest::json::ArrayOrderer m_orderer;
 };
 
 class PostprocessorV4
 {
 public:
-    PostprocessorV4(const QString& pathPrefix): m_pathPrefix(pathPrefix) {}
-
     bool operator()(rapidjson::Value* origin, const QJsonObject& schema)
     {
         if (schema.isEmpty())
@@ -248,13 +213,13 @@ public:
             if (oneOf == schema.end())
                 return false;
 
-            for (auto item: asArray(oneOf.value(), pathString(schema)))
+            for (auto item: asArray(oneOf.value()))
             {
-                const auto itemSchema = asObject(item, pathString(schema));
+                const auto itemSchema = asObject(item);
                 if (itemSchema.isEmpty())
                     continue;
 
-                const auto itemType = optString(itemSchema, "type", pathString(itemSchema));
+                const auto itemType = optString(itemSchema, "type");
                 //Do not process oneOf objects as fields can be erased mistakenly.
                 if (originType == rapidjson::kObjectType && itemType == "object")
                     return false;
@@ -267,33 +232,32 @@ public:
             }
 
             NX_ASSERT(false, "No %1 in oneOf %2",
-                originType == rapidjson::kArrayType ? "array" : "object", pathString(schema));
+                originType == rapidjson::kArrayType ? "array" : "object");
             return false;
         }
 
         if (originType == rapidjson::kArrayType)
         {
-            if (!NX_ASSERT(type->toString() == "array", pathString(schema)))
+            if (!NX_ASSERT(type->toString() == "array"))
                 return false;
 
             const auto items = schema.find("items");
-            if (!NX_ASSERT(items != schema.end(), pathString(schema)))
+            if (!NX_ASSERT(items != schema.end()))
                 return false;
             return postprocessArray(origin, items->toObject());
         }
         else
         {
-            if (!NX_ASSERT(type->toString() == "object", pathString(schema)))
+            if (!NX_ASSERT(type->toString() == "object"))
                 return false;
 
-            if (const auto additionalSchema = optObject(schema, "additionalProperties", pathString(schema));
+            if (const auto additionalSchema = optObject(schema, "additionalProperties");
                 !additionalSchema.isEmpty())
             {
                 bool postprocessed = false;
                 for (auto it = origin->MemberBegin(); it != origin->MemberEnd(); ++it)
                 {
                     const QString fieldName = it->value.IsArray() ? "*[]" : "*";
-                    const FieldScope scope(fieldName, this);
                     if ((*this)(&it->value, additionalSchema))
                         postprocessed = true;
                 }
@@ -304,44 +268,18 @@ public:
             if (properties == schema.end())
                 return false;
             const auto& propertiesObject = properties->toObject();
-            if (!NX_ASSERT(!propertiesObject.isEmpty(), pathString(schema)))
+            if (!NX_ASSERT(!propertiesObject.isEmpty()))
                 return false;
             return postprocessObject(origin, propertiesObject);
         }
     }
 
 private:
-    struct FieldScope
-    {
-        FieldScope(const QString& name, PostprocessorV4* p): parent(p) { p->beginField(name); }
-        ~FieldScope() { parent->endField(); }
-
-        PostprocessorV4* parent;
-    };
-
-    struct ArrayItemScope
-    {
-        ArrayItemScope(size_t index, PostprocessorV4* p): parent(p) { p->beginItem(index); }
-        ~ArrayItemScope() { parent->endItem(); }
-
-        PostprocessorV4* parent;
-    };
-
-    void beginItem(size_t index) { m_path.push_back(QString::number(index)); }
-    void endItem() { m_path.pop_back(); }
-    void beginField(const QString& name) { m_path.push_back(name); }
-    void endField() { m_path.pop_back(); }
-    QString pathString(const QJsonObject& schema) const
-    {
-        return NX_FMT("%1 %2 %3", m_pathPrefix, containerString(m_path), QJson::serialized(schema));
-    }
-
     bool postprocessArray(rapidjson::Value* origin, const QJsonObject& items)
     {
         bool postprocessed = false;
         for (rapidjson::SizeType i = 0; i < origin->Size(); ++i)
         {
-            const ArrayItemScope scope(i, this);
             if ((*this)(&(*origin)[i], items))
                 postprocessed = true;
         }
@@ -354,7 +292,6 @@ private:
         for (auto it = origin->MemberBegin(); it != origin->MemberEnd();)
         {
             const QString fieldName{it->name.GetString()};
-            const FieldScope scope(fieldName + (it->value.IsArray() ? "[]" : ""), this);
             if (const auto property = properties.find(fieldName); property != properties.end())
             {
                 if ((*this)(&it->value, property->toObject()))
@@ -369,10 +306,6 @@ private:
         }
         return postprocessed;
     }
-
-private:
-    const QString m_pathPrefix;
-    std::deque<QString> m_path;
 };
 
 void validateParameters(const QJsonObject& schema,
@@ -640,22 +573,8 @@ void removeUnused(const std::vector<QString>& unused, QJsonValue* from)
 
 } // anonymous namespace
 
-void OpenApiSchema::postprocessResponse(const Request& request, QJsonValue* response)
-{
-    if (response->isNull())
-        return;
-
-    const auto schemaMethod = QString::fromStdString(request.method().toString()).toLower();
-    const auto [path, method] = getJsonPathAndMethod(schemaMethod, request.decodedPath());
-    postprocessResponse(path, method, request.params(), schemaMethod, response);
-}
-
 void OpenApiSchema::postprocessResponse(
-    const QJsonObject& path,
-    const QJsonObject& method,
-    const Params& params,
-    const QString& decodedPath,
-    QJsonValue* response)
+    const QJsonObject& path, const QJsonObject& method, const Params& params, QJsonValue* response)
 {
     if (path.isEmpty() || method.isEmpty())
         return;
@@ -667,25 +586,12 @@ void OpenApiSchema::postprocessResponse(
 
     auto orderByValues = params.values("_orderBy");
     orderByValues.removeAll(QString());
-    Postprocessor(decodedPath, {orderByValues})(
+    Postprocessor{{orderByValues}}(
         response, getObject(getObject(content, "application/json"), "schema"));
 }
 
-void OpenApiSchema::postprocessResponse(const Request& request, rapidjson::Value* response)
-{
-    if (response->IsNull())
-        return;
-
-    const auto schemaMethod = QString::fromStdString(request.method().toString()).toLower();
-    const auto [path, method] = getJsonPathAndMethod(schemaMethod, request.decodedPath());
-    postprocessResponse(path, method, schemaMethod, response);
-}
-
 void OpenApiSchema::postprocessResponse(
-    const QJsonObject& path,
-    const QJsonObject& method,
-    const QString& decodedPath,
-    rapidjson::Value* response)
+    const QJsonObject& path, const QJsonObject& method, rapidjson::Value* response)
 {
     if (path.isEmpty() || method.isEmpty())
         return;
@@ -695,16 +601,7 @@ void OpenApiSchema::postprocessResponse(
     if (content.isEmpty())
         return;
 
-    PostprocessorV4{decodedPath}(
-        response, getObject(getObject(content, "application/json"), "schema"));
-}
-
-void OpenApiSchema::validateOrThrow(Request* request, http::HttpHeaders* headers)
-{
-    NX_CRITICAL(request);
-    const auto [path, method] = getJsonPathAndMethod(
-        QString::fromStdString(request->method().toString()).toLower(), request->decodedPath());
-    validateOrThrow(path, method, request, headers);
+    PostprocessorV4{}(response, getObject(getObject(content, "application/json"), "schema"));
 }
 
 void OpenApiSchema::validateOrThrow(const QJsonObject& path,
@@ -1065,7 +962,7 @@ void OpenApiSchemas::postprocessResponse(
 
     auto [schema, path, method_] = findSchema(decodedPath, method);
     if (schema)
-        schema->postprocessResponse(path, method_, params, decodedPath, response);
+        schema->postprocessResponse(path, method_, params, response);
 }
 
 void OpenApiSchemas::postprocessResponse(
@@ -1078,7 +975,7 @@ void OpenApiSchemas::postprocessResponse(
 
     auto [schema, path, method_] = findSchema(decodedPath, method);
     if (schema)
-        schema->postprocessResponse(path, method_, decodedPath, response);
+        schema->postprocessResponse(path, method_, response);
 }
 
 std::tuple<std::shared_ptr<OpenApiSchema>, QJsonObject, QJsonObject> OpenApiSchemas::findSchema(

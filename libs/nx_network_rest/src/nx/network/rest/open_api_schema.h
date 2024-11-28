@@ -17,22 +17,15 @@ class NX_NETWORK_REST_API OpenApiSchema
 {
 public:
     OpenApiSchema(QJsonObject schema): m_schema(std::move(schema)) { denormalize(&m_schema); }
-    void postprocessResponse(const Request& request, QJsonValue* response);
     void postprocessResponse(
         const QJsonObject& path,
         const QJsonObject& method,
         const Params& params,
-        const QString& decodedPath,
         QJsonValue* response);
 
-    void postprocessResponse(const Request& request, rapidjson::Value* response);
     void postprocessResponse(
-        const QJsonObject& path,
-        const QJsonObject& method,
-        const QString& decodedPath,
-        rapidjson::Value* response);
+        const QJsonObject& path, const QJsonObject& method, rapidjson::Value* response);
 
-    void validateOrThrow(Request* request, nx::network::http::HttpHeaders* = nullptr);
     void validateOrThrow(const QJsonObject& path,
         const QJsonObject& method,
         Request* request,
