@@ -931,8 +931,10 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
 {
     switch (QnNotificationLevel::valueOf(action))
     {
-        case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
+            return "20x20/Outline/error.svg";
+
+        case QnNotificationLevel::Value::ImportantNotification:
             return "20x20/Outline/warning.svg";
 
         case QnNotificationLevel::Value::SuccessNotification:

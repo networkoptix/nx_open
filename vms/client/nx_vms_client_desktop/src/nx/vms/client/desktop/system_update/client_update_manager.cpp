@@ -394,7 +394,7 @@ void ClientUpdateManager::Private::showErrorNotification(const QString& message)
     }
 
     notificationsManager->setLevel(errorNotificationId, QnNotificationLevel::Value::CriticalNotification);
-    notificationsManager->setIconPath(errorNotificationId, "20x20/Outline/warning.svg");
+    notificationsManager->setIconPath(errorNotificationId, "20x20/Outline/error.svg");
 }
 
 void ClientUpdateManager::Private::hideErrorNotification()

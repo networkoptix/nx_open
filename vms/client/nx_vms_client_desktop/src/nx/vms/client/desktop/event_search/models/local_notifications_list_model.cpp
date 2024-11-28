@@ -27,8 +27,10 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
         case QnNotificationLevel::Value::SuccessNotification:
             return "20x20/Outline/success.svg";
 
-        case QnNotificationLevel::Value::ImportantNotification:
         case QnNotificationLevel::Value::CriticalNotification:
+            return "20x20/Outline/error.svg";
+
+        case QnNotificationLevel::Value::ImportantNotification:
             return "20x20/Outline/warning.svg";
 
         default:
@@ -39,7 +41,7 @@ QString levelDecorationPath(QnNotificationLevel::Value level)
 QString progressDecorationPath(ProgressState progress)
 {
     if (progress.isFailed())
-        return "20x20/Outline/warning.svg";
+        return "20x20/Outline/error.svg";
 
     if (progress.isCompleted())
         return "20x20/Outline/success.svg";
