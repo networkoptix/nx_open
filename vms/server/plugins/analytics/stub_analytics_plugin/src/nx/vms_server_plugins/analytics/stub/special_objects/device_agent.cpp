@@ -131,6 +131,8 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 
     m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
     m_deviceAgentSettings.generatePoint = toBool(settingValue(kGeneratePointSetting));
+    m_deviceAgentSettings.generateEmptyNameObject =
+        toBool(settingValue(kGenerateEmptyNameObjectSetting));
 
     assignNumericSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);
@@ -342,10 +344,11 @@ void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPac
 
 void DeviceAgent::addPointIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
 {
+    // The object is moving diagonally, from the left top corner to the right bottom corner.
     static float realXOffset = 0.0F;
     static float realYOffset = 0.0F;
     constexpr float kOffsetInc = 0.005F;
-    
+
     if (!m_deviceAgentSettings.generatePoint)
         return;
 
@@ -356,11 +359,11 @@ void DeviceAgent::addPointIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacke
 
     realXOffset = clamp(realXOffset + kOffsetInc, 0.0F, 1.0F);
     if (realXOffset >= 1.0F - kOffsetInc)
-        realXOffset = 0;    
+        realXOffset = 0;
 
     realYOffset = clamp(realYOffset + kOffsetInc, 0.0F, 1.0F);
     if (realYOffset >= 1.0F - kOffsetInc)
-        realYOffset = 0;    
+        realYOffset = 0;
 
     // The size does not matter.
     const float realWidth = 0.0F;
@@ -372,6 +375,36 @@ void DeviceAgent::addPointIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacke
         "nx.sys.showAsPoint",
         "true"));
 
+    objectMetadataPacket->addItem(objectMetadata.get());
+}
+
+void DeviceAgent::addEmptyNameObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
+{
+    // The object is moving diagonally, from the left bottom corner to the right top corner.
+    static float realXOffset = 0.0F;
+    static float realYOffset = 0.9F;
+    constexpr float kOffsetInc = 0.005F;
+
+    if (!m_deviceAgentSettings.generateEmptyNameObject)
+        return;
+
+    auto objectMetadata = makePtr<ObjectMetadata>();
+    static const Uuid trackId = UuidHelper::randomUuid();
+    objectMetadata->setTypeId(kEmptyNameObjectType);
+    objectMetadata->setTrackId(trackId);
+
+    realXOffset = clamp(realXOffset + kOffsetInc, 0.0F, 1.0F);
+    if (realXOffset >= 1.0F - kOffsetInc)
+        realXOffset = 0;
+
+    realYOffset = clamp(realYOffset - kOffsetInc, 0.0F, 1.0F);
+    if (realYOffset <= kOffsetInc)
+        realYOffset = 0.9F;
+
+    const float realWidth = 0.1F;
+    const float realHeight = 0.1F;
+
+    objectMetadata->setBoundingBox(Rect(realXOffset, realYOffset, realWidth, realHeight));
     objectMetadataPacket->addItem(objectMetadata.get());
 }
 
@@ -397,6 +430,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     addFixedObjectIfNeeded(objectMetadataPacket);
     addCounterIfNeeded(objectMetadataPacket);
     addPointIfNeeded(objectMetadataPacket);
+    addEmptyNameObjectIfNeeded(objectMetadataPacket);
 
     const microseconds delay(m_lastVideoFrameTimestampUs - metadataTimestampUs);
 

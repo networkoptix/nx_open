@@ -84,6 +84,10 @@ std::string Engine::manifestString() const
                         "type": "Boolean"
                     }
                 ]
+            },
+            {
+                "id": ")json" + kEmptyNameObjectType + R"json(",
+                "name": ""
             }
         ]
     },

@@ -33,12 +33,13 @@ public:
         for (const auto& entity: entityList)
         {
             const auto fieldValue = fieldValueGetter(entity);
-            if (fieldValue.isEmpty() && !m_isEmptyFieldDetected)
+            if (fieldValue.isEmpty() && !m_isEmptyFieldDetected
+                && m_manifestErrorTypes.emptyField != ManifestErrorType::noError)
             {
                 inOutErrorList->emplace_back(m_manifestErrorTypes.emptyField);
                 m_isEmptyFieldDetected = true;
             }
-            else
+            else if (!fieldValue.isEmpty())
             {
                 const bool isDuplicate =
                     m_processedFields.find(fieldValue) != m_processedFields.cend();
@@ -164,7 +165,7 @@ std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManife
         deviceAgentManifest.objectTypes,
         {
             ManifestErrorType::emptyObjectTypeId,
-            ManifestErrorType::emptyObjectTypeName,
+            ManifestErrorType::noError, //< Empty Object Type names are allowed.
             ManifestErrorType::duplicatedObjectTypeId,
             ManifestErrorType::duplicatedObjectTypeName,
             "Object Type"

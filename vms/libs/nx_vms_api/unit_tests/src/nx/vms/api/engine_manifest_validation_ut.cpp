@@ -185,13 +185,6 @@ TEST_F(EngineManifestValidationTest, manifestWithDuplicatedObjectTypeIdsProduces
     makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectTypeId});
 }
 
-TEST_F(EngineManifestValidationTest, manifestWithEmptyObjectTypeNamesProducesAnError)
-{
-    givenManifestWithEmptyObjectTypeNames();
-    whenValidatingManifest();
-    makeSureErrorsAreCaught({ManifestErrorType::emptyObjectTypeName});
-}
-
 TEST_F(EngineManifestValidationTest, manifestWithDuplicatedObjectTypeNamesProducesAnError)
 {
     givenManifestWithDuplicatedObjectTypeNames();

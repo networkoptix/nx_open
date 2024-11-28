@@ -28,6 +28,7 @@ const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
 const std::string kFixedObjectType = "nx.stub.fixedObject";
 const std::string kPointObjectType = "nx.stub.pointObject";
 const std::string kCounterObjectType = "nx.stub.counter";
+const std::string kEmptyNameObjectType = "nx.stub.emptyNameObject";
 
 class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
 {
@@ -70,6 +71,9 @@ private:
     void addPointIfNeeded(
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
+    void addEmptyNameObjectIfNeeded(
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
+
     void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
 
     void processCustomMetadataPacket(
@@ -104,6 +108,7 @@ private:
 
         std::atomic<bool> generateCounter{false};
         std::atomic<bool> generatePoint{false};
+        std::atomic<bool> generateEmptyNameObject{false};
 
         std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{
             std::chrono::milliseconds::zero()};

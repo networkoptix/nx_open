@@ -84,11 +84,6 @@ protected:
         makeIncorrectManifest(&m_manifest.objectTypes, [](auto entry) { entry->id = "name"; });
     }
 
-    void givenManifestWithEmptyObjectTypeNames()
-    {
-        makeIncorrectManifest(&m_manifest.objectTypes, [](auto entry) { entry->name.clear(); });
-    }
-
     void givenManifestWithDuplicatedObjectTypeNames()
     {
         makeIncorrectManifest(&m_manifest.objectTypes, [](auto entry) { entry->name = "name"; });
@@ -209,13 +204,6 @@ TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedObjectTypeIdsPro
     givenManifestWithDuplicatedObjectTypeIds();
     whenValidatingManifest();
     makeSureErrorsAreCaught({ManifestErrorType::duplicatedObjectTypeId});
-}
-
-TEST_F(DeviceAgentManifestValidationTest, manifestWithEmptyObjectTypeNamesProducesAnError)
-{
-    givenManifestWithEmptyObjectTypeNames();
-    whenValidatingManifest();
-    makeSureErrorsAreCaught({ManifestErrorType::emptyObjectTypeName});
 }
 
 TEST_F(DeviceAgentManifestValidationTest, manifestWithDuplicatedObjectTypeNamesProducesAnError)

@@ -20,6 +20,7 @@ const std::string kCounterXOffsetSetting{"counterXOffset"};
 const std::string kCounterYOffsetSetting{"counterYOffset"};
 
 const std::string kGeneratePointSetting{"generatePoint"};
+const std::string kGenerateEmptyNameObjectSetting{"generateEmptyNameObject"};
 
 const std::string kBlinkingObjectPeriodMsSetting{"blinkingObjectPeriodMs"};
 const std::string kBlinkingObjectInDedicatedPacketSetting{"blinkingObjectInDedicatedPacket"};
@@ -97,6 +98,13 @@ static const std::string kSettingsModel = /*suppress newline*/ 1 + R"json(
                             "name": ")json" + kGeneratePointSetting + R"json(",
                             "caption": "Generate point",
                             "description": "Generates a point-like object with showAsPoint=true",
+                            "defaultValue": false
+                        },
+                        {
+                            "type": "CheckBox",
+                            "name": ")json" + kGenerateEmptyNameObjectSetting + R"json(",
+                            "caption": "Generate empty-name object",
+                            "description": "Generates an object with an empty Object Type Name",
                             "defaultValue": false
                         },
                         {

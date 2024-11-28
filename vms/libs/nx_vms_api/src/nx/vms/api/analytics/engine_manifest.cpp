@@ -29,12 +29,13 @@ void validateListByField(
     for (const auto& entry: list)
     {
         const auto fieldValue = fieldValueGetter(entry);
-        if (fieldValue.isEmpty() && !isEmptyFieldDetected)
+        if (fieldValue.isEmpty() && !isEmptyFieldDetected
+            && entryFieldErrorTypes.emptyField != ManifestErrorType::noError)
         {
             outErrorList->emplace_back(entryFieldErrorTypes.emptyField, QString());
             isEmptyFieldDetected = true;
         }
-        else
+        else if (!fieldValue.isEmpty())
         {
             const bool isDuplicate = processedFields.find(fieldValue) != processedFields.cend();
             const bool isDuplicateAlreadyProcessed =
@@ -141,7 +142,7 @@ std::vector<ManifestError> validate(const EngineManifest& manifest)
         manifest.objectTypes,
         {
             ManifestErrorType::emptyObjectTypeId,
-            ManifestErrorType::emptyObjectTypeName,
+            ManifestErrorType::noError, //< Empty Object Type names are allowed.
             ManifestErrorType::duplicatedObjectTypeId,
             ManifestErrorType::duplicatedObjectTypeName,
             "Object Type"

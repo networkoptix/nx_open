@@ -159,7 +159,8 @@ This JSON object describes an Object type. It has the following fields:
     Full name of the Object type, in English. Will be shown to the user. May look like
     `"Human face"`.
 
-    Mandatory.
+    Optional. An empty name means there will be no label for the object rectangle, and such objects
+    will not be easily available for search.
 
 - `"provider"`: String
 

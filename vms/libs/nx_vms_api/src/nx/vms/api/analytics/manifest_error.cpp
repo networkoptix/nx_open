@@ -36,8 +36,6 @@ QString toString(ManifestErrorType errorType)
             return "Multiple Event Types have the same name";
         case ManifestErrorType::emptyObjectTypeId:
             return "Object Type id is empty";
-        case ManifestErrorType::emptyObjectTypeName:
-            return "Object Type name is empty";
         case ManifestErrorType::duplicatedObjectTypeId:
             return "Multiple Object Types have the same id";
         case ManifestErrorType::duplicatedObjectTypeName:
@@ -54,14 +52,14 @@ QString toString(ManifestErrorType errorType)
             return "DeviceAgent settings model is defined but is not a correct JSON object";
         case ManifestErrorType::uncompressedFramePixelFormatIsNotSpecified:
         {
-            return "Uncompressed video stream is requested by the Integration but its pixel format is "
-                "not specified";
+            return "Uncompressed video stream is requested by the Integration, "
+                "but its pixel format is not specified";
         }
         case ManifestErrorType::excessiveUncompressedFramePixelFormatSpecification:
             return "Pixel format is specified but uncompressed video stream is not requested";
         default:
             NX_ASSERT(false);
-            return QString();
+            return "Internal error while processing the manifest";
     }
 }
 

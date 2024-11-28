@@ -28,7 +28,7 @@ NX_REFLECTION_ENUM_CLASS(ManifestErrorType,
     duplicatedEventTypeName = 1 << 12,
 
     emptyObjectTypeId = 1 << 13,
-    emptyObjectTypeName = 1 << 14,
+    obsolete_emptyObjectTypeName = 1 << 14, //< No longer used; kept for backward compatibility.
     duplicatedObjectTypeId = 1 << 15,
     duplicatedObjectTypeName = 1 << 16,
 
