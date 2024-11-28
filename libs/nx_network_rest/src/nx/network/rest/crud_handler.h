@@ -74,6 +74,15 @@ constexpr bool StaticAssertAll()
 template <auto FunctionPtr, size_t I>
 using FunctionArgumentType = typename nx::utils::FunctionTraits<FunctionPtr>::template ArgumentType<I>;
 
+template<typename List>
+constexpr bool isStdArrayOfSingleElement(const List&)
+{
+    if constexpr (!nx::utils::Is<std::array, List>())
+        return false;
+    else
+        return std::tuple_size_v<List> == 1;
+}
+
 } // namespace detail
 
 enum class CrudFeature
@@ -437,6 +446,16 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
             for (auto& model: list)
                 d->fillMissingParamsForResponse(&model, request);
         }
+
+        // As of this writing `std::array<X, 1>` return type for `CrudHandler::read` implementation
+        // is an ad hoc to allow returning a single element or to not unwrap an array that might
+        // contain a single element but still has to be serialized as an array.
+        if constexpr (detail::isStdArrayOfSingleElement(list))
+        {
+            return response(detail::front(std::move(list)),
+                request, std::move(responseAttributes), std::move(params), defaultValueAction);
+        }
+
         if (const auto id = idParam(request);
             (id.value && id.isInPath) || m_idParamName.isEmpty())
         {
