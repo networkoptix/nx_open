@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Ustawienia kafelków</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Ustawienia tabeli</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Integracje umożliwiają bezproblemowe wykorzystanie analizy wideo na różnych urządzeniach z poziomu systemu VMS.
+Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translation>
     </message>
   </context>
   <context>
@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Wklej</translation>
     </message>
   </context>
   <context>
@@ -410,7 +410,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Udostępnione przez link</translation>
     </message>
   </context>
   <context>
@@ -624,7 +624,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>skopiowane</translation>
     </message>
   </context>
   <context>
@@ -705,24 +705,24 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Wybierz typ</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Usunięcie atrybutów spowoduje usunięcie wszystkich powiązanych danych</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Usunięcie listy spowoduje usunięcie wszystkich znajdujących się na niej danych.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Usunąć listę?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
       <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+        <numerusform>Ta lista jest powiązana z %n Reguły Wydarzenia. Czy na pewno chcesz ją usunąć?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
@@ -733,7 +733,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Zdarzenie analityczne</translation>
     </message>
   </context>
   <context>
@@ -751,15 +751,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Eksportuj listy</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Eksportowanie</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Otwórz folder plików...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -767,7 +767,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Gotowe</translation>
     </message>
   </context>
   <context>
