@@ -93,6 +93,7 @@ public:
 
     virtual QValidator::State roleValidity(const nx::Uuid& roleId) const override;
     virtual bool userValidity(const QnUserResourcePtr& user) const override;
+    virtual QString calculateAlert(bool allUsers, const QSet<nx::Uuid>& subjects) const override;
 
     void setLayout(const QnLayoutResourcePtr& layout);
 

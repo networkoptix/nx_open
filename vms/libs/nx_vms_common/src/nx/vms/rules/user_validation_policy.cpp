@@ -412,16 +412,15 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& r
             if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
                 [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
             {
+                // The group does not have read permissions, but some of the users in the group have.
                 return QValidator::Intermediate;
             }
 
             return QValidator::Invalid;
         }
-        else
-        {
-            // Local layout. Non-admin groups have no access.
-            return QValidator::Invalid;
-        }
+
+        // Local layout. Non-admin groups have no access.
+        return QValidator::Invalid;
     }
 
     // No layout has been selected. All users are acceptable.
@@ -433,6 +432,33 @@ bool QnLayoutAccessValidationPolicy::userValidity(const QnUserResourcePtr& user)
     return m_layout
         ? resourceAccessManager()->hasPermission(user, m_layout, Qn::ReadPermission)
         : true;
+}
+
+QString QnLayoutAccessValidationPolicy::calculateAlert(
+    bool allUsers, const QSet<nx::Uuid>& subjects) const
+{
+    QString alert = base_type::calculateAlert(allUsers, subjects);
+    if (!alert.isEmpty())
+        return alert;
+
+    const QnUserResourceList users = allUsers
+        ? allVisibleUsers(resourcePool())
+        : buildUserList(subjects, systemContext());
+
+    int invalidUsersCount{};
+    for (const auto& user: users)
+    {
+        if (!userValidity(user))
+            ++invalidUsersCount;
+    }
+
+    if (invalidUsersCount == users.size())
+        return tr("Users do not have access to the selected layout");
+
+    if (invalidUsersCount > 0)
+        return tr("Some users do not have access to the selected layout");
+
+    return {};
 }
 
 void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout)
