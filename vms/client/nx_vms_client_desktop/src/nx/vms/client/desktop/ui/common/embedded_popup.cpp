@@ -89,6 +89,24 @@ EmbeddedPopup::EmbeddedPopup(QObject* parent):
     d->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     d->quickWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
     d->quickWidget->setVisible(d->visible);
+
+    d->geometry = d->quickWidget->geometry();
+
+    // Resizing QQuickWidget internal framebuffer sometimes causes an issue with Intel Xe drivers
+    // (the whole windows becomes black and stops updating). Resizing at specific point - just
+    // after the frame is submitted - seems to mitigate this issue.
+    connect(d->quickWidget->quickWindow(), &QQuickWindow::afterFrameEnd, this,
+        [this]()
+        {
+            if (!NX_ASSERT(qApp->thread() == QThread::currentThread()))
+                return;
+
+            const auto requiredSize = d->geometry.toAlignedRect().size();
+
+            if (d->quickWidget->size() != requiredSize)
+                d->quickWidget->resize(requiredSize);
+        },
+        Qt::DirectConnection);
 }
 
 EmbeddedPopup::~EmbeddedPopup()
@@ -480,7 +498,18 @@ void EmbeddedPopup::Private::updateGeometry()
             if (!quickWidget || !quickWidget->parentWidget())
                 return;
             const auto offset = quickWidget->parentWidget()->mapToGlobal(QPoint{0, 0});
-            quickWidget->setGeometry(windowGeometry.toAlignedRect().translated(-offset));
+            const auto aligned = windowGeometry.toAlignedRect().translated(-offset);
+
+            quickWidget->move(aligned.topLeft());
+
+            if (quickWidget->size() == aligned.size())
+                return;
+
+            // When resizing on QQuickWindow::afterFrameEnd (see above) the QQuickWidget does not
+            // update its internal framebuffer size when exposed for the first time.
+            // Sending a resize event fixes that.
+            QResizeEvent resizeEvent(aligned.size(), quickWidget->size());
+            QCoreApplication::sendEvent(quickWidget.get(), &resizeEvent);
         },
         q);
 }
