@@ -8,11 +8,12 @@
 
 namespace nx::vms::api {
 
-class RectAsString: public QRectF
+class NX_VMS_API RectAsString: public QRectF
 {
 public:
     using QRectF::QRectF;
     RectAsString(const QRectF& crop): QRectF(crop) {}
+    std::string toString() const;
 };
 QN_FUSION_DECLARE_FUNCTIONS(RectAsString, (json), NX_VMS_API)
 NX_REFLECTION_TAG_TYPE(RectAsString, useStringConversionForSerialization)

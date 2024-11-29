@@ -8,6 +8,11 @@ namespace nx::vms::api {
 
 QN_FUSION_DEFINE_FUNCTIONS(RectAsString, (json_lexical))
 
+std::string RectAsString::toString() const
+{
+    return QnLexical::serialized(*this).toStdString();
+}
+
 bool fromString(const std::string& str, RectAsString* target)
 {
     return QnLexical::deserialize(QString::fromStdString(str), target);

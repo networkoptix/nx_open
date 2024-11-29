@@ -55,6 +55,9 @@ struct NX_VMS_COMMON_API QnTimePeriod
 
     static constexpr QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs)
     {
+        if (endTimeMs < 0)
+            return {std::max<qint64>(0, startTimeMs), kInfiniteDuration};
+
         if (startTimeMs <= endTimeMs)
         {
             auto durationMs =
