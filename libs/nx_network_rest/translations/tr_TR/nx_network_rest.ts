@@ -16,7 +16,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Bu kullanıcı mevcut değil veya oturum açamıyor.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -28,11 +28,11 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP sunucusuna erişilemiyor. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 henüz erişilebilir değil. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Birkaç başarısız deneme nedeniyle kullanıcı kilitlendi. Lütfen daha sonra tekrar deneyiniz.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
@@ -48,23 +48,19 @@
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
-    </message>
-    <message>
-      <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
+      <translation>Oturum anahtarı geçersiz veya süresi dolmuş.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Bilet anahtarı geçersiz veya süresi dolmuş.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Aynı girişe sahip birden fazla kullanıcı sunuldu.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP sunucusu SSL/TLS sertifikası doğrulanamıyor.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
@@ -74,36 +70,40 @@
       <source>The request is unauthorized due to an unknown error.</source>
       <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
     </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
+    </message>
   </context>
   <context>
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Gerekli parametre eksik: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>İstek işlenemedi.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Yasaklı.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Uyuşmazlık.</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Hatalı istek.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Uygulanmadı.</translation>
     </message>
     <message>
       <source>Not found.</source>

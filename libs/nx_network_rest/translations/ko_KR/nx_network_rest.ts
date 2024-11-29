@@ -5,22 +5,22 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>잘못된 JSON 콘텐츠입니다.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>지원되지 않는 콘텐츠 유형입니다.</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>이 사용자가 존재하지 않거나 로그인할 수 없습니다.</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>패스워드가 틀립니다.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -28,11 +28,11 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP 서버에 액세스할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 는 아직 액세스할 수 없습니다. 나중에 다시 시도 해주십시오.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>여러 번의 실패로 인해 사용자가 잠겼습니다. 나중에 다시 시도해 주십시오.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
@@ -49,10 +49,6 @@
     <message>
       <source>The session key is invalid or expired.</source>
       <translation type="unfinished">The session key is invalid or expired.</translation>
-    </message>
-    <message>
-      <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
@@ -73,6 +69,10 @@
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
       <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>

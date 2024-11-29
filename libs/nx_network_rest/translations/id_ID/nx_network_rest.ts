@@ -5,18 +5,18 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Konten JSON tidak valid.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Jenis konten tidak didukung.</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Pengguna ini tidak ada atau tidak dapat login.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -51,10 +51,6 @@
       <translation type="unfinished">The session key is invalid or expired.</translation>
     </message>
     <message>
-      <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
-    </message>
-    <message>
       <source>The ticket key is invalid or expired.</source>
       <translation type="unfinished">The ticket key is invalid or expired.</translation>
     </message>
@@ -73,6 +69,10 @@
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
       <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>

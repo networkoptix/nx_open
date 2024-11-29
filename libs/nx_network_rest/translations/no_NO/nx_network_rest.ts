@@ -5,22 +5,22 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Ugyldig JSON-innhold.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Innholdstype som ikke støttes.</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Denne brukeren eksisterer ikke eller kan ikke logge på.</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Feil passord</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -28,11 +28,11 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP-serveren er ikke tilgjengelig. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 er ikke tilgjengelig ennå. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Brukeren er utestengt på grunn av flere mislykkede forsøk. Prøv igjen senere.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
@@ -48,11 +48,7 @@
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
-    </message>
-    <message>
-      <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
+      <translation>Sesjonsnøkkelen er ugyldig eller utløpt.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
@@ -73,6 +69,10 @@
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
       <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>

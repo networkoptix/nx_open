@@ -51,10 +51,6 @@
       <translation>Khóa phiên không hợp lệ hoặc đã hết hạn.</translation>
     </message>
     <message>
-      <source>The session key is to old for this Site.</source>
-      <translation>Khóa phiên đã quá cũ đối với Chi nhánh này.</translation>
-    </message>
-    <message>
       <source>The ticket key is invalid or expired.</source>
       <translation>Mã vé không hợp lệ hoặc đã hết hạn.</translation>
     </message>
@@ -73,6 +69,10 @@
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
       <translation>Yêu cầu không được phép do có lỗi không xác định.</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>

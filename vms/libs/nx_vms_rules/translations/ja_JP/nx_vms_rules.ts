@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>ツールチップテキスト</translation>
     </message>
   </context>
   <context>
@@ -79,7 +79,7 @@
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>サーバーイベント</translation>
     </message>
     <message>
       <source>Any server event</source>
@@ -95,23 +95,23 @@
     </message>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>サーバーを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>ユーザーを1人以上選択してください</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>カメラを 1 台だけ選択してください。</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>デバイスを1台以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>カメラを1台以上選択してください</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -119,7 +119,7 @@
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>適切なサーバーがありません。</translation>
     </message>
     <message>
       <source>At</source>
@@ -143,11 +143,11 @@
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>プレ録画</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>ポスト録画</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>一部のユーザーは選択したレイアウトにアクセスできません。</translation>
     </message>
     <message>
       <source>For</source>
@@ -208,31 +208,31 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>選択したデバイスは削除されました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>選択したカメラは削除されました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>選択したサーバーは削除されました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>選択したレイアウトは削除されました</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>時間は0未満にできません。</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Bearer認証タイプを選択した場合、トークンのフィールドに入力する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -562,7 +562,7 @@
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>レイアウトを選択してください</translation>
     </message>
   </context>
   <context>
@@ -593,7 +593,7 @@
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>一部の LDAP ユーザーまたはグループが LDAP データベース内に見つかりませんでした。</translation>
     </message>
   </context>
   <context>
@@ -792,11 +792,11 @@
     <message>
       <source>Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
+      <translation>電力上限を超過しました (%1)</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>%1 のPoE給電量が給電能力を超えています。</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
@@ -868,11 +868,11 @@
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>ルールの入力が完了していません。フィルターとビルダーが1つずつ必要です。</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>指定されたフィルターは、指定されたビルダーと互換性がありません。</translation>
     </message>
   </context>
   <context>
@@ -913,7 +913,7 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>サービス障害</translation>
     </message>
   </context>
   <context>
@@ -1049,7 +1049,7 @@
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>サウンドが選択されていません。</translation>
     </message>
   </context>
   <context>
@@ -1140,7 +1140,7 @@
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>レイアウトを1つ以上選択してください</translation>
     </message>
   </context>
   <context>
@@ -1170,7 +1170,7 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>対象</translation>
     </message>
   </context>
   <context>

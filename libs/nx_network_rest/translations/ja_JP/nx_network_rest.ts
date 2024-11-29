@@ -9,26 +9,26 @@
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>サポートされていないコンテンツタイプです。</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>このユーザーは存在しないか、ログインできません。</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>パスワードが違います</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>パスワードの有効期限が切れています。サイト管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP サーバーにアクセスできません。後ほどお試しください。</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
@@ -36,27 +36,23 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>このユーザーはサイト管理者によって無効にされています。</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>複数回の試行に失敗したため、ユーザーがロックされました。後ほどお試しください。</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>この認証方法は禁止されています。サイト管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
-    </message>
-    <message>
-      <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
+      <translation>セッションキーが無効または期限切れです。</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>チケットキーが無効または期限切れです。</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
@@ -72,7 +68,11 @@
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>不明なエラーにより、リクエストに必要な権限が満たされません。</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>サービス利用不可。</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -128,19 +128,19 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>セッションの期限切れ。</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>セッション認証が必要です。</translation>
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>サイト設定に対してセッションが古すぎます。</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>リソースはサーバー上に存在しません。</translation>
     </message>
     <message>
       <source>Not allowed.</source>

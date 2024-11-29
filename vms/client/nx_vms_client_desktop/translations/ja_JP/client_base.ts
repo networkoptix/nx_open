@@ -1174,11 +1174,11 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>サイト管理...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>サイト更新...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
@@ -1186,7 +1186,7 @@
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>インテグレーションを開く...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1195,7 +1195,7 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>開く</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1980,7 +1980,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>プラットフォーム</translation>
     </message>
   </context>
   <context>
@@ -2080,7 +2080,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>サイトがシャットダウンしました。ビデオウォールに接続するには、サイトがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -2176,32 +2176,32 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>これらのデバイスはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>これらのカメラはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
+      <translation>
+        <numerusform>これらのサーバーはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
+      <translation>
+        <numerusform>これらのユーザーはサイトから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>これらのリソースはサイトから削除されています。</numerusform>
       </translation>
     </message>
   </context>
@@ -2387,19 +2387,19 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>サイト名変更</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>サイト統合</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>サーバープロキシ接続</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>サイトがバージョン %1 に更新されました。</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
@@ -2409,7 +2409,7 @@ License Key: %2</source>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>開始時刻: %1、ターゲット: %2</translation>
     </message>
     <message>
       <source>User IP</source>
@@ -2560,7 +2560,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>サイト</translation>
     </message>
   </context>
   <context>
@@ -2963,7 +2963,7 @@ License Key: %2</source>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>現在、このサイトは %1 に接続していません。</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
@@ -2978,7 +2978,7 @@ License Key: %2</source>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>サイトが %1 から切断されました。</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
@@ -2987,7 +2987,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>録画は停止され、すべてのサービスサブスクリプションが削除されます。</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
@@ -3000,7 +3000,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>サイトはローカルネットワークからのみアクセス可能になります。</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
@@ -3199,7 +3199,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>サイトは二要素認証に対応していません。</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
@@ -3316,7 +3316,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>サイト構成がバックアップから復元され、サーバーアプリケーションが再起動されます。</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
@@ -3581,7 +3581,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>インテグレーションを開く</translation>
     </message>
   </context>
   <context>
@@ -3874,7 +3874,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>設定は読み取り専用です。サイト管理者にお問い合わせください。プログラム終了後、すべての変更が破棄されます。</translation>
     </message>
   </context>
   <context>
@@ -4781,7 +4781,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
+      <translation>このカメラにアクセスできません。詳細については、デスクトップクライアント内でカメラ診断を実行してください。</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4789,11 +4789,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+      <translation>このカメラでは、クラウドポータルまたはデスクトップクライアントのデバイス設定で、十分な権限を持つ資格情報を入力する必要があります。</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>非対応</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4801,11 +4801,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>サイトはシャットダウンしました</translation>
     </message>
     <message>
       <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
+      <translation>ストリーム制限</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -5009,7 +5009,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>ストレージに対する読み取り/書き込みポリシーが、サイトサーバーによって異なります。</translation>
     </message>
     <message>
       <source>URL: %1</source>
@@ -5145,7 +5145,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>リムーバブル</translation>
     </message>
     <message>
       <source>Unknown size</source>
@@ -5153,7 +5153,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>このストレージは、サイト内のサーバーごとに異なる読み取り/書き込みポリシーを持っています。</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
@@ -5161,7 +5161,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>読み取り/書き込みポリシー</translation>
     </message>
   </context>
   <context>
@@ -5397,23 +5397,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>時刻同期のためのインターネット接続ができません</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>システムパーティションが分析データ用に使用されています</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>システムがサスペンドされました</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>サイトがシャットダウンしました</translation>
     </message>
     <message>
       <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
+      <translation>インターホン通話を拒否</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
@@ -5429,8 +5429,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>%n サーバーでストレージが構成されていません</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5441,12 +5441,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>録画スケジュールが無効です。</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>%n カメラの録画スケジュールが無効です。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5462,7 +5462,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>カメラストレージとの同期に失敗しました</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -5472,8 +5472,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>%n サーバーで分析データ用にシステムストレージが使用されています</numerusform>
       </translation>
     </message>
     <message>
@@ -5490,11 +5490,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>サイト通知をメールで受信できません。</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>一部のカメラは、サポートされていないモードで録画するように設定されています。</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
@@ -5504,24 +5504,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>サイトはまもなく機能しなくなります。</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>サイトが機能停止しました。</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>サイトは本日中に機能しなくなります。</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>サイトは明日中に機能しなくなります。</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>サイトは %n 日後に機能しなくなります。</numerusform>
       </translation>
     </message>
     <message>
@@ -5900,11 +5900,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>サイトがシャットダウンしました</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>ビデオウォールを追加するには、サイトがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -6706,7 +6706,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>音声の再生</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
@@ -7052,15 +7052,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>サイトがシャットダウンしました</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>クラウドストレージへのバックアップを実行するには、サイトがアクティブな状態である必要があります。 %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>サイトがサスペンドされました。バックアップ設定を変更するには、サイトがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -7244,7 +7244,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+      <translation>サイト追加後のカメラまたはサーバーのオフライン期間のみが自動的にインポートされます。</translation>
     </message>
   </context>
   <context>
@@ -7263,7 +7263,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>新規タブでレイアウトを開く</translation>
     </message>
   </context>
   <context>
@@ -7290,7 +7290,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>ターゲットを選択...</translation>
     </message>
   </context>
   <context>
@@ -7309,11 +7309,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>対象リソースが存在しません。</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>カメラまたはレイアウトを選択...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -7324,7 +7324,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>ホットスポットターゲットを選択してください。</translation>
     </message>
   </context>
   <context>
@@ -7974,7 +7974,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>サイトが %1 に接続されました。</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
@@ -8108,11 +8108,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>このカメラにはパスワードの設定が必要です。サイト管理者に依頼してください。</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります。サイト管理者に依頼してください。</translation>
     </message>
   </context>
   <context>
@@ -8248,7 +8248,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>サイト管理</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8358,15 +8358,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>イベント映像を開く</translation>
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>イベントデバイスを開く</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>イベントカメラを開く</translation>
     </message>
   </context>
   <context>
@@ -8425,7 +8425,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>不明</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
@@ -8874,11 +8874,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>サイトはまもなく統合されます。</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>他のサイトのサーバーがリソースツリーに表示されます。</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
@@ -8886,7 +8886,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>サーバーはまもなくサイトに接続されます。</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
@@ -8970,7 +8970,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>この ID はすでに使用されています。利用可能な ID を見つけるには、生成ボタンを使用してください。</translation>
     </message>
   </context>
   <context>
@@ -9181,8 +9181,8 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>指定されたログレベルではパフォーマンスが低下する可能性があります。
+必要なログを収集した後、忘れずにログレベルを初期設定にお戻しください。</translation>
     </message>
   </context>
   <context>
@@ -9335,11 +9335,11 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>リトライ (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>リトライ</translation>
     </message>
   </context>
   <context>
@@ -9381,7 +9381,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>存在</translation>
     </message>
     <message>
       <source>Absent</source>
@@ -9396,7 +9396,7 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>テキストファイル</translation>
     </message>
     <message>
       <source>All</source>
@@ -9415,7 +9415,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>テキストファイル</translation>
     </message>
     <message>
       <source>All other text files</source>
@@ -9509,15 +9509,15 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>これは現在のサイトの URL です。</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>データベースの同期が完了すると、他のサイトのサーバーがリソースツリーに表示されます。</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>サイトはまもなく統合されます。</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
@@ -9576,16 +9576,16 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>サイトが見つかりませんでした。</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>検出されたサイト %1 は互換性のないバージョン %2 です。</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>対象のサイトは、現在のサイトと互換性のない古いソフトウェアバージョンです。対象サイトを最新のビルドに更新してから、現在のシステムと統合してください。</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -9593,7 +9593,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>スターターライセンスはサイトごとに1つのみ許可されます。2番目のスターターライセンスは無効になります。</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
@@ -9601,7 +9601,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>NVRライセンスはサイトごとに1つだけ許可されます。2番目のNVRライセンスは無効になります。</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
@@ -9629,7 +9629,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>サイト名がまだ設定されていません。</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
@@ -9937,7 +9937,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>一部のコンポーネントのOSバージョンはサポートが終了しました。サイトから削除するか、サポートされているバージョンにOSを更新してください。</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
@@ -9950,11 +9950,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>サイトが更新されました</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>サイトを更新しています</translation>
     </message>
   </context>
   <context>
@@ -9968,7 +9968,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>利用可能な形式:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -10134,7 +10134,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>システム通知</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -10155,7 +10155,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>通知タイプを選択</translation>
     </message>
   </context>
   <context>
@@ -10389,7 +10389,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
       <source>Attention! Power limit exceeded</source>
-      <translation>注意！電力制限を超えました</translation>
+      <translation>注意！電力上限を超過しました</translation>
     </message>
   </context>
   <context>
@@ -10414,7 +10414,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>サイトは %1 に接続されていません。モバイル通知は、サイトが %1 に接続されている場合にのみ動作します。</translation>
     </message>
   </context>
   <context>
@@ -11021,8 +11021,8 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>アーカイブを復元するには暗号化パスワードが必要です。
+注意: このパスワードはリセットできません。紛失した場合、アーカイブは復元できなくなります。</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
@@ -11456,15 +11456,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>サイトは組織の制限を超えており、まもなく機能しなくなる可能性があります。サービスの中断を避けるために、使用状況を調整してください。</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>設定を開く</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>サービスを開く</translation>
     </message>
   </context>
   <context>
@@ -11560,7 +11560,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>このアクションは、他のサイトからの通知には対応していません。</translation>
     </message>
   </context>
   <context>
@@ -11718,7 +11718,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>この名前のグループが複数あります。明確で組織的な構造を維持するために、各グループに一意の名前を付けることをお勧めします。</translation>
     </message>
   </context>
   <context>
@@ -11777,7 +11777,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>サイトエラー</translation>
     </message>
   </context>
   <context>
@@ -11829,7 +11829,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>同じログイン名を持つ別のユーザーが存在します。問題を回避するには、すべてのユーザーに一意のログイン名を持たせる必要があります。</translation>
     </message>
   </context>
   <context>
@@ -11975,7 +11975,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>これにより、このユーザーのサイトへのアクセス権が即座に削除されます。</translation>
     </message>
   </context>
   <context>
@@ -12311,7 +12311,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>サイトがオフラインになったため、接続できません。</translation>
     </message>
   </context>
   <context>
@@ -12401,7 +12401,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>バージョンをスキップ</translation>
     </message>
   </context>
   <context>
@@ -12412,7 +12412,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>タイトル</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12532,7 +12532,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>他のサイト</translation>
     </message>
   </context>
   <context>
@@ -12669,11 +12669,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>リソースが見つかりません。</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>パラメーターが見つかりません</translation>
     </message>
   </context>
   <context>
@@ -12868,7 +12868,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>ルールが不完全であるため、動作しない可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -12887,7 +12887,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>トークン</translation>
     </message>
   </context>
   <context>
@@ -12994,15 +12994,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>レイアウトを1つ以上選択してください</translation>
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>ユーザーを1人以上選択してください</translation>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>サイト</translation>
     </message>
   </context>
   <context>
@@ -13035,7 +13035,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>状態を選択してください</translation>
     </message>
   </context>
   <context>
@@ -13488,10 +13488,10 @@ We recommend you not to open this web page. If you understand the risks, you can
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>分析データベースはローカルドライブにのみ保存する必要があり、大量のスペースを占有する可能性があります。
+一度分析データの保存先を選択すると、既存のデータを失わずに簡単に変更することはできません。深刻な誤動作を引き起こす可能性があるシステムパーティションの使用を避けて、保存先を慎重に選択することをお勧めします。
+デフォルトでは、分析データは %1 に保存されます。
+サーバー設定ダイアログの &quot;ストレージ管理&quot; タブで別の保存先を選択できます。</translation>
     </message>
   </context>
   <context>

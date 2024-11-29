@@ -131,15 +131,15 @@
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>このオプションをオンにすると、インターネットにアクセスできないクライアントを更新するための追加ファイルをサーバーにダウンロードできるようになります。</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>これにより、サーバー上のすべての更新ファイルが削除されます。</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>続行しますか?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>すべて選択/選択解除</translation>
     </message>
   </context>
   <context>
@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>タイル設定</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>テーブル設定</translation>
     </message>
   </context>
   <context>
@@ -257,7 +257,7 @@
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>このプラグインには、サイトレベルでの設定はありません。</translation>
     </message>
   </context>
   <context>
@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>貼り付け</translation>
     </message>
   </context>
   <context>
@@ -693,11 +693,11 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>タイプを選択</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>属性を削除すると、関連するすべてのデータが削除されます。</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
@@ -709,8 +709,8 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>このリストは %n 個のイベントルールに関連付けられています。削除してもよろしいですか?</numerusform>
       </translation>
     </message>
   </context>
@@ -744,7 +744,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>ファイルフォルダーを開く...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -917,7 +917,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>一部の値が自動的に一致しませんでした。手動でマッピングしてください。</translation>
     </message>
     <message>
       <source>Back</source>
@@ -1233,7 +1233,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>このプラグインには、サイトレベルでの設定はありません。</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1407,7 +1407,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>LDAP 設定を変更する際はご注意ください。誤った設定により、多数のユーザーがサイトに接続できなくなる可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -1480,7 +1480,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>区切り文字:</translation>
     </message>
     <message>
       <source>Data contains header</source>
@@ -1508,7 +1508,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>ファイルが存在し、選択したファイルにアクセスできることを確認してください。</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
@@ -1520,11 +1520,11 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>ファイルは空のようです。</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>選択したファイルが存在し、アクセスできることを確認してください。</translation>
     </message>
   </context>
   <context>
@@ -1571,7 +1571,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>選択したフォルダーにアクセスでき、十分なディスク容量があることを確認してください。</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1833,7 +1833,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>必要な権限グループ</translation>
     </message>
     <message>
       <source>View Permissions</source>
@@ -1879,7 +1879,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>オブジェクトを選択</translation>
     </message>
     <message>
       <source>All Objects</source>
@@ -1981,7 +1981,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>属性を選択</translation>
     </message>
   </context>
   <context>
@@ -2116,7 +2116,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation>サーバーはリモートアクセス機能用に設定されていません</translation>
+      <translation>サーバーはリモートアクセス機能用に設定されていません。</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
@@ -2363,19 +2363,19 @@ Alt + クリックを使用してください。</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>サイトはサスペンドしています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>サイトはサスペンドしています。サイト内のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブな状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>サイトはシャットダウンされました。現在のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>サイトはシャットダウンされました。サイト内のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
     </message>
   </context>
   <context>
@@ -2827,7 +2827,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>追加されたサイトは、既存のクラウドアカウントを持つユーザーにはすぐに表示されます。クラウドアカウントを持たないユーザーには、電子メールで案内が送信されます。</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3029,11 +3029,11 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>スケジュール</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>状態</translation>
     </message>
   </context>
   <context>

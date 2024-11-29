@@ -51,10 +51,6 @@
       <translation>Klucz sesji jest nieprawidłowy lub wygasł.</translation>
     </message>
     <message>
-      <source>The session key is to old for this Site.</source>
-      <translation>Klucz sesji jest za stary dla tej witryny.</translation>
-    </message>
-    <message>
       <source>The ticket key is invalid or expired.</source>
       <translation>Klucz zgłoszenia jest nieprawidłowy lub wygasł.</translation>
     </message>
@@ -73,6 +69,10 @@
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
       <translation>Żądanie jest nieautoryzowane z powodu nieznanego błędu.</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>

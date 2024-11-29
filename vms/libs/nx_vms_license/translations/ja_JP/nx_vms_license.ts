@@ -77,15 +77,15 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>サイトごとに許可されるスターターライセンスは1つだけです。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>サイトごとに許可されるNVRライセンスは1つだけです。</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>このタイプのライセンスは、サイトごとに1つだけ許可されます。</translation>
     </message>
   </context>
 </TS>

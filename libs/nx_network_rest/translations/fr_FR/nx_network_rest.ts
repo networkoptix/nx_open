@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Contenu JSON invalide.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Type de contenu non pris en charge.</translation>
     </message>
   </context>
   <context>
@@ -51,10 +51,6 @@
       <translation type="unfinished">The session key is invalid or expired.</translation>
     </message>
     <message>
-      <source>The session key is to old for this Site.</source>
-      <translation type="unfinished">The session key is to old for this Site.</translation>
-    </message>
-    <message>
       <source>The ticket key is invalid or expired.</source>
       <translation type="unfinished">The ticket key is invalid or expired.</translation>
     </message>
@@ -73,6 +69,10 @@
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
       <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+    </message>
+    <message>
+      <source>The session key is too old for this Site.</source>
+      <translation type="unfinished">The session key is too old for this Site.</translation>
     </message>
   </context>
   <context>

@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>サイトサーバー</translation>
     </message>
   </context>
   <context>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>サイトアクション</translation>
     </message>
   </context>
   <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>このサイトは次のアカウントと連携しています。</translation>
     </message>
   </context>
   <context>
@@ -1433,7 +1433,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>サイト設定</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>ライブ再生でタイムスタンプを表示</translation>
     </message>
   </context>
   <context>
@@ -2051,7 +2051,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>署名</translation>
     </message>
   </context>
   <context>
@@ -2150,7 +2150,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>サイト通知</translation>
     </message>
   </context>
   <context>
@@ -2317,14 +2317,14 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>この接続オプションを削除すると、サイトの誤動作につながる可能性があります。</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>サイト管理</translation>
     </message>
   </context>
   <context>
@@ -2519,7 +2519,7 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>組織制限を超過</translation>
     </message>
   </context>
   <context>
@@ -2672,7 +2672,7 @@
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>リモートアクセスツール</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2684,7 +2684,7 @@
     </message>
     <message>
       <source>Power users</source>
-      <translation type="unfinished">Power users</translation>
+      <translation>パワーユーザー</translation>
     </message>
   </context>
   <context>
@@ -2764,7 +2764,7 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>リモートアクセス</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
