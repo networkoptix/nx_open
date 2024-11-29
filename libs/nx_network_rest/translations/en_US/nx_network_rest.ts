@@ -51,10 +51,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The session key is to old for this Site.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The ticket key is invalid or expired.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -72,6 +68,10 @@
     </message>
     <message>
         <source>The request is unauthorized due to an unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The session key is too old for this Site.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
