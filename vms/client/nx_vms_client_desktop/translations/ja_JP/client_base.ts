@@ -5018,7 +5018,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>SYSTEM SHUT DOWN</source>
-      <translation>システムがシャットダウンしました</translation>
+      <translation>システムはシャットダウンしました</translation>
     </message>
     <message>
       <source>RESTRICTED</source>
@@ -10377,7 +10377,7 @@ You can force it, but it may significantly increase CPU load.</source>
     <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
       <source>Attention! Power limit exceeded</source>
-      <translation>注意！電力制限を超えました</translation>
+      <translation>注意！電力上限を超過しました</translation>
     </message>
   </context>
   <context>
