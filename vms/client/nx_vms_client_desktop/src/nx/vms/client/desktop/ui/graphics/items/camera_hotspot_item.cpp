@@ -77,6 +77,8 @@ struct CameraHotspotItem::Private
 
     // Interactive actions.
     menu::Parameters::ArgumentHash itemPlaybackParameters() const;
+    menu::Parameters::ArgumentHash layoutPlaybackParameters() const;
+
     void openItem();
     void openInNewTab();
     void openItemInPlace();
@@ -227,6 +229,22 @@ menu::Parameters::ArgumentHash CameraHotspotItem::Private::itemPlaybackParameter
     return result;
 }
 
+menu::Parameters::ArgumentHash CameraHotspotItem::Private::layoutPlaybackParameters() const
+{
+    using namespace std::chrono;
+
+    menu::Parameters::ArgumentHash result;
+    StreamSynchronizationState state{
+        .timeUs = mediaResourceWidget()->isPlayingLive()
+            ? DATETIME_NOW
+            : duration_cast<microseconds>(mediaResourceWidget()->position()).count(),
+        .speed = mediaResourceWidget()->speed()};
+
+    result.insert(Qn::LayoutSyncStateRole, QVariant::fromValue(state));
+
+    return result;
+}
+
 void CameraHotspotItem::Private::openItem()
 {
     const auto actionManager = q->menu();
@@ -275,9 +293,7 @@ void CameraHotspotItem::Private::openItem()
 void CameraHotspotItem::Private::openInNewTab()
 {
     auto parameters = menu::Parameters(hotspotResource());
-    if (!q->navigator()->syncEnabled())
-        parameters.setArguments(itemPlaybackParameters());
-
+    parameters.setArguments(layoutPlaybackParameters());
     q->menu()->trigger(menu::OpenInNewTabAction, parameters);
 }
 

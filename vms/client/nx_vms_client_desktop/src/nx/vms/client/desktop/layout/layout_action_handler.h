@@ -94,11 +94,14 @@ private:
 
     /**
      * Open provided layouts in new tabs.
-     * @param state Playback synchronization state for the layout if it is not opened yet.
+     * @param playbackState Playback synchronization state for the layout if it is not opened yet.
+     * @param forceStateUpdate If true, the state of the layout's items will be updated forcefully,
+     *     ignoring their previous state.
      */
     void openLayouts(
         const LayoutResourceList& layouts,
-        const StreamSynchronizationState& playbackState);
+        const StreamSynchronizationState& playbackState,
+        bool forceStateUpdate = false);
 
     QString generateUniqueLayoutName(const QnUserResourcePtr& user) const;
 };

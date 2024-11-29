@@ -924,7 +924,8 @@ bool LayoutActionHandler::closeLayouts(const LayoutResourceList& resources)
 
 void LayoutActionHandler::openLayouts(
     const LayoutResourceList& layouts,
-    const StreamSynchronizationState& playbackState)
+    const StreamSynchronizationState& playbackState,
+    bool forceStateUpdate)
 {
     if (!NX_ASSERT(!layouts.empty()))
         return;
@@ -933,10 +934,13 @@ void LayoutActionHandler::openLayouts(
     for (const auto& layout: layouts)
     {
         auto wbLayout = workbench()->layout(layout);
+        const bool updateState = !wbLayout || forceStateUpdate;
+
         if (!wbLayout)
-        {
             wbLayout = workbench()->addLayout(layout);
 
+        if (updateState)
+        {
             // Use zero position for nov files.
             const auto state = layout->isFile()
                 ? StreamSynchronizationState::playFromStart()
@@ -948,7 +952,7 @@ void LayoutActionHandler::openLayouts(
             for (auto item: wbLayout->items())
             {
                 // Do not set item's playback parameters if they are already set.
-                if (!item->data(Qn::ItemTimeRole).isValid())
+                if (forceStateUpdate || !item->data(Qn::ItemTimeRole).isValid())
                 {
                     item->setData(Qn::ItemTimeRole,
                         state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
@@ -956,8 +960,8 @@ void LayoutActionHandler::openLayouts(
                     item->setData(Qn::ItemSpeedRole, state.speed);
                 }
             }
-
         }
+
         // Explicitly set that we do not control videowall through this layout.
         wbLayout->setData(Qn::VideoWallItemGuidRole, QVariant::fromValue(nx::Uuid()));
 
@@ -1216,7 +1220,11 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     {
         NX_ASSERT(!calledFromScene, "Layouts can not be passed from the scene");
         NX_ASSERT(resources.size() == layouts.size(), "Mixed resources are not expected here");
-        openLayouts(layouts, currentState);
+        openLayouts(
+            layouts,
+            currentState,
+            /*forceStateUpdate*/ parameters.hasArgument(Qn::LayoutSyncStateRole));
+
         // Do not return in case mixed resource set is passed somehow.
     }
 
