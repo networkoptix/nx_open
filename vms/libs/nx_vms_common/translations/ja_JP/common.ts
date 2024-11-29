@@ -1300,7 +1300,7 @@
     </message>
     <message>
       <source>SaaS shut down</source>
-      <translation>SaaS はシャットダウンしました</translation>
+      <translation>SaaS がシャットダウンしました</translation>
     </message>
     <message>
       <source>SaaS shut down automatically</source>
