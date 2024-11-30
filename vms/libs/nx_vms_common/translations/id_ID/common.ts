@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>Periksa izin stream video pada periode server VMS (milidetik)</translation>
     </message>
   </context>
   <context>
