@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</source>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>ペアリングコードが間違っています。</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -1693,8 +1693,8 @@ Select an Integration to begin configuring its parameters.</source>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>%n 属性を持つ</numerusform>
       </translation>
     </message>
     <message>
@@ -1837,7 +1837,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>権限を表示</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
@@ -2662,11 +2662,11 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>コンテキストメニューを使うことで、サイトをお気に入りに追加できます。</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>コンテキストメニューを使うことで、メインリスト上でサイトを非表示にすることができます。</translation>
     </message>
   </context>
   <context>

@@ -55,19 +55,19 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>วิเคราะห์เหตุการณ์</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>วิเคราะห์เหตุการณ์</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>ปัญหาของกล้อง</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
     </message>
     <message>
       <source>Any camera issue</source>
@@ -75,15 +75,15 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
@@ -99,19 +99,19 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>เลือกอีกหนึ่งกล้อง</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>เลือกอุปกรณ์อย่างน้อยหนึ่ง</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>เลือกอย่างน้อยหนึ่งกล้อง</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -139,15 +139,15 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>ระยะเวลา</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>ก่อนการบันทึก</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>โพสต์บันทึก</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -255,7 +255,7 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>รับทราบ</translation>
     </message>
   </context>
   <context>
@@ -266,12 +266,12 @@
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>ที่อยู่อีเมลไม่ถูกต้อง %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n จาก %1 ที่อยู่อีเมลเพิ่มเติมไม่ถูกต้อง</numerusform>
       </translation>
     </message>
   </context>
@@ -424,11 +424,11 @@
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>ความขัดแย้งทางอุปกรณ์ IP</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">Camera IP Conflict</translation>
+      <translation>ข้อขัดแย้ง IP ของกล้อง</translation>
     </message>
   </context>
   <context>
@@ -562,7 +562,7 @@
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>เลือกเค้าโครง</translation>
     </message>
   </context>
   <context>
@@ -574,8 +574,8 @@
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n เวลา)</numerusform>
       </translation>
     </message>
     <message>

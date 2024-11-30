@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Solun kuvasuhde</translation>
     </message>
   </context>
   <context>
@@ -2003,7 +2003,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Alusta</translation>
     </message>
   </context>
   <context>
@@ -6338,7 +6338,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Asettelut</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6393,7 +6393,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n palvelinta</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6442,7 +6442,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n poistetut aiheet</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -9483,7 +9483,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Yritä uudelleen</translation>
     </message>
   </context>
   <context>
@@ -9521,7 +9521,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ei</translation>
     </message>
     <message>
       <source>Present</source>
@@ -10283,7 +10283,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Järjestelmän ilmoitukset</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -13057,7 +13057,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Todennus</translation>
     </message>
     <message>
       <source>Login</source>

@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Contrasinal incorrecto</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -108,7 +108,7 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Non atopado.</translation>
     </message>
     <message>
       <source>Internal error.</source>

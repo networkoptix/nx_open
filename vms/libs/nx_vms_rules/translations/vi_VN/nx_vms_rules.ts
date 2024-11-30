@@ -107,11 +107,11 @@
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Chọn ít nhất một thiết bị</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Chọn ít nhất một máy ảnh</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -119,7 +119,7 @@
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Không có máy chủ phù hợp</translation>
     </message>
     <message>
       <source>At</source>
@@ -139,15 +139,15 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Thời gian</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Trước khi ghi</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Video liên tục</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -204,7 +204,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Dành cho</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
@@ -255,7 +255,7 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Công nhận</translation>
     </message>
   </context>
   <context>
@@ -266,12 +266,12 @@
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Địa chỉ email không hợp lệ</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n trong tổng số %1 địa chỉ email bổ sung không hợp lệ</numerusform>
       </translation>
     </message>
   </context>
@@ -382,11 +382,11 @@
     </message>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>Thiết bị ngắt kết nối</translation>
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>Camera Ngắt kết nối</translation>
     </message>
     <message>
       <source>Device</source>
@@ -424,11 +424,11 @@
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Xung đột IP của thiết bị</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">Camera IP Conflict</translation>
+      <translation>Xung đột IP của camera</translation>
     </message>
   </context>
   <context>
@@ -562,7 +562,7 @@
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Chọn bố cục</translation>
     </message>
   </context>
   <context>
@@ -574,26 +574,26 @@
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n lần)</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Không thể kết nối với máy chủ LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Không thể hoàn tất đồng bộ hóa trong khoảng thời gian chờ %1.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Không có tài khoản người dùng nào trên máy chủ LDAP khớp với cài đặt đồng bộ hóa.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Không tìm thấy người dùng hoặc nhóm LDAP trong cơ sở dữ liệu LDAP.</translation>
     </message>
   </context>
   <context>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Không thể buộc sử dụng thời gian camera vì nó bị trễ quá nhiều. Thay vào đó, thời gian Chi nhánh sẽ được sử dụng.</translation>
     </message>
   </context>
   <context>
@@ -717,11 +717,11 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Danh sách không được chọn</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Danh sách có id được chỉ định &apos;%1&apos; không tồn tại</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>

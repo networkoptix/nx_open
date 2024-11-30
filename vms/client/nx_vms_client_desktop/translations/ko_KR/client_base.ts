@@ -1226,7 +1226,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>셀 종횡비</translation>
     </message>
   </context>
   <context>
@@ -1980,7 +1980,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>플렛폼</translation>
     </message>
   </context>
   <context>
@@ -2560,7 +2560,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>사이트</translation>
     </message>
   </context>
   <context>
@@ -5001,7 +5001,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>공유</translation>
     </message>
     <message>
       <source>Isolated</source>
@@ -5137,7 +5137,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>공유</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -5498,8 +5498,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n 더 보기</numerusform>
       </translation>
     </message>
     <message>
@@ -6243,7 +6243,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n 레이아웃</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6297,7 +6297,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n 서버</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6343,7 +6343,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n 제목삭제</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6435,7 +6435,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>끝</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9338,7 +9338,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>다시 시도</translation>
     </message>
   </context>
   <context>
@@ -9376,15 +9376,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>아니요</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>현재의</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>부재 중인</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -10133,7 +10133,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>시스템 알림</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11011,7 +11011,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>아카이브 암호화로 CPU 사용량 증가</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12411,7 +12411,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>제목</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12419,7 +12419,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>객체 유형</translation>
     </message>
   </context>
   <context>
@@ -12874,7 +12874,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>인증</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13001,7 +13001,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>사이트</translation>
     </message>
   </context>
   <context>

@@ -57,19 +57,19 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Eventi di Analitica</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Qualsiasi evento di analisi</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemi della telecamera</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemi del dispositivo</translation>
     </message>
     <message>
       <source>Any camera issue</source>
@@ -77,15 +77,15 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Qualsiasi problema con il dispositivo</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Eventi del server</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Qualsiasi evento del server</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
@@ -101,19 +101,19 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Selezionare almeno un utente</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleziona esattamente una telecamera</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Seleziona almeno un dispositivo</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Seleziona almeno una telecamera</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -141,15 +141,15 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Durata</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Pre-registrazione</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Post-registrazione</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -206,7 +206,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Per</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
@@ -261,7 +261,7 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Riconoscimento</translation>
     </message>
   </context>
   <context>
@@ -272,13 +272,13 @@
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Indirizzo email non valido %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n di %1 gli indirizzi email aggiuntivi non sono validi</numerusform>
+        <numerusform>%n di %1 gli indirizzi email aggiuntivi non sono validi</numerusform>
       </translation>
     </message>
   </context>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Seleziona il layout</translation>
     </message>
   </context>
   <context>
@@ -581,9 +581,9 @@
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n volte)</numerusform>
+        <numerusform>%1 (%n volte)</numerusform>
       </translation>
     </message>
     <message>

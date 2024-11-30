@@ -1226,7 +1226,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Tỷ lệ ô khung hình</translation>
     </message>
   </context>
   <context>
@@ -1980,7 +1980,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Nền tảng</translation>
     </message>
   </context>
   <context>
@@ -2560,7 +2560,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -4996,15 +4996,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Độc quyền</translation>
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Chia sẻ</translation>
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Biệt lập</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -5128,15 +5128,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Biệt lập</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Độc quyền</translation>
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Chia sẻ</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -5160,7 +5160,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Chính sách đọc-ghi</translation>
     </message>
   </context>
   <context>
@@ -5497,8 +5497,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n thêm</numerusform>
       </translation>
     </message>
     <message>
@@ -6242,7 +6242,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>Bố cục %n</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6296,7 +6296,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n Máy chủ</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6338,11 +6338,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>Trong</translation>
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n chủ đề đã bị xóa</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6434,7 +6434,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Kết thúc</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -6705,7 +6705,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Phát âm thanh</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
@@ -8057,7 +8057,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Chi nhánh mới</translation>
     </message>
   </context>
   <context>
@@ -9337,7 +9337,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>thử lại</translation>
     </message>
   </context>
   <context>
@@ -9375,26 +9375,26 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Từ chối</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Có</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Không</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Bất kỳ %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Tệp văn bản</translation>
     </message>
     <message>
       <source>All</source>
@@ -9402,18 +9402,18 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>Xuất danh sách</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>Nhập danh sách tra cứu</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Tệp văn bản</translation>
     </message>
     <message>
       <source>All other text files</source>
@@ -9570,7 +9570,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Chi nhánh mới</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -10132,7 +10132,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Hệ thống Thông báo</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11010,7 +11010,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Mã hóa lưu trữ làm tăng mức sử dụng CPU</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12412,7 +12412,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Chức vụ</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12420,7 +12420,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Loại đối tượng</translation>
     </message>
   </context>
   <context>
@@ -12465,7 +12465,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Chi nhánh mới</translation>
     </message>
   </context>
   <context>
@@ -12532,7 +12532,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>Các Chi nhánh khác</translation>
     </message>
   </context>
   <context>
@@ -12875,7 +12875,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Xác nhận</translation>
     </message>
     <message>
       <source>Login</source>
@@ -12994,15 +12994,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Chọn ít nhất một bố cục</translation>
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Chọn ít nhất một người dùng</translation>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Chi nhánh</translation>
     </message>
   </context>
   <context>

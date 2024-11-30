@@ -50,11 +50,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Nombre maximum de décodeurs</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Améliorez les performances de décodage vidéo en utilisant le nombre maximal de décodeurs matériels</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -231,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Entrez votre mot de passe de compte %1 pour vous connecter au Site</translation>
     </message>
   </context>
   <context>
@@ -333,7 +333,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>Vous n'êtes connecté à aucun site</translation>
     </message>
   </context>
   <context>
@@ -414,15 +414,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Tous les Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Sites sélectionnés</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Au moins un site doit être sélectionné</translation>
     </message>
   </context>
   <context>
@@ -622,7 +622,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>Aucun site trouvé</translation>
     </message>
   </context>
   <context>
@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Les notifications sont désactivées dans les paramètres de l'appareil</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -869,7 +869,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Saisissez le mot de passe de cryptage sur le client de bureau pour décrypter cette archive ou demandez de l’aide à l’administrateur de votre site.</translation>
     </message>
   </context>
   <context>

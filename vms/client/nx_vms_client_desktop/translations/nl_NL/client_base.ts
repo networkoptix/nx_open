@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Hoogte-breedteverhouding van cel</translation>
     </message>
   </context>
   <context>
@@ -2003,7 +2003,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Platform</translation>
     </message>
   </context>
   <context>
@@ -6338,7 +6338,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Schermindelingen</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6393,7 +6393,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n servers</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6442,7 +6442,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n verwijderde onderwerpen</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6535,7 +6535,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Einde</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9483,7 +9483,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Opnieuw proberen</translation>
     </message>
   </context>
   <context>
@@ -9521,15 +9521,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nee</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Aanwezig</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Afwezig</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -10283,7 +10283,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Systeemnotificaties</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11174,7 +11174,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Archiefversleuteling verhoogt het CPU-gebruik</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12602,7 +12602,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Object type</translation>
     </message>
   </context>
   <context>
@@ -13057,7 +13057,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Authenticatie</translation>
     </message>
     <message>
       <source>Login</source>

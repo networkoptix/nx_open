@@ -261,7 +261,7 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Мэдэгдэл</translation>
     </message>
   </context>
   <context>

@@ -1226,7 +1226,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>影像顯示長寬比例</translation>
     </message>
   </context>
   <context>
@@ -1980,7 +1980,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>平台</translation>
     </message>
   </context>
   <context>
@@ -5001,7 +5001,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>已共用</translation>
     </message>
     <message>
       <source>Isolated</source>
@@ -5137,7 +5137,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>已共用</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -6243,7 +6243,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n 佈局</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6297,7 +6297,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n 伺服器</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6339,11 +6339,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>於登入後</translation>
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n 個已移除之項目</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6435,7 +6435,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>結束</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9338,7 +9338,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>重試</translation>
     </message>
   </context>
   <context>
@@ -9376,15 +9376,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>否</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>存在</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>不存在</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -9395,7 +9395,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>文字檔</translation>
     </message>
     <message>
       <source>All</source>
@@ -9403,18 +9403,18 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>匯出清單</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>匯入查找列表</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>文字檔</translation>
     </message>
     <message>
       <source>All other text files</source>
@@ -10133,7 +10133,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>系統通知</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11008,7 +11008,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>啟用錄影資料加密將增加CPU資源使用率</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12416,7 +12416,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>物件類型</translation>
     </message>
   </context>
   <context>
@@ -12871,7 +12871,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>身份驗証</translation>
     </message>
     <message>
       <source>Login</source>

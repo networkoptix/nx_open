@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Enganxa</translation>
     </message>
   </context>
   <context>
@@ -616,7 +616,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>copiat</translation>
     </message>
   </context>
   <context>
@@ -723,7 +723,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Esdeveniment d'analítica</translation>
     </message>
   </context>
   <context>
@@ -757,7 +757,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Fet</translation>
     </message>
   </context>
   <context>
@@ -926,11 +926,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Enrere</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Finalitza</translation>
     </message>
   </context>
   <context>
@@ -1480,11 +1480,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Arxiu:</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1583,7 +1583,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>No s'ha pogut exportar</translation>
     </message>
     <message>
       <source>Export Selected</source>
@@ -1673,7 +1673,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>No hi ha notificacions noves</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
@@ -1709,7 +1709,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Qualsevol tipus</translation>
     </message>
   </context>
   <context>
@@ -1882,7 +1882,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitat</translation>
     </message>
   </context>
   <context>
@@ -1982,7 +1982,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copia</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2004,11 +2004,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Fet</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Finalitzat</translation>
     </message>
   </context>
   <context>
@@ -2134,11 +2134,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Més informació</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Desconegut</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2154,7 +2154,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nom d'usuari</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3034,7 +3034,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regles d'esdeveniments</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3042,11 +3042,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Calendari</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Estat</translation>
     </message>
   </context>
   <context>

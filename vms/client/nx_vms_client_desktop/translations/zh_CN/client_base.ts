@@ -1226,7 +1226,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>改变宽高比</translation>
     </message>
   </context>
   <context>
@@ -1980,7 +1980,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>平台</translation>
     </message>
   </context>
   <context>
@@ -6243,7 +6243,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n 布局</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6297,7 +6297,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n 服务器</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6343,7 +6343,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n 个已删除主题</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6435,7 +6435,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>结束</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9338,7 +9338,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>重试</translation>
     </message>
   </context>
   <context>
@@ -9376,15 +9376,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>否</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>存在</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>不存在</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -10133,7 +10133,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>系统提醒</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11008,7 +11008,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>启用录像资料加密将增加CPU使用率</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12416,7 +12416,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>物件类型</translation>
     </message>
   </context>
   <context>
@@ -12871,7 +12871,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>验证</translation>
     </message>
     <message>
       <source>Login</source>

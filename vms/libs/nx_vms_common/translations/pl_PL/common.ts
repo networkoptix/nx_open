@@ -607,6 +607,17 @@
     </message>
   </context>
   <context>
+    <name>QnLayoutAccessValidationPolicy</name>
+    <message>
+      <source>Users do not have access to the selected layout</source>
+      <translation type="unfinished">Users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation>Niektórzy użytkownicy nie mają dostępu do wybranego układu</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
@@ -1980,11 +1991,11 @@
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility</translation>
+      <translation>Nagłówek HTTP: Serwer, obsługiwane zmienne: $vmsName, $vmsVersion, $company, $compatibility</translation>
     </message>
     <message>
       <source>Device storage information update interval</source>
-      <translation type="unfinished">Device storage information update interval</translation>
+      <translation>Częstotliwość aktualizacji informacji o pamięci urządzenia</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
@@ -2040,7 +2051,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>Sprawdź uprawnienia strumienia wideo na serwerze VMS (milisekundy)</translation>
     </message>
   </context>
   <context>
@@ -2723,15 +2734,15 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Problem z usługami</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has license migration issue</source>
-      <translation type="unfinished">Server &quot;%1&quot; has license migration issue</translation>
+      <translation>Serwer &quot;%1&quot; ma problem z migracją licencji</translation>
     </message>
     <message>
       <source>Service overuse</source>
-      <translation type="unfinished">Service overuse</translation>
+      <translation>Nadmierne wykorzystanie usług</translation>
     </message>
     <message>
       <source>The following licenses were not migrated:</source>
@@ -2739,7 +2750,7 @@
     </message>
     <message>
       <source>License</source>
-      <translation type="unfinished">License</translation>
+      <translation>Licencja</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -2748,7 +2759,7 @@
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
@@ -2757,8 +2768,8 @@
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Tworzenie kopii zapasowej w chmurze na %n kanałach zostało zatrzymane z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
@@ -2766,7 +2777,7 @@
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
@@ -2774,11 +2785,11 @@
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Nie udało się przenieść licencji.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Pominięto import licencji. Kolejna próba migracji zostanie automatycznie zaplanowana na później.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>

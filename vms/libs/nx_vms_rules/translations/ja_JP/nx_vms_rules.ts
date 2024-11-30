@@ -91,7 +91,7 @@
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>予期しない検証ポリシー</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -240,11 +240,11 @@
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>%1 を下回る値は指定できません。</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>%1 を上回る値は指定できません。</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -544,7 +544,7 @@
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Basic または Digest 認証方式が選択されている場合は、ユーザーとパスワードのフィールドを入力する必要があります。</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
@@ -739,11 +739,11 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>`%1` のイベント状態に対して、動作継続時間を 0 に設定することはできません。</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation>`%1` イベント状態に対して、0 以外の動作継続時間を設定することはできません</translation>
+      <translation>`%1` のイベント状態に対して、動作継続時間を 0 以外に設定することはできません。</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>消費上限: %1 ワット</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
@@ -1042,7 +1042,7 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>ユーザー: %1</translation>
     </message>
   </context>
   <context>
@@ -1177,15 +1177,15 @@
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>URL を入力してください。</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>有効な URL である必要があります。</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>URL にはユーザー名やパスワードを含めないでください。</translation>
     </message>
   </context>
   <context>

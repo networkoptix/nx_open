@@ -2656,7 +2656,7 @@
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Konfigurasi...</translation>
     </message>
     <message>
       <source>Blur</source>
@@ -2676,7 +2676,7 @@
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administrator</translation>
     </message>
     <message>
       <source>Available to</source>

@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Cella képarány</translation>
     </message>
   </context>
   <context>
@@ -2003,7 +2003,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Platform</translation>
     </message>
   </context>
   <context>
@@ -6338,7 +6338,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Elrendezések</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6393,7 +6393,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n szerver</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6442,7 +6442,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n eltávolított tárgy</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -9483,7 +9483,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Újra</translation>
     </message>
   </context>
   <context>
@@ -9521,7 +9521,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nem</translation>
     </message>
     <message>
       <source>Present</source>
@@ -10283,7 +10283,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Rendszerfigyelmeztetések</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -13057,7 +13057,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Azonosítás</translation>
     </message>
     <message>
       <source>Login</source>

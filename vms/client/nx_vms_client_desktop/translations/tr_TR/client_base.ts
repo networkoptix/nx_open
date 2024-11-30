@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>En boy oranı</translation>
     </message>
   </context>
   <context>
@@ -2002,7 +2002,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Platform</translation>
     </message>
   </context>
   <context>
@@ -2593,7 +2593,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
   </context>
   <context>
@@ -5060,7 +5060,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Paylaşıldı</translation>
     </message>
     <message>
       <source>Isolated</source>
@@ -5196,7 +5196,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Paylaşıldı</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -5563,9 +5563,9 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n daha fazla</numerusform>
+        <numerusform>+ %n daha fazla</numerusform>
       </translation>
     </message>
     <message>
@@ -6336,7 +6336,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Düzenleri</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6391,7 +6391,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n sunucular</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6436,11 +6436,11 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>İçinde</translation>
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n kaldırılan konular</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6533,7 +6533,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Son</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9481,7 +9481,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Tekrar Dene</translation>
     </message>
   </context>
   <context>
@@ -9519,26 +9519,26 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Hayır</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Mevcut</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Yok</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Herhangi bir %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Metin dosyaları</translation>
     </message>
     <message>
       <source>All</source>
@@ -9546,18 +9546,18 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>Aktarım Listesi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>Arama Listesini İçe Aktar</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Metin dosyaları</translation>
     </message>
     <message>
       <source>All other text files</source>
@@ -10281,7 +10281,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Sistem Bildirimleri</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11169,7 +11169,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Arşiv şifreleme CPU kullanımını artırır</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12587,7 +12587,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Başlık</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12595,7 +12595,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Nesne türü</translation>
     </message>
   </context>
   <context>
@@ -13050,7 +13050,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Kimlik Doğrulama</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13180,7 +13180,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Site</translation>
     </message>
   </context>
   <context>

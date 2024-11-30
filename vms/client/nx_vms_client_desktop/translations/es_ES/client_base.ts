@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Relación de Aspecto de Celda</translation>
     </message>
   </context>
   <context>
@@ -2003,7 +2003,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Plataforma</translation>
     </message>
   </context>
   <context>
@@ -6337,7 +6337,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Diseños</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6392,7 +6392,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n Servidores</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6437,11 +6437,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>En</translation>
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n sujetos eliminados</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -9482,7 +9482,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Volver a intentar</translation>
     </message>
   </context>
   <context>
@@ -9520,15 +9520,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>No</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Presente</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Ausente</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -10282,7 +10282,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Notificaciones del sistema</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11172,7 +11172,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>El cifrado de archivo aumenta el uso de la CPU</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12600,7 +12600,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de objeto</translation>
     </message>
   </context>
   <context>
@@ -13055,7 +13055,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autenticación</translation>
     </message>
     <message>
       <source>Login</source>

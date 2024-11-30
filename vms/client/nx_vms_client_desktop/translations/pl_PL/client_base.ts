@@ -5331,19 +5331,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Nieznany rozmiar</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>Pamięć posiada różne zasady odczytu na różnych serwerach w witrynie</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Kliknij ikonę, aby zobaczyć listę serwerów</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Polityka odczytu i zapisu</translation>
     </message>
   </context>
   <context>
@@ -5456,7 +5456,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>Nie udało się zapisać ustawień witryny</translation>
     </message>
   </context>
   <context>
@@ -5698,11 +5698,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n więcej</numerusform>
+        <numerusform>+ %n więcej</numerusform>
+        <numerusform>+ %n więcej</numerusform>
+        <numerusform>+ %n więcej</numerusform>
       </translation>
     </message>
     <message>
@@ -6527,7 +6527,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Układów</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6584,7 +6584,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n serwer</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6639,7 +6639,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n usunięty obiekt</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6734,7 +6734,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Koniec</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -8363,12 +8363,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Połącz witrynę z %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Połącz witrynę z %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
@@ -8438,7 +8438,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nowa strona</translation>
     </message>
   </context>
   <context>
@@ -8636,7 +8636,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Zarządzanie witryną</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -9772,7 +9772,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Ponów</translation>
     </message>
   </context>
   <context>
@@ -9810,15 +9810,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nie</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Obecnie</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Nieobecny</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -9925,7 +9925,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Połącz witryny</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -10005,7 +10005,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nowa strona</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -10582,7 +10582,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Powiadomienia systemowe</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11498,7 +11498,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Szyfrowanie archiwów zwiększa obciążenie procesora</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12952,7 +12952,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Tytuł</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12960,7 +12960,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Typ obiektu</translation>
     </message>
   </context>
   <context>
@@ -13005,7 +13005,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nowa strona</translation>
     </message>
   </context>
   <context>
@@ -13072,7 +13072,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>Inne strony</translation>
     </message>
   </context>
   <context>
@@ -13415,7 +13415,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Uwierzytelnianie</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13543,7 +13543,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Wybierz co najmniej jeden układ</translation>
     </message>
     <message>
       <source>Select at least one User</source>
@@ -13551,7 +13551,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Witryna</translation>
     </message>
   </context>
   <context>

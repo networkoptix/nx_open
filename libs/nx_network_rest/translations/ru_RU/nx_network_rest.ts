@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Сессионный ключ слишком стар для этого сайта.</translation>
     </message>
   </context>
   <context>
@@ -98,21 +98,21 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Неверный запрос.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Не реализовано.</translation>
     </message>
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Не найдено.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Внутренняя ошибка.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Не авторизован.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Требуется авторизация.</translation>
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
@@ -145,7 +145,7 @@
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>Не допускается.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2</source>

@@ -108,11 +108,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>ไม่​พบ.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>ข้อผิดพลาดภายใน</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>หน้าเว็บไซต์ไม่ได้รับอนุญาต.</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -145,7 +145,7 @@
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>ไม่ได้รับอนุญาต.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2</source>

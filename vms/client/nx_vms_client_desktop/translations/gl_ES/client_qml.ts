@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Pegar</translation>
     </message>
   </context>
   <context>
@@ -616,7 +616,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>copiado</translation>
     </message>
   </context>
   <context>
@@ -723,7 +723,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Evento analítico</translation>
     </message>
   </context>
   <context>
@@ -757,7 +757,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Feito!</translation>
     </message>
   </context>
   <context>
@@ -926,11 +926,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Volver</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Rematar</translation>
     </message>
   </context>
   <context>
@@ -1709,7 +1709,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Calquera tipo</translation>
     </message>
   </context>
   <context>
@@ -1982,7 +1982,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copiar</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2004,7 +2004,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Feito!</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -2138,7 +2138,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Descoñecido</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -3034,7 +3034,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regras do evento</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3046,7 +3046,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Estado</translation>
     </message>
   </context>
   <context>

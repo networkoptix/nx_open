@@ -65,11 +65,11 @@
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemer med kamera</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemer med enheden</translation>
     </message>
     <message>
       <source>Any camera issue</source>
@@ -77,15 +77,15 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Ethvert enhedsproblem</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Serverhændelser</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Enhver serverhændelse</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
@@ -121,7 +121,7 @@
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Der er ingen egnede servere</translation>
     </message>
     <message>
       <source>At</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Varighed</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
@@ -431,7 +431,7 @@
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Enheds IP-konflikt</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Vælg layout</translation>
     </message>
   </context>
   <context>

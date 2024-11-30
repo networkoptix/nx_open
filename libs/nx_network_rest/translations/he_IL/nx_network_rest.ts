@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -98,7 +98,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>בקשה שגויה.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -108,11 +108,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>לא נמצא.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>שגיאה פנימית.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>לא מורשה.</translation>
     </message>
     <message>
       <source>Session expired.</source>

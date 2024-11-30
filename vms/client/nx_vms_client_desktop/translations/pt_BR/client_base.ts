@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Proporção das células</translation>
     </message>
   </context>
   <context>
@@ -2003,7 +2003,7 @@ Chave de licença: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Plataforma</translation>
     </message>
   </context>
   <context>
@@ -4901,7 +4901,7 @@ Chave de licença: %2</translation>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>ERRO DE CERTIFICADO</translation>
     </message>
   </context>
   <context>
@@ -6338,7 +6338,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Layout</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6393,7 +6393,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n Servidores</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6442,7 +6442,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n assuntos removidos</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6535,7 +6535,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Fim</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9483,7 +9483,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Tentar Novamente</translation>
     </message>
   </context>
   <context>
@@ -9521,15 +9521,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Não</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Presente</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Ausente</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -10283,7 +10283,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Notificações do sistema</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11174,7 +11174,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>A criptografia de arquivo aumenta o uso da CPU</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12601,7 +12601,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de objeto</translation>
     </message>
   </context>
   <context>
@@ -13056,7 +13056,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autenticação</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13182,7 +13182,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Selecione pelo menos um usuário</translation>
     </message>
     <message>
       <source>Site</source>

@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Paste</translation>
     </message>
   </context>
   <context>
@@ -612,7 +612,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>copied</translation>
     </message>
   </context>
   <context>
@@ -925,7 +925,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Finish</translation>
     </message>
   </context>
   <context>
@@ -1476,7 +1476,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Browse...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1872,7 +1872,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensity</translation>
     </message>
   </context>
   <context>
@@ -1970,7 +1970,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copy</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2122,11 +2122,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Learn more</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -3019,7 +3019,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Event Rules</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3027,7 +3027,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Schedule</translation>
     </message>
     <message>
       <source>State</source>

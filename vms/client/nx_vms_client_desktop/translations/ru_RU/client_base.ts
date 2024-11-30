@@ -1250,7 +1250,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation type="unfinished">Cell Aspect Ratio</translation>
+      <translation>Соотношение сторон ячеек</translation>
     </message>
   </context>
   <context>
@@ -2049,7 +2049,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Платформа</translation>
     </message>
   </context>
   <context>
@@ -2662,7 +2662,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Сайт</translation>
     </message>
   </context>
   <context>
@@ -6528,7 +6528,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Layouts</source>
-      <translation type="unfinished">%n Layouts</translation>
+      <translation>%n Раскладкок</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -6585,7 +6585,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n серверов</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6640,7 +6640,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n удаленных объекта</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -6735,7 +6735,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Конец</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -9773,7 +9773,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Повторить</translation>
     </message>
   </context>
   <context>
@@ -9811,15 +9811,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Нет</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Присутствующий</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Отсутствующий</translation>
     </message>
     <message>
       <source>Any %1</source>
@@ -10583,7 +10583,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Системные оповещения</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -11499,7 +11499,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Шифрование архива увеличивает загрузку ЦП</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
@@ -12955,7 +12955,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Заголовок</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12963,7 +12963,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Тип объекта</translation>
     </message>
   </context>
   <context>
@@ -13418,7 +13418,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Аутентификация</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13554,7 +13554,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Сайт</translation>
     </message>
   </context>
   <context>

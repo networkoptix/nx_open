@@ -50,11 +50,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>Jumlah dekoder maksimum</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>Tingkatkan kinerja decoding video menggunakan jumlah hardware decoder maksimum</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -231,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>Masukkan kata sandi akun %1 Anda untuk terkoneksi ke Site</translation>
     </message>
   </context>
   <context>
@@ -332,7 +332,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>Anda tidak terkoneksi ke Site mana pun</translation>
     </message>
   </context>
   <context>
@@ -413,15 +413,15 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Semua Site</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>Site yang Dipilih</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>Setidaknya satu site harus dipilih</translation>
     </message>
   </context>
   <context>
@@ -621,7 +621,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>Tidak ada Site yang ditemukan</translation>
     </message>
   </context>
   <context>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>Notifikasi dimatikan di pengaturan perangkat</translation>
     </message>
     <message>
       <source>Beta Features</source>
@@ -868,7 +868,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Masukkan kata sandi enkripsi pada Klien Desktop untuk mendekripsi archive ini, atau mintalah bantuan administrator site Anda.</translation>
     </message>
   </context>
   <context>

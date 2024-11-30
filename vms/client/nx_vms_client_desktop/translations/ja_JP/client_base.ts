@@ -1166,7 +1166,7 @@
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>初期画面タブ</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
@@ -2413,7 +2413,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>ユーザーIP</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2996,7 +2996,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>サイトからログアウトします。サイトはローカルネットワーク経由でのみアクセス可能になります。</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
@@ -5014,7 +5014,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
@@ -5149,7 +5149,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>サイズ不明</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
@@ -5486,7 +5486,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>サイト通知をメールで受信できません。</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
@@ -5553,7 +5553,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>有効にすると、新しいカメラとサーバーが継続的に検出され、ステータス更新のために検出リクエストがカメラに送信されます。</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
@@ -6147,7 +6147,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>デバイスを移動できません</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
@@ -8763,7 +8763,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>編集なしの映像を表示</translation>
     </message>
   </context>
   <context>
@@ -9589,7 +9589,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>スターターライセンスを含むサイトと統合しようとしています。</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
@@ -9597,7 +9597,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>NVRライセンスを含むサイトと統合しようとしています。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
@@ -10076,7 +10076,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>組織ユーザーに対するユーザー管理は組織レベルでのみ利用でき、サイトレベルでは利用できません。</translation>
     </message>
   </context>
   <context>
@@ -11030,7 +11030,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>ユーザーセッション期間を無制限にすると、サイト全体のセキュリティが損なわれるほか、パフォーマンスが低下する可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -11488,12 +11488,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>サイトへのアクセスの有効期限が %1 に切れます</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>サイトへのアクセスの有効期限が %1 後に切れます</translation>
     </message>
   </context>
   <context>
@@ -12281,7 +12281,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>専用ウィンドウモードでは使用できません。</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
@@ -13023,15 +13023,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>イベント発生時</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>イベント開始時</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>イベント終了時</translation>
     </message>
     <message>
       <source>Select state</source>

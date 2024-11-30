@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Indsæt</translation>
     </message>
   </context>
   <context>
@@ -723,7 +723,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analyse Begivenhed</translation>
     </message>
   </context>
   <context>
@@ -757,7 +757,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Udført</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Tilbage</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -1480,7 +1480,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Fil:</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1677,7 +1677,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Notifikationsindstillinger</translation>
     </message>
   </context>
   <context>
@@ -1709,7 +1709,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Enhver type</translation>
     </message>
   </context>
   <context>
@@ -1982,7 +1982,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopier</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2004,7 +2004,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Udført</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -2134,11 +2134,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Læs mere</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukendt</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -3034,7 +3034,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regler For Begivenhed</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3046,7 +3046,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Status</translation>
     </message>
   </context>
   <context>

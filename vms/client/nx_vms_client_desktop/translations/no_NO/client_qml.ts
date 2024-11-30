@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Lim inn</translation>
     </message>
   </context>
   <context>
@@ -616,7 +616,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>kopiert</translation>
     </message>
   </context>
   <context>
@@ -723,7 +723,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analyse-hendelser</translation>
     </message>
   </context>
   <context>
@@ -757,7 +757,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Ferdig</translation>
     </message>
   </context>
   <context>
@@ -926,11 +926,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Tilbake</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Fullfør</translation>
     </message>
   </context>
   <context>
@@ -1480,11 +1480,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Fil:</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bla gjennom...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1571,7 +1571,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Ny liste...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -1583,7 +1583,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Eksport feilet</translation>
     </message>
     <message>
       <source>Export Selected</source>
@@ -1673,11 +1673,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Ingen nye varsler</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Varslingsinnstillinger</translation>
     </message>
   </context>
   <context>
@@ -1709,7 +1709,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Hvilken som helst type</translation>
     </message>
   </context>
   <context>
@@ -1882,7 +1882,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitet</translation>
     </message>
   </context>
   <context>
@@ -1982,7 +1982,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiér</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2004,11 +2004,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Ferdig</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Fullført</translation>
     </message>
   </context>
   <context>
@@ -2134,11 +2134,11 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Finn ut mer</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukjent</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2154,7 +2154,7 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Brukernavn</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3003,7 +3003,7 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alle nettsteder</translation>
     </message>
   </context>
   <context>
@@ -3034,7 +3034,7 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Hendelsesregler</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3042,11 +3042,11 @@ Trykk Alt + Klikk for å følge objektet</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Tidsplan</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Tilstand</translation>
     </message>
   </context>
   <context>

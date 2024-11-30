@@ -2676,7 +2676,7 @@
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>ผู้ดูแลระบบ</translation>
     </message>
     <message>
       <source>Available to</source>

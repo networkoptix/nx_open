@@ -2656,7 +2656,7 @@
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Configurar...</translation>
     </message>
     <message>
       <source>Blur</source>

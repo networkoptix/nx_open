@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>サイトプリセットを使用</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2652,7 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>映像の編集</translation>
     </message>
     <message>
       <source>Configure...</source>

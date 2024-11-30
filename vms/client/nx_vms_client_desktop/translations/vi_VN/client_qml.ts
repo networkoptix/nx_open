@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Dán</translation>
     </message>
   </context>
   <context>
@@ -612,7 +612,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>đã sao chép</translation>
     </message>
   </context>
   <context>
@@ -718,7 +718,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Sự kiện phân tích</translation>
     </message>
   </context>
   <context>
@@ -752,7 +752,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Hoàn Thành</translation>
     </message>
   </context>
   <context>
@@ -921,11 +921,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Quay lại</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Kết thúc</translation>
     </message>
   </context>
   <context>
@@ -1472,11 +1472,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Tập tin:</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Duyệt...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1563,7 +1563,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Danh sách mới...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -1575,7 +1575,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Xuất không thành công</translation>
     </message>
     <message>
       <source>Export Selected</source>
@@ -1664,11 +1664,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Không có thông báo mới</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Cài đặt thông báo</translation>
     </message>
   </context>
   <context>
@@ -1699,7 +1699,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Bất kỳ loại nào</translation>
     </message>
   </context>
   <context>
@@ -1872,7 +1872,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Cường độ</translation>
     </message>
   </context>
   <context>
@@ -1970,7 +1970,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Bản sao</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -1992,11 +1992,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Hoàn Thành</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Hoàn thành</translation>
     </message>
   </context>
   <context>
@@ -2122,11 +2122,11 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Tìm hiểu thêm</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Không xác định</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2142,7 +2142,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Tên người dùng</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2988,7 +2988,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Tất cả Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -3019,7 +3019,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Quy tắc sự kiện</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3027,11 +3027,11 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Lịch trình</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Tình trạng</translation>
     </message>
   </context>
   <context>

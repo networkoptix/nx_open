@@ -607,6 +607,17 @@
     </message>
   </context>
   <context>
+    <name>QnLayoutAccessValidationPolicy</name>
+    <message>
+      <source>Users do not have access to the selected layout</source>
+      <translation type="unfinished">Users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>

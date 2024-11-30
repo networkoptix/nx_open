@@ -57,19 +57,19 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Eventos de análise</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Calquera evento de análise</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemas coa cámara</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemas cos dispositivos</translation>
     </message>
     <message>
       <source>Any camera issue</source>
@@ -77,15 +77,15 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Calquera problema co dispositivo</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Eventos do servidor</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Calquera evento do servidor</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
@@ -109,11 +109,11 @@
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Selecciona polo menos un dispositivo</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Selecciona polo menos unha cámara</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Duración</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
@@ -206,7 +206,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Para</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Seleccionar deseño</translation>
     </message>
   </context>
   <context>

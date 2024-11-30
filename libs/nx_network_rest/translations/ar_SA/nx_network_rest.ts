@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>كلمة مرور خاطئة</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>غير مصرح به.</translation>
     </message>
     <message>
       <source>Session expired.</source>

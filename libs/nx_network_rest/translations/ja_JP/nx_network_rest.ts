@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation>パスワードが違います</translation>
+      <translation>パスワードが違います。</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -60,7 +60,7 @@
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP サーバーの SSL/TLS 証明書を検証できません。</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>このサイトに対してセッションキーが古すぎます。</translation>
     </message>
   </context>
   <context>
@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>サポートされていないメディアタイプです。</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>要認証。</translation>
     </message>
     <message>
       <source>Session expired.</source>

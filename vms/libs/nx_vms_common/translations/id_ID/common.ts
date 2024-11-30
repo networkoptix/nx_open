@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Putar Audio</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Event Site</translation>
     </message>
   </context>
   <context>
@@ -174,20 +174,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Site Health Viewers</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Anggota grup ini memiliki hak istimewa Site tanpa batas. Administrator dapat membuat dan mengubah Power Users, menggabungkan Site, dan mengkoneksikan atau memutuskan koneksi Site ke %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Anggota grup ini dapat, selain izin yang diberikan oleh grup Advanced Viewers, mengendalikan sebagian besar konfigurasi Site, tetapi tidak diperbolehkan mengubah pengaturan terkait Administrator, seperti menghapus atau mengubah grup dan izin mereka sendiri, dan tidak dapat membuat atau mengedit Power Users lainnya.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Anggota grup ini dapat melihat informasi Site Health Monitoring dan beban prosesor server secara real-time (Server Monitoring).</translation>
     </message>
   </context>
   <context>
@@ -560,11 +560,22 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Kamera ini saat ini tidak ada pada layout yang dipilih</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Kamera ini saat ini tidak ada pada beberapa layout yang dipilih</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLayoutAccessValidationPolicy</name>
+    <message>
+      <source>Users do not have access to the selected layout</source>
+      <translation type="unfinished">Users do not have access to the selected layout</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout</source>
+      <translation type="unfinished">Some users do not have access to the selected layout</translation>
     </message>
   </context>
   <context>
@@ -981,7 +992,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Tidak ada peran user yang dipilih yang berisi users</translation>
     </message>
   </context>
   <context>
@@ -1245,11 +1256,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>Alamat email tidak ditetapkan untuk semua user yang dipilih.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>Alamat email tidak ditetapkan untuk beberapa user yang dipilih.</translation>
     </message>
   </context>
   <context>
@@ -1286,7 +1297,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Site Baru</translation>
     </message>
   </context>
   <context>
@@ -1778,47 +1789,47 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>Interval update site aktif (seconds, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
+      <translation>Kebijakan akses koneksi proxy</translation>
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>ID Site Cloud</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>Aktifkan 2FA untuk Site</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>Nama Site</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>ID Site Lokal, null berarti Site belum diset up.</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
+      <translation>Penggabungan ID Site Master Terakhir</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
+      <translation>ID Penggabungan Site slave terakhir</translation>
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>Pengaturan pikselasi</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>Terapkan batas sesi untuk token Cloud</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Mengaktifkan atau menonaktifkan pembuatan permintaan pendaftaran Integrasi baru</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
@@ -1830,7 +1841,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>Periksa izin stream video pada periode server VMS (milidetik)</translation>
     </message>
   </context>
   <context>
@@ -2524,15 +2535,15 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Gagal memaksakan penggunaan waktu kamera, karena terlalu lambat. Waktu site akan digunakan sebagai gantinya.</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Permintaan Panggilan</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Permintaan Panggilan Tak Terjawab</translation>
     </message>
   </context>
 </TS>

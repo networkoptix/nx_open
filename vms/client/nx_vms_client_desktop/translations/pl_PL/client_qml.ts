@@ -936,11 +936,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Powrót</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Zakończ</translation>
     </message>
   </context>
   <context>
@@ -1251,7 +1251,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Ta wtyczka nie posiada ustawień na poziomie witryny.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1496,11 +1496,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Plik:</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Przeglądaj...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1587,7 +1587,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Nowa lista...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -1599,7 +1599,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Eksportowanie nie powiodło się</translation>
     </message>
     <message>
       <source>Export Selected</source>
@@ -1691,11 +1691,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Brak nowych powiadomień</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Ustawienia powiadomień</translation>
     </message>
   </context>
   <context>
@@ -1729,7 +1729,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Dowolny typ</translation>
     </message>
   </context>
   <context>
@@ -1902,7 +1902,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensywność</translation>
     </message>
   </context>
   <context>
@@ -2006,7 +2006,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiuj</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2028,11 +2028,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Gotowe</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Zakończono</translation>
     </message>
   </context>
   <context>
@@ -2158,11 +2158,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Więcej informacji</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2178,7 +2178,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nazwa użytkownika</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2874,7 +2874,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Język powiadomień</translation>
     </message>
   </context>
   <context>
@@ -3014,7 +3014,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Język powiadomień</translation>
     </message>
     <message>
       <source>Interface Language</source>
@@ -3033,7 +3033,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Wszystkie witryny</translation>
     </message>
   </context>
   <context>
@@ -3064,7 +3064,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Reguły zdarzeń</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3072,11 +3072,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Harmonogram</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Stan</translation>
     </message>
   </context>
   <context>

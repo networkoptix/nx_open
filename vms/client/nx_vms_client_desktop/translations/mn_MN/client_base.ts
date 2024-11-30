@@ -9483,7 +9483,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Дахин оролдох</translation>
     </message>
   </context>
   <context>
@@ -9521,7 +9521,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Үгүй</translation>
     </message>
     <message>
       <source>Present</source>

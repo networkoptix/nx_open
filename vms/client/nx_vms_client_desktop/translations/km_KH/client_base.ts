@@ -6297,7 +6297,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n Servers</source>
-      <translation type="unfinished">%n Servers</translation>
+      <translation>%n Servers</translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
@@ -6343,7 +6343,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n removed subjects</translation>
     </message>
     <message>
       <source>%n removed devices</source>
@@ -10133,7 +10133,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>System Notifications</translation>
     </message>
     <message>
       <source>Choose Types...</source>
@@ -12876,7 +12876,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Authentication</translation>
     </message>
     <message>
       <source>Login</source>

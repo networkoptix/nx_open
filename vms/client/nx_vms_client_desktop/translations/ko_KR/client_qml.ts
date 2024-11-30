@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>붙여넣기</translation>
     </message>
   </context>
   <context>
@@ -612,7 +612,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>복사됨</translation>
     </message>
   </context>
   <context>
@@ -718,7 +718,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>분석 이벤트</translation>
     </message>
   </context>
   <context>
@@ -752,7 +752,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>완료</translation>
     </message>
   </context>
   <context>
@@ -921,11 +921,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>뒤로</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>마침</translation>
     </message>
   </context>
   <context>
@@ -1472,11 +1472,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>파일:</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>찾기...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1563,7 +1563,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>새 목록...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -1575,7 +1575,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>내보내기 실패</translation>
     </message>
     <message>
       <source>Export Selected</source>
@@ -1664,11 +1664,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>새 알림 없음</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>알림 설정</translation>
     </message>
   </context>
   <context>
@@ -1699,7 +1699,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>모든 유형</translation>
     </message>
   </context>
   <context>
@@ -1872,7 +1872,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>강도</translation>
     </message>
   </context>
   <context>
@@ -1970,7 +1970,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>복사</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -1992,11 +1992,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>완료</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>완료됨</translation>
     </message>
   </context>
   <context>
@@ -2117,11 +2117,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>자세히 알아보기</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2137,7 +2137,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>사용자이름</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3014,7 +3014,7 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>이벤트 규칙</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -3022,11 +3022,11 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>일정</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>시/도</translation>
     </message>
   </context>
   <context>

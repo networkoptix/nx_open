@@ -350,7 +350,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Буулгах</translation>
     </message>
   </context>
   <context>
@@ -926,7 +926,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Буцах</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -1480,7 +1480,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Файл:</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1982,7 +1982,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Хуулах</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2138,7 +2138,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Тодорхойгүй</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -3046,7 +3046,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Нөхцөл байдал</translation>
     </message>
   </context>
   <context>
