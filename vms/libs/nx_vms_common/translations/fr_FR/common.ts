@@ -1854,7 +1854,7 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>Intervalle de mise à jour du site (secondes, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
@@ -2608,15 +2608,15 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Impossible de forcer l'utilisation de l'heure de la caméra, car il y a trop de retard. L'heure du site sera utilisée à la place.</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Demande d'appel</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Demande d'appel manquée</translation>
     </message>
   </context>
 </TS>
