@@ -34,7 +34,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Site Anda</translation>
     </message>
   </context>
   <context>
@@ -46,7 +46,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Tidak dapat terkoneksi ke Site &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Session duration limit can be changed by the site administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the site administrators</translation>
+      <translation>Batasan durasi sesi dapat diubah oleh administrator site</translation>
     </message>
   </context>
   <context>
