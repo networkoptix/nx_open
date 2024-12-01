@@ -20,6 +20,7 @@ NxObject
     property alias placeholder: placeholderParameters
     property alias tileController: tileController
     property bool standardTileInteraction: true
+    property bool allowToFetchNewer: true
 
     onEnabledChanged:
     {
@@ -54,8 +55,10 @@ NxObject
         {
             if (view.atYBeginning)
             {
-                console.debug(loggingCategory, `${view.objectName}: scrolled to the beginning`)
-                d.updateData()
+                console.debug(loggingCategory, `${view.objectName}: scrolled to the beginning`
+                    + `, allowToFetchNewer: ${controller.allowToFetchNewer}`)
+                if (controller.allowToFetchNewer)
+                    d.updateData()
             }
         }
 
@@ -235,7 +238,7 @@ NxObject
             {
                 d.fetchBottom()
             }
-            else if (view.atYBeginning)
+            else if (view.atYBeginning && controller.allowToFetchNewer)
             {
                 d.fetchTop()
             }

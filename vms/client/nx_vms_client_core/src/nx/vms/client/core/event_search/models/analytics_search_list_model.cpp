@@ -112,7 +112,6 @@ public:
     QSet<nx::Uuid> dataChangedTrackIds; //< For which tracks delayed dataChanged is queued.
 
     bool gapBeforeNewTracks = false;
-    bool keepLiveDataAtClear = false;
 
     detail::AnalyticDataStorage newTracks; //< Live metadata tracks not yet added to displayed list.
     detail::AnalyticDataStorage hiddenTracks; //< Tracks without best shots or titles.
@@ -973,6 +972,20 @@ FetchedDataRanges AnalyticsSearchListModel::Private::applyFetchedData(
     q->setFetchedTimeWindow(timeWindow<Facade>(data.items));
 
     data.rebuild();
+
+    if (gapBeforeNewTracks
+        && request.direction == FetchDirection::newer
+        && !q->livePaused()
+        && !data.empty()
+        && !newTracks.empty()
+        && data.items.front().id == newTracks.items.front().id)
+    {
+        NX_VERBOSE(this, "Fetched to the top; live data behind a gap is discarded.");
+        newTracks.clear();
+        gapBeforeNewTracks = false;
+        emit q->availableNewTracksChanged();
+    }
+
     return fetched.ranges;
 }
 
@@ -1215,8 +1228,6 @@ void AnalyticsSearchListModel::commitAvailableNewTracks()
     if (d->gapBeforeNewTracks)
     {
         NX_VERBOSE(this, "Clearing model due to the gap before new tracks");
-
-        const QScopedValueRollback guard(d->keepLiveDataAtClear, true);
         clear();
         return;
     }
@@ -1491,18 +1502,9 @@ void AnalyticsSearchListModel::clearData()
     const auto availableNewTracksGuard = d->makeAvailableNewTracksGuard();
 
     ScopedReset reset(this, !d->data.empty());
-    if (d->keepLiveDataAtClear)
-    {
-        subtractKeysFromSet(/*minuend*/ d->externalBestShotTracks,
-            /*subtrahend*/ d->data.idToTimestamp);
-    }
-    else
-    {
-        d->newTracks.clear();
-        d->hiddenTracks.clear();
-        d->externalBestShotTracks.clear();
-    }
-
+    d->newTracks.clear();
+    d->hiddenTracks.clear();
+    d->externalBestShotTracks.clear();
     d->currentHttpRequestId = {};
     d->data.clear();
     d->gapBeforeNewTracks = false;
