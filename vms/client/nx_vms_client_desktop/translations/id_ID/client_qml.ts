@@ -2988,7 +2988,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Semua Site</translation>
     </message>
   </context>
   <context>

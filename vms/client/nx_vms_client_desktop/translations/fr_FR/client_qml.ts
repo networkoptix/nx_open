@@ -3003,7 +3003,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Tous les Sites</translation>
     </message>
   </context>
   <context>

@@ -708,7 +708,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Impossible de forcer l'utilisation de l'heure de la caméra, car il y a trop de retard. L'heure du site sera utilisée à la place.</translation>
     </message>
   </context>
   <context>

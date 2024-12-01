@@ -5058,7 +5058,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exclusif</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5194,7 +5194,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exclusif</translation>
     </message>
     <message>
       <source>Shared</source>
