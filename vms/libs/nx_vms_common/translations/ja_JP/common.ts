@@ -571,7 +571,7 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>指定ユーザーは選択したレイアウトにアクセスできません。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
