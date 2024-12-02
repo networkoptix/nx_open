@@ -21,6 +21,9 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
     connect(indicator, &LoadingIndicator::frameChanged, this,
         [this](const QPixmap& pixmap) { m_img->setPixmap(pixmap); });
 
+    m_img->setFixedSize(nx::vms::client::core::kIconSize);
+    m_img->setScaledContents(true);
+
     layout->addWidget(m_img);
     layout->addWidget(m_text);
     m_text->setVisible(false);
