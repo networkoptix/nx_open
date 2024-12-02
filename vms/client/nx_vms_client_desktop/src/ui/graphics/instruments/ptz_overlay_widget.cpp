@@ -10,8 +10,8 @@ using namespace nx::vms::client::desktop;
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
     {QIcon::Normal, {.primary = "light1", .secondary = "dark7"}}};
 
-NX_DECLARE_COLORIZED_ICON(kZoomInIcon, "32x32/Solid/zoom_in.svg", kLight1Theme)
-NX_DECLARE_COLORIZED_ICON(kZoomOutIcon, "32x32/Solid/zoom_out.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kZoomInIcon, "32x32/Solid/ptz_zoom_in.svg", kLight1Theme)
+NX_DECLARE_COLORIZED_ICON(kZoomOutIcon, "32x32/Solid/ptz_zoom_out.svg", kLight1Theme)
 NX_DECLARE_COLORIZED_ICON(kFocusAutoIcon, "32x32/Solid/focus_auto.svg", kLight1Theme)
 
 PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
