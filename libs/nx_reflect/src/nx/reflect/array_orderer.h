@@ -131,7 +131,7 @@ std::function<int(const T&, const T&)> makeComparator(const ArrayOrder& order)
         for (const auto& f: order.fields)
         {
             if (f.variantIndex < std::variant_size_v<T>)
-                orderPerIndex[*f.variantIndex].fields.emplace_back(f);
+                orderPerIndex[*f.variantIndex] = f;
         }
         std::vector<std::function<int(const T&, const T&)>> comparators;
         comparators.reserve(std::variant_size_v<T>);

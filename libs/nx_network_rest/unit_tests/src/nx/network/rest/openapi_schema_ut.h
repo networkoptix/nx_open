@@ -45,6 +45,7 @@ struct TestDeviceModel
     std::optional<nx::vms::api::CameraAttributesData> attributes;
     std::optional<nx::vms::api::ResourceStatus> status;
 };
+NX_REFLECTION_INSTRUMENT(TestDeviceModel, (general)(credentials)(attributes)(status))
 
 struct Base64Model
 {
@@ -57,15 +58,18 @@ struct ArrayOrderedTestNested
 {
     std::string name;
 };
+NX_REFLECTION_INSTRUMENT(ArrayOrderedTestNested, (name))
 
 struct ArrayOrderedTestVariant
 {
     std::variant<std::string, int, ArrayOrderedTestNested> id;
 };
+NX_REFLECTION_INSTRUMENT(ArrayOrderedTestVariant, (id))
 
 struct ArrayOrdererTestResponse
 {
     std::map<std::string, std::vector<ArrayOrderedTestVariant>> map;
 };
+NX_REFLECTION_INSTRUMENT(ArrayOrdererTestResponse, (map))
 
 } // namespace nx::network::rest::json::test

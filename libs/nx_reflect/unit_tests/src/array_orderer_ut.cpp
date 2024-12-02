@@ -92,11 +92,11 @@ TEST(ArrayOrderer, Variant)
         Model2{"name1", 1},
     };
     std::vector<ArrayOrder> fields{
-        {.name = "number2", .variantIndex = 1},
-        {.name = "name2", .variantIndex = 1},
-        {.name = "variant", .variantIndex = 1},
+        {"number2"},
+        {"name2"},
+        {"variant"},
     };
-    order(&list, {.fields = fields});
+    order(&list, {.fields = {{.variantIndex = 1, .fields = fields}}});
     std::vector<std::variant<Model, Model2>> expectedList{
         Model2{"name1", 1, {}, 1},
         Model2{"name1", 1, {}, 2},

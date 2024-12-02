@@ -13,6 +13,7 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/reflect.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/rest_api_versions.h>
 
@@ -134,19 +135,6 @@ public:
             ASSERT_EQ(response.statusCode, http::StatusCode::ok);
         }
         NX_INFO(this, "Made %1 API requests in %2", testCount, timer.elapsed());
-    }
-
-    static QJsonValue testJson()
-    {
-        using namespace nx::utils::json;
-        QJsonObject object1{{"id", "11111111-1111-1111-1111-111111111111"}, {"name", "1"}};
-        QJsonObject object2{{"id", "22222222-2222-2222-2222-222222222222"}, {"name", "2"}};
-        QJsonObject object3{{"id", "33333333-3333-3333-3333-333333333333"}, {"name", "3"}};
-        QJsonObject object4{{"id", "44444444-4444-4444-4444-444444444444"}, {"name", "4"}};
-        QJsonArray list{object2, object1};
-        object4.insert("list", list);
-        QJsonValue json = QJsonArray{object4, object3};
-        return json;
     }
 
     void postprocessResponse(const Request& request, QJsonValue* json)
@@ -439,100 +427,156 @@ TEST_P(OpenApiSchemaTest, Postprocess)
     std::vector<TestDeviceModel> devices(1);
     devices[0].attributes = nx::vms::api::CameraAttributesData();
     devices[0].attributes->cameraId = nx::Uuid::createUuid();
-    QJsonValue json;
-    QJson::serialize(devices, &json);
-    postprocessResponse(*restRequest({"GET /rest/{version}/devices HTTP/1.1"}), &json);
-    ASSERT_TRUE(json.isArray());
-    ASSERT_EQ(json.toArray().size(), 1);
-    QJsonValue device = json.toArray()[0];
-    ASSERT_TRUE(device.isObject());
-    QJsonValue attributes = device["attributes"];
-    ASSERT_TRUE(attributes.isObject());
-    ASSERT_FALSE(attributes.toObject().contains("cameraId"));
+    const auto request{restRequest({"GET /rest/{version}/devices HTTP/1.1"})};
+    if (GetParam() == *kRestApiV3)
+    {
+        using namespace nx::utils::json;
+        QJsonValue json;
+        QJson::serialize(devices, &json);
+        postprocessResponse(*request, &json);
+        ASSERT_FALSE(getObject(asArray(json)[0], "attributes").contains("cameraId"));
+    }
+    else
+    {
+        using namespace nx::utils::reflect;
+        auto json{nx::utils::serialization::json::serialized(devices, /*stripDefault*/ false)};
+        postprocessResponse(*request, &json);
+        ASSERT_FALSE(getObject(asArray(json)[0], "attributes").HasMember("cameraId"));
+    }
 }
 
 TEST_P(OpenApiSchemaTest, ArrayOrdererVariant)
 {
     ArrayOrdererTestResponse data{{{"key", {{{2}, {1}}}}}};
-    QJsonValue json;
-    QJson::serialize(data, &json);
-    postprocessResponse(
-        *restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"}), &json);
-    ASSERT_TRUE(json.isObject());
-    ASSERT_EQ(json.toObject().size(), 1);
-    QJsonValue map = json.toObject()["map"];
-    ASSERT_TRUE(map.isObject());
-    ASSERT_EQ(map.toObject().size(), 1);
-    QJsonValue value = map.toObject()["key"];
-    ASSERT_TRUE(value.isArray());
-    QJsonArray sorted = value.toArray();
-    ASSERT_EQ(sorted.size(), 2);
-    QJsonValue item1 = sorted[0];
-    ASSERT_TRUE(item1.isObject());
-    ASSERT_EQ(item1.toObject().size(), 1);
-    ASSERT_EQ(item1.toObject()["id"], 1);
-    QJsonValue item2 = sorted[1];
-    ASSERT_TRUE(item2.isObject());
-    ASSERT_EQ(item2.toObject().size(), 1);
-    ASSERT_EQ(item2.toObject()["id"], 2);
+    const auto request{
+        restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%231 HTTP/1.1"})};
+    if (GetParam() == *kRestApiV3)
+    {
+        using namespace nx::utils::json;
+        QJsonValue json;
+        QJson::serialize(data, &json);
+        postprocessResponse(*request, &json);
+        auto sorted{getArray(getObject(asObject(json), "map"), "key")};
+        ASSERT_EQ(sorted.size(), 2);
+        ASSERT_EQ(getDouble(asObject(sorted[0]), "id"), 1);
+        ASSERT_EQ(getDouble(asObject(sorted[1]), "id"), 2);
+    }
+    else
+    {
+        using namespace nx::utils::reflect;
+        detail::orderBy(&data, request->params());
+        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        postprocessResponse(*request, &json);
+        auto sorted{getArray(getObject(asObject(json), "map"), "key")};
+        ASSERT_EQ(sorted.Size(), 2);
+        ASSERT_EQ(getDouble(asObject(sorted[0]), "id"), 1);
+        ASSERT_EQ(getDouble(asObject(sorted[1]), "id"), 2);
+    }
 }
 
 TEST_P(OpenApiSchemaTest, ArrayOrdererVariantNested)
 {
     ArrayOrdererTestResponse data{
         {{"key", {{{ArrayOrderedTestNested{"2"}}, {ArrayOrderedTestNested{"1"}}}}}}};
-    QJsonValue json;
-    QJson::serialize(data, &json);
-    postprocessResponse(
-        *restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"}), &json);
-    ASSERT_TRUE(json.isObject());
-    ASSERT_EQ(json.toObject().size(), 1);
-    QJsonValue map = json.toObject()["map"];
-    ASSERT_TRUE(map.isObject());
-    ASSERT_EQ(map.toObject().size(), 1);
-    QJsonValue value = map.toObject()["key"];
-    ASSERT_TRUE(value.isArray());
-    QJsonArray sorted = value.toArray();
-    ASSERT_EQ(sorted.size(), 2);
-    QJsonValue item1 = sorted[0];
-    ASSERT_TRUE(item1.isObject());
-    ASSERT_EQ(item1.toObject().size(), 1);
-    QJsonValue nested1 = item1.toObject()["id"];
-    ASSERT_TRUE(nested1.isObject());
-    ASSERT_EQ(nested1.toObject().size(), 1);
-    ASSERT_EQ(nested1.toObject()["name"], "1") << QJson::serialized(json).toStdString();
-    QJsonValue item2 = sorted[1];
-    ASSERT_TRUE(item2.isObject());
-    ASSERT_EQ(item2.toObject().size(), 1);
-    QJsonValue nested2 = item2.toObject()["id"];
-    ASSERT_TRUE(nested2.isObject());
-    ASSERT_EQ(nested2.toObject().size(), 1);
-    ASSERT_EQ(nested2.toObject()["name"], "2");
+    const auto request{
+        restRequest({"GET /rest/{version}/orderer?_orderBy=map.*[].id.%232.name HTTP/1.1"})};
+    if (GetParam() == *kRestApiV3)
+    {
+        using namespace nx::utils::json;
+        QJsonValue json;
+        QJson::serialize(data, &json);
+        postprocessResponse(*request, &json);
+        auto sorted{getArray(getObject(asObject(json), "map"), "key")};
+        ASSERT_EQ(sorted.size(), 2);
+        ASSERT_EQ(getString(getObject(asObject(sorted[0]), "id"), "name"), "1");
+        ASSERT_EQ(getString(getObject(asObject(sorted[1]), "id"), "name"), "2");
+    }
+    else
+    {
+        using namespace nx::utils::reflect;
+        detail::orderBy(&data, request->params());
+        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        postprocessResponse(*request, &json);
+        auto sorted{getArray(getObject(asObject(json), "map"), "key")};
+        ASSERT_EQ(sorted.Size(), 2);
+        ASSERT_EQ(getString(getObject(asObject(sorted[0]), "id"), "name"), "1");
+        ASSERT_EQ(getString(getObject(asObject(sorted[1]), "id"), "name"), "2");
+    }
 }
+
+static const char* kTestJson = R"json([
+    {"id":"44444444-4444-4444-4444-444444444444", "name":"4",
+        "list":[
+            {"id":"22222222-2222-2222-2222-222222222222", "name":"2"},
+            {"id":"11111111-1111-1111-1111-111111111111", "name":"1"}
+        ]
+    },
+    {"id":"33333333-3333-3333-3333-333333333333", "name":"3"}
+])json";
 
 TEST_P(OpenApiSchemaTest, EmptyOrderBy)
 {
-    using namespace nx::utils::json;
-    auto json = testJson();
-    postprocessResponse(
-        *restRequest({"GET /rest/{version}/test?_orderBy= HTTP/1.1"}), &json);
-    ASSERT_EQ(asArray(json).size(), 2);
-    EXPECT_EQ(getString(asObject(asArray(json)[0]), "name"), "4");
-    ASSERT_EQ(getArray(asObject(asArray(json)[0]), "list").size(), 2);
-    EXPECT_EQ(getString(asObject(getArray(asObject(asArray(json)[0]), "list")[0]), "name"), "2");
-    EXPECT_EQ(getString(asObject(asArray(json)[1]), "name"), "3");
+    const auto request{restRequest({"GET /rest/{version}/test?_orderBy= HTTP/1.1"})};
+    if (GetParam() == *kRestApiV3)
+    {
+        using namespace nx::utils::json;
+        QJsonValue json;
+        QJson::deserialize(QByteArray{kTestJson}, &json);
+        postprocessResponse(*request, &json);
+        ASSERT_EQ(asArray(json).size(), 2);
+        ASSERT_EQ(getString(asObject(asArray(json)[0]), "name"), "4");
+        ASSERT_EQ(getArray(asObject(asArray(json)[0]), "list").size(), 2);
+        ASSERT_EQ(
+            getString(asObject(getArray(asObject(asArray(json)[0]), "list")[0]), "name"), "2");
+        ASSERT_EQ(getString(asObject(asArray(json)[1]), "name"), "3");
+    }
+    else
+    {
+        using namespace nx::utils::reflect;
+        auto [data, result] = nx::reflect::json::deserialize<std::vector<TestData>>(kTestJson);
+        ASSERT_TRUE(result);
+        detail::orderBy(&data, request->params());
+        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        postprocessResponse(*request, &json);
+        ASSERT_EQ(asArray(json).Size(), 2);
+        ASSERT_EQ(getString(asObject(asArray(json)[0]), "name"), "4");
+        ASSERT_EQ(getArray(asObject(asArray(json)[0]), "list").Size(), 2);
+        ASSERT_EQ(
+            getString(asObject(getArray(asObject(asArray(json)[0]), "list")[0]), "name"), "2");
+        ASSERT_EQ(getString(asObject(asArray(json)[1]), "name"), "3");
+    }
 }
 
 TEST_P(OpenApiSchemaTest, OrderByNameAndListName)
 {
-    using namespace nx::utils::json;
-    auto json = testJson();
-    postprocessResponse(
-        *restRequest({"GET /rest/{version}/test?_orderBy=name&_orderBy=list[].name HTTP/1.1"}), &json);
-    ASSERT_EQ(asArray(json).size(), 2);
-    EXPECT_EQ(getString(asObject(asArray(json)[0]), "name"), "3");
-    ASSERT_EQ(getArray(asObject(asArray(json)[1]), "list").size(), 2);
-    EXPECT_EQ(getString(asObject(getArray(asObject(asArray(json)[1]), "list")[0]), "name"), "1");
+    const auto request{
+        restRequest({"GET /rest/{version}/test?_orderBy=name&_orderBy=list[].name HTTP/1.1"})};
+    if (GetParam() == *kRestApiV3)
+    {
+        using namespace nx::utils::json;
+        QJsonValue json;
+        QJson::deserialize(QByteArray{kTestJson}, &json);
+        postprocessResponse(*request, &json);
+        ASSERT_EQ(asArray(json).size(), 2);
+        ASSERT_EQ(getString(asObject(asArray(json)[0]), "name"), "3");
+        ASSERT_EQ(getArray(asObject(asArray(json)[1]), "list").size(), 2);
+        ASSERT_EQ(
+            getString(asObject(getArray(asObject(asArray(json)[1]), "list")[0]), "name"), "1");
+    }
+    else
+    {
+        using namespace nx::utils::reflect;
+        auto [data, result] = nx::reflect::json::deserialize<std::vector<TestData>>(kTestJson);
+        ASSERT_TRUE(result);
+        detail::orderBy(&data, request->params());
+        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        postprocessResponse(*request, &json);
+        ASSERT_EQ(asArray(json).Size(), 2);
+        ASSERT_EQ(getString(asObject(asArray(json)[0]), "name"), "3");
+        ASSERT_EQ(getArray(asObject(asArray(json)[1]), "list").Size(), 2);
+        ASSERT_EQ(
+            getString(asObject(getArray(asObject(asArray(json)[1]), "list")[0]), "name"), "1");
+    }
 }
 
 static const QByteArray kPostLayoutDataJson = R"json({
