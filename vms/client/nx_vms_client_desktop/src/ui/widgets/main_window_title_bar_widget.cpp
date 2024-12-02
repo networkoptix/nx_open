@@ -642,14 +642,16 @@ void QnMainWindowTitleBarWidget::initControls()
         kControlButtonSize));
     topLayout->addWidget(newVLine("dark8", "dark6"));
     {
-        const QColor background = "#212A2F";
         const QColor cross = "#E1E7EA";
-        const core::SvgIconColorer::IconSubstitutions colorSubs = {
-            { QnIcon::Normal, {{background, "dark7"}, {cross, "light4"}}},
-            { QnIcon::Active, {{background, "red" }, {cross, "light4"}}},
-            { QnIcon::Pressed, {{background, "red" }, {cross, "light4"}}}};
+        const core::SvgIconColorer::IconSubstitutions colorSubs =
+            {{ QnIcon::Normal, {{cross, "light4"}}}};
         QIcon icon = qnSkin->icon("20x20/Outline/close_main_window.svg", "", nullptr, colorSubs);
-        topLayout->addWidget(newActionButton(menu::ExitAction, icon));
+        auto closeActionButton = newActionButton(menu::ExitAction, icon);
+        closeActionButton->setFixedSize(kControlButtonSize);
+        const auto closeButtonStyleSheet = QString{"QToolButton::hover{background-color: %1}"}.arg(
+            core::colorTheme()->color("red").name());
+        closeActionButton->setStyleSheet(closeButtonStyleSheet);
+        topLayout->addWidget(closeActionButton);
     }
 
     d->mainLayout = new QVBoxLayout(this);
