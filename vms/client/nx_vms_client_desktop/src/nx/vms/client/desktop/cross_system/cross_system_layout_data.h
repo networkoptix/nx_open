@@ -24,11 +24,11 @@ struct CrossSystemLayoutData
     bool locked = false;
     qint32 fixedWidth = 0;
     qint32 fixedHeight = 0;
-
     std::vector<CrossSystemLayoutItemData> items;
+    QString customGroupId;
 };
 #define CrossSystemLayoutData_Fields (id)(name)(cellAspectRatio)(cellSpacing) \
-    (locked)(fixedWidth)(fixedHeight)(items)
+    (locked)(fixedWidth)(fixedHeight)(items)(customGroupId)
 NX_REFLECTION_INSTRUMENT(CrossSystemLayoutData, CrossSystemLayoutData_Fields)
 
 void fromDataToResource(

@@ -12,12 +12,35 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
+#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <ui/workbench/workbench_context.h>
+
+namespace {
+
+void saveResources(const QnResourceList& resources)
+{
+    using namespace nx::vms::client::desktop;
+
+    for (const auto& resource: resources)
+    {
+        resource->savePropertiesAsync();
+
+        if (const auto layout = resource.objectCast<LayoutResource>())
+        {
+            const auto layoutSnapshotManager =
+                SystemContext::fromResource(layout)->layoutSnapshotManager();
+            layoutSnapshotManager->save(layout);
+        }
+    }
+}
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -88,8 +111,7 @@ void ResourceGroupingActionHandler::createNewCustomResourceTreeGroup() const
         setResourceCustomGroupId(resource, resourceCompositeGroupId);
     }
 
-    for (const auto& resource: resources)
-        resource->savePropertiesAsync();
+    saveResources(resources);
 
     menu()->trigger(menu::NewCustomGroupCreatedEvent,
         menu::Parameters(Qn::ResourceTreeCustomGroupIdRole, newCompositeGroupId));
@@ -111,8 +133,7 @@ void ResourceGroupingActionHandler::assignCustomResourceTreeGroupId() const
     for (const auto& resource: resources)
         setResourceCustomGroupId(resource, newGroupCompositeId);
 
-    for (const auto& resource: resources)
-        resource->savePropertiesAsync();
+    saveResources(resources);
 
     menu()->trigger(menu::CustomGroupIdAssignedEvent);
 }
@@ -191,8 +212,7 @@ void ResourceGroupingActionHandler::renameCustomResourceTreeGroup() const
         setResourceCustomGroupId(resource, newGroupCompositeId);
     }
 
-    for (const auto& resource: resources)
-        resource->savePropertiesAsync();
+    saveResources(resources);
 
     menu()->trigger(menu::CustomGroupRenamedEvent,
         menu::Parameters(Qn::TargetResourceTreeCustomGroupIdRole, newGroupCompositeId));
@@ -240,8 +260,7 @@ void ResourceGroupingActionHandler::moveToCustomResourceTreeGroup() const
             resources[i], appendCompositeId(destinationGroupId, resourcesCompositeIds.at(i)));
     }
 
-    for (const auto& resource: resources)
-        resource->savePropertiesAsync();
+    saveResources(resources);
 
     menu()->trigger(menu::MovedToCustomGroupEvent);
 }
@@ -274,8 +293,7 @@ void ResourceGroupingActionHandler::removeCustomResourceTreeGroup() const
         setResourceCustomGroupId(resource, newResourceGroupId);
     }
 
-    for (const auto& modifiedResource: modifiedResources)
-        modifiedResource->savePropertiesAsync();
+    saveResources(resources);
 
     menu()->trigger(menu::CustomGroupRemovedEvent);
 }

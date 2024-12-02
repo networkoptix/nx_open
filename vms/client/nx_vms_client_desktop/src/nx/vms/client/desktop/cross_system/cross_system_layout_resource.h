@@ -11,15 +11,26 @@ struct CrossSystemLayoutData;
 class CrossSystemLayoutResource: public LayoutResource
 {
     Q_OBJECT
+    using base_type = LayoutResource;
 
 public:
     CrossSystemLayoutResource();
 
     void update(const CrossSystemLayoutData& layoutData);
 
+    virtual QString getProperty(const QString& key) const override;
+
+    virtual bool setProperty(
+        const QString& key,
+        const QString& value,
+        bool markDirty = true) override;
+
 protected:
     /** Virtual constructor for cloning. */
     virtual LayoutResourcePtr create() const override;
+
+private:
+    QString m_customGroupId;
 };
 
 using CrossSystemLayoutResourcePtr = QnSharedResourcePointer<CrossSystemLayoutResource>;

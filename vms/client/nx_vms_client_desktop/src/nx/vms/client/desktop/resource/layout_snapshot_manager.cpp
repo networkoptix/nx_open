@@ -104,6 +104,9 @@ bool LayoutSnapshotManager::save(
     if (layout->isFile())
         return false;
 
+    NX_ASSERT(layout->systemContext() == systemContext(),
+        "Resource belongs to a different system context than layout snapshot manager");
+
     auto internalCallback = nx::utils::guarded(this,
         [this, layout, callback](bool success)
         {

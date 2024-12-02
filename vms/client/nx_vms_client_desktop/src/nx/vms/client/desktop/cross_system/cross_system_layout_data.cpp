@@ -3,6 +3,7 @@
 #include "cross_system_layout_data.h"
 
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
+#include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include "cross_system_layout_resource.h"
@@ -29,6 +30,9 @@ void fromDataToResource(
         dstItems.push_back(itemData);
     }
     resource->setItems(dstItems);
+
+    entity_resource_tree::resource_grouping::setResourceCustomGroupId(resource,
+        data.customGroupId);
 }
 
 void fromResourceToData(
@@ -60,6 +64,7 @@ void fromResourceToData(
 
         data.items.push_back(itemData);
     }
+    data.customGroupId = entity_resource_tree::resource_grouping::resourceCustomGroupId(resource);
 }
 
 } // namespace nx::vms::client::desktop
