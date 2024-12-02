@@ -103,6 +103,34 @@ InvalidatorPtr recorderNameInvalidator(
     return result;
 }
 
+GenericItem::DataProvider recorderIconProvider(
+    const QString& groupId,
+    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper)
+{
+    return
+        [groupId, recorderItemDataHelper]()
+        {
+            return recorderItemDataHelper->iconKey(groupId);
+        };
+}
+
+InvalidatorPtr recorderIconInvalidator(
+    const QString& groupId,
+    const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper)
+{
+    auto result = std::make_shared<Invalidator>();
+
+    result->connections()->add(recorderItemDataHelper->connect(
+        recorderItemDataHelper.get(), &RecorderItemDataHelper::groupedDeviceStatusChanged,
+        [groupId, invalidator = result.get()](const QString& changedGroupId)
+        {
+            if (groupId == changedGroupId)
+                invalidator->invalidate();
+        }));
+
+    return result;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Icon data provider / invalidator and flags provider factory functions for the cloud system item.
 //-------------------------------------------------------------------------------------------------
@@ -634,17 +662,16 @@ AbstractItemPtr ResourceTreeItemFactory::createRecorderItem(
     const QSharedPointer<RecorderItemDataHelper>& recorderItemDataHelper,
     Qt::ItemFlags itemFlags)
 {
-    const auto iconKey = recorderItemDataHelper->isMultisensorCamera(cameraGroupId)
-        ? IconCache::MultisensorCamera
-        : IconCache::Recorder;
     const auto nameProvider = recorderNameProvider(cameraGroupId, recorderItemDataHelper);
     const auto nameInvalidator = recorderNameInvalidator(cameraGroupId, recorderItemDataHelper);
+    const auto iconProvider = recorderIconProvider(cameraGroupId, recorderItemDataHelper);
+    const auto iconInvalidator = recorderIconInvalidator(cameraGroupId, recorderItemDataHelper);
 
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
         .withRole(Qt::ToolTipRole, nameProvider, nameInvalidator)
         .withRole(Qt::EditRole, nameProvider, nameInvalidator)
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(iconKey))
+        .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::recorder))
         .withRole(Qn::HelpTopicIdRole, static_cast<int>(HelpTopic::Id::MainWindow_Tree_Recorder))
         .withRole(Qn::CameraGroupIdRole, cameraGroupId)

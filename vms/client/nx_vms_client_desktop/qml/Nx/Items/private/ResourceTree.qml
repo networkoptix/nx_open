@@ -9,6 +9,7 @@ import Nx.Layout 1.0
 import Nx.Models 1.0
 import Nx.Utils 1.0
 
+import nx.vms.api
 import nx.vms.client.core 1.0
 import nx.vms.client.desktop 1.0
 
@@ -322,6 +323,38 @@ TreeView
                 }
 
                 return defaultState()
+            }
+
+            isDisabledResource:
+            {
+                if (delegateItem.resource)
+                    return delegateItem.resource.status === API.ResourceStatus.offline;
+
+                if (delegateItem.nodeType === ResourceTree.NodeType.recorder)
+                {
+                    const childCount = resourceTreeModel.rowCount(modelIndex);
+                    if (!childCount)
+                        return false
+
+                    for (let i = 0; i < childCount; ++i)
+                    {
+                        const childResource = modelDataAccessor.getData(
+                            resourceTreeModel.index(i, 0, modelIndex), "resource");
+
+                        if (!childResource)
+                            continue;
+
+                        if (childResource.status === API.ResourceStatus.online
+                            || childResource.status === API.ResourceStatus.recording)
+                        {
+                            return false; //< At least one child resource is online.
+                        }
+                    }
+
+                    return true; //< All child resources offline or uninitialized.
+                }
+
+                return false //< There is no resource to check status.
             }
 
             ResourceIdentificationThumbnail

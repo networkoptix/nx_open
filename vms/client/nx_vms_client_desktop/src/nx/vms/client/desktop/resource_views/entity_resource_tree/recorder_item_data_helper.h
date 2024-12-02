@@ -22,6 +22,7 @@ public:
     RecorderItemDataHelper(const CameraResourceIndex* cameraResourceIndex);
 
     QString groupedDeviceName(const QString& recorderGroupId) const;
+    int iconKey(const QString& recorderGroupId) const;
     bool isMultisensorCamera(const QString& recorderGroupId) const;
     bool isRecorder(const QString& recorderGroupId) const;
 
@@ -32,6 +33,7 @@ public:
 
 signals:
     void groupedDeviceNameChanged(const QString& recorderGroupId);
+    void groupedDeviceStatusChanged(const QString& recorderGroupId);
 
 private:
     void onCameraAdded(const QnResourcePtr& cameraResource);
@@ -39,6 +41,7 @@ private:
     void onCameraGroupIdChanged(const QnResourcePtr& cameraResource,
         const QString& previousRecorderGroupId);
     void onCameraGroupNameChanged(const QnResourcePtr& cameraResource);
+    void onCameraStatusChanged(const QnResourcePtr& cameraResource);
 
 private:
     QHash<QString, QSet<QnVirtualCameraResourcePtr>> m_camerasByRecorderGroupId;

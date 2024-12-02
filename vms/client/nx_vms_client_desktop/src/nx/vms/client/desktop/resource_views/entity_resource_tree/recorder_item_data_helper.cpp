@@ -2,12 +2,14 @@
 
 #include "recorder_item_data_helper.h"
 
+#include <range/v3/algorithm/any_of.hpp>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
-
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/camera_resource_index.h>
+#include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop {
@@ -72,6 +74,20 @@ bool RecorderItemDataHelper::isMultisensorCamera(const QString& recorderGroupId)
     return !camerasSet.empty() && (*camerasSet.cbegin())->isMultiSensorCamera();
 }
 
+int RecorderItemDataHelper::iconKey(const QString& recorderGroupId) const
+{
+    const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
+    if (camerasSet.empty() || !(*camerasSet.cbegin())->isMultiSensorCamera())
+        return QnResourceIconCache::Recorder;
+
+    const bool anyOfCameraOnline =
+        ranges::any_of(camerasSet, [](const auto& camera) { return camera->isOnline(); });
+
+    return anyOfCameraOnline
+        ? QnResourceIconCache::MultisensorCamera
+        : QnResourceIconCache::MultisensorCamera | QnResourceIconCache::Offline;
+}
+
 bool RecorderItemDataHelper::isRecorder(const QString& recorderGroupId) const
 {
     const auto& camerasSet = m_camerasByRecorderGroupId.value(recorderGroupId);
@@ -108,6 +124,9 @@ void RecorderItemDataHelper::onCameraAdded(const QnResourcePtr& cameraResource)
     connect(camera.get(), &QnVirtualCameraResource::groupNameChanged,
         this, &RecorderItemDataHelper::onCameraGroupNameChanged);
 
+    connect(camera.get(), &QnVirtualCameraResource::statusChanged,
+        this, &RecorderItemDataHelper::onCameraStatusChanged);
+
     if (groupId.isEmpty())
         return;
 
@@ -139,6 +158,12 @@ void RecorderItemDataHelper::onCameraGroupNameChanged(const QnResourcePtr& camer
 {
     const auto camera = cameraResource.staticCast<QnVirtualCameraResource>();
     emit groupedDeviceNameChanged(camera->getGroupId());
+}
+
+void RecorderItemDataHelper::onCameraStatusChanged(const QnResourcePtr& cameraResource)
+{
+    const auto camera = cameraResource.staticCast<QnVirtualCameraResource>();
+    emit groupedDeviceStatusChanged(camera->getGroupId());
 }
 
 } // namespace entity_resource_tree

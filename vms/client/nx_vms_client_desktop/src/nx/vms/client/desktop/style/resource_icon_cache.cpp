@@ -100,6 +100,8 @@ NX_DECLARE_COLORIZED_ICON(kVirtualCamerasNotificationIcon, "20x20/Outline/virtua
     kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kMultisensorIcon, "20x20/Solid/multisensor.svg",\
     kTreeThemeSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kMultisensorOfflineIcon, "20x20/Solid/multisensor_offline.svg",\
+    kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kMultisensorNotificationIcon, "20x20/Outline/multisensor.svg",\
     kTreeThemeSubstitutions)
 
@@ -377,6 +379,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Recorder, IconWithDescription(kEncoderIcon));
     m_cache.insert(Recorder | NotificationMode, IconWithDescription(kEncoderNotificationIcon));
     m_cache.insert(MultisensorCamera, IconWithDescription(kMultisensorIcon));
+    m_cache.insert(MultisensorCamera | Offline, IconWithDescription(kMultisensorOfflineIcon));
     m_cache.insert(MultisensorCamera | NotificationMode, IconWithDescription(kMultisensorNotificationIcon));
 
     // Local files.
