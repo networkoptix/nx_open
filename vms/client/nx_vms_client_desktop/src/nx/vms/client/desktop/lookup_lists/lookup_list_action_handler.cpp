@@ -88,6 +88,7 @@ struct LookupListActionHandler::Private
 
     LookupListActionHandler* const q;
     std::unique_ptr<LookupListsDialog> dialog;
+    nx::Uuid lastSelectedListId;
     std::optional<rest::Handle> requestId;
     std::deque<DataDescriptor> saveQueue;
     std::deque<Uuid> removeQueue;
@@ -384,16 +385,29 @@ void LookupListActionHandler::openLookupListsDialog()
     {
         d->dialog = std::make_unique<LookupListsDialog>(systemContext(), mainWindowWidget());
         if (lookupListManager()->isInitialized())
+        {
             d->dialog->setData(lookupListManager()->lookupLists());
+            d->dialog->selectList(d->lastSelectedListId);
+        }
 
         connect(d->dialog.get(), &LookupListsDialog::saveRequested, this,
             [this](LookupListDataList data) { d->saveData(std::move(data)); });
 
         connect(windowContext(), &WindowContext::beforeSystemChanged, this,
-            [this] { d->dialog.reset(); });
+            [this]
+            {
+                d->lastSelectedListId = nx::Uuid();
+                d->dialog.reset();
+            });
     }
 
     d->dialog->exec(Qt::ApplicationModal);
+
+    d->lastSelectedListId = d->dialog->selectedListId();
+
+    // TODO: #vbutkevich add real-time data update. For now the dialog must be recreated each time
+    // it is opened to ensure it reflects the current state.
+    d->dialog.reset();
 }
 
 void LookupListActionHandler::openLookupListEditDialog()

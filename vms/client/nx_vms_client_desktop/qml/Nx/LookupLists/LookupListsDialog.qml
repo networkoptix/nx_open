@@ -40,6 +40,8 @@ Dialog
     topPadding: 0
     bottomPadding: 0
 
+    // TODO: #vbutkevich. Replace the current QML model with a standalone C++ model to encapsulate
+    // all logic related to the model.
     ListModel
     {
         id: listsModel
@@ -114,6 +116,14 @@ Dialog
         saving = true
         hasChanges = false
         dialog.save(data)
+    }
+
+    function selectList(id)
+    {
+        if (id.isNull() || !currentList || id === currentList.data.id)
+            return
+
+        listComboBox.setCurrentList(id)
     }
 
     Connections
@@ -391,6 +401,19 @@ Dialog
                 function listsModelIndex()
                 {
                     return sortModel.mapToSource(sortModel.index(listComboBox.currentIndex, 0)).row
+                }
+
+                function setCurrentList(id)
+                {
+                    for (let i = 0; i < listsModel.count; ++i)
+                    {
+                        let list = listsModel.get(i).value
+                        if (list && list.data.id === id)
+                        {
+                            listComboBox.currentIndex = listComboBox.indexOfValue(list)
+                            break
+                        }
+                    }
                 }
 
                 model: SortFilterProxyModel

@@ -25,6 +25,8 @@ public:
 
     void setData(nx::vms::api::LookupListDataList data);
     void appendData(nx::vms::api::LookupListDataList data);
+    void selectList(const nx::Uuid& listId);
+    nx::Uuid selectedListId() const;
 
     /** Show error message box over the dialog. */
     void showError(const QString& title, const QString& description);

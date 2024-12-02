@@ -110,4 +110,16 @@ void LookupListsDialog::save(QList<LookupListModel*> data)
     emit saveRequested(result);
 }
 
+void LookupListsDialog::selectList(const nx::Uuid& listId)
+{
+    QMetaObject::invokeMethod(
+        window(), "selectList", Q_ARG(QVariant, QVariant::fromValue(listId)));
+}
+
+nx::Uuid LookupListsDialog::selectedListId() const
+{
+    const auto currentList = QmlProperty<LookupListModel*>(window(), "currentList").value();
+    return currentList ? currentList->rawData().id : nx::Uuid();
+}
+
 } // namespace nx::vms::client::desktop
