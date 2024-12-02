@@ -534,7 +534,10 @@ QPixmap QnResourceIconCache::iconPixmap(Key key,
     QnIcon::Mode mode)
 {
     using namespace nx::vms::client::core;
-    const auto& desc = iconDescription(key).iconDescription;
+    const auto& [icon, desc] = iconDescription(key);
+
+    if (desc.iconPath().isEmpty()) //< Use preloaded legacy icons.
+        return icon.pixmap(requestedSize, mode);
 
     QMap<QString /*source class name*/, QString /*target color name*/> customization;
     for (const auto& theme : {desc.themeSubstitutions(), svgColorSubstitutions})
