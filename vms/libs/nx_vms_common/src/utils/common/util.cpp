@@ -15,18 +15,37 @@ QString strPadLeft(const QString &str, int len, char ch)
     return str;
 }
 
+QString toUnixSeparator(QString path)
+{
+    return path.replace("\\", "/");
+}
+
 QString getPathSeparator(const QString& path)
 {
     return path.contains("\\") ? "\\" : "/";
 }
 
-QString closeDirPath(const QString& value)
+QString closeDirPath(QString path)
 {
-    QString separator = getPathSeparator(value);
-    if (value.endsWith(separator))
-        return value;
+    QString separator = getPathSeparator(path);
+    if (path.endsWith(separator))
+        return path;
     else
-        return value + separator;
+        return path + separator;
+}
+
+QString closeDirPathUnix(QString path)
+{
+    path = toUnixSeparator(std::move(path));
+    return closeDirPath(std::move(path));
+}
+
+QString stripLastSeparator(QString path)
+{
+    while (path.endsWith("/") || path.endsWith("\\"))
+        path.chop(1);
+
+    return path;
 }
 
 QString getValueFromString(const QString& line)

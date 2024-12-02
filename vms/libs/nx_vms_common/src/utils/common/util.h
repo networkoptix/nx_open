@@ -9,8 +9,11 @@
 
 NX_VMS_COMMON_API QString strPadLeft(const QString &str, int len, char ch);
 
-NX_VMS_COMMON_API QString closeDirPath(const QString &value);
+NX_VMS_COMMON_API QString closeDirPath(QString path);
 NX_VMS_COMMON_API QString getPathSeparator(const QString& path);
+NX_VMS_COMMON_API QString stripLastSeparator(QString path);
+NX_VMS_COMMON_API QString toUnixSeparator(QString path);
+NX_VMS_COMMON_API QString closeDirPathUnix(QString path);
 
 //#define MAX_RTSP_DATA_LEN (65535 - 16)
 
