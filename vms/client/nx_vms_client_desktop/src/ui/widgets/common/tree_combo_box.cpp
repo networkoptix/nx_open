@@ -4,11 +4,11 @@
 
 #include <QtGui/QKeyEvent>
 #include <QtGui/QWheelEvent>
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHeaderView>
 
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/client/desktop/common/delegates/styled_combo_box_delegate.h>
 #include <utils/common/delayed.h>
 
 namespace {
@@ -57,6 +57,9 @@ QnTreeComboBox::QnTreeComboBox(QWidget *parent):
     m_treeView->header()->setVisible(false);
 
     m_treeView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+    // Tree-like combobox should look like an average combobox.
+    m_treeView->setItemDelegate(new nx::vms::client::desktop::StyledComboBoxDelegate{m_treeView});
 
     setView(m_treeView);
 

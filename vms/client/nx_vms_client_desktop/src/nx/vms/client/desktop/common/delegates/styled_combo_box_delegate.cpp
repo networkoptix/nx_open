@@ -3,6 +3,7 @@
 #include "styled_combo_box_delegate.h"
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QTreeView>
 
 #include <nx/vms/client/desktop/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -21,7 +22,19 @@ void StyledComboBoxDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     initStyleOption(&itemOption, index);
 
     /* Fill background: */
-    painter->fillRect(itemOption.rect, itemOption.palette.midlight());
+    if (qobject_cast<QTreeView*>(parent()))
+    {
+        // Delegate's background should fill the entire width of the tree-like combobox.
+        painter->fillRect(
+            itemOption.rect.adjusted(-itemOption.rect.x(), 0, itemOption.rect.x(), 0),
+            itemOption.state.testFlag(QStyle::StateFlag::State_Selected)
+                ? itemOption.palette.highlight()
+                : itemOption.palette.midlight());
+    }
+    else
+    {
+        painter->fillRect(itemOption.rect, itemOption.palette.midlight());
+    }
 
     if (isSeparator(index))
     {
