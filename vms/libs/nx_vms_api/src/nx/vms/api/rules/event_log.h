@@ -80,7 +80,8 @@ struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
 };
 
 #define EventLogFilter_Fields \
-    ServerTimePeriod_Fields(eventResourceId)(eventType)(eventSubtype)(actionType)(ruleId)(text)(eventsOnly)(order)(limit)
+    ServerTimePeriod_Fields(eventResourceId)(eventType)(eventSubtype)(actionType)(ruleId)(text) \
+    (eventsOnly)(order)(limit)(flags)
 
 NX_REFLECTION_INSTRUMENT(EventLogFilter, EventLogFilter_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogFilter, (json), NX_VMS_API)
