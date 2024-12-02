@@ -10,13 +10,14 @@
 #include <nx/analytics/taxonomy/utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/events/camera_disconnected_event.h>
-#include <nx/vms/rules/aggregated_event.h>
-#include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/events/builtin_events.h>
-#include <nx/vms/rules/group.h>
-#include <nx/vms/rules/utils/event_parameter_format_functions.h>
-#include <nx/vms/rules/utils/field.h>
-#include <nx/vms/rules/utils/type.h>
+
+#include "../aggregated_event.h"
+#include "../engine.h"
+#include "../group.h"
+#include "event_parameter_format_functions.h"
+#include "field.h"
+#include "resource.h"
+#include "type.h"
 
 namespace {
 
@@ -28,16 +29,23 @@ constexpr char kStartOfSubstitutionSymbol = '{';
 constexpr char kEndOfSubstitutionSymbol = '}';
 constexpr char kGroupSeparatorSymbol = '.';
 constexpr int kSubgroupStart = 2;
-const auto kEventAttributesPrefix = QStringLiteral("event.attributes.");
 
-using FormatFunction = std::function<QString(const AggregatedEventPtr&, common::SystemContext*)>;
-using FilterFunction = std::function<bool(const ItemDescriptor&, State)>;
+using FormatFunction = std::function<QString(SubstitutionContext*, common::SystemContext*)>;
+using FilterFunction = std::function<bool(SubstitutionContext*, common::SystemContext*)>;
 
 struct SubstitutionDoc
 {
     QString text;
     QString resultExample;
     QString filterText = "All events.";
+};
+
+struct SubstitutionDesc
+{
+    FormatFunction formatFunction;
+    bool visible = true;
+    FilterFunction filter;
+    SubstitutionDoc documentation;
 };
 
 const QString kEventTimestampDescription = "The Current Epoch Unix Timestamp in %1.";
@@ -73,81 +81,61 @@ const SubstitutionDoc kDefaultEventNameDoc = {
 const SubstitutionDoc kDefaultEventTypeDoc = {
     .text = "The analytics event types.", .resultExample = "Line Crossing"};
 
-struct SubstitutionDesc
-{
-    FormatFunction formatFunction;
-    bool visible = true;
-    FilterFunction filter = {};
-    SubstitutionDoc documentation = {};
-};
 
 EventParameterHelper::EventParametersNames getAttributesParameters(
-    const QString& eventType, common::SystemContext* systemContext, const QString& objectId)
+    common::SystemContext* systemContext, const QString& objectTypeId)
 {
-    if (eventType != type<AnalyticsObjectEvent>() || objectId.isEmpty())
+    if (objectTypeId.isEmpty())
         return {};
 
     EventParameterHelper::EventParametersNames result;
     const auto attributesNames =
-        getAttributesNames(systemContext->analyticsTaxonomyState().get(), objectId);
+        getAttributesNames(systemContext->analyticsTaxonomyState().get(), objectTypeId);
     for (auto& attribute: attributesNames)
         result.insert(kEventAttributesPrefix + attribute);
     return result;
 }
 
 bool isValidEventAttribute(
-    const QString& text,
-    common::SystemContext* systemContext,
-    const AggregatedEventPtr& eventAggregator)
+    SubstitutionContext* substitution,
+    common::SystemContext* systemContext)
 {
-    if (systemContext->analyticsTaxonomyState()->objectTypes().empty())
+    if (substitution->event)
     {
-        // Taxonomy state is not initialized. Check that event at least has property attributes.
-        return eventAggregator->initialEvent()->property(kAttributesFieldName).isValid();
+        substitution->objectTypeId = substitution->event->property(kObjectTypeIdFieldName).toString();
+        if (substitution->objectTypeId.isEmpty())
+            return false;
+
+        if (systemContext->analyticsTaxonomyState()->objectTypes().empty())
+        {
+            // Taxonomy state is not initialized. Check that event at least has property attributes.
+            return substitution->event->property(kAttributesFieldName).isValid();
+        }
     }
 
-    const auto objectTypeId = eventAggregator->initialEvent()->property(kObjectTypeIdFieldName);
-    if (!objectTypeId.isValid() || !objectTypeId.canConvert<QString>())
-        return false;
-    return getAttributesParameters(eventAggregator->type(), systemContext, objectTypeId.toString())
-        .contains(text);
+    return getAttributesParameters(systemContext, substitution->objectTypeId).contains(
+        substitution->name);
 }
 
-bool deviceEvents(const ItemDescriptor& itemDescriptor, State)
+bool deviceEvents(SubstitutionContext* context, common::SystemContext*)
 {
-    return std::any_of(itemDescriptor.fields.begin(),itemDescriptor.fields.end(),
-        [](const FieldDescriptor& desc)
-        {
-            return desc.fieldName == kDeviceIdsFieldName || desc.fieldName == kCameraIdFieldName;\
-        });
+    return !resourceField(context->manifest.value(), ResourceType::device).empty();
 }
 
-bool prolongedEvents(const ItemDescriptor&, State eventState)
+bool prolongedEvents(SubstitutionContext* context, common::SystemContext*)
 {
-    return eventState == State::started || eventState == State::stopped;
+    return context->state == State::started || context->state == State::stopped;
 }
 
-bool userEvents(const ItemDescriptor& itemDescriptor, State)
+bool userEvents(SubstitutionContext* context, common::SystemContext*)
 {
-    return std::any_of(itemDescriptor.fields.begin(),itemDescriptor.fields.end(),
-        [](const FieldDescriptor& desc)
-        { return desc.fieldName == kUsersFieldName || desc.fieldName == kUserIdFieldName; });
+    return !resourceField(context->manifest.value(), ResourceType::user).empty();
 }
 
-bool substitutionIsApplicable(
-    const SubstitutionDesc& desc,
-    const QString& eventType,
-    State eventState,
-    common::SystemContext* context)
+bool hasProperty(SubstitutionContext* context, common::SystemContext*)
 {
-    if (!desc.filter)
-        return true;
-
-    const auto eventDesc = context->vmsRulesEngine()->eventDescriptor(eventType);
-    if (!eventDesc)
-        return false;
-
-    return desc.filter(eventDesc.value(), eventState);
+    return context->event && context->event->property(
+        context->name.sliced(kEventFieldsPrefix.size()).toUtf8()).isValid();
 }
 
 } // namespace
@@ -155,38 +143,81 @@ bool substitutionIsApplicable(
 struct EventParameterHelper::Private
 {
     std::map<QString, SubstitutionDesc, nx::utils::CaseInsensitiveStringCompare> formatFunctions;
-    FormatFunction formatFunction(
-        const QString& name, common::SystemContext* context, const AggregatedEventPtr& event)
-    {
-        if (name.startsWith(kEventAttributesPrefix))
-        {
-            if (!isValidEventAttribute(name, context, event))
-                return {};
 
-            return
-                [name](const AggregatedEventPtr& event, common::SystemContext* /*context*/)
-                { return eventAttribute(name.sliced(kEventAttributesPrefix.size()), event); };
+    const SubstitutionDesc* findDesc(const QString& name) const
+    {
+        auto it = formatFunctions.lower_bound(name);
+
+        if (it != formatFunctions.end() && it->first == name)
+            return &it->second;
+
+        if (it != formatFunctions.begin())
+        {
+            --it;
+            if (it->first.endsWith(kGroupSeparatorSymbol) && name.startsWith(it->first))
+                return &it->second;
         }
 
-        const auto it = formatFunctions.find(name);
-        if (it == formatFunctions.end())
+        return nullptr;
+    }
+
+    FormatFunction formatFunction(
+        common::SystemContext* system, SubstitutionContext* substitution) const
+    {
+        const auto desc = findDesc(substitution->name);
+        if (!desc)
             return {};
-        if (!substitutionIsApplicable(it->second, event->type(), event->state(), context))
+
+        if (desc->filter && !desc->filter(substitution, system))
             return {};
-        return it->second.formatFunction;
+
+        return desc->formatFunction;
     }
 
     void registerFormatFunction(const QString& parameter,const SubstitutionDesc& desc)
     {
         formatFunctions[parameter] = desc;
     }
+
     void initFormatFunctions();
 };
 
-
-
 void EventParameterHelper::Private::initFormatFunctions()
 {
+    registerFormatFunction(kEventAttributesPrefix,
+        {
+            .formatFunction = eventAttribute,
+            .visible = true,
+            .filter = isValidEventAttribute,
+            .documentation = {
+                .text = "Analytics Object attribute",
+                .resultExample = "Blue",
+                .filterText = "Analytic Object Event",
+            }
+        });
+
+    registerFormatFunction(kEventFieldsPrefix,
+    {
+        .formatFunction = eventField,
+        .visible = false,
+        .filter = hasProperty,
+        .documentation = {
+            .text = "Event data field convertible to string",
+            .resultExample = "6f9619ff-8b86-d011-b42d-00cf4fc964ff",
+        }
+    });
+
+    registerFormatFunction(kEventDetailsPrefix,
+    {
+        .formatFunction = eventDetail,
+        .visible = false,
+        .filter = {},
+        .documentation = {
+            .text = "Event detail convertible to string",
+            .resultExample = "Vehicle at Camera 1",
+        }
+    });
+
     registerFormatFunction("camera.id",
         {
             .formatFunction = &deviceId,
@@ -476,42 +507,54 @@ QString EventParameterHelper::getHtmlDescription(bool skipHidden)
 EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEventParameters(
     const QString& eventType,
     common::SystemContext* systemContext,
-    const QString& objectTypeField,
+    const QString& objectTypeId,
     State eventState)
 {
-    if (eventType.isEmpty())
+    auto context = SubstitutionContext{
+        .manifest = systemContext->vmsRulesEngine()->eventDescriptor(eventType),
+        .state = eventState,
+        .objectTypeId = objectTypeId,
+    };
+
+    if (!context.manifest)
         return {};
 
     EventParametersNames result;
     for (auto& [key, desc]: d->formatFunctions)
     {
+        if (key.endsWith(kGroupSeparatorSymbol))
+            continue; // TODO: #amalov Implement universal param name extraction.
+
         if (!desc.visible)
             continue; // Hidden elements are processed, but not visible in drop down menu.
 
-        if (!substitutionIsApplicable(desc, eventType, eventState, systemContext))
+        if (desc.filter && !desc.filter(&context, systemContext))
             continue;
 
         result.insert(key);
     }
 
-    for (auto& attributeValue: getAttributesParameters(eventType, systemContext, objectTypeField))
+    for (auto& attributeValue: getAttributesParameters(systemContext, objectTypeId))
         result.insert(attributeValue);
 
     return result;
 }
 
 QString EventParameterHelper::evaluateEventParameter(
-    common::SystemContext* context, const AggregatedEventPtr& eventAggregator, const QString& eventParameter)
+    common::SystemContext* context,
+    const AggregatedEventPtr& event,
+    const QString& eventParameter) const
 {
-    if (const auto function = d->formatFunction(eventParameter, context, eventAggregator))
-        return function(eventAggregator, context);
+    auto substitution = SubstitutionContext{
+        .name = eventParameter,
+        .event = event,
+        .manifest = context->vmsRulesEngine()->eventDescriptor(event->type()),
+        .state = event->state(),
+    };
 
-    const auto propertyValue = eventAggregator->property(eventParameter.toUtf8().data());
-    if (propertyValue.isValid() && propertyValue.canConvert<QString>())
-    {
-        // Found a valid event field, use it instead of the placeholder.
-        return propertyValue.toString();
-    }
+    if (const auto function = d->formatFunction(context, &substitution))
+        return function(&substitution, context);
+
     // Event parameter not found. Just add placeholder name to the result text.
     return addBrackets(eventParameter);
 }
@@ -529,7 +572,6 @@ QString EventParameterHelper::removeBrackets(QString text)
         text.removeLast();
     return text;
 }
-
 
 QString EventParameterHelper::getMainGroupName(const QString& text)
 {

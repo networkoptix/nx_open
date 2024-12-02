@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/router.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/utils/type.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::rules::test {
@@ -53,16 +53,19 @@ struct EngineBasedTest: public common::test::ContextBasedTest
         const Engine::EventConstructor& eventConstructor = []{ return new Event; },
         const Engine::ActionConstructor& actionConstructor = []{ return new Action; })
     {
-        if (!engine->eventDescriptor(utils::type<Event>()))
+        const auto eventType = rules::utils::type<Event>();
+        const auto actionType = rules::utils::type<Action>();
+
+        if (!engine->eventDescriptor(eventType))
             engine->registerEvent(Event::manifest(), eventConstructor);
 
-        if (!engine->actionDescriptor(utils::type<Action>()))
+        if (!engine->actionDescriptor(actionType))
             engine->registerAction(Action::manifest(), actionConstructor);
 
         auto rule = std::make_unique<Rule>(nx::Uuid::createUuid(), engine.get());
 
-        rule->addEventFilter(engine->buildEventFilter(utils::type<Event>()));
-        rule->addActionBuilder(engine->buildActionBuilder(utils::type<Action>()));
+        rule->addEventFilter(engine->buildEventFilter(eventType));
+        rule->addActionBuilder(engine->buildActionBuilder(actionType));
 
         return rule;
     }

@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
+#include <nx/utils/std_string_utils.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -22,9 +23,11 @@
 #include <nx/vms/rules/utils/field.h>
 #include <nx/vms/rules/utils/type.h>
 
+namespace nx::vms::rules::utils {
+
 namespace {
 
-using namespace nx::vms::rules;
+constexpr auto kDelimiter = QLatin1StringView(", ");
 
 QStringList toStringList(const QVariant& value)
 {
@@ -43,6 +46,32 @@ QString propertyToString(const AggregatedEventPtr& event, const char* key)
     return value.isValid() && value.canConvert<QString>() ? value.toString() : QString();
 }
 
+// Can convert common event types.
+std::optional<QString> variantToString(const QVariant& var)
+{
+    if (!var.isValid())
+        return {};
+
+    if (var.canConvert<QStringList>())
+        return var.value<QStringList>().join(kDelimiter);
+
+    if (var.canConvert<QString>())
+        return var.toString();
+
+    if (var.canConvert<nx::Uuid>())
+        return var.value<nx::Uuid>().toSimpleString();
+
+    if (var.canConvert<UuidList>())
+    {
+        return QString::fromStdString(nx::utils::join(
+            var.value<UuidList>(),
+            kDelimiter,
+            [](const nx::Uuid& id){ return id.toSimpleStdString(); }));
+    }
+
+    return {};
+}
+
 nx::Uuid eventSourceId(const AggregatedEventPtr& eventAggregator)
 {
     return eventAggregator ? sourceId(eventAggregator->initialEvent().get()) : nx::Uuid();
@@ -50,63 +79,58 @@ nx::Uuid eventSourceId(const AggregatedEventPtr& eventAggregator)
 
 } // namespace
 
-namespace nx::vms::rules::utils {
-
-QString eventType(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString eventType(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto result = eventAggregator->details(context).value(kEventTypeIdFieldName);
+    const auto result = substitution->event->details(context).value(kEventTypeIdFieldName);
     if (result.canConvert<QString>())
         return result.toString();
 
-    return eventAggregator->type();
+    return substitution->event->type();
 }
 
-QString eventCaption(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString eventCaption(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto captionProperty = propertyToString(eventAggregator, kCaptionFieldName);
-    QString result = captionProperty.isEmpty()
-        ? detailToString(eventAggregator->details(context), kCaptionDetailName)
-        : captionProperty;
+    QString result = propertyToString(substitution->event, kCaptionFieldName);
+    if (!result.isEmpty())
+        return result;
+
+    const auto details = substitution->event->details(context);
+    result = detailToString(details, kCaptionDetailName);
 
     if (result.isEmpty())
-    {
-        const auto name = eventAggregator->details(context).value(kNameDetailName);
-        if (name.canConvert<QString>())
-            result = name.toString();
-    }
+        result = detailToString(details, kNameDetailName);
 
     NX_ASSERT(!result.isEmpty(), "An event should have a caption");
     return result;
 }
 
-QString eventName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString eventName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto result = eventAggregator->details(context).value(kAnalyticsEventTypeDetailName);
-    if (result.canConvert<QString>())
-        return result.toString();
+    const auto details = substitution->event->details(context);
 
-    const auto name = eventAggregator->details(context).value(kNameDetailName);
-    if (name.canConvert<QString>())
-        return name.toString();
-
-    return {};
-}
-
-QString eventDescription(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
-{
-    auto result = detailToString(eventAggregator->details(context), kDescriptionDetailName);
+    auto result = detailToString(details, kAnalyticsEventTypeDetailName);
 
     if (result.isEmpty())
-        result = propertyToString(eventAggregator, kDescriptionFieldName);
+        result = detailToString(details, kNameDetailName);
+
+    return result;
+}
+
+QString eventDescription(SubstitutionContext* substitution, common::SystemContext* context)
+{
+    auto result = detailToString(substitution->event->details(context), kDescriptionDetailName);
+
+    if (result.isEmpty())
+        result = propertyToString(substitution->event, kDescriptionFieldName);
 
     return result;
 }
 
 // Keep in sync with StringHelper::eventDescription().
 QString extendedEventDescription(
-    const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+    SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto eventDetails = eventAggregator->details(context);
+    const auto eventDetails = substitution->event->details(context);
 
     QStringList extendedDescription;
     if (const auto it = eventDetails.find(utils::kNameDetailName); it != eventDetails.end())
@@ -125,25 +149,27 @@ QString extendedEventDescription(
         extendedDescription << QString("Caption: %1").arg(it->toString());
 
     extendedDescription << Strings::timestamp(
-        eventAggregator->initialEvent()->timestamp(),
-        static_cast<int>(eventAggregator->count()));
+        substitution->event->initialEvent()->timestamp(),
+        static_cast<int>(substitution->event->count()));
 
     extendedDescription << Strings::eventDetails(eventDetails);
 
     return toStringList(extendedDescription).join(common::html::kLineBreak);
 }
 
-QString eventTime(const AggregatedEventPtr& eventAggregator, common::SystemContext* /*context*/)
+QString eventTime(SubstitutionContext* substitution, common::SystemContext* /*context*/)
 {
-    return nx::utils::timestampToISO8601(eventAggregator->timestamp());
+    return nx::utils::timestampToISO8601(substitution->event->timestamp());
 }
 
-QString eventTimeStart(const AggregatedEventPtr& event, common::SystemContext* context)
+QString eventTimeStart(SubstitutionContext* substitution, common::SystemContext* context)
 {
+    const auto event = substitution->event;
+
     switch (event->state())
     {
         case State::started:
-            return eventTime(event, context);
+            return eventTime(substitution, context);
         case State::stopped:
             return nx::utils::timestampToISO8601(
                 context->vmsRulesEngine()->runningEventWatcher(event->ruleId()).startTime(
@@ -153,65 +179,65 @@ QString eventTimeStart(const AggregatedEventPtr& event, common::SystemContext* c
     }
 }
 
-QString eventTimeEnd(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString eventTimeEnd(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (eventAggregator->state() != State::stopped)
+    if (substitution->event->state() != State::stopped)
         return {};
 
-    return eventTime(eventAggregator, context);
+    return eventTime(substitution, context);
 }
 
-QString eventSource(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString eventSource(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto sourceId = eventSourceId(eventAggregator);
+    const auto sourceId = eventSourceId(substitution->event);
     if (const auto resource = context->resourcePool()->getResourceById(sourceId))
         return resource->getName();
 
-    return sourceId.toString();
+    return sourceId.toSimpleString();
 }
 
-QString deviceIp(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context)
 {
     if (const auto resource = context->resourcePool()->getResourceById<QnNetworkResource>(
-            eventSourceId(eventAggregator)))
+            eventSourceId(substitution->event)))
     {
         return resource->getHostAddress();
     }
     return {};
 }
 
-QString deviceId(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString deviceId(SubstitutionContext* substitution, common::SystemContext* context)
 {
     if (const auto resource =
-            context->resourcePool()->getResourceById(eventSourceId(eventAggregator)))
+            context->resourcePool()->getResourceById(eventSourceId(substitution->event)))
     {
         return resource->getId().toString();
     }
     return {};
 }
 
-QString deviceMac(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString deviceMac(SubstitutionContext* substitution, common::SystemContext* context)
 {
     if (const auto resource = context->resourcePool()->getResourceById<QnNetworkResource>(
-            eventSourceId(eventAggregator)))
+            eventSourceId(substitution->event)))
     {
         return resource->getMAC().toString();
     }
     return {};
 }
 
-QString deviceName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString deviceName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto sourceId = eventSourceId(eventAggregator);
+    const auto sourceId = eventSourceId(substitution->event);
     if (const auto resource = context->resourcePool()->getResourceById(sourceId))
         return resource->getName();
     return {};
 }
 
-QString deviceType(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString deviceType(SubstitutionContext* substitution, common::SystemContext* context)
 {
     if (const auto resource =
-            context->resourcePool()->getResourceById(eventSourceId(eventAggregator)))
+            context->resourcePool()->getResourceById(eventSourceId(substitution->event)))
     {
         if (const auto resType = qnResTypePool->getResourceType(resource->getTypeId()))
             return resType->getName();
@@ -219,15 +245,15 @@ QString deviceType(const AggregatedEventPtr& eventAggregator, common::SystemCont
     return {};
 }
 
-QString siteName(const AggregatedEventPtr& /*eventAggregator*/, common::SystemContext* context)
+QString siteName(SubstitutionContext*, common::SystemContext* context)
 {
     return context->globalSettings()->systemName();
 }
 
-QString userName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString userName(SubstitutionContext* substitution, common::SystemContext* context)
 {
     const auto userUuid =
-        eventAggregator->details(context).value(kUserIdDetailName).value<nx::Uuid>();
+        substitution->event->details(context).value(kUserIdDetailName).value<nx::Uuid>();
     if (userUuid.isNull())
         return {};
 
@@ -237,15 +263,17 @@ QString userName(const AggregatedEventPtr& eventAggregator, common::SystemContex
     return {};
 }
 
-QString eventAttribute(const QString& attributeName, const AggregatedEventPtr& eventAggregator)
+QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context)
 {
     using Attributes = nx::common::metadata::Attributes;
 
-    const auto& attributesVariant = eventAggregator->property(kAttributesFieldName);
+    const auto attributesVariant = substitution->event->property(kAttributesFieldName);
     if (!attributesVariant.canConvert<Attributes>())
         return {};
 
-    for (auto& attribute: attributesVariant.value<Attributes>())
+    const auto attributeName = substitution->name.sliced(kEventAttributesPrefix.size());
+
+    for (const auto& attribute: attributesVariant.value<Attributes>())
     {
         if (attributeName.compare(attribute.name, Qt::CaseInsensitive) == 0)
             return attribute.value;
@@ -254,9 +282,9 @@ QString eventAttribute(const QString& attributeName, const AggregatedEventPtr& e
     return {};
 }
 
-QString serverName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context)
+QString serverName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    auto resource = context->resourcePool()->getResourceById(eventSourceId(eventAggregator));
+    auto resource = context->resourcePool()->getResourceById(eventSourceId(substitution->event));
     while (resource)
     {
         if (const auto server = resource.dynamicCast<QnMediaServerResource>())
@@ -264,6 +292,20 @@ QString serverName(const AggregatedEventPtr& eventAggregator, common::SystemCont
         resource = resource->getParentResource();
     }
     return {};
+}
+
+QString eventField(SubstitutionContext* substitution, common::SystemContext* context)
+{
+    return variantToString(substitution->event->property(
+        substitution->name.sliced(kEventFieldsPrefix.size()).toUtf8()))
+            .value_or(EventParameterHelper::addBrackets(substitution->name));
+}
+
+QString eventDetail(SubstitutionContext* substitution, common::SystemContext* context)
+{
+    return variantToString(substitution->event->details(context).value(
+        substitution->name.sliced(kEventDetailsPrefix.size())))
+            .value_or(EventParameterHelper::addBrackets(substitution->name));
 }
 
 } // namespace nx::vms::rules::utils

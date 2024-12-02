@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/reflect/json.h>
+#include <nx/utils/buffer.h>
 
 namespace nx::analytics::taxonomy {
 
@@ -16,9 +17,14 @@ bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
     if (!file.open(QFile::ReadOnly))
         return false;
 
-    const auto data = file.readAll().toStdString();
+    const auto data = file.readAll();
 
-    auto [fullData, jsonResult] = nx::reflect::json::deserialize<QJsonObject>(data);
+    return makeDescriptorsTestData(nx::toBufferView(data), outTestData);
+}
+
+bool makeDescriptorsTestData(std::string_view body, TestData* outTestData)
+{
+    auto [fullData, jsonResult] = nx::reflect::json::deserialize<QJsonObject>(body);
 
     outTestData->fullData = fullData;
 

@@ -26,7 +26,9 @@ public:
     nx::vms::api::analytics::Descriptors descriptors(const nx::Uuid& serverId = nx::Uuid());
 
     // Server-only method.
-    void updateDescriptors(nx::vms::api::analytics::Descriptors descriptors);
+    void updateDescriptors(const nx::vms::api::analytics::Descriptors& descriptors);
+
+    void updateDescriptorsForTests(nx::vms::api::analytics::Descriptors descriptors);
 
 signals:
     void descriptorsUpdated();

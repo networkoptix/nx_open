@@ -90,7 +90,7 @@ TEST(VmsRulesSerialization, Event)
         std::chrono::seconds(5),
         State::started);
     sourceEvent->attributes = nx::common::metadata::Attributes{{"key", "value"}};
-    sourceEvent->level = nx::vms::api::EventLevel::error;
+    sourceEvent->level = nx::vms::event::Level::critical;
     sourceEvent->reason = nx::vms::api::EventReason::networkBadCameraTime;
     sourceEvent->conflicts.camerasByServer["test"] = QStringList{"cam1", "cam2"};
 
@@ -160,6 +160,13 @@ TEST(VmsRulesSerialization, VariantStringList)
         // Empty variant may be extracted as empty string list.
         EXPECT_FALSE(v.canConvert<QStringList>());
         ASSERT_EQ(v.toStringList().size(), 0);
+    }
+    {
+        QVariant v = QStringList{"line 1", "line 2"};
+
+        // Variant with string list can be converted to QString, but can not be extracted.
+        EXPECT_TRUE(v.canConvert<QString>());
+        EXPECT_EQ(QString(), v.toString());
     }
 }
 

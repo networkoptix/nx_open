@@ -293,10 +293,7 @@ taxonomy::AbstractStateWatcher* SystemContext::analyticsTaxonomyStateWatcher() c
 
 std::shared_ptr<taxonomy::AbstractState> SystemContext::analyticsTaxonomyState() const
 {
-    if (d->analyticsTaxonomyStateWatcher)
-        return d->analyticsTaxonomyStateWatcher->state();
-
-    return nullptr;
+    return analyticsTaxonomyStateWatcher()->state();
 }
 
 std::shared_ptr<nx::metric::Storage> SystemContext::metrics() const

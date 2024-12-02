@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <nx/vms/api/analytics/descriptors.h>
 
 namespace nx::analytics::taxonomy {
@@ -14,5 +16,8 @@ struct NX_VMS_COMMON_TEST_SUPPORT_API TestData
 
 NX_VMS_COMMON_TEST_SUPPORT_API bool loadDescriptorsTestData(
     const QString& filePath, TestData* outTestData);
+
+NX_VMS_COMMON_TEST_SUPPORT_API bool makeDescriptorsTestData(
+    std::string_view body, TestData* outTestData);
 
 } // namespace nx::analytics::taxonomy

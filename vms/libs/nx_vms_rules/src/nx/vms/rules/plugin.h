@@ -43,23 +43,19 @@ public:
 protected:
     Plugin(); // Should be used as base class only.
 
-    template<class C>
-    bool registerEventField() const
+    template<class F>
+    bool registerEventField(auto... args) const
     {
-        const QString id = fieldMetatype<C>();
-        if (NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
-        {
-            if (!m_engine->isEventFieldRegistered(id))
+        const QString id = fieldMetatype<F>();
+        if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
+            return false;
+
+        return m_engine->registerEventField(
+            id,
+            [args...](const FieldDescriptor* descriptor)
             {
-                return m_engine->registerEventField(
-                    id,
-                    [](const FieldDescriptor* descriptor)
-                    {
-                        return new C(descriptor);
-                    });
-            }
-        }
-        return false;
+                return new F(args..., descriptor);
+            });
     }
 
     template<class Field, class Validator>

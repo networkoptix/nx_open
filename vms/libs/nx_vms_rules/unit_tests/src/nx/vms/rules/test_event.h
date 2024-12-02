@@ -59,7 +59,7 @@ public:
     QString m_cacheKey;
 };
 
-// Test event with permissions. No filter fields.
+// Test event with permissions. No filter fields. May be used for field/details format tests.
 class TestEvent: public nx::vms::rules::BasicEvent
 {
     using base_type = BasicEvent;
@@ -76,7 +76,7 @@ class TestEvent: public nx::vms::rules::BasicEvent
     Q_PROPERTY(double floatField MEMBER m_floatField)
 
     Q_PROPERTY(nx::common::metadata::Attributes attributes MEMBER attributes)
-    Q_PROPERTY(nx::vms::api::EventLevel level MEMBER level)
+    Q_PROPERTY(nx::vms::event::Level level MEMBER level)
     Q_PROPERTY(nx::vms::api::EventReason reason MEMBER reason)
     Q_PROPERTY(nx::vms::rules::CameraConflictList conflicts MEMBER conflicts)
 
@@ -111,12 +111,14 @@ public:
     {
         auto result = base_type::details(context, aggregatedInfo);
         result[utils::kSourceNameDetailName] = "Test resource";
-        nx::vms::rules::utils::insertLevel(result, nx::vms::event::Level::none);
+        nx::vms::rules::utils::insertLevel(result, level);
         nx::vms::rules::utils::insertIcon(result, nx::vms::rules::Icon::alert);
         result[nx::vms::rules::utils::kCustomIconDetailName] = "test";
         nx::vms::rules::utils::insertClientAction(result, nx::vms::rules::ClientAction::none);
         result[nx::vms::rules::utils::kUrlDetailName] = "http://localhost";
         result[utils::kDetailingDetailName] = QStringList{"line 1", "line 2"};
+        result["number"] = m_intField;
+        result["stdString"] = QVariant::fromValue(m_text.toStdString());
 
         return result;
     }
@@ -131,7 +133,7 @@ public:
     double m_floatField{};
 
     nx::common::metadata::Attributes attributes;
-    nx::vms::api::EventLevel level = {};
+    nx::vms::event::Level level = {};
     nx::vms::api::EventReason reason = {};
     nx::vms::rules::CameraConflictList conflicts;
 };

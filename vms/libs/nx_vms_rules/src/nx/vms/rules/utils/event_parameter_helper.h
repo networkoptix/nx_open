@@ -43,9 +43,10 @@ public:
     /**
      * Generates eventParameter's replacement for specific event, if it is applicable.
      */
-    QString evaluateEventParameter(common::SystemContext* context,
+    QString evaluateEventParameter(
+        common::SystemContext* context,
         const AggregatedEventPtr& eventAggregator,
-        const QString& eventParameter);
+        const QString& eventParameter) const;
 
     /**
      * Generates html table with description of available event parameters.

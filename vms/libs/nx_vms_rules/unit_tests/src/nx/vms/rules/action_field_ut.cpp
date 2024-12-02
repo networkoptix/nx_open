@@ -81,11 +81,9 @@ public:
         {"text", "hello"},
         {"boolField", true},
         {"floatField", 123.123},
+        {"cameraId", nx::Uuid::createUuid().toSimpleString()},
     };
-    const QString kAttributeNameField = QStringLiteral("Name");
-    const QString kAttributeName = QStringLiteral("Temporal Displacement");
-    const QString kAttributeLicensePlateNumberField = QStringLiteral("LicensePlate.Number");
-    const QString kAttributeLicensePlateNumber = QStringLiteral("OUTATIME");
+
     const FieldDescriptor kDummyDescriptor;
 
     ActionFieldTest()
@@ -93,58 +91,13 @@ public:
         engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
     }
 
-    EventPtr makeEvent(State state = State::instant)
+    TestEventPtr makeEvent(State state = State::instant)
     {
-        auto event = engine->buildEvent(kEventData);
+        auto event = engine->buildEvent(kEventData).staticCast<TestEvent>();
         auto timestamp = std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::system_clock::now().time_since_epoch());
         event->setTimestamp(timestamp);
         event->setState(state);
-        return event;
-    }
-
-    EventPtr makeAnalyticsObjectEvent()
-    {
-        engine->registerEventField(
-            fieldMetatype<SourceCameraField>(),
-            [](const FieldDescriptor* descriptor)
-            {
-                return new SourceCameraField(descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<AnalyticsObjectTypeField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new AnalyticsObjectTypeField(systemContext(), descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<ObjectLookupField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new ObjectLookupField(systemContext(), descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<StateField>(),
-            [](const FieldDescriptor* descriptor)
-            {
-                return new StateField(descriptor);
-            });
-
-        engine->registerEvent(
-            AnalyticsObjectEvent::manifest(), [] { return new AnalyticsObjectEvent(); });
-
-        static const EventData kEventAtributeData = {
-            {"type", AnalyticsObjectEvent::manifest().id},
-            {"objectTypeId", "nx.base.Vehicle"}
-        };
-        auto event = engine->buildEvent(kEventAtributeData);
-
-        // This has to be added manually since the Json conversion will fail.
-        static const nx::common::metadata::Attributes kAttributes{
-            {kAttributeNameField, kAttributeName},
-            {kAttributeLicensePlateNumberField, kAttributeLicensePlateNumber}};
-
-        event->setProperty("attributes", QVariant::fromValue(kAttributes));
         return event;
     }
 
@@ -333,22 +286,6 @@ TEST_F(ActionFieldTest, EventTimeProlongedEvent)
     EXPECT_EQ(stoppedActionTimestamps.activeTime, stoppedActionTimestamps.endTime);
 }
 
-TEST_F(ActionFieldTest, EventAttributes)
-{
-    TextWithFields field(systemContext(), &kDummyDescriptor);
-    auto event = makeAnalyticsObjectEvent();
-    auto aggregatedEvent = AggregatedEventPtr::create(event);
-    field.setText(
-        QStringLiteral("{event.attributes.%1} {event.attributes.%2} \"{event.attributes.empty}\"")
-            .arg(kAttributeNameField)
-            .arg(kAttributeLicensePlateNumberField));
-
-    const auto& actual = field.build(aggregatedEvent).toString();
-    const auto& expected = QStringLiteral("%1 %2 \"\"").arg(kAttributeName).arg(kAttributeLicensePlateNumber);
-
-    EXPECT_EQ(expected, actual);
-}
-
 TEST_F(ActionFieldTest, EventDotType)
 {
     TextWithFields field(systemContext(), &kDummyDescriptor);
@@ -413,9 +350,8 @@ TEST_F(ActionFieldTest, EventDotSource)
     auto eventAggregator = AggregatedEventPtr::create(event);
 
     field.setText("{event.source}");
-    static const auto kZeroId = u"{00000000-0000-0000-0000-000000000000}";
 
-    EXPECT_EQ(kZeroId, field.build(eventAggregator).toString());
+    EXPECT_EQ(event->m_cameraId.toSimpleString(), field.build(eventAggregator).toString());
 }
 
 TEST_F(ActionFieldTest, EventTooltip)
@@ -450,15 +386,16 @@ static const std::vector<FormatResult> kFormatResults
     {"", ""},
 
     // Test valid formatting
-    {"int 123", "int {intField}"},
+    {"int 123", "int {event.fields.intField}"},
     {"int {} int", "int {} int"},
-    {"string hello", "string {text}"},
-    {"bool true", "bool {boolField}"},
-    {"float 123.123", "float {floatField}"},
-    {"123 hello true 123.123", "{intField} {text} {boolField} {floatField}"},
+    {"string hello", "string {event.fields.text}"},
+    {"bool true", "bool {event.fields.boolField}"},
+    {"float 123.123", "float {event.fields.floatField}"},
+    {"123 hello true 123.123",
+    "{event.fields.intField} {event.fields.text} {event.fields.boolField} {event.fields.floatField}"},
 
     // Test placeholders.
-    {"123 {absent}", "{intField} {absent}"},
+    {"123 {absent}", "{event.fields.intField} {absent}"},
 
     // Test invalid format string.
     {"int {int", "int {int"},
@@ -466,11 +403,11 @@ static const std::vector<FormatResult> kFormatResults
     {"int {} int", "int {} int"},
 
     // Test exotic cases.
-    {"{{123}}", "{{{intField}}}"},
-    {"}{{123}}", "}{{{intField}}}"},
-    {"{{123}}{", "{{{intField}}}{"},
-    {"{ { 123}}", "{ { {intField}}}"},
-    {"{ 123}}", "{ {intField}}}"},
+    {"{{123}}", "{{{event.fields.intField}}}"},
+    {"}{{123}}", "}{{{event.fields.intField}}}"},
+    {"{{123}}{", "{{{event.fields.intField}}}{"},
+    {"{ { 123}}", "{ { {event.fields.intField}}}"},
+    {"{ 123}}", "{ {event.fields.intField}}}"},
     {"{ {int{}}}", "{ {int{}}}"},
 };
 
@@ -538,10 +475,10 @@ void notContainsHiddenElements(
     ASSERT_FALSE(visibleElements.contains("camera.id"));
 }
 
-TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForGeneric)
+TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesAnyEvent)
 {
     auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
-        utils::type<GenericEvent>(), systemContext(), {});
+        utils::type<TestEvent>(), systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
     // List dont have parameters for soft trigger.
     ASSERT_FALSE(visibleElements.contains("user.name"));
@@ -552,7 +489,6 @@ TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForGeneric)
 
     containsParametersForAllEvents(visibleElements);
     notContainsHiddenElements(visibleElements);
-
 }
 
 TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForSoftTrigger)
@@ -571,28 +507,23 @@ TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForSoftTrigger)
 
 TEST_F(ActionFieldTest, EventParametersHelperVisibleValuesForDeviceEvents)
 {
-    // Required for registering the event.
-    makeAnalyticsObjectEvent();
-
     auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
-        utils::type<AnalyticsObjectEvent>(), systemContext(), {});
+        utils::type<TestEvent>(), systemContext(), {});
     ASSERT_FALSE(visibleElements.empty());
 
     // List has element related to device events.
-    ASSERT_TRUE(visibleElements.contains("device.ip"));
-    ASSERT_TRUE(visibleElements.contains("device.mac"));
+    EXPECT_TRUE(visibleElements.contains("device.ip"));
+    EXPECT_TRUE(visibleElements.contains("device.mac"));
 
     containsParametersForAllEvents(visibleElements);
     notContainsHiddenElements(visibleElements);
 }
 
-TEST_F(ActionFieldTest, EventParametersHelperCustomEvent)
+TEST_F(ActionFieldTest, EventParametersHelperUnregisteredEvent)
 {
     auto visibleElements = utils::EventParameterHelper::instance()->getVisibleEventParameters(
         "customEventType", systemContext(), {});
-    ASSERT_FALSE(visibleElements.empty());
-    containsParametersForAllEvents(visibleElements);
-    notContainsHiddenElements(visibleElements);
+    ASSERT_TRUE(visibleElements.empty());
 }
 
 TEST_F(ActionFieldTest, EventParametersProlongedEvents)

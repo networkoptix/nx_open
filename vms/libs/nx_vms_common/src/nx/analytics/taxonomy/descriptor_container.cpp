@@ -4,10 +4,10 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <nx/analytics/properties.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/system_context.h>
+#include <nx_ec/abstract_ec_connection.h>
 
 using namespace nx::vms::api::analytics;
 
@@ -102,7 +102,7 @@ Descriptors DescriptorContainer::descriptors(const nx::Uuid& serverId)
     return QJson::deserialized(serializedDescriptors.toUtf8(), Descriptors());
 }
 
-void DescriptorContainer::updateDescriptors(Descriptors descriptors)
+void DescriptorContainer::updateDescriptors(const Descriptors& descriptors)
 {
     QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(
         m_context->peerId());
@@ -112,6 +112,16 @@ void DescriptorContainer::updateDescriptors(Descriptors descriptors)
 
     ownServer->setProperty(kDescriptorsProperty, QString::fromUtf8(QJson::serialized(descriptors)));
     ownServer->saveProperties();
+}
+
+void DescriptorContainer::updateDescriptorsForTests(Descriptors descriptors)
+{
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_cachedDescriptors = std::move(descriptors);
+    }
+
+    emit descriptorsUpdated();
 }
 
 void DescriptorContainer::at_descriptorsUpdated()

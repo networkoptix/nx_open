@@ -5,41 +5,62 @@
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/rules_fwd.h>
 
+#include "event_parameter_helper.h"
+
 namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules::utils {
 
-QString eventType(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString eventCaption(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString eventName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+/** Data required for substitution evaluation or filtering. */
+struct SubstitutionContext
+{
+    QString name;
+
+    AggregatedEventPtr event;
+    std::optional<ItemDescriptor> manifest;
+
+    nx::vms::rules::State state;
+    QString objectTypeId;
+};
+
+constexpr auto kEventAttributesPrefix = QLatin1StringView("event.attributes.");
+constexpr auto kEventFieldsPrefix = QLatin1StringView("event.fields.");
+constexpr auto kEventDetailsPrefix = QLatin1StringView("event.details.");
+
+QString eventType(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventCaption(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventName(SubstitutionContext* substitution, common::SystemContext* context);
 QString eventDescription(
-    const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+    SubstitutionContext* substitution, common::SystemContext* context);
 
 // Keep in sync with StringHelper::eventDescription().
 QString extendedEventDescription(
-    const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+    SubstitutionContext* substitution, common::SystemContext* context);
 
-QString eventTime(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString eventTimeStart(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString eventTimeEnd(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+QString eventTime(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventTimeStart(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventTimeEnd(SubstitutionContext* substitution, common::SystemContext* context);
 template<class T>
-QString eventTimestamp(const AggregatedEventPtr& eventAggregator, common::SystemContext*)
+QString eventTimestamp(SubstitutionContext* substitution, common::SystemContext*)
 {
-    const auto count = std::chrono::duration_cast<T>(eventAggregator->timestamp()).count();
+    const auto count = std::chrono::duration_cast<T>(substitution->event->timestamp()).count();
     return QString::fromStdString(reflect::toString(count));
 }
-QString eventSource(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+QString eventSource(SubstitutionContext* substitution, common::SystemContext* context);
 
-QString deviceIp(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString deviceId(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString deviceMac(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString deviceType(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context);
+QString deviceId(SubstitutionContext* substitution, common::SystemContext* context);
+QString deviceMac(SubstitutionContext* substitution, common::SystemContext* context);
+QString deviceType(SubstitutionContext* substitution, common::SystemContext* context);
 
-QString deviceName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+QString deviceName(SubstitutionContext* substitution, common::SystemContext* context);
 
-QString siteName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString userName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
-QString eventAttribute(const QString& attributeName, const AggregatedEventPtr& eventAggregator);
-QString serverName(const AggregatedEventPtr& eventAggregator, common::SystemContext* context);
+QString siteName(SubstitutionContext* substitution, common::SystemContext* context);
+QString userName(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context);
+QString serverName(SubstitutionContext* substitution, common::SystemContext* context);
+
+QString eventField(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventDetail(SubstitutionContext* substitution, common::SystemContext* context);
 
 } // namespace nx::vms::rules::utils
