@@ -516,7 +516,7 @@ std::map<nx::Uuid, std::set<QString>> LocalRecordingUsageHelper::cameraGroupsByS
     std::set<QString> cameraGroups;
     for (const auto& camera: getAllCameras())
     {
-        if (!camera->isScheduleEnabled())
+        if (!camera->isScheduleEnabled() || camera->licenseType() == Qn::LicenseType::LC_Free)
             continue;
         cameraGroups.insert(camera->isSharingLicenseInGroup()
             ? camera->getGroupId()
