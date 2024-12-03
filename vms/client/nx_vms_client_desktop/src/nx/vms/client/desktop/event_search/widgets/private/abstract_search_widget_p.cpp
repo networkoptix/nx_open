@@ -399,7 +399,7 @@ void AbstractSearchWidget::Private::setupViewportHeader()
 
     ui->ribbon->setViewportHeader(viewportHeader);
 
-    m_itemCounterLabel->setForegroundRole(QPalette::Mid);
+    setPaletteColor(m_itemCounterLabel, QPalette::Text, core::colorTheme()->color("dark16"));
     m_itemCounterLabel->setText({});
 
     m_toggleFootersButton->setChecked(ui->ribbon->footersEnabled());
