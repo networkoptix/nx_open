@@ -841,6 +841,9 @@ begin_label:
         } // negative speed
     } // videoData || eof
 
+    if (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE)
+        setSkipFramesToTime(0, true);
+
     if (videoData) // in case of video packet
     {
         if (m_skipFramesToTime)
@@ -863,9 +866,7 @@ begin_label:
 
             if (m_nextData)
             {
-                if (m_nextData->flags & QnAbstractMediaData::MediaFlags_LIVE)
-                    setSkipFramesToTime(0, true);
-                else if (!reverseMode && m_nextData->timestamp <= m_skipFramesToTime)
+                if (!reverseMode && m_nextData->timestamp <= m_skipFramesToTime)
                     videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
                 else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
                     videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
