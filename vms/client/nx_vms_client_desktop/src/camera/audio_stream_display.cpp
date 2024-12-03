@@ -238,6 +238,15 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     bool canDropLateAudio =
         !m_sound ||
         (m_sound->state() != QAudio::State::ActiveState && decodeMode() != AudioDecodeMode::spectrumOnly);
+
+    bool bufferOverflow = bufferSizeMs > appContext()->localSettings()->maximumLiveBufferMs();
+    if (bufferOverflow)
+    {
+        NX_DEBUG(this,
+            "Skip audio packet: %1, since buffer is full: %2ms", data->timestamp, bufferSizeMs);
+        return true;
+    }
+
     if (canDropLateAudio && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
