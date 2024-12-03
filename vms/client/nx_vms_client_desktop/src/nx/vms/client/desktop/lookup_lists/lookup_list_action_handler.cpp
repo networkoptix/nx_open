@@ -275,7 +275,7 @@ struct LookupListActionHandler::Private
 
         descriptor.data.entries.push_back(entryToAdd);
         descriptor.successHandler =
-            [this, listName = descriptor.data.name]()
+            [this, listName = descriptor.data.name, listId = descriptor.data.id]()
             {
                 QnMessageBox messageBox(QnMessageBox::Icon::Success,
                     tr("Object was added to the List"),
@@ -289,6 +289,7 @@ struct LookupListActionHandler::Private
 
                 messageBox.setInformativeText(elidedText);
                 messageBox.exec();
+                lastSelectedListId = listId;
             };
     }
 };
