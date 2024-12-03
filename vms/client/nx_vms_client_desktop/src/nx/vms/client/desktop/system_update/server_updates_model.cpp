@@ -2,8 +2,6 @@
 
 #include "server_updates_model.h"
 
-#include <QtWidgets/QApplication>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
@@ -13,28 +11,17 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/system_settings.h>
-#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "peer_state_tracker.h"
 
 namespace nx::vms::client::desktop {
 
-ServerUpdatesModel::ServerUpdatesModel(
-    std::shared_ptr<PeerStateTracker> tracker,
-    QObject* parent):
+ServerUpdatesModel::ServerUpdatesModel(std::shared_ptr<PeerStateTracker> tracker, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_tracker(tracker)
 {
-    m_tracker = tracker;
-    // Dat strange thingy.
-    connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(),
-        &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this,
-        [this]()
-        {
-            forceUpdateColumn(VersionColumn);
-        });
-
     connect(m_tracker.get(), &PeerStateTracker::itemAdded,
         this, &ServerUpdatesModel::atItemAdded);
     connect(m_tracker.get(), &PeerStateTracker::itemToBeRemoved,

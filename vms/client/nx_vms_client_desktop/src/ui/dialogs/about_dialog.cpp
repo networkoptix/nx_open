@@ -34,7 +34,6 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
@@ -44,7 +43,6 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/models/resource/resource_list_model.h>
-#include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client;
@@ -84,15 +82,21 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     ui->servers->setItemDelegateForColumn(
         QnResourceListModel::NameColumn, new QnResourceItemDelegate(this));
-    ui->servers->setItemDelegateForColumn(
-        QnResourceListModel::CheckColumn, makeVersionStatusDelegate(workbenchContext(), this));
 
     m_serverListModel = new QnResourceListModel(this);
     m_serverListModel->setHasStatus(true);
 
     // Custom accessor to get a string with server version.
-    m_serverListModel->setCustomColumnAccessor(
-        QnResourceListModel::CheckColumn, resourceVersionAccessor);
+    m_serverListModel->setCustomColumnAccessor(QnResourceListModel::CheckColumn,
+        [](const QnResourcePtr& resource, int role) -> QVariant
+        {
+            if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
+            {
+                if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+                    return server->getVersion().toString();
+            }
+            return {};
+        });
     ui->servers->setModel(m_serverListModel);
 
     auto* header = ui->servers->horizontalHeader();
@@ -108,10 +112,6 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
     connect(system()->globalSettings(), &SystemSettings::emailSettingsChanged, this,
-        &QnAboutDialog::retranslateUi);
-    connect(workbenchContext()->instance<QnWorkbenchVersionMismatchWatcher>(),
-        &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,
-        this,
         &QnAboutDialog::retranslateUi);
 
     connect(windowContext(), &WindowContext::systemChanged, this, &QnAboutDialog::retranslateUi);
@@ -136,36 +136,21 @@ void QnAboutDialog::changeEvent(QEvent *event)
 
 void QnAboutDialog::generateServersReport()
 {
-    using namespace nx::vms::common;
-
-    const bool isAdmin = system()->accessController()->hasPowerUserPermissions();
     QnMediaServerResourceList servers;
-    QStringList report;
-
-    if (isAdmin)
-    {
-        const auto watcher = workbenchContext()->instance<QnWorkbenchVersionMismatchWatcher>();
-        for (const auto& data: watcher->components())
-        {
-            if (data.component != QnWorkbenchVersionMismatchWatcher::Component::server)
-                continue;
-
-            NX_ASSERT(data.server);
-            if (!data.server)
-                continue;
-
-            QString version = 'v' + data.version.toString();
-            QString serverText = lit("%1: %2")
-                .arg(QnResourceDisplayInfo(data.server).toString(Qn::RI_WithUrl), version);
-            report << serverText;
-            servers << data.server;
-        }
-    }
-
-    this->m_serversReport = report.join(html::kLineBreak);
+    if (system()->accessController()->hasPowerUserPermissions())
+        servers = resourcePool()->servers();
 
     m_serverListModel->setResources(servers);
     ui->serversGroupBox->setVisible(!servers.empty());
+
+    QStringList report;
+    for (const QnMediaServerResourcePtr& server: servers)
+    {
+        report.append(nx::format("%1: v%2",
+            QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl),
+            server->getVersion()));
+    }
+    m_serversReport = report.join(html::kLineBreak);
 }
 
 void QnAboutDialog::retranslateUi()
