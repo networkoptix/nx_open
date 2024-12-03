@@ -1,6 +1,7 @@
 [settings]
 build_type=Release
 intel-media-driver/*:compiler.cppstd=17
+libdatachannel/*:build_type=RelWithDebInfo
 
 [options]
 boost/*:zlib = False
