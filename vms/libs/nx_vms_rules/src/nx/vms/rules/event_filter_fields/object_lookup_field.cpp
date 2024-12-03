@@ -14,19 +14,12 @@ namespace nx::vms::rules {
 
 namespace {
 
-/** Returns whether the list has entries with the given attributes. */
+/** Returns whether the list contains an entry that matches the given attributes. */
 bool checkForListEntries(
     const api::LookupListData& lookupList, const nx::common::metadata::Attributes& attributes)
 {
-    for (const auto& attribute: attributes)
-    {
-        const auto& listAttributes = lookupList.attributeNames;
-        if (std::find(listAttributes.cbegin(), listAttributes.cend(), attribute.name)
-            == listAttributes.cend())
-        {
-            return false;
-        }
-    }
+    if (attributes.empty())
+        return false;
 
     for (const auto& entry: lookupList.entries)
     {
@@ -34,13 +27,8 @@ bool checkForListEntries(
         for (const auto& attribute: attributes)
         {
             const auto entryIt = entry.find(attribute.name);
-            if (entryIt == entry.end())
-            {
-                isMatch = false;
-                break;
-            }
 
-            if (entryIt->second.isEmpty())
+            if (entryIt == entry.end() || entryIt->second.isEmpty())
                 continue; //< Empty entry value matches any event value.
 
             if (entryIt->second != attribute.value)

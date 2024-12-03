@@ -197,6 +197,7 @@ TEST_F(ObjectLookupFieldTest, emptyLookupList)
     field.setCheckType(ObjectLookupCheckType::inList);
     // An empty List will always return false for 'inList' comparison.
     ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "bar"}})));
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{})));
 
     // And always return true for 'notInList' comparison.
     field.setCheckType(ObjectLookupCheckType::notInList);
@@ -215,9 +216,11 @@ TEST_F(ObjectLookupFieldTest, emptyAttributes)
 
 TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
 {
-    const auto listId = makeAndRegisterList({"foo"},
+    const auto listId = makeAndRegisterList({"foo, bar"},
         {
-            {{"foo", ""}} //< The entry accepts any value for the 'foo' attribute.
+            // The entries accept any value for the 'foo' attribute.
+            {{"foo", ""}, {"bar", "1"}},
+            {{"bar", "1"}}
         });
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
@@ -226,6 +229,8 @@ TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
     field.setCheckType(ObjectLookupCheckType::inList);
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "2"}})));
+    // Empty attributes doesn't match lookup list.
+    ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{})));
 
     field.setCheckType(ObjectLookupCheckType::notInList);
     ASSERT_FALSE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
