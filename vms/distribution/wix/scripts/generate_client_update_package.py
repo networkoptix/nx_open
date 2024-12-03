@@ -14,6 +14,7 @@ qt_libraries = [
     'Core',
     'Core5Compat',
     'Gui',
+    'LabsPlatform',
     'LabsQmlModels',
     'Multimedia',
     'MultimediaQuick',

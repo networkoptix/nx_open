@@ -12,6 +12,7 @@
                 Id="client_qt_libraries"
                 Source="${QT_DIR}/bin"
                 Directory="InstallDirRoot">
+            <Component><File Name="Qt6LabsPlatform.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6LabsQmlModels.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6MultimediaQuick.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="Qt6MultimediaWidgets.dll" KeyPath="yes" DiskId="3"/></Component>

@@ -286,6 +286,7 @@ copyQtLibs()
         Core5Compat
         DBus
         Gui
+        LabsPlatform
         LabsQmlModels
         Multimedia
         MultimediaQuick
