@@ -192,6 +192,7 @@ const QString kMulticastIsSupported("multicastIsSupported");
 const QString kOnvifIgnoreMedia2("onvifIgnoreMedia2");
 
 const QString kFixWrongUri("fixWrongUri");
+const QString kFixWrongUriScheme("fixWrongUriScheme");
 const QString kAlternativeSecondStreamSorter("alternativeSecondStreamSorter");
 
 const QString kOnvifTimeoutSeconds("onvifTimeoutSeconds");

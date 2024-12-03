@@ -275,6 +275,7 @@ NX_VMS_COMMON_API extern const QString kMulticastIsSupported;
 NX_VMS_COMMON_API extern const QString kOnvifIgnoreMedia2;
 
 NX_VMS_COMMON_API extern const QString kFixWrongUri;
+NX_VMS_COMMON_API extern const QString kFixWrongUriScheme;
 NX_VMS_COMMON_API extern const QString kAlternativeSecondStreamSorter;
 
 NX_VMS_COMMON_API extern const QString kOnvifTimeoutSeconds;
