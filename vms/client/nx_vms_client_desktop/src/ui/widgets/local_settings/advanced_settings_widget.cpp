@@ -377,8 +377,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
 bool QnAdvancedSettingsWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return (qnRuntime->isGlDoubleBuffer() != isDoubleBufferingEnabled())
-        || (qnRuntime->maximumLiveBufferMs() != maximumLiveBufferMs());
+    return (qnRuntime->isGlDoubleBuffer() != isDoubleBufferingEnabled());
 }
 
 // -------------------------------------------------------------------------- //
