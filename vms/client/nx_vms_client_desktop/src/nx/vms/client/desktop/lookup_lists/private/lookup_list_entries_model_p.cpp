@@ -18,13 +18,25 @@ namespace nx::vms::client::desktop {
 
 QVariant LookupListEntriesModel::Private::intFormatter(const QString& value)
 {
-    auto [result, ok] = nx::reflect::json::deserialize<int>(value.toStdString());
+    const auto [result, ok] = nx::reflect::json::deserialize<int>(value.toStdString());
+    if (!ok)
+    {
+        NX_WARNING(typeid(LookupListEntriesModel), "Unexpected int value %1", value);
+        return value;
+    }
+
     return result;
 }
 
 QVariant LookupListEntriesModel::Private::doubleFormatter(const QString& value)
 {
-    auto [result, ok] = nx::reflect::json::deserialize<double>(value.toStdString());
+    const auto [result, ok] = nx::reflect::json::deserialize<double>(value.toStdString());
+    if (!ok)
+    {
+        NX_WARNING(typeid(LookupListEntriesModel), "Unexpected double value %1", value);
+        return value;
+    }
+
     return result;
 }
 
@@ -40,8 +52,8 @@ QVariant LookupListEntriesModel::Private::booleanFormatter(const QString& value)
     if (value == "false")
         return tr("No");
 
-    NX_WARNING(typeid(LookupListEntriesModel), "Unexpected value %1", value);
-    return {};
+    NX_WARNING(typeid(LookupListEntriesModel), "Unexpected boolean value %1", value);
+    return value;
 }
 
 QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
@@ -51,8 +63,8 @@ QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
     if (value == "false")
         return tr("Absent");
 
-    NX_WARNING(typeid(LookupListEntriesModel), "Unexpected value %1", value);
-    return {};
+    NX_WARNING(typeid(LookupListEntriesModel), "Unexpected object value %1", value);
+    return value;
 }
 
 QVariant LookupListEntriesModel::Private::getDisplayValue(
@@ -64,8 +76,11 @@ QVariant LookupListEntriesModel::Private::getDisplayValue(
     auto it = formatterByAttributeName.find(attributeName);
     if (it == formatterByAttributeName.end())
     {
-        NX_WARNING(typeid(LookupListEntriesModel), "Incorrect attribute name %1", attributeName);
-        return {};
+        NX_WARNING(typeid(LookupListEntriesModel),
+            "Incorrect attribute name %1, for value %2",
+            attributeName,
+            value);
+        return value;
     }
 
     if (value.isEmpty())
@@ -134,7 +149,6 @@ void LookupListEntriesModel::Private::initEnumFunctions(
             {
                 NX_WARNING(
                     typeid(LookupListEntriesModel), "Unexpected enum value %1", value);
-                return QString();
             }
             return value;
         };
@@ -174,7 +188,7 @@ void LookupListEntriesModel::Private::initColorFunctions(const QString& fullAttr
             if (!colorByName.contains(value))
             {
                 NX_WARNING(typeid(LookupListEntriesModel), "Unexpected color value %1", value);
-                return QString();
+                return value;
             }
             return value; //< Value is already valid color name.
         };

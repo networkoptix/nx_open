@@ -22,15 +22,6 @@ Control
 
     property bool isGeneric: !objectType
 
-    function isValidDisplayColor()
-    {
-        if (!value)
-            return false // displayValue is "Any color"
-
-        // Empty displayValue means that value is incorrect color.
-        return displayValue && value
-    }
-
     component ElementViewer: BasicTableCellDelegate
     {
         x: 8
@@ -68,7 +59,7 @@ Control
                 radius: 1
                 anchors.verticalCenter: parent.verticalCenter
                 border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                color: isValidDisplayColor() ? colorHexValue : "transparent"
+                color: colorHexValue || "transparent"
             }
         }
     }

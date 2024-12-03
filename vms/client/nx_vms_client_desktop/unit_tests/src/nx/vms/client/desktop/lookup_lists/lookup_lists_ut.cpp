@@ -389,9 +389,21 @@ protected:
         const auto rawValue = m_entriesModel->data(m_entriesModel->index(row, column),
              LookupListEntriesModel::DataRole::RawValueRole).toString();
         if (attributeName == "Color" && !rawValue.isEmpty())
-            ASSERT_TRUE(value.toString().startsWith("#")) << "value:"<< value.toString().toStdString();
+        {
+            ASSERT_TRUE(value.toString().startsWith("#"))
+                << "Expected the value to start with '#', but received:"
+                << value.toString().toStdString();
+        }
         else
+        {
             ASSERT_TRUE(value.isNull());
+        }
+    }
+
+    void thenColorHexIsEmpty(QVariant value)
+    {
+        ASSERT_TRUE(value.isNull())
+            << "Expected empty value, but received:" << value.toString().toStdString();
     }
 
     void thenColorNameIsValid(int row, int column, QVariant value)
@@ -892,6 +904,28 @@ TEST_F(LookupListTests, color_rgb_hex)
         {
             const auto result = whenRequestingColorHex(row, column);
             thenColorHexIsValidOrEmpty(row, column, result);
+        }
+    }
+}
+
+/**
+ * Check hex RGB value is empty for incorrect or empty values.
+ */
+TEST_F(LookupListTests, color_rgb_hex_invalid_values)
+{
+    auto data = bigColumnNumberExampleData();
+    data.entries.clear();
+    data.entries.push_back({{"Color", "invalid1"}});
+    data.entries.push_back({{"Color", "invalid3"}});
+    data.entries.push_back({{"Color", ""}, {"Approved", "true"}});
+    givenLookupListEntriesModel(data);
+
+    for (int row = 0; row < m_entriesModel->rowCount(); ++row)
+    {
+        for (int column = 0; column < m_entriesModel->columnCount(); ++column)
+        {
+            const auto result = whenRequestingColorHex(row, column);
+            thenColorHexIsEmpty(result);
         }
     }
 }
