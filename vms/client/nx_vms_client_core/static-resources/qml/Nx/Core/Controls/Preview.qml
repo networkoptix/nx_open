@@ -34,6 +34,8 @@ Control
     property bool videoPreviewForced: false //< Always play video preview, not only on hover.
     property alias videoPreviewResource: intervalPreview.resource
     property alias videoPreviewTimestampMs: intervalPreview.timestampMs
+    property alias videoPreviewDurationMs: intervalPreview.durationMs
+    property alias snippedPreview: intervalPreview.snippedPreview
 
     padding: backgroundRect.border.width
 

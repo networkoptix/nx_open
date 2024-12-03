@@ -19,6 +19,7 @@ Item
     property bool active: false
     property Resource resource: null
     property bool autoplay: true
+    property bool snippedPreview: false
 
     property real timestampMs: -1
     property real durationMs: CoreSettings.iniConfigValue("intervalPreviewDurationMs")
@@ -184,10 +185,37 @@ Item
 
         function startPlaying(position)
         {
-            if (!item)
+            if (!item || control.durationMs === 0)
                 return
 
-            loader.item.content.mediaPlayer.setPlaybackMask(control.startTimeMs, control.durationMs)
+            if (control.snippedPreview && control.durationMs > 10000)
+            {
+                const chunkSizeMs = 5000
+
+                // If the video is 10 seconds or shorter, all video is played as a preview.
+                // If the video is 15 seconds or shorter, the first 5 seconds and last 5
+                // seconds are played. Else, the first 5 seconds must be played, then 5 seconds
+                // after the exact middle of the video and last 5 seconds.
+                let periods =
+                    [{startTimeMs: Math.floor(control.startTimeMs), durationMs: chunkSizeMs}]
+                if (control.durationMs > 15000)
+                {
+                    periods.push({
+                        startTimeMs:
+                        Math.floor(control.startTimeMs + (control.durationMs - chunkSizeMs) / 2),
+                        durationMs: chunkSizeMs})
+                }
+                periods.push({
+                    startTimeMs: Math.floor(control.startTimeMs + control.durationMs - chunkSizeMs),
+                    durationMs: chunkSizeMs})
+                loader.item.content.mediaPlayer.setPlaybackMask(periods)
+            }
+            else
+            {
+                loader.item.content.mediaPlayer.setPlaybackMask(
+                    control.startTimeMs, control.durationMs)
+            }
+
             loader.item.content.mediaPlayer.position = typeof position === "undefined"
                 ? control.startTimeMs
                 : position

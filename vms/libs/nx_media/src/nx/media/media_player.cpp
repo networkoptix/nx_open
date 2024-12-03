@@ -1546,6 +1546,26 @@ void Player::setPlaybackMask(qint64 startTimeMs, qint64 durationMs)
     setPlaybackMask({QnTimePeriod(startTimeMs, durationMs)});
 }
 
+void Player::setPlaybackMask(const QVariantList& periods)
+{
+    static const QString kStartTimeMs = "startTimeMs";
+    static const QString kDurationMs = "durationMs";
+
+    QnTimePeriodList result;
+    for (const auto& periodItem: periods)
+    {
+        if (const auto period = periodItem.toJsonObject(); !period.isEmpty())
+        {
+            if (period.contains(kStartTimeMs) && period.contains(kDurationMs))
+            {
+                result.includeTimePeriod(
+                    {period[kStartTimeMs].toInteger(), period[kDurationMs].toInteger()});
+            }
+        }
+    }
+    setPlaybackMask(result);
+}
+
 QString videoQualityToString(int videoQuality)
 {
     if (videoQuality >= Player::CustomVideoQuality)

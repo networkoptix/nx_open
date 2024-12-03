@@ -225,6 +225,12 @@ public:
     Q_INVOKABLE void setPlaybackMask(qint64 startTimeMs, qint64 durationMs);
 
     /**
+     * Set playback mask with list of @param periods. Each period in the list represents
+     * QJsonObject with fields 'startTimeMs' and 'durationMs'.
+     */
+    Q_INVOKABLE void setPlaybackMask(const QVariantList& periods);
+
+    /**
      * @return True if current playback position is 'now' time (live video from a camera).
      * For non-camera sources like local files it is already false.
      */
