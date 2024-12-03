@@ -29,8 +29,8 @@ static constexpr int kExtraMargin = 2;
 namespace nx::vms::client::desktop {
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions HintButton::kIconSubstitutions = {
-    {QIcon::Normal, {.primary = "dark14"}},
-    {QIcon::Active, {.primary = "dark15"}}};
+    {QIcon::Normal, {.primary = "dark16"}},
+    {QIcon::Active, {.primary = "dark18"}}};
 
 NX_DECLARE_COLORIZED_ICON(kContextHintIcon, "16x16/Solid/help.svg", HintButton::kIconSubstitutions)
 
