@@ -33,7 +33,7 @@ Rectangle
         verticalAlignment: Text.AlignVCenter
 
         elide: Text.ElideRight
-        color: ColorTheme.mid
+        color: ColorTheme.colors.dark16
 
         visible: !hasAvailableItems
     }
