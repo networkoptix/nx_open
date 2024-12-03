@@ -26,10 +26,5 @@ SiteInformation::SiteInformation(const ModuleInformation& module):
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SiteInformation, (json), SiteInformation_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OtherSiteRequest, (json), OtherSiteRequest_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalSiteAuth, (json), LocalSystemAuth_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudSiteAuth, (json), CloudSiteAuth_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(CloudSystemAuth, (json), CloudSystemAuth_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SetupSiteData, (json), SetupSiteData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SetupSystemData, (json), SetupSystemData_Fields)
 
 } // namespace nx::vms::api

@@ -172,110 +172,6 @@ static void registerSystemRestHandlers(
     reg("rest/v{1-}/^system|site/other", GlobalPermission::none,
         std::make_unique<OtherSiteInformationHandler>(serverModule));
 
-    /**%apidoc POST /rest/v{1-3}/system/setup
-     * Sets up this Server to form a new Site. Can only be called if this Server is not a part of
-     * any other Site.
-     * %caption Set up Site
-     * %ingroup Site
-     * %struct SetupSystemData
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v{1-3}/system/setup", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<SiteSetupHandler<api::SetupSystemData>>(
-            serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v{4-}/site/setup
-     * Sets up this Server to form a new Site. Can only be called if this Server is not a part of
-     * any other Site.
-     * %caption Set up Site
-     * %ingroup Site
-     * %struct SetupSiteData
-     *     %param:{std::variant<int, QString>} settings.auditTrailPeriodDays
-     *     %param:{std::variant<int, QString>} settings.ec2AliveUpdateIntervalSec
-     *     %param:{std::variant<int, QString>} settings.eventLogPeriodDays
-     *     %param:{std::variant<int, QString>} settings.maxDifferenceBetweenSynchronizedAndInternetTime
-     *     %param:{std::variant<int, QString>} settings.maxRtspConnectDurationSeconds
-     *     %param:{std::variant<int, QString>} settings.syncTimeEpsilon
-     *     %param:{std::variant<int, QString>} settings.syncTimeExchangePeriod
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v{4-}/site/setup", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<SiteSetupHandler<api::SetupSiteData>>(serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v{1-2}/system/cloudBind
-     * Binds the Site to the Cloud.
-     * %caption Bind Site to Cloud
-     * %ingroup Site
-     * %struct CloudSystemAuth
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v{1-2}/system/cloudBind", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<CloudBindHandler<api::CloudSystemAuth>>(
-            serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v3/system/cloud/bind
-     * Binds the Site to the Cloud.
-     * %caption Bind Site to Cloud
-     * %ingroup Site
-     * %struct CloudSystemAuth
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v3/system/cloud/bind", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<CloudBindHandler<api::CloudSystemAuth>>(
-            serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v{4-}/cloud/bind
-     * Binds the Site to the Cloud.
-     * %caption Bind Site to Cloud
-     * %ingroup Cloud
-     * %struct CloudSiteAuth
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v{4-}/cloud/bind", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<CloudBindHandler<api::CloudSiteAuth>>(
-            serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v{1-2}/system/cloudUnbind
-     * Unbinds the Site from the Cloud and sets a new administrator password.
-     * %caption Unbind Site from Cloud
-     * %ingroup Site
-     * %struct LocalSiteAuth
-     * %param[opt] password
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v{1-2}/system/cloudUnbind", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<CloudUnbindHandler>(serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v3/system/cloud/unbind
-     * Unbinds the Site from the Cloud and sets a new administrator password.
-     * %caption Unbind Site from Cloud
-     * %ingroup Site
-     * %struct LocalSiteAuth
-     * %param[opt] password
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v3/system/cloud/unbind", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<CloudUnbindHandler>(serverModule, cloudManagerGroup));
-
-    /**%apidoc POST /rest/v{4-}/cloud/unbind
-     * Unbinds the Site from the Cloud and sets a new administrator password.
-     * %caption Unbind Site from Cloud
-     * %ingroup Cloud
-     * %struct LocalSiteAuth
-     * %param[opt] password
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator with a fresh session.
-     */
-    reg("rest/v{4-}/cloud/unbind", GlobalPermission::administratorWithFreshSession,
-        std::make_unique<CloudUnbindHandler>(serverModule, cloudManagerGroup));
-
     /**%apidoc POST /rest/v{1-2}/system/cloudSignature
      * Generates or checks the Cloud message signature by the Cloud key.
      * %caption Generate/check Cloud signature
@@ -353,125 +249,6 @@ static void registerSystemRestHandlers(
      */
     reg("rest/v{4-}/site/merge", GlobalPermission::none, GlobalPermission::administrator,
         std::make_unique<SiteMergeHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{1-3}/system/settings
-     * %caption Get Site settings
-     * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Any User.
-     * %return Site settings and their values.
-     *
-     **%apidoc GET /rest/v{1-3}/system/settings/{name}
-     * %caption Get Site setting
-     * %ingroup Site
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket
-     * %param:string name Site setting name to retrieve.
-     *     %example systemName
-     * %permissions Any User.
-     * %return Value of the particular Site setting.
-     *
-     **%apidoc:object PATCH /rest/v{1-3}/system/settings
-     * Modifies a bunch of Site settings by passing a JSON object with the setting keys and
-     * values in the request body. The existing settings can be obtained in the same format using
-     * the "Get Site settings" function. The complete list of settings with their types is
-     * returned by the "Get Site settings manifest" function.
-     * %example {"systemName": "Site"}
-     * %caption Modify Site settings
-     * %ingroup Site
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator or power user (see manifest) with a fresh session.
-     *
-     **%apidoc:any PUT /rest/v{1-3}/system/settings/{name}
-     * Replaces a single Site setting by passing a JSON value in the request body. The existing
-     * setting values can be obtained using the "Get Site settings" function as a JSON object
-     * with setting values mapped by field names. The complete list of settings with their types is
-     * returned by the "Get Site settings manifest" function.
-     * %example Site
-     * %caption Replace Site setting
-     * %ingroup Site
-     * %param[ref] _strict,_ticket
-     * %param:string name Site setting name to replace.
-     *     %example systemName
-     * %permissions Administrator or power user (see manifest) with a fresh session.
-     */
-    reg("rest/v{1-3}/system/settings/:name?",
-        GlobalPermission::none, GlobalPermission::powerUserWithFreshSession,
-        std::make_unique<SystemSettingsHandler>(serverModule->systemContext(), cloudManagerGroup));
-
-    /**%apidoc GET /rest/v{4-}/site/settings
-     * %caption Get Site settings
-     * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Any User.
-     * %return:{SiteSettings} Site settings and their values.
-     *
-     **%apidoc GET /rest/v{4-}/site/settings/{name}
-     * %caption Get Site setting
-     * %ingroup Site
-     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket
-     * %param:string name Site setting name to retrieve.
-     *     %example siteName
-     * %permissions Any User.
-     * %return Value of the particular Site setting.
-     *
-     **%apidoc PATCH /rest/v{4-}/site/settings
-     * Modifies a bunch of Site settings by passing a JSON object with the setting keys and
-     * values in the request body. The existing settings can be obtained in the same format using
-     * the "Get Site settings" function. The complete list of settings with their types is
-     * returned by the "Get Site settings manifest" function.
-     * %example {"siteName": "Site"}
-     * %caption Modify Site settings
-     * %ingroup Site
-     * %struct[opt] SaveableSiteSettings
-     * %param[ref] _strict,_ticket
-     * %permissions Administrator or power user (see manifest) with a fresh session.
-     * %return:{SiteSettings}
-     *
-     **%apidoc:any PUT /rest/v{4-}/site/settings/{name}
-     * Replaces a single Site setting by passing a JSON value in the request body. The existing
-     * setting values can be obtained using the "Get Site settings" function as a JSON object
-     * with setting values mapped by field names. The complete list of settings with their types is
-     * returned by the "Get Site settings manifest" function.
-     * %example Site
-     * %caption Replace Site setting
-     * %ingroup Site
-     * %param[ref] _strict,_ticket
-     * %param:string name Site setting name to replace.
-     *     %example siteName
-     * %permissions Administrator or power user (see manifest) with a fresh session.
-     */
-    reg("rest/v{4-}/site/settings/:name?",
-        GlobalPermission::none, GlobalPermission::powerUserWithFreshSession,
-        std::make_unique<SiteSettingsHandler>(serverModule->systemContext(), cloudManagerGroup));
-
-    /**%apidoc GET /rest/v1/system/settingsManifest
-     * %caption Get Site settings manifest
-     * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Any User.
-     * %return:{std::map<QString, SystemSettingDescription>} Descriptions of the Site settings.
-     */
-    reg("rest/v1/system/settingsManifest", GlobalPermission::none,
-        std::make_unique<SystemSettingsManifestRestHandlerV1>(serverModule->globalSettings()));
-
-    /**%apidoc GET /rest/v{2-3}/system/settings/%2A/manifest
-     * %caption Get Site settings manifest
-     * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Any User.
-     * %return:{std::map<QString, SystemSettingDescription>} Descriptions of the Site settings.
-     *
-     * %apidoc GET /rest/v{2-3}/system/settings/{name}/manifest
-     * %caption Get Site setting manifest
-     * %ingroup Site
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket
-     * %param:string name Site setting name to get.
-     *     %example systemName
-     * %permissions Any User.
-     * %return:{SystemSettingDescription} Description of the particular Site setting.
-     */
-    reg("rest/v{2-3}/system/settings/:name/manifest", GlobalPermission::none,
-        std::make_unique<SystemSettingsManifestRestHandlerV2>(serverModule->globalSettings()));
 
     /**%apidoc POST /rest/v{1-3}/system/storageEncryption
      * Adds a new key to encrypt the media data in the video archive. The key is generated from the
@@ -561,7 +338,7 @@ static void registerSystemRestHandlers(
      * %permissions Any User.
      */
     reg("rest/v{2-3}/system/resourceData", GlobalPermission::none,
-        std::make_unique<ResourceDataHandler>(serverModule->commonModule()->resourceDataPool()));
+        std::make_unique<ResourceDataHandler>(serverModule->resourceDataPool()));
 
     /**%apidoc GET /rest/v{4-}/site/resourceData
      * Retrieves the Device configuration file (resource_data.json) which is currently in use.
@@ -571,7 +348,7 @@ static void registerSystemRestHandlers(
      * %permissions Any User.
      */
     reg("rest/v{4-}/site/resourceData", GlobalPermission::none,
-        std::make_unique<ResourceDataHandler>(serverModule->commonModule()->resourceDataPool()));
+        std::make_unique<ResourceDataHandler>(serverModule->resourceDataPool()));
 
     /**%apidoc GET /rest/v{2-3}/system/metrics/manifest
      * Retrieves the manifest for `GET /rest/v{2-3}/system/metrics/alarms` and
@@ -876,7 +653,6 @@ static void registerSystemRestHandlers(
 }
 
 static void registerServerRestHandlers(
-    QnUniversalTcpListener* universalTcpListener,
     nx::network::rest::HandlerPool* processorPool,
     QnMediaServerModule* serverModule,
     nx::vms::network::AbstractServerConnector* serverConnector,
@@ -983,8 +759,7 @@ static void registerServerRestHandlers(
      * %return:{ServerRuntimeInformation} Runtime information about the Server.
      */
     reg("rest/v{2-}/servers/:id/runtimeInfo", GlobalPermission::none, GlobalPermission::administratorWithFreshSession,
-        std::make_unique<ServerRuntimeInformationHandler>(
-            universalTcpListener, serverModule, serverConnector));
+        std::make_unique<ServerRuntimeInformationHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{2-}/servers/{id}/logSettings
      * %caption Get Server log settings
@@ -1838,29 +1613,6 @@ static void registerServerRestHandlers(
     reg("rest/v{2-}/servers/:id/rebuildArchive/:location?", GlobalPermission::powerUser,
         std::make_unique<RebuildArchiveHandler>(serverModule, serverConnector));
 
-    // TODO: #amalov Fix the handle apidoc return type when removing old engine handler.
-    std::unique_ptr<nx::network::rest::Handler> v3LogHandler;
-    if (serverModule->systemContext()->vmsRulesEngine()->isOldEngineEnabled())
-        v3LogHandler = std::make_unique<EventLogHandlerOldEngine>(serverModule, serverConnector);
-    else
-        v3LogHandler = std::make_unique<EventLogHandlerOldFilter>(serverModule, serverConnector);
-
-    /**%apidoc GET /rest/v3/servers/{serverId}/events
-     * %caption Read Server Event Log
-     * %ingroup Servers
-     * %struct EventLogFilterDeprecated
-     * %param:string serverId Server id. Can be obtained from "id" field via
-     *     `GET /rest/v{1-}/servers`, or be `this` to refer to the current Server, or be "*" to
-     *     involve all Servers.
-     *     %example this
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %param[ref] _local
-     * %permissions Event log and audit trail view.
-     * %return Server event log.
-     */
-    reg("rest/v3/servers/:serverId/events", GlobalPermission::viewLogs,
-        std::move(v3LogHandler));
-
     /**%apidoc GET /rest/v{3-}/servers/{id}/timeZones
      * Retrieves the complete list of time zones supported by the Server machine.
      * %caption Get Time Zones
@@ -1994,7 +1746,7 @@ static void registerServerRestHandlers(
         std::make_unique<AuditHandler>(serverModule, serverConnector));
 }
 
-static void registerDeviceRestHandlers(
+static void registerDeviceHandlers(
     nx::network::rest::HandlerPool* processorPool,
     QnMediaServerModule* serverModule,
     nx::vms::network::AbstractServerConnector* serverConnector,
@@ -2368,276 +2120,6 @@ static void registerDeviceRestHandlers(
         std::make_unique<DeviceSearchesHandler<api::DeviceSearchV2>>(
             serverModule, serverModule->deviceSearchManager(), serverConnector));
 
-    /**%apidoc POST /rest/v{1-}/devices/{id}/changePassword
-     * Changes the password for the already existing User on the specified Device. This function
-     * is allowed only for Devices with "SetUserPasswordCapability". Otherwise, it returns an error
-     * in the JSON result.
-     * %caption Change Device password
-     * %ingroup Devices
-     * %struct DevicePasswordRequest
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Power User.
-     */
-    reg("rest/v{1-}/devices/:id/changePassword", GlobalPermission::powerUser,
-        std::make_unique<ChangeDevicePasswordHandler>(serverConnector));
-
-    /**%apidoc GET /rest/v{1-2}/devices/{id}/footage
-     * Retrieves the info for the recorded chunks for the Device specified by {id}.
-     * %caption Get Device footage
-     * %ingroup Device Media
-     * %struct DeviceFootageRequest
-     * %param:string id
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions View Archive on selected Device.
-     * %return:{ServerTimePeriodList} List of recorded chunks.
-     *     %param durationMs Duration in milliseconds. For the video chunk currently being
-     *         recorded, `-1` is returned.
-     *
-     **%apidoc GET /rest/v{1-2}/devices/%2A/footage
-     * Retrieves the info for the recorded chunks for all Devices in the Site.
-     * %caption Get all Devices' footage
-     * %ingroup Device Media
-     * %struct DeviceFootageRequest
-     * %param[opt] id
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions View Archive on some Devices.
-     * %return:{std::map<nx::Uuid, ServerTimePeriodList>} List of recorded chunks.
-     *     %param *[].durationMs Duration in milliseconds. For the video chunk currently being
-     *         recorded, `-1` is returned.
-     *
-     **%apidoc GET /rest/v{3-}/devices/{id}/footage
-     * Retrieves the info for the recorded chunks for the Device specified by {id}.
-     * %caption Get Device footage
-     * %ingroup Device Media
-     * %struct DeviceFootageRequest
-     * %param:string id
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions View Archive on selected Device.
-     * %return:{ServerTimePeriodList} List of recorded chunks.
-     *
-     **%apidoc GET /rest/v{3-}/devices/%2A/footage
-     * Retrieves the recorded chunks info for all Devices in the Site.
-     * %caption Get all Devices' footage
-     * %ingroup Device Media
-     * %struct DeviceFootageRequest
-     * %param[opt] id
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions View Archive on some Devices.
-     * %return:{std::map<nx::Uuid, ServerTimePeriodList>} List of recorded chunks.
-     */
-    reg("rest/v{1-}/devices/:id/footage", GlobalPermission::none,
-        std::make_unique<DeviceFootageHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{1-}/devices/{id}/status
-     * Retrieves the Device Diagnosis information for the particular Device.
-     * %caption Get Device Diagnosis
-     * %ingroup Devices
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Power User.
-     * %return:{DeviceDiagnosis} Device Diagnosis information.
-     *
-     **%apidoc GET /rest/v{1-}/devices/%2A/status
-     * Retrieves the Device Diagnosis information for all Devices.
-     * %caption Get all Devices' Diagnoses
-     * %ingroup Devices
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Power User.
-     * %return:{DeviceDiagnosisList} List of Device Diagnosis information.
-     */
-    reg("rest/v{1-}/devices/:id/status", GlobalPermission::powerUser,
-        std::make_unique<DeviceDiagnoseHandler>(serverConnector, serverModule->videoCameraPool()));
-
-    /**%apidoc GET /rest/v{3-}/devices/{id}/resourceData
-     * Retrieves the data from Device configuration file (resource_data.json) which is currently in
-     *     use, for the particular Device.
-     * %caption Get Device's Resource data
-     * %ingroup Devices
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _format,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return:{DeviceResourceData} Device resource data information.
-     *
-     **%apidoc GET /rest/v{3-}/devices/%2A/resourceData
-     * Retrieves the data from Device configuration file (resource_data.json) which is currently in
-     *     use, for all Devices.
-     * %caption Get all Devices' Resource data
-     * %ingroup Devices
-     * %param[ref] _filter,_format,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return:{DeviceResourceDataList} List of Device resource data.
-     */
-    reg("rest/v{3-}/devices/:id/resourceData", GlobalPermission::none,
-        std::make_unique<DeviceResourceDataHandler>(serverModule->systemContext()));
-
-    /**%apidoc POST /rest/v{2-}/devices/{id}/replace
-     * Replaces the Device with another one. The replaced Device is removed completely, and its
-     * settings and Archive are transferred to the Device it is replaced with.
-     * %caption Replace Device
-     * %ingroup Devices
-     * %struct DeviceReplacementRequest
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     * %return:{DeviceReplacementResponse} Device replacement report.
-     *
-     **%apidoc DELETE /rest/v{2-}/devices/{id}/replace
-     * Deletes the Device replacement record.
-     * %caption Undo Device replacement
-     * %ingroup Devices
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     */
-    reg("rest/v{2-}/devices/:id/replace", GlobalPermission::powerUser,
-        std::make_unique<DeviceReplacementHandler>(serverModule));
-
-    /**%apidoc POST /rest/v{2-}/devices/{id}/changeId
-     * Changes the Device id to a new unique value. The next discovery will find the Device with
-     * the new id.
-     * %caption Change Device id
-     * %ingroup Devices
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     * %return:object
-     *     %param:uuid newId Auto-generated id of the Device.
-     *
-     **%apidoc DELETE /rest/v{2-}/devices/{id}/changeId
-     * Deletes the Device id change record.
-     * %caption Undo Device id change
-     * %ingroup Devices
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     */
-    reg("rest/v{2-}/devices/:id/changeId", GlobalPermission::powerUser,
-        std::make_unique<DeviceChangeIdHandler>(serverModule));
-
-    /**%apidoc GET /rest/v{2-}/devices/{id}/advanced/%2A/manifest
-     * Retrieves the Device Advanced Parameter manifest.
-     * %caption Get Device Advanced manifest
-     * %ingroup Devices
-     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
-     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return:{QnCameraAdvancedParams} Device Advanced Manifest.
-     *
-     **%apidoc GET /rest/v{2-3}/devices/%2A/advanced/%2A/manifest
-     * Retrieves the Advanced Parameter manifests of all Devices.
-     * %caption Get Device Advanced manifests
-     * %ingroup Devices
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return:{std::map<nx::Uuid, QnCameraAdvancedParams>} Map with an Advanced Parameter manifest per Device.
-     *
-     **%apidoc GET /rest/v{4-}/devices/%2A/advanced/%2A/manifest
-     * Retrieves the Advanced Parameter manifests of all Devices.
-     * %caption Get Device Advanced manifests
-     * %ingroup Devices
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return:{std::map<nx::Uuid, QnCameraAdvancedParams>} Map with an Advanced Parameter manifest per Device.
-     */
-    reg("rest/v{2-}/devices/:id/advanced/*/manifest", GlobalPermission::none,
-        std::make_unique<DeviceAdvancedManifestHandler>(serverConnector));
-
-    /**%apidoc GET /rest/v{2-}/devices/{deviceId}/advanced/{id}
-     * Retrieves the specified Advanced Parameter of the Device.
-     * %caption Get Device Advanced Parameter
-     * %ingroup Devices
-     * %struct DeviceAdvancedFilter
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return Device Advanced Parameter.
-     *
-     **%apidoc GET /rest/v{2-}/devices/{deviceId}/advanced
-     * %caption Get Device Advanced Parameters
-     * %ingroup Devices
-     * %param:string deviceId Device id to get Advanced Parameters from.
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return Device Advanced Parameters and their values.
-     *
-     **%apidoc:object PATCH /rest/v{2-}/devices/{deviceId}/advanced
-     * Modifies a bunch of Device Advanced Parameters by passing a JSON object with the parameter ids
-     * and values in the request body. The complete list of ids with their types is returned by the
-     * "Get Device Advanced manifests" function.
-     * %caption Modify Device Adv. Parameters
-     * %ingroup Devices
-     * %param:string deviceId Device id to modify Advanced Parameters for.
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Edit Device.
-     *
-     **%apidoc:any PUT /rest/v{2-}/devices/{deviceId}/advanced/{id}
-     * Replaces the single Device Advanced Parameter by passing a JSON value in the request body.
-     * The complete list of Parameters with their types is returned by the "Get Device Advanced
-     * Manifests" function.
-     * %caption Replace Device Adv. Parameter
-     * %ingroup Devices
-     * %param:string deviceId Device id to modify an Advanced Parameter for.
-     * %param:string id Parameter id to modify.
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Edit Device.
-     */
-    reg("rest/v{2-}/devices/:deviceId/advanced/:id?", GlobalPermission::none,
-        std::make_unique<DeviceAdvancedParametersHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{4-}/devices/{deviceId}/io/{port}
-     * Returns current IO state from Device and port.
-     * %caption Get IO State
-     * %ingroup Devices
-     * %struct IoPortData
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{IoStateResponseList} IO state.
-     *
-     **%apidoc GET /rest/v{4-}/devices/{deviceId}/io
-     * Returns current IO states from Device for all ports.
-     * %caption Get IO States
-     * %ingroup Devices
-     * %struct IoPortData
-     *     %param[unused] port
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{IoStateResponseList} List of IO states.
-     *
-     **%apidoc PATCH /rest/v{4-}/devices/%2A/io
-     * Update current IO State of Device.
-     * %caption Update IO State
-     * %ingroup Devices
-     * %struct IoStateUpdateRequestList
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     */
-    reg("rest/v{4-}/devices/:deviceId/io/:port?",
-        GlobalPermission::none,
-        std::make_unique<DeviceIoHandler>(serverConnector));
-
     /**%apidoc GET /rest/v2/devices/{id}/image
      * Retrieves a thumbnail image from the Device.
      * %caption Get Device thumbnail
@@ -2647,11 +2129,8 @@ static void registerDeviceRestHandlers(
      * %param[ref] _local,_strict,_ticket
      * %permissions View live or Archive on selected Device.
      * %return Thumbnail image.
-     */
-    reg("rest/v2/devices/:id/image", GlobalPermission::none,
-        std::make_unique<ThumbnailHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{3-}/devices/{id}/image
+     *
+     **%apidoc GET /rest/v{3-}/devices/{id}/image
      * Retrieves a thumbnail image from the Device.
      * %caption Get Device thumbnail
      * %ingroup Device Media
@@ -2662,7 +2141,7 @@ static void registerDeviceRestHandlers(
      * %permissions View live or Archive on selected Device.
      * %return Thumbnail image.
      */
-    reg("rest/v{3-}/devices/:id/image", GlobalPermission::none,
+    reg("rest/v{2-}/devices/:id/image", GlobalPermission::none,
         std::make_unique<ThumbnailHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{3-}/devices/{id}/media
@@ -2745,185 +2224,6 @@ static void registerDeviceRestHandlers(
      */
     reg("rest/v{4-}/devices/:id/webrtc-camera", GlobalPermission::none,
         std::make_unique<WebRtcCameraTrackerHandler>(authenticator, serverModule, serverConnector));
-
-    /**%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/move
-     * Starts a continuous PTZ move.
-     * %caption Start PTZ move
-     * %ingroup Device PTZ
-     * %struct PtzMovement
-     *     %param[unused] type
-     *     %param[unused] speed
-     *     %param pan X-axis movement speed (-1.0 to 1.0).
-     *     %param tilt Y-axis movement speed (-1.0 to 1.0).
-     *     %param zoom Zoom in/out speed (-1.0 to 1.0).
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     *
-     **%apidoc DELETE /rest/v{3-}/devices/{deviceId}/ptz/move
-     * Stops a continuous PTZ move.
-     * %caption Stop PTZ move
-     * %ingroup Device PTZ
-     * %struct PtzPositionFilter
-     *     %param[unused] type
-     * %param[ref] _local
-     * %param[ref] _strict,_ticket
-     * %permissions Depends on Resource access rights.
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/move",
-        GlobalPermission::none,
-        std::make_unique<ptz::MoveHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/position
-     * Retrieves the Device current position. Returns x, y, and z in the range defined by the
-     * Device.
-     * %caption Get Device PTZ position
-     * %ingroup Device PTZ
-     * %struct PtzPositionFilter
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzPosition} Device position
-     *     %param[unused] deviceId
-     *     %param[unused] type
-     *     %param[unused] speed
-     *
-     **%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/position
-     * Moves the Device to an absolute position. When the Device reports its PTZ capabilities to
-     * the Server during initialization, the range of position parameters is sent to the Server.
-     * PTZ capabilities can not be read via API.
-     * %caption Move to absolute PTZ position
-     * %ingroup Device PTZ
-     * %struct PtzPosition
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzPosition} Device position
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/position",
-        GlobalPermission::none,
-        std::make_unique<ptz::PositionHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/limits
-     * Retrieves the Device PTZ limitations.
-     * %caption Get Device PTZ limits
-     * %ingroup Device PTZ
-     * %struct PtzPositionFilter
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzPositionLimits} Device position limits
-     *     %param[unused] deviceId
-     *     %param[unused] type
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/limits",
-        GlobalPermission::none,
-        std::make_unique<ptz::PositionLimitsHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/presets
-     * Retrieves the PTZ preset list.
-     * %caption Get PTZ presets
-     * %ingroup Device PTZ
-     * %struct PtzPresetFilter
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzPresetList} Preset list
-     *
-     **%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/presets
-     * Creates a new PTZ preset.
-     * %caption Create PTZ preset
-     * %ingroup Device PTZ
-     * %struct PtzPreset
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzPreset}
-     *
-     **%apidoc PATCH /rest/v{3-}/devices/{deviceId}/ptz/presets/{id}
-     * Updates the display name of the specified PTZ preset.
-     * %caption Update PTZ preset name
-     * %ingroup Device PTZ
-     * %struct PtzPreset
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzPreset}
-     *
-     **%apidoc DELETE /rest/v{3-}/devices/{deviceId}/ptz/presets/{id}
-     * Deletes the specified PTZ preset.
-     * %caption Delete PTZ preset
-     * %ingroup Device PTZ
-     * %struct PtzPresetFilter
-     * %param[ref] _local
-     * %param[ref] _strict,_ticket
-     * %permissions Depends on Resource access rights.
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/presets/:id?",
-        GlobalPermission::none,
-        std::make_unique<ptz::PresetHandler>(serverModule, serverConnector));
-
-    /**%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/presets/{id}/activate
-     * Activates the specified PTZ preset.
-     * %caption Activate PTZ preset
-     * %ingroup Device PTZ
-     * %struct PtzPresetActivation
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/presets/:id/activate",
-        GlobalPermission::none,
-        std::make_unique<ptz::PresetActivationHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/tours
-     * Retrieves the PTZ Tour list.
-     * %caption Get PTZ Tours
-     * %ingroup Device PTZ
-     * %param:string deviceId Device id to get PTZ Tours from.
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzTourList} Tour list
-     *
-     **%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/tours
-     * Creates a new PTZ Tour.
-     * %caption Create PTZ Tour
-     * %ingroup Device PTZ
-     * %struct PtzTour
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzTour}
-     *
-     **%apidoc DELETE /rest/v{3-}/devices/{deviceId}/ptz/tours/{id}
-     * Deletes the specified PTZ Tour.
-     * %caption Delete PTZ Tour
-     * %ingroup Device PTZ
-     * %struct PtzPresetFilter
-     * %param[ref] _local
-     * %param[ref] _strict,_ticket
-     * %permissions Depends on Resource access rights.
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/tours/:id?",
-        GlobalPermission::none,
-        std::make_unique<ptz::TourHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/tours/%2A/active
-     * Retrieves the active PTZ Tour.
-     * %caption Get active PTZ Tour
-     * %ingroup Device PTZ
-     * %struct PtzPresetFilter
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{PtzTour} Active Tour
-     *
-     **%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/tours/{id}/active
-     * Activates the specified PTZ Tour.
-     * %caption Activate PTZ Tour
-     * %ingroup Device PTZ
-     * %struct PtzPresetFilter
-     * %param[ref] _local,_strict,_ticket
-     * %permissions Depends on Resource access rights.
-     */
-    reg("rest/v{3-}/devices/:deviceId/ptz/tours/:id/active",
-        GlobalPermission::none,
-        std::make_unique<ptz::TourActivationHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{3-}/devices/{id}/virtual/status
      * Returns virtual Device status.
@@ -3100,221 +2400,6 @@ static void registerLdapRestHandlers(
      */
     reg("rest/v{3-}/ldap/settings", GlobalPermission::powerUser, GlobalPermission::powerUserWithFreshSession,
         std::make_unique<LdapSettingsHandler>(serverConnector->systemContext()));
-}
-
-static void registerRuleRestHandlers(
-    nx::network::rest::HandlerPool* processorPool,
-    QnMediaServerModule* serverModule,
-    AbstractServerConnector* serverConnector)
-{
-    using QueryProcessor = ec2::ServerQueryProcessorAccess;
-    const auto engine = serverModule->vmsRulesEngine();
-    const auto reg = processorPool->createRegisterHandlerFunctor();
-
-    /**%apidoc[proprietary] GET /rest/v{4-}/events/manifest/events
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Get Event manifest
-     * %ingroup Events
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Power User.
-     * %return:{QMap<QString, ItemDescriptor>}
-     */
-    reg("rest/v{4-}/events/manifest/events", GlobalPermission::powerUser,
-        std::make_unique<EventManifestHandler>(engine));
-
-    /**%apidoc[proprietary] GET /rest/v{4-}/events/manifest/actions
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Get Action manifest
-     * %ingroup Events
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Power User.
-     * %return:{QMap<QString, ItemDescriptor>}
-     */
-    reg("rest/v{4-}/events/manifest/actions", GlobalPermission::powerUser,
-        std::make_unique<ActionManifestHandler>(engine));
-
-    /**%apidoc GET /rest/v{4-}/events/log
-     * Read Event Log from all servers
-     * %caption Get Event Log
-     * %ingroup Events
-     * %struct EventLogFilter
-     * %param[ref] _format,_stripDefault,_language,_local,_pretty,_strict,_ticket,_with
-     * %permissions Event log and audit trail view.
-     * %return:{EventLogRecordList} Server event log.
-     *
-     **%apidoc GET /rest/v{4-}/events/log/{serverId}
-     * Read Event Log from single server
-     * %caption Get Event Log
-     * %ingroup Events
-     * %struct EventLogFilter
-     * %param:string serverId Server id. Can be obtained from "id" field via
-     *     `GET /rest/v{1-}/servers`, or be `this` to refer to the current Server.
-     *     %example this
-     * %param[ref] _format,_stripDefault,_language,_local,_pretty,_strict,_ticket,_with
-     * %permissions Event log and audit trail view.
-     * %return:{EventLogRecordList} Server event log.
-     */
-    reg("rest/v{4-}/events/log/:serverId?", GlobalPermission::viewLogs,
-        std::make_unique<EventLogHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{4-}/events/acknowledges
-     * Retrieves notifications to acknowledge for the given user.
-     * %caption Notifications to acknowledge
-     * %ingroup Events
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
-     * %permissions Any User.
-     * %return:{EventLogRecordList} Notifications to acknowledge
-     *
-     **%apidoc GET /rest/v{4-}/events/acknowledges/{id}
-     * Retrieves notification with the given action ID.
-     * %caption Notification to acknowledge
-     * %ingroup Events
-     * %param:uuid id Action ID.
-     * %param[ref] _format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
-     * %permissions Any User.
-     * %return:{EventLogRecord} Notification to acknowledge
-     *
-     **%apidoc POST /rest/v{4-}/events/acknowledges
-     * Marks event as acknowledged and creates corresponding bookmark.
-     * %caption Acknowledge Event notification
-     * %ingroup Events
-     * %struct AcknowledgeBookmark
-     * %param[ref] _strict,_ticket,_local
-     * %permissions Target user for the event, permission to add bookmark for the device.
-     * %return:{BookmarkV3} Created bookmark data
-     */
-    reg("rest/v{4-}/events/acknowledges/:id?", GlobalPermission::none,
-        std::make_unique<AcknowledgeHandler>(serverModule, serverConnector));
-
-    /**%apidoc POST /rest/v{4-}/events/create
-     * This method may trigger an event of the "Generic Event" type in the Site from a 3rd party.
-     * Such Event will be handled and logged according to current VMS Rules.
-     * Parameters of the generated Event, such as "source", "caption" and "description", are
-     * intended to be analyzed by these Rules.
-     * <br/> Parameters should be passed as a JSON object in POST message body with content type
-     * "application/json". Example:
-     * <pre><code>
-     * {
-     *     "state": "instant",
-     *     "timestamp": "2024-06-16T16:02:41Z",
-     *     "caption": "CreditCardUsed",
-     *     "deviceIds": [
-     *         "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248",
-     *         "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"
-     *     ]
-     * }
-     * </code></pre>
-     * This example triggers a generic Event informing the Site that a
-     * credit card has been used on June 16, 2024 at 16:03:41 UTC in a POS
-     * terminal being watched by the two specified Devices.
-     * %caption Create generic event
-     * %ingroup Events
-     * %param[opt]:string type Type of the Event to be created. Omit the parameter for
-     *     Generic Event. See /rest/v{4-}/events/manifest/events for event manifests with possible
-     *     event types.
-     * %param[opt]:any timestamp Event date and time, as a number containing time in
-     *     microseconds since epoch, or an ISO timestamp string formatted like
-     *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> -
-     *     the format is auto-detected. If "timestamp" is absent or "now", the current Server
-     *     date and time are used.
-     * %param[opt]:string source Name of the Device which has triggered the Event. It can be used
-     *     in a filter in VMS Rules to assign different actions to different Devices. Also, the
-     *     user could see this name in the notification panel. Example: "POS terminal 5".
-     * %param[opt]:string caption Short Event description. It can be used in a filter in VMS
-     *     Rules to assign actions depending on this text.
-     * %param[opt]:string description Long Event description. It can be used as a filter in VMS
-     *     Rules to assign actions depending on this text.
-     * %param[opt]:array deviceIds Specifies the list of Devices which are linked to the Event (e.g.
-     *     the Event will appear on their timelines), in the form of a list of Device ids (can
-     *     be obtained from "id" field via /rest/v{1-}/devices).
-     * %param[opt]:enum state Generic Events can be used either with "prolonged" actions like
-     *     "do recording", or instant actions like "send email". This parameter should be specified
-     *     in case "prolonged" actions are going to be used with Generic Events. The Event is
-     *     considered instant in case of parameter absence.
-     *     %value started Generic Event is considered a "prolonged" Event. It transits to the
-     *         "active" state. "Prolonged" actions will continue executing until the Generic Event
-     *         transits to the "inactive" state.
-     *     %value stopped A "prolonged" action associated with this Generic Event in VMS Rules
-     *         will stop. Transition to the <code>stopped</code> state requires the state to be
-     *         <code>started</code>.
-     * %param[opt]:string cameraId Used for soft trigger.
-     * %param[opt]:string triggerId Used for soft trigger.
-     * %param[opt]:string triggerName Used for soft trigger.
-     * %param[opt]:string triggerIcon Used for soft trigger.
-     * %param[opt]:string serverId Used for testing.
-     * %param[opt]:string reason Used for testing.
-     * %param[ref] _strict,_ticket
-     * %permissions Event dependent permissions. Generate events in most cases.
-     */
-    reg("rest/v{4-}/events/create", GlobalPermission::none,
-        std::make_unique<SendEventHandler>(serverModule->systemContext()));
-
-    /**%apidoc[proprietary] POST /rest/v{4-}/events/rules
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Create Rule
-     * %ingroup Events
-     * %struct RuleV4
-     *     %param[unused] id
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     * %return:{RuleV4}
-     *
-     **%apidoc[proprietary] PUT /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Replace Rule
-     * %ingroup Events
-     * %struct RuleV4
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     * %return:{RuleV4}
-     *
-     **%apidoc[proprietary] PATCH /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Modify Rule
-     * %ingroup Events
-     * %struct[opt] RuleV4
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     * %return:{RuleV4}
-     *
-     **%apidoc[proprietary] GET /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Get Rule
-     * %ingroup Events
-     * %param:string id
-     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Depends on Resource access rights.
-     * %return:{RuleV4}
-     *
-     **%apidoc[proprietary] GET /rest/v{4-}/events/rules
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Get all Rules
-     * %ingroup Events
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Depends on Resource access rights.
-     * %return:{RuleV4List}
-     *
-     **%apidoc[proprietary] DELETE /rest/v{4-}/events/rules/{id}
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Remove Rule
-     * %ingroup Events
-     * %param:string id
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     */
-    reg("rest/v{4-}/events/rules/:id?", GlobalPermission::none, GlobalPermission::powerUser,
-        std::make_unique<SimpleRuleHandler<QueryProcessor>>(
-            serverModule->directConnection()->queryProcessor(), serverModule->systemContext()));
-
-    /**%apidoc[proprietary] POST /rest/v{4-}/events/rules/%2A/reset
-     * <b>ATTENTION:</b> Works with new Event Rule Engine only.
-     * %caption Reset all rules to default
-     * %ingroup Events
-     * %param[ref] _strict,_ticket
-     * %permissions Power User.
-     */
-    reg("rest/v{4-}/events/rules/*/reset", GlobalPermission::powerUser,
-        std::make_unique<ResetRulesHandler>(serverModule->systemContext()));
 }
 
 static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPool* processorPool,
@@ -3804,7 +2889,7 @@ static void registerMiscRestHandlers(
     nx::network::rest::HandlerPool* processorPool, QnMediaServerModule* serverModule)
 {
     const auto reg = processorPool->createRegisterHandlerFunctor();
-    const auto* systemContext = serverModule->commonModule()->systemContext();
+    const auto* systemContext = serverModule->systemContext();
 
     /**%apidoc GET /rest/v{1-2}/licenseSummaries
      * %caption Get license usage info

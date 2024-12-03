@@ -47,6 +47,7 @@
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/api/data/site_information.h>
+#include <nx/vms/api/data/site_setup.h>
 #include <nx/vms/api/data/storage_encryption_data.h>
 #include <nx/vms/api/rules/event_log.h>
 #include <nx/vms/common/api/helpers/parser_helper.h>
