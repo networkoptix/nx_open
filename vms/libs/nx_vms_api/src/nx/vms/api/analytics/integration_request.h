@@ -77,7 +77,7 @@ struct NX_VMS_API RegisterIntegrationResponse: IntegrationRequestIdentity
     /**%apidoc
      * Username of the user, which should be used by the Integration to log in to the VMS.
      */
-    QString user;
+    QString username;
 
     /**%apidoc
      * Password of the user, which should be used by the Integration to log in to the VMS.
@@ -85,7 +85,7 @@ struct NX_VMS_API RegisterIntegrationResponse: IntegrationRequestIdentity
     QString password;
 };
 #define nx_vms_api_analytics_RegisterIntegrationResponse_Fields \
-    nx_vms_api_analytics_IntegrationRequestIdentity_Fields (user)(password)
+    nx_vms_api_analytics_IntegrationRequestIdentity_Fields (username)(password)
 QN_FUSION_DECLARE_FUNCTIONS(RegisterIntegrationResponse, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(
     RegisterIntegrationResponse, nx_vms_api_analytics_RegisterIntegrationResponse_Fields)

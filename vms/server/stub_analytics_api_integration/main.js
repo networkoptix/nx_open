@@ -590,7 +590,7 @@ const initializeNotifications = () => {
         {
             const response = await axiosInstance.post(route, data, config);
             console.log('Response:', response.data);
-            appContext.integrationContext.integrationUserName = response.data.user;
+            appContext.integrationContext.integrationUserName = response.data.username;
             appContext.integrationContext.integrationPassword = response.data.password;
             appContext.integrationContext.integrationUserId = response.data.requestId;
 
