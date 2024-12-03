@@ -571,11 +571,11 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Người dùng không có quyền truy cập vào bố cục đã chọn</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Một số người dùng không có quyền truy cập vào bố cục đã chọn</translation>
     </message>
   </context>
   <context>

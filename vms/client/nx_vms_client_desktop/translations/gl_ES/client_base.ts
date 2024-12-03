@@ -107,23 +107,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Durante a duración do evento</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>De duración fixa</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>O evento ocorre</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>O evento comeza</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>O evento detense</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -194,7 +194,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>Cancelado</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1162,48 +1162,48 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Conectar ao sitio</translation>
     </message>
     <message>
       <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
+      <translation>Pestana Deseño</translation>
     </message>
     <message>
       <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
+      <translation>Nova pestana de deseño</translation>
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>Pestana Pantalla de benvida</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
+      <translation>Nova pestana da pantalla de benvida</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Administración do sitio...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Actualización do sitio...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Xestión de listas...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Integracións abertas...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Combinar sitios...</translation>
     </message>
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Abrir en</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1218,7 +1218,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Ventana dedicada</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1226,11 +1226,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>API de JavaScript...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Fusionar ao sistema actualmente conectado...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1501,11 +1501,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Se o teu sistema non ten acceso a Internet, envía a clave de licenza e o ID de hardware proporcionados a %1 para recibir o arquivo de activación.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Se o teu sitio non ten acceso a Internet, envía a clave de licenza e o ID de hardware proporcionados ao teu equipo de asistencia rexional/de licenza para recibir o ficheiro de activación:</translation>
     </message>
   </context>
   <context>
@@ -1635,7 +1635,7 @@ Clave de licenza: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Conectar ao sitio</translation>
     </message>
   </context>
   <context>
@@ -1750,7 +1750,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>Introduce aquí unha breve descrición do sitio.</translation>
     </message>
   </context>
   <context>
@@ -2003,7 +2003,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Plataforma</translation>
     </message>
   </context>
   <context>
@@ -2103,7 +2103,7 @@ Clave de licenza: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Sitio pechado. Para anexar a un muro de vídeo (video wall), o sitio debe estar en estado activo. %1</translation>
     </message>
   </context>
   <context>
@@ -2201,37 +2201,37 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Estes dispositivos elimínanse do sitio</numerusform>
+        <numerusform>Estes dispositivos elimínanse do sitio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Estas cámaras elimínanse do sitio</numerusform>
+        <numerusform>Estas cámaras elimínanse do sitio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
-        <numerusform>These servers are removed from Site</numerusform>
+      <translation>
+        <numerusform>Estes servidores elimínanse do sitio</numerusform>
+        <numerusform>Estes servidores elimínanse do sitio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
-        <numerusform>These users are removed from Site</numerusform>
+      <translation>
+        <numerusform>Estes usuarios elimínanse do sitio</numerusform>
+        <numerusform>Estes usuarios elimináronse do stio</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>Estes recursos elimínanse do sitio</numerusform>
+        <numerusform>Estes recursos elimínanse do sitio</numerusform>
       </translation>
     </message>
   </context>
@@ -2418,33 +2418,33 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Nome de sitio cambiado</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Fusión de sitios</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Conexión de servidor proxy</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>Actualizouse o sitio á versión %1</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Duración: %3, Obxectivo: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Hora de inicio: %1, Obxectivo: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>IP do usuario</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2456,11 +2456,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>IP do dispositivo</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>Cámara IP</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2594,7 +2594,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Sitio web</translation>
     </message>
   </context>
   <context>
@@ -2990,46 +2990,46 @@ Clave de licenza: %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Desconectar sitio de %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Conectar o sitio a %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Actualmente non hai conexión entre o teu sitio e %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Introduce o contrasinal da túa conta para desconectar o sitio de %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Non se pode desconectar o sitio de %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Sitio desconectado de %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Desconectar o sitio de %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>A gravación deterase e eliminaranse todas as subscricións de servizos</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Todos os %1 usuarios serán eliminados do sitio</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
@@ -5545,61 +5545,61 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>Conéctate ao teu sitio desde calquera lugar!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Ningún servidor en liña do sitio ten acceso a Internet para a sincronización horaria.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>Non podes recibir notificacións do sitio por correo electrónico.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>Non poden recibir notificacións do sitio por correo electrónico.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Algunhas cámaras están configuradas para gravar nun modo que non admiten.</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n máis</numerusform>
+        <numerusform>+ %n máis</numerusform>
       </translation>
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>O sitio deixará de funcionar en breve</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>O sitio deixou de funcionar</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>O sitio deixará de funcionar hoxe</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>O sitio deixará de funcionar mañá</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>O sitio deixará de funcionar en %n días</numerusform>
+        <numerusform>O sitio deixará de funcionar en %n días</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>Os idiomas de notificación e interface difiren</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>O idioma das notificacións é diferente do idioma da interface</translation>
     </message>
   </context>
   <context>
@@ -5622,19 +5622,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>Cando se activa, descóbrense continuamente novas cámaras e servidores e as solicitudes de descubrimento envíanse ás cámaras para actualizar o estado.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Inclúe información sobre o sitio, como modelos de cámaras e versións de firmware, número de servidores, etc.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Permitir optimizar a configuración do dispositivo</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Permitir optimizar a configuración da cámara</translation>
     </message>
   </context>
   <context>
@@ -5750,7 +5750,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>Actualización automática cada %1</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5977,11 +5977,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Sitio pechado</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Para engadir un muro de vídeo (video wall), o sitio debe estar en estado activo. %1</translation>
     </message>
   </context>
   <context>
@@ -6241,11 +6241,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>Non se puido mover o dispositivo</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>Alcanzouse o número máximo de dispositivos para este servidor</translation>
     </message>
   </context>
   <context>

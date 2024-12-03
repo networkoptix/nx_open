@@ -584,11 +584,11 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Kullanıcıların seçili ekran düzenine erişimi yok</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Bazı kullanıcıların seçili ekran düzenine erişimi yok</translation>
     </message>
   </context>
   <context>

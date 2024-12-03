@@ -1571,7 +1571,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Hãy đảm bảo rằng bạn có quyền truy cập vào thư mục đã chọn và đủ dung lượng đĩa</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1579,7 +1579,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Xuất đã chọn</translation>
     </message>
   </context>
   <context>
@@ -1693,8 +1693,8 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>với %n thuộc tính</numerusform>
       </translation>
     </message>
     <message>
@@ -1741,7 +1741,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Mã ghép nối tích hợp</translation>
     </message>
   </context>
   <context>
@@ -1833,15 +1833,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Nhóm quyền yêu cầu</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Xem Quyền</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Ẩn Quyền</translation>
     </message>
   </context>
   <context>
@@ -1879,11 +1879,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Chọn đối tượng</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Tất cả các Đối tượng</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1974,14 +1974,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Lọc theo</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Chọn thuộc tính</translation>
     </message>
   </context>
   <context>
@@ -2114,11 +2114,11 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Máy chủ không được cấu hình cho tính năng truy cập từ xa</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Công cụ truy cập từ xa hiện đang bị vô hiệu hóa. Vui lòng bật hoặc liên hệ với quản trị viên.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2130,15 +2130,15 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Kết nối %1 ứng dụng khách với máy chủ cục bộ:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Cổng cục bộ</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Đã xảy ra lỗi</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2150,7 +2150,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Truy cập từ xa không khả dụng</translation>
     </message>
   </context>
   <context>
@@ -2361,19 +2361,19 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Chi nhánh đã bị tạm dừng. Để bật/tắt việc sử dụng tích hợp cho thiết bị hiện tại, Chi nhánh phải ở trạng thái hoạt động. Liên hệ với đối tác kênh của bạn để biết thêm chi tiết</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Chi nhánh đã bị tạm dừng. Để bật/tắt việc sử dụng tích hợp cho một số thiết bị, Chi nhánh phải ở trạng thái hoạt động. Liên hệ với đối tác kênh của bạn để biết thêm chi tiết</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Chi nhánh đã bị tắt. Để kích hoạt việc sử dụng tích hợp này cho thiết bị hiện tại, Chi nhánh phải ở trạng thái hoạt động. Liên hệ với đối tác kênh của bạn để biết thêm chi tiết</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Chi nhánh đã bị tắt. Để kích hoạt việc sử dụng tích hợp này cho một số thiết bị, Chi nhánh phải ở trạng thái hoạt động. Liên hệ với đối tác kênh của bạn để biết thêm chi tiết</translation>
     </message>
   </context>
   <context>
@@ -2456,7 +2456,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Chấp nhận yêu cầu đăng ký tích hợp API</translation>
     </message>
   </context>
   <context>
@@ -2652,19 +2652,19 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Không có Chi nhánh yêu thích</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Không có Chi nhánh ẩn</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Bạn có thể thêm Chi nhánh vào mục yêu thích từ menu</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Bạn có thể ẩn các Chi nhánh khỏi danh sách chính từ menu</translation>
     </message>
   </context>
   <context>
@@ -2825,11 +2825,11 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Chi nhánh được thêm vào sẽ nhanh chóng hiển thị cho người dùng đang có tài khoản đám mây, trong khi người dùng không có tài khoản đám mây sẽ nhận được hướng dẫn qua Email.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Ngôn ngữ thông báo</translation>
     </message>
   </context>
   <context>
@@ -2969,11 +2969,11 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Ngôn ngữ thông báo</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Ngôn ngữ giao diện</translation>
     </message>
   </context>
   <context>
@@ -3023,7 +3023,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 đã chọn:</translation>
     </message>
     <message>
       <source>Schedule</source>

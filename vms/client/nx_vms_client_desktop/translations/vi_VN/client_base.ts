@@ -105,23 +105,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Trong suốt thời gian diễn ra sự kiện</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>Có thời hạn cố định</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>Sự kiện xảy ra</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>Sự kiện bắt đầu</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>Sự kiện dừng lại</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -189,7 +189,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>Đã hủy</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1154,48 +1154,48 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Kết nối với Chi nhánh</translation>
     </message>
     <message>
       <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
+      <translation>Thẻ Bố cục</translation>
     </message>
     <message>
       <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
+      <translation>Thẻ Bố cục mới</translation>
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>Thẻ Màn hình chào mừng</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
+      <translation>Thẻ Màn hình chào mừng mới</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Quản trị Chi nhánh...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Cập nhật Chi nhánh...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Quản lý danh sách...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Mở tích hợp...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Hợp nhất các Chi nhánh...</translation>
     </message>
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Mở trong</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1210,7 +1210,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Cửa sổ chuyên dụng</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1218,11 +1218,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>JavaScript API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Hợp nhất vào Chi nhánh hiện đang kết nối...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1490,11 +1490,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Nếu Chi nhánh của bạn không có quyền truy cập Internet, vui lòng gửi Khóa cấp phép và ID phần cứng được cung cấp tới %1 để nhận tệp kích hoạt.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Nếu Chi nhánh của bạn không có quyền truy cập Internet, vui lòng gửi Khóa cấp phép và ID phần cứng được cung cấp cho nhóm hỗ trợ Khu vực/Giấy phép để nhận tệp kích hoạt:</translation>
     </message>
   </context>
   <context>
@@ -1617,7 +1617,7 @@ Khóa giấy phép: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Kết nối với Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -1732,7 +1732,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>Nhập mô tả ngắn về Chi nhánh tại đây.</translation>
     </message>
   </context>
   <context>
@@ -2080,7 +2080,7 @@ Khóa giấy phép: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Chi nhánh đã đóng. Để gắn vào Tường video, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -2176,32 +2176,32 @@ Khóa giấy phép: %2</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Các thiết bị này đã được gỡ bỏ khỏi Chi nhánh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Những camera này đã được gỡ bỏ khỏi Chi nhánh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
+      <translation>
+        <numerusform>Các máy chủ này đã được xóa khỏi Chi nhánh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
+      <translation>
+        <numerusform>Những người dùng này đã được xóa khỏi Chi nhánh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>Những tài nguyên này đã bị xóa khỏi Chi nhánh</numerusform>
       </translation>
     </message>
   </context>
@@ -2387,33 +2387,33 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Tên Chi nhánh đã thay đổi</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Hợp nhất Chi nhánh</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Kết nối proxy máy chủ</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>Chi nhánh đã được cập nhật lên phiên bản %1</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Khoảng thời gian: %3, Mục tiêu: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Thời gian bắt đầu: %1, Mục tiêu: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>IP người dùng</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2425,11 +2425,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>IP Thiết bị</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>IP Camera</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2953,58 +2953,58 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Ngắt kết nối Chi nhánh từ %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Kết nối Chi nhánh tới %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Hiện tại không có kết nối nào giữa Chi nhánh của bạn và %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để ngắt kết nối Chi nhánh khỏi %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Không thể ngắt kết nối Chi nhánh khỏi %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Chi nhánh bị ngắt kết nối khỏi %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Ngắt kết nối Chi nhánh từ %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>Việc ghi sẽ dừng lại và tất cả Đăng ký dịch vụ sẽ bị xóa</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Tất cả người dùng %1 sẽ bị xóa khỏi Chi nhánh</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Bạn sẽ được đăng xuất khỏi Chi nhánh. Chi nhánh sẽ chỉ có thể truy cập được thông qua mạng cục bộ</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Chi nhánh này chỉ có thể truy cập được thông qua mạng cục bộ</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>Dữ liệu hiện có (cài đặt Chi nhánh và lưu trữ) sẽ được bảo toàn</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -3199,11 +3199,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>Chi nhánh không tương thích với xác thực hai yếu tố</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>Không thể đăng nhập vào Chi nhánh &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3316,11 +3316,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>Cấu hình Chi nhánh sẽ được phục hồi từ bản sao lưu, ứng dụng máy chủ sẽ được khởi động lại.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để khôi phục Chi nhánh từ bản sao lưu</translation>
     </message>
   </context>
   <context>
@@ -3522,7 +3522,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>Bộ lọc thông báo được di chuyển sang bảng bên phải</translation>
     </message>
   </context>
   <context>
@@ -3581,7 +3581,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Mở tích hợp</translation>
     </message>
   </context>
   <context>
@@ -3874,7 +3874,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>Cài đặt chỉ đọc. Vui lòng liên hệ với quản trị viên Chi nhánh của bạn. Mọi thay đổi sẽ bị mất sau khi thoát khỏi chương trình.</translation>
     </message>
   </context>
   <context>
@@ -4044,7 +4044,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;Camera ảo&quot; là bộ lưu trữ ảo cho các tệp video, có thể được tải lên bất kỳ máy chủ nào trên Chi nhánh của bạn và được bất kỳ người dùng nào truy cập.</translation>
     </message>
   </context>
   <context>
@@ -4374,7 +4374,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Di chuyển đến một cửa sổ chuyên dụng</translation>
     </message>
   </context>
   <context>
@@ -4697,7 +4697,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>Bạn phải tắt xác thực không an toàn (digest) cho tài khoản của mình trước khi có thể truy cập từ xa.</translation>
     </message>
   </context>
   <context>
@@ -4780,7 +4780,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
+      <translation>Không thể truy cập vào camera này. Thực hiện chẩn đoán camera trong ứng dụng khách để biết thêm thông tin.</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4788,11 +4788,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+      <translation>Camera này yêu cầu phải có thông tin xác thực được thiết lập trong phần cài đặt thiết bị trên cổng thông tin đám mây hoặc máy khách trên máy tính.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>KHÔNG ĐƯỢC HỖ TRỢ</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4800,11 +4800,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>CHI NHÁNH ĐÃ ĐÓNG</translation>
     </message>
     <message>
       <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
+      <translation>GIỚI HẠN LUỒNG</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4812,7 +4812,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
+      <translation>CHỈ ÂM THANH</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4840,7 +4840,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>LỖI CHỨNG NHẬN</translation>
     </message>
   </context>
   <context>
@@ -4992,7 +4992,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Chọn chính sách đọc-ghi để xác định cách tương tác với các thư mục lưu trữ.</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -5008,24 +5008,24 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>Các máy chủ Chi nhánh có các chính sách đọc-ghi khác nhau cho bộ lưu trữ</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>Độc quyền - máy chủ đọc từ tất cả các thư mục nhưng chỉ ghi vào thư mục của riêng nó. Nó xóa dữ liệu cũ khỏi tất cả các thư mục.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Chia sẻ - máy chủ đọc từ tất cả các thư mục nhưng chỉ ghi vào thư mục của riêng nó. Nó chỉ xóa dữ liệu cũ khỏi thư mục của riêng nó.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Tách biệt - máy chủ chỉ đọc và ghi vào thư mục riêng của nó. Nó chỉ xóa dữ liệu cũ khỏi thư mục riêng của nó.</translation>
     </message>
   </context>
   <context>
@@ -5144,19 +5144,19 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>có thể xóa bỏ</translation>
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Kích thước không xác định</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>Bộ lưu trữ có các chính sách đọc-ghi khác nhau trên nhiều Máy chủ trong Chi nhánh</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Nhấp vào biểu tượng để xem danh sách Máy chủ</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
@@ -5273,7 +5273,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>Không lưu được cài đặt Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -5396,7 +5396,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>Chi nhánh không có quyền truy cập internet để đồng bộ hóa thời gian</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
@@ -6411,7 +6411,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>Tính năng chéo các chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -6419,17 +6419,17 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Cũng bao gồm</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Bắt đầu</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Trước sự kiện</translation>
     </message>
     <message>
       <source>End</source>
@@ -6439,7 +6439,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Sau sự kiện</translation>
     </message>
   </context>
   <context>
@@ -6610,8 +6610,8 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>Xóa %n quy tắc?</numerusform>
       </translation>
     </message>
   </context>
@@ -6709,7 +6709,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>Cho phép người dùng truy cập luồng âm thanh từ thiết bị. Được sử dụng kết hợp với Xem Trực tiếp và/hoặc Xem Lưu trữ.</translation>
     </message>
   </context>
   <context>
@@ -6741,11 +6741,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Thêm vào danh sách</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Tạo danh sách mới...</translation>
     </message>
   </context>
   <context>
@@ -7051,15 +7051,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Chi nhánh đã đóng</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>Để thực hiện sao lưu vào bộ nhớ đám mây, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>Chi nhánh bị tạm dừng. Để thực hiện thay đổi cấu hình sao lưu, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -7131,7 +7131,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Cuộc gọi nhỡ</translation>
     </message>
   </context>
   <context>
@@ -7239,11 +7239,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>Không thay đổi các thiết lập này trừ khi bạn hoàn toàn chắc chắn về tác động tiềm tàng của chúng đối với hiệu suất</translation>
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+      <translation>Chỉ những khoảng thời gian camera hoặc máy chủ ngoại tuyến sau lần đầu tiên thêm vào trang web mới được tự động nhập.</translation>
     </message>
   </context>
   <context>
@@ -7262,7 +7262,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>Mở Bố cục trong Tab mới</translation>
     </message>
   </context>
   <context>
@@ -7289,7 +7289,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>Chọn mục tiêu...</translation>
     </message>
   </context>
   <context>
@@ -7308,11 +7308,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>Tài nguyên mục tiêu không tồn tại</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Chọn Camera hoặc Bố cục...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -7323,7 +7323,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>Chọn mục tiêu điểm phát sóng</translation>
     </message>
   </context>
   <context>
@@ -7464,7 +7464,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>%1 will be removed from the Site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
+      <translation>%1 sẽ bị xóa khỏi Chi nhánh và thay thế bằng camera đã chọn</translation>
     </message>
   </context>
   <context>
@@ -7870,7 +7870,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 Bố cục là &lt;b&gt;bố cục liên chi nhánh&lt;/b&gt; cho phép bạn làm việc với các thiết bị từ các Chi nhánh khác nhau. Hiện tại, chỉ có một số tính năng của bố cục thông thường khả dụng, nhưng chúng tôi sẽ tiếp tục mở rộng khả năng của %1 Bố cục trong các phiên bản tương lai</translation>
     </message>
   </context>
   <context>
@@ -7947,7 +7947,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>Bạn có chắc chắn muốn ngắt kết nối?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -7967,32 +7967,32 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>Chủ sở hữu Chi nhánh cục bộ vắng mặt hoặc bị vô hiệu hóa.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>Chi nhánh được kết nối tới %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>Không thể kết nối Chi nhánh tới %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Kết nối Chi nhánh tới %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Kết nối Chi nhánh tới %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để kết nối Chi nhánh với %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8021,11 +8021,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>Hợp nhất Máy chủ vào Chi nhánh</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để hợp nhất Máy chủ vào Chi nhánh</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8106,11 +8106,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Camera này cần phải thiết lập mật khẩu. Hãy yêu cầu quản trị viên trang web của bạn thực hiện việc này.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Một số camera được chọn yêu cầu phải thiết lập mật khẩu. Hãy yêu cầu quản trị viên Chi nhánh của bạn thực hiện việc này.</translation>
     </message>
   </context>
   <context>
@@ -8246,11 +8246,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Quản trị Chi nhánh</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>Đã đạt đến số lượng Thiết bị tối đa cho Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -8356,15 +8356,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>Mở video sự kiện</translation>
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>Mở thiết bị sự kiện</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>Mở camera sự kiện</translation>
     </message>
   </context>
   <context>
@@ -8423,11 +8423,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>KHÔNG XÁC ĐỊNH</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> + %n</numerusform>
       </translation>
     </message>
@@ -8761,7 +8761,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>Xem video không bị biên tập</translation>
     </message>
   </context>
   <context>
@@ -8872,23 +8872,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Các Chi nhánh sẽ sớm được hợp nhất</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>Máy chủ từ Chi nhánh khác sẽ xuất hiện trong cây tài nguyên.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>Đang kết nối tới Chi nhánh hiện tại...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>Máy chủ sẽ sớm được kết nối với Chi nhánh</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>Không thể hợp nhất %1 vào Chi nhánh của chúng tôi.</translation>
     </message>
   </context>
   <context>
@@ -8968,7 +8968,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>ID này đã được sử dụng. Sử dụng nút Tạo để tìm ID miễn phí.</translation>
     </message>
   </context>
   <context>
@@ -9077,7 +9077,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Tất cả người dùng và nhóm LDAP sẽ bị xóa.&lt;br&gt;&lt;br&gt;Cài đặt LDAP cũng sẽ bị xóa.</translation>
     </message>
   </context>
   <context>
@@ -9179,8 +9179,8 @@ Nhật ký Cấp độ &quot;%1&quot; sẽ cung cấp cho bạn thông tin chi t
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>Mức ghi nhật ký được chọn có thể làm giảm hiệu suất.
+Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau khi bạn đã thu thập đủ số nhật ký.</translation>
     </message>
   </context>
   <context>
@@ -9246,7 +9246,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>Mức độ ghi nhật ký làm giảm hiệu suất</translation>
     </message>
   </context>
   <context>
@@ -10124,7 +10124,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>Bất kỳ thông báo nào</translation>
     </message>
     <message>
       <source>Event Notifications</source>

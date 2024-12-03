@@ -3103,19 +3103,19 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Wszyscy użytkownicy %1 zostaną usunięci z witryny</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Zostaniesz wylogowany z witryny. Strona będzie dostępna tylko przez sieć lokalną</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Dostęp do witryny będzie możliwy wyłącznie za pośrednictwem sieci lokalnej</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>Istniejące dane (ustawienia witryny i archiwum) zostaną zachowane</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -3310,11 +3310,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>Witryna nie jest kompatybilna z uwierzytelnianiem dwuskładnikowym</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>Nie udało się zalogować do witryny &quot;%1&quot;</translation>
     </message>
   </context>
   <context>

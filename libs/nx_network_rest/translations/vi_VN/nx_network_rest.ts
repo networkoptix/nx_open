@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Khóa phiên đã quá cũ đối với Chi nhánh này.</translation>
     </message>
   </context>
   <context>

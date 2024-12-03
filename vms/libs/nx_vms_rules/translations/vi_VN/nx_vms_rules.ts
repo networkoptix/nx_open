@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Không phải tất cả các máy chủ đều phù hợp</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Thiết bị sự kiện</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -188,19 +188,19 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Giá trị trường %1 phải được cung cấp cho chính sách xác thực</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>Bố cục cục bộ được chọn chỉ có thể hiển thị cho chủ sở hữu của nó %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Không có người dùng được chọn nào có quyền truy cập vào bố cục đã chọn</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Một số người dùng không có quyền truy cập vào bố cục đã chọn</translation>
     </message>
     <message>
       <source>For</source>
@@ -208,43 +208,43 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Các thiết bị đang chọn đã bị xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Các camera đang chọn đã bị xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Các máy chủ đang chọn đã bị xóa</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>Các bố cục đang chọn đã bị xóa</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>Giá trị thời gian không thể nhỏ hơn 0</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>Thời lượng không thể nhỏ hơn 0</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>Giá trị không thể nhỏ hơn %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>Giá trị không thể lớn hơn %1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -262,7 +262,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Không được phép để văn bản trống</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -291,7 +291,7 @@
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Chưa chọn loại sự kiện phân tích</translation>
     </message>
   </context>
   <context>
@@ -318,7 +318,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Chưa chọn loại đối tượng phân tích</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     <message>
       <source>%1 was disconnected</source>
       <comment>Device name will be substituted</comment>
-      <translation type="unfinished">%1 was disconnected</translation>
+      <translation>%1 đã bị ngắt kết nối</translation>
     </message>
   </context>
   <context>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <translation>Sự kiện chung từ %1</translation>
     </message>
   </context>
   <context>
@@ -537,25 +537,25 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>Xác thực HTTP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Phải điền các trường người dùng và mật khẩu trong trường hợp phương thức xác thực cơ bản hoặc digest được chọn</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Phải điền trường mã thông báo trong trường hợp loại xác thực bearer được chọn</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
-      <translation type="unfinished">HTTP Method should be known</translation>
+      <translation>Cần phải biết phương pháp HTTP</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
+      <translation>Sự kiện vấn đề đồng bộ LDAP</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -617,7 +617,7 @@
     <message>
       <source>%1 has a license problem</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation>%1 có vấn đề về giấy phép</translation>
     </message>
   </context>
   <context>
@@ -725,7 +725,7 @@
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>Danh sách có ID được chỉ định &apos;%1&apos; có kiểu đối tượng không hợp lệ - &apos;%2&apos;, mong đợi - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -739,7 +739,7 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>Không thể thiết lập thời lượng bằng không cho trạng thái sự kiện `%1`</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
