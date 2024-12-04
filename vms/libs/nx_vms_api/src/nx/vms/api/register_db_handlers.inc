@@ -1311,7 +1311,7 @@
     reg("rest/v{3-}/lookupLists/:id?",
         GlobalPermission::powerUser,
         std::make_unique<nx::vms::server::LookupListsHandler<QueryProcessor>>(
-            queryProcessor, systemContext));
+            queryProcessor));
 
     /**%apidoc GET /rest/v{1-}/videoWalls
      * Retrieves all Video Wall records stored in the Site.
