@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 
 import Nx.Controls
 import Nx.Core
@@ -168,7 +169,7 @@ Item
 
             delegate: Component
             {
-                Row
+                RowLayout
                 {
                     id: cellValues
 
@@ -185,12 +186,11 @@ Item
                     {
                         id: rowRepeater
 
-                        anchors.verticalCenter: parent.verticalCenter
                         objectName: "valueRowRepeater"
                         model: cellValues.values
                         readonly property bool shrinked: count === 1 && itemAt(0).shrinked
 
-                        Row
+                        RowLayout
                         {
                             id: valueItem
 
@@ -202,11 +202,13 @@ Item
 
                             Rectangle
                             {
+                                id: colorRectangle
+
                                 objectName: "colorRectangle"
-                                width: 16
+                                readonly property bool relevant: cellValues.colors[index] ?? false
+                                width: relevant ? 16 : 0
                                 height: 16
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: cellValues.colors[index] ?? false
+                                visible: relevant
                                 color: cellValues.colors[index] ?? "transparent"
                                 border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
                                 radius: 1
@@ -217,7 +219,7 @@ Item
                                 id: valueText
 
                                 objectName: "valueText"
-                                anchors.verticalCenter: parent.verticalCenter
+                                Layout.fillWidth: index === cellValues.lastVisibleIndex
 
                                 color: control.valueColor
                                 font: control.valueFont
@@ -237,8 +239,10 @@ Item
                     {
                         id: appendix
 
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: cellValues.lastVisibleIndex < rowRepeater.count - 1
+                        readonly property bool relevant:
+                            cellValues.lastVisibleIndex < rowRepeater.count - 1
+                        width: relevant ? undefined : 0
+                        visible: relevant
                         text: `+ ${rowRepeater.count - cellValues.lastVisibleIndex - 1}`
                         color: ColorTheme.darker(control.valueColor, 10)
                         font: control.valueFont
@@ -265,21 +269,7 @@ Item
                         }
 
                         // At least one elided value we should show.
-                        if (lastIndex < 0)
-                        {
-                            const item = rowRepeater.itemAt(0)
-                            for (var i = 0; i < item.children.length; ++i)
-                            {
-                                var itemChild = item.children[i]
-                                if (itemChild.objectName === "valueText")
-                                {
-                                    itemChild.width = width - (appendix.visible ? appendix.width : 0)
-                                    break
-                                }
-                            }
-                            lastIndex = 0
-                        }
-                        lastVisibleIndex = lastIndex
+                        lastVisibleIndex = Math.max(0, lastIndex)
                     }
                 }
             }
@@ -299,7 +289,8 @@ Item
             const implicitLabelWidth = calculateImplicitWidth(labels)
             const implicitValuesWidth = calculateImplicitWidth(values)
 
-            const availableWidth = grid.width - grid.columnSpacing
+            const availableWidth =
+                grid.width - grid.columnSpacing - grid.leftPadding - grid.rightPadding
             const preferredLabelWidth = availableWidth * control.labelFraction
             const preferredValuesWidth = availableWidth - preferredLabelWidth
 
