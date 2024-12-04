@@ -1426,14 +1426,14 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Kết nối với Chi nhánh trước đó ngay khi khởi động</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Cài đặt Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>Hiển thị dấu thời gian trên LIVE</translation>
     </message>
   </context>
   <context>
@@ -1856,7 +1856,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Hợp nhất các Chi nhánh...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1941,7 +1941,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>Địa chỉ hoặc Mặt nạ mạng con</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1969,16 +1969,16 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>Tìm thiết bị</translation>
     </message>
     <message>
       <source>
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
+      <translation>
+              Nhập địa chỉ, phạm vi mạng con hoặc mặt nạ mạng con, tên đăng nhập và mật khẩu
+              và nhấp vào nút &quot;Tìm kiếm&quot;
           </translation>
     </message>
   </context>
@@ -2051,7 +2051,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Chữ ký</translation>
     </message>
   </context>
   <context>
@@ -2150,7 +2150,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Thông báo Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -2317,14 +2317,14 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>Việc xóa tùy chọn kết nối này có thể khiến Chi nhánh bị trục trặc.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Quản trị Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -2519,7 +2519,7 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>Vi phạm giới hạn của Tổ chức</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2652,7 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>Biên tập video</translation>
     </message>
     <message>
       <source>Configure...</source>
@@ -2660,19 +2660,19 @@
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>Mờ</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>Loại trừ camera</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>Áp dụng thời lượng phiên cho người dùng Cloud</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>Công cụ truy cập từ xa</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2684,7 +2684,7 @@
     </message>
     <message>
       <source>Power users</source>
-      <translation type="unfinished">Power users</translation>
+      <translation>Người dùng cấp cao</translation>
     </message>
   </context>
   <context>
@@ -2764,11 +2764,11 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>Truy cập từ xa</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>Bật giải mã phần cứng</translation>
     </message>
   </context>
   <context>
@@ -3104,11 +3104,11 @@
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>Mỗi</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>Buộc mở trong một cửa sổ chuyên dụng</translation>
     </message>
   </context>
   <context>

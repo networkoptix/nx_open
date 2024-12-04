@@ -3033,15 +3033,15 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Pecharás a sesión do sitio web. O sitio só será accesible a través da rede local</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Só se poderá acceder ao sitio web a través da rede local</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>Conservaranse os datos existentes (configuración do sitio e arquivo)</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -3236,11 +3236,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>O sitio non é compatible coa autenticación de dous factores</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>Vaia, produciuse un erro ao iniciar sesión no sitio &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3353,11 +3353,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>A configuración do sitio web restaurarase a partir da copia de seguridade, reiniciarase a aplicación do servidor.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Introduce o contrasinal da túa conta para restaurar o sitio desde a copia de seguridade</translation>
     </message>
   </context>
   <context>
@@ -3566,7 +3566,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>Os filtros de notificacións móvense ao panel dereito</translation>
     </message>
   </context>
   <context>
@@ -3625,7 +3625,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Integracións abertas</translation>
     </message>
   </context>
   <context>
@@ -3919,7 +3919,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>A configuración é de só lectura. Por favor, ponte en contacto co administrador do teu sitio. Todos os cambios perderanse despois da saída do programa.</translation>
     </message>
   </context>
   <context>
@@ -4090,7 +4090,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;Cámara virtual&quot; é un almacenamento virtual para ficheiros de vídeo, que poden cargarse en calquera servidor do teu sitio e ao que calquera usuario pode acceder.</translation>
     </message>
   </context>
   <context>
@@ -4426,7 +4426,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Mover a unha xanela específica</translation>
     </message>
   </context>
   <context>
@@ -4757,7 +4757,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>A autenticación insegura (resumo) debe estar desactivada para a túa conta antes de que estea dispoñible o acceso remoto.</translation>
     </message>
   </context>
   <context>
@@ -4841,7 +4841,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
+      <translation>Non se pode acceder a esta cámara. Realiza diagnósticos da cámara dentro do escritorio de cliente para obter información adicional.</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4849,11 +4849,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+      <translation>Esta cámara require que se establezan credenciais autorizadas na configuración do dispositivo no portal Cloud ou no escritorio de cliente.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>NON SOPORTADO</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4861,11 +4861,11 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>SITIO WEB PECHADO</translation>
     </message>
     <message>
       <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
+      <translation>LIMITACIÓN DE FLUJO</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4873,7 +4873,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
+      <translation>SÓ AUDIO</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4901,7 +4901,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>ERRO DE CERTIFICADO</translation>
     </message>
   </context>
   <context>
@@ -5054,11 +5054,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Escolle unha política de lectura-escritura para definir como interactuar cos directorios de almacenamento.</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exclusivo</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5066,28 +5066,28 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Illado</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>Os servidores do sitio teñen políticas de lectura e escritura diferentes para o almacenamento</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>Exclusivo: o servidor le de todos os cartafoles pero só escribe no seu propio cartafol. Elimina os datos antigos de todos os cartafoles.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Compartido: o servidor le de todos os cartafoles pero só escribe no seu propio cartafol. Elimina os datos antigos só do seu propio cartafol.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Illado: o servidor le e escribe exclusivamente no seu propio cartafol. Elimina os datos antigos só do seu propio cartafol.</translation>
     </message>
   </context>
   <context>
@@ -5190,11 +5190,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Illado</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exclusivo</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5206,23 +5206,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>extraíble</translation>
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Tamaño descoñecido</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>O almacenamento ten diferentes políticas de lectura e escritura en varios servidores do sitio web</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Fai clic na icona para ver a lista de servidores</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Política de lectura-escritura</translation>
     </message>
   </context>
   <context>
@@ -5335,7 +5335,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>Produciuse un erro ao gardar a configuración do sitio web</translation>
     </message>
   </context>
   <context>
@@ -5458,27 +5458,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>O sitio non ten acceso a Internet para a sincronización horaria</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>A partición do sistema úsase para os datos de análise</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Sitio suspendido</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Sitio pechado</translation>
     </message>
     <message>
       <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
+      <translation>Rexeitar a chamada do intercomunicador</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>O enderezo de correo electrónico non está definido para a túa conta</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -5486,31 +5486,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Chamada perdida</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>O almacenamento non está configurado nos servidores %n</numerusform>
+        <numerusform>O almacenamento non está configurado nos servidores %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>O almacenamento de copia de seguridade non está configurado nos servidores %n</numerusform>
+        <numerusform>O almacenamento de copia de seguridade non está configurado nos servidores %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>A programación de gravación non é válida</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>A programación de gravación non é válida nas cámaras %n</numerusform>
+        <numerusform>A programación de gravación non é válida nas cámaras %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5523,11 +5523,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Consulta %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>Fallou a sincronización do arquivo remoto</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -5538,9 +5538,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>O almacenamento do sistema úsase para os datos de análise en servidores %n</numerusform>
+        <numerusform>O almacenamento do sistema úsase para os datos de análise en servidores %n</numerusform>
       </translation>
     </message>
     <message>
@@ -6426,81 +6426,81 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
+      <translation>Información do modo de programador</translation>
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>Está listado</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>Non está listado</translation>
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>En</translation>
     </message>
     <message>
       <source>%n removed subjects</source>
-      <translation type="unfinished">%n removed subjects</translation>
+      <translation>%n temas eliminados</translation>
     </message>
     <message>
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation>%n dispositivos eliminados</translation>
     </message>
     <message>
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation>%n cámaras eliminadas</translation>
     </message>
     <message>
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation>%n servidores eliminados</translation>
     </message>
     <message>
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation>%n deseños eliminados</translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n temas máis</numerusform>
+        <numerusform>%n temas máis</numerusform>
       </translation>
     </message>
     <message>
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation>%n dispositivos máis</translation>
     </message>
     <message>
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation>%n cámaras máis</translation>
     </message>
     <message>
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation>%n servidores máis</translation>
     </message>
     <message>
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation>%n deseños máis</translation>
     </message>
   </context>
   <context>
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Número de servidores por sitio</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>Número de dispositivos por servidor</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>Número de elementos no deseño</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>Número de días de arquivo</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -6512,7 +6512,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>Características cruzadas dos sitios web</translation>
     </message>
   </context>
   <context>
@@ -6520,17 +6520,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Tamén inclúe</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Comezar</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Antes do evento</translation>
     </message>
     <message>
       <source>End</source>
@@ -6540,7 +6540,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Despois do Evento</translation>
     </message>
   </context>
   <context>
@@ -6718,9 +6718,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>Queres eliminar %n regras?</numerusform>
+        <numerusform>Queres eliminar %n regras?</numerusform>
       </translation>
     </message>
   </context>
@@ -6814,11 +6814,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Reproducir audio</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>Permite aos usuarios acceder a unha emisión de audio dende un dispositivo. Usado en combinación con View Live (Ver en directo) e/ou View Archive (Ver arquivo).</translation>
     </message>
   </context>
   <context>
@@ -6850,11 +6850,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Engadir á lista</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Crear unha nova lista...</translation>
     </message>
   </context>
   <context>
@@ -7166,15 +7166,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Sitio web pechado</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>Para realizar copias de seguridade nun almacenamento na nube, o sitio debe estar en estado activo. %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>Sitio suspendido. Para facer cambios na configuración de copia de seguridade, o sitio debe estar en estado activo. %1</translation>
     </message>
   </context>
   <context>
@@ -7249,7 +7249,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Chamada perdida</translation>
     </message>
   </context>
   <context>
@@ -7358,11 +7358,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>Non cambies esta configuración a menos que esteas absolutamente seguro/a do seu impacto potencial no rendemento</translation>
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+      <translation>Só se importarán automaticamente os períodos sen conexión da cámara ou do servidor despois da primeira incorporación ao sitio.</translation>
     </message>
   </context>
   <context>
@@ -7381,7 +7381,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>Abre o deseño nunha nova pestana</translation>
     </message>
   </context>
   <context>
@@ -7408,7 +7408,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>Seleccionar destino...</translation>
     </message>
   </context>
   <context>
@@ -7427,11 +7427,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>O recurso de destino non existe</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Selecciona Cámara ou Deseño...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -7442,7 +7442,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>Seleccione punto de acceso desexado</translation>
     </message>
   </context>
   <context>
@@ -7585,7 +7585,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be removed from the Site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
+      <translation>%1 eliminarase do sitio e substituirase pola cámara seleccionada</translation>
     </message>
   </context>
   <context>
@@ -7998,7 +7998,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 Os deseños son &lt;b&gt;deseños entre sitios&lt;/b&gt; que che permiten traballar con dispositivos de diferentes sitios. Actualmente, só están dispoñibles algunhas funcións dos deseños habituais, pero seguiremos ampliando as capacidades de %1 deseños en futuras versións</translation>
     </message>
   </context>
   <context>
@@ -8075,7 +8075,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>Seguro de que queres desconectar?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8095,32 +8095,32 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>O propietario do sitio web local está ausente ou está desactivado.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>Sistema conectado a %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>Erro ao conectar o sistema a %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Conectar o sitio a %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Conectar o sitio a %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>Introduce o contrasinal da túa conta para conectar o sitio de %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8149,11 +8149,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>Fusiona o servidor co sitio</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>Introduce o contrasinal da túa conta para combinar o servidor co sitio</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8185,7 +8185,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Novo sitio web</translation>
     </message>
   </context>
   <context>
@@ -8234,11 +8234,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Esta cámara require que se configure un contrasinal. Por favor, pídelle ao administrador do teu sitio que o faga.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Algunhas das cámaras seleccionadas requiren a configuración dun contrasinal. Por favor, pídelle ao administrador do teu sitio que o faga.</translation>
     </message>
   </context>
   <context>
@@ -8377,11 +8377,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administración do sitio</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>Alcanzouse o número máximo de dispositivos para este sitio web</translation>
     </message>
   </context>
   <context>
@@ -8489,15 +8489,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>Abrir vídeo do evento</translation>
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>Abrir dispositivo de eventos</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>Abrir a cámara de eventos</translation>
     </message>
   </context>
   <context>
@@ -8557,11 +8557,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>DESCOÑECIDO</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> + %n</numerusform>
         <numerusform> + %n</numerusform>
       </translation>
@@ -8899,7 +8899,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>Ver vídeo sen censura</translation>
     </message>
   </context>
   <context>
@@ -9010,23 +9010,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Os sitios fusionaranse en breve</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>Os servidores do outro sitio web aparecerán na árbore de recursos.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>Conectando ao sitio web actual...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>O servidor conectarase ao sitio web en breve</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>Erro ao combinar %1 co noso sitio web.</translation>
     </message>
   </context>
   <context>
@@ -9106,7 +9106,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>Este ID xa está en uso. Usa o botón Xerar para atopar un ID libre.</translation>
     </message>
   </context>
   <context>
@@ -9215,7 +9215,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Eliminaranse todos os usuarios e grupos LDAP.&lt;br&gt;&lt;br&gt;tamén se eliminará a configuración LDAP.</translation>
     </message>
   </context>
   <context>
@@ -9323,8 +9323,8 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>O nivel de rexistro seleccionado pode deteriorar o rendemento.
+Lembra devolver o nivel de rexistro á súa configuración predeterminada despois de recoller suficientes rexistros.</translation>
     </message>
   </context>
   <context>
@@ -9390,7 +9390,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>O nivel de rexistro degrada o rendemento</translation>
     </message>
   </context>
   <context>
@@ -9420,35 +9420,35 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>O rexistro de depuración está activado no cliente</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>O rexistro de depuración está activado.
+O rendemento do cliente está degradado.</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>O rexistro de depuración está activado</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>O rexistro de depuración está activado.
+O rendemento do sitio web está degradado.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>Descarga de rexistros cancelada</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>Descargando rexistros...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>Erro na descarga dos rexistros</translation>
     </message>
   </context>
   <context>
@@ -9459,27 +9459,27 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>Descargando...</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>Descarga completada con erros</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>Descarga exitosa</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n seleccionado:</numerusform>
+        <numerusform>%n seleccionado:</numerusform>
       </translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>Tentar de novo (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -9494,23 +9494,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>
-      <translation type="unfinished">Lookup List remove request failed</translation>
+      <translation>Erro na solicitude de eliminación da lista de busca</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>Non se puido engadir o obxecto á Lista</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Un obxecto non&apos;non ten atributos que coincidan coa lista seleccionada</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>Engadiuse o obxecto á Lista</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>Engadiuse un obxecto ao &quot;%1&quot; con éxito</translation>
     </message>
   </context>
   <context>
@@ -9533,7 +9533,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Calquera %1</translation>
     </message>
   </context>
   <context>
@@ -9563,7 +9563,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>Todos os demais ficheiros de texto</translation>
     </message>
   </context>
   <context>
@@ -9636,11 +9636,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Fusionar sitios web</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>Introduce o contrasinal da túa conta para fusinar os sitios web</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9649,23 +9649,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Fusionando sitios web...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>Este é o URL do sitio actual.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Os servidores do outro sitio web aparecerán na árbore de recursos cando remate a sincronización da base de datos.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Os sitios fusionaranse en breve</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>Erro ao fusionar os sitios</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9716,68 +9716,68 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Novo sitio web</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>Non se atopou o sitio web.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>O sitio descuberto %1 ten unha versión incompatible %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>O sitio web seleccionado ten unha versión de software máis antiga que é incompatible co sitio actual. Actualiza o sitio seleccionado á versión máis recente para combinalo co actual.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Estás a piques de fusionar sitios web con licenzas de inicio (Starter).</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Só se permite unha licenza de inicio por sitio, polo que se desactivará a segunda licenza.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>Estás a piques de fusionar sitios web con licenzas NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Só se permite unha licenza NVR por sitio, polo que se desactivará a segunda licenza.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>Non se puido configurar o sitio web remoto %1.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>%1 O sitio web só se pode combinar con non-%1. O nome e o contrasinal do sitio son tomados do sitio %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>Ambos sitios están conectados a %1. Non se permite a fusión.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>%1 os sitios teñen persoas propietarias diferentes. Non se permite a fusión.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Non se poden combinar sitios porque teñen polo menos un servidor co mesmo ID. Por favor, elimina este servidor e téntao de novo.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>O nome do sitio aínda non está configurado.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>Alcanzouse o número máximo de servidores para o sitio.</translation>
     </message>
   </context>
   <context>
@@ -9807,8 +9807,8 @@ You can force it, but it may significantly increase CPU load.</translation>
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>A detección de movemento está actualmente desactivada para esta cámara porque o fluxo de vídeo (video stream) supera a resolución %1 * %2.
+Podes forzar a detección de movemento, pero pode provocar un aumento substancial da carga da CPU.</translation>
     </message>
   </context>
   <context>
@@ -10082,24 +10082,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>As versións do sistema operativo dalgúns compoñentes xa non son compatibles. Elimínaos do sitio ou actualiza o seu sistema operativo a unha versión compatible.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>Incompatible %1 instancia. Para actualizar, desconecta o sitio de %1 primeiro.</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>Non se recomenda aplicar actualizacións ao final da semana</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>Sitio actualizado a</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>Actualización do sitio en proceso</translation>
     </message>
   </context>
   <context>
@@ -10113,7 +10113,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>Formatos posibles:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -10220,11 +10220,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>O grupo predeterminado de LDAP non se pode eliminar mentres o sitio estea conectado ao servidor LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>A xestión de usuarios para os usuarios da organización só está dispoñible a nivel de organización, non a nivel de sitio web</translation>
     </message>
   </context>
   <context>
@@ -10235,7 +10235,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>Non se puido recoñecer o evento na cámara inaccesible.</translation>
     </message>
   </context>
   <context>
@@ -10271,33 +10271,33 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>Sitio actual</translation>
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>Calquera notificación</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>Notificacións de eventos</translation>
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Notificacións do sistema</translation>
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Escolle tipos...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Calquera notificación</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n tipos de notificación</numerusform>
+        <numerusform>%n tipos de notificación</numerusform>
       </translation>
     </message>
   </context>
@@ -10305,7 +10305,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Selecciona tipos de notificación</translation>
     </message>
   </context>
   <context>
@@ -10566,7 +10566,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>O sitio non está conectado a %1. As notificacións móbiles só funcionan cando o sitio está conectado a %1.</translation>
     </message>
   </context>
   <context>
@@ -10665,11 +10665,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Integración de actualización automática</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Actualización automática da páxina web</translation>
     </message>
   </context>
   <context>
@@ -12143,7 +12143,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Isto eliminará instantáneamente o acceso ao sitio para este usuario/a</translation>
     </message>
   </context>
   <context>
@@ -12462,11 +12462,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>Non dispoñible no modo de ventá especificado</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>Move esta xanela ao Deseño para usar esta funcionalidade</translation>
     </message>
   </context>
   <context>
@@ -12492,7 +12492,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>Non se puido conectar ao sitio web porque quedou sen conexión</translation>
     </message>
   </context>
   <context>
@@ -12583,7 +12583,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>Omitir a versión</translation>
     </message>
   </context>
   <context>
@@ -12602,7 +12602,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de obxecto</translation>
     </message>
   </context>
   <context>
@@ -12647,7 +12647,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Novo sitio web</translation>
     </message>
   </context>
   <context>
@@ -12714,7 +12714,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>Outros sitios</translation>
     </message>
   </context>
   <context>
@@ -12851,11 +12851,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>Recurso non atopado</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>Parámetro non atopado</translation>
     </message>
   </context>
   <context>
@@ -13046,11 +13046,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>Engadir título ou comentario</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>A regra non é válida e pode non funcionar</translation>
     </message>
   </context>
   <context>
@@ -13069,7 +13069,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>Token / Identificador</translation>
     </message>
   </context>
   <context>
@@ -13179,15 +13179,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Selecciona polo menos un deseño</translation>
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Selecciona polo menos un usuario/a</translation>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Sitio web</translation>
     </message>
   </context>
   <context>
@@ -13208,19 +13208,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>Cando ocorre o evento</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>Cando comeza o evento</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>Cando o evento cesa</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>Seleccionar estado</translation>
     </message>
   </context>
   <context>
@@ -13243,11 +13243,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Non contén palabras clave</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Non contén entradas de lista</translation>
     </message>
   </context>
   <context>
@@ -13310,15 +13310,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>Limitación</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>Permitido</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>Actual</translation>
     </message>
   </context>
   <context>
@@ -13683,10 +13683,10 @@ We recommend you not to open this web page. If you understand the risks, you can
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>A base de datos de análise só debe almacenarse nunha unidade local e pode ocupar grandes cantidades de espazo.
+Unha vez seleccionada unha localización para almacenar datos de análise, non se pode cambiar facilmente sen perder os datos existentes. Recomendamos elixir a localización con coidado e evitar o uso da partición do sistema xa que pode causar un mal funcionamento grave.
+De xeito predeterminado, os datos de análise almacenaranse en %1.
+Pode seleccionar outra localización de almacenamento na pestana &quot;Xestión do almacenamento&quot; do cadro de diálogo Configuración do servidor.</translation>
     </message>
   </context>
   <context>
@@ -13833,7 +13833,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>Actualizacións automáticas do cliente</translation>
     </message>
   </context>
   <context>

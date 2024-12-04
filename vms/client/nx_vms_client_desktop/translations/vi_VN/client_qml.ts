@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Ngôn ngữ thông báo</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Cập nhật máy khách ngoại tuyến</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Cập nhật ngoại tuyến được bật và các tập tin được lưu trữ trên máy chủ.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Bật tùy chọn này sẽ cho phép tải xuống các tệp bổ sung vào máy chủ, có thể được sử dụng để cập nhật các máy khách đang kết nối ngay cả khi không có kết nối internet.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Thao tác này sẽ xóa tất cả các tệp cập nhật trên máy chủ.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Vẫn tiếp tục?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Chọn / Bỏ chọn tất cả</translation>
     </message>
   </context>
   <context>
@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Cài đặt ô</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Cài đặt bảng</translation>
     </message>
   </context>
   <context>
@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Kiểm tra cài đặt Quản trị Chi nhánh để cấu hình plugin này.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Plugin này không có cài đặt nào ở cấp độ Chi nhánh.</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Tích hợp cho phép sử dụng liền mạch chức năng phân tích video trên nhiều thiết bị khác nhau từ VMS.
+Chọn Tích hợp để bắt đầu cấu hình các tham số của tích hợp đó.</translation>
     </message>
   </context>
   <context>
@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Mã ghép nối sai</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -404,7 +404,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Chia sẻ bởi liên kết</translation>
     </message>
   </context>
   <context>
@@ -693,24 +693,24 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Chọn loại</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Xóa thuộc tính sẽ xóa tất cả dữ liệu liên quan</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Xóa danh sách sẽ xóa toàn bộ dữ liệu bên trong.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Xóa danh sách?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Danh sách này liên quan đến %n Quy tắc sự kiện. Bạn có chắc chắn muốn xóa nó không?</numerusform>
       </translation>
     </message>
   </context>
@@ -736,15 +736,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Xuất danh sách</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Đang xuất</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Mở thư mục...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -820,7 +820,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Bộ lọc giúp kiểm soát quyền truy cập vào Chi nhánh và đồng bộ hóa bằng cách chỉ định người dùng và/hoặc nhóm nào từ DN cơ sở được phép.</translation>
     </message>
   </context>
   <context>
@@ -917,7 +917,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Một số giá trị không thể tự động khớp. Vui lòng ánh xạ chúng theo cách thủ công.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -939,11 +939,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Ở cấp độ Chi nhánh, các thành viên nhóm có các quyền:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Ở cấp độ Chi nhánh, người dùng có các quyền:</translation>
     </message>
   </context>
   <context>
@@ -1067,7 +1067,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Một nhóm khác có cùng tên. Nên chỉ định tên duy nhất cho các nhóm.</translation>
     </message>
   </context>
   <context>
@@ -1218,7 +1218,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Quản lý tích hợp</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1233,7 +1233,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Plugin này không có cài đặt nào ở cấp độ Chi nhánh.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1325,7 +1325,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Đăng nhập vào Chi nhánh để cấu hình cách mở bố cục</translation>
     </message>
   </context>
   <context>
@@ -1395,19 +1395,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Kết nối Chi nhánh của bạn với máy chủ LDAP để quản lý người dùng dễ dàng hơn</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Việc nhập liên tục từ máy chủ LDAP bị vô hiệu hóa đối với Chi nhánh này. Việc cập nhật nhóm, thành viên nhóm và người dùng sẽ chỉ diễn ra thông qua đồng bộ hóa thủ công.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Không có người dùng hoặc nhóm nào khớp với cài đặt đồng bộ hóa và được thêm vào DB của Chi nhánh. Đảm bảo các tham số và bộ lọc của máy chủ LDAP được cấu hình đúng.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Vui lòng cẩn thận khi thay đổi cài đặt LDAP. Cấu hình không đúng có thể làm gián đoạn khả năng truy cập Chi nhánh của nhiều người dùng cùng lúc.</translation>
     </message>
   </context>
   <context>
@@ -1464,11 +1464,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Nhập danh sách</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Tùy chọn nhập</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1480,11 +1480,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Bộ phân cách:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Dữ liệu chứa tiêu đề</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1500,31 +1500,31 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Đang nhập</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Không thể mở tập tin</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Hãy đảm bảo rằng tệp đó tồn tại và bạn có quyền truy cập vào tệp đã chọn</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Sửa các mục đã nhập</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Không thể nhập tệp đã chọn</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Tập có vẻ như đang trống.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Hãy đảm bảo rằng tệp đã chọn tồn tại và bạn có quyền truy cập.</translation>
     </message>
   </context>
   <context>
@@ -1551,7 +1551,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 đã chọn:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1567,7 +1567,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Không thể lưu tập tin</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>

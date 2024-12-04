@@ -5400,23 +5400,23 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>Phân vùng hệ thống được sử dụng cho dữ liệu phân tích</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Chi nhánh bị đình chỉ</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Chi nhánh đã đóng</translation>
     </message>
     <message>
       <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
+      <translation>Từ chối cuộc gọi liên lạc nội bộ</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>Địa chỉ email chưa được thiết lập cho tài khoản của bạn</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -5424,28 +5424,28 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Cuộc gọi nhỡ</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Lưu trữ không được cấu hình trên %n máy chủ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Lưu trữ sao lưu không được cấu hình trên %n máy chủ</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>Lịch biểu ghi không hợp lệ</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>Lịch ghi không hợp lệ cho %n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5457,11 +5457,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Kiểm tra %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>Đồng bộ hóa lưu trữ từ xa không thành công</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -5471,29 +5471,29 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>Lưu trữ hệ thống được sử dụng cho dữ liệu phân tích trên %n máy chủ</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>Kết nối với Chi nhánh của bạn từ bất cứ đâu!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Không có máy chủ trực tuyến nào trong Chi nhánh có kết nối internet để đồng bộ hóa thời gian.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>Bạn không thể nhận thông báo của Chi nhánh qua email.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>Họ không thể nhận thông báo của Chi nhánh qua email.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Một số camera được thiết lập để ghi hình ở chế độ mà chúng không hỗ trợ.</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
@@ -5503,33 +5503,33 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>Chi nhánh sẽ sớm ngừng hoạt động</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>Chi nhánh đã ngừng hoạt động</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>Chi nhánh sẽ ngừng hoạt động vào hôm nay</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>Chi nhánh sẽ ngừng hoạt động vào ngày mai</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>Chi nhánh sẽ ngừng hoạt động trong %n ngày</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>Ngôn ngữ thông báo và giao diện khác nhau</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>Ngôn ngữ thông báo khác với ngôn ngữ giao diện</translation>
     </message>
   </context>
   <context>
@@ -5552,19 +5552,19 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>Khi được bật, các camera và máy chủ mới sẽ liên tục được phát hiện và các yêu cầu phát hiện sẽ được gửi đến các camera để cập nhật trạng thái.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Bao gồm thông tin về Chi nhánh, chẳng hạn như mẫu camera và phiên bản phần mềm, số lượng máy chủ, v.v.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Cho phép tối ưu hóa cài đặt thiết bị</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Cho phép tối ưu hóa cài đặt camera</translation>
     </message>
   </context>
   <context>
@@ -5679,7 +5679,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>Tự động làm mới sau mỗi %1</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5899,11 +5899,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Chi nhánh đã đóng</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Để thêm Video Wall, Chi nhánh phải ở trạng thái hoạt động. %1</translation>
     </message>
   </context>
   <context>
@@ -6146,11 +6146,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>Không thể di chuyển thiết bị</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>Đã đạt đến số lượng thiết bị tối đa cho máy chủ này</translation>
     </message>
   </context>
   <context>
@@ -6326,15 +6326,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
+      <translation>Thông tin chế độ nhà phát triển</translation>
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>Được liệt kê</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>Không được liệt kê</translation>
     </message>
     <message>
       <source>In</source>
@@ -6346,60 +6346,60 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation>%n thiết bị đã xóa</translation>
     </message>
     <message>
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation>%n camera đã bị xóa</translation>
     </message>
     <message>
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation>%n máy chủ đã bị xóa</translation>
     </message>
     <message>
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation>%n các bố cục đã xóa</translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n chủ đề nhiều hơn</numerusform>
       </translation>
     </message>
     <message>
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation>%n thiết bị nhiều hơn</translation>
     </message>
     <message>
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation>%n camera nhiều hơn</translation>
     </message>
     <message>
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation>%n máy chủ nhiều hơn</translation>
     </message>
     <message>
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation>%n bố cục nhiều hơn</translation>
     </message>
   </context>
   <context>
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Số lượng máy chủ trên mỗi Chi nhánh</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>Số lượng thiết bị trên mỗi máy chủ</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>Số lượng mục trên bố cục</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>Số ngày lưu trữ</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -9275,35 +9275,35 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>Đã bật ghi nhật ký gỡ lỗi trên máy khách</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>Đã bật ghi nhật ký gỡ lỗi.
+Hiệu suất của máy khách bị giảm.</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>Đã bật ghi nhật ký gỡ lỗi</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>Đã bật ghi nhật ký gỡ lỗi.
+Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>Nhật ký tải xuống đã bị hủy</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>Đang tải xuống nhật ký...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>Tải xuống nhật ký không thành công</translation>
     </message>
   </context>
   <context>
@@ -9314,26 +9314,26 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>Đang tải...</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>Tải xuống hoàn tất nhưng có lỗi</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>Tải xuống thành công</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n đã chọn:</numerusform>
       </translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>Thử lại (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -9348,23 +9348,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>
-      <translation type="unfinished">Lookup List remove request failed</translation>
+      <translation>Yêu cầu xóa danh sách tra cứu không thành công</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>Không thể thêm đối tượng vào Danh sách</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Một đối tượng không có thuộc tính khớp với danh sách đã chọn</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>Đối tượng đã được thêm vào Danh sách</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>Một đối tượng đã được thêm vào &quot;%1&quot; thành công</translation>
     </message>
   </context>
   <context>
@@ -9417,7 +9417,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>Tất cả các tập tin văn bản khác</translation>
     </message>
   </context>
   <context>
@@ -9490,11 +9490,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Hợp nhất các Chi nhánh</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>Nhập mật khẩu tài khoản của bạn để hợp nhất Chi nhánh</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9503,23 +9503,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Hợp nhất các Chi nhánh...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>Đây là URL Chi nhánh hiện tại.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Máy chủ từ Chi nhánh khác sẽ xuất hiện trong cây tài nguyên khi quá trình đồng bộ hóa cơ sở dữ liệu hoàn tất.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Các Chi nhánh sẽ sớm được hợp nhất</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>Không thể hợp nhất các Chi nhánh</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9574,64 +9574,64 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>Không tìm thấy Chi nhánh.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>Phát hiện Chi nhánh %1 có phiên bản không tương thích %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>Chi nhánh đã chọn có phiên bản phần mềm cũ hơn không tương thích với Chi nhánh hiện tại. Cập nhật Chi nhánh đã chọn lên bản dựng mới nhất để hợp nhất với bản dựng hiện tại.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Bạn sắp hợp nhất Chi nhánh với giấy phép Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Mỗi Chi nhánh chỉ được phép có một giấy phép Starter, do đó giấy phép thứ hai sẽ bị hủy kích hoạt.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>Bạn sắp hợp nhất các Chi nhánh với giấy phép NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Mỗi Chi nhánh chỉ được phép có một giấy phép NVR, do đó giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>Không thể cấu hình Chi nhánh từ xa %1.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>%1 Chi nhánh chỉ có thể được hợp nhất với Chi nhánh không phải %1. Tên Chi nhánh và mật khẩu được lấy từ Chi nhánh %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>Cả hai Chi nhánh đều được kết nối tới %1. Không được phép hợp nhất.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>Các Chi nhánh %1 có chủ sở hữu khác nhau. Không được phép hợp nhất.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Không thể hợp nhất các Chi nhánh vì chúng có ít nhất một máy chủ có cùng ID. Vui lòng xóa máy chủ này và thử lại.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>Tên Chi nhánh chưa được cấu hình.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>Đã đạt đến số lượng máy chủ tối đa cho Chi nhánh.</translation>
     </message>
   </context>
   <context>
@@ -9661,8 +9661,8 @@ Bạn có thể buộc tính năng đó hoạt động, nhưng nó có thể là
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>Tính năng phát hiện chuyển động hiện đang bị vô hiệu hóa đối với camera này vì luồng video vượt quá độ phân giải %1 * %2.
+Bạn có thể buộc phát hiện chuyển động, nhưng điều này có thể dẫn đến tăng đáng kể tải CPU.</translation>
     </message>
   </context>
   <context>
@@ -9935,24 +9935,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>Phiên bản hệ điều hành của một số thành phần không còn được hỗ trợ. Vui lòng xóa chúng khỏi Chi nhánh hoặc cập nhật hệ điều hành của chúng lên phiên bản được hỗ trợ.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>Phiên bản %1 không tương thích. Để cập nhật, hãy ngắt kết nối Chi nhánh khỏi %1 trước.</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>Không nên áp dụng bản cập nhật vào cuối tuần</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>Chi nhánh đã được cập nhật</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>Đang cập nhật Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -9966,7 +9966,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>Các định dạng có thể có:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -10070,11 +10070,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>Nhóm LDAP mặc định không thể bị xóa khi Chi nhánh vẫn được kết nối với máy chủ LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>Quản lý người dùng cho người dùng tổ chức chỉ khả dụng ở cấp độ tổ chức, không phải cấp độ Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -10085,7 +10085,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>Không thể xác nhận sự kiện trên camera không truy cập được.</translation>
     </message>
   </context>
   <context>
@@ -10120,7 +10120,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>Chi nhánh hiện tại</translation>
     </message>
     <message>
       <source>Any Notification</source>
