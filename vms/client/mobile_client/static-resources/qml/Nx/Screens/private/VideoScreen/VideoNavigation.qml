@@ -221,7 +221,7 @@ Item
 
             property real prevY
 
-            onPressed:
+            onPressed: (mouse) =>
             {
                 /* We propagate composed events for areas free of the UI controls (timeline, play/pause button). */
                 propagateComposedEvents =

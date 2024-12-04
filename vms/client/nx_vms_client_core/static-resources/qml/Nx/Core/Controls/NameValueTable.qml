@@ -173,11 +173,13 @@ Item
                     id: cellValues
 
                     objectName: "cellValues"
+                    spacing: 4
 
                     property var values: modelData[control.valuesRole] ?? []
                     property var colors: modelData[control.colorsRole] ?? []
                     property int lastVisibleIndex: 0
-                    spacing: 4
+                    readonly property bool shrinked:
+                        lastVisibleIndex < values.length - 1 || rowRepeater.shrinked
 
                     Repeater
                     {
@@ -186,6 +188,7 @@ Item
                         anchors.verticalCenter: parent.verticalCenter
                         objectName: "valueRowRepeater"
                         model: cellValues.values
+                        readonly property bool shrinked: count === 1 && itemAt(0).shrinked
 
                         Row
                         {
@@ -194,6 +197,8 @@ Item
                             objectName: "valueItem"
                             spacing: 4
                             visible: index <= cellValues.lastVisibleIndex
+                            readonly property bool shrinked:
+                                valueText.width < valueText.implicitWidth
 
                             Rectangle
                             {
@@ -209,6 +214,8 @@ Item
 
                             Text
                             {
+                                id: valueText
+
                                 objectName: "valueText"
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -336,6 +343,9 @@ Item
 
         onPositionChanged: (mouse) =>
         {
+            if (mouse.buttons !== Qt.NoButton)
+                return
+
             const row = grid.childAt(grid.leftPadding, mouse.y)
             if (!row)
                 return
@@ -343,15 +353,82 @@ Item
             highlight.y = row.y
             highlight.height = row.height
             highlight.rowIndex = row.rowIndex
+
+            const cell = grid.childAt(mouse.x, mouse.y)
+            if (cell && cell.objectName === "cellValues" && cell.shrinked)
+            {
+                toolTip.dataItem = cell
+                toolTip.y = cell.y - toolTip.height
+            }
+            else
+            {
+                toolTip.hide()
+            }
         }
 
         onExited:
+        {
             highlight.rowIndex = -1
+            toolTip.hide()
+        }
 
         onClicked:
         {
             if (contextMenu)
                 contextMenu.popup()
+        }
+    }
+
+    ToolTip
+    {
+        id: toolTip
+
+        property var dataItem: null
+        readonly property var values: dataItem?.values ?? []
+        readonly property var colors: dataItem?.colors ?? []
+
+        parent: grid
+        visible: !!dataItem
+        contentWidth: toolTipContent.width
+
+        Row
+        {
+            id: toolTipContent
+
+            spacing: 4
+
+            Repeater
+            {
+                id: toolTipRepeater
+                model: toolTip.values
+
+                Row
+                {
+                    spacing: 4
+
+                    Rectangle
+                    {
+                        readonly property bool relevant: !!toolTip.colors[index]
+                        width: 16
+                        height: 16
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: relevant
+                        color: toolTip.colors[index] ?? "transparent"
+                        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+                        radius: 1
+                    }
+
+                    Text
+                    {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: modelData
+                            + (index < toolTipRepeater.model.length - 1 && !toolTip.colors[index]
+                                ? ","
+                                : "")
+                        lineHeight: control.tableLineHeight
+                    }
+                }
+            }
         }
     }
 }

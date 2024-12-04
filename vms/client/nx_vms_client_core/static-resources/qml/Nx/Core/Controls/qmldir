@@ -9,3 +9,4 @@ NxDotPreloader 1.0 NxDotPreloader.qml
 Preview 1.0 Preview.qml
 RectangularMask 1.0 RectangularMask.qml
 ColoredImage 1.0 ColoredImage.qml
+ToolTip 1.0 ToolTip.qml
