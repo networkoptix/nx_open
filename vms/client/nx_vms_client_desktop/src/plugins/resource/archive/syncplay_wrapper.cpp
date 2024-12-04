@@ -735,7 +735,17 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
             qint64 currentTime = getCurrentTime();
             if (currentTime != qint64(AV_NOPTS_VALUE)) {
                 setJumpTime(currentTime);
-                reader->jumpToPreviousFrame(currentTime);
+                if (reader->getSpeed() > 0)
+                {
+                    // There is tuning when big amount of items goes from offscreen to screen.
+                    // New items could have slightly bigger timestamp that cause playback position.
+                    // So, jump it to previous frame to prevent it.
+                    reader->jumpToPreviousFrame(currentTime);
+                }
+                else
+                {
+                    reader->jumpTo(currentTime, currentTime);
+                }
                 reader->setSpeed(d->speed, currentTime);
             }
             else {
