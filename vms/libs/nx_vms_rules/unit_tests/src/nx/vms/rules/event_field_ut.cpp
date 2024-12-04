@@ -131,7 +131,7 @@ TEST_F(TextLookupFieldTest, emptyKeywords)
     // An empty keywords always return true for 'containsKeywords' comparison.
     field.setCheckType(TextLookupCheckType::containsKeywords);
     ASSERT_TRUE(field.match(QString{"foo"}));
-    // And always return true for 'doesNotContainKeywords' comparison.
+    // And always return false for 'doesNotContainKeywords' comparison.
     field.setCheckType(TextLookupCheckType::doesNotContainKeywords);
     ASSERT_FALSE(field.match(QString{"foo"}));
 }
@@ -173,12 +173,15 @@ TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
     ASSERT_TRUE(field.match(QString{"1"}));
     ASSERT_TRUE(field.match(QString{"2"}));
     ASSERT_TRUE(field.match(QString{"three"}));
+    // Check value contains lookup list entry
+    ASSERT_TRUE(field.match(QString{"three123"}));
     // Check attribute lookup list does not contains.
     ASSERT_FALSE(field.match(QString{"four"}));
 
     field.setCheckType(TextLookupCheckType::notInList);
     ASSERT_FALSE(field.match(QString{"1"}));
     ASSERT_FALSE(field.match(QString{"2"}));
+    ASSERT_FALSE(field.match(QString{"three123"}));
     ASSERT_FALSE(field.match(QString{"three"}));
     ASSERT_TRUE(field.match(QString{"four"}));
 }

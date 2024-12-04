@@ -109,9 +109,11 @@ bool TextLookupField::match(const QVariant& eventValue) const
         case TextLookupCheckType::doesNotContainKeywords:
             return !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
         case TextLookupCheckType::inList:
-            return m_list->contains(eventValue.toString());
+            return !m_list->empty()
+                && nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
         case TextLookupCheckType::notInList:
-            return !m_list->contains(eventValue.toString());
+            return m_list->empty()
+                || !nx::vms::event::checkForKeywords(eventValue.toString(), m_list.value());
     }
 
     return {};
