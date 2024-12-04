@@ -219,7 +219,7 @@ class NxOpenConan(ConanFile):
 
         if self.haveDesktopClient:
             if self.isMacos:
-                self.requires("hidapi/0.10.1" "#67c06b0755251878327ddea8fe964d6b")
+                self.requires("hidapi/0.14.0" "#67b81bb0b1ef84cedc49b2e3671a48e6")
             self.requires("pathkit/78de037" "#22007955c2c497d518f7efa9b3a45766")
 
         if self.haveDesktopClient or self.haveMobileClient:
