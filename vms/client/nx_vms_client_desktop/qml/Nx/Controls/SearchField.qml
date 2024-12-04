@@ -57,16 +57,13 @@ TextField
             {
                 id: image
 
-                readonly property real factor:
-                    Math.min(implicitWidth / parent.width, implicitHeight / parent.height)
-
                 anchors.centerIn: parent
 
-                width: implicitWidth * factor
-                height: implicitHeight * factor
+                width: implicitWidth
+                height: implicitHeight
 
                 sourcePath: actionButton.icon.source
-                sourceSize: searchField.menu ? Qt.size(24, 24) : Qt.size(20, 20)
+                sourceSize: searchField.menu ? Qt.size(24, 20) : Qt.size(20, 20)
 
                 primaryColor: actionButton.icon.color
             }

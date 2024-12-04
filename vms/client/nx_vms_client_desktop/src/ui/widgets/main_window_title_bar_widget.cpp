@@ -407,7 +407,8 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     menu::IDType actionId,
     const QIcon& icon,
-    int helpTopicId)
+    int helpTopicId,
+    const QSize& fixedSize)
 {
     auto button = new ToolButton(this);
 
@@ -415,7 +416,7 @@ ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     button->setFocusPolicy(Qt::NoFocus);
     button->setIcon(icon);
     button->adjustIconSize();
-    button->setFixedSize(qnSkin->maximumSize(icon));
+    button->setFixedSize(fixedSize.isEmpty() ? qnSkin->maximumSize(icon) : fixedSize);
     button->setAutoRaise(true);
 
     if (helpTopicId != HelpTopic::Id::Empty)
@@ -646,8 +647,11 @@ void QnMainWindowTitleBarWidget::initControls()
         const core::SvgIconColorer::IconSubstitutions colorSubs =
             {{ QnIcon::Normal, {{cross, "light4"}}}};
         QIcon icon = qnSkin->icon("20x20/Outline/close_main_window.svg", "", nullptr, colorSubs);
-        auto closeActionButton = newActionButton(menu::ExitAction, icon);
-        closeActionButton->setFixedSize(kControlButtonSize);
+        auto closeActionButton = newActionButton(
+            menu::ExitAction,
+            icon,
+            nx::vms::client::desktop::HelpTopic::Id::Empty,
+            kControlButtonSize);
         const auto closeButtonStyleSheet = QString{"QToolButton::hover{background-color: %1}"}.arg(
             core::colorTheme()->color("red").name());
         closeActionButton->setStyleSheet(closeButtonStyleSheet);
