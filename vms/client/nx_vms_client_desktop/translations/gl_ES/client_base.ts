@@ -10499,7 +10499,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Confío neste servidor</translation>
     </message>
     <message>
       <source>Continue</source>
