@@ -162,15 +162,6 @@ QString resourceName(const QnResourcePtr& resource)
     return vms::rules::Strings::resource(resource, infoLevel);
 }
 
-QString resourceNames(const QnResourceList& resources)
-{
-    QStringList names;
-    for (const auto& resource: resources)
-        names.push_back(resourceName(resource));
-
-    return names.join(", ");
-}
-
 QIcon resourceIcon(QnResourceIconCache::Key key)
 {
     if ((key & QnResourceIconCache::TypeMask) == QnResourceIconCache::Unknown)
@@ -254,6 +245,22 @@ QString actionTargetTooltip(SystemContext* context, const EventLogModelData& dat
     return targets.join(", ");
 }
 
+QnResourceIconCache::Key resourceIconKey(ResourceType type, bool multiple)
+{
+    using Key = QnResourceIconCache::KeyPart;
+
+    static const std::map<ResourceType, std::pair<Key, Key>> iconMap = {
+        {ResourceType::server, {Key::Server, Key::Servers}},
+        {ResourceType::device, {Key::Camera, Key::Cameras}},
+        {ResourceType::layout, {Key::Layout, Key::Layouts}},
+        {ResourceType::user, {Key::User, Key::Users}}};
+
+    if (const auto it = iconMap.find(type); it != iconMap.end())
+        return multiple ? it->second.second : it->second.first;
+
+    return Key::Unknown;
+}
+
 QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLogModelData& data)
 {
     using Key = QnResourceIconCache::KeyPart;
@@ -267,26 +274,57 @@ QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLog
     const bool multiple = resourceData.all || !resourceData.groups.empty()
         || (resourceData.names.size() + resourceData.resources.size()) > 1;
 
-    static const std::map<ResourceType, std::pair<Key, Key>> iconMap = {
-        {ResourceType::server, {Key::Server, Key::Servers}},
-        {ResourceType::device, {Key::Camera, Key::Cameras}},
-        {ResourceType::layout, {Key::Layout, Key::Layouts}},
-        {ResourceType::user, {Key::User, Key::Users}}};
-
-    if (const auto it = iconMap.find(resourceMap.begin()->first); it != iconMap.end())
-        return multiple ? it->second.second : it->second.first;
-
-    return Key::Unknown;
-}
-
-nx::Uuid eventSourceId(SystemContext* context, const EventLogModelData& data)
-{
-    return data.details(context).value(utils::kSourceIdDetailName).value<nx::Uuid>();
+    return resourceIconKey(resourceMap.begin()->first, multiple);
 }
 
 QnResourcePtr eventSource(SystemContext* context, const EventLogModelData& data)
 {
-    return context->resourcePool()->getResourceById(eventSourceId(context, data));
+    return context->resourcePool()->getResourceById(
+        data.details(context).value(utils::kSourceIdDetailName).value<nx::Uuid>());
+}
+
+ResourceType eventSourceType(SystemContext* context, const EventLogModelData& data)
+{
+    const auto manifest = context->vmsRulesEngine()->eventDescriptor(data.eventType());
+    std::map<ResourceType, int> resourceCount;
+
+    for (const auto& [_, desc]: manifest->resources)
+        ++resourceCount[desc.type];
+
+    for (const auto type: {ResourceType::device, ResourceType::server})
+    {
+        if (resourceCount[type] > 0)
+            return type;
+    }
+
+    return ResourceType::none;
+}
+
+QString eventSourceText(SystemContext* context, const EventLogModelData& data)
+{
+    if (auto sourceName = data.details(context).value(vms::rules::utils::kSourceNameDetailName);
+        sourceName.isValid())
+    {
+        return sourceName.toString();
+    }
+
+    if (const auto resource = eventSource(context, data))
+        return resourceName(resource);
+
+    // Resource was removed.
+    if (const auto type = eventSourceType(context, data); type != ResourceType::none)
+        return desktop::rules::Strings::removed(context, type);
+
+    NX_ASSERT(false, "Unexpected resource type");
+    return {};
+}
+
+QnResourceIconCache::Key eventSourceIcon(SystemContext* context, const EventLogModelData& data)
+{
+    if (data.details(context).value(utils::kSourceNameDetailName).isValid())
+        return QnResourceIconCache::Unknown;
+
+    return resourceIconKey(eventSourceType(context, data), /*multiple*/ false);
 }
 
 bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
@@ -549,6 +587,8 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
     {
         if (const auto resource = eventSource(systemContext(), data))
             return qnResIconCache->icon(resource);
+
+        return resourceIcon(eventSourceIcon(systemContext(), data));
     }
 
     return {};
@@ -570,12 +610,8 @@ QString EventLogModel::textData(Column column, const EventLogModelData& data) co
             return eventTitle(eventDetails);
 
         case EventCameraColumn:
-        {
-            QString result = eventDetails.value(vms::rules::utils::kSourceNameDetailName).toString();
-            if (result.isEmpty())
-                result = resourceName(getResource(EventCameraColumn, data));
-            return result;
-        }
+            return eventSourceText(systemContext(), data);
+
         case ActionColumn:
             return vms::rules::Strings::actionName(systemContext(), data.actionType());
 

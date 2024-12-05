@@ -71,6 +71,8 @@ public:
         int removed,
         int max);
 
+    static QString removed(SystemContext* context, nx::vms::rules::ResourceType type);
+
 private:
     static QString getName(SystemContext* context, const QnVirtualCameraResourceList& resources);
     static QString getName(const QnMediaServerResourceList& resources);

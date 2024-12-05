@@ -424,6 +424,25 @@ QString Strings::getName(
     return result.join(", ");
 }
 
+QString Strings::removed(SystemContext* context, nx::vms::rules::ResourceType type)
+{
+    switch (type)
+    {
+        case ResourceType::user:
+            return tr("Removed subject", "The subject is user or group");
+        case ResourceType::device:
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                context->resourcePool(), tr("Removed device"), tr("Removed camera"));
+        case ResourceType::server:
+            return tr("Removed server");
+        case ResourceType::layout:
+            return tr("Removed layout");
+        default:
+            NX_ASSERT(false, "Unexpected resource type: %1", type);
+            return {};
+    }
+}
+
 QString Strings::removed(SystemContext* context, nx::vms::rules::ResourceType type, int count)
 {
     if (!NX_ASSERT(count > 0))
@@ -432,7 +451,7 @@ QString Strings::removed(SystemContext* context, nx::vms::rules::ResourceType ty
     switch (type)
     {
         case ResourceType::user:
-            return tr("%n removed subjects", {}, count);
+            return tr("%n removed subjects", "The subject is user or group", count);
         case ResourceType::device:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 context->resourcePool(),
