@@ -40,7 +40,10 @@ protected:
 
 protected:
     /**
-     * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
+     * @param enableOutput Specifies whether NX_OUTPUT macros called from the implementation of
+	 *     this class will produce the actual output. It is recommended to specify
+	 *     NX_DEBUG_ENABLE_OUTPUT as a value of this argument, which will take the actual value
+	 *     from the plugin's .ini file.
      * @param integrationInstanceId Must be non-empty only for Plugins from multi-IIntegration
      *     libraries.
      */
@@ -60,7 +63,7 @@ protected:
 
     /**
      * Override to accept next uncompressed video frame for processing.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
+     * @param videoFrame Contains a pointer to the uncompressed video frame raw bytes.
      */
     virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame);
 
