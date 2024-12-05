@@ -58,11 +58,6 @@ bool DeviceAgent::pushCustomMetadataPacket(
     return true;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
-{
-}
-
 } // namespace custom_metadata
 } // namespace stub
 } // namespace analytics

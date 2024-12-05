@@ -202,6 +202,11 @@ void ConsumingDeviceAgent::doGetSettingsOnActiveSettingChange(
 {
 }
 
+void ConsumingDeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
+{
+}
+
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 

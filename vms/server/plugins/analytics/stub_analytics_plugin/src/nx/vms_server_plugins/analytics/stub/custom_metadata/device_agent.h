@@ -19,10 +19,6 @@ public:
     virtual ~DeviceAgent() override;
 
 protected:
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-
     virtual std::string manifestString() const override;
 
     virtual bool pushCustomMetadataPacket(

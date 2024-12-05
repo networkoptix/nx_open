@@ -122,12 +122,6 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     return true;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
 {
     const std::lock_guard<std::mutex> lock(m_mutex);

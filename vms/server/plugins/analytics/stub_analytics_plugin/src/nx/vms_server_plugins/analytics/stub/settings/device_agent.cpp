@@ -260,11 +260,6 @@ void DeviceAgent::processActiveSettings(
     *inOutSettingsModel = Json(updatedModel);
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 void DeviceAgent::getIntegrationSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {

@@ -216,11 +216,6 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 //-------------------------------------------------------------------------------------------------
 // private
 

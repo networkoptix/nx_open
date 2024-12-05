@@ -28,10 +28,6 @@ protected:
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
         const nx::sdk::IStringMap* settings) override;

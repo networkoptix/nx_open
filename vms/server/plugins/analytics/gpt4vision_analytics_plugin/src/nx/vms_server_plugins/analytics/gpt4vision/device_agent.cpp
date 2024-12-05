@@ -297,12 +297,6 @@ void DeviceAgent::handleOpenAiResponse(const open_ai::Response& response)
     }
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 nx::sdk::Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
 {
     std::map<std::string, std::string> settings = currentSettings();

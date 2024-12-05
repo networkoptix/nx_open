@@ -27,10 +27,6 @@ protected:
     virtual bool pullMetadataPackets(
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-
 private:
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateObjectMetadataPacket();

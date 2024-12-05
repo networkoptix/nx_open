@@ -227,11 +227,6 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
     NX_OUTPUT << "Generated " << motionObjectMetadataCount << " motion Objects for the frame.";
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 } // namespace motion_metadata
 } // namespace stub
 } // namespace analytics

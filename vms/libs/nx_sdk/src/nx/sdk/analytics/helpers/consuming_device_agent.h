@@ -146,6 +146,8 @@ protected:
         Result<const ISettingsResponse*>* outResult, const IStringMap* settings) override;
     virtual void getIntegrationSideSettings(Result<const ISettingsResponse*>* outResult) const override;
     virtual void getManifest(Result<const IString*>* outResult) const override;
+    virtual void doSetNeededMetadataTypes(
+        Result<void>* outResult, const IMetadataTypes* neededMetadataTypes) override;
 
 private:
     void logMetadataPacketIfNeeded(

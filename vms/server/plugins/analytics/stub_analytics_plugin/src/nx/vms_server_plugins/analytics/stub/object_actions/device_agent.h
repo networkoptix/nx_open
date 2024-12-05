@@ -23,10 +23,6 @@ protected:
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-
 private:
     struct TrackContext
     {

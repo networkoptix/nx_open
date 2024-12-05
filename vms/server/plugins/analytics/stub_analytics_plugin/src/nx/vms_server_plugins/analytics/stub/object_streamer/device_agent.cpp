@@ -210,12 +210,6 @@ Uuid DeviceAgent::obtainObjectTrackIdFromRef(const std::string& objectTrackIdRef
     return emplacementResult.first->second;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 {
     std::string manifestFilePath;

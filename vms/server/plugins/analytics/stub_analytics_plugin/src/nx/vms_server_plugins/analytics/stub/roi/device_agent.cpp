@@ -41,11 +41,6 @@ std::string DeviceAgent::manifestString() const
 )json";
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 void DeviceAgent::doSetSettings(
     nx::sdk::Result<const nx::sdk::ISettingsResponse*>* /*outResult*/,
     const nx::sdk::IStringMap* settings)

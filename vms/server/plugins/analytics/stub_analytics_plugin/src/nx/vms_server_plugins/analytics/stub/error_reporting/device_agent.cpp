@@ -141,11 +141,6 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     return nullptr;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 } // namespace error_reporting
 } // namespace stub
 } // namespace analytics

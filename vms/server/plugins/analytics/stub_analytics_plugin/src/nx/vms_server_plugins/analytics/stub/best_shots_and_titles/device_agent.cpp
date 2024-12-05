@@ -171,12 +171,6 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     return true;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 void DeviceAgent::configureBestShots(std::map<std::string, std::string>& settings)
 {
     nx::kit::utils::fromString(settings[kEnableBestShotGeneration], &m_generateBestShot);

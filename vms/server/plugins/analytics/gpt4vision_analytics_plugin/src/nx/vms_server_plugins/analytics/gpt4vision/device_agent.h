@@ -32,10 +32,6 @@ protected:
     virtual bool pushUncompressedVideoFrame(
         const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
 
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 private:

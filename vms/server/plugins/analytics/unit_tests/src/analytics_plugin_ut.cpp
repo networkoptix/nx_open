@@ -305,9 +305,9 @@ public:
     {
         NX_PRINT << "Making HTTP request with HttpDomainName = " << (int) requestDomain
             << ", url = " << url
-			<< ", httpMethod = " << httpMethod
-			<< ", mimeType = " << mimeType
-			<< ", requestBody = " << requestBody;
+            << ", httpMethod = " << httpMethod
+            << ", mimeType = " << mimeType
+            << ", requestBody = " << requestBody;
         callback->execute({new nx::sdk::String()});
     }
 

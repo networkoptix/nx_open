@@ -57,12 +57,6 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     return true;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 Ptr<IObjectMetadataPacket> DeviceAgent::generateObject(int64_t timestampUs)
 {
     NX_OUTPUT << "Generating object for frame with timestamp " << timestampUs << " us; ";

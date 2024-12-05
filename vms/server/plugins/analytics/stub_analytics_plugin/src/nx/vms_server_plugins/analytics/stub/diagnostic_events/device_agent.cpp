@@ -80,11 +80,6 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     return nullptr;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 void DeviceAgent::eventThreadLoop()
 {
     while (!m_terminated)

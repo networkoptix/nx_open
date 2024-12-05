@@ -145,10 +145,10 @@ Engine Manifest is a JSON Object containing the following fields:
         certain camera family, and typically do not consume the video stream from the Server. Also,
         Device Agents of such Engines do not have the "Enable/Disable" switch for the user - they
         are always enabled, thus, start working every time a compatible device (the one for which
-		IEngine::isCompatible() returns true) appears on the Server. The opposite Integration type,
-		not having this flag, is called "device-independent" - for example, such Integrations may
-		analyze video from any camera using either their own code, or via some backend (a server or
-		an analytics device).
+        IEngine::isCompatible() returns true) appears on the Server. The opposite Integration type,
+        not having this flag, is called "device-independent" - for example, such Integrations may
+        analyze video from any camera using either their own code, or via some backend (a server or
+        an analytics device).
 
     - `keepObjectBoundingBoxRotation` - When a camera for which the Engine is working has the frame
         rotation option set to 90, 180 or 270 degrees, the Engine which requests uncompressed video

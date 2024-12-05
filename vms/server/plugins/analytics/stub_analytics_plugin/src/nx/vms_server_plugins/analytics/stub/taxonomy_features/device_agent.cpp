@@ -135,12 +135,6 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     return true;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
-{
-}
-
 Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
 {
     m_settings.generateInstanceOfBaseObjectType =

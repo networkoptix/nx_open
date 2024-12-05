@@ -48,11 +48,6 @@ std::string DeviceAgent::manifestString() const
     return result;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
-{
-}
-
 } // namespace sdk_features
 } // namespace stub
 } // namespace analytics

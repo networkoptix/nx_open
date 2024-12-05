@@ -28,10 +28,6 @@ protected:
     virtual void getIntegrationSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
-    virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
-
     virtual std::string manifestString() const override;
 
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;

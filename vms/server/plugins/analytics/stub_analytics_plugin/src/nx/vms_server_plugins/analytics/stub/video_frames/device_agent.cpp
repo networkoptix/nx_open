@@ -159,11 +159,6 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
     return checkVideoFrame(videoFrame);
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
-{
-}
-
 //-------------------------------------------------------------------------------------------------
 // private
 
