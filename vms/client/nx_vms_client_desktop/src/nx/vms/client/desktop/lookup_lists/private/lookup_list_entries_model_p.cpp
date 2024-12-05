@@ -161,9 +161,9 @@ void LookupListEntriesModel::Private::initColorFunctions(const QString& fullAttr
     const auto colorByHex = attribute->colorSet->colorByHex();
     const auto colorByName = attribute->colorSet->colorByName();
     validatorByAttributeName[fullAttributeName] =
-        [colorByHex, colorByName](const QString& value)
+        [colorByName](const QString& value)
         {
-            return colorByHex.contains(value) || colorByName.contains(value);
+            return colorByName.contains(value);
         };
 
     formatterByAttributeName[fullAttributeName] =
@@ -182,11 +182,8 @@ void LookupListEntriesModel::Private::initColorFunctions(const QString& fullAttr
         };
 
     rgbCalculatorByAttributeName[fullAttributeName] =
-        [colorByHex, colorByName](const QString& value) -> QVariant
+        [colorByName](const QString& value) -> QVariant
         {
-            if (colorByHex.contains(value))
-                return value; //< Value is already correct RGB.
-
             auto colorItByName = colorByName.find(value);
             if (colorItByName != colorByName.cend())
                return colorItByName->second;

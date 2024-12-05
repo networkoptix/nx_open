@@ -389,7 +389,7 @@ protected:
         const auto rawValue = m_entriesModel->data(m_entriesModel->index(row, column),
              LookupListEntriesModel::DataRole::RawValueRole).toString();
         if (attributeName == "Color" && !rawValue.isEmpty())
-            ASSERT_TRUE(value.toString().startsWith("#"));
+            ASSERT_TRUE(value.toString().startsWith("#")) << "value:"<< value.toString().toStdString();
         else
             ASSERT_TRUE(value.isNull());
     }
@@ -517,7 +517,7 @@ protected:
         QVariantMap entry;
         entry["Approved"] = "true";
         entry["IntNumberWithoutLimit"] = "1";
-        entry["Color"] = "#FF0000";
+        entry["Color"] = "red";
         entry["Enum"] = "base enum item 1.1";
         entry["FloatNumberWithLimit"] = "3.5";
         entry["FloatNumberWithoutLimit"] = "-9.67";
@@ -621,7 +621,7 @@ protected:
         e1.attributeNames.push_back("IntNumberWithMaxLimit");
         e1.entries = {
             {{"IntNumberWithoutLimit", "12345"},
-                {"Color", "#FF0000"},
+                {"Color", "red"},
                 {"Enum", "base enum item 1.1"},
                 {"Approved", "true"},
                 {"IntNumberWithLimit", "19"},
@@ -634,9 +634,9 @@ protected:
                 {"IntNumberWithMaxLimit", "99"},
             },
             {{"IntNumberWithoutLimit", "67890"}, {"Approved", "false"}},
-            {{"Color", "#00FF00"}, {"IntNumberWithoutLimit", "9876"}},
+            {{"Color", "blue"}, {"IntNumberWithoutLimit", "9876"}},
             {{"IntNumberWithLimit", "4"}, {"FloatNumberWithLimit", "2"}},
-            {{"Enum", "base enum item 1.2"}, {"FloatNumberWithLimit", "7"}, {"Color", "#0000FF"}},
+            {{"Enum", "base enum item 1.2"}, {"FloatNumberWithLimit", "7"}, {"Color", "green"}},
         };
         return e1;
     }
@@ -871,7 +871,6 @@ TEST_F(LookupListTests, validate_int_negative_number_value_with_limit)
  */
 TEST_F(LookupListTests, validate_color_value)
 {
-    checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "#000000");
     checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "blue");
     checkValidationOfEmptyRowWithOneIncorrect("Color", "incorrect", "base color 1.1");
     checkValidationOfRowsWithCorrectAndIncorrectValues("Color");
@@ -885,7 +884,7 @@ TEST_F(LookupListTests, color_rgb_hex)
     auto data = bigColumnNumberExampleData();
     data.entries.push_back({{"Color", "blue"}});
     data.entries.push_back({{"Color", "green"}});
-        givenLookupListEntriesModel(data);
+    givenLookupListEntriesModel(data);
 
     for (int row = 0; row < m_entriesModel->rowCount(); ++row)
     {
