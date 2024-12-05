@@ -4,7 +4,6 @@
 
 #include <nx/sdk/analytics/helpers/engine.h>
 #include <nx/sdk/analytics/helpers/integration.h>
-#include <nx/sdk/analytics/i_compressed_video_packet.h>
 
 namespace nx {
 namespace vms_server_plugins {
