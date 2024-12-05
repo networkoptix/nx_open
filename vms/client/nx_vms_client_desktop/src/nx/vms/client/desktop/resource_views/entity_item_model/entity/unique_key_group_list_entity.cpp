@@ -323,20 +323,28 @@ void UniqueKeyGroupListEntity<Key, KeyHasher, KeyEqual>::dataChangedHandler(
     const GroupEntity* group,
     const QVector<int> roles)
 {
-    dataChanged(modelMapping(), roles, groupIndex(group));
+    bool shouldRecoverItemOrder = true;
 
     if (m_itemOrder.roles.empty())
-        return;
+        shouldRecoverItemOrder = false;
 
-    const auto itemOrderRoles = m_itemOrder.roles;
-    const auto matchingRoleItr =
-        std::find_first_of(std::cbegin(roles), std::cend(roles),
-        std::cbegin(m_itemOrder.roles), std::cend(m_itemOrder.roles));
+    const auto matchingRoleItr = std::find_first_of(std::cbegin(roles),
+        std::cend(roles),
+        std::cbegin(m_itemOrder.roles),
+        std::cend(m_itemOrder.roles));
 
-    if (matchingRoleItr != std::cend(roles))
+    if (matchingRoleItr == std::cend(roles))
+        shouldRecoverItemOrder = false;
+
+    dataChanged(modelMapping(), roles, groupIndex(group));
+
+    // At this point this object may be deleted by the owner GroupGroupingEntity that observing
+    // dataChanged notifications from this entity. Code within if statement won't be called in this
+    // case since used group key roles does not intersect with used item order roles.
+    // TODO: #vbreus Figure out how to avoid deleting this within method scope.
+    if (shouldRecoverItemOrder)
     {
-        auto itemItr =
-            std::find(std::begin(m_groupSequence), std::end(m_groupSequence), group);
+        auto itemItr = std::find(std::begin(m_groupSequence), std::end(m_groupSequence), group);
         int index = std::distance(std::begin(m_groupSequence), itemItr);
         recoverItemSequenceOrder(index);
     }
