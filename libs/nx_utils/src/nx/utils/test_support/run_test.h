@@ -66,16 +66,18 @@ class ThrowListener:
 class TimeoutThread
 {
 public:
-    TimeoutThread(std::chrono::seconds timeout):
-        m_thread([=, this] { NX_CRITICAL(m_cancel.pop(timeout), "Timeout %1 has expired", timeout); })
+    TimeoutThread(std::chrono::seconds timeout)
     {
         NX_INFO(this, "Timeout %1 is set", timeout);
+        m_thread = std::thread(
+            [=, this]{ NX_CRITICAL(m_cancel.pop(timeout), "Timeout %1 has expired", timeout); });
     }
 
     ~TimeoutThread()
     {
         m_cancel.push();
         m_thread.join();
+        NX_INFO(this, "Canceled");
     }
 
 private:
