@@ -127,6 +127,9 @@ public:
     /** Notify all instances that they must logout from cloud. */
     void requestLogoutFromCloud();
 
+    /** Update cloud layout resources by fetching the latest data. */
+    void requestUpdateCloudLayouts();
+
 signals:
     void clientCommandRequested(SharedMemoryData::Command command, const QByteArray& data);
     void sessionTokenChanged(const std::string& token);

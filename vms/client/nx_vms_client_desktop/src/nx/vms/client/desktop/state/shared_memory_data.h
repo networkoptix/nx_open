@@ -64,7 +64,10 @@ public:
             restoreWindowState,
 
             /** Logout from cloud. */
-            logoutFromCloud
+            logoutFromCloud,
+
+            /** Update cloud layout resources by fetching the latest data. */
+            updateCloudLayouts
         );
 
         /** PID of the process. */

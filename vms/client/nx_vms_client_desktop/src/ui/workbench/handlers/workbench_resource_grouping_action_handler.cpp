@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -16,6 +17,7 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
+#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
@@ -38,6 +40,8 @@ void saveResources(const QnResourceList& resources)
             layoutSnapshotManager->save(layout);
         }
     }
+
+    appContext()->sharedMemoryManager()->requestUpdateCloudLayouts();
 }
 
 } // namespace

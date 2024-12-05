@@ -22,7 +22,10 @@ void CrossSystemLayoutResource::update(const CrossSystemLayoutData& layoutData)
     fromDataToResource(layoutData, copy);
     copy->setFlags(flags()); //< Do not update current resource flags.
     QnResource::update(copy);
-    m_customGroupId = layoutData.customGroupId;
+
+    setProperty(
+        entity_resource_tree::resource_grouping::kCustomGroupIdPropertyKey,
+        layoutData.customGroupId);
 }
 
 QString CrossSystemLayoutResource::getProperty(const QString& key) const

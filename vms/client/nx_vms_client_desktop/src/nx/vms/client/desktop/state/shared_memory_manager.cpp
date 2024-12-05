@@ -537,4 +537,9 @@ void SharedMemoryManager::requestLogoutFromCloud()
     d->sendCommand(Command::logoutFromCloud);
 }
 
+void SharedMemoryManager::requestUpdateCloudLayouts()
+{
+    d->sendCommand(Command::updateCloudLayouts);
+}
+
 } // namespace nx::vms::client::desktop
