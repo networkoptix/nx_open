@@ -598,7 +598,7 @@ struct RemoteConnectionFactory::Private
                 + '.'
                 + context->moduleInformation.cloudSystemId;
             context->logonData.address.address = fullHostname;
-            NX_DEBUG(this, "Fixed connection address: %1", fullHostname);
+            NX_DEBUG(this, "Fixed connection address: %1 -> %2", hostname, fullHostname);
         }
     }
 
@@ -1227,7 +1227,8 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
     LogonData logonData,
     Callback callback,
     SystemContext* systemContext,
-    std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate)
+    std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> customUserInteractionDelegate,
+    bool ignoreCachedData)
 {
     auto process = std::make_shared<RemoteConnectionProcess>(systemContext);
 
@@ -1237,14 +1238,24 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
 
     process->future = std::async(std::launch::async,
         [this, contextPtr = WeakContextPtr(process->context), callback,
-            logonData = std::move(logonData)]
+            logonData = std::move(logonData), ignoreCachedData]
         {
             nx::utils::setCurrentThreadName("RemoteConnectionFactoryThread");
 
             bool useFastConnect = false;
 
-            if (auto context = contextPtr.lock(); !context->logonData.authCacheData.empty())
-                useFastConnect = RemoteConnectionFactoryCache::fillContext(context);
+            if (!ignoreCachedData)
+            {
+                if (auto context = contextPtr.lock(); !context->logonData.authCacheData.empty())
+                    useFastConnect = RemoteConnectionFactoryCache::fillContext(context);
+            }
+            else
+            {
+                if (auto context = contextPtr.lock())
+                    RemoteConnectionFactoryCache::restoreContext(context, logonData);
+            }
+
+            NX_DEBUG(this, "Connect fast? %1", useFastConnect);
 
             d->connectToServerAsync(contextPtr);
 
@@ -1261,6 +1272,7 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
 
                 if (retryConnection) //< Try again without cache.
                 {
+                    NX_DEBUG(this, "Connect - Try again without cache");
                     useFastConnect = false;
                     d->connectToServerAsync(contextPtr);
                 }
@@ -1287,6 +1299,7 @@ RemoteConnectionFactory::ProcessPtr RemoteConnectionFactory::connect(
                     else
                     {
                         auto connection = d->makeRemoteConnectionInstance(context);
+                        connection->setCached(useFastConnect);
                         RemoteConnectionFactoryCache::startWatchingConnection(
                             connection, context, useFastConnect);
                         callback(connection);

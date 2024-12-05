@@ -16,6 +16,7 @@
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <network/system_helpers.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
@@ -179,7 +180,7 @@ public:
     QString currentUser() const;
     nx::Uuid localSystemId() const;
 
-    void connectToServer();
+    void connectToServer(bool ignoreCachedData = false);
     void connectToKnownServer(nx::vms::client::core::RemoteConnectionPtr connection);
     void disconnectFromServer();
     void handleSuccessfullReply();
@@ -290,7 +291,7 @@ nx::Uuid Session::Private::localSystemId() const
     return m_localSystemId;
 }
 
-void Session::Private::connectToServer()
+void Session::Private::connectToServer(bool ignoreCachedData)
 {
     if (!m_logonData)
     {
@@ -307,8 +308,8 @@ void Session::Private::connectToServer()
         return;
     }
 
-    NX_DEBUG(this, "connectToServer(): starting connection to <%1>",
-        m_logonData->address.toString());
+    NX_DEBUG(this, "connectToServer(): starting connection to <%1> cached? %2",
+        m_logonData->address.toString(), !ignoreCachedData && !m_logonData->authCacheData.empty());
 
     if (!m_connectionTimer.isValid()) //< No connection process was started.
         m_connectionTimer.start();
@@ -337,7 +338,8 @@ void Session::Private::connectToServer()
         });
 
     const auto factory = qnClientCoreModule->networkModule()->connectionFactory();
-    m_connectionProcess = factory->connect(m_logonData.value(), callback, q->systemContext());
+    m_connectionProcess = factory->connect(
+        m_logonData.value(), callback, q->systemContext(), {}, ignoreCachedData);
 
     updateConnectionState();
     NX_DEBUG(this, "connectToServer(): end");
@@ -363,6 +365,25 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
 
     const auto session = std::make_shared<core::RemoteSession>(connection, q->systemContext());
     // TODO: #ynikitenkov Here probably should be session signal handlers like reconnect processing.
+
+    connect(session.get(), &core::RemoteSession::reconnectFailed,
+        this, [this, cached=connection->isCached(), id=moduleInformation.cloudSystemId](
+            RemoteConnectionErrorCode errorCode)
+        {
+            NX_DEBUG(this, "connectToKnownServer(): reconnectFailed with %1", errorCode);
+            if (!cached)
+                return;
+
+            m_logonData->authCacheData.clear();
+            if (nx::network::SocketGlobals::addressResolver().isCloudHostname(
+                m_logonData->address.address.toString()))
+            {
+                m_logonData->address = network::SocketAddress(id.toStdString());
+            }
+            m_logonData->expectedServerId = std::nullopt;
+
+            executeLater([this](){ connectToServer(/* ignoreCachedData */ true); }, this);
+        });
 
     qnClientCoreModule->networkModule()->setSession(session);
     q->systemContext()->setSession(session);

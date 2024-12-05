@@ -280,7 +280,7 @@ bool RemoteSession::keepCurrentServerOnError(RemoteConnectionErrorCode error)
 
 void RemoteSession::establishConnection(RemoteConnectionPtr connection)
 {
-    NX_VERBOSE(this, "Initialize new connection");
+    NX_DEBUG(this, "Initialize new connection, cached? %1", connection->isCached());
     stopReconnecting();
 
     if (auto oldConnection = this->connection())
@@ -337,6 +337,13 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
                     NX_DEBUG(this, "Try to mark original server invalid, error: %1, keep: %2",
                         errorCode, keepCurrentServerOnError(errorCode));
 
+                    if (!d->reconnectHelper && d->connection->isCached())
+                    {
+                        NX_DEBUG(this, "Cached connection failed, try without cache.");
+                        emit reconnectFailed(errorCode);
+                        return;
+                    }
+
                     d->activeServerReconnectErrorCode = errorCode;
                     if (d->reconnectHelper && !keepCurrentServerOnError(errorCode))
                     {
@@ -383,6 +390,11 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
         &ec2::TransactionMessageBusAdapter::remotePeerHandshakeError,
         this,
         makeServerMarkingFunction(RemoteConnectionErrorCode::certificateRejected));
+
+    connect(messageBus,
+        &ec2::TransactionMessageBusAdapter::remotePeerError,
+        this,
+        makeServerMarkingFunction(RemoteConnectionErrorCode::genericNetworkError));
 
     setState(State::waitingPeer);
 }

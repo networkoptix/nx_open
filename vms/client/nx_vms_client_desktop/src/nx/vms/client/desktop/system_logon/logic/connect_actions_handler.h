@@ -108,7 +108,7 @@ private:
 
     void reportServerSelectionFailure();
 
-    void connectToCloudSystem(const CloudSystemConnectData& connectData);
+    void connectToCloudSystem(const CloudSystemConnectData& connectData, bool anyServer = false);
 
     void at_connectAction_triggered();
     void at_connectToCloudSystemAction_triggered();
