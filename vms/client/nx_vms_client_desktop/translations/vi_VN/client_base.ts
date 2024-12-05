@@ -10128,7 +10128,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>Thông báo sự kiện</translation>
     </message>
     <message>
       <source>System Notifications</source>
@@ -10136,16 +10136,16 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Chọn loại...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Bất kỳ thông báo nào</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n loại thông báo</numerusform>
       </translation>
     </message>
   </context>
@@ -10153,7 +10153,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Chọn loại thông báo</translation>
     </message>
   </context>
   <context>
@@ -10412,7 +10412,7 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>Chi nhánh không được kết nối với %1. Thông báo trên thiết bị di động chỉ hoạt động khi Chi nhánh được kết nối với %1.</translation>
     </message>
   </context>
   <context>
@@ -10511,11 +10511,11 @@ Bạn có thể buộc phát hiện chuyển động, nhưng điều này có th
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Tích hợp tự động làm mới</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Tự động làm mới trang web</translation>
     </message>
   </context>
   <context>
@@ -10912,8 +10912,8 @@ Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên ca
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Cài đặt chất lượng và FPS bị vô hiệu hóa do tùy chọn &quot;Cho phép tối ưu hóa cài đặt camera&quot; trong hộp thoại &quot;Quản trị Chi nhánh&quot;.
+Bạn vẫn có thể thay đổi chất lượng và FPS trực tiếp trên camera.</translation>
     </message>
   </context>
   <context>
@@ -11014,21 +11014,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Có thể cần phải cấu hình bổ sung trên máy chủ.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Mật khẩu mã hóa sẽ được yêu cầu để khôi phục kho lưu trữ.
+Thận trọng: Không thể đặt lại mật khẩu này. Nếu bạn mất mật khẩu, kho lưu trữ sẽ không thể khôi phục được.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Mã hóa dữ liệu lưu trữ để ngăn không cho dữ liệu này được xem bên ngoài Chi nhánh. Bạn sẽ không cần nhập mật khẩu mã hóa để xem kho lưu trữ video trong Chi nhánh này.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>Thời lượng phiên người dùng không giới hạn đe dọa đến tính bảo mật của toàn bộ Chi nhánh và có thể dẫn đến giảm hiệu suất</translation>
     </message>
   </context>
   <context>
@@ -11039,13 +11039,13 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>%n các đối tượng được chọn</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Tất cả các đối tượng</translation>
     </message>
   </context>
   <context>
@@ -11454,15 +11454,15 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>Chi nhánh vượt quá giới hạn của Tổ chức và có thể sớm không hoạt động. Vui lòng điều chỉnh mức sử dụng để tránh gián đoạn dịch vụ.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Mở Cài đặt</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Dịch vụ mở</translation>
     </message>
   </context>
   <context>
@@ -11486,12 +11486,12 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Quyền truy cập của bạn vào Chi nhánh hết hạn %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>Quyền truy cập của bạn vào Chi nhánh sẽ hết hạn sau %1</translation>
     </message>
   </context>
   <context>
@@ -11558,7 +11558,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Hành động này không được hỗ trợ cho thông báo từ các Chi nhánh khác</translation>
     </message>
   </context>
   <context>
@@ -11716,7 +11716,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Có nhiều nhóm có tên này. Để duy trì cấu trúc rõ ràng và có tổ chức, chúng tôi đề xuất cung cấp tên duy nhất cho mỗi nhóm.</translation>
     </message>
   </context>
   <context>
@@ -11775,7 +11775,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Lỗi Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -11827,7 +11827,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Có một người dùng khác có thông tin đăng nhập này. Để tránh sự cố, tất cả người dùng phải có thông tin đăng nhập duy nhất.</translation>
     </message>
   </context>
   <context>
@@ -11973,7 +11973,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Điều này sẽ ngay lập tức xóa quyền truy cập vào trang web của người dùng này</translation>
     </message>
   </context>
   <context>
@@ -12281,11 +12281,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>Không khả dụng ở chế độ cửa sổ chuyên dụng</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>Di chuyển cửa sổ này đến Bố cục để sử dụng chức năng này</translation>
     </message>
   </context>
   <context>
@@ -12311,7 +12311,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>Không thể kết nối với Chi nhánh vì nó đã ngoại tuyến</translation>
     </message>
   </context>
   <context>
@@ -12401,7 +12401,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>Bỏ qua phiên bản</translation>
     </message>
   </context>
   <context>
@@ -12669,11 +12669,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>Không tìm thấy tài nguyên</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>Không tìm thấy tham số</translation>
     </message>
   </context>
   <context>
@@ -12864,11 +12864,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>Thêm tiêu đề hoặc bình luận</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>Quy tắc này không hợp lệ và có thể không hoạt động</translation>
     </message>
   </context>
   <context>
@@ -12887,7 +12887,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>Mã thông báo</translation>
     </message>
   </context>
   <context>
@@ -13023,19 +13023,19 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>Khi sự kiện xảy ra</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>Khi sự kiện bắt đầu</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>Khi sự kiện dừng lại</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>Chọn trạng thái</translation>
     </message>
   </context>
   <context>
@@ -13058,11 +13058,11 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Không chứa từ khóa</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Không chứa các mục nhập danh sách</translation>
     </message>
   </context>
   <context>
@@ -13125,15 +13125,15 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>Giới hạn</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>Cho phép</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>Hiện tại</translation>
     </message>
   </context>
   <context>
@@ -13488,10 +13488,10 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Cơ sở dữ liệu phân tích chỉ nên được lưu trữ trên ổ đĩa cục bộ và có thể chiếm nhiều dung lượng.
+Sau khi chọn vị trí lưu trữ dữ liệu phân tích, bạn không thể dễ dàng thay đổi mà không làm mất dữ liệu hiện có. Chúng tôi khuyên bạn nên chọn vị trí cẩn thận và tránh sử dụng phân vùng hệ thống vì có thể gây ra sự cố nghiêm trọng.
+Theo mặc định, dữ liệu phân tích sẽ được lưu trữ trên %1.
+Bạn có thể chọn vị trí lưu trữ khác trong tab &quot;Quản lý lưu trữ&quot; của hộp thoại Cài đặt máy chủ.</translation>
     </message>
   </context>
   <context>
@@ -13638,7 +13638,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>Cập nhật tự động của khách hàng</translation>
     </message>
   </context>
   <context>

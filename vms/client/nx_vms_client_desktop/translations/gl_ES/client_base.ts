@@ -11075,8 +11075,8 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>A configuración de calidade e FPS están desactivadas debido á opción &quot;Permitir optimizar a configuración da cámara&quot; do cadro de diálogo &quot;Administración do sitio&quot;.
+Aínda podes cambiar a calidade e os FPS directamente na cámara.</translation>
     </message>
   </context>
   <context>
@@ -11174,25 +11174,25 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>O cifrado dos arquivos aumenta o uso da CPU</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Pode ser necesaria unha configuración adicional no servidor.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>O contrasinal de cifrado será necesario para restaurar o arquivo.
+Precaución: este contrasinal non se pode restablecer. Se o perdes, o arquivo será irrecuperable.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Cifra os datos do arquivo para evitar que se vexan fóra do sitio. Non será necesario que introduza o contrasinal de cifrado para ver o arquivo de vídeo neste sitio.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>A duración ilimitada da sesión de usuario ameaza a seguridade global do sitio e pode provocar unha degradación do rendemento</translation>
     </message>
   </context>
   <context>
@@ -11203,14 +11203,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>%n obxectos seleccionados</numerusform>
+        <numerusform>%n obxectos seleccionados</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Todos os obxectos</translation>
     </message>
   </context>
   <context>
@@ -11312,7 +11312,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Confío neste servidor</translation>
     </message>
   </context>
   <context>
@@ -11622,15 +11622,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>O sitio supera os límites da súa organización&apos; e pode que non funcione en breve. Axusta o teu uso para evitar a interrupción do servizo.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Abrir axustes</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Abrir servizos</translation>
     </message>
   </context>
   <context>
@@ -11654,12 +11654,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>O teu acceso ao sitio caduca %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>O teu acceso ao sitio caduca en %1</translation>
     </message>
   </context>
   <context>
@@ -11728,7 +11728,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Esta acción non é compatible con notificacións doutros sitios</translation>
     </message>
   </context>
   <context>
@@ -11886,7 +11886,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Hai varios grupos con este nome. Para manter unha estrutura clara e organizada, suxerímosche que proporciones nomes únicos para cada grupo.</translation>
     </message>
   </context>
   <context>
@@ -11945,7 +11945,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Erro do sitio</translation>
     </message>
   </context>
   <context>
@@ -11997,7 +11997,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Hai outro usuario con este inicio de sesión. Para evitar problemas, é necesario que todos os usuarios teñan un inicio de sesión único.</translation>
     </message>
   </context>
   <context>

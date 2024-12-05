@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Máy chủ Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>Hành động Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Sử dụng cài đặt trước của Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>Chi nhánh này được kết nối với</translation>
     </message>
   </context>
   <context>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>Tạo bản sao lưu dữ liệu quản lý Chi nhánh hoặc khôi phục dữ liệu quản lý Chi nhánh từ bản sao lưu hiện có</translation>
     </message>
   </context>
   <context>
