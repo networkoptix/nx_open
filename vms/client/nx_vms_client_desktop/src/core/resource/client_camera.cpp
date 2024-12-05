@@ -28,7 +28,7 @@ QnClientCameraResource::QnClientCameraResource(const nx::Uuid& resourceTypeId):
 Qn::ResourceFlags QnClientCameraResource::calculateFlags() const
 {
     Qn::ResourceFlags result = base_type::flags();
-    if (!isDtsBased() && (supportedMotionTypes() != MotionTypes{MotionType::none}))
+    if (!isDtsBased() && (supportedMotionTypes() != nx::vms::api::MotionTypes{nx::vms::api::MotionType::none}))
         result |= Qn::motion;
     return result;
 }
