@@ -139,7 +139,7 @@ TileBase
                 && tile.controller.videoPreviewMode == RightPanelGlobals.VideoPreviewMode.selection
                 && tile.controller.selectedRow === index
 
-            videoPreviewTimestampMs: (model && NxGlobals.toDouble(model.previewTimestampMs)) || 0
+            videoPreviewStartTimeMs: (model && NxGlobals.toDouble(model.previewTimestampMs)) || 0
             videoPreviewDurationMs: (model && model.durationMs) || 0
             snippedPreview: true
 
