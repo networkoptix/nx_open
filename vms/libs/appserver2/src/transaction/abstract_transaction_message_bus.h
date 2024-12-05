@@ -78,6 +78,7 @@ signals:
     void remotePeerUnauthorized(nx::Uuid id, nx::network::rest::AuthResult);
     void remotePeerForbidden(nx::Uuid id, const QString& message);
     void remotePeerHandshakeError(nx::Uuid id);
+    void remotePeerError(nx::Uuid id);
     void stateChanged(const nx::Uuid& id, const QString& state);
 };
 

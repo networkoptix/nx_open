@@ -93,7 +93,8 @@ public:
         Callback callback,
         SystemContext* systemContext,
         std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate>
-            customUserInteractionDelegate = {});
+            customUserInteractionDelegate = {},
+            bool ignoreCachedData = false);
 
     virtual void shutdown() override;
 

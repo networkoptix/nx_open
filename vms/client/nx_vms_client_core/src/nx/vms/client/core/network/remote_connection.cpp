@@ -153,6 +153,7 @@ struct RemoteConnection::Private
 {
     const nx::vms::api::PeerType peerType;
     nx::vms::api::ModuleInformation moduleInformation;
+    bool cached = false;
     const nx::Uuid auditId;
     ConnectionInfo connectionInfo;
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime;
@@ -384,6 +385,16 @@ std::shared_ptr<CertificateCache> RemoteConnection::certificateCache() const
 bool RemoteConnection::isRestApiSupported() const
 {
     return d->moduleInformation.version >= kRestApiSupportVersion;
+}
+
+bool RemoteConnection::isCached() const
+{
+    return d->cached;
+}
+
+void RemoteConnection::setCached(bool value)
+{
+    d->cached = value;
 }
 
 } // namespace nx::vms::client::core
