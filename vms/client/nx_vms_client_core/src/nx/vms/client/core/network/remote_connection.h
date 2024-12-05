@@ -107,6 +107,9 @@ public:
 
     bool isRestApiSupported() const;
 
+    bool isCached() const;
+    void setCached(bool value);
+
 signals:
     void credentialsChanged();
 

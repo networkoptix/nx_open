@@ -30,6 +30,7 @@
 #include <nx/analytics/utils.h>
 #include <nx/build_info.h>
 #include <nx/monitoring/hardware_information.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -795,14 +796,27 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     connect(session.get(),
         &RemoteSession::reconnectFailed,
         this,
-        [this, serverModuleInformation](RemoteConnectionErrorCode errorCode)
+        [this, serverModuleInformation, cached=connection->isCached()](
+            RemoteConnectionErrorCode errorCode)
         {
             NX_DEBUG(this, "Reconnect failed with error: %1", errorCode);
 
             executeDelayedParented(
-                [this, errorCode, serverModuleInformation]()
+                [this, errorCode, serverModuleInformation, cached=cached]()
                 {
                     d->handleWSError(errorCode);
+
+                    if (cached && !serverModuleInformation.cloudSystemId.isEmpty())
+                    {
+                        NX_DEBUG(this, "Try reconnect to cloud system without cache %1",
+                            d->lastAttemptedConnectCloudSystemId);
+                        connectToCloudSystem({
+                            d->lastAttemptedConnectCloudSystemId,
+                            /*connectScenario*/ std::nullopt,
+                            /*useCache*/ false},
+                            /*anyServer*/ true);
+                        return;
+                    }
 
                     if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
                     {
@@ -1088,13 +1102,20 @@ void ConnectActionsHandler::updatePreloaderVisibility()
     }
 }
 
-void ConnectActionsHandler::connectToCloudSystem(const CloudSystemConnectData& connectData)
+void ConnectActionsHandler::connectToCloudSystem(
+    const CloudSystemConnectData& connectData, bool anyServer)
 {
-    const auto connectionInfo = core::cloudLogonData(connectData.systemId, connectData.useCache);
+    auto connectionInfo = core::cloudLogonData(connectData.systemId, connectData.useCache);
     d->lastAttemptedConnectCloudSystemId = connectData.systemId;
 
     if (!connectionInfo)
         return;
+
+    if (anyServer && nx::network::SocketGlobals::addressResolver().isCloudHostname(
+        connectionInfo->address.address.toString()))
+    {
+        connectionInfo->address = network::SocketAddress(connectData.systemId.toStdString());
+    }
 
     statisticsModule()->certificates()->resetScenario();
     std::shared_ptr<QnStatisticsScenarioGuard> connectScenario = connectData.connectScenario

@@ -572,6 +572,10 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     {
         emitAsync(this, &MessageBus::remotePeerHandshakeError, remotePeer.id);
     }
+    else if (connection->state() == Connection::State::Error)
+    {
+        emitAsync(this, &MessageBus::remotePeerError, remotePeer.id);
+    }
 }
 
 void MessageBus::at_stateChanged(
