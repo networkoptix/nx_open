@@ -8,6 +8,7 @@
 #include <nx/reflect/to_string.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/storage_space_data.h>
 
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
@@ -49,6 +50,12 @@ QString QnStorageResource::getStorageType() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_storageType;
+}
+
+bool QnStorageResource::isCloudStorage() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_storageType == nx::vms::api::kCloudStorageType;
 }
 
 void QnStorageResource::setMaxStoreTime(int timeInSeconds)

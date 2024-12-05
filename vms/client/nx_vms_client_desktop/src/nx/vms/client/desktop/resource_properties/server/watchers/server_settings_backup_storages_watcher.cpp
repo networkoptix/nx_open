@@ -48,8 +48,7 @@ bool usesCloudBackupStorage(const QnMediaServerResourcePtr& server)
             return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
                 && storageResource->isBackup()
                 && storageResource->isUsedForWriting()
-                && ((storageResource->getStorageType() == nx::vms::api::kCloudStorageType)
-                    || emulateCloudStorage);
+                && (storageResource->isCloudStorage() || emulateCloudStorage);
         });
 }
 
@@ -65,7 +64,7 @@ int enabledNonCloudStoragesCount(const QnMediaServerResourcePtr& server)
             const auto statusFlags = storageResource->runtimeStatusFlags();
             return !statusFlags.testFlag(nx::vms::api::StorageRuntimeFlag::disabled)
                 && storageResource->isUsedForWriting()
-                && storageResource->getStorageType() != nx::vms::api::kCloudStorageType;
+                && !storageResource->isCloudStorage();
         });
 }
 

@@ -2025,7 +2025,7 @@ private:
         bool hasBackupCloudStorage = false;
         for (const auto& s: storages)
         {
-            if (s->isBackup() && s->getStorageType() == nx::vms::api::kCloudStorageType)
+            if (s->isBackup() && s->isCloudStorage())
             {
                 hasBackupCloudStorage = true;
                 break;

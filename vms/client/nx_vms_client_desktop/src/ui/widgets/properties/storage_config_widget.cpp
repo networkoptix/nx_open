@@ -1317,7 +1317,7 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
         QnStorageResourcePtr storage =
             resourcePool()->getResourceById<QnStorageResource>(storageData.id);
 
-        if (!storage || storage->getParentId() != m_server->getId())
+        if (!storage || (storage->getParentId() != m_server->getId() && !storage->isCloudStorage()))
             return true;
 
         // Storage was modified.
