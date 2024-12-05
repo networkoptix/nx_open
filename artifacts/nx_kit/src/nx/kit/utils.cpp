@@ -125,34 +125,32 @@ std::string getProcessName()
     return processName;
 }
 
-const std::vector<std::string>& getProcessCmdLineArgs()
+static std::vector<std::string> obtainProcessCmdLineArgs()
 {
-    static std::vector<std::string> args;
-
-    if (!args.empty())
-        return args;
+    std::vector<std::string> args;
 
     #if defined(_WIN32)
+	{
         int argc;
         LPWSTR* const argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-        if (!argv || argc == 0)
+        if (argv)
         {
-            LocalFree(argv);
-            args = std::vector<std::string>{""};
-            return args;
+            for (int i = 0; i < argc; ++i)
+                args.push_back(wideCharToStdString(argv[i]));
         }
-
-        for (int i = 0; i < argc; ++i)
-            args.push_back(wideCharToStdString(argv[i]));
-
         LocalFree(argv);
+	}
     #elif defined(__APPLE__)
+	{
         args = nx::kit::apple_utils::getProcessCmdLineArgs();
-    #else //< Assuming Linux-like OS.
+    }
+	#else //< Assuming Linux-like OS.
+	{
         std::ifstream inputStream("/proc/self/cmdline");
         std::string arg;
         while (std::getline(inputStream, arg, '\0'))
             args.push_back(arg);
+	}
     #endif
 
     // Ensure at least one element in the return value since we rely on the fact that this
@@ -160,6 +158,12 @@ const std::vector<std::string>& getProcessCmdLineArgs()
     if (args.empty())
         args.push_back("");
 
+    return args;
+}
+
+const std::vector<std::string>& getProcessCmdLineArgs()
+{
+    static const std::vector<std::string> args = obtainProcessCmdLineArgs();
     return args;
 }
 
