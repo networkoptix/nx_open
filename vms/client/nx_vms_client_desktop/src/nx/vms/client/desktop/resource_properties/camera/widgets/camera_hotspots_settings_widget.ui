@@ -12,77 +12,102 @@
   </property>
   <layout class="QVBoxLayout" name="widgetLayout">
    <property name="spacing">
-    <number>8</number>
+    <number>1</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="addHotspotButtonHorizontalLayout">
+    <layout class="QVBoxLayout" name="contentLayout">
      <item>
-      <widget class="nx::vms::client::desktop::CheckBox" name="enableHotspotsCheckBox">
-       <property name="text">
-        <string>Hotspots</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="addHotspotButtonHorizontalLayout">
+       <item>
+        <widget class="nx::vms::client::desktop::CheckBox" name="enableHotspotsCheckBox">
+         <property name="text">
+          <string>Hotspots</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="addHotspotButtonHorizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="addHotspotButton">
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <spacer name="addHotspotButtonHorizontalSpacer">
+      <spacer name="verticalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>0</width>
-         <height>0</height>
+         <width>8</width>
+         <height>8</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="addHotspotButton">
-       <property name="text">
-        <string>Add</string>
+      <widget class="nx::vms::client::desktop::CameraHotspotsEditorWidget" name="hotspotsEditorWidget" native="true"/>
+     </item>
+     <item>
+      <widget class="QTreeView" name="hotspotsItemView">
+       <property name="rootIsDecorated">
+        <bool>false</bool>
        </property>
+       <property name="itemsExpandable">
+        <bool>false</bool>
+       </property>
+       <property name="expandsOnDoubleClick">
+        <bool>false</bool>
+       </property>
+       <attribute name="headerStretchLastSection">
+        <bool>false</bool>
+       </attribute>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>8</width>
-       <height>8</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::CameraHotspotsEditorWidget" name="hotspotsEditorWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="QTreeView" name="hotspotsItemView">
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <property name="itemsExpandable">
-      <bool>false</bool>
-     </property>
-     <property name="expandsOnDoubleClick">
-      <bool>false</bool>
-     </property>
-     <attribute name="headerStretchLastSection">
-      <bool>false</bool>
-     </attribute>
-    </widget>
+    <widget class="nx::vms::client::desktop::CommonMessageBar" name="alertBar" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::CommonMessageBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/message_bar.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::CameraHotspotsEditorWidget</class>
    <extends>QWidget</extends>

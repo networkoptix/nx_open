@@ -88,7 +88,7 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
 
     auto contentMargins(nx::style::Metrics::kDefaultTopLevelMargins);
     contentMargins.setBottom(0);
-    ui->widgetLayout->setContentsMargins(contentMargins);
+    ui->contentLayout->setContentsMargins(contentMargins);
 
     ui->enableHotspotsCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableHotspotsCheckBox->setForegroundRole(QPalette::ButtonText);
@@ -115,6 +115,14 @@ void CameraHotspotsSettingsWidget::Private::setupUi() const
     ui->hotspotsItemView->setItemDelegate(hotspotsDelegate.get());
     ui->hotspotsItemView->setModel(hotspotsModel.get());
     ui->hotspotsItemView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+    ui->alertBar->init(BarDescription{
+        .text = tr("Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the "
+            "field of view through the use of presets or movement may cause the hotspot to be no "
+            "longer relevant."),
+        .level = BarDescription::BarLevel::Warning,
+        .isClosable = true
+    });
 
     auto header = ui->hotspotsItemView->header();
     header->setSectionResizeMode(
@@ -258,6 +266,8 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
                 d->ui->hotspotsEditorWidget->setSelectedHotspotIndex({});
                 d->ui->hotspotsItemView->scrollToTop();
             }
+
+            d->ui->alertBar->setDisplayed(hotspotsEnabled && state.hasPanTiltCapabilities());
         });
 
     connect(d->ui->addHotspotButton, &QPushButton::clicked, this,
