@@ -18,7 +18,7 @@ const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetad
     }
     else
     {
-      objectActionMetadata.boundingBox.x += 1.0 / 500;
+      objectActionMetadata.boundingBox.x += 1.0 / 70;
     }
 
     return [
@@ -81,6 +81,7 @@ class DeviceAgent {
     mouseMovableObjectMetadata = null;
     rpcClient = null;
     frameCounter = 0;
+    lastTrackId = null;
     objectActionMetadata = {
         typeId: "analytics.api.stub.objectTypeWithActions",
         trackId: null,
@@ -128,34 +129,19 @@ class DeviceAgent {
             this.rpcClient.notify(method, parameters);
         }
 
-        // Send one event metadata packet every 240 frames.
-        if (this.frameCounter % 240 === 0)
-        {
-            let method = constants.PUSH_DEVICE_AGENT_EVENT_METADATA_METHOD;
+        // Send event metadata, best shot metadata and object title metadata only once per track,
+        // based on the trackId of objectActionMetadata.
+        if (this.lastTrackId === this.objectActionMetadata.trackId)
+            return;
 
-            let packet = makeEventMetadataPacket(this.mouseMovableObjectMetadata.trackId,
-                this.lastDataTimestampUs);
-            let parameters = mergeMaps(this.target, packet);
-            this.rpcClient.notify(method, parameters);
-        }
+        this.lastTrackId = this.objectActionMetadata.trackId;
 
-        // Send one best shot metadata packet every 60 frames.
-        if (this.frameCounter % 60 === 0)
-        {
-            let method = constants.PUSH_DEVICE_AGENT_BESTSHOT_METADATA_METHOD;
 
-            let packet = makeBestShotMetadataPacket(this.mouseMovableObjectMetadata.trackId,
-                this.lastDataTimestampUs);
-            let parameters = mergeMaps(this.target, packet);
-            this.rpcClient.notify(method, parameters);
-        }
 
-        // Send one object title metadata packet every 90 frames.
-        if (this.frameCounter % 90 === 0)
         {
             let method = constants.PUSH_DEVICE_AGENT_OBJECT_TITLE_METADATA_METHOD;
 
-            let packet = makeObjectTitleMetadataPacket(this.mouseMovableObjectMetadata.trackId,
+            let packet = makeObjectTitleMetadataPacket(this.objectActionMetadata.trackId,
                 this.lastDataTimestampUs);
             let parameters = mergeMaps(this.target, packet);
             this.rpcClient.notify(method, parameters);

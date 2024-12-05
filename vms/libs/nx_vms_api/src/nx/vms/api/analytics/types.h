@@ -180,7 +180,7 @@ struct NX_VMS_API ApiObjectMetadata
     /**%apidoc[opt] Subtype */
     std::string subtype;
     /**%apidoc[opt] Bounding box */
-    Rect boundingBox;
+    Rect boundingBox = {0, 0, 0, 0};
     /**%apidoc[opt] Type id */
     std::string typeId;
     /**%apidoc[opt] Confidence */
@@ -238,7 +238,7 @@ struct NX_VMS_API ApiBestShotMetadataPacket
     /**%apidoc[opt] Timestamp */
     std::chrono::microseconds timestampUs;
     /**%apidoc[opt] Bounding box */
-    Rect boundingBox;
+    Rect boundingBox = {0, 0, 0, 0};
     /**%apidoc[opt] Image URL */
     std::string imageUrl;
     /**%apidoc[opt] Image data */
@@ -273,7 +273,7 @@ struct NX_VMS_API ApiObjectTitleMetadataPacket
     /**%apidoc[opt] Timestamp */
     std::chrono::microseconds timestampUs;
     /**%apidoc[opt] Bounding box */
-    Rect boundingBox;
+    Rect boundingBox = {0, 0, 0, 0};
     /**%apidoc[opt] Text */
     std::string text;
     /**%apidoc[opt] Image URL */
