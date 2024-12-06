@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation>伺服器未授權登入</translation>
+      <translation>伺服器未授權存取資源</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation>重新加載並跳過緩存</translation>
+      <translation>重新載入並跳過緩存</translation>
     </message>
     <message>
       <source>Open link in this window</source>

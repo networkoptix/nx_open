@@ -8818,7 +8818,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>NGOẠI TUYẾN</translation>
     </message>
   </context>
   <context>

@@ -394,7 +394,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Non se puido inicializar o codificador de audio.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Non se puido inicializar o codificador de vídeo.</translation>
     </message>
   </context>
   <context>
@@ -483,7 +483,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>Start</source>
@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -1151,7 +1151,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Non autorizado.</translation>
     </message>
     <message>
       <source>Session expired.</source>

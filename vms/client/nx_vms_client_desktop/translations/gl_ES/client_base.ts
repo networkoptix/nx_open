@@ -3266,16 +3266,16 @@ a %1</translation>
     <name>QnDeprecatedUserListModel</name>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Usuario local</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 usuario</translation>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>Usuario LDAP</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -3345,7 +3345,7 @@ a %1</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message>
       <source>With enabled digest authentication</source>
@@ -3485,7 +3485,7 @@ a %1</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -3515,9 +3515,9 @@ a %1</translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Temas eliminados</numerusform>
+        <numerusform>%n Temas eliminados</numerusform>
       </translation>
     </message>
     <message>
@@ -3804,15 +3804,15 @@ a %1</translation>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>Os axustes proporcionados non son válidos.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>Non se puido realizar unha proba.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Fóra de prazo</translation>
     </message>
   </context>
   <context>
@@ -4204,7 +4204,7 @@ a %1</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -4760,7 +4760,7 @@ a %1</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Introducir URL</translation>
     </message>
     <message>
       <source>URL</source>
@@ -4981,7 +4981,7 @@ a %1</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation type="unfinished">Storage Analytics</translation>
+      <translation>Analítica de almacenamento</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
@@ -5145,7 +5145,7 @@ a %1</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>SIN ACCESO</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
@@ -5181,7 +5181,7 @@ a %1</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>SIN EMISIÓN EN VIVO</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -5260,7 +5260,7 @@ a %1</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Exportar os eventos seleccionados ao ficheiro</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
@@ -6940,31 +6940,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>View live video</source>
-      <translation type="unfinished">View live video</translation>
+      <translation>Ver vídeo en directo</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
-      <translation type="unfinished">Adjust device settings</translation>
+      <translation>Axustar a configuración do dispositivo</translation>
     </message>
     <message>
       <source>Adjust camera settings</source>
-      <translation type="unfinished">Adjust camera settings</translation>
+      <translation>Axustar a configuración da cámara</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
-      <translation type="unfinished">Use PTZ controls</translation>
+      <translation>Usar os controis PTZ</translation>
     </message>
     <message>
       <source>View video archives</source>
-      <translation type="unfinished">View video archives</translation>
+      <translation>Ver arquivos de vídeo</translation>
     </message>
     <message>
       <source>Export video</source>
-      <translation type="unfinished">Export video</translation>
+      <translation>Exportar vídeo</translation>
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation type="unfinished">Control Video Walls</translation>
+      <translation>Control de Video Walls / Muros</translation>
     </message>
   </context>
   <context>
@@ -7520,7 +7520,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Nunca</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -8268,7 +8268,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Success</source>
@@ -8448,7 +8448,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Contrasinal non válido</translation>
     </message>
   </context>
   <context>
@@ -8501,7 +8501,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Non hai eventos</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -9554,7 +9554,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Descargar &amp;&amp; Instalar</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -10160,7 +10160,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Xenérico</translation>
     </message>
     <message>
       <source>Input Signal</source>
@@ -10704,7 +10704,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Ir a Live/en vivo</translation>
     </message>
   </context>
   <context>
@@ -11024,16 +11024,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Usuario local</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 usuario</translation>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>Usuario LDAP</translation>
     </message>
     <message>
       <source>Login</source>
@@ -11466,7 +11466,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Múltiples</translation>
     </message>
   </context>
   <context>
@@ -11590,11 +11590,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias no título con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Se o campo está baleiro, o evento sempre se activará.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
@@ -11638,11 +11638,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias no título con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Se o campo está baleiro, o evento sempre se activará.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>

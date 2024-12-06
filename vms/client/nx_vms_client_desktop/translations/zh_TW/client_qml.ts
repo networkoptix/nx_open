@@ -367,7 +367,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation>請嘗試更改過濾條件或者新增事件規則</translation>
+      <translation>請嘗試更改篩選條件或者新增事件規則</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -795,7 +795,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation>未安裝任何外掛程式</translation>
+      <translation>未安裝任何擴充套件</translation>
     </message>
     <message>
       <source>Server is offline</source>

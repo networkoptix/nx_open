@@ -28,35 +28,35 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Salasana on vanhentunut. Ota yhteyttä järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP palvelin ei ole käytettävissä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 ei ole vielä käytettävissä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Käyttäjä on lukittu useiden epäonnistuneiden yritysten vuoksi. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Tämä valtuutusmenetelmä on kielletty. Ota yhteyttä järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Istuntoavain on virheellinen tai vanhentunut.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>Sisäinen palvelinvirhe (%1). Ota yhteyttä järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Järjestelmänvalvoja on poistanut tämän käyttäjän käytöstä.</translation>
     </message>
   </context>
   <context>
@@ -95,7 +95,7 @@
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
+        <numerusform>Tavu(t)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
     </message>
@@ -103,7 +103,7 @@
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilotavu(t)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
     </message>
@@ -111,7 +111,7 @@
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megatavu(t)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
     </message>
@@ -119,7 +119,7 @@
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigatavu(t)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
     </message>
@@ -127,7 +127,7 @@
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Teratavu(t)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
     </message>
@@ -135,7 +135,7 @@
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petatavu(t)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
     </message>

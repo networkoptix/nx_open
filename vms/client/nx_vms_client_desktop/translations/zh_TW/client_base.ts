@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation>錄影資料過濾器</translation>
+      <translation>錄影資料篩選器</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1035,14 +1035,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>將項目靜音</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>將項目取消靜音</numerusform>
       </translation>
     </message>
   </context>
@@ -1411,7 +1411,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>請聯繫 %1以取得有效授權。</translation>
+      <translation>請聯繫 %1以取得有效授權序號。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -2190,11 +2190,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation>存儲空間已更新</translation>
+      <translation>儲存裝置已更新</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation>存儲空間已移除</translation>
+      <translation>儲存裝置已移除</translation>
     </message>
     <message>
       <source>MitM Attack</source>
@@ -4003,7 +4003,7 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>欲取得離線授權檔，請提供授權碼和硬體ID到 %1，</translation>
+      <translation>欲取得離線授權檔，請提供授權碼和硬體ID至 %1，</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
@@ -4012,7 +4012,7 @@ to %1</source>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援(%1), 以取得離線授權.</translation>
+      <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援(%1), 以取得離線授權檔案。</translation>
     </message>
   </context>
   <context>
@@ -4222,7 +4222,7 @@ to %1</source>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;虛擬攝影機&quot; 是一個影像資料專用的虛擬空間, 可上傳到系統中的任一伺服器並讓所有使用者存取.</translation>
+      <translation>&quot;虛擬攝影機&quot; 是一個影像資料專用的虛擬空間, 可上傳到系統中的任一伺服器並讓所有使用者存取。</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
@@ -5166,11 +5166,11 @@ to %1</source>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>受限制的</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>驗證</translation>
     </message>
   </context>
   <context>
@@ -6391,12 +6391,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>伺服器儲存裝置上沒有太多可用空間. 請注意, 如果所選的檔案是伺服器中最舊的資料, 則可能會在上傳後被刪除.</numerusform>
+        <numerusform>伺服器儲存裝置上沒有太多可用空間。 請注意, 如果所選的檔案是伺服器中最舊的資料，則可能會在上傳後被刪除。</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>您可以新增額外的儲存空間來防止這種情況. 也可以調整錄影保存天數來控制哪些錄影資料會先被刪除.</translation>
+      <translation>您可以新增額外的儲存空間來防止這種情況， 也可以調整錄影保存天數來控制哪些錄影資料會先被刪除。</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
@@ -6404,11 +6404,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>因使用者 &quot;%1&quot; 正在將影像上傳至本攝影機, 因此無法開始上傳.</translation>
+      <translation>因使用者 &quot;%1&quot; 正在將影像上傳至本攝影機, 因此無法開始上傳。</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>因其它使用者正在將影像上傳至本攝影機, 因此無法開始上傳.</translation>
+      <translation>因其它使用者正在將影像上傳至本攝影機, 因此無法開始上傳。</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
@@ -9655,7 +9655,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation>等待同等數據中</translation>
+      <translation>等待其他伺服器數據中</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
@@ -9667,7 +9667,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation>無法下載更新套件.</translation>
+      <translation>無法下載更新套件。</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
@@ -9699,7 +9699,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation>未找到更新檔.</translation>
+      <translation>未找到更新檔。</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
@@ -9711,7 +9711,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation>不再支援此作業系統版本.</translation>
+      <translation>不再支援此作業系統版本。</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
@@ -10393,19 +10393,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation>無效或不兼容的插件函式庫</translation>
+      <translation>無效或不相容的擴充套件函式庫</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>插件函式庫無法初始化</translation>
+      <translation>擴充套件函式庫無法初始化</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>插件回應不良</translation>
+      <translation>擴充套件回應不良</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation>不再支援API版本的插件</translation>
+      <translation>不再支援API版本的擴充套件</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -10421,7 +10421,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation>插件位於黑名單中</translation>
+      <translation>擴充套件位於黑名單中</translation>
     </message>
     <message>
       <source>Status</source>
@@ -10429,7 +10429,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>插件是可選的且不在白名單中</translation>
+      <translation>擴充套件不是必要的的且不在白名單中</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -10977,7 +10977,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>其它使用者正在將影像上傳到此攝影機.</translation>
+      <translation>其它使用者正在將錄影資料上傳到此攝影機。</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
@@ -11471,14 +11471,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>任何插件</translation>
+      <translation>任何擴充套件</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -11486,7 +11486,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>此欄位有大小寫之區分</translation>
+      <translation>此欄位區分大小寫</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>

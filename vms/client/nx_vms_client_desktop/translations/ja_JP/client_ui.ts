@@ -859,7 +859,7 @@
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>カメラ選択</translation>
+      <translation>カメラを選択してください</translation>
     </message>
   </context>
   <context>
@@ -1102,7 +1102,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Search</source>
@@ -1193,11 +1193,11 @@
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
-      <translation>認証のためにログイン（オプション）</translation>
+      <translation>認証用ログイン名 (オプション)</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password to authenticate (optional)</source>
@@ -1630,7 +1630,7 @@
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>レイアウトを選択</translation>
+      <translation>レイアウト選択</translation>
     </message>
     <message>
       <source>Shared layouts</source>
@@ -2313,7 +2313,7 @@
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
-      <translation>空の場合、デフォルトの通知タイトルが使用されます</translation>
+      <translation>このフィールドが空の場合、デフォルトの通知タイトルが使用されます</translation>
     </message>
     <message>
       <source>Body</source>
@@ -2628,7 +2628,7 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation>再生時間 :</translation>
+      <translation>再生時刻 :</translation>
     </message>
     <message>
       <source>rewind for</source>
@@ -2682,7 +2682,7 @@
     </message>
     <message>
       <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>

@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Credits</source>
-      <translation>Yếu tố</translation>
+      <translation>Tín dụng</translation>
     </message>
     <message>
       <source>GPU Information</source>

@@ -262,7 +262,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Password</source>
@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Speak the following</source>
@@ -667,7 +667,7 @@
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>システムディスク &quot;%1&quot; の空き容量が少なくなっています。</translation>
+      <translation>システムディスク &quot;%1&quot; の空き領域が少なくなっています。</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
@@ -675,7 +675,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>分析ストレージ &quot;%1&quot; の空き容量が少なくなっています。</translation>
+      <translation>分析ストレージ &quot;%1&quot; の空き領域が少なくなっています。</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>

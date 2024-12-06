@@ -437,7 +437,7 @@
     <name>nx::vms::rules::PluginDiagnosticEvent</name>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>插件診斷事件</translation>
+      <translation>擴充套件診斷事件</translation>
     </message>
     <message>
       <source>Camera</source>

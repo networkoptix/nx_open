@@ -697,7 +697,7 @@
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation>カメラ選択...</translation>
+      <translation>カメラを選択してください...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -1086,7 +1086,7 @@ to activate PTZ</source>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>レイアウトを選択</translation>
+      <translation>レイアウト選択</translation>
     </message>
   </context>
   <context>

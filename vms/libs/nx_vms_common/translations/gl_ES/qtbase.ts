@@ -58,7 +58,7 @@
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation type="unfinished">Press</translation>
+      <translation>Premer</translation>
     </message>
     <message>
       <source>Increase</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -427,7 +427,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation type="unfinished">Go back</translation>
+      <translation>Volver atrás</translation>
     </message>
     <message>
       <source>Forward</source>

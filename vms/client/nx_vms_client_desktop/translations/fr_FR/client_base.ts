@@ -3723,7 +3723,7 @@ to %1</source>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation>Circuit à la terre</translation>
+      <translation>Circuit Fermé</translation>
     </message>
     <message>
       <source>Invalid state</source>

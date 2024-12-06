@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de obxecto</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -129,7 +129,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>

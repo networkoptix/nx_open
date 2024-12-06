@@ -346,11 +346,11 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation>插件錯誤。 %1</translation>
+      <translation>擴充套件錯誤。 %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation>插件失效</translation>
+      <translation>無法使用擴充套件</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
@@ -392,23 +392,23 @@
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation>無法初始化聲音解碼器.</translation>
+      <translation>無法初始化音訊解碼器。</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>找不到 %1 編碼的解碼器。</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
+      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1。</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1.</translation>
+      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1。</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
+      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1。</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
@@ -446,11 +446,11 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>找不到 %1 編碼的編碼器。</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>無法初始化編碼器.</translation>
+      <translation>無法初始化影像編碼器。</translation>
     </message>
   </context>
   <context>
@@ -982,15 +982,15 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL 轉碼未執行.</translation>
+      <translation>OpenCL 轉碼未實行。</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation>未知轉碼模式。</translation>
+      <translation>未知轉碼方式。</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL 轉碼未被執行.</translation>
+      <translation>OpenCL 轉碼未被實行。</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
@@ -1079,7 +1079,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation>錯誤的要求.</translation>
+      <translation>錯誤的請求。</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1089,11 +1089,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation>找不到.</translation>
+      <translation>找不到。</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>內部錯誤.</translation>
+      <translation>內部錯誤。</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>未驗證.</translation>
+      <translation>未驗證。</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -1346,11 +1346,11 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>最後的主系統合併ID</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>最後的附屬系統合併ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
@@ -1431,7 +1431,7 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>啟用循序 Flir Onvif 搜尋工具</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
@@ -1479,7 +1479,7 @@
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>檔案的的對等下載控制器</translation>
     </message>
     <message>
       <source>Client update settings</source>
@@ -1503,11 +1503,11 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>遠端連線token快取的更新間隔（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>遠端連線token快取的等待時間（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1535,11 +1535,11 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>用於儲存更新的常駐伺服器</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>儲存更新的常駐伺服器</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
@@ -1547,11 +1547,11 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>更多用於儲存錄影的本機 FS 儲存類型</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>失敗時強制授予分析資料庫儲存掛載點權限</translation>
+      <translation>失敗時強制授予掛載分析資料儲存裝置的權限</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
@@ -1587,7 +1587,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation>啟用跨域策略</translation>
+      <translation>啟用跨域政策</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1639,7 +1639,7 @@
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>是否緩存一些主串流幀數。數值：&apos;是&apos; - 永遠啟用(可能占用大量RAM)，&apos;否&apos; - 永遠停用，除非重播影片需要(例如HLS)，&apos;自動&apos; - 類似於&apos;否&apos; ，但會在改善使用者體驗時開啟(例如當某些分析插件在攝影機上運作時)。</translation>
+      <translation>是否暫存一些主串流幀數。值：&apos;是&apos; - 永遠啟用(可能占用大量RAM)，&apos;否&apos; - 永遠停用，除非重播影片需要(例如HLS)，&apos;自動&apos; - 類似於&apos;否&apos; ，但會在改善使用者體驗時開啟(例如當攝影機上有某些擴充套件在運作時)。</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
@@ -2052,11 +2052,11 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>存儲問題</translation>
+      <translation>儲存裝置問題</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1 的存儲問題</translation>
+      <translation>%1 的儲存裝置問題</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
@@ -2076,19 +2076,19 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>儲存空間 &quot;%1&quot; 處於離線狀態。</translation>
+      <translation>分析儲空間 &quot;%1&quot; 處於離線狀態。</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>儲存空間 &quot;%1&quot; 容量即將不足。</translation>
+      <translation>分析儲存空間 &quot;%1&quot; 容量即將不足。</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>插件診斷事件</translation>
+      <translation>擴充套件診斷事件</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation>不明的插件診斷事件</translation>
+      <translation>不明的擴充套件診斷事件</translation>
     </message>
     <message>
       <source>Buzzer</source>
