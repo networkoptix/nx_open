@@ -5,6 +5,7 @@
 #include <QtCore/QRectF>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 
 namespace nx::vms::api {
 

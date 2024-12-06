@@ -18,6 +18,7 @@ tags:
   - name: Video Wall
   - name: Stored File
   - name: Web Page
+  - name: Analytics
 components:
   parameters:
     _filter:
@@ -85,6 +86,15 @@ components:
       schema:
         type: boolean
         enum: [true]
+    _ticket:
+      in: query
+      name: _ticket
+      required: false
+      description: >-
+        One-time authorization ticket previously generated using Login REST API
+        obtained from the current Server.
+      schema:
+        type: string
     _pretty:
       in: query
       name: _pretty

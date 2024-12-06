@@ -55,7 +55,7 @@ template<typename T> DeserializationResult deserializeValue(
 
 template<
     typename Data,
-    typename = std::enable_if_t<IsInstrumentedV<Data>>
+    typename = std::enable_if_t<IsInstrumentedV<Data> && !IsStringAlikeV<Data>>
 >
 DeserializationResult deserialize(const DeserializationContext& ctx, Data* data)
 {
@@ -285,19 +285,37 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
     // Using if constexpr over SFINAE to make clear prioritization between serialization methods.
     // E.g., if type both instrumented and stringizable, then choosing instrumentation.
 
-    if constexpr (nx::reflect::IsInstrumentedV<T>)
+    if constexpr (IsStringAlikeV<T>)
+    {
+        *data = T();
+        if (!ctx.value.IsString())
+            return {false, "String value is expected", getStringRepresentation(ctx.value)};
+
+        if constexpr (std::is_same_v<T, std::string>)
+        {
+            *data = std::string();
+            if (!ctx.value.IsString())
+                return {false, "String value is expected", getStringRepresentation(ctx.value)};
+            *data = std::string(ctx.value.GetString(), ctx.value.GetStringLength());
+            return DeserializationResult(true);
+        }
+        else
+        {
+            if (!nx::reflect::fromString(ctx.value.GetString(), data))
+            {
+                *data = T();
+                return {false,
+                    "Can't parse the string (custom parser failed)",
+                    getStringRepresentation(ctx.value)};
+            }
+            return DeserializationResult(true);
+        }
+    }
+    else if constexpr (nx::reflect::IsInstrumentedV<T>)
     {
         // ADL. Custom deserialize() overload will be invoked here if present despite the fact
         // that the type was instrumented.
         return deserialize(ctx, data);
-    }
-    if constexpr (std::is_same_v<T, std::string>)
-    {
-        *data = std::string();
-        if (!ctx.value.IsString())
-            return {false, "String value is expected", getStringRepresentation(ctx.value)};
-        *data = std::string(ctx.value.GetString(), ctx.value.GetStringLength());
-        return DeserializationResult(true);
     }
     else if constexpr (std::is_same_v<T, bool>)
     {
@@ -374,33 +392,10 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
             "Either a number or a string is expected for an enum value",
             getStringRepresentation(ctx.value)};
     }
-    // Checking if custom deserialize() overload is defined for a non-instrumented type T.
-    // Invoking this custom method before fromString() since this deserialize() is more specific
-    // to the format.
     else if constexpr (IsDeserializableV<T>)
     {
         // ADL call.
         return deserialize(ctx, data);
-    }
-    else if constexpr (useStringConversionForSerialization((const T*) nullptr))
-    {
-        *data = T();
-        if (!ctx.value.IsString())
-        {
-            return {
-                false,
-                "String value is expected for an object",
-                getStringRepresentation(ctx.value)};
-        }
-        if (!nx::reflect::fromString(ctx.value.GetString(), data))
-        {
-            *data = T();
-            return {
-                false,
-                "Can't parse the string (custom parser failed)",
-                getStringRepresentation(ctx.value)};
-        }
-        return DeserializationResult(true);
     }
     else
     {

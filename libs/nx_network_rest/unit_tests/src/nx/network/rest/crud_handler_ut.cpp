@@ -4,6 +4,7 @@
 
 #include <nx/network/rest/crud_handler.h>
 #include <nx/network/rest/open_api_schema.h>
+#include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/api/data/rest_api_versions.h>
 
@@ -80,6 +81,15 @@ static const QString& jsonTemplate(std::string_view version)
 {
     return version == *kRestApiV3 ? kJsonTemplateV3 : kJsonTemplateV4;
 }
+
+class AnalyticsObjectTracksHandler: public CrudHandler<AnalyticsObjectTracksHandler>
+{
+public:
+    std::vector<ObjectTrackV4> read(ObjectTrackFilter, const nx::network::rest::Request&)
+    {
+        return {{.bestShot = BestShotV4{.boundingBox = RectAsString{1, 2, 3, 4}}}};
+    }
+};
 
 class CrudHandlerTest: public ::testing::TestWithParam<std::string_view>{};
 
@@ -184,6 +194,41 @@ TEST_P(CrudHandlerTest, BookmarkPatch)
         request(R"json({"eventRuleId": "{3771fd64-9b41-4216-8800-9610d40b9c16}"})json"));
     ASSERT_TRUE(response.content->body.contains(
         R"json("eventRuleId":"{3771fd64-9b41-4216-8800-9610d40b9c16}")json"));
+}
+
+TEST_P(CrudHandlerTest, ObjectTrackGet)
+{
+    if (GetParam() == *kRestApiV3)
+        return;
+
+    AnalyticsObjectTracksHandler handler;
+    handler.setSchemas(std::make_shared<json::OpenApiSchemas>(json::OpenApiSchemas{{
+        json::OpenApiSchema::load(":/openapi_v4.json")}}));
+    http::Request httpRequest;
+    httpRequest.requestLine.method = http::Method::get;
+    Request request{&httpRequest, std::optional<Content>{}};
+    request.setDecodedPath("/rest/v4/analytics/objectTracks");
+    request.setApiVersion(4);
+    auto response{handler.executeRequestOrThrow(&request)};
+    ASSERT_EQ(nx::utils::formatJsonString(response.content->body), R"json([
+    {
+        "id": "{00000000-0000-0000-0000-000000000000}",
+        "deviceId": "{00000000-0000-0000-0000-000000000000}",
+        "objectTypeId": "",
+        "firstAppearanceTimeMs": 0,
+        "lastAppearanceTimeMs": 0,
+        "objectRegion": {
+            "boundingBoxGrid": ""
+        },
+        "attributes": [],
+        "bestShot": {
+            "timestampMs": 0,
+            "boundingBox": "1,2,3x4",
+            "streamIndex": ""
+        },
+        "analyticsEngineId": "{00000000-0000-0000-0000-000000000000}"
+    }
+])json");
 }
 
 INSTANTIATE_TEST_SUITE_P(Rest, CrudHandlerTest, ::testing::ValuesIn(kRestApiV3, kRestApiEnd),

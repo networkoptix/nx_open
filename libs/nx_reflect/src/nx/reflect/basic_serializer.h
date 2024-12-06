@@ -142,17 +142,6 @@ struct VisitorDeclarator
     template<typename... Args> using type = Visitor<Composer, Args...>;
 };
 
-template<typename SerializationContext, typename Data>
-void serialize(
-    [[maybe_unused]] SerializationContext* ctx,
-    [[maybe_unused]] const Data& data,
-    std::enable_if_t<IsInstrumentedV<Data>>* = nullptr)
-{
-    typename VisitorDeclarator<SerializationContext>::template type<Data> visitor(ctx, data);
-
-    nx::reflect::visitAllFields<Data>(visitor);
-}
-
 template<
     typename SerializationContext,
     typename Container
@@ -203,8 +192,7 @@ void serialize(
 
 template<typename SerializationContext, typename Value>
 void serialize(
-    SerializationContext* ctx, const Value& val,
-    std::enable_if_t<!IsInstrumentedV<Value> && !IsContainerV<Value>>* = nullptr)
+    SerializationContext* ctx, const Value& val, std::enable_if_t<!IsContainerV<Value>>* = nullptr)
 {
     if constexpr (std::is_same_v<Value, bool>)
     {
@@ -218,9 +206,14 @@ void serialize(
     {
         ctx->composer.writeValue(val);
     }
-    else if constexpr (IsStringAlikeV<Value> || nx::reflect::IsInstrumentedEnumV<Value>)
+    else if constexpr (IsStringAlikeV<Value> || IsInstrumentedEnumV<Value>)
     {
         ctx->composer.writeValue(nx::reflect::toString(val));
+    }
+    else if constexpr (IsInstrumentedV<Value>)
+    {
+        typename VisitorDeclarator<SerializationContext>::template type<Value> visitor(ctx, val);
+        nx::reflect::visitAllFields<Value>(visitor);
     }
     else
     {

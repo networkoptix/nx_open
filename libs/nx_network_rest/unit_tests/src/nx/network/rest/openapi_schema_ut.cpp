@@ -285,6 +285,30 @@ NX_REFLECTION_INSTRUMENT(Base64Model, (param))
      */
     reg("rest/v{3-}/bookmarks");
 
+    /**%apidoc GET /rest/v{4-}/analytics/objectTracks
+     * Searches the Analytics DB for Objects that match the specified filter, and retrieves the
+     * list of the matching Object Tracks.
+     * %caption Get Object Tracks
+     * %ingroup Analytics
+     * %struct ObjectTrackFilter
+     * %param[unused] id
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
+     * %permissions Power User.
+     * %return:{std::vector<ObjectTrackV4>} Object Tracks.
+     *
+     **%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}
+     * Retrieves the specified Object Track.
+     * %caption Get Object Track
+     * %ingroup Analytics
+     * %struct ObjectTrackFilter
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
+     * %permissions Power User.
+     * %return:{ObjectTrackV4} Object Track.
+     */
+    reg("rest/v{4-}/analytics/objectTracks/:id?");
+
     /**%apidoc GET /rest/v{3-}/orderer
      * %ingroup Test
      * %return:{ArrayOrdererTestResponse}

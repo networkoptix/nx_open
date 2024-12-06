@@ -27,11 +27,13 @@ inline constexpr bool HasTrimmedV = HasTrimmed<Args...>::value;
 
 } // namespace detail
 
+//TODO: Remove !std::is_same_v<T, std::nullptr_t> after c++23 support.
 template<typename T>
-inline constexpr bool IsStringAlikeV = detail::HasTrimmedV<T>
-    || useStringConversionForSerialization((const T*) nullptr)
-    || std::is_convertible_v<T, std::string>
-    || std::is_convertible_v<T, std::string_view>;
+inline constexpr bool IsStringAlikeV = !std::is_same_v<T, std::nullptr_t>
+    && (detail::HasTrimmedV<T>
+        || useStringConversionForSerialization((const T*) nullptr)
+        || std::is_convertible_v<T, std::string>
+        || std::is_convertible_v<T, std::string_view>);
 
 template<typename T>
 struct IsOptional: std::false_type {};

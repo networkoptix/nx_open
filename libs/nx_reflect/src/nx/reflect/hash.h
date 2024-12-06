@@ -83,11 +83,14 @@ constexpr Sink typeName(const Sink& sink)
         FieldEnumerator<Sink> fieldEnumerator(sink.add("{"));
         return nx::reflect::visitAllFields<T>(fieldEnumerator).add("}");
     }
+    else if constexpr (std::is_same_v<T, std::nullptr_t>)
+    {
+        return sink.add("null");
+    }
     else if constexpr (IsStringAlikeV<T> || IsInstrumentedEnumV<T>)
     {
         return sink.add("string");
     }
-
     else if constexpr (!IsSetContainerV<T>
         && !IsUnorderedSetContainerV<T>
         && (IsAssociativeContainerV<T>

@@ -184,7 +184,7 @@ Params::Fields Params::deserializeOrThrow(T* data) const
             data->emplace(std::move(key), std::move(value));
         }
     }
-    else if constexpr (IsInstrumentedV<T>)
+    else if constexpr (IsInstrumentedV<T> && !IsStringAlikeV<T>)
     {
         nxReflectVisitAllFields(
             data, [this, data, &fields](auto&&... f) { (this->deserialize(f, data, &fields), ...); });
