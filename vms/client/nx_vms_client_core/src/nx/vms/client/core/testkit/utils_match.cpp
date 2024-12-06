@@ -22,12 +22,8 @@ QString stripShortcuts(QString title)
 
 bool objectHasId(const QObject* object, const QString& id)
 {
-    for (auto c = qmlContext(object); c; c = c->parentContext())
-    {
-        if (c->nameForObject(const_cast<QObject*>(object)) == id)
-            return true;
-    }
-    return false;
+    auto c = qmlContext(object);
+    return c && c->nameForObject(const_cast<QObject*>(object)) == id;
 }
 
 bool valueIsTrue(const QJSValue& value)
