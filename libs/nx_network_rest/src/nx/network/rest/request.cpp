@@ -89,14 +89,16 @@ Request::Request(
         return;
     }
 
-    if (!m_jsonRpcContext->request.params->isObject())
+    if (!m_jsonRpcContext->request.params->IsObject())
     {
         m_content = Content{nx::network::http::header::ContentType::kJson,
-            QJson::serialized(m_jsonRpcContext->request.params.value())};
+            QByteArray::fromStdString(
+                nx::reflect::json::serialize(*m_jsonRpcContext->request.params))};
         return;
     }
 
-    auto object = m_jsonRpcContext->request.params->toObject();
+    QJsonValue params{json::serialized(*m_jsonRpcContext->request.params)};
+    auto object = params.toObject();
     QJsonObject body;
     for (auto it = object.begin(); it != object.end(); ++it)
     {
@@ -250,9 +252,9 @@ Params Request::calculateParams() const
         //     For details: VMS-41649
         json = m_content->parse();
     }
-    else if (m_jsonRpcContext)
+    else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
-        json = m_jsonRpcContext->request.params;
+        json = json::serialized(*m_jsonRpcContext->request.params);
     }
 
     if (json && json->type() == QJsonValue::Object)
@@ -283,7 +285,8 @@ void Request::updateContent(QJsonValue value)
 {
     if (m_jsonRpcContext)
     {
-        m_jsonRpcContext->request.params = value;
+        m_jsonRpcContext->request =
+            nx::json_rpc::Request::create(m_jsonRpcContext->request.id, m_jsonRpcContext->request.method, value);
     }
     else
     {
@@ -406,14 +409,13 @@ void Request::renameParameter(const QString& oldName, const QString& newName)
     m_pathParams.rename(oldName, newName);
     if (m_jsonRpcContext
         && m_jsonRpcContext->request.params
-        && m_jsonRpcContext->request.params->isObject())
+        && m_jsonRpcContext->request.params->IsObject())
     {
-        auto object = m_jsonRpcContext->request.params->toObject();
-        auto value = object.take(oldName);
-        if (!value.isUndefined())
+        auto it = m_jsonRpcContext->request.params->FindMember(oldName.toStdString());
+        if (NX_ASSERT(it != m_jsonRpcContext->request.params->MemberEnd()))
         {
-            object.insert(newName, value);
-            m_jsonRpcContext->request.params = object;
+            it->name.SetString(
+                newName.toStdString(), m_jsonRpcContext->request.document->GetAllocator());
         }
     }
     if (!m_paramsCache)

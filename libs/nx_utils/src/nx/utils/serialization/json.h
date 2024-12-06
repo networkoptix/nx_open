@@ -217,7 +217,7 @@ private:
         }
         else
         {
-            return serialize(lhs) == serialize(rhs);
+            return nx::reflect::json::serialize(lhs) == nx::reflect::json::serialize(rhs);
         }
     }
 
@@ -231,8 +231,16 @@ private:
     template<typename Value>
     void writeAttribute(const char* name, const Value& value)
     {
-        m_context->composer.writeAttributeName(name);
-        BasicSerializer::serializeAdl(m_context, value);
+        if constexpr (std::is_pointer_v<Value>)
+        {
+            if (value)
+                writeAttribute(name, *value);
+        }
+        else
+        {
+            m_context->composer.writeAttributeName(name);
+            BasicSerializer::serializeAdl(m_context, value);
+        }
     }
 
 private:
@@ -242,3 +250,67 @@ private:
 };
 
 } // namespace nx::reflect
+
+namespace rapidjson {
+
+template<typename SerializationContext>
+void serialize(SerializationContext* context, const Value& value)
+{
+    if constexpr (std::is_same_v<SerializationContext, nx::reflect::json::SerializationContext>)
+    {
+        return context->composer.writeRawString(
+            nx::reflect::json_detail::getStringRepresentation(value));
+    }
+
+    if (value.IsBool())
+    {
+        context->composer.writeValue(value.GetBool());
+    }
+    else if (value.IsNumber())
+    {
+        const auto doubleValue = value.GetDouble();
+        const auto intValue = static_cast<int>(doubleValue);
+        if (static_cast<double>(intValue) == doubleValue)
+            context->composer.writeInt(intValue);
+        else
+            context->composer.writeFloat(doubleValue);
+    }
+    else if (value.IsNull())
+    {
+        context->composer.writeNull();
+    }
+    else if (value.IsString())
+    {
+        context->composer.writeValue(std::string_view{value.GetString(), value.GetStringLength()});
+    }
+    else if (value.IsObject())
+    {
+        context->composer.startObject();
+        for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
+        {
+            context->composer.writeAttributeName(
+                std::string_view{it->name.GetString(), it->name.GetStringLength()});
+            serialize(context, it->value);
+        }
+        context->composer.endObject(value.MemberCount());
+    }
+    else if (value.IsArray())
+    {
+        context->composer.startArray();
+        for (auto it = value.Begin(); it != value.End(); ++it)
+            serialize(context, *it);
+        context->composer.endArray(value.Size());
+    }
+    else
+    {
+        NX_ASSERT(false, "Unsupported rapidjson::Value type");
+    }
+}
+
+template<typename SerializationContext>
+void serialize(SerializationContext* context, const Document& value)
+{
+    serialize(context, static_cast<const Value&>(value));
+}
+
+} // namespace rapidjson

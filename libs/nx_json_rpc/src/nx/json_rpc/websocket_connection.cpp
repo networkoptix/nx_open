@@ -2,11 +2,10 @@
 
 #include "websocket_connection.h"
 
-#include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/websocket/websocket.h>
 
-#include "incoming_processor.h"
 #include "detail/outgoing_processor.h"
+#include "incoming_processor.h"
 
 namespace nx::json_rpc {
 
@@ -23,34 +22,33 @@ void logMessage(
             : buffer.substr(0, 1024 * 5)); //< Should be enough for 5 devices.
 }
 
-bool isResponse(const QJsonObject& object)
+bool isObjectResponse(const rapidjson::Value& object)
 {
-    return object.contains("result") || object.contains("error");
+    return object.HasMember("result") || object.HasMember("error");
 }
 
-bool isResponse(const QJsonArray& list)
+std::pair<bool, std::optional<Response>> isArrayResponse(const rapidjson::Value& list)
 {
-    bool result = !list.empty() && isResponse(list.begin()->toObject());
-    for (int i = 1; i < list.size(); ++i)
+    bool result = !list.Empty() && list[0].IsObject() && isObjectResponse(list[0]);
+    std::optional<Response> error;
+    for (int i = 1; i < (int) list.Size(); ++i)
     {
-        if (isResponse(list[i].toObject()) != result)
+        if (list.IsObject() && isObjectResponse(list[i]) != result)
         {
-            throw Error{
-                Error::invalidRequest, "Mixed request and response in a batch"};
+            error = Response::makeError(
+                std::nullptr_t{}, Error::invalidRequest, "Mixed request and response in a batch");
+            break;
         }
     }
-    return result;
+    return {result, std::move(error)};
 }
 
-bool isResponse(const QJsonValue& value)
+std::pair<bool, std::optional<Response>> isResponse(const rapidjson::Value& value)
 {
-    if (value.isArray())
-        return isResponse(value.toArray());
+    if (value.IsArray())
+        return isArrayResponse(value);
 
-    if (value.isObject())
-        return isResponse(value.toObject());
-
-    return false;
+    return {value.IsObject() && isObjectResponse(value), std::optional<Response>{}};
 }
 
 } // namespace
@@ -73,15 +71,16 @@ WebSocketConnection::WebSocketConnection(
 void WebSocketConnection::setRequestHandler(RequestHandler requestHandler)
 {
     m_incomingProcessor = std::make_unique<IncomingProcessor>(
-        [this, requestHandler = std::move(requestHandler)](auto request, auto responseHandler)
+        [this, requestHandler = std::move(requestHandler)](const auto& request, auto responseHandler)
         {
             requestHandler(
-                std::move(request),
+                request,
                 [this, handler = std::move(responseHandler)](auto response) mutable
                 {
-                    dispatch([response = std::move(response),
-                                    handler = std::move(handler)]() mutable
-                        { handler(std::move(response)); });
+                    dispatch([response = std::move(response), handler = std::move(handler)]() mutable
+                    {
+                        handler(std::move(response));
+                    });
                 },
                 this);
         });
@@ -112,12 +111,12 @@ void WebSocketConnection::stopWhileInAioThread()
 
     m_guards.clear();
     m_socket->pleaseStopSync();
-    std::queue<QJsonValue> empty;
+    std::queue<rapidjson::Document> empty;
     m_queuedRequests.swap(empty);
 }
 
 void WebSocketConnection::send(
-    Request request, ResponseHandler handler, QByteArray serializedRequest)
+    Request request, ResponseHandler handler, std::string serializedRequest)
 {
     dispatch(
         [this,
@@ -164,46 +163,53 @@ void WebSocketConnection::readNextMessage()
 void WebSocketConnection::readHandler(const nx::Buffer& buffer)
 {
     logMessage("receive from", m_address, buffer);
-    try
+    rapidjson::Document data;
+    data.Parse(buffer.data(), buffer.size());
+    if (data.HasParseError())
     {
-        QJsonValue data;
-        QString error;
-        if (!QJsonDetail::deserialize_json(buffer.toRawByteArray(), &data, &error))
-            throw Error{Error::parseError, error.toStdString()};
-
-        if (isResponse(data))
-            m_outgoingProcessor->onResponse(data);
-        else
-            processRequest(data);
+        auto r{nx::reflect::json::serialize(Response::makeError(std::nullptr_t{},
+            Error::parseError, nx::reflect::json_detail::parseErrorToString(data)))};
+        NX_DEBUG(this, "Error processing received message: " + r);
+        send(std::move(r));
+        return;
     }
-    catch (Error e)
+
+    if (auto [isResponse_, errorResponse] = isResponse(data); errorResponse)
     {
-        NX_DEBUG(this, "Error %1 processing received message", QJson::serialized(e));
-        send(QJson::serialized(Response::makeError(std::nullptr_t(), std::move(e))));
+        auto r{nx::reflect::json::serialize(*errorResponse)};
+        NX_DEBUG(this, "Error processing received message: " + r);
+        send(std::move(r));
+    }
+    else
+    {
+        if (isResponse_)
+            m_outgoingProcessor->onResponse(std::move(data));
+        else
+            processRequest(std::move(data));
     }
 }
 
-void WebSocketConnection::processRequest(const QJsonValue& data)
+void WebSocketConnection::processRequest(rapidjson::Document data)
 {
-    m_queuedRequests.push(data);
+    m_queuedRequests.push(std::move(data));
     if (m_queuedRequests.size() == 1)
         processQueuedRequest();
 }
 
 void WebSocketConnection::processQueuedRequest()
 {
-    m_incomingProcessor->processRequest(m_queuedRequests.front(),
-        [this](QJsonValue response)
+    m_incomingProcessor->processRequest(std::move(m_queuedRequests.front()),
+        [this](std::string response)
         {
-            if (!response.isNull())
-                send(QJson::serialized(response));
+            if (!response.empty())
+                send(std::move(response));
             m_queuedRequests.pop();
             if (!m_queuedRequests.empty())
                 processQueuedRequest();
         });
 }
 
-void WebSocketConnection::send(QByteArray data)
+void WebSocketConnection::send(std::string data)
 {
     auto buffer = std::make_unique<nx::Buffer>(std::move(data));
     auto bufferPtr = buffer.get();

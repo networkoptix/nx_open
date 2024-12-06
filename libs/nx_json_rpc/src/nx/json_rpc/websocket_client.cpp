@@ -161,9 +161,9 @@ void WebSocketClient::sendAsync(Request request, ResponseHandler handler)
                     }
 
                     handler(Response::makeError(request.responseId(),
-                        {Error::transportError,
-                            NX_FMT("Failed to establish connnection to %1 with error %2",
-                                m_url, errorCode).toStdString()}));
+                        Error::transportError,
+                        NX_FMT("Failed to establish connnection to %1 with error %2",
+                            m_url, errorCode).toStdString()));
                 });
         });
 }

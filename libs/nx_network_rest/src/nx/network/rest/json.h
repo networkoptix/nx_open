@@ -109,6 +109,9 @@ inline QJsonValue serialized(const T& data)
     return value;
 }
 
+// TODO: Switch on nx_reflect and remove.
+NX_NETWORK_REST_API QJsonValue serialized(rapidjson::Value& data);
+
 // throws exception if can't process all withs
 template<typename T>
 QJsonValue filter(

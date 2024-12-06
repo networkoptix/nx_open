@@ -274,6 +274,15 @@ bool deserialize(QnJsonContext* context, QnConversionWrapper<QJsonValue> value, 
     return true;
 }
 
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& context, Result* data)
+{
+    using namespace nx::reflect;
+    return json_detail::Deserializer{json::DeserializationContext{context.value}, data}(
+        WrappedMemberVariableField("errorId", &Result::errorId),
+        WrappedMemberVariableField("errorString", &Result::errorString));
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Result, (ubjson)(xml)(csv_record), Result_Fields)
 
 JsonResult::JsonResult(const Result& result):

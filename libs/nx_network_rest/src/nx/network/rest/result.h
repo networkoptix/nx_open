@@ -9,6 +9,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/json/deserializer.h>
 
 namespace nx::network::rest {
 
@@ -115,6 +116,22 @@ NX_NETWORK_REST_API bool deserialize(
 
 #define Result_Fields (errorId)(errorString)
 QN_FUSION_DECLARE_FUNCTIONS(Result, (ubjson)(xml)(csv_record), NX_NETWORK_REST_API)
+
+NX_NETWORK_REST_API nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& context, Result* data);
+
+template<typename SerializationContext>
+inline void serialize(SerializationContext* context, const Result& value)
+{
+    context->composer.startObject();
+    context->composer.writeAttributeName("errorId");
+    context->composer.writeString(nx::reflect::enumeration::toString(value.errorId));
+    context->composer.writeAttributeName("errorString");
+    context->composer.writeString(value.errorString.toStdString());
+    context->composer.writeAttributeName("error");
+    context->composer.writeString(std::to_string((int) value.errorId));
+    context->composer.endObject(/*members*/ 3);
+}
 
 struct NX_NETWORK_REST_API JsonResult: public Result
 {

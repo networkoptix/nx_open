@@ -32,8 +32,11 @@ std::tuple<nx::network::rest::ErrorId, QString> extractError(
     if (error.code == JsonRpcError::applicationError && error.data)
     {
         nx::network::rest::Result result;
-        if (QJson::deserialize(*error.data, &result))
+        if (nx::reflect::json::deserialize(
+            nx::reflect::json::DeserializationContext{*error.data}, &result))
+        {
             return {result.errorId, result.errorString};
+        }
     }
 
     static const auto kRestApiError = nx::network::rest::ErrorId::serviceUnavailable;
@@ -102,22 +105,14 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     const UserGroupRequest::RemoveUser& data,
     int reqId)
 {
-    return api::JsonRpcRequest{
-        .method = "rest.v4.users.delete",
-        .params = paramsWithId(data.id),
-        .id = reqId
-    };
+    return api::JsonRpcRequest::create(reqId, "rest.v4.users.delete", paramsWithId(data.id));
 }
 
 static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     const UserGroupRequest::RemoveGroup& data,
     int reqId)
 {
-    return api::JsonRpcRequest{
-        .method = "rest.v4.userGroups.delete",
-        .params = paramsWithId(data.id),
-        .id = reqId
-    };
+    return api::JsonRpcRequest::create(reqId, "rest.v4.userGroups.delete", paramsWithId(data.id));
 }
 
 static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
@@ -128,11 +123,8 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     if (data.enableDigest.has_value())
         params.insert("isHttpDigestEnabled", data.enableDigest.value());
 
-    return api::JsonRpcRequest{
-        .method = "rest.v4.users.update",
-        .params = paramsWithId(data.id, params),
-        .id = reqId
-    };
+    return api::JsonRpcRequest::create(
+        reqId, "rest.v4.users.update", paramsWithId(data.id, params));
 }
 
 static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
@@ -147,11 +139,8 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
         JsonField(group, parentGroupIds)
     };
 
-    return api::JsonRpcRequest{
-        .method = "rest.v4.userGroups.update",
-        .params = paramsWithId(mod.id, params),
-        .id = reqId
-    };
+    return api::JsonRpcRequest::create(
+        reqId, "rest.v4.userGroups.update", paramsWithId(mod.id, params));
 }
 
 static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
@@ -166,11 +155,8 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
         JsonField(user, groupIds)
     };
 
-    return api::JsonRpcRequest{
-        .method = "rest.v4.users.update",
-        .params = paramsWithId(mod.id, params),
-        .id = reqId
-    };
+    return api::JsonRpcRequest::create(
+        reqId, "rest.v4.users.update", paramsWithId(mod.id, params));
 }
 
 static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
@@ -190,11 +176,9 @@ static nx::vms::api::JsonRpcRequest toJsonRpcRequest(
     if (updateGroup.newGroup)
         jsonObject.remove(JsonField(group, id).first);
 
-    return api::JsonRpcRequest{
-        .method = "rest.v4.userGroups." + std::string(updateGroup.newGroup ? "create" : "update"),
-        .params = jsonObject,
-        .id = reqId
-    };
+    return api::JsonRpcRequest::create(reqId,
+        "rest.v4.userGroups." + std::string(updateGroup.newGroup ? "create" : "update"),
+        jsonObject);
 }
 
 } // namespace
@@ -360,8 +344,12 @@ void UserGroupRequestChain::Private::runRequests(
                             continue;
 
                         Result resultData;
-                        if (!QJson::deserialize(*response.result, &resultData))
+                        if (!nx::reflect::json::deserialize(
+                            nx::reflect::json::DeserializationContext{*response.result},
+                            &resultData))
+                        {
                             continue;
+                        }
 
                         const auto replyIdRollback = nx::utils::makeScopedRollback(replyId);
 

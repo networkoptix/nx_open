@@ -9,6 +9,7 @@
 #include <nx/utils/void.h>
 
 #include "exception.h"
+#include "json.h"
 #include "nx_network_rest_ini.h"
 #include "params.h"
 #include "user_access_data.h"
@@ -363,17 +364,18 @@ T Request::parseContentByFusionOrThrow(NxFusionContent* content) const
     }
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
-        if (m_jsonRpcContext->request.params->isObject() && hasNonRefParameter)
+        QJsonValue requestParams{json::serialized(*m_jsonRpcContext->request.params)};
+        if (requestParams.isObject() && hasNonRefParameter)
         {
             auto paramsObject{params.toJson(/*excludeCommon*/ true)};
-            auto object{m_jsonRpcContext->request.params->toObject()};
+            auto object{requestParams.toObject()};
             for (auto it = paramsObject.begin(); it != paramsObject.end(); ++it)
                 object.insert(it.key(), it.value());
             deserialize(std::move(object));
         }
         else
         {
-            deserialize(m_jsonRpcContext->request.params.value());
+            deserialize(requestParams);
         }
     }
     else
@@ -483,9 +485,25 @@ std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() 
     }
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
-        // TODO: Switch JSON RPC to rapidjson.
-        return {
-            std::move(data), deserializeWithMerge(m_jsonRpcContext->request.serializedParams())};
+        const nx::reflect::json::DeserializationContext deserializationContext{
+            *m_jsonRpcContext->request.params, (int) nx::reflect::json::DeserializationFlag::fields};
+        return {std::move(data),
+            [&fields, &data, &merge, &throwIfFailed, &deserializationContext]()
+            {
+                if (fields.empty())
+                {
+                    auto result = nx::reflect::json::deserialize(deserializationContext, &data);
+                    throwIfFailed(result);
+                    return std::move(result.fields);
+                }
+
+                T copy{data};
+                auto result = nx::reflect::json::deserialize(deserializationContext, &data);
+                throwIfFailed(result);
+                if constexpr (HasPostprocessFields<T>::value)
+                    copy.postprocessFields(&fields);
+                return merge(&copy, std::move(result.fields));
+            }()};
     }
     return {std::move(data), std::move(fields)};
 }

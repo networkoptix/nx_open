@@ -42,7 +42,7 @@ namespace json_detail {
 // Subject to change since it is not a real deserialization context currently.
 struct DeserializationContext
 {
-    const rapidjson::Value& value;
+    rapidjson::Value& value;
     int flags = 0;
 };
 
@@ -70,7 +70,7 @@ DeserializationResult deserialize(const DeserializationContext& ctx, Data* data)
 
     Deserializer deserializer(ctx, data);
     nx::reflect::visitAllFields<Data>(deserializer);
-    return deserializer.ok();
+    return deserializer.finish();
 }
 
 template<typename T>
@@ -440,7 +440,7 @@ public:
         }
     }
 
-    DeserializationResult ok() const
+    DeserializationResult finish() const
     {
         return m_deserializationResult;
     }

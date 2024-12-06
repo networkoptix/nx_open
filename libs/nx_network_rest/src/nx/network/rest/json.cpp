@@ -6,9 +6,9 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/serialization/qjson.h>
 
 #include "exception.h"
-#include "params.h"
 
 namespace nx::network::rest::json {
 
@@ -665,6 +665,15 @@ void filter(rapidjson::Document* value, nx::utils::DotNotationString with)
 }
 
 } // namespace details
+
+QJsonValue serialized(rapidjson::Value& data)
+{
+    QJsonValue value;
+    const auto r{
+        nx::reflect::json::deserialize(nx::reflect::json::DeserializationContext{data}, &value)};
+    NX_ASSERT(r, "%1", r.toString());
+    return value;
+}
 
 QByteArray serialized(const QJsonValue& value, Qn::SerializationFormat format)
 {

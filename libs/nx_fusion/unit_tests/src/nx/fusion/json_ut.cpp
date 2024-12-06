@@ -4,7 +4,10 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/nx_fusion_test_fixture.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/serialization/flags.h>
+#include <nx/utils/serialization/json.h>
+#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/serialization/qt_core_types.h>
 
 namespace {
@@ -1075,4 +1078,28 @@ TEST(QnJsonReflectEnums, deserializeInstrumentedEnums)
     const auto deserialized = QJson::deserialized<NxReflectFlagsStruct>(serialized);
 
     EXPECT_EQ(deserialized, expected);
+}
+
+TEST(QnJsonReflect, FusionToReflectIdentity)
+{
+    const std::string kJson{R"json([
+    {
+        "i":1,
+        "d_as_i":2.0,
+        "d":3.4,
+        "s":"string",
+        "b":true,
+        "n":null
+    }
+])json"};
+    rapidjson::Document document;
+    document.Parse(kJson);
+    ASSERT_FALSE(document.HasParseError());
+    QJsonValue expected;
+    ASSERT_TRUE(nx::reflect::json::deserialize(nx::reflect::json::DeserializationContext{document}, &expected));
+    QJsonValue actual;
+    ASSERT_TRUE(QJson::deserialize(kJson, &actual));
+    ASSERT_EQ(actual, expected)
+        << "\nactual: " << QJson::serialized(actual).toStdString()
+        << "\nexpected: " << QJson::serialized(expected).toStdString();
 }

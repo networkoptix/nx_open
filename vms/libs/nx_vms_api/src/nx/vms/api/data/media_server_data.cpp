@@ -41,7 +41,7 @@ nx::reflect::DeserializationResult deserialize(
 
     for (int i = 0; i < (int) context.value.Size(); ++i)
     {
-        const auto& item = context.value[i];
+        auto& item = context.value[i];
         if (!item.IsObject())
         {
             return {false, "Invalid BackupBitratePerSecond format",

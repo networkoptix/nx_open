@@ -2,7 +2,7 @@
 
 #include "outgoing_processor.h"
 
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/reflect/json.h>
 
 namespace std {
 
@@ -26,21 +26,24 @@ static OutgoingProcessor::Id toId(const ResponseId& id)
 
 void OutgoingProcessor::clear(SystemError::ErrorCode error)
 {
-    auto response = Response::makeError(std::nullptr_t(),
-        {Error::transportError,
-            NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
-                .toStdString()});
+    auto response =
+        [error](const auto& id)
+        {
+            return Response::makeError(
+                std::holds_alternative<int>(id)
+                    ? ResponseId{std::get<int>(id)}
+                    : ResponseId{std::get<QString>(std::move(id))},
+                Error::transportError,
+                    NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
+                        .toStdString());
+        };
     for (const auto& [id, handler]: m_awaitingResponses)
     {
         NX_DEBUG(this, "Terminating response with %1 id", id);
         if (!handler)
             continue;
 
-        if (std::holds_alternative<int>(id))
-            response.id = std::get<int>(id);
-        else
-            response.id = std::get<QString>(id);
-        handler(response);
+        handler(response(id));
     }
     m_awaitingResponses.clear();
     for (auto& [key, batchResponse]: m_awaitingBatchResponseHolder)
@@ -51,13 +54,7 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
 
         std::vector<Response> responses;
         for (auto& id: batchResponse.ids)
-        {
-            if (std::holds_alternative<int>(id))
-                response.id = std::get<int>(id);
-            else
-                response.id = std::get<QString>(std::move(id));
-            responses.push_back(response);
-        }
+            responses.push_back(response(id));
         responses.insert(responses.end(),
             std::make_move_iterator(batchResponse.errors.begin()),
             std::make_move_iterator(batchResponse.errors.end()));
@@ -67,7 +64,7 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
 }
 
 void OutgoingProcessor::processRequest(
-    Request request, ResponseHandler handler, QByteArray serializedRequest)
+    Request request, ResponseHandler handler, std::string serializedRequest)
 {
     if (!request.id)
     {
@@ -85,7 +82,7 @@ void OutgoingProcessor::processRequest(
         if (handler)
         {
             handler(Response::makeError(request.responseId(),
-                {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
+                Error::invalidRequest, "Invalid parameter 'id': Already used"));
         }
         return;
     }
@@ -115,7 +112,7 @@ void OutgoingProcessor::processBatchRequest(
             NX_DEBUG(this, "Id %1 is already used", id);
             awaitingResponse.errors.emplace_back(
                 Response::makeError(jsonRpcRequest.responseId(),
-                    {Error::invalidRequest, "Invalid parameter 'id': Already used"}));
+                    Error::invalidRequest, "Invalid parameter 'id': Already used"));
             continue;
         }
 
@@ -124,8 +121,8 @@ void OutgoingProcessor::processBatchRequest(
             NX_DEBUG(this, "Id %1 is already used in this batch request", id);
             awaitingResponse.errors.emplace_back(
                 Response::makeError(jsonRpcRequest.responseId(),
-                    {Error::invalidRequest,
-                        "Invalid parameter 'id': Already used in this batch request"}));
+                    Error::invalidRequest,
+                        "Invalid parameter 'id': Already used in this batch request"));
             continue;
         }
 
@@ -180,103 +177,114 @@ void OutgoingProcessor::processBatchRequest(
     send(std::move(goodRequests));
 }
 
-void OutgoingProcessor::send(
-    Request request, QByteArray serializedRequest) const
+void OutgoingProcessor::send(Request request, std::string serializedRequest) const
 {
     NX_ASSERT_HEAVY_CONDITION(
-        serializedRequest.isEmpty() || serializedRequest == QJson::serialized(request),
-        "Request: `%1`, serialized: `%2`", QJson::serialized(request), serializedRequest);
-    if (serializedRequest.isEmpty())
-        serializedRequest = QJson::serialized(request);
+        serializedRequest.empty() || serializedRequest == nx::reflect::json::serialize(request),
+        "Request: `%1`, serialized: `%2`", nx::reflect::json::serialize(request), serializedRequest);
+    if (serializedRequest.empty())
+        serializedRequest = nx::reflect::json::serialize(request);
     m_sendFunc(std::move(serializedRequest));
 }
 
-void OutgoingProcessor::send(
-    std::vector<Request> jsonRpcRequests) const
+void OutgoingProcessor::send(std::vector<Request> requests) const
 {
-    m_sendFunc(QJson::serialized(jsonRpcRequests));
+    m_sendFunc(nx::reflect::json::serialize(requests));
 }
 
-void OutgoingProcessor::onResponse(const QJsonValue& data)
+void OutgoingProcessor::onResponse(rapidjson::Document data)
 {
-    if (data.isArray())
+    if (data.IsArray())
     {
-        onResponse(data.toArray());
+        onArrayResponse(std::move(data));
         return;
     }
 
-    Response jsonRpcResponse;
-    if (!QJson::deserialize(data, &jsonRpcResponse))
+    Response response{.document = std::make_shared<rapidjson::Document>(std::move(data))};
+    if (!response.deserialize(*response.document))
     {
-        NX_DEBUG(this, "Failed to deserialize response: %1", data);
-        jsonRpcResponse.error = Error{
-            Error::parseError, "Failed to deserialize response", data};
+        NX_DEBUG(this,
+            "Failed to deserialize response: %1",
+            nx::reflect::json_detail::getStringRepresentation(*response.document));
+        response.error =
+            Error{Error::parseError, "Failed to deserialize response", &*response.document};
     }
 
-    if (std::holds_alternative<std::nullptr_t>(jsonRpcResponse.id))
+    if (std::holds_alternative<std::nullptr_t>(response.id))
     {
         if (m_awaitingResponses.size() == 1)
         {
-            NX_DEBUG(this, "Apply %1 response to any previously sent request", data);
+            NX_DEBUG(this,
+                "Apply %1 response to any previously sent request",
+                nx::reflect::json_detail::getStringRepresentation(*response.document));
             auto handler = std::move(m_awaitingResponses.begin()->second);
             m_awaitingResponses.clear();
             if (handler)
-                handler(std::move(jsonRpcResponse));
+                handler(std::move(response));
         }
         else
         {
-            NX_DEBUG(this, "Ignore null or invalid response: %1", data);
+            NX_DEBUG(this,
+                "Ignore null or invalid response: %1",
+                nx::reflect::json_detail::getStringRepresentation(*response.document));
         }
         return;
     }
 
-    const auto id = toId(jsonRpcResponse.id);
+    const auto id = toId(response.id);
     if (auto it = m_awaitingResponses.find(id); it != m_awaitingResponses.end())
     {
         NX_DEBUG(this, "Received response with %1 id", id);
         auto handler = std::move(it->second);
         m_awaitingResponses.erase(it);
         if (handler)
-            handler(std::move(jsonRpcResponse));
+            handler(std::move(response));
         return;
     }
 
-    NX_DEBUG(this, "Ignore response without request: %1", data);
+    NX_DEBUG(this,
+        "Ignore response without request: %1",
+        nx::reflect::json_detail::getStringRepresentation(*response.document));
 }
 
-void OutgoingProcessor::onResponse(const QJsonArray& list)
+void OutgoingProcessor::onArrayResponse(rapidjson::Document list)
 {
     std::set<Key> batchResponseKeys;
     std::unordered_map<Id, Response> idResponses;
     std::vector<Response> nullResponses;
-    for (int i = 0; i < list.size(); ++i)
+    auto holder{std::make_shared<rapidjson::Document>(std::move(list))};
+    for (int i = 0; i < (int) holder->Size(); ++i)
     {
-        Response jsonRpcResponse;
-        if (!QJson::deserialize(list[i], &jsonRpcResponse))
+        Response response{.document = holder};
+        if (!response.deserialize((*holder)[i]))
         {
-            NX_DEBUG(this, "Failed to deserialize response item %1: %2", i, list);
-            jsonRpcResponse.error = Error{Error::parseError,
+            NX_DEBUG(this,
+                "Failed to deserialize response item %1: %2", i,
+                nx::reflect::json_detail::getStringRepresentation(*holder));
+            response.error = Error{Error::parseError,
                 NX_FMT("Failed to deserialize response item %1", i).toStdString(),
-                list};
-            nullResponses.push_back(std::move(jsonRpcResponse));
+                &*holder};
+            nullResponses.push_back(std::move(response));
             continue;
         }
 
-        if (std::holds_alternative<std::nullptr_t>(jsonRpcResponse.id))
+        if (std::holds_alternative<std::nullptr_t>(response.id))
         {
-            nullResponses.push_back(std::move(jsonRpcResponse));
+            nullResponses.push_back(std::move(response));
             continue;
         }
 
-        auto id = toId(jsonRpcResponse.id);
+        auto id = toId(response.id);
         auto it = m_awaitingBatchResponses.find(id);
         if (it == m_awaitingBatchResponses.end())
         {
-            NX_DEBUG(this, "Ignore not-requested batch response item %1: %2", i, list);
+            NX_DEBUG(this,
+                "Ignore not-requested batch response item %1: %2", i,
+                nx::reflect::json_detail::getStringRepresentation(*holder));
             continue;
         }
 
-        idResponses.insert({std::move(id), std::move(jsonRpcResponse)});
+        idResponses.insert({std::move(id), std::move(response)});
         batchResponseKeys.insert(it->second);
         m_awaitingBatchResponses.erase(it);
     }
@@ -300,12 +308,18 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
 
     if (batchResponseKeys.empty())
     {
-        NX_DEBUG(this, "Ignore null or invalid batch response: %1", list);
+        NX_DEBUG(this,
+            "Ignore null or invalid batch response: %1",
+            nx::reflect::json_detail::getStringRepresentation(*holder));
         return;
     }
 
     if (batchResponseKeys.size() != 1)
-        NX_DEBUG(this, "Mixed ids of %1 batch requests in response: %1", batchResponseKeys, list);
+    {
+        NX_DEBUG(this,
+            "Mixed ids of %1 batch requests in response: %1", batchResponseKeys,
+            nx::reflect::json_detail::getStringRepresentation(*holder));
+    }
 
     for (Key batchResponseKey: batchResponseKeys)
     {
@@ -325,13 +339,14 @@ void OutgoingProcessor::onResponse(const QJsonArray& list)
             for (const auto& id: it->second.ids)
             {
                 if (auto it = idResponses.find(id); it != idResponses.end())
-                    jsonRpcResponses.push_back(it->second);
+                    jsonRpcResponses.push_back(std::move(it->second));
             }
             jsonRpcResponses.insert(jsonRpcResponses.end(),
                 std::make_move_iterator(it->second.errors.begin()),
                 std::make_move_iterator(it->second.errors.end()));
-            jsonRpcResponses.insert(
-                jsonRpcResponses.end(), nullResponses.begin(), nullResponses.end());
+            jsonRpcResponses.insert(jsonRpcResponses.end(),
+                std::make_move_iterator(nullResponses.begin()),
+                std::make_move_iterator(nullResponses.end()));
         }
         m_awaitingBatchResponseHolder.erase(it);
         if (handler)

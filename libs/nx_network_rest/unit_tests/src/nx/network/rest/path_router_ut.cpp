@@ -5,6 +5,7 @@
 #include <nx/network/rest/handler.h>
 #include <nx/network/rest/handler_pool.h>
 #include <nx/network/rest/path_router.h>
+#include <nx/utils/serialization/qjson.h>
 
 namespace nx::network::rest::test {
 
@@ -179,8 +180,8 @@ TEST_F(PathRouterTest, Route)
                 if (type == jsonRpc)
                 {
                     request = std::make_unique<Request>(
-                        Request::JsonRpcContext{{.method = data.testPath[type].toStdString(),
-                            .params = data.params.toJson()}},
+                        Request::JsonRpcContext{nx::json_rpc::Request::create(
+                            /*id*/ {}, data.testPath[type].toStdString(), data.params.toJson())},
                         kSystemSession);
                 }
                 else

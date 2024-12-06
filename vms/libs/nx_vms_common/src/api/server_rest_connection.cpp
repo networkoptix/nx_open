@@ -64,6 +64,65 @@
 
 using namespace nx;
 
+namespace rest {
+
+using JsonRpcResultType =
+    std::variant<nx::json_rpc::Response, std::vector<nx::json_rpc::Response>>;
+
+} // namespace rest
+
+namespace nx::reflect::json {
+
+static DeserializationResult deserialize(
+    const std::string_view& json,
+    rest::JsonRpcResultType* data,
+    DeserializationFlag skipErrors = json::DeserializationFlag::none)
+{
+    auto document{std::make_shared<rapidjson::Document>()};
+    document->Parse(json.data(), json.size());
+    if (document->HasParseError())
+    {
+        return DeserializationResult(
+            false, json_detail::parseErrorToString(*document), std::string(json));
+    }
+
+    if (document->IsObject())
+    {
+        nx::json_rpc::Response response{std::move(document)};
+        auto r{response.deserialize(*response.document)};
+        if (r)
+        {
+            *data = std::move(response);
+            return {};
+        }
+        return r;
+    }
+
+    if (!document->IsArray())
+        return DeserializationResult(false, "Must be array or object", std::string{json});
+
+    std::vector<nx::json_rpc::Response> responses;
+    responses.reserve(document->Size());
+    for (int i = 0; i < (int) document->Size(); ++i)
+    {
+        nx::json_rpc::Response response{.document = document};
+        auto r{response.deserialize((*document)[i])};
+        if (!r)
+        {
+            return DeserializationResult(false,
+                NX_FMT("Failed to deserialize response item %1: %2", i, r.errorDescription)
+                    .toStdString(),
+                r.firstBadFragment,
+                r.firstNonDeserializedField);
+        }
+        responses.push_back(std::move(response));
+    }
+    *data = responses;
+    return {};
+}
+
+} // namespace nx::reflect::json
+
 namespace {
 
 constexpr int kMessageBodyLogSize = 50;
@@ -278,7 +337,7 @@ static bool isSessionExpiredError(nx::network::rest::ErrorId code)
         || code == nx::network::rest::ErrorId::sessionRequired;
 }
 
-static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
+static bool isSessionExpiredError(const nx::json_rpc::Response& response)
 {
     if (!response.error)
         return false;
@@ -286,8 +345,11 @@ static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
         return false;
 
     nx::network::rest::Result result;
-    if (!QJson::deserialize(*response.error->data, &result))
+    if (!nx::reflect::json::deserialize(
+        nx::reflect::json::DeserializationContext{*response.error->data}, &result))
+    {
         return false;
+    }
 
     return isSessionExpiredError(result.errorId);
 }
@@ -1599,10 +1661,6 @@ Handle ServerConnection::postJsonResult(
         proxyToServer);
 }
 
-using JsonRpcResultType = std::variant<
-    nx::vms::api::JsonRpcResponse,
-    std::vector<nx::vms::api::JsonRpcResponse>>;
-
 using JsonRpcRequestIdType = decltype(nx::vms::api::JsonRpcRequest::id);
 using JsonRpcResponseIdType = decltype(nx::vms::api::JsonRpcResponse::id);
 
@@ -1647,20 +1705,15 @@ bool mergeJsonRpcResults(
         // Server could not handle the request.
         if (const auto error = std::get_if<nx::network::rest::Result>(&result))
         {
-            QJsonValue data;
-            QJson::serialize(error, &data);
-
             // For all requests with expired session fill in error from single rest::Result.
             for (auto& response: originalResponse)
             {
                 if (isSessionExpiredError(response))
                 {
-                    response.result = {};
-                    response.error = vms::api::JsonRpcError{
-                        nx::vms::api::JsonRpcError::applicationError,
+                    response = nx::json_rpc::Response::makeError(response.id,
+                        nx::json_rpc::Error::applicationError,
                         error->errorString.toStdString(),
-                        data
-                    };
+                        *error);
                 }
             }
             return true;
@@ -1721,7 +1774,7 @@ Handle ServerConnection::jsonRpcBatchCall(
         nx::network::http::Method::post,
         prepareUrl(kJsonRpcPath, /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
-        QJson::serialized(requests));
+        nx::reflect::json::serialize(requests));
 
     auto internalCallback =
         [callback = std::move(callback)](
@@ -1746,18 +1799,11 @@ Handle ServerConnection::jsonRpcBatchCall(
 
             if (const auto error = std::get_if<nx::network::rest::Result>(&result))
             {
-                nx::vms::api::JsonRpcResponse rpcError;
-
-                QJsonValue data;
-                QJson::serialize(error, &data);
-
-                rpcError.error = vms::api::JsonRpcError{
-                    nx::vms::api::JsonRpcError::applicationError,
+                callback(success, requestId, {nx::json_rpc::Response::makeError(
+                    std::nullptr_t{},
+                    nx::json_rpc::Error::applicationError,
                     error->errorString.toStdString(),
-                    data
-                };
-
-                callback(success, requestId, {rpcError});
+                    *error)});
                 return;
             }
 

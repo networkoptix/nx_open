@@ -627,9 +627,9 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
 
             auto content = request->content()
                 ? request->content()->parseOrThrow()
-                : request->jsonRpcContext()
-                    ? request->jsonRpcContext()->request.params.value_or(QJsonValue::Undefined)
-                    : QJsonValue::Undefined;
+                : request->jsonRpcContext() && request->jsonRpcContext()->request.params
+                    ? serialized(*request->jsonRpcContext()->request.params)
+                    : QJsonValue{QJsonValue::Undefined};
             if (content.isUndefined())
             {
                 if (isRequired(body))

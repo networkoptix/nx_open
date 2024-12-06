@@ -102,7 +102,7 @@ TEST(NxFusion, JsonFailedDeserializeStringAsDouble)
         QJson::deserializeOrThrow<TYPE>(QByteArray(VALUE)); \
         FAIL() << "Exception was not thrown"; \
     } \
-    catch (const QJson::EXCEPTION& e) \
+    catch (const nx::utils::serialization::json::EXCEPTION& e) \
     { \
         EXPECT_EQ(e.message(), MESSAGE); \
     } \

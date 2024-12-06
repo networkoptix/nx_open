@@ -2,43 +2,39 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/fusion/serialization/json_functions.h>
 #include <nx/json_rpc/detail/outgoing_processor.h>
+#include <nx/utils/serialization/qjson.h>
 
 namespace nx::json_rpc::test {
 
 TEST(OutgoingProcessor, batchRequest)
 {
-    std::vector<Request> requests(2);
-    requests[0].id = 1;
-    requests[0].method = "method1";
-    requests[1].id = "2";
-    requests[1].method = "method2";
-    std::vector<Response> responses(2);
-    responses[0].id = "2";
-    responses[0].result = QJsonValue();
-    responses[1].id = 1;
-    responses[1].result = QJsonValue();
-    QJsonValue responseJson;
-    QJson::serialize(responses, &responseJson);
+    std::vector<Request> requests{
+        Request::create(1, "method1", QJsonObject{}),
+        Request::create("2", "method2", QJsonArray{})};
+    std::vector<Response> responses{
+        Response::makeResult("2", QJsonArray{}),
+        Response::makeResult(1, QJsonObject{})};
+    auto responseJson{
+        nx::utils::serialization::json::serialized(responses, /*stripDefault*/ false)};
 
     detail::OutgoingProcessor processor(
         [](auto value)
         {
-            ASSERT_EQ(value.toStdString(),
-                "[{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"method1\"},"
-                "{\"id\":\"2\",\"jsonrpc\":\"2.0\",\"method\":\"method2\"}]");
+            ASSERT_EQ(value,
+                "[{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"method1\",\"params\":{}},"
+                "{\"jsonrpc\":\"2.0\",\"id\":\"2\",\"method\":\"method2\",\"params\":[]}]");
         });
     std::vector<Response> expectedResponses;
     processor.processBatchRequest(
         requests, [&expectedResponses](auto value) { expectedResponses = std::move(value); });
-    processor.onResponse(responseJson);
+    processor.onResponse(std::move(responseJson));
     ASSERT_EQ(
-        QJson::serialized(expectedResponses[0]).toStdString(),
-        QJson::serialized(responses[1]).toStdString());
+        nx::reflect::json::serialize(expectedResponses[0]),
+        nx::reflect::json::serialize(responses[1]));
     ASSERT_EQ(
-        QJson::serialized(expectedResponses[1]).toStdString(),
-        QJson::serialized(responses[0]).toStdString());
+        nx::reflect::json::serialize(expectedResponses[1]),
+        nx::reflect::json::serialize(responses[0]));
 }
 
 } // namespace nx::json_rpc::test

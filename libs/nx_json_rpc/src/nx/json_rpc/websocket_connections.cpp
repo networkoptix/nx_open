@@ -39,13 +39,13 @@ void WebSocketConnections::executeAsync(
                     catch (const std::exception& e)
                     {
                         return nx::json_rpc::Response::makeError(responseId,
-                            {Error::internalError,
-                                NX_FMT("Unhandled exception: %1", e.what()).toStdString()});
+                            Error::internalError,
+                                NX_FMT("Unhandled exception: %1", e.what()).toStdString());
                     }
                     catch (...)
                     {
                         return nx::json_rpc::Response::makeError(
-                            responseId, {Error::internalError, "Unhandled exception"});
+                            responseId, Error::internalError, "Unhandled exception");
                     }
                 }();
             if (auto connection = weakConnection.lock())
@@ -100,8 +100,8 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
                 }
             }
 
-            handler(Response::makeError(request.responseId(),
-                {Error::methodNotFound, "Unsupported method"}));
+            handler(Response::makeError(
+                request.responseId(), Error::methodNotFound, "Unsupported method"));
         });
     {
         NX_MUTEX_LOCKER lock(&m_mutex);

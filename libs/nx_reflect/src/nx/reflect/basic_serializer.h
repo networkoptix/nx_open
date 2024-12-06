@@ -320,9 +320,17 @@ private:
     template<typename Value>
     void writeAttribute(const char* name, const Value& value)
     {
-        m_ctx->composer.writeAttributeName(name);
-        BasicSerializer::serializeAdl(m_ctx, value);
-        ++m_attributes;
+        if constexpr (std::is_pointer_v<Value>)
+        {
+            if (value)
+                writeAttribute(name, *value);
+        }
+        else
+        {
+            m_ctx->composer.writeAttributeName(name);
+            BasicSerializer::serializeAdl(m_ctx, value);
+            ++m_attributes;
+        }
     }
 };
 

@@ -15,6 +15,11 @@ namespace nx::utils::reflect {
 // that are returned from a rapidjson::Value are valid until their allocator lives in their
 // rapidjson::Document used to parse the DOM.
 
+inline std::string toString(rapidjson::Value& value)
+{
+    return nx::reflect::json_detail::getStringRepresentation(value);
+}
+
 inline std::string toString(const rapidjson::Value& value)
 {
     return nx::reflect::json_detail::getStringRepresentation(value);
@@ -43,7 +48,21 @@ inline rapidjson::Value::Object asObject(rapidjson::Value& value, const QString&
     return value.GetObject();
 }
 
+inline rapidjson::Value::ConstObject asObject(
+    const rapidjson::Value& value, const QString& assertMessage = {})
+{
+    NX_ASSERT(value.IsObject(), "%1 is not an object (%2)", toString(value), assertMessage);
+    return value.GetObject();
+}
+
 inline rapidjson::Value::Array asArray(rapidjson::Value& value, const QString& assertMessage = {})
+{
+    NX_ASSERT(value.IsArray(), "%1 is not an array (%2)", toString(value), assertMessage);
+    return value.GetArray();
+}
+
+inline rapidjson::Value::ConstArray asArray(
+    const rapidjson::Value& value, const QString& assertMessage = {})
 {
     NX_ASSERT(value.IsArray(), "%1 is not an array (%2)", toString(value), assertMessage);
     return value.GetArray();
@@ -73,8 +92,28 @@ inline rapidjson::Value& getField(
     return object[key.s]; //< Use rapidjson::Value::Object adhoc.
 }
 
+inline const rapidjson::Value& getField(
+    rapidjson::Value::ConstObject object,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    if (auto it = object.FindMember(key); it != object.MemberEnd())
+        return it->value;
+
+    NX_ASSERT(false, "No field '%1' in %2 (%3)", key.s, toString(object), assertMessage);
+    return object[key.s]; //< Use rapidjson::Value::Object adhoc.
+}
+
 inline rapidjson::Value::Object getObject(
     rapidjson::Value::Object object,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return asObject(getField(object, std::move(key), assertMessage), assertMessage);
+}
+
+inline rapidjson::Value::ConstObject getObject(
+    rapidjson::Value::ConstObject object,
     rapidjson::Value::StringRefType key,
     const QString& assertMessage = {})
 {
@@ -89,6 +128,14 @@ inline rapidjson::Value::Object getObject(
     return getObject(asObject(value, assertMessage), std::move(key), assertMessage);
 }
 
+inline rapidjson::Value::ConstObject getObject(
+    const rapidjson::Value& value,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return getObject(asObject(value, assertMessage), std::move(key), assertMessage);
+}
+
 inline rapidjson::Value::Array getArray(
     rapidjson::Value::Object object,
     rapidjson::Value::StringRefType key,
@@ -97,8 +144,24 @@ inline rapidjson::Value::Array getArray(
     return asArray(getField(object, std::move(key), assertMessage), assertMessage);
 }
 
+inline rapidjson::Value::ConstArray getArray(
+    rapidjson::Value::ConstObject object,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return asArray(getField(object, std::move(key), assertMessage), assertMessage);
+}
+
 inline rapidjson::Value::Array getArray(
     rapidjson::Value& value,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return getArray(asObject(value, assertMessage), std::move(key), assertMessage);
+}
+
+inline rapidjson::Value::ConstArray getArray(
+    const rapidjson::Value& value,
     rapidjson::Value::StringRefType key,
     const QString& assertMessage = {})
 {
@@ -130,7 +193,15 @@ inline std::string getString(
 }
 
 inline std::string getString(
-    rapidjson::Value& value,
+    rapidjson::Value::ConstObject object,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return asString(getField(object, std::move(key), assertMessage), assertMessage);
+}
+
+inline std::string getString(
+    const rapidjson::Value& value,
     rapidjson::Value::StringRefType key,
     const QString& assertMessage = {})
 {
@@ -146,7 +217,17 @@ inline double getDouble(
 }
 
 inline double getDouble(
-    rapidjson::Value& value, rapidjson::Value::StringRefType key, const QString& assertMessage = {})
+    rapidjson::Value::ConstObject object,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return asDouble(getField(object, std::move(key), assertMessage), assertMessage);
+}
+
+inline double getDouble(
+    const rapidjson::Value& value,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
 {
     return getDouble(asObject(value, assertMessage), std::move(key), assertMessage);
 }
@@ -160,7 +241,15 @@ inline bool getBool(
 }
 
 inline bool getBool(
-    rapidjson::Value& value,
+    rapidjson::Value::ConstObject object,
+    rapidjson::Value::StringRefType key,
+    const QString& assertMessage = {})
+{
+    return asBool(getField(object, std::move(key), assertMessage), assertMessage);
+}
+
+inline bool getBool(
+    const rapidjson::Value& value,
     rapidjson::Value::StringRefType key,
     const QString& assertMessage = {})
 {

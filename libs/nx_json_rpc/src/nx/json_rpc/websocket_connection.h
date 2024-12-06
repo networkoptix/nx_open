@@ -25,7 +25,7 @@ public:
     using base_type = nx::network::aio::BasicPollable;
     using ResponseHandler = nx::utils::MoveOnlyFunc<void(Response)>;
     using RequestHandler = nx::utils::MoveOnlyFunc<
-        void(Request, ResponseHandler, WebSocketConnection*)>;
+        void(const Request&, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
     WebSocketConnection(
@@ -38,7 +38,7 @@ public:
     void send(
         Request request,
         ResponseHandler handler = {},
-        QByteArray serializedRequest = {});
+        std::string serializedRequest = {});
 
     using BatchResponseHandler =
         nx::utils::MoveOnlyFunc<void(std::vector<Response>)>;
@@ -52,16 +52,16 @@ private:
     virtual void stopWhileInAioThread() override;
     void readNextMessage();
     void readHandler(const nx::Buffer& buffer);
-    void processRequest(const QJsonValue& data);
+    void processRequest(rapidjson::Document data);
     void processQueuedRequest();
-    void send(QByteArray data);
+    void send(std::string data);
 
 private:
     OnDone m_onDone;
     nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
-    std::queue<QJsonValue> m_queuedRequests;
+    std::queue<rapidjson::Document> m_queuedRequests;
     std::unique_ptr<nx::network::websocket::WebSocket> m_socket;
     std::unordered_map<QString, nx::utils::Guard> m_guards;
 };
