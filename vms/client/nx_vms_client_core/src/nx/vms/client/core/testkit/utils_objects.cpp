@@ -160,24 +160,16 @@ std::pair<QString, QString> nameAndBaseUrl(const QObject* object)
     QString id;
     QUrl contextLocation;
 
-    // Find topmost context with id or at least topmost context base URL.
-    for (auto c = qmlContext(object); c; c = c->parentContext())
+    if (auto c = qmlContext(object))
     {
-        if (const auto name = c->nameForObject(const_cast<QObject*>(object)); !name.isEmpty())
+        id = c->nameForObject(const_cast<QObject*>(object));
+
+        if (!id.isEmpty() || !c->baseUrl().isEmpty())
         {
-            id = name;
             contextLocation = c->baseUrl();
-        }
-        else if (id.isEmpty())
-        {
-            if (const auto baseUrl = c->baseUrl(); !baseUrl.isEmpty())
-                contextLocation = baseUrl;
+            return {id, contextLocation.toString()};
         }
     }
-
-    if (!id.isEmpty() || !contextLocation.isEmpty())
-        return {id, contextLocation.toString()};
-
 
     return {object->objectName(), ""};
 }
