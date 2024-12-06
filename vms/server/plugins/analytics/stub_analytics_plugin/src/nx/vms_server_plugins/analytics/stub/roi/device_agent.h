@@ -4,6 +4,8 @@
 
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 
+#include <string>
+
 #include "engine.h"
 #include "stub_analytics_plugin_roi_ini.h"
 
@@ -27,10 +29,15 @@ protected:
         nx::sdk::Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+
     virtual std::string manifestString() const override;
 
 private:
     Engine* const m_engine;
+    std::string m_integrationSideTestPolygonSettingValue;
 };
 
 } // namespace roi

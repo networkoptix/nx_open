@@ -6,6 +6,7 @@
 #include <nx/kit/json.h>
 #include <nx/sdk/helpers/settings_response.h>
 
+#include "device_agent_settings_model.h"
 #include "stub_analytics_plugin_roi_ini.h"
 
 #undef NX_PRINT_PREFIX
@@ -41,28 +42,30 @@ std::string DeviceAgent::manifestString() const
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
+    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
 {
+}
+
+void DeviceAgent::doSetSettings(
+    nx::sdk::Result<const nx::sdk::ISettingsResponse*>* /*outResult*/,
+    const nx::sdk::IStringMap* settings)
+{
+    const char* testPolygon = settings->value(kTestPolygonSettingName.c_str());
+
+    if (testPolygon)
+        m_integrationSideTestPolygonSettingValue = testPolygon;
 }
 
 void DeviceAgent::getIntegrationSideSettings(
     Result<const ISettingsResponse*>* outResult) const
 {
-    const auto response = new SettingsResponse();
-
-    nx::kit::Json::array jsonPoints{
-        nx::kit::Json::array{0.138, 0.551},
-        nx::kit::Json::array{0.775, 0.429},
-        nx::kit::Json::array{0.748, 0.844}};
-
-    nx::kit::Json::object jsonFigure;
-    jsonFigure.insert(std::make_pair("points", jsonPoints));
-
-    nx::kit::Json::object jsonResult;
-    jsonResult.insert(std::make_pair("figure", jsonFigure));
-
-    response->setValue("testPolygon", nx::kit::Json(jsonResult).dump());
-    *outResult = response;
+    // If the test polygon setting was set previously, return it in the response.
+    if (!m_integrationSideTestPolygonSettingValue.empty())
+    {
+        const auto response = new SettingsResponse();
+        response->setValue(kTestPolygonSettingName, m_integrationSideTestPolygonSettingValue);
+        *outResult = response;
+    }
 }
 
 } // namespace roi

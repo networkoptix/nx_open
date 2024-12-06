@@ -10,6 +10,7 @@ namespace analytics {
 namespace stub {
 namespace roi {
 
+static const std::string kTestPolygonSettingName = "testPolygon";
 static const std::string kDeviceAgentSettingsModel = /*suppress newline*/ 1 + R"json(
 {
     "type": "Settings",
@@ -195,7 +196,7 @@ static const std::string kDeviceAgentSettingsModel = /*suppress newline*/ 1 + R"
             [
                 {
                     "type": "PolygonFigure",
-                    "name": "testPolygon",
+                    "name": ")json" + kTestPolygonSettingName + R"json(",
                     "caption": "Polygon outside of a repeater",
                     "description": "The points of this polygon are considered as a Integration-side setting",
                     "minPoints": 3,
