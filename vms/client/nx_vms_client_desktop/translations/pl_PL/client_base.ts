@@ -923,11 +923,11 @@
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation>Zapisz ustawienia</translation>
+      <translation>Zapisz konfigurację okien</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation>Konfiguracja Windows</translation>
+      <translation>Konfiguracja okien</translation>
     </message>
     <message>
       <source>Save Current State</source>
