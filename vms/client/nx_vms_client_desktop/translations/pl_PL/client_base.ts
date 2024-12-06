@@ -991,11 +991,11 @@
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation>Zapisz ustawienia</translation>
+      <translation>Zapisz konfigurację okien</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation>Konfiguracja Windows</translation>
+      <translation>Konfiguracja okien</translation>
     </message>
     <message>
       <source>Save Current State</source>
@@ -5187,7 +5187,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Odizolowany</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -5311,7 +5311,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Odizolowany</translation>
     </message>
     <message>
       <source>Exclusive</source>

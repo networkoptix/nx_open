@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Klucz sesji jest za stary dla tej witryny.</translation>
     </message>
   </context>
   <context>
@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Usługa nieautoryzowana.</translation>
     </message>
   </context>
 </TS>

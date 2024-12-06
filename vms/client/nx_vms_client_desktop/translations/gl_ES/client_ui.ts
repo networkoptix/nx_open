@@ -1856,7 +1856,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Combinar sitios...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -2324,7 +2324,7 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administración do sitio</translation>
     </message>
   </context>
   <context>
@@ -2676,7 +2676,7 @@
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administradores</translation>
     </message>
     <message>
       <source>Available to</source>

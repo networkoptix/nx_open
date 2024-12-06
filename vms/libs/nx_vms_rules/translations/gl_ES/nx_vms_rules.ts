@@ -1152,7 +1152,7 @@
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Selecciona polo menos un deseño</translation>
     </message>
   </context>
   <context>
