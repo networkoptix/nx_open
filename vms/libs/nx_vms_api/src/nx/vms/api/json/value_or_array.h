@@ -30,6 +30,11 @@ struct ValueOrArray
         valueOrArray(vector)
     {}
 
+    bool contains(const T& value) const
+    {
+       return std::ranges::find(valueOrArray, value) != valueOrArray.end();
+    }
+
     bool empty() const { return valueOrArray.empty(); }
 
     bool operator==(const ValueOrArray& origin) const { return valueOrArray == origin.valueOrArray; }

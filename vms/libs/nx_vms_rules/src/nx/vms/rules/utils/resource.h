@@ -58,6 +58,7 @@ UuidList fieldResourceIds(const T& entity, std::string_view fieldName)
     return result;
 }
 
+NX_VMS_RULES_API bool hasResourceField(const ItemDescriptor& manifest, ResourceType type);
 NX_VMS_RULES_API std::string resourceField(const ItemDescriptor& manifest, ResourceType type);
 
 NX_VMS_RULES_API UuidList getDeviceIds(const AggregatedEventPtr& event);

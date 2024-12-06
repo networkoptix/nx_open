@@ -13,6 +13,7 @@
 #include "../manifest.h"
 #include "common.h"
 #include "field.h"
+#include "resource.h"
 
 namespace nx::vms::rules {
 
@@ -84,6 +85,16 @@ bool hasSourceServer(const vms::rules::ItemDescriptor& eventDescriptor)
 bool hasSourceUser(const vms::rules::ItemDescriptor& eventDescriptor)
 {
     return utils::fieldByName(utils::kUserIdFieldName, eventDescriptor).has_value();
+}
+
+bool hasDeviceField(const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    return utils::hasResourceField(eventDescriptor, rules::ResourceType::device);
+}
+
+std::string getDeviceField(const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    return utils::resourceField(eventDescriptor, rules::ResourceType::device);
 }
 
 nx::Uuid sourceId(const BasicEvent* event)

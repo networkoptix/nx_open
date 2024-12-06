@@ -79,9 +79,20 @@ QnVirtualCameraResourceList cameras(
         : context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selection.ids);
 }
 
+bool hasResourceField(const ItemDescriptor& manifest, ResourceType type)
+{
+    for (const auto& [name, desc]: manifest.resources)
+    {
+        if (desc.type == type)
+            return true;
+    }
+
+    return false;
+}
+
 std::string resourceField(const ItemDescriptor& manifest, ResourceType type)
 {
-    for (const auto& [name, desc] : manifest.resources)
+    for (const auto& [name, desc]: manifest.resources)
     {
         if (desc.type == type)
             return name;
