@@ -10,7 +10,3 @@ compiler.cppstd=20
 
 [options]
 icu/*:data_packaging=library
-
-[env]
-libvpx:CC=clang
-libvpx:CXX=clang++

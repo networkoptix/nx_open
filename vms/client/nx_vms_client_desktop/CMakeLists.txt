@@ -242,6 +242,11 @@ if(WINDOWS)
     target_link_libraries(nx_vms_client_desktop PRIVATE d3d9 Winmm Dinput8 dxguid)
 endif()
 
+if(LINUX OR WINDOWS)
+    find_package(VulkanHeaders REQUIRED)
+    target_link_libraries(nx_vms_client_desktop PRIVATE Vulkan::Headers)
+endif()
+
 if(MACOSX)
     find_library(CoreServices_LIBRARY CoreServices)
     mark_as_advanced(CoreServices_LIBRARY)

@@ -69,7 +69,7 @@ class NxOpenConan(ConanFile):
         "onlyUnrevisionedPackages": False,
     }
 
-    ffmpeg_version_and_revision = "7.0.1#ec5bbd0d3035bd795ad103b097a1f5c7"
+    ffmpeg_version_and_revision = "7.0.1#eb88894f5b15d315a9850029c54f2576"
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
@@ -194,6 +194,12 @@ class NxOpenConan(ConanFile):
         if self.settings.os not in ("Android", "iOS"):
             # Qt dependency.
             self.requires("icu/74.2" "#a0ffc2036da25e5dbe72dc941074a6c4")
+            # FFmpeg dependencies.
+            self.requires("ogg/1.3.5" "#00fb0bd978d034d12af5efd5d6921364")
+            self.requires("vorbis/1.3.7" "#0400cbb550b491521361a41c889d5c48")
+            self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
+            self.requires("libvpx/1.14.1" "#fb51b8d71add5751343a0d06ed3bb44e")
+            self.requires("openh264/2.4.1" "#e7846aa3511316c230721ca13fc9a127")
 
         if self.isWindows or self.isLinux:
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
@@ -209,6 +215,7 @@ class NxOpenConan(ConanFile):
                 self.requires("intel-onevpl/23.4.2" "#35a35b4e4db86741752331dce439a71d")
                 self.requires("intel-gmmlib/22.5.2" "#52c5832c9ea9dcc989b58c480de6733a")
                 self.requires("intel-media-driver/23.4.3" "#fc9a92c1f8ef08c7beb2a4c7f69935b1")
+                self.requires("nv-codec-headers/12.1.14.0" "#65e2d80efd67e46fc41f135f2468e3df")
 
                 self.requires("libmysqlclient/8.1.0" "#96475a9cb3a02bbe2626543d0b3d33b7")
 
