@@ -1467,6 +1467,8 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
                 injectResourceList(*messageBox, resourcePool()->getResourcesByIds(peersFailed));
             }
 
+            bool shouldRestartClient = false;
+
             QStringList informativeText;
             if (m_clientUpdateTool->shouldRestartTo(m_updateInfo.info.version))
             {
@@ -1478,8 +1480,9 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
                 }
                 else
                 {
-                    informativeText += tr("%1 will be restarted to the updated version.").arg(
-                        appName);
+                    informativeText +=
+                        tr("%1 will be restarted to the updated version.").arg(appName);
+                    shouldRestartClient = true;
                 }
             }
 
@@ -1489,9 +1492,6 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
             messageBox->addButton(tr("OK"),
                 QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
             messageBox->exec();
-
-            bool shouldRestartClient = m_clientUpdateTool->hasUpdate()
-                && m_clientUpdateTool->shouldRestartTo(m_updateInfo.info.version);
 
             completeClientInstallation(shouldRestartClient);
         }
