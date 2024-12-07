@@ -15,11 +15,11 @@
 
 namespace nx::vms::client::core {
 
-static const QString kInvalidColor = "invalidColor";
-
 class NX_VMS_CLIENT_CORE_API SvgIconColorer
 {
 public:
+    static const QString kInvalidColor;
+
     struct ThemeColorsRemapData
     {
         QString primary = kInvalidColor;

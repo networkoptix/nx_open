@@ -2,8 +2,6 @@
 
 #include "svg_icon_colorer.h"
 
-#include <functional>
-
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QFileInfo>
 #include <QtCore/QMap>
@@ -116,7 +114,7 @@ QByteArray substituteColors(
                 themeSubstitutions.contains(_class))
             {
                 QColor value;
-                if (NX_ASSERT(themeSubstitutions[_class] != kInvalidColor,
+                if (NX_ASSERT(themeSubstitutions[_class] != SvgIconColorer::kInvalidColor,
                     "Color theme is missing for icon, %1 is not specified", _class))
                 {
                     if (colorTheme()->hasColor(themeSubstitutions[_class]))
@@ -156,6 +154,8 @@ QByteArray substituteColors(
 }
 
 } // namespace
+
+const QString SvgIconColorer::kInvalidColor = "invalidColor";
 
 static const SvgIconColorer::ThemeColorsRemapData kUnspecified;
 
