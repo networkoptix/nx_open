@@ -1,11 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "utils.h"
+
 #include "windows.h"
 
-#include <QtGui/QGuiApplication>
+#include <ranges>
 
-#include <range/v3/view/reverse.hpp>
+#include <QtGui/QGuiApplication>
 
 namespace nx::vms::client::core::testkit::utils {
 
@@ -127,7 +128,7 @@ void sendKeySequence(const QStringList& keyList, const KeyOption option)
 
     if (option == KeyType)
     {
-        for (auto key : ranges::reverse_view(keyList))
+        for (auto key: std::ranges::reverse_view(keyList))
         {
             keyQueue.push_back({
                 .type = INPUT_KEYBOARD,

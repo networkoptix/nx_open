@@ -2,7 +2,7 @@
 
 #include "advanced_system_settings_widget.h"
 
-#include <range/v3/algorithm/any_of.hpp>
+#include <algorithm>
 
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
@@ -167,7 +167,7 @@ AdvancedSystemSettingsWidget::~AdvancedSystemSettingsWidget()
 
 bool AdvancedSystemSettingsWidget::isNetworkRequestRunning() const
 {
-    return ranges::any_of(d->tabs(), [](auto tab) { return tab->isNetworkRequestRunning(); });
+    return std::ranges::any_of(d->tabs(), [](auto tab) { return tab->isNetworkRequestRunning(); });
 }
 
 bool AdvancedSystemSettingsWidget::activate(const QUrl& url)

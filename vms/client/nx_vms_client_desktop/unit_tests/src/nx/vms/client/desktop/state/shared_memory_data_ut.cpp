@@ -1,10 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <ranges>
+#include <algorithm>
 
 #include <gtest/gtest.h>
-
-#include <range/v3/algorithm/copy.hpp>
 
 #include <nx/vms/client/desktop/state/shared_memory_data.h>
 
@@ -98,7 +96,7 @@ TEST(SharedMemoryDataFilters, exceptPids)
     }};
 
     QVector<Process> result;
-    ranges::copy(processes | exceptPids({0, 1, 3}), std::back_inserter(result));
+    std::ranges::copy(processes | exceptPids({0, 1, 3}), std::back_inserter(result));
 
     const QVector<Process> expected = {
         processes[1],
@@ -118,7 +116,7 @@ TEST(SharedMemoryDataFilters, withinSession)
     }};
 
     QVector<Process> result;
-    ranges::copy(processes | withinSession(sessionId2), std::back_inserter(result));
+    std::ranges::copy(processes | withinSession(sessionId2), std::back_inserter(result));
 
     const QVector<Process> expected = {
         processes[1],
@@ -138,7 +136,7 @@ TEST(SharedMemoryDataFilters, all)
     }};
 
     SharedMemoryData::Processes result;
-    ranges::copy(processes | all(), result.begin());
+    std::ranges::copy(processes | all(), result.begin());
 
     ASSERT_EQ(result, processes);
 }

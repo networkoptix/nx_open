@@ -2,9 +2,7 @@
 
 #include "user_management_tab_widget.h"
 
-#include <functional>
-
-#include <range/v3/algorithm/any_of.hpp>
+#include <algorithm>
 
 #include <QtWidgets/QVBoxLayout>
 
@@ -94,7 +92,7 @@ void UserManagementTabWidget::applyChanges()
 
 bool UserManagementTabWidget::hasChanges() const
 {
-    return ranges::any_of(d->tabs(), [](auto tab) { return tab->hasChanges(); });
+    return std::ranges::any_of(d->tabs(), [](auto tab) { return tab->hasChanges(); });
 }
 
 void UserManagementTabWidget::discardChanges()
@@ -106,7 +104,7 @@ void UserManagementTabWidget::discardChanges()
 
 bool UserManagementTabWidget::isNetworkRequestRunning() const
 {
-    return ranges::any_of(d->tabs(), [](auto tab) { return tab->isNetworkRequestRunning(); });
+    return std::ranges::any_of(d->tabs(), [](auto tab) { return tab->isNetworkRequestRunning(); });
 }
 
 void UserManagementTabWidget::manageDigestUsers()

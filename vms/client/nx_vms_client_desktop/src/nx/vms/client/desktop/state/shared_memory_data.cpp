@@ -2,7 +2,8 @@
 
 #include "shared_memory_data.h"
 
-#include <range/v3/algorithm/find_if.hpp>
+#include <algorithm>
+#include <ranges>
 
 #include <nx/reflect/json.h>
 #include <nx/utils/log/assert.h>
@@ -20,7 +21,7 @@ namespace nx::vms::client::desktop {
 
 const SharedMemoryData::Process* SharedMemoryData::findProcess(PidType pid) const
 {
-    auto process = ranges::find_if(processes,
+    auto process = std::ranges::find_if(processes,
         [=](const Process& process) { return process.pid == pid; });
 
     return process != processes.end() ? &(*process) : nullptr;
@@ -46,7 +47,7 @@ SharedMemoryData::Process* SharedMemoryData::addProcess(PidType pid)
 
 const SharedMemoryData::Session* SharedMemoryData::findSession(SessionId sessionId) const
 {
-    auto session = ranges::find_if(sessions,
+    auto session = std::ranges::find_if(sessions,
         [&](const Session& session) { return session.id == sessionId; });
 
     return session != sessions.end() ? &(*session) : nullptr;
@@ -88,7 +89,7 @@ const SharedMemoryData::Session* SharedMemoryData::findProcessSession(PidType pi
 const SharedMemoryData::CloudUserSession* SharedMemoryData::findCloudUserSession(
     CloudUserName cloudUserName) const
 {
-    auto cloudUserSession = ranges::find_if(cloudUserSessions,
+    auto cloudUserSession = std::ranges::find_if(cloudUserSessions,
         [&](const CloudUserSession& cloudUserSession)
         {
             return cloudUserSession.cloudUserName == cloudUserName;
@@ -153,19 +154,19 @@ using Process = SharedMemoryData::Process;
 
 PipeFilterType exceptPids(const QSet<SharedMemoryData::PidType>& pids)
 {
-    return ranges::views::filter(ProcessPredicate(
+    return std::ranges::views::filter(ProcessPredicate(
         [=](const SharedMemoryData::Process& process) { return !pids.contains(process.pid); }));
 }
 
 PipeFilterType withinSession(const SessionId& sessionId)
 {
-    return ranges::views::filter(ProcessPredicate(
+    return std::ranges::views::filter(ProcessPredicate(
         [=](const Process& process) { return process.sessionId == sessionId; }));
 }
 
 PipeFilterType all()
 {
-    return ranges::views::filter(ProcessPredicate([](const Process&) { return true; }));
+    return std::ranges::views::filter(ProcessPredicate([](const Process&) { return true; }));
 }
 
 } // namespace shared_memory

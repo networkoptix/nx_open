@@ -2,9 +2,7 @@
 
 #include "lookup_list_entries_model_p.h"
 
-#include <range/v3/algorithm/any_of.hpp>
-#include <range/v3/algorithm/contains.hpp>
-#include <range/v3/algorithm/find_if.hpp>
+#include <algorithm>
 
 #include <nx/reflect/json/deserializer.h>
 #include <nx/utils/log/log.h>
@@ -281,7 +279,7 @@ QVector<int> LookupListEntriesModel::Private::removeIncorrectColumnValues()
             row,
             [&](const auto& entry) { return !isValidValue(entry.second, entry.first); });
 
-        const bool hasAtLeastOneValidValue = ranges::any_of(
+        const bool hasAtLeastOneValidValue = std::ranges::any_of(
             row,
             [&](const auto& entry)
             {
@@ -301,7 +299,7 @@ bool LookupListEntriesModel::Private::isValidValue(const QString& value, const Q
 
     const auto& displayedAttributes = data->rawData().attributeNames;
 
-    if (!ranges::contains(displayedAttributes, attributeName))
+    if (std::ranges::find(displayedAttributes, attributeName) == displayedAttributes.end())
         return false; //< There is no such attribute name in displayed columns.
 
     if (value.isEmpty())

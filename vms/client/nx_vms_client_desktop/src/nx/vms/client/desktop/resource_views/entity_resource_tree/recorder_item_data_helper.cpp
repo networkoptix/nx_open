@@ -2,7 +2,7 @@
 
 #include "recorder_item_data_helper.h"
 
-#include <range/v3/algorithm/any_of.hpp>
+#include <algorithm>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -81,7 +81,7 @@ int RecorderItemDataHelper::iconKey(const QString& recorderGroupId) const
         return QnResourceIconCache::Recorder;
 
     const bool anyOfCameraOnline =
-        ranges::any_of(camerasSet, [](const auto& camera) { return camera->isOnline(); });
+        std::ranges::any_of(camerasSet, [](const auto& camera) { return camera->isOnline(); });
 
     return anyOfCameraOnline
         ? QnResourceIconCache::MultisensorCamera

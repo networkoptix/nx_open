@@ -12,8 +12,7 @@
 
 #include <array>
 #include <functional>
-
-#include <range/v3/view/filter.hpp>
+#include <ranges>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QSet>
@@ -189,7 +188,7 @@ NX_VMS_CLIENT_DESKTOP_API void PrintTo(SharedMemoryData::Session session, ::std:
 namespace shared_memory {
 
 using ProcessPredicate = std::function<bool(const SharedMemoryData::Process&)>;
-using PipeFilterType = decltype(ranges::views::filter(ProcessPredicate{}));
+using PipeFilterType = decltype(std::ranges::views::filter(ProcessPredicate{}));
 
 /**
  * Creates a filter to except pids.

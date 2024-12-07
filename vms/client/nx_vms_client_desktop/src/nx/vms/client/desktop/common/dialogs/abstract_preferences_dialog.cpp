@@ -2,8 +2,7 @@
 
 #include "abstract_preferences_dialog.h"
 
-#include <range/v3/algorithm/all_of.hpp>
-#include <range/v3/algorithm/any_of.hpp>
+#include <algorithm>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QPushButton>
@@ -171,14 +170,14 @@ bool AbstractPreferencesDialog::canApplyChanges() const
     if (isReadOnly())
         return false;
 
-    return ranges::all_of(preferencesPages(),
+    return std::ranges::all_of(preferencesPages(),
         [](const auto& page)
         { return !page.enabled || !page.visible || page.preferencesWidget->canApplyChanges(); });
 }
 
 bool AbstractPreferencesDialog::isNetworkRequestRunning() const
 {
-    return ranges::any_of(preferencesPages(),
+    return std::ranges::any_of(preferencesPages(),
         [](const auto& page) { return page.preferencesWidget->isNetworkRequestRunning(); });
 }
 
@@ -187,7 +186,7 @@ bool AbstractPreferencesDialog::hasChanges() const
     if (isReadOnly())
         return false;
 
-    return ranges::any_of(preferencesPages(),
+    return std::ranges::any_of(preferencesPages(),
         [](const auto& page)
         { return page.enabled && page.visible && page.preferencesWidget->hasChanges(); });
 }

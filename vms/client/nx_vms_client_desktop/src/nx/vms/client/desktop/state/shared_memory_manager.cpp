@@ -60,7 +60,7 @@ struct SharedMemoryManager::Private
 
     auto isRunning(bool isRunning) const
     {
-        return exceptPids({0}) | ranges::views::filter(
+        return exceptPids({0}) | std::ranges::views::filter(
             [this, isRunning](const SharedMemoryData::Process& process)
             {
                 return processInterface->isProcessRunning(process.pid) == isRunning;
