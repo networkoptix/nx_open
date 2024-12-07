@@ -42,6 +42,7 @@ struct NX_VMS_UPDATE_API Package
 #define Package_Fields \
     (component)(platform)(customClientVariant)(variants)(file)(size)(md5)(url)(signature)
 
+NX_REFLECTION_INSTRUMENT(Package, Package_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (hash)(json), NX_VMS_UPDATE_API)
 
 NX_REFLECTION_ENUM_CLASS(FindPackageError,
@@ -92,6 +93,7 @@ struct NX_VMS_UPDATE_API PublicationInfo
     (packages) \
     (url)
 
+NX_REFLECTION_INSTRUMENT(PublicationInfo, PublicationInfo_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(PublicationInfo, (json), NX_VMS_UPDATE_API)
 
 } // namespace nx::vms::update

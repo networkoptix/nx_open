@@ -9,7 +9,7 @@
 
 #include <nx/build_info.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/software_version_serialization.h>
 
@@ -42,7 +42,7 @@ struct NX_VMS_UPDATE_API ReleaseInfo
     (release_delivery_days) \
     (availableForReleasesFrom) \
     (availableForReleasesBefore)
-
+NX_REFLECTION_INSTRUMENT(ReleaseInfo, ReleaseInfo_Fields)
 
 struct NX_VMS_UPDATE_API ReleasesInfo
 {
@@ -57,6 +57,7 @@ struct NX_VMS_UPDATE_API ReleasesInfo
         const int protocolVersion) const;
 };
 #define ReleasesInfo_Fields (packages_urls)(releases)
+NX_REFLECTION_INSTRUMENT(ReleasesInfo, ReleasesInfo_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(ReleasesInfo, (json), NX_VMS_UPDATE_API)
 
 } // namespace nx::vms::update

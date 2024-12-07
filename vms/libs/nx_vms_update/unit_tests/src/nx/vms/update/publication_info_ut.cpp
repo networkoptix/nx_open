@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
+#include <nx/reflect/json.h>
 #include <nx/vms/update/publication_info.h>
 
 namespace nx::vms::update::test {
@@ -18,7 +18,7 @@ const nx::utils::OsInfo ubuntu18{"linux_x64", "ubuntu", "18.04"};
 
 TEST(PublicationInfoTest, bestVariantVersionSelection)
 {
-    const auto info = QJson::deserialized<PublicationInfo>(
+    const auto [info, _] = nx::reflect::json::deserialize<PublicationInfo>(
         R"({
             "packages": [
                 {
@@ -49,7 +49,7 @@ TEST(PublicationInfoTest, bestVariantVersionSelection)
 
 TEST(PublicationInfoTest, variantVersionBoundaries)
 {
-    const auto info = QJson::deserialized<PublicationInfo>(
+    const auto [info, _] = nx::reflect::json::deserialize<PublicationInfo>(
         R"({
             "packages": [
                 {
@@ -75,7 +75,7 @@ TEST(PublicationInfoTest, variantVersionBoundaries)
 
 TEST(PublicationInfoTest, emptyOsVersionAndVersionedPackage)
 {
-    const auto info = QJson::deserialized<PublicationInfo>(
+    const auto [info, _] = nx::reflect::json::deserialize<PublicationInfo>(
         R"({
             "packages": [
                 {
@@ -96,7 +96,7 @@ TEST(PublicationInfoTest, emptyOsVersionAndVersionedPackage)
 
 TEST(PublicationInfoTest, preferPackageForCertainVariant)
 {
-    const auto info = QJson::deserialized<PublicationInfo>(
+    const auto [info, _] = nx::reflect::json::deserialize<PublicationInfo>(
         R"({
             "packages": [
                 {
@@ -120,7 +120,7 @@ TEST(PublicationInfoTest, preferPackageForCertainVariant)
 
 TEST(PublicationInfoTest, preferVersionedVariant)
 {
-    const auto info = QJson::deserialized<PublicationInfo>(
+    const auto [info, _] = nx::reflect::json::deserialize<PublicationInfo>(
         R"({
             "packages": [
                 {
@@ -145,7 +145,7 @@ TEST(PublicationInfoTest, preferVersionedVariant)
 
 TEST(PublicationInfoTest, aSyntheticTest)
 {
-    const auto info = QJson::deserialized<PublicationInfo>(
+    const auto [info, _] = nx::reflect::json::deserialize<PublicationInfo>(
         R"({
             "packages": [
                 {

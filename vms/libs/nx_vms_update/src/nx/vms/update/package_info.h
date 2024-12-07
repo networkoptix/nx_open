@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/os_info.h>
 #include <nx/vms/api/data/software_version_serialization.h>
 
@@ -22,6 +22,7 @@ struct NX_VMS_UPDATE_API PlatformVariant
     bool operator==(const PlatformVariant& other) const = default;
 };
 #define PlatformVariant_Fields (name)(minimumVersion)(maximumVersion)
+NX_REFLECTION_INSTRUMENT(PlatformVariant, PlatformVariant_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(PlatformVariant, (hash)(json), NX_VMS_UPDATE_API)
 
 using PlatformVariantList = QVector<PlatformVariant>;
@@ -61,6 +62,7 @@ struct NX_VMS_UPDATE_API PackageInfo
     (variants) \
     (installScript) \
     (freeSpaceRequired)
+NX_REFLECTION_INSTRUMENT(PackageInfo, PackageInfo_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(PackageInfo, (json), NX_VMS_UPDATE_API)
 
 NX_VMS_UPDATE_API bool isPackageCompatibleTo(

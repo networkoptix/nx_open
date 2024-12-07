@@ -6,9 +6,10 @@
 
 #include <QtCore/QJsonObject>
 
-#include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/http/http_client.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/serialization/qjson.h>
 
 using namespace std::chrono;
 
@@ -68,11 +69,11 @@ std::variant<T, FetchError> fetchJson(const nx::utils::Url& url)
         return FetchError::httpError;
     }
 
-    bool ok = false;
-    const auto info = QJson::deserialized<T>(*body, {}, &ok);
-    if (!ok)
+    const auto [info, result] = nx::reflect::json::deserialize<T>(*body);
+    if (!result.success)
     {
-        NX_WARNING(NX_SCOPE_TAG, "Cannot deserialize reply. URL: %1", url);
+        NX_WARNING(NX_SCOPE_TAG, "Cannot deserialize reply. URL: %1, error: %2",
+            url, result.errorDescription);
         return FetchError::parseError;
     }
 
