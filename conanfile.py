@@ -155,7 +155,7 @@ class NxOpenConan(ConanFile):
             self.build_requires("sdk-gcc/7.5" "#8e4d5d65d516a14449a95f3c314189f8")
 
         if self.isWindows:
-            self.build_requires("wix/3.11" "#a662d89b677af4a98ac8cd2371be63b8")
+            self.build_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
 
         if self.haveDesktopClient or self.haveMediaserver:
             self.build_requires("doxygen/1.8.14" "#ad17490b6013c61d63e10c0e8ea4d6c9")
@@ -239,14 +239,14 @@ class NxOpenConan(ConanFile):
             self.requires("winsdk-redist/10.0.22621.0" "#8dfc5bcbabe971a46f78c8d2657d7ec2")
 
         if self.isArm32 or self.isArm64:
-            self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
+            self.requires("sse2neon/1.7.0" "#188c824e380c1a5ad666d1229226b7c8")
 
         if self.settings.os in ("Android", "iOS") or self.haveAnalyticsServer:
             self.requires("libjpeg-turbo/3.0.3" "#1e534ce92aac40555ae9fd1184428b04")
 
         if self.haveDesktopClient or self.haveMediaserver:
             if not self.isEdge1:
-                self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
+                self.requires("flite/2.2" "#52b50c815dd81e40a21aaabb87d38b50")
 
     def prepare_pkg_config_files(self):
         if self.isLinux:
