@@ -5579,27 +5579,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>Witryna nie ma dostępu do Internetu w celu synchronizacji czasu</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>Partycja systemowa jest używana do danych analitycznych</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Witryna zawieszona</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Wyłączenie witryny</translation>
     </message>
     <message>
       <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
+      <translation>Odrzuć połączenie interkomowe</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>Adres e-mail nie jest ustawiony dla Twojego konta</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -5607,12 +5607,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Nieodebrane połączenie</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
       <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
+        <numerusform>Pamięć nie jest skonfigurowana na serwerach %n</numerusform>
         <numerusform>Storage is not configured on %n servers</numerusform>
         <numerusform>Storage is not configured on %n servers</numerusform>
         <numerusform>Storage is not configured on %n servers</numerusform>
@@ -5621,7 +5621,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
       <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+        <numerusform>Kopia zapasowa nie jest skonfigurowana na serwerach %n</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
@@ -5629,12 +5629,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>Harmonogram nagrywania jest nieprawidłowy</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+        <numerusform>Harmonogram nagrywania jest nieprawidłowy w kamerach %n</numerusform>
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
@@ -5652,7 +5652,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Sprawdź %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
@@ -5670,7 +5670,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
       <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+        <numerusform>Pamięć systemowa jest używana do przechowywania danych analitycznych na %n serwerach</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
@@ -5678,23 +5678,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>Połącz się ze swoją witryną z dowolnego miejsca!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Żaden z serwerów w witrynie nie ma dostępu do synchronizacji czasu z Internetu.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>Nie możesz otrzymywać powiadomień o witrynie przez e-mail.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>Nie mogą otrzymywać powiadomień o witrynie przez e-mail.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Niektóre kamery są ustawione na nagrywanie w trybie, którego nie obsługują.</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
@@ -5707,24 +5707,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>Witryna wkrótce przestanie działać</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>Witryna przestała działać</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>Witryna przestanie dzisiaj działać</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>Witryna przestanie jutro działać</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
       <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
+        <numerusform>Witryna przestanie działać za %n dni</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
@@ -5732,11 +5732,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>Języki powiadomień i interfejsu są różne</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>Język powiadomień różni się od języka interfejsu</translation>
     </message>
   </context>
   <context>
@@ -5759,19 +5759,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>Po włączeniu tej opcji nowe kamery i serwery będą stale wykrywane, a do obecnych kamer będą wysyłane żądania w celu uzyskania aktualizacji statusu.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Zawiera informacje o witrynie, takie jak modele kamer i wersje firmware, liczba serwerów itp.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Zezwalaj na optymalizowanie ustawień w urządzeniu</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Zezwalaj na optymalizowanie ustawień w kamerze</translation>
     </message>
   </context>
   <context>
@@ -5889,7 +5889,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>Automatyczne odświeżanie co %1</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6134,7 +6134,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Aby dodać ścianę wideo, witryna musi być aktywna. %1</translation>
     </message>
   </context>
   <context>
@@ -6428,7 +6428,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>Nie można przenieść urządzenia</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
@@ -7069,7 +7069,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Utwórz nową listę...</translation>
     </message>
   </context>
   <context>

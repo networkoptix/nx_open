@@ -932,7 +932,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Niektóre wartości nie mogły zostać dopasowane automatycznie. Proszę mapować je ręcznie.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -954,11 +954,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Na poziomie witryny członkowie grupy mają uprawnienia do:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Na poziomie witryny użytkownik ma uprawnienia do:</translation>
     </message>
   </context>
   <context>
@@ -1082,7 +1082,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>W systemie istnieje inna grupa o tej samej nazwie. Zaleca się przypisanie grupom unikalnych nazw.</translation>
     </message>
   </context>
   <context>
@@ -1236,7 +1236,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Zarządzanie integracjami</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1343,7 +1343,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Zaloguj się do witryny, aby skonfigurować sposób otwierania układów</translation>
     </message>
   </context>
   <context>
