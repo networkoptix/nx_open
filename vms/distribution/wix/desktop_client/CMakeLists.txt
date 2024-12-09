@@ -36,7 +36,7 @@ nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_webengine_locales.wixobj
     COMPONENT_GROUP WebEngineLocalesComponentGroup)
 
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_fonts.wixobj
-    SOURCE_DIR ${CONAN_ROBOTO-FONTS_ROOT}/bin/fonts
+    SOURCE_DIR ${CMAKE_BINARY_DIR}/bin/fonts
     TARGET_DIR_ALIAS FontsDirectoryReference
     COMPONENT_GROUP FontsComponentGroup)
 

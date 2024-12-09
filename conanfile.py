@@ -69,7 +69,7 @@ class NxOpenConan(ConanFile):
         "onlyUnrevisionedPackages": False,
     }
 
-    ffmpeg_version_and_revision = "7.0.1#eb88894f5b15d315a9850029c54f2576"
+    ffmpeg_version_and_revision = "7.0.1#b9bb17f3bf3fcf3b1562a0ee030dcdd5"
 
     def configure(self):
         # The open-source Customization Package coming from Conan has the name "opensource-meta",
@@ -144,21 +144,21 @@ class NxOpenConan(ConanFile):
         if self.options.onlyUnrevisionedPackages:
             return
 
-        self.build_requires("apidoctool/3.0" "#9b48851ed49e6272d9cf190a230d32c1")
+        self.build_requires("apidoctool/3.0" "#d64fbd2e42475cc531b5011fb70c2791")
         self.build_requires("qt-host/6.8.1" "#85e70e412be85fa75148b0c341cd78fb")
-        self.build_requires("swagger-codegen/3.0.21" "#58d9476941c662c4b3f8a9e99683f034")
+        self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
                 self.build_requires("clang/18.1.6" "#701e83b53a73cea5282566e4190fc859")
-            self.build_requires("sdk-gcc/7.5" "#8e4d5d65d516a14449a95f3c314189f8")
+            self.build_requires("sdk-gcc/7.5" "#8043121c286249d893120d712317d3d3")
 
         if self.isWindows:
             self.build_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
 
         if self.haveDesktopClient or self.haveMediaserver:
-            self.build_requires("doxygen/1.8.14" "#ad17490b6013c61d63e10c0e8ea4d6c9")
+            self.build_requires("doxygen/1.8.14" "#e4d349d41cd2ea37812b3f284bd88784")
 
         if self.isAndroid:
             self.build_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
@@ -184,8 +184,8 @@ class NxOpenConan(ConanFile):
 
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
-        self.requires("qt/6.8.1" "#d9e4a43478ddf0227a348c686289f972")
-        self.requires("roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123")
+        self.requires("qt/6.8.1" "#139adc221374b629f774118e234ed81e")
+        self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
         self.requires("rapidjson/cci.20230929" "#624c0094d741e6a3749d2e44d834b96c")
@@ -204,17 +204,17 @@ class NxOpenConan(ConanFile):
         if self.isWindows or self.isLinux:
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
-                self.requires("cuda-toolkit/12.5.1" "#52c56e278e56d5a0cb47df11090bbeb7")
-                self.requires("libvpl/2023.4.0" "#7c3fb86a89705272e31f163320e8384f")
+                self.requires("cuda-toolkit/12.5.1" "#0272783ab5f85d21ae421dd8366a3296")
+                self.requires("libvpl/2023.4.0" "#5f8cdb7f1df8161cbb957e1f4486d32e")
                 self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
                 self.requires("libva/2.22.0" "#80b7709c721fc7f0aa72cb42f5b91e2b")
-                self.requires("intel-media-sdk/19.4" "#a3ac2d7e36a1260f757893833af8dea2")
-                self.requires("intel-onevpl/23.4.2" "#35a35b4e4db86741752331dce439a71d")
+                self.requires("intel-media-sdk/19.4" "#9f323b944fa3e04572e9da7134f9ef3e")
+                self.requires("intel-onevpl/23.4.2" "#f16d6aba048c856f7d6e4680090e0a47")
                 self.requires("intel-gmmlib/22.5.2" "#52c5832c9ea9dcc989b58c480de6733a")
-                self.requires("intel-media-driver/23.4.3" "#fc9a92c1f8ef08c7beb2a4c7f69935b1")
+                self.requires("intel-media-driver/23.4.3" "#9f52c4393479e16d22aaa6c6b57ecf99")
                 self.requires("nv-codec-headers/12.1.14.0" "#65e2d80efd67e46fc41f135f2468e3df")
 
                 self.requires("libmysqlclient/8.1.0" "#96475a9cb3a02bbe2626543d0b3d33b7")
@@ -233,8 +233,8 @@ class NxOpenConan(ConanFile):
             self.requires("openal/ec2ffbfa" "#baf81c7873a6dc2c60d67bb41efd9aa4")
 
         if self.isWindows:
-            self.requires("directx/JUN2010" "#ca268f1b54e3874ad43524cd81447b01")
-            self.requires("intel-media-sdk-bin/2019R1" "#0a123266dd20b84b16a4cc60b752fc4b")
+            self.requires("directx/june2010" "#a0cbbd6a9cfef629fae6d2cf5a18bcdd")
+            self.requires("intel-media-sdk-bin/2019r1-1" "#40cd824192475ce059cb9529a06a3e13")
             self.requires("msvc-redist/14.38.33135" "#716dc6c575a38ac17943d6f0f45dde6d")
             self.requires("winsdk-redist/10.0.22621.0" "#8dfc5bcbabe971a46f78c8d2657d7ec2")
 
@@ -304,7 +304,7 @@ class NxOpenConan(ConanFile):
         if self.isLinux and self.settings.arch == "x86_64":
             self.import_files_from_package("cuda-toolkit", "lib64", "lib", "*.so*")
 
-        self.import_files_from_package("roboto-fonts", "bin/fonts", "bin/fonts", "*.ttf")
+        self.import_files_from_package("roboto-fonts", ".", "bin/fonts", "*.ttf")
 
         if "vms_help" in list(self.requires):
             self.import_files_from_package("vms_help", "help", "bin/help", "**/*")

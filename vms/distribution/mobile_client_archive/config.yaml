@@ -11,7 +11,7 @@ cmake_binary_dir: '${CMAKE_BINARY_DIR}'
 ucrt_directory: '${ucrt_directory}'
 vcrt_directory: '${vcrt_directory}'
 mobile_client_qml_dir: '${compiled_qml_directory}'
-fonts_directory: '${CONAN_ROBOTO-FONTS_ROOT}'
+fonts_directory: '${CMAKE_BINARY_DIR}/bin/fonts'
 
 # Source binary
 mobile_client_binary_name: '$<TARGET_FILE_NAME:mobile_client>'

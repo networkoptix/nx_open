@@ -23,7 +23,6 @@ INSTALLER_ICON="@installer_icon@"
 APPLE_TEAM_ID="@appleTeamId@"
 BUNDLE_ID="@customization.desktop.macos.bundleIdentifier@"
 NOTARIZATION="@notarization@"
-ROBOTO_FONTS_DIRECTORY=@CONAN_ROBOTO-FONTS_ROOT@
 QUICK_START_GUIDE_FILE="@quick_start_guide_directory@/@quick_start_guide_file_name@"
 PYTHON="@PYTHON_EXECUTABLE@"
 VMS_DISTRIBUTION_COMMON_DIR="@vms_distribution_common_dir@"

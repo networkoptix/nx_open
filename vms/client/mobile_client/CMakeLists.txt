@@ -78,7 +78,7 @@ set(common_assets
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/client_core_external.dat
 )
 
-file(GLOB_RECURSE font_files ${CONAN_ROBOTO-FONTS_ROOT}/*.ttf)
+file(GLOB_RECURSE font_files ${CMAKE_BINARY_DIR}/bin/fonts/*.ttf)
 
 set(dev_data_path "${CMAKE_CURRENT_LIST_DIR}/dev-data")
 

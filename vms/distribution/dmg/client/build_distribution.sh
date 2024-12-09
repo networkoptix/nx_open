@@ -105,7 +105,7 @@ buildDistribution()
     mkdir -p "$APP_RESOURCES_DIR"
     cp "$APP_ICON" "$APP_RESOURCES_DIR/appIcon.icns"
     cp "$INSTALLER_ICON" "$SRC/.VolumeIcon.icns"
-    cp -r "$ROBOTO_FONTS_DIRECTORY/bin/fonts" "$APP_RESOURCES_DIR/"
+    cp -r "$BUILD_DIR/bin/fonts" "$APP_RESOURCES_DIR/"
 
     copyMacOsSpecificApplauncherStuff
 

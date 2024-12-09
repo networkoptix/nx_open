@@ -49,7 +49,7 @@ nx_add_external_resources_target(nx_vms_client_desktop_external_resources
 add_dependencies(nx_vms_client_desktop_external_resources js_api_documentation)
 
 # Place Roboto font into resources so it can be loaded by Qt WebEngine.
-set(client_font_roboto_regular ${CONAN_ROBOTO-FONTS_ROOT}/bin/fonts/Roboto-Regular.ttf)
+set(client_font_roboto_regular ${CMAKE_BINARY_DIR}/bin/fonts/Roboto-Regular.ttf)
 set_source_files_properties(${client_font_roboto_regular} PROPERTIES RESOURCE_ALIAS_PREFIX fonts/)
 
 file(GLOB_RECURSE QML_FILES CONFIGURE_DEPENDS qml/*)
