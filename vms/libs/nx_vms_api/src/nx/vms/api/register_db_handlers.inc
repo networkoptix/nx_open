@@ -4,7 +4,17 @@
  * Intended to be included into the Server code.
  */
 
+void registerRestHandlers(
+    nx::network::rest::HandlerPool* processorPool,
+    Ec2DirectConnection* connection,
+    const nx::vms::utils::StorageAccess* storageAccess,
+    const nx::vms::license::LicenseRequest& licenseRequest,
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
 {
+    const auto reg = processorPool->createRegisterHandlerFunctor();
+    nx::vms::common::SystemContext* const systemContext = connection->systemContext();
+    QueryProcessor* const queryProcessor = connection->queryProcessor();
+
     /**%apidoc GET /rest/v{1-3}/servers
      * Retrieves all Server records stored in the Site.
      * %caption Get Servers

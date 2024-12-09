@@ -4,8 +4,13 @@
  * Intended to be included into the Server code.
  */
 
-void MediaServerProcess::registerUtilitiesHandlers()
+void registerUtilitiesHandlers(
+    MediaServerProcess* mediaServerProcess,
+    nx::vms::network::AbstractServerConnector* serverConnector,
+    int maxTcpRequestSize)
 {
+    const auto serverModule = mediaServerProcess->serverModule();
+
     /**%apidoc GET /{deviceId}
      * Opens RTSP video stream from Device. It is not exactly an API function but rather a URL
      * format. Example:
@@ -66,7 +71,11 @@ void MediaServerProcess::registerUtilitiesHandlers()
      * RTP packet has 'marker' bit in case of it includes the end of a Json object.
      * %struct ObjectMetadataPacket
      */
-    registerTcpHandler<QnRtspConnectionProcessor>("RTSP", "*", serverModule());
+    registerTcpHandler<QnRtspConnectionProcessor>(
+        mediaServerProcess,
+        /*protocol*/ "RTSP",
+        /*path*/ "*",
+        serverModule);
 
     /**%apidoc GET /api/http_audio
      * Open websocket audio stream to Device. Example:
@@ -93,8 +102,11 @@ void MediaServerProcess::registerUtilitiesHandlers()
      *     %value 2
      * %return Audio stream in the requested format.
      */
-    registerTcpHandler<http_audio::AudioRequestProcessor>("HTTP", "api/http_audio",
-        serverModule());
+    registerTcpHandler<http_audio::AudioRequestProcessor>(
+        mediaServerProcess,
+        /*protocol*/ "HTTP",
+        /*path*/ "api/http_audio",
+        serverModule);
 
     /**%apidoc GET /proxy/{protocol}/{serverId}/{apiRequest}
      * <p>
@@ -122,12 +134,16 @@ void MediaServerProcess::registerUtilitiesHandlers()
      * %return Result of the target API request.
      */
     registerTcpHandler<nx::vms::server::network::ProxyConnectionProcessor>(
-        "*", "proxy", m_ec2ConnectionFactory->serverConnector(),
-        serverModule()->certificateVerifier(),
-        [authenticator = m_universalTcpListener->authenticator()](auto&&... args)
+        mediaServerProcess,
+        /*protocol*/ "*",
+        /*path*/ "proxy",
+        /*ProxyConnectionProcessor/reverseConnectionManager*/ serverConnector,
+        serverModule->certificateVerifier(),
+        [authenticator = mediaServerProcess->universalTcpListener()->authenticator()](
+            auto&&... args)
         {
             return authenticator->watch(std::forward<decltype(args)>(args)...);
         },
-        serverModule()->auditManager(),
-        maxTcpRequestSize());
+        serverModule->auditManager(),
+        maxTcpRequestSize);
 }

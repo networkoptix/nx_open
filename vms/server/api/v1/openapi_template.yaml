@@ -1,0 +1,132 @@
+openapi: 3.0.2
+info:
+  title: "REST v1 (VMS 5.0+)"
+  version: 1.0.0
+
+tags:
+  - name: Login
+  - name: Site
+  - name: Servers
+  - name: Server Data
+  - name: Devices
+  - name: Device Media
+  - name: Users
+  - name: User Roles
+  - name: Licenses
+  - name: Layouts
+  - name: Showreels
+  - name: Video Walls
+  - name: Stored Files
+  - name: Web Pages
+  - name: Utilities
+components:
+  parameters:
+    _filter:
+      in: query
+      name: _filter
+      required: false
+      description: >-
+        This is a family of parameters rather than a fixed-name parameter: any number of response
+        object fields can be specified as parameters, with the desired field values as parameter
+        values. It defines a filter for the response objects: only objects having the specified
+        field values will be included in the response. Nested fields must be referenced by joining
+        their names via a period - see the example.
+      schema:
+        type: object
+    _format:
+      in: query
+      name: _format
+      required: false
+      description: >-
+        Response format type. The HTTP `Accept` header is used as the format if this parameter is
+        unspecified. If the `Accept` header is unspecifed too, then `JSON` is used. Keys of
+        the elements that do not start with a letter or an underscore are prefixed with an
+        underscore for `XML`. Fields of the list type are skipped for `CSV`.
+      schema:
+        type: string
+        enum:
+          - JSON
+          - XML
+          - CSV
+    _keepDefault:
+      in: query
+      name: _keepDefault
+      required: false
+      description: >-
+        If `false` or unspecified, then in the response objects the Server will omit fields which
+        have values equal to their default values. Otherwise, such fields will not be omitted.
+      schema:
+        type: boolean
+        enum: [true]
+    _stripDefault:
+      in: query
+      name: _stripDefault
+      required: false
+      description: >-
+        Not supported until REST API version 3.
+      schema:
+        type: boolean
+        enum: [true]
+    _language:
+      in: query
+      name: _language
+      required: false
+      description: >-
+        Preferred language for texts in the response body. If unspecified, then `en_US` is used.
+      schema:
+        type: string
+    _local:
+      in: query
+      name: _local
+      required: false
+      description: >-
+        If `false` or unspecified, the information in the response will be collected from other
+        Servers in the Site as well. If specified as empty or `true`, then only the Server
+        processing the request will provide information.
+      schema:
+        type: boolean
+        enum: [true]
+    _ticket:
+      in: query
+      name: _ticket
+      required: false
+      description: >-
+        One-time authorization ticket previously generated using Login REST API
+        obtained from the current Server.
+      schema:
+        type: string
+    _pretty:
+      in: query
+      name: _pretty
+      required: false
+      description: >-
+        Pretty-format the response body if specified. Applied to JSON only.
+      schema:
+        type: boolean
+        enum: [true]
+    _strict:
+      in: query
+      name: _strict
+      required: false
+      description: >-
+        If `false` or unspecified, the Server will produce available results, ignoring minor
+        errors. If specified as empty or `true`, then the request will fail on any error.
+      schema:
+        type: boolean
+    _with:
+      in: query
+      name: _with
+      required: false
+      description: >-
+        Comma-separated list of field names, which defines a filter for the response objects: only
+        those objects will be included in the response which have at least one field from this
+        list, and only such fields will be included (fields not on this list will be omitted).
+        Nested fields must be referenced by joining their names via a period, for example:
+        `_with=id,parameters.name`.
+      schema:
+        type: string
+# This section is required by Swagger codegen CLI.
+paths:
+  # At least one path is required, but as it is empty the `paths` section in the result Open API
+  # JSON file is empty.
+  /dummy:
