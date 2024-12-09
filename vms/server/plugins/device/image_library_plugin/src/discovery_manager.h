@@ -28,7 +28,7 @@ public:
     virtual int checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password ) override;
     //!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
     virtual int checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password) override;
-    //!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
+    //!Implementation of nxcip::CameraDiscoveryManager2::findCameras2
     virtual int findCameras2(nxcip::CameraInfo2* cameras, const char* serverURL) override;
 
     //!Implementation of nxcip::CameraDiscoveryManager::fromMDNSData

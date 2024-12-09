@@ -74,19 +74,24 @@ int DiscoveryManager::findCameras2(nxcip::CameraInfo2* /*cameras*/, const char* 
 
 int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
 {
-    const size_t addressLen = strlen( address );
-    if( addressLen == 0 || addressLen > FILENAME_MAX )
+    static constexpr char kFilePrefix[] = "file://";
+    const char* path = address;
+    if( strncmp( address, kFilePrefix, sizeof(kFilePrefix) - 1 ) == 0 )
+        path += sizeof(kFilePrefix) - 1; //< Skip the prefix.
+
+    const size_t pathLen = strlen( path );
+    if( pathLen == 0 || pathLen > FILENAME_MAX )
         return 0;
 
     struct stat fStat;
     memset( &fStat, 0, sizeof(fStat) );
 
-    if( address[addressLen-1] == '/' || address[addressLen-1] == '\\' )
+    if( path[pathLen-1] == '/' || path[pathLen-1] == '\\' )
     {
         //removing trailing separator
         char tmpNameBuf[FILENAME_MAX+1];
-        strcpy( tmpNameBuf, address );
-        for( char* pos = tmpNameBuf+addressLen-1;
+        strcpy( tmpNameBuf, path );
+        for( char* pos = tmpNameBuf+pathLen-1;
             pos >= tmpNameBuf && (*pos == '/' || *pos == '\\');
             --pos )
         {
@@ -97,17 +102,17 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
     }
     else
     {
-        if( stat( address, &fStat ) != 0 )
+        if( stat( path, &fStat ) != 0 )
             return 0;
     }
 
     if( !(fStat.st_mode & S_IFDIR) )
         return 0;
 
-    //address is a path to local directory
+    //path is a path to local directory
 
-    //checking, whether address dir contains jpg images
-    DirIterator dirIterator( address );
+    //checking, whether the path dir contains jpg images
+    DirIterator dirIterator( path );
 
     //m_dirIterator.setRecursive( true );
     dirIterator.setEntryTypeFilter( FsEntryType::etRegularFile );
@@ -123,14 +128,14 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
     if( !isImageLibrary )
         return 0;
 
-    strcpy( cameras[0].url, address );
-    strcpy( cameras[0].uid, address );
-    strcpy( cameras[0].modelName, address );
+    strcpy( cameras[0].url, path );
+    strcpy( cameras[0].uid, path );
+    strcpy( cameras[0].modelName, path );
 
     return 1;
 }
 
-//!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress
+//!Implementation of nxcip::CameraDiscoveryManager2::checkHostAddress2
 int DiscoveryManager::checkHostAddress2(nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password)
 {
     return checkHostAddress(cameras, address, login, password);
