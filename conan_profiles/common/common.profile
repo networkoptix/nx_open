@@ -30,7 +30,6 @@ opencv-static/*:with_jpeg=libjpeg-turbo
 opencv/*:shared=True
 opencv/*:with_cuda=False
 opencv/*:with_jpeg=False
-protobuf/*:with_zlib=False
 prometheus-cpp/*:with_pull=False
 prometheus-cpp/*:with_push=False
 sdk-gcc/*:with_sanitizer=False
