@@ -662,3 +662,67 @@ function(nx_json_get_array json_variable_name)
 
     set(${JSON_ARRAY_NAME} ${array} PARENT_SCOPE)
 endfunction()
+
+function(nx_download_from_artifactory url file)
+    cmake_parse_arguments(DOWNLOAD "" "USER;PASSWORD;RESULT" "" ${ARGN})
+
+    if(DEFINED DOWNLOAD_USER AND DEFINED DOWNLOAD_PASSWORD)
+        set(auth_args USERPWD "${DOWNLOAD_USER}:${DOWNLOAD_PASSWORD}")
+    else()
+        set(auth_args)
+    endif()
+
+    set(result FALSE)
+
+    message(STATUS "Downloading ${file} from ${url}")
+    file(DOWNLOAD ${url}.sha256 ${file}.sha256 STATUS status TIMEOUT 3 ${auth_args})
+    if(status MATCHES "^0;.*")
+        file(READ ${file}.sha256 sha256)
+        file(REMOVE ${file}.sha256)
+
+        if(EXISTS ${file})
+            file(SHA256 ${file} existing_sha256)
+        else()
+            set(existing_sha256 "invalid")
+        endif()
+
+        # We cannot simply use EXPECTED_HASH because we want to keep the original file in case of a
+        # download failure.
+        if("${sha256}" STREQUAL "${existing_sha256}")
+            message(STATUS "Skipped downloading ${file}. SHA256 did not change: [${sha256}].")
+            set(result TRUE)
+        else()
+            file(DOWNLOAD ${url} ${file}.tmp
+                EXPECTED_HASH SHA256=${sha256}
+                STATUS status
+                TIMEOUT 3 ${auth_args})
+
+            if(status MATCHES "^0;.*")
+                file(RENAME ${file}.tmp ${file})
+                message(STATUS "Successfully downloaded ${file}. SHA256: [${sha256}].")
+                set(result TRUE)
+            endif()
+        endif()
+    endif()
+
+    if(DEFINED DOWNLOAD_RESULT)
+        set(${DOWNLOAD_RESULT} ${result} PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(nx_download_from_nx_artifactory url_path file)
+    cmake_parse_arguments(DOWNLOAD "" "RESULT" "" ${ARGN})
+
+    set(auth_args)
+    if(DEFINED ENV{NX_ARTIFACTORY_USERNAME})
+        list(APPEND auth_args USER "$ENV{NX_ARTIFACTORY_USERNAME}")
+    endif()
+    if(DEFINED ENV{NX_ARTIFACTORY_PASSWORD})
+        list(APPEND auth_args PASSWORD "$ENV{NX_ARTIFACTORY_PASSWORD}")
+    endif()
+
+    nx_download_from_artifactory(${artifactoryUrl}/${url_path} ${file} ${auth_args} RESULT result)
+    if(DEFINED DOWNLOAD_RESULT)
+        set(${DOWNLOAD_RESULT} ${result} PARENT_SCOPE)
+    endif()
+endfunction()
