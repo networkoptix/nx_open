@@ -203,6 +203,13 @@ GridView
             function onShowInformationChanged() { d.resetAutomaticRowHeight() }
         }
 
+        Connections
+        {
+            target: controller.tileController?.attributeManager
+
+            function onVisibleAttributesChanged() { d.resetAutomaticRowHeight() }
+        }
+
         Behavior on automaticRowHeight
         {
             id: automaticRowHeightAnimation
