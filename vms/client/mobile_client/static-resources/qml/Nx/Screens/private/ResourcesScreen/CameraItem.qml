@@ -50,9 +50,6 @@ Control
         readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
         readonly property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
         readonly property bool ioModule: !mediaResourceHelper.hasVideo && mediaResourceHelper.isIoModule
-
-        // This property prevents video component re-creation while scrolling.
-        property bool videoAllowed: false
     }
 
     MediaResourceHelper
@@ -100,21 +97,73 @@ Control
                 id: thumbnailContentLoader
 
                 anchors.centerIn: parent
-                sourceComponent:
+                state:
                 {
                     if (d.showTumbnailDummy)
-                        return thumbnailDummyComponent
+                        return "dummyContent"
 
-                    if (!cameraItem.active || !d.videoAllowed || !settings.liveVideoPreviews)
+                    if (initialLoadingTimer.running)
+                        return "preloaderContent"
+
+                    if (settings.liveVideoPreviews)
                     {
-                        if (!cameraItem.thumbnail)
-                            return thumbnailPreloaderComponent
-
-                        return thumbnailComponent
+                        return cameraItem.active
+                            ? "videoContent"
+                            : "preloaderContent"
                     }
 
-                    return videoComponent
+                    return cameraItem.thumbnail
+                        ? "thumbnailContent"
+                        : "thumbnailPreloaderContent"
                 }
+
+                states:
+                [
+                    State
+                    {
+                        name: "preloaderContent";
+                        PropertyChanges
+                        {
+                            thumbnailContentLoader.sourceComponent: preloaderComponent
+                        }
+                    },
+
+                    State
+                    {
+                        name: "thumbnailPreloaderContent";
+                        PropertyChanges
+                        {
+                            thumbnailContentLoader.sourceComponent: preloaderComponent
+                        }
+                    },
+
+                    State
+                    {
+                        name: "dummyContent";
+                        PropertyChanges
+                        {
+                            thumbnailContentLoader.sourceComponent: thumbnailDummyComponent
+                        }
+                    },
+
+                    State
+                    {
+                        name: "thumbnailContent";
+                        PropertyChanges
+                        {
+                            thumbnailContentLoader.sourceComponent: thumbnailComponent
+                        }
+                    },
+
+                    State
+                    {
+                        name: "videoContent";
+                        PropertyChanges
+                        {
+                            thumbnailContentLoader.sourceComponent: videoComponent
+                        }
+                    }
+                ]
             }
         }
 
@@ -221,7 +270,7 @@ Control
 
     Component
     {
-        id: thumbnailPreloaderComponent
+        id: preloaderComponent
 
         NxDotPreloader {}
     }
@@ -329,7 +378,10 @@ Control
 
         interval: initialLoadDelay
         repeat: true
-        running: active && sessionManager.hasConnectedSession
+        running: active
+            && sessionManager.hasConnectedSession
+            && (thumbnailContentLoader.state === "thumbnailContent"
+                || thumbnailContentLoader.state === "thumbnailPreloaderContent")
 
         onTriggered:
         {
@@ -344,10 +396,13 @@ Control
         }
     }
 
+    // Avoid excessive video components and thumbnail requests creation while scrolling.
     Timer
     {
+        id: initialLoadingTimer
+
+        repeat: false
+        running: true
         interval: 2000
-        running: active
-        onTriggered: d.videoAllowed = true
     }
 }

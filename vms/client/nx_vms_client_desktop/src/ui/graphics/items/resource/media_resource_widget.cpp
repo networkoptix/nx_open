@@ -1244,6 +1244,17 @@ void QnMediaResourceWidget::updatePtzController()
     connect(m_ptzController.get(), &QnAbstractPtzController::changed, this,
         &QnMediaResourceWidget::at_ptzController_changed);
 
+    if (m_ptzController)
+    {
+        // Forces ptz related data load or update.
+        m_ptzController->invalidate();
+
+        QnPtzPresetList presets;
+        m_ptzController->getPresets(&presets);
+        QnPtzTourList tours;
+        m_ptzController->getTours(&tours);
+    }
+
     emit ptzControllerChanged();
 }
 

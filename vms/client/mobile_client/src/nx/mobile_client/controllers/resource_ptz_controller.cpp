@@ -63,6 +63,7 @@ void ResourcePtzController::setRawResource(QnResource* value)
         controller.reset(new QnActivityPtzController(
             QnActivityPtzController::Client,
             controller));
+        controller->invalidate();
     }
     setBaseController(controller);
 

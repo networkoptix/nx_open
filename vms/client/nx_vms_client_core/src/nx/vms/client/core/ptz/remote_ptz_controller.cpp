@@ -143,10 +143,14 @@ bool RemotePtzController::sendRequest(
 
     PtzServerCallback callback = nx::utils::guarded(this,
         [this, command, deserializer=std::move(helper)](
-            bool /*success*/, rest::Handle /*handle*/, const nx::network::rest::JsonResult& data)
+            bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& data)
         {
             QVariant value = deserializer(data);
             auto notConstThis = const_cast<RemotePtzController*>(this);
+
+            if (!success && (command == Command::getPresets || command == Command::getTours))
+                notConstThis->invalidate(); //< Force update at the next time in case of error.
+
             emit notConstThis->finished(command, value);
         });
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <core/ptz/proxy_ptz_controller.h>
+#include <nx/utils/deadline_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/from_this_to_shared.h>
 
@@ -52,6 +53,8 @@ public:
         DataFields query,
         const Options& options) const override;
 
+    virtual void invalidate() override;
+
 protected:
     virtual void baseFinished(Command command, const QVariant& data) override;
 
@@ -76,6 +79,15 @@ private:
     bool m_initialized;
     mutable nx::Mutex m_mutex;
     QnPtzData m_data;
+
+    enum UpdateTimerType
+    {
+        presets,
+        tours,
+
+        count
+    };
+    mutable nx::utils::DeadlineTimer m_updateTimers[UpdateTimerType::count];
 };
 
 } // namespace ptz

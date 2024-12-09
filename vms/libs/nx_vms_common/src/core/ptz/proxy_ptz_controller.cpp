@@ -48,6 +48,12 @@ void QnProxyPtzController::initialize()
     m_isInitialized = true;
 }
 
+void QnProxyPtzController::invalidate()
+{
+    if (m_controller)
+        m_controller->invalidate();
+}
+
 Ptz::Capabilities QnProxyPtzController::getCapabilities(const Options& options) const
 {
     return m_controller
