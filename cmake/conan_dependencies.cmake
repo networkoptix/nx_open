@@ -34,9 +34,7 @@ else()
     set(build_type "Release")
 endif()
 
-if(customizationPackageFile)
-    list(APPEND _additional_conan_parameters "-o skipCustomizationPackage=True")
-elseif(NOT "${customization}" STREQUAL "")
+if(customization)
     list(APPEND _additional_conan_parameters "-o customization=${customization}")
 endif()
 

@@ -59,7 +59,6 @@ class NxOpenConan(ConanFile):
     options = {
         "targetDevice": "ANY",
         "useClang": (True, False),
-        "skipCustomizationPackage": (True, False),
         "customization": "ANY",
         "installRuntimeDependencies": (True, False),
         "onlyUnrevisionedPackages": (True, False),
@@ -67,8 +66,7 @@ class NxOpenConan(ConanFile):
     default_options = {
         "targetDevice": None,
         "useClang": False,
-        "skipCustomizationPackage": False,
-        "customization": "default",
+        "customization": "metavms",
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
         "mobile_user_manual:format": "pdf",
@@ -78,9 +76,6 @@ class NxOpenConan(ConanFile):
     ffmpeg_version_and_revision = "7.0.1#b9bb17f3bf3fcf3b1562a0ee030dcdd5"
 
     def configure(self):
-        # The open-source Customization Package coming from Conan has the name "opensource-meta",
-        # but its id (the "id" field in description.json inside the zip) is "metavms".
-        self.options["customization"].customization = "opensource-meta"
         self.options["vms_help"].customization = "metavms"
         self.options["quick_start_guide"].customization = "metavms"
         self.options["mobile_user_manual"].customization = "metavms"
@@ -177,9 +172,6 @@ class NxOpenConan(ConanFile):
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
     def requirements(self):
-        if not self.options.skipCustomizationPackage:
-            self.requires("customization/1.0")  #< Always use the latest revision.
-
         if self.options.onlyUnrevisionedPackages:
             return
 

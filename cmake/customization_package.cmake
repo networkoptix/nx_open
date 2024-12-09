@@ -72,26 +72,16 @@ function(_set_customization_from_file)
 endfunction()
 
 macro(nx_load_customization_package)
-    if(customizationPackageFile)
-        set(customization_package_file ${customizationPackageFile})
-        get_filename_component(customization_name "${customization_package_file}" NAME_WE)
-    elseif(CONAN_CUSTOMIZATION_ROOT)
-        set(customization_package_file "${CONAN_CUSTOMIZATION_ROOT}/package.zip")
-        set(customization_name ${customization})
-    else()
-        message(FATAL_ERROR "Customization Package not found in Conan.")
-    endif()
-
-    if(NOT EXISTS "${customization_package_file}")
+    if(NOT EXISTS "${customizationPackageFile}")
         message(FATAL_ERROR
-            "The Customization Package file (${customization_package_file}) was not found.")
+            "The customization package file does not exist: ${customizationPackageFile}")
     endif()
 
-    set(customization_dir "${CMAKE_BINARY_DIR}/customization/${customization_name}")
+    set(customization_dir "${CMAKE_BINARY_DIR}/customization/${customization}")
     set(customization_unpack_log_file
-        "${CMAKE_BINARY_DIR}/build_logs/unpack-${customization_name}.log")
+        "${CMAKE_BINARY_DIR}/build_logs/unpack-${customization}.log")
     _unpack_customization_package(
-        ${customization_package_file}
+        ${customizationPackageFile}
         ${customization_dir}
         ${customization_unpack_log_file}
     )
@@ -121,5 +111,32 @@ macro(nx_load_customization_package)
         )
     endif()
 endmacro()
+
+function(_download_customization_package artifactory_path customization_file)
+    nx_download_from_nx_artifactory(
+        "${artifactory_path}/${customization}/package.zip"
+        ${customization_file}
+        RESULT result)
+
+    if(result)
+        nx_store_known_file(${customization_file})
+        message(STATUS "Successfully downloaded customization to ${customization_file}")
+    elseif(EXISTS ${customization_file})
+        message(STATUS
+            "Cannot download customization. Using the existing file ${customization_file}.")
+    else()
+        message(FATAL_ERROR "Cannot download customization package.")
+    endif()
+endfunction()
+
+function(nx_fetch_customization_package artifactory_path)
+    if(customizationPackageFile)
+        return()
+    endif()
+
+    set(customizationPackageFile "${CMAKE_BINARY_DIR}/customization/${customization}.zip")
+    _download_customization_package(${artifactory_path} ${customizationPackageFile})
+    nx_expose_to_parent_scope(customizationPackageFile)
+endfunction()
 
 _set_customization_from_file()
