@@ -59,9 +59,17 @@ endif()
 
 include(cmake/versions/release_version.cmake)
 
-set(conanNxRemote https://artifactory.nxvms.dev/artifactory/api/conan/conan
-    CACHE INTERNAL "The URL of Conan remote containing packages needed for the build."
-)
+if(DEFINED ENV{NX_ARTIFACTORY_URL})
+    set(artifactoryUrl "$ENV{NX_ARTIFACTORY_URL}")
+else()
+    set(artifactoryUrl "https://artifactory.nxvms.dev/artifactory")
+endif()
+
+nx_fetch_customization_package("artifacts/customization")
+nx_load_customization_package()
+
+set(conanNxRemote "${artifactoryUrl}/api/conan/conan"
+    CACHE INTERNAL "The URL of Conan remote containing packages needed for the build.")
 include(cmake/conan_dependencies.cmake)
 
 project(vms_opensource VERSION ${releaseVersion})
@@ -90,7 +98,6 @@ include(process_target_debug_symbols)
 include(find_sources)
 include(compiler_options)
 include(linker_options)
-nx_load_customization_package()
 include(distribution_names)
 include(cmake/properties.cmake)
 include(cmake/cloud_host.cmake)
