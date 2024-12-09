@@ -4,6 +4,10 @@
 
 #include <QTextCursor>
 
+#include <nx/vms/client/core/analytics/taxonomy/attribute.h>
+#include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
+#include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/core/analytics/taxonomy/state_view.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/rules/model_view/event_parameters_model.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -33,6 +37,7 @@ struct TextWithFieldsPicker::Private: public QObject
     EventParameterCompleter* completer{nullptr};
     bool highlightErrors{true};
     EventTrackableData currentEventData;
+    QPointer<core::analytics::taxonomy::StateView> taxonomy;
 
     Private(TextWithFieldsPicker* parent): q(parent){};
 
@@ -83,7 +88,13 @@ struct TextWithFieldsPicker::Private: public QObject
             cursor.setPosition(val.start + val.length, QTextCursor::KeepAnchor);
 
             if (val.type == vms::rules::TextWithFields::FieldType::Substitution)
-                cursor.setCharFormat(val.isValid ? correctCharFormat : incorrectCharFormat);
+            {
+                // TODO: #vbutkevich Move value validation to TextWithFieldsValidator once it
+                // supports collection of all attributes.
+                cursor.setCharFormat(completer->containsElement(val.value)
+                    ? correctCharFormat
+                    : incorrectCharFormat);
+            }
             else
                 cursor.setCharFormat(defaultCharFormat);
         }
@@ -107,6 +118,42 @@ struct TextWithFieldsPicker::Private: public QObject
         return stateField ? stateField->value() : api::rules::State::none;
     }
 
+    QStringList collectAttributeNames(const QString& objectTypeId)
+    {
+        if (objectTypeId.isEmpty())
+            return {};
+
+        if (!NX_ASSERT(!taxonomy.isNull(), "Taxonomy must be initialized"))
+            return {};
+
+        const auto objectType = taxonomy->objectTypeById(objectTypeId);
+        if (objectType == nullptr)
+            return {};
+
+        using namespace core::analytics::taxonomy;
+
+        QStringList attributeNames;
+        std::function<void(const std::vector<Attribute*>&, const QString&)> collectNames =
+            [&](
+                const std::vector<Attribute*>& attributes,
+                const QString& parentAttributeName)
+            {
+                for (const auto& attribute: attributes)
+                {
+                    const QString fullAttributeName = parentAttributeName.isEmpty()
+                        ? attribute->name
+                        : parentAttributeName + "." + attribute->name;
+                    attributeNames.append(fullAttributeName);
+
+                    if (attribute->type == Attribute::Type::attributeSet)
+                        collectNames(attribute->attributeSet->attributes(), fullAttributeName);
+                }
+            };
+
+        collectNames(objectType->attributes(), QString{});
+        return attributeNames;
+    }
+
     void updateCompleterModel(const vms::rules::ItemDescriptor& eventDesc)
     {
         EventTrackableData newData{.objectType = getObjectTypeFieldValue(),
@@ -122,7 +169,8 @@ struct TextWithFieldsPicker::Private: public QObject
             EventParameterHelper::instance()->getVisibleEventParameters(currentEventData.eventId,
                 q->common::SystemContextAware::systemContext(),
                 currentEventData.objectType,
-                currentEventData.eventState));
+                currentEventData.eventState,
+                collectAttributeNames(currentEventData.objectType)));
         completer->setModel(model);
     }
 };
@@ -137,6 +185,21 @@ TextWithFieldsPicker::TextWithFieldsPicker(
 {
     d->highlightErrors = field->properties().highlightErrors;
     d->completer = new EventParameterCompleter{new EventParametersModel({}), m_textEdit, this};
+
+    const auto taxonomyManager = systemContext()->taxonomyManager();
+    if (!NX_CRITICAL(taxonomyManager, "Common module singletons must be initialized"))
+        return;
+
+    d->taxonomy = taxonomyManager->createStateView(d.get());
+
+    connect(taxonomyManager,
+        &core::analytics::TaxonomyManager::currentTaxonomyChanged,
+        this,
+        [this, taxonomyManager]()
+        {
+            d->taxonomy.clear();
+            d->taxonomy = taxonomyManager->createStateView(d.get());
+        });
 }
 
 TextWithFieldsPicker::~TextWithFieldsPicker()

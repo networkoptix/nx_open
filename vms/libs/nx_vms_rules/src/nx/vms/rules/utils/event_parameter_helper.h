@@ -39,7 +39,8 @@ public:
         const QString& eventType,
         common::SystemContext* systemContext,
         const QString& objectTypeField,
-        State eventState = State::none);
+        State eventState = State::none,
+        const QStringList& externallyCalculatedAttributes = {});
     /**
      * Generates eventParameter's replacement for specific event, if it is applicable.
      */

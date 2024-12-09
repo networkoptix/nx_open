@@ -24,24 +24,7 @@ ValidationResult TextWithFieldsValidator::validity(
         return {QValidator::State::Invalid, Strings::invalidFieldType()};
 
     using namespace utils;
-    const auto event = rule->eventFilters().front();
-    const auto objectTypeField = event->fieldByType<AnalyticsObjectTypeField>();
-    const auto eventState = event->fieldByType<StateField>();
-
-    const auto availableNames =
-        EventParameterHelper::instance()->getVisibleEventParameters(event->eventType(),
-        context,
-        objectTypeField ? objectTypeField->value() : "",
-        eventState ? eventState->value() : State::none);
-
     auto parsedValues = textWithFields->parsedValues();
-    for (auto& value: parsedValues)
-    {
-        if (value.type != TextWithFields::FieldType::Substitution)
-            continue;
-
-        value.isValid = availableNames.contains(EventParameterHelper::removeBrackets(value.value));
-    }
 
     ValidationResult result{
         .validity = QValidator::State::Acceptable,

@@ -128,7 +128,10 @@ TEST_F(EventParameterTest, simpleAttributes)
     EXPECT_EQ("{event.attributes.undefined}", evaluate(event, "event.attributes.undefined"));
 
     event->setAttributes({});
-    EXPECT_EQ("", evaluate(event, "event.attributes.Name"));
+    // TODO: #vbutkevich. Change to "" instead "{event.attributes.Name}". An empty string should be
+    // returned if the attribute is supported by the objectTypeId but is not present in the event's
+    // attributes.
+    EXPECT_EQ("{event.attributes.Name}", evaluate(event, "event.attributes.Name"));
 }
 
 TEST_F(EventParameterTest, nestedAttributes)

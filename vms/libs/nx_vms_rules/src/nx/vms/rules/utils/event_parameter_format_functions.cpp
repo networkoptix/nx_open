@@ -263,6 +263,11 @@ QString userName(SubstitutionContext* substitution, common::SystemContext* conte
     return {};
 }
 
+QString eventAttributeName(SubstitutionContext* substitution)
+{
+    return substitution->name.sliced(kEventAttributesPrefix.size());
+}
+
 QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context)
 {
     using Attributes = nx::common::metadata::Attributes;
@@ -271,7 +276,7 @@ QString eventAttribute(SubstitutionContext* substitution, common::SystemContext*
     if (!attributesVariant.canConvert<Attributes>())
         return {};
 
-    const auto attributeName = substitution->name.sliced(kEventAttributesPrefix.size());
+    const auto attributeName = eventAttributeName(substitution);
 
     for (const auto& attribute: attributesVariant.value<Attributes>())
     {

@@ -3,8 +3,7 @@
 #include "event_parameter_helper.h"
 
 #include <QStringView>
-
-#include <QtCore/QStringLiteral>
+#include <algorithm>
 
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/utils.h>
@@ -81,40 +80,44 @@ const SubstitutionDoc kDefaultEventNameDoc = {
 const SubstitutionDoc kDefaultEventTypeDoc = {
     .text = "The analytics event types.", .resultExample = "Line Crossing"};
 
-
 EventParameterHelper::EventParametersNames getAttributesParameters(
-    common::SystemContext* systemContext, const QString& objectTypeId)
+    common::SystemContext*,
+    const QString& objectTypeId,
+    const QStringList& externallyCalculatedAttributes)
 {
     if (objectTypeId.isEmpty())
         return {};
 
     EventParameterHelper::EventParametersNames result;
-    const auto attributesNames =
-        getAttributesNames(systemContext->analyticsTaxonomyState().get(), objectTypeId);
-    for (auto& attribute: attributesNames)
-        result.insert(kEventAttributesPrefix + attribute);
+
+    for (const auto& attributeName: externallyCalculatedAttributes)
+        result.insert(kEventAttributesPrefix + attributeName);
+
+    // TODO: #vbutkevich. Change to collecting attributes by traversing the attributes of
+    // objectType.
     return result;
 }
 
-bool isValidEventAttribute(
-    SubstitutionContext* substitution,
-    common::SystemContext* systemContext)
+bool isValidEventAttribute(SubstitutionContext* substitution, common::SystemContext*)
 {
-    if (substitution->event)
-    {
-        substitution->objectTypeId = substitution->event->property(kObjectTypeIdFieldName).toString();
-        if (substitution->objectTypeId.isEmpty())
-            return false;
+    if (!substitution->event)
+        return false;
 
-        if (systemContext->analyticsTaxonomyState()->objectTypes().empty())
+    using Attributes = nx::common::metadata::Attributes;
+
+    const auto attributesVariant = substitution->event->property(kAttributesFieldName);
+    if (!attributesVariant.canConvert<Attributes>())
+        return false;
+
+    const auto& attributes = attributesVariant.value<Attributes>();
+    const auto attributeName = eventAttributeName(substitution);
+
+    return std::ranges::any_of(
+        attributes,
+        [&attributeName](const auto& attribute)
         {
-            // Taxonomy state is not initialized. Check that event at least has property attributes.
-            return substitution->event->property(kAttributesFieldName).isValid();
-        }
-    }
-
-    return getAttributesParameters(systemContext, substitution->objectTypeId).contains(
-        substitution->name);
+            return attributeName.compare(attribute.name, Qt::CaseInsensitive) == 0;
+        });
 }
 
 bool deviceEvents(SubstitutionContext* context, common::SystemContext*)
@@ -508,12 +511,14 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
     const QString& eventType,
     common::SystemContext* systemContext,
     const QString& objectTypeId,
-    State eventState)
+    State eventState,
+    const QStringList& attributes)
 {
     auto context = SubstitutionContext{
         .manifest = systemContext->vmsRulesEngine()->eventDescriptor(eventType),
         .state = eventState,
         .objectTypeId = objectTypeId,
+        .attributes = attributes,
     };
 
     if (!context.manifest)
@@ -534,7 +539,7 @@ EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEvent
         result.insert(key);
     }
 
-    for (auto& attributeValue: getAttributesParameters(systemContext, objectTypeId))
+    for (auto& attributeValue: getAttributesParameters(systemContext, objectTypeId, attributes))
         result.insert(attributeValue);
 
     return result;

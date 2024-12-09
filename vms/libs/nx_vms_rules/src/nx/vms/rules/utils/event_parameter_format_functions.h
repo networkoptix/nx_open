@@ -21,6 +21,8 @@ struct SubstitutionContext
 
     nx::vms::rules::State state;
     QString objectTypeId;
+    // TODO: #vbutkevich. Remove once the server can collect all attributes for objectType.
+    QStringList attributes;
 };
 
 constexpr auto kEventAttributesPrefix = QLatin1StringView("event.attributes.");
@@ -58,6 +60,7 @@ QString deviceName(SubstitutionContext* substitution, common::SystemContext* con
 QString siteName(SubstitutionContext* substitution, common::SystemContext* context);
 QString userName(SubstitutionContext* substitution, common::SystemContext* context);
 QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventAttributeName(SubstitutionContext* substitution);
 QString serverName(SubstitutionContext* substitution, common::SystemContext* context);
 
 QString eventField(SubstitutionContext* substitution, common::SystemContext* context);
