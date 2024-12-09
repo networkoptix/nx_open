@@ -23,6 +23,9 @@ ValidationResult TextLookupFieldValidator::validity(
         if (fieldValue.isEmpty())
             return {QValidator::State::Invalid, tr("List is not selected")};
 
+        if (!nx::Uuid::isUuidString(fieldValue))
+            return {QValidator::State::Invalid, tr("Invalid UUID string")};
+
         const auto lookupList = context->lookupListManager()->lookupList(Uuid{fieldValue});
         if (lookupList == nx::vms::api::LookupListData{})
         {
