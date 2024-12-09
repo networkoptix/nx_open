@@ -83,7 +83,6 @@ public:
     static State setSettingsOptimizationEnabled(State state, bool value);
     static std::pair<bool, State> setHasPowerUserPermissions(State state, bool value);
     static std::pair<bool, State> setHasEventLogPermission(State state, bool value);
-    static std::pair<bool, State> setHasEditAccessRightsForAllCameras(State state, bool value);
     static std::pair<bool, State> setPermissions(State state, Qn::Permissions value);
     static std::pair<bool, State> setAllCamerasEditable(State state, bool value);
     static std::pair<bool, State> setSaasInitialized(State state, bool value);

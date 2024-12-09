@@ -94,7 +94,6 @@ public:
     void setSettingsOptimizationEnabled(bool value);
     void setHasPowerUserPermissions(bool value);
     void setHasEventLogPermission(bool value);
-    void setHasEditAccessRightsForAllCameras(bool value);
     void setPermissions(Qn::Permissions value);
     void setAllCamerasEditable(bool value);
     void setSaasInitialized(bool value);

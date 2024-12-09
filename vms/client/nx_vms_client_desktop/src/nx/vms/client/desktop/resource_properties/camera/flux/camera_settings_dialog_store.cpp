@@ -218,15 +218,6 @@ void CameraSettingsDialogStore::setHasEventLogPermission(bool value)
         [&](State state) { return Reducer::setHasEventLogPermission(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setHasEditAccessRightsForAllCameras(bool value)
-{
-    d->executeAction(
-        [&](State state)
-        {
-            return Reducer::setHasEditAccessRightsForAllCameras(std::move(state), value);
-        });
-}
-
 void CameraSettingsDialogStore::setPermissions(Qn::Permissions value)
 {
     d->executeAction(

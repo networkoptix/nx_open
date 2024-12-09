@@ -136,7 +136,7 @@ bool CameraSettingsDialogState::canShowHotspotsPage() const
     return isSingleCamera()
         && singleCameraProperties.supportsCameraHotspots
         && devicesDescription.streamCapabilitiesInitialized == CombinedValue::All
-        && hasEditAccessRightsForAllCameras
+        && allCamerasEditable
         && ini().enableCameraHotspotsFeature;
 }
 

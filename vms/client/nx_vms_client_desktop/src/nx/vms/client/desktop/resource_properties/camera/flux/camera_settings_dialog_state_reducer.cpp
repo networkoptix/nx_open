@@ -995,26 +995,6 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setHasEventLogPermissio
     return {true, std::move(state)};
 }
 
-std::pair<bool, State> CameraSettingsDialogStateReducer::setHasEditAccessRightsForAllCameras(
-    State state,
-    bool value)
-{
-    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
-
-    if (state.hasEditAccessRightsForAllCameras == value)
-        return {false, std::move(state)};
-
-    state.hasEditAccessRightsForAllCameras = value;
-
-    if (!state.hasEditAccessRightsForAllCameras)
-    {
-        state.singleCameraSettings.cameraHotspotsEnabled.resetUser();
-        state.singleCameraSettings.cameraHotspots.resetUser();
-    }
-
-    return {true, std::move(state)};
-}
-
 std::pair<bool, State> CameraSettingsDialogStateReducer::setPermissions(
     State state,
     Qn::Permissions value)
@@ -1038,6 +1018,13 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAllCamerasEditable(
         return {false, std::move(state)};
 
     state.allCamerasEditable = value;
+
+    if (!state.allCamerasEditable)
+    {
+        state.singleCameraSettings.cameraHotspotsEnabled.resetUser();
+        state.singleCameraSettings.cameraHotspots.resetUser();
+    }
+
     return {true, std::move(state)};
 }
 

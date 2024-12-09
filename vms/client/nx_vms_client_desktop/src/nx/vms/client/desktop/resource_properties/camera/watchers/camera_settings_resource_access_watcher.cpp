@@ -85,36 +85,6 @@ CameraSettingsResourceAccessWatcher::CameraSettingsResourceAccessWatcher(
         connect(action, &QAction::toggled, this,
             [this](bool checked){ d->store->setScreenRecordingOn(checked); });
     }
-
-    const auto updateUserAccessRightsInfo =
-        [this]()
-        {
-            if (!d->systemContext)
-                return;
-
-            const auto user = d->systemContext->accessController()->user();
-            if (!user)
-            {
-                d->store->setHasEditAccessRightsForAllCameras(false);
-                return;
-            }
-
-            if (user->isAdministrator())
-            {
-                d->store->setHasEditAccessRightsForAllCameras(true);
-                return;
-            }
-
-            d->store->setHasEditAccessRightsForAllCameras(
-                d->systemContext->resourceAccessManager()->hasAccessToAllCameras(
-                    user->getId(),
-                    nx::vms::api::AccessRight::edit));
-        };
-
-    connect(systemContext->accessController(), &core::AccessController::permissionsMaybeChanged,
-        this, updateUserAccessRightsInfo);
-
-    updateUserAccessRightsInfo();
 }
 
 CameraSettingsResourceAccessWatcher::~CameraSettingsResourceAccessWatcher()
