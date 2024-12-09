@@ -17,7 +17,7 @@ namespace {
 
 QString attribute(const nx::vms::api::LookupListData& list, int column)
 {
-    if (column >= (int) list.attributeNames.size())
+    if (column < 0 || column >= (int) list.attributeNames.size())
         return {};
 
     return list.attributeNames[column];
