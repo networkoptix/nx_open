@@ -17,9 +17,6 @@ namespace ptz {
 ControllerPool::ControllerPool(common::SystemContext* systemContext, QObject* parent):
     base_type(systemContext, parent)
 {
-    // Controller may potentially be created with delay.
-    connect(this, &QnPtzControllerPool::controllerChanged,
-        this, &ControllerPool::cacheCameraPresets);
     init();
 }
 
@@ -60,11 +57,6 @@ void ControllerPool::registerResource(const QnResourcePtr &resource)
                 cacheCameraPresets(camera);
             }
         });
-
-    connect(camera.get(), &QnResource::statusChanged,
-        this, &ControllerPool::cacheCameraPresets);
-
-    cacheCameraPresets(camera);
 }
 
 void ControllerPool::unregisterResource(const QnResourcePtr &resource) {

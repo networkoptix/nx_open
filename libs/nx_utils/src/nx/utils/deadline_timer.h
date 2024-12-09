@@ -23,6 +23,11 @@ public:
         return nx::utils::systemUptime() >= *m_deadline;
     }
 
+    void forceExpire()
+    {
+        setRemainingTime({});
+    }
+
     void setRemainingTime(std::chrono::milliseconds value)
     {
         m_deadline = nx::utils::systemUptime() + value;
