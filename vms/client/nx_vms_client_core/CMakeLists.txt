@@ -1,7 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 find_package(Qt6 COMPONENTS ShaderTools Widgets Test REQUIRED)
-find_package(range-v3 REQUIRED)
 
 set(qt_helpers_root "${open_source_root}/artifacts/qt_helpers/src")
 file(GLOB_RECURSE qt_helpers_sources "${qt_helpers_root}/qt_helpers/*")
@@ -56,7 +55,6 @@ nx_add_target(nx_vms_client_core LIBRARY
         nx_vms_utils
         ffmpeg::ffmpeg
         speex
-        range-v3::range-v3
     ADDITIONAL_MOC_INCLUDE_DIRS
         ${Qt6Qml_INCLUDE_DIRS}
     ADDITIONAL_MOCABLES

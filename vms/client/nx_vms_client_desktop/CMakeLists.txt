@@ -18,8 +18,6 @@ if(MACOSX)
     find_package(hidapi REQUIRED)
 endif()
 
-find_package(range-v3 REQUIRED)
-
 if(WINDOWS)
     set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
 else()
@@ -137,7 +135,6 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         nx_kit
         nx_monitoring
         nx_pathkit
-        range-v3::range-v3
         ${nx_vms_client_desktop_conditional_dependencies}
     FOLDER client/libs
     GDI
