@@ -12,10 +12,15 @@ using namespace nx::vms::common::ptz;
 namespace nx::vms::client::core {
 namespace ptz {
 
+namespace {
+static constexpr auto kUpdateInterval = std::chrono::minutes(1);
+} // namespace
+
 CachingPtzController::CachingPtzController(const QnPtzControllerPtr& baseController):
     base_type(baseController),
     m_initialized(false)
 {
+    invalidate();
 }
 
 CachingPtzController::~CachingPtzController()
@@ -87,28 +92,66 @@ bool CachingPtzController::getFlip(
 
 bool CachingPtzController::getPresets(QnPtzPresetList* presets) const
 {
-    if (!base_type::getPresets(presets))
-        return false;
+    bool result = false;
+    bool requestBasePresets = false;
+    auto& timer = m_updateTimers[UpdateTimerType::presets];
 
-    const NX_MUTEX_LOCKER locker(&m_mutex);
-    if (!m_data.fields.testFlag(DataField::presets))
-        return false;
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+        if (m_data.fields.testFlag(DataField::presets))
+        {
+            *presets = m_data.presets; //< Return any existing data anyway.
+            result = true;
+        }
 
-    *presets = m_data.presets;
-    return true;
+        if (!result || timer.hasExpired())
+        {
+            // We rely either on returned data or future update signals here and start timer
+            // like if we have this data already.
+            timer.setRemainingTime(kUpdateInterval);
+            requestBasePresets = true;
+        }
+    }
+
+    if (requestBasePresets && !(result = base_type::getPresets(presets)))
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+        timer.forceExpire(); //< Reset timer in case of failure.
+    }
+
+    return result;
 }
 
 bool CachingPtzController::getTours(QnPtzTourList* tours) const
 {
-    if (!base_type::getTours(tours))
-        return false;
+    bool result = false;
+    bool requestBaseTours = false;
+    auto& timer = m_updateTimers[UpdateTimerType::tours];
 
-    const NX_MUTEX_LOCKER locker(&m_mutex);
-    if (!m_data.fields.testFlag(DataField::tours))
-        return false;
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+        if (m_data.fields.testFlag(DataField::tours))
+        {
+            *tours = m_data.tours; //< Return any existing data anyway.
+            result = true;
+        }
 
-    *tours = m_data.tours;
-    return true;
+        if (!result || timer.hasExpired())
+        {
+            // We rely either on returned data or future update signals here and start timer
+            // like if we have this data already.
+            timer.setRemainingTime(kUpdateInterval);
+            requestBaseTours = true;
+        }
+    }
+
+    if (requestBaseTours && !(result = base_type::getTours(tours)))
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+        timer.forceExpire(); //< Reset timer in case of failure.
+    }
+
+    return result;
 }
 
 bool CachingPtzController::getActiveObject(QnPtzObject* activeObject) const
@@ -413,6 +456,18 @@ DataFields CachingPtzController::updateCacheLocked(const QnPtzData& data)
     }
 
     return changedFields;
+}
+
+void CachingPtzController::invalidate()
+{
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+
+        for (auto& timer: m_updateTimers)
+            timer.forceExpire();
+    }
+
+    base_type::invalidate();
 }
 
 } // namespace ptz

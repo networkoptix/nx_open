@@ -19,7 +19,9 @@ public:
     QnPtzControllerPtr baseController() const;
 
 public: // Overrides section
-    virtual void initialize();
+    virtual void initialize() override;
+
+    virtual void invalidate() override;
 
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 

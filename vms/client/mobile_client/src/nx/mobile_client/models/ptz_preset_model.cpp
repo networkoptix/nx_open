@@ -38,16 +38,31 @@ PtzPresetModel::PtzPresetModel(QObject* parent):
                 d->uniqueResourceId);
             auto systemContext = nx::vms::client::core::SystemContext::fromResource(resource);
             const auto controller = systemContext->ptzControllerPool()->controller(resource);
-            QnPtzPresetList presets;
-            // In case of error empty list will be returned.
-            nx::vms::client::core::ptz::helpers::getSortedPresets(controller, presets);
-
-            if (presets == d->presets)
+            if (!NX_ASSERT(controller))
                 return;
 
-            beginResetModel();
-            d->presets = presets;
-            endResetModel();
+            const auto updatePresets =
+                [this, rawController = controller.data()]()
+                {
+                    QnPtzPresetList presets;
+                    // In case of error empty list will be returned.
+                    nx::vms::client::core::ptz::helpers::getSortedPresets(rawController, presets);
+                    if (presets == d->presets)
+                        return;
+
+                    beginResetModel();
+                    d->presets = presets;
+                    endResetModel();
+                };
+
+            updatePresets();
+
+            connect(controller.data(), &QnAbstractPtzController::changed, this,
+                [updatePresets](nx::vms::common::ptz::DataFields fields)
+                {
+                    if (fields.testFlag(nx::vms::common::ptz::DataField::presets))
+                        updatePresets();
+                });
         });
 }
 
