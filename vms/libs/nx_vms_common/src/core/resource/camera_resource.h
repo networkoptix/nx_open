@@ -11,6 +11,7 @@
 #include <common/common_globals.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/misc/schedule_task.h>
+#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/resource_fwd.h>
@@ -40,8 +41,6 @@ namespace nx::core::resource { class AbstractRemoteArchiveManager; }
 namespace nx::media { enum class StreamEvent; }
 namespace nx::core::ptz { enum class PresetType; }
 
-class CameraMediaStreams;
-class CameraMediaStreamInfo;
 class CameraBitrates;
 class CameraBitrateInfo;
 
@@ -806,6 +805,9 @@ public:
     using DeviceAgentManifestMap = std::map<nx::Uuid, nx::vms::api::analytics::DeviceAgentManifest>;
     DeviceAgentManifestMap deviceAgentManifests() const;
 
+    int backupMegapixels() const;
+    int backupMegapixels(nx::vms::api::CameraBackupQuality quality) const;
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
@@ -916,6 +918,8 @@ private:
     nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedEventTypes;
     nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedObjectTypes;
     mutable nx::Lockable<std::map<nx::Uuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
+    nx::utils::CachedValue<CameraMediaStreams> m_cachedMediaStreams;
+    nx::utils::CachedValue<int> m_cachedBackupMegapixels;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);

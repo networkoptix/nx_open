@@ -7,7 +7,6 @@
 #include <api/model/api_ioport_data.h>
 #include <common/common_module.h>
 #include <core/ptz/ptz_preset.h>
-#include <core/resource/camera_media_stream_info.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_data.h>
@@ -244,7 +243,26 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_cachedSupportedEventTypes(
         [this]() { return calculateSupportedEventTypes(); }),
     m_cachedSupportedObjectTypes(
-        [this]() { return calculateSupportedObjectTypes(); })
+        [this]() { return calculateSupportedObjectTypes(); }),
+    m_cachedMediaStreams(
+        [this]()
+        {
+            const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
+            CameraMediaStreams supportedMediaStreams =
+                QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
+
+            // TODO #lbusygin: just for vms_4.2 version, get rid of this code when the mobile client
+            // stops supporting servers < 5.0.
+            for (auto& str: supportedMediaStreams.streams)
+            {
+                if (str.codec == AV_CODEC_ID_INDEO3)
+                    str.codec = AV_CODEC_ID_H264;
+                if (str.codec == AV_CODEC_ID_FIC)
+                    str.codec = AV_CODEC_ID_H265;
+            }
+            return supportedMediaStreams;
+        }),
+    m_cachedBackupMegapixels([this]() { return backupMegapixels(getActualBackupQualities()); })
 {
     NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
@@ -1835,6 +1853,8 @@ void QnVirtualCameraResource::resetCachedValues()
     m_cachedMotionStreamIndex.reset();
     m_cachedIoPorts.reset();
     m_cachedHasVideo.reset();
+    m_cachedBackupMegapixels.reset();
+    m_cachedMediaStreams.reset();
 }
 
 bool QnVirtualCameraResource::useBitratePerGop() const
@@ -2242,19 +2262,7 @@ nx::vms::api::RtpTransportType QnVirtualCameraResource::preferredRtpTransport() 
 
 CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
 {
-    const QString& mediaStreamsStr = getProperty(ResourcePropertyKey::kMediaStreams);
-    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
-
-    // TODO #lbusygin: just for vms_4.2 version, get rid of this code when the mobile client
-    // stops supporting servers < 5.0.
-    for(auto& str: supportedMediaStreams.streams)
-    {
-        if (str.codec == AV_CODEC_ID_INDEO3)
-            str.codec = AV_CODEC_ID_H264;
-        if (str.codec == AV_CODEC_ID_FIC)
-            str.codec = AV_CODEC_ID_H265;
-    }
-    return supportedMediaStreams;
+    return m_cachedMediaStreams.get();
 }
 
 CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(nx::vms::api::StreamIndex index) const
@@ -2356,6 +2364,11 @@ void QnVirtualCameraResource::emitPropertyChanged(
     else if (key == ResourcePropertyKey::kIoConfigCapability)
     {
         emit isIOModuleChanged(::toSharedPointer(this));
+    }
+    else if (key == ResourcePropertyKey::kMediaStreams)
+    {
+        m_cachedMediaStreams.reset();
+        m_cachedBackupMegapixels.reset();
     }
 
     if (key == kDeviceAgentManifestsProperty || key == kAnalyzedStreamIndexes)
@@ -2868,4 +2881,25 @@ QString QnVirtualCameraResource::forcedProfile(nx::vms::api::StreamIndex index) 
         index == nx::vms::api::StreamIndex::primary
         ? ResourcePropertyKey::kForcedPrimaryProfile
         : ResourcePropertyKey::kForcedSecondaryProfile);
+}
+
+int QnVirtualCameraResource::backupMegapixels() const
+{
+    return m_cachedBackupMegapixels.get();
+}
+
+int QnVirtualCameraResource::backupMegapixels(nx::vms::api::CameraBackupQuality quality) const
+{
+    int result = 0;
+    for (const auto& s: mediaStreams().streams)
+    {
+        using namespace nx::vms::api;
+        if (s.getEncoderIndex() == StreamIndex::primary && isHiQualityEnabled(quality)
+            || s.getEncoderIndex() == StreamIndex::secondary && isLowQualityEnabled(quality))
+        {
+            const auto resolution = ResolutionData(s.getResolution());
+            result = std::max(result, resolution.megaPixels());
+        }
+    }
+    return result;
 }

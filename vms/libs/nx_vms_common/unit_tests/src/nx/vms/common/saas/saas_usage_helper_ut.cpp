@@ -213,9 +213,19 @@ protected:
             camera->setBackupQuality(CameraBackupQuality::CameraBackupBoth);
             camera->setBackupPolicy(BackupPolicy::on);
         }
-        auto capabilities = camera->cameraMediaCapability();
-        capabilities.maxResolution = QSize(1000 * megapixels, 1000);
-        camera->setCameraMediaCapability(capabilities);
+
+        CameraMediaStreams streams;
+        streams.streams.push_back(CameraMediaStreamInfo(StreamIndex::primary));
+        streams.streams.push_back(CameraMediaStreamInfo(StreamIndex::secondary));
+        for (auto& s: streams.streams)
+        {
+            s.resolution = CameraMediaStreamInfo::resolutionToString(
+                QSize(1000 * megapixels, 1000));
+        }
+        camera->setProperty(
+            ResourcePropertyKey::kMediaStreams, QString::fromUtf8(QJson::serialized(streams)));
+        camera->saveProperties();
+
         return camera;
     }
 

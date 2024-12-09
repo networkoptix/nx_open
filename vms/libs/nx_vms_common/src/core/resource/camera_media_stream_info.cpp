@@ -31,11 +31,10 @@ bool CameraMediaStreamInfo::operator!=(const CameraMediaStreamInfo& rhs) const
 
 QSize CameraMediaStreamInfo::getResolution() const
 {
-    QStringList tmp = resolution.split('x');
-    if (tmp.size() == 2)
-        return QSize(tmp[0].toInt(), tmp[1].toInt());
-    else
+    auto delimiter = resolution.indexOf('x');
+    if (delimiter == -1)
         return QSize();
+    return QSize(resolution.left(delimiter).toInt(), resolution.mid(delimiter+1).toInt());
 }
 
 nx::vms::api::StreamIndex CameraMediaStreamInfo::getEncoderIndex() const

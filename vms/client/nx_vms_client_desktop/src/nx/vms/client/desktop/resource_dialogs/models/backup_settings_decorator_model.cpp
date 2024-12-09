@@ -90,11 +90,6 @@ bool cameraHasNotRemovedFlag(const QnVirtualCameraResourcePtr& camera)
     return !camera->hasFlags(Qn::ResourceFlag::removed);
 }
 
-int cameraMaxResolutionMegaPixels(const QnVirtualCameraResourcePtr& camera)
-{
-    return camera->cameraMediaCapability().maxResolution.megaPixels();
-}
-
 nx::utils::ScopedChangeNotifier<bool> makeHasChangesNotifier(
     nx::vms::client::desktop::BackupSettingsDecoratorModel* decoratorModel)
 {
@@ -345,7 +340,7 @@ std::optional<MessageTexts> BackupSettingsDecoratorModel::Private::servicesOveru
 int BackupSettingsDecoratorModel::Private::availableCloudStorageServices(
     const QnVirtualCameraResourcePtr& camera) const
 {
-    const auto resolution = cameraMaxResolutionMegaPixels(camera);
+    const auto resolution = camera->backupMegapixels(backupQuality(camera));
     const auto servicesSummary = cloudStorageUsageHelper->allInfoForResolution(resolution);
     return servicesSummary.available - servicesSummary.inUse;
 }
@@ -522,7 +517,7 @@ QVariant BackupSettingsDecoratorModel::data(const QModelIndex& index, int role) 
 
     // Data for rows that contain camera resource which supports backup.
     const auto backupEnabled = d->backupEnabled(camera);
-    const auto cameraResolution = cameraMaxResolutionMegaPixels(camera);
+    const auto cameraResolution = camera->backupMegapixels(d->backupQuality(camera));
 
     const auto availableServices = d->isCloudBackupStorage
         ? d->availableCloudStorageServices(camera) : 0;

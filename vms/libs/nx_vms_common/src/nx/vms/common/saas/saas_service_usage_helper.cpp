@@ -17,7 +17,7 @@ namespace {
 
 int getMegapixels(const auto& camera)
 {
-    int megapixels = camera->cameraMediaCapability().maxResolution.megaPixels();
+    int megapixels = camera->backupMegapixels();
     if (megapixels == 0)
     {
         // In case of device don't provide megapixel information then it requires license
