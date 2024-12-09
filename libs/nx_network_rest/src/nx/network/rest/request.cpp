@@ -14,12 +14,13 @@ namespace nx::network::rest {
 
 static std::tuple<nx::network::http::Method, QString> methodAndPath(const std::string& method)
 {
-    static constexpr std::array<std::pair<std::string_view, std::string_view>, 7>
+    static constexpr std::array<std::pair<std::string_view, std::string_view>, 8>
         kValueTailToMethod = {
             std::make_pair(std::string_view(".create"), nx::network::http::Method::post),
             std::make_pair(std::string_view(".list"), nx::network::http::Method::get),
             std::make_pair(std::string_view(".get"), nx::network::http::Method::get),
             std::make_pair(std::string_view(".update"), nx::network::http::Method::patch),
+            std::make_pair(std::string_view(".set"), nx::network::http::Method::put),
             std::make_pair(std::string_view(".delete"), nx::network::http::Method::delete_),
             std::make_pair(std::string_view(".subscribe"), nx::network::http::Method::get),
             std::make_pair(std::string_view(".unsubscribe"), nx::network::http::Method::get),
