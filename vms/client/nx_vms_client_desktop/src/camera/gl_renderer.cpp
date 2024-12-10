@@ -502,18 +502,6 @@ bool QnGLRenderer::drawVideoTextures(
     bool isStillImage,
     qreal opacity)
 {
-    const float textureCoordArray[8] = {
-        (float)textureRect.x(), (float)textureRect.y(),
-        (float)textureRect.right(), (float)textureRect.top(),
-        (float)textureRect.right(), (float)textureRect.bottom(),
-        (float)textureRect.x(), (float)textureRect.bottom()};
-
-    float vertexCoordArray[] = {
-        (float)viewRect.left(), (float)viewRect.top(),
-        (float)viewRect.right(), (float)viewRect.top(),
-        (float)viewRect.right(), (float)viewRect.bottom(),
-        (float)viewRect.left(), (float)viewRect.bottom()};
-
     // TODO: #vkutin I'm not sure NV12 will work correctly.
     // Old code was written like this:
     // float textureCoordArray[8] = {
@@ -544,6 +532,7 @@ bool QnGLRenderer::drawVideoTextures(
         : dewarping::ViewData();
 
     float ar = 1.0;
+    bool doExtraRotation = false;
     if (mediaParams.enabled && itemParams.enabled)
     {
         if (isDewarpingAllowed())
@@ -563,7 +552,7 @@ bool QnGLRenderer::drawVideoTextures(
         }
         else
         {
-            std::rotate(vertexCoordArray, vertexCoordArray + 4, vertexCoordArray + 8);
+            doExtraRotation = true;
             itemParams.enabled = false;
         }
     }
@@ -651,6 +640,9 @@ bool QnGLRenderer::drawVideoTextures(
             program.verts[1] = toDevice(viewRect.topRight());
             program.verts[2] = toDevice(viewRect.bottomLeft());
             program.verts[3] = toDevice(viewRect.bottomRight());
+
+            if (doExtraRotation)
+                std::reverse(program.verts.begin(), program.verts.end());
 
             program.texCoords[0] = QVector2D(textureRect.left(), textureRect.top());
             program.texCoords[1] = QVector2D(textureRect.right(), textureRect.top());
@@ -774,6 +766,27 @@ bool QnGLRenderer::drawVideoTextures(
         m_gl->glBindTexture(GL_TEXTURE_2D, textureIds[i]);
         glCheckError("glBindTexture");
     }
+
+    const float textureCoordArray[8] = {(float) textureRect.x(),
+        (float) textureRect.y(),
+        (float) textureRect.right(),
+        (float) textureRect.top(),
+        (float) textureRect.right(),
+        (float) textureRect.bottom(),
+        (float) textureRect.x(),
+        (float) textureRect.bottom()};
+
+    float vertexCoordArray[] = {(float) viewRect.left(),
+        (float) viewRect.top(),
+        (float) viewRect.right(),
+        (float) viewRect.top(),
+        (float) viewRect.right(),
+        (float) viewRect.bottom(),
+        (float) viewRect.left(),
+        (float) viewRect.bottom()};
+
+    if (doExtraRotation)
+        std::rotate(vertexCoordArray, vertexCoordArray + 4, vertexCoordArray + 8);
 
     drawBindedTexture(program, vertexCoordArray, textureCoordArray);
     program->release();
