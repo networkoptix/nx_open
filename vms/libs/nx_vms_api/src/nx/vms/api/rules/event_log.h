@@ -109,13 +109,10 @@ struct NX_VMS_API EventLogRecord
 
     /**%apidoc[opt] Event log record flags. */
     EventLogFlags flags;
-
-    /**%apidoc[opt] Id of the Server that stores the record. */
-    Uuid serverId;
 };
 
 #define EventLogRecord_Fields \
-    (timestampMs)(eventData)(actionData)(aggregatedInfo)(ruleId)(flags)(serverId)
+    (timestampMs)(eventData)(actionData)(aggregatedInfo)(ruleId)(flags)
 
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(ubjson)(sql_record), NX_VMS_API)
