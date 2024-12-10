@@ -79,12 +79,6 @@ bool TextLookupField::match(const QVariant& eventValue) const
         if (m_checkType == TextLookupCheckType::containsKeywords
             || m_checkType == TextLookupCheckType::doesNotContainKeywords)
         {
-            if (!NX_ASSERT(m_value.isEmpty()
-                || !nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
-            {
-                return {};
-            }
-
             m_list = nx::vms::event::splitOnPureKeywords(m_value);
         }
         else
