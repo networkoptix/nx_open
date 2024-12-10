@@ -173,16 +173,16 @@ void TextLookupPicker::updateUi()
 {
     TitledFieldPickerWidget<vms::rules::TextLookupField>::updateUi();
 
-    const auto newIndex = m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType()));
-    if (m_field->value() == m_lineEdit->text() && newIndex == m_checkTypeComboBox->currentIndex())
-        return;
+    m_checkTypeComboBox->setCurrentIndex(
+        m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType())));
 
-    m_checkTypeComboBox->setCurrentIndex(newIndex);
     switch (m_field->checkType())
     {
         case LookupCheckType::containsKeywords:
         case LookupCheckType::doesNotContainKeywords:
             m_stackedWidget->setCurrentIndex(0);
+            if (m_field->value() == m_lineEdit->text())
+                return;
             m_lineEdit->setText(m_field->value());
             return;
         case LookupCheckType::inList:
