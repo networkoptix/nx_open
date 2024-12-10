@@ -78,11 +78,6 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSub
     {QIcon::Selected, {.primary = "light10"}},
     {QnIcon::Pressed, {.primary = "light14"}},
 };
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kCheckedThemeSubstitutions = {
-    {QIcon::Normal, {.primary = "light2"}},
-    {QIcon::Active, {.primary = "light1"}},
-    {QIcon::Selected, {.primary = "light3"}},
-};
 
 static const QColor kLight16Color = "#698796";
 static const QColor kDark17Color = "#53707F";
@@ -98,7 +93,7 @@ NX_DECLARE_COLORIZED_ICON(kDeviceIcon, "20x20/Solid/camera.svg", kThemeSubstitut
 NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckedEventLogIcon,
     "20x20/Outline/event_log.svg", kThemeSubstitutions,
-    "20x20/Outline/no_list.svg", kCheckedThemeSubstitutions)
+    "20x20/Outline/no_list.svg", kThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kCheckedImageIcon,
     "20x20/Outline/image.svg", kThemeSubstitutions,
     "20x20/Outline/image_hide.svg", kThemeSubstitutions)
