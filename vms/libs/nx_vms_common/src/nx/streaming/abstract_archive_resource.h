@@ -18,15 +18,6 @@ public:
     virtual nx::vms::api::ResourceStatus getStatus() const override;
     virtual void setStatus(nx::vms::api::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
-    //!Implementation of QnMediaResource::toResource
-    virtual const QnResource* toResource() const override;
-    //!Implementation of QnMediaResource::toResource
-    virtual QnResource* toResource() override;
-    //!Implementation of QnMediaResource::toResource
-    virtual const QnResourcePtr toResourcePtr() const override;
-    //!Implementation of QnMediaResource::toResource
-    virtual QnResourcePtr toResourcePtr() override;
-
 private:
     nx::vms::api::ResourceStatus m_localStatus;
 };

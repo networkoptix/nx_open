@@ -1283,7 +1283,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
                 else
                 {
-                    if (m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(Qn::live))
+                    if (m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(Qn::live))
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
                 }
             }
@@ -2212,7 +2212,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
         if (mutedItemIds.contains(mediaResourceWidget->uuid()))
             mediaResourceWidget->setMuted(true);
 
-        const auto resource = mediaResourceWidget->resource()->toResourcePtr();
+        const auto resource = mediaResourceWidget->resource();
 
         std::optional<qint64> timeMs;
         if (const auto timeData = mediaResourceWidget->item()->data(Qn::ItemTimeRole);

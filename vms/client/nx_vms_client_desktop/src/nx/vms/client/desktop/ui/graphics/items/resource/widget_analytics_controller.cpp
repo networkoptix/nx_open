@@ -374,7 +374,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 {
     for (const auto& objectInfo: objectInfoByTrackId)
     {
-        const auto deviceId = mediaResourceWidget->resource()->toResourcePtr()->getId();
+        const auto deviceId = mediaResourceWidget->resource()->getId();
         const bool checkBounds = relevantCameraIds.empty()
             || relevantCameraIds.contains(deviceId);
 
@@ -496,7 +496,7 @@ WidgetAnalyticsController::WidgetAnalyticsController(QnMediaResourceWidget* medi
     {
         d->logger = std::make_unique<nx::analytics::MetadataLogger>(
             "widget_analytics_controller_",
-            d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
+            d->mediaResourceWidget->resource()->getId(),
             /*engineId*/ nx::Uuid());
     }
 }
@@ -530,7 +530,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         "Found %2 tracks for resource %3",
         approximateDebugTime(timestamp),
         tracks.size(),
-        d->mediaResourceWidget->resource()->toResourcePtr()->getId());
+        d->mediaResourceWidget->resource()->getId());
 
     // Process each object from the actual metadata packets.
     for (const auto& track: tracks)

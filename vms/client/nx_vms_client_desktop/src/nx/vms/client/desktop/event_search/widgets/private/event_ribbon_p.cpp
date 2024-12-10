@@ -374,13 +374,14 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!mediaResource)
         return;
 
-    if (auto cameraResource = mediaResource->toResourcePtr())
+    if (auto camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
+        camera && modelIndex.data(Qn::ShowVideoPreviewRole).toBool())
     {
-        auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
-        widget->setVideoPreviewResource(
-            camera && modelIndex.data(Qn::ShowVideoPreviewRole).toBool()
-            ? camera
-            : QnVirtualCameraResourcePtr{});
+        widget->setVideoPreviewResource(camera);
+    }
+    else
+    {
+        widget->setVideoPreviewResource({});
     }
 
     const bool forcePreviewLoader = modelIndex.data(Qn::ForcePreviewLoaderRole).toBool();

@@ -655,7 +655,7 @@ void ActionHandler::addToLayout(
     const AddToLayoutParams& params)
 {
     for (const QnMediaResourcePtr& resource: resources)
-        addToLayout(layout, resource->toResourcePtr(), params);
+        addToLayout(layout, resource, params);
 }
 
 void ActionHandler::addToLayout(
@@ -2947,7 +2947,7 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
     addParams.displayHotspots = widget->item()->displayHotspots();
     addToLayout(
         workbench()->currentLayoutResource(),
-        widget->resource()->toResourcePtr(),
+        widget->resource(),
         addParams);
 }
 

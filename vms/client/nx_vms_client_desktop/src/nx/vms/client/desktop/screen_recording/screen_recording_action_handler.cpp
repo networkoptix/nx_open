@@ -213,7 +213,7 @@ void ScreenRecordingActionHandler::startRecordingInternal()
 
     m_dataProvider.reset(dynamic_cast<DesktopDataProviderWrapper*>(
         qnClientCoreModule->dataProviderFactory()->createDataProvider(res)));
-    m_recorder.reset(new ExportStorageStreamRecorder(res->toResourcePtr(), m_dataProvider.get()));
+    m_recorder.reset(new ExportStorageStreamRecorder(res, m_dataProvider.get()));
     m_dataProvider->addDataProcessor(m_recorder.data());
 
     if (!m_recorder->addRecordingContext(filePath))

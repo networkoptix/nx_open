@@ -649,8 +649,7 @@ void ExportSettingsDialog::setMediaParams(
     const auto startTimeMs = currentSettings.period.startTimeMs;
 
     QString timePart;
-    const auto resource = mediaResource->toResourcePtr();
-    if (resource->hasFlags(Qn::utc))
+    if (mediaResource->hasFlags(Qn::utc))
     {
         auto dateTime = QDateTime::fromMSecsSinceEpoch(startTimeMs, timestampTimeZone);
         timePart = nx::vms::time::toString(dateTime, nx::vms::time::Format::filename_date);
@@ -661,7 +660,7 @@ void ExportSettingsDialog::setMediaParams(
     }
 
     Filename baseFileName = currentSettings.fileName;
-    QString namePart = resource->getName();
+    QString namePart = mediaResource->getName();
 
     static constexpr int kMaxNamePartLength = 200;
     if (namePart.length() > kMaxNamePartLength)
@@ -669,7 +668,7 @@ void ExportSettingsDialog::setMediaParams(
 
     baseFileName.name = nx::utils::replaceNonFileNameCharacters(namePart + '_' + timePart, '_');
 
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
 
     d->setMediaResource(mediaResource);
 

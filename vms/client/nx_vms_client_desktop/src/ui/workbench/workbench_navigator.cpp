@@ -801,14 +801,14 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         return;
 
     auto syncedResource = widget->resource();
-    auto systemContext = SystemContext::fromResource(syncedResource->toResourcePtr());
+    auto systemContext = SystemContext::fromResource(syncedResource);
     if (!NX_ASSERT(systemContext))
         return;
 
     m_syncedWidgets.insert(widget);
     ++m_syncedResources[syncedResource];
 
-    connect(syncedResource->toResourcePtr().get(), &QnResource::parentIdChanged,
+    connect(syncedResource.get(), &QnResource::parentIdChanged,
         this, &QnWorkbenchNavigator::updateTimeZone);
 
     if (auto loader = systemContext->cameraDataManager()->loader(syncedResource))
@@ -835,7 +835,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         updateSyncedPeriods();
 
     if (!widget->isZoomWindow())
-        updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
+        updateHistoryForCamera(widget->resource().dynamicCast<QnVirtualCameraResource>());
 
     updateLines();
     updateSyncIsForced();
@@ -848,7 +848,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
         return;
 
     auto syncedResource = widget->resource();
-    syncedResource->toResourcePtr()->disconnect(this);
+    syncedResource->disconnect(this);
 
     if (display() && !display()->isChangingLayout())
     {
@@ -871,7 +871,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
 
     if (noMoreWidgetsOfThisResource)
     {
-        auto systemContext = SystemContext::fromResource(syncedResource->toResourcePtr());
+        auto systemContext = SystemContext::fromResource(syncedResource);
         if (!NX_ASSERT(systemContext))
             return;
 
@@ -1731,7 +1731,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 bool onlyVirtualCameras = std::all_of(m_syncedWidgets.begin(), m_syncedWidgets.end(),
                     [](QnMediaResourceWidget* widget)
                     {
-                        return widget->resource()->toResourcePtr()->hasFlags(Qn::virtual_camera);
+                        return widget->resource()->hasFlags(Qn::virtual_camera);
                     });
 
                 if (onlyVirtualCameras)
@@ -2012,7 +2012,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
             continue; /* Ignore it. */
 
         // Ignore cross-system cameras from offline Systems.
-        if (widget->resource()->toResourcePtr()->hasFlags(Qn::fake))
+        if (widget->resource()->hasFlags(Qn::fake))
             continue;
 
         if (auto loader = loaderByWidget(widget))
@@ -2228,7 +2228,7 @@ bool QnWorkbenchNavigator::calculateIsLiveSupported() const
     {
         for (const QnMediaResourcePtr& resource: m_syncedResources.keys())
         {
-            if (calculateResourceWidgetFlags(resource->toResourcePtr()) & WidgetSupportsLive)
+            if (calculateResourceWidgetFlags(resource) & WidgetSupportsLive)
                 return true;
         }
     }
@@ -2307,7 +2307,7 @@ bool QnWorkbenchNavigator::calculateTimelineRelevancy() const
     if (!m_currentMediaWidget)
         return false;
 
-    const auto resource = m_currentMediaWidget->resource()->toResourcePtr();
+    const auto resource = m_currentMediaWidget->resource();
     NX_ASSERT(resource);
     if (!resource)
         return false;
@@ -2585,7 +2585,7 @@ core::CachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(
 
     auto systemContext = widget->systemContext();
     if (!NX_ASSERT(systemContext)
-        || !NX_ASSERT(systemContext == widget->resource()->toResourcePtr()->systemContext()))
+        || !NX_ASSERT(systemContext == widget->resource()->systemContext()))
     {
         return {};
     }
@@ -2974,7 +2974,7 @@ bool QnWorkbenchNavigator::hasWidgetWithCamera(const QnVirtualCameraResourcePtr&
     return std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
         [cameraId = camera->getId()](const QnMediaResourcePtr& resource)
         {
-            return resource->toResourcePtr()->getId() == cameraId;
+            return resource->getId() == cameraId;
         });
 }
 

@@ -136,12 +136,12 @@ core::CachingCameraDataLoaderPtr QnCameraDataManager::loader(
     if (!core::CachingCameraDataLoader::supportedResource(resource))
         return {};
 
-    NX_ASSERT(resource->toResourcePtr()->systemContext() == systemContext(),
+    NX_ASSERT(resource->systemContext() == systemContext(),
         "Resource belongs to another System Context");
 
     core::CachingCameraDataLoaderPtr loader(new core::CachingCameraDataLoader(resource));
 
-    const auto camera = resource->toResourcePtr().dynamicCast<QnClientCameraResource>();
+    const auto camera = resource.dynamicCast<QnClientCameraResource>();
     if (camera)
     {
         connect(camera.get(), &QnClientCameraResource::footageAdded,

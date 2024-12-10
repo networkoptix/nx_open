@@ -922,7 +922,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const Vector& speed, 
 {
     if (widget && widget->resource())
     {
-        if (const auto resource = widget->resource()->toResourcePtr())
+        if (const auto resource = widget->resource())
             NX_DEBUG(this, "Move attempt: %1", resource->getName());
     }
 

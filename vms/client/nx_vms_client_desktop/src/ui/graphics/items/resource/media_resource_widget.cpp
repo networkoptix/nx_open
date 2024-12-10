@@ -1275,7 +1275,7 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (result.isValid())
         return result.toFloat();
 
-    if (const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+    if (const auto& camera = resource().dynamicCast<QnVirtualCameraResource>())
     {
         const auto cameraAspectRatio = camera->aspectRatio();
         if (cameraAspectRatio.isValid())
@@ -1296,7 +1296,7 @@ void QnMediaResourceWidget::updateDisplay()
 
     const auto display = zoomTargetWidget
         ? zoomTargetWidget->display()
-        : QnResourceDisplayPtr(new QnResourceDisplay(d->mediaResource->toResourcePtr()));
+        : QnResourceDisplayPtr(new QnResourceDisplay(d->mediaResource));
 
     setDisplay(display);
 }

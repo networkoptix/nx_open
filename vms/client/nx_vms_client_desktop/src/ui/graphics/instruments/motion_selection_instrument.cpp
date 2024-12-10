@@ -38,7 +38,7 @@ bool widgetWithMotion(QGraphicsItem* item)
 {
     if (const auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
     {
-        return widget->resource()->toResource()->hasFlags(Qn::motion)
+        return widget->resource()->hasFlags(Qn::motion)
             && !widget->isZoomWindow();
     }
     return false;

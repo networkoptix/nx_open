@@ -94,8 +94,7 @@ static const QSize kMaximumResolution(std::numeric_limits<int>::max(),
 ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportMediaSettings& settings, QnMediaResourcePtr mediaResource)
 {
-    const QnResourcePtr resource = mediaResource->toResourcePtr();
-    auto systemContext = SystemContext::fromResource(resource);
+    auto systemContext = SystemContext::fromResource(mediaResource);
     if (!NX_ASSERT(systemContext))
         return {};
 
@@ -112,13 +111,13 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     Results results;
 
-    if (!systemContext->accessController()->hasPermissions(resource, Qn::ExportPermission))
+    if (!systemContext->accessController()->hasPermissions(mediaResource, Qn::ExportPermission))
         results.set((int) Result::exportNotAllowed);
 
     // The local video file may not have timestamps.
     // This does not mean that there is no data in it. We can export it.
 
-    const auto isLocalVideoFile = resource->hasFlags(Qn::local_video) && !resource->hasFlags(Qn::periods);
+    const auto isLocalVideoFile = mediaResource->hasFlags(Qn::local_video) && !mediaResource->hasFlags(Qn::periods);
 
     if (periods.isEmpty() && !isLocalVideoFile)
         results.set(int(Result::noCameraData));

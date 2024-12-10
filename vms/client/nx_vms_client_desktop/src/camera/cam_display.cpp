@@ -165,12 +165,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 {
     nx::vms::client::desktop::ini().reload();
 
-    if (resource && resource->toResource()->hasFlags(Qn::live_cam))
+    if (resource && resource->hasFlags(Qn::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
 
-    if (resource && resource->toResource()->hasFlags(Qn::still_image))
+    if (resource && resource->hasFlags(Qn::still_image))
         m_isStillImage = true;
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -1265,7 +1265,7 @@ void QnCamDisplay::processFillerPacket(
 {
     // Do 'jump to live' either for real cameras or '.nov' file items
     const bool hasUtcTime = m_resource
-        && m_resource->toResource()->hasFlags(Qn::ResourceFlag::utc);
+        && m_resource->hasFlags(Qn::ResourceFlag::utc);
 
     m_emptyPacketCounter++;
     const bool needFlushAudio = m_playAudio && m_audioDisplay && m_audioDisplay->msInBuffer() > 0;
@@ -1792,11 +1792,11 @@ void QnCamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 
 void QnCamDisplay::playAudio(bool play)
 {
-    if (m_resource->toResourcePtr()->hasFlags(Qn::virtual_camera))
+    if (m_resource->hasFlags(Qn::virtual_camera))
     {
         m_shouldPlayAudio = play;
         QnVirtualCameraResourcePtr camera =
-            m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+            m_resource.dynamicCast<QnVirtualCameraResource>();
         if (camera && !camera->isAudioEnabled())
             play = false; //< Ignore audio for virtual cameras if it is disabled in UI.
     }
@@ -2164,7 +2164,7 @@ bool QnCamDisplay::isBuffering() const
     // for offline resource at LIVE position no any data. Check it
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
-    return m_resource->toResource()->isOnline();
+    return m_resource->isOnline();
 }
 
 QnAspectRatio QnCamDisplay::overridenAspectRatio() const
@@ -2204,7 +2204,7 @@ nx::media::StreamEventPacket QnCamDisplay::lastMediaEvent() const
 
 QString QnCamDisplay::getName() const
 {
-    return resource()->toResourcePtr()->getName();
+    return resource()->getName();
 }
 
 bool QnCamDisplay::isRadassSupported() const

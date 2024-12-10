@@ -213,7 +213,7 @@ void QnPtzManageDialog::setWidget(QnMediaResourceWidget* widget)
         connect(m_widget, &QnMediaResourceWidget::dewarpingParamsChanged, this,
             &QnPtzManageDialog::updateCanSaveCurrentPosition);
 
-        if (const auto resource = m_widget->resource()->toResourcePtr())
+        if (const auto resource = m_widget->resource())
         {
             setWindowTitle(tr("Manage PTZ for %1...").arg(
                 QnResourceDisplayInfo(resource).toString(
@@ -506,7 +506,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
     if (!isValid())
         return;
 
-    const auto resource = m_widget->resource()->toResourcePtr();
+    const auto resource = m_widget->resource();
     if (resource->getStatus() == nx::vms::api::ResourceStatus::offline
         || resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
     {
@@ -527,7 +527,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
     if (!index.isValid())
         return;
 
-    const auto resource = m_widget->resource()->toResourcePtr();
+    const auto resource = m_widget->resource();
 
     if (resource->getStatus() == nx::vms::api::ResourceStatus::offline
         || resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
@@ -571,7 +571,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
     if (!index.isValid())
         return;
 
-    const auto resource = m_widget->resource()->toResourcePtr();
+    const auto resource = m_widget->resource();
 
     if (resource->getStatus() == nx::vms::api::ResourceStatus::offline
         || resource->getStatus() == nx::vms::api::ResourceStatus::unauthorized)

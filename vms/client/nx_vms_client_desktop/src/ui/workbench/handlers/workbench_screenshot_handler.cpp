@@ -152,10 +152,7 @@ QString getCameraName(const QnMediaResourceWidget* widget)
     if (!mediaResource)
         return QString();
 
-    if (const auto resource = mediaResource->toResource())
-        return resource->getName();
-
-    return QString();
+    return mediaResource->getName();
 }
 
 // -------------------------------------------------------------------------- //
@@ -283,7 +280,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     if (!previousDir.isEmpty())
         keyStack.push(previousDir + "/");
 
-    keyStack.push(widget->resource()->toResource()->getName());
+    keyStack.push(widget->resource()->getName());
 
     struct Key {
         Key(QStack<QString> &stack, const QString &value):
@@ -360,7 +357,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     {
         parameters.utcTimestamp = widgetUtcTime(widget);
         parameters.timeZone = displayTimeZone(widget->resource());
-        parameters.isUtc = widget->resource()->toResource()->flags().testFlag(Qn::utc);
+        parameters.isUtc = widget->resource()->flags().testFlag(Qn::utc);
         Key timeKey(keyStack, lit("_") + parameters.timeString(/*forFilename*/ true));
 
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -429,7 +426,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
     QnResourceDisplayPtr display = widget->display();
     if (display->videoLayout()->channelCount() == 0) {
-        NX_ASSERT(false, "No channels in resource '%1' of type '%2'.", widget->resource()->toResource()->getName(), widget->resource()->toResource()->metaObject()->className());
+        NX_ASSERT(false, "No channels in resource '%1' of type '%2'.", widget->resource()->getName(), widget->resource()->metaObject()->className());
         return;
     }
 
@@ -441,7 +438,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QnScreenshotParameters parameters;
     parameters.utcTimestamp = widgetUtcTime(widget);
     parameters.timeZone = displayTimeZone(widget->resource());
-    parameters.isUtc = widget->resource()->toResource()->flags().testFlag(Qn::utc);
+    parameters.isUtc = widget->resource()->flags().testFlag(Qn::utc);
     parameters.sharedParameters.filename = filename;
     // TODO: #sivanov Store full screenshot settings.
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -734,7 +731,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.customAspectRatio = QnAspectRatio();
         localParameters.rotationAngle = 0;
     } else {
-        QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camera, "Camera must exist here");
         if (camera)
         {
@@ -771,7 +768,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     if (localParameters.sharedParameters.filename.isEmpty())
     {
         localParameters.sharedParameters.filename =
-            widget->resource()->toResource()->getName(); //< Suggested name.
+            widget->resource()->getName(); //< Suggested name.
         if (!updateParametersFromDialog(localParameters))
             return;
 

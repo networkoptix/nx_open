@@ -147,7 +147,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     if(!mediaWidget)
         return;
 
-    const auto resource = mediaWidget->resource()->toResource();
+    const auto resource = mediaWidget->resource().get();
 
     connect(
         resource,
@@ -163,7 +163,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
     if(!mediaWidget)
         return;
 
-    disconnect(mediaWidget->resource()->toResource(), nullptr, this, nullptr);
+    disconnect(mediaWidget->resource().get(), nullptr, this, nullptr);
 
     m_queuedWidgets.remove(mediaWidget);
     if (m_syncedWidgets.contains(mediaWidget))
@@ -195,7 +195,7 @@ void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr
     const auto insertAffectedWidget =
         [&affectedWidgets, &resource] (QnMediaResourceWidget* widget)
         {
-            if(widget->resource()->toResourcePtr() == resource)
+            if(widget->resource() == resource)
                 affectedWidgets.push_back(widget);
         };
 
@@ -213,7 +213,7 @@ void QnWorkbenchStreamSynchronizer::handleWidget(QnMediaResourceWidget* widget)
 {
     NX_ASSERT(!(m_syncedWidgets.contains(widget) && m_queuedWidgets.contains(widget)));
 
-    const auto resource = widget->resource()->toResource();
+    const auto resource = widget->resource();
     const bool hasArchiveReader = widget->display()->archiveReader() != nullptr;
     const bool hasToBeSynced = hasArchiveReader && resource->hasFlags(Qn::sync);
     const bool isSyncedAlready = m_syncedWidgets.contains(widget);

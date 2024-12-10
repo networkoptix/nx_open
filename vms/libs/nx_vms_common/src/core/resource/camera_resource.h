@@ -389,15 +389,6 @@ public:
 
     bool needsToChangeDefaultPassword() const;
 
-    //!Implementation of QnMediaResource::toResource
-    virtual const QnResource* toResource() const override;
-    //!Implementation of QnMediaResource::toResource
-    virtual QnResource* toResource() override;
-    //!Implementation of QnMediaResource::toResource
-    virtual const QnResourcePtr toResourcePtr() const override;
-    //!Implementation of QnMediaResource::toResource
-    virtual QnResourcePtr toResourcePtr() override;
-
     /**
      * @return Whether dual streaming is disabled by a user. Second stream is not provided by the
      * camera in this case, so it cannot be used for motion detection.

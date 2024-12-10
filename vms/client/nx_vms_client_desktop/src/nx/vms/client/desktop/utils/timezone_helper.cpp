@@ -12,12 +12,10 @@ namespace nx::vms::client::desktop {
 // FIXME: #sivanov Code duplication with core::ServerTimeWatcher.
 QTimeZone timeZone(const QnMediaResourcePtr& mediaResource)
 {
-    const auto resource = mediaResource->toResourcePtr();
-
-    if (auto fileResource = resource.dynamicCast<QnAviResource>())
+    if (auto fileResource = mediaResource.dynamicCast<QnAviResource>())
         return fileResource->timeZone();
 
-    if (auto server = resource->getParentResource().dynamicCast<core::ServerResource>())
+    if (auto server = mediaResource->getParentResource().dynamicCast<core::ServerResource>())
         return server->timeZone();
 
     return QTimeZone{QTimeZone::LocalTime};

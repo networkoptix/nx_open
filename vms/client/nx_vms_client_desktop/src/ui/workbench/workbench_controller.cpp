@@ -918,7 +918,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 break;
 
             nx::vms::client::core::ptz::HotkeysResourcePropertyAdaptor adaptor;
-            adaptor.setResource(widget->resource()->toResourcePtr());
+            adaptor.setResource(widget->resource());
 
             QString objectId = adaptor.value().value(hotkey);
             if (objectId.isEmpty())
@@ -1360,7 +1360,7 @@ void QnWorkbenchController::at_zoomTargetChanged(
     const QRectF& zoomRect,
     QnMediaResourceWidget* zoomTargetWidget)
 {
-    const auto resource = zoomTargetWidget->resource()->toResourcePtr();
+    const auto resource = zoomTargetWidget->resource();
     if (!NX_ASSERT(resource))
         return;
 

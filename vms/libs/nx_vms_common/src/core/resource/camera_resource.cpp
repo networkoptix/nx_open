@@ -464,24 +464,6 @@ bool QnVirtualCameraResource::needsToChangeDefaultPassword() const
            && hasCameraCapabilities(nx::vms::api::DeviceCapability::setUserPassword);
 }
 
-const QnResource* QnVirtualCameraResource::toResource() const {
-    return this;
-}
-
-QnResource* QnVirtualCameraResource::toResource()
-{
-    return this;
-}
-
-const QnResourcePtr QnVirtualCameraResource::toResourcePtr() const {
-    return toSharedPointer();
-}
-
-QnResourcePtr QnVirtualCameraResource::toResourcePtr()
-{
-    return toSharedPointer();
-}
-
 void QnVirtualCameraResource::updateAudioRequiredOnDevice(const QString& deviceId)
 {
     auto prevDevice = nx::Uuid(deviceId);

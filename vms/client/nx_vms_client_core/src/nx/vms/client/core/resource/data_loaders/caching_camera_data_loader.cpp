@@ -41,7 +41,7 @@ CachingCameraDataLoader::CachingCameraDataLoader(
     init();
     initLoaders();
 
-    m_analyticsFilter.deviceIds.insert(m_resource->toResource()->getId());
+    m_analyticsFilter.deviceIds.insert(m_resource->getId());
 
     QTimer* loadTimer = new QTimer(this);
     // Time period will be loaded no often than once in 30 seconds,
@@ -145,7 +145,7 @@ bool CachingCameraDataLoader::isContentAllowed(Qn::TimePeriodContent content) co
 
 QString CachingCameraDataLoader::idForToStringFromPtr() const
 {
-    return m_resource->toResourcePtr()->getName();
+    return m_resource->getName();
 }
 
 QnMediaResourcePtr CachingCameraDataLoader::resource() const

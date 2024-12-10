@@ -15,26 +15,6 @@ QnAbstractArchiveResource::~QnAbstractArchiveResource()
 {
 }
 
-const QnResource* QnAbstractArchiveResource::toResource() const
-{
-    return this;
-}
-
-QnResource* QnAbstractArchiveResource::toResource()
-{
-    return this;
-}
-
-const QnResourcePtr QnAbstractArchiveResource::toResourcePtr() const
-{
-    return toSharedPointer();
-}
-
-QnResourcePtr QnAbstractArchiveResource::toResourcePtr()
-{
-    return toSharedPointer();
-}
-
 nx::vms::api::ResourceStatus QnAbstractArchiveResource::getStatus() const
 {
     return m_localStatus;

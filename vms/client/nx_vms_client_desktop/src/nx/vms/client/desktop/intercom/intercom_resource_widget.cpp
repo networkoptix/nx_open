@@ -94,7 +94,7 @@ void IntercomResourceWidget::setOutputPortState(
         return;
     }
 
-    const auto intecomResource = resource()->toResourcePtr();
+    const auto intecomResource = resource();
 
     nx::vms::api::EventActionData actionData;
     actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;

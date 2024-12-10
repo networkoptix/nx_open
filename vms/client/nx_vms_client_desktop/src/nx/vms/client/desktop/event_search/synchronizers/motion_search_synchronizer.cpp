@@ -127,7 +127,7 @@ void MotionSearchSynchronizer::updateCachedDevices()
 
 bool MotionSearchSynchronizer::isMediaAccepted(QnMediaResourceWidget* widget) const
 {
-    return widget && widget->resource() && widget->resource()->toResource()->hasFlags(Qn::motion);
+    return widget && widget->resource() && widget->resource()->hasFlags(Qn::motion);
 }
 
 } // namespace nx::vms::client::desktop

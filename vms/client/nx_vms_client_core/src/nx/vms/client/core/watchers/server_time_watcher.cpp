@@ -76,7 +76,7 @@ QTimeZone ServerTimeWatcher::timeZone(const QnMediaResourcePtr& resource)
     if (auto fileResource = resource.dynamicCast<QnAviResource>())
         return fileResource->timeZone();
 
-    if (auto server = resource->toResource()->getParentResource().dynamicCast<ServerResource>())
+    if (auto server = resource->getParentResource().dynamicCast<ServerResource>())
         return server->timeZone();
 
     return QTimeZone{QTimeZone::LocalTime};

@@ -205,11 +205,7 @@ public:
         if (!mediaResource)
             return false;
 
-        QnResource* resource = mediaResource->toResource();
-        if (!resource)
-            return false;
-
-        showPtzBanner(resource->getName());
+        showPtzBanner(mediaResource->getName());
 
         return false;
     }
@@ -347,7 +343,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
-    QnResourcePtr resource = widget->resource()->toResourcePtr();
+    QnResourcePtr resource = widget->resource();
 
     // TODO: #sivanov Fix the text.
     if (resource->getStatus() == nx::vms::api::ResourceStatus::offline
@@ -375,7 +371,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 
     if (!widget || !widget->ptzController() || id.isEmpty())
         return;
-    QnResourcePtr resource = widget->resource()->toResourcePtr();
+    QnResourcePtr resource = widget->resource();
 
     if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
     {
@@ -407,7 +403,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
     auto widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->ptzController())
         return;
-    QnResourcePtr resource = widget->resource()->toResourcePtr();
+    QnResourcePtr resource = widget->resource();
 
     QString id = parameters.argument<QString>(Qn::PtzObjectIdRole).trimmed();
     if (id.isEmpty())
@@ -489,7 +485,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
-    auto res = widget->resource()->toResourcePtr();
+    auto res = widget->resource();
     auto hotkeysDelegate =
         new QnSingleCameraPtzHotkeysDelegate(dialog, res, context());
 
@@ -578,7 +574,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     if (!mediaResource)
         return;
 
-    const auto resource = mediaResource->toResourcePtr();
+    const auto resource = mediaResource;
     if (!resource)
         return;
 
@@ -589,7 +585,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
         return;
     }
 
-    if (const auto resource = widget->resource()->toResource(); resource)
+    if (const auto resource = widget->resource(); resource)
         NX_DEBUG(this, "Resource: %1, controller: %2", resource->getName(), controller.get());
 
     auto speed = parameters.argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
@@ -677,7 +673,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateObjectByHotkeyAction_triggered()
         .argument(Qn::ItemDataRole::PtzPresetIndexRole).toInt();
 
     nx::vms::client::core::ptz::HotkeysResourcePropertyAdaptor adaptor;
-    adaptor.setResource(widget->resource()->toResourcePtr());
+    adaptor.setResource(widget->resource());
 
     QString objectId = adaptor.value().value(hotkey);
     if (objectId.isEmpty())

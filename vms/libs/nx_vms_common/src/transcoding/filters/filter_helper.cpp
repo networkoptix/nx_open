@@ -55,7 +55,7 @@ QString getFrameTimestampText(
 
 QString getCameraName(const QnLegacyTranscodingSettings& settings)
 {
-    return settings.resource->toResource()->getName();
+    return settings.resource->getName();
 }
 
 } // namespace

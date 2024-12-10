@@ -30,7 +30,7 @@ void FisheyePreviewController::preview(
     if (!m_resource)
         return;
 
-    for (const auto widget: display()->widgets(resource->toResourcePtr()))
+    for (const auto widget: display()->widgets(resource))
     {
         const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
 
@@ -56,7 +56,7 @@ void FisheyePreviewController::rollback()
         return;
 
     const auto params = m_resource->getDewarpingParams();
-    for (const auto widget: display()->widgets(m_resource->toResourcePtr()))
+    for (const auto widget: display()->widgets(m_resource))
     {
         const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
 

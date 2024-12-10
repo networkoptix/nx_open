@@ -485,7 +485,7 @@ void WorkbenchExportHandler::handleExportVideoAction(const menu::Parameters& par
     const auto centralResource = widget ? widget->resource() : mediaResource;
 
     const bool hasPermission = ResourceAccessManager::hasPermissions(
-        centralResource->toResourcePtr(),
+        centralResource,
         Qn::ExportPermission);
 
     if (!hasPermission && !widget)
@@ -544,7 +544,7 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const menu::Parameters& 
         return;
 
     const auto widget = extractMediaWidget(display(), parameters);
-    NX_ASSERT(!widget || widget->resource()->toResourcePtr() == camera);
+    NX_ASSERT(!widget || widget->resource() == camera);
 
     const bool hasPermission = ResourceAccessManager::hasPermissions(camera, Qn::ExportPermission);
     NX_ASSERT(hasPermission);
@@ -729,7 +729,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
                 // This rotation properly matches either to:
                 //  - export from the scene, uses rotation from the layout.
                 //  - export from bookmark. Matches rotation from camera settings.
-                const auto& resourcePtr = dialog.mediaResource()->toResourcePtr();
+                const auto& resourcePtr = dialog.mediaResource();
                 LayoutResourcePtr layout = layoutFromResource(resourcePtr);
                 auto layoutItems = layout->getItems();
                 if (!layoutItems.empty())
@@ -746,7 +746,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
             else
             {
                 exportId = d->createExportContext(settings,
-                    dialog.mediaResource()->toResourcePtr(),
+                    dialog.mediaResource(),
                     /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
 
                 tool.reset(new ExportMediaTool(settings, dialog.mediaResource()));

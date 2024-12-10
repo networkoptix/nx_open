@@ -311,7 +311,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
         quint32 flags = d->settings.readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
         for (const QnMediaResourcePtr& resource : d->resources)
         {
-            if (resource->toResource()->hasFlags(Qn::utc))
+            if (resource->hasFlags(Qn::utc))
             {
                 flags |= QnLayoutFileStorageResource::ContainsCameras;
                 break;
@@ -341,7 +341,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
         QByteArray data;
         if (d->settings.bookmarks.empty())
         {
-            auto systemContext = SystemContext::fromResource(resource->toResourcePtr());
+            auto systemContext = SystemContext::fromResource(resource);
             if (!NX_ASSERT(systemContext))
                 continue;
 
@@ -363,7 +363,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
             QnTimePeriodList periods;
             for (const auto& bookmark: d->settings.bookmarks)
             {
-                if (bookmark.cameraId == resource->toResourcePtr()->getId())
+                if (bookmark.cameraId == resource->getId())
                     periods.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
             }
             NX_ASSERT(std::is_sorted(periods.cbegin(), periods.cend()));
@@ -371,7 +371,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
         }
 
 
-        auto fileName = nx::format("chunk_%1.bin", fileNameForResource(resource->toResourcePtr()));
+        auto fileName = nx::format("chunk_%1.bin", fileNameForResource(resource));
         if (!writeData(fileName, data))
             return false;
     }
@@ -517,12 +517,12 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         m_currentCamera->setMotionIODevice(motionFileBuffer, i);
     }
 
-    QString uniqId = fileNameForResource(resource->toResourcePtr());
+    QString uniqId = fileNameForResource(resource);
 
     QnTimePeriodList playbackMask;
     for (const auto& bookmark: d->settings.bookmarks)
     {
-        if (bookmark.cameraId == resource->toResourcePtr()->getId())
+        if (bookmark.cameraId == resource->getId())
             playbackMask.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
     }
 
@@ -574,7 +574,7 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
             if (error)
                 continue;
 
-            QString uniqId = fileNameForResource(camera->resource()->toResourcePtr());
+            QString uniqId = fileNameForResource(camera->resource());
             QString motionFileName = lit("motion%1_%2.bin").arg(i).arg(uniqId);
             /* Other buffers must be closed even in case of error. */
             writeData(motionFileName, motionFileBuffer->buffer());

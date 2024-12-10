@@ -27,11 +27,6 @@ public:
     virtual ~TestMediaResource() override {}
     virtual bool hasVideo([[maybe_unused]] const QnAbstractStreamDataProvider* dataProvider = nullptr) const override { return true; }
 
-    virtual const QnResource* toResource() const override { return this; }
-    virtual QnResource* toResource() override { return this; }
-    virtual const QnResourcePtr toResourcePtr() const override { return toSharedPointer(); }
-    virtual QnResourcePtr toResourcePtr() override { return toSharedPointer(); }
-
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) override
     {
         if (videoLayout)

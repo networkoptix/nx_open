@@ -393,7 +393,7 @@ ArchiveFrameExtractor::ArchiveFrameExtractor(
     if (!d->streamWorker.archiveDelegate->getFlags().testFlag(
         QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
     {
-        d->streamWorker.archiveDelegate->open(mediaResource->toResourcePtr());
+        d->streamWorker.archiveDelegate->open(mediaResource);
     }
 
     d->streamWorker.thread = std::make_unique<std::thread>(&Private::processRequests, d.get());

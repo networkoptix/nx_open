@@ -868,9 +868,8 @@ bool QnVideoStreamDisplay::processDecodedFrame(
 
     if (m_isLive && outFrame->memoryType() != MemoryType::VideoMemory)
     {
-        auto camera = m_resource->toResourcePtr();
-        auto systemContext = SystemContext::fromResource(camera);
-        systemContext->videoCache()->add(camera->getId(), outFrame);
+        auto systemContext = SystemContext::fromResource(m_resource);
+        systemContext->videoCache()->add(m_resource->getId(), outFrame);
     }
 
     NX_ASSERT(!outFrame->isExternalData());

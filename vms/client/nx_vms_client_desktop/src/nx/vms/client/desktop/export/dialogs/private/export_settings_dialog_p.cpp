@@ -139,7 +139,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         // We do have our own image processor, so we do not bother server with transcoding.
         // The only server-side applied transform is merging several channels into a single image.
         nx::api::ResourceImageRequest request;
-        request.resource = m_mediaResource->toResourcePtr();
+        request.resource = m_mediaResource->toSharedPointer();
         request.timestampMs = std::chrono::milliseconds(
             state().exportMediaSettings.period.startTimeMs);
         request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameAfter;
@@ -433,7 +433,7 @@ ExportInfoOverlayPersistentSettings ExportSettingsDialog::Private::getInfoTextDa
     ExportInfoOverlayPersistentSettings data) const
 {
     if (data.exportCameraName && m_mediaResource)
-        data.cameraNameText = m_mediaResource->toResource()->getName();
+        data.cameraNameText = m_mediaResource->getName();
     else
         data.cameraNameText.clear();
 
@@ -509,7 +509,7 @@ Filename ExportSettingsDialog::Private::selectedFileName(ExportMode mode) const
 bool ExportSettingsDialog::Private::mediaSupportsUtc() const
 {
     return m_mediaResource
-        && m_mediaResource->toResource()->hasFlags(Qn::utc);
+        && m_mediaResource->hasFlags(Qn::utc);
 }
 
 ExportSettingsDialog::BarDescs ExportSettingsDialog::Private::generateMessageBarDescs(

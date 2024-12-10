@@ -238,7 +238,7 @@ void QnAviResource::setDewarpingParams(const nx::vms::api::dewarping::MediaData&
 
         m_aviMetadata->dewarpingParams = params;
         lock.unlock();
-        emit mediaDewarpingParamsChanged(toResourcePtr());
+        emit mediaDewarpingParamsChanged(toSharedPointer());
     }
     else
     {

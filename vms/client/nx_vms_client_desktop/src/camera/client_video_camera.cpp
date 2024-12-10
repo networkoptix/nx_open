@@ -73,7 +73,7 @@ void QnClientVideoCamera::streamJump(qint64 time)
 
 void QnClientVideoCamera::startDisplay()
 {
-    NX_DEBUG(this, nx::format("startDisplay %1").arg(m_resource->toResource()->getId()));
+    NX_DEBUG(this, nx::format("startDisplay %1").arg(m_resource->getId()));
 
     m_camdispay.start();
     if (m_reader)
@@ -99,7 +99,7 @@ void QnClientVideoCamera::beforeStopDisplay()
 
 QnResourcePtr QnClientVideoCamera::getDevice() const
 {
-    return m_resource->toResourcePtr();
+    return m_resource;
 }
 
 QnAbstractStreamDataProvider* QnClientVideoCamera::getStreamreader()
@@ -145,7 +145,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
     if (!m_exportRecorder)
     {
         auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
-            m_resource->toResourcePtr());
+            m_resource);
         QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
         if (!archiveReader)
         {
@@ -166,7 +166,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         if (rtspClient) {
             // 'slow' open mode. send DESCRIBE and SETUP to server.
             // it is required for av_streams in output file - we should know all codec context immediately
-            QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+            QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
             rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setMediaRole(PlaybackMode::export_);
@@ -176,7 +176,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
         m_exportReader = archiveReader;
 
         m_exportRecorder = new nx::vms::client::desktop::ExportStorageStreamRecorder(
-            m_resource->toResourcePtr(), m_exportReader);
+            m_resource, m_exportReader);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

@@ -64,7 +64,7 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
     if(!m_widget) {
         setWindowTitle(tr("Image Enhancement"));
     } else {
-        setWindowTitle(tr("Image Enhancement - %1").arg(m_widget->resource()->toResource()->getName()));
+        setWindowTitle(tr("Image Enhancement - %1").arg(m_widget->resource()->getName()));
     }
 
     ui->histogramWidget->setEnabled(m_widget != 0);

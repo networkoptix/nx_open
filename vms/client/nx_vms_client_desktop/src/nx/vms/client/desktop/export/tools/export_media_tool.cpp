@@ -167,10 +167,10 @@ private:
         NX_ASSERT(!dataProvider);
         const bool isRapidReview = timelapseFrameStepUs > 0;
 
-        if (mediaResource->toResource()->hasFlags(Qn::local) && isRapidReview)
+        if (mediaResource->hasFlags(Qn::local) && isRapidReview)
         {
             auto thumbnailsReader = new QnThumbnailsStreamReader(
-                mediaResource->toResourcePtr(),
+                mediaResource,
                 new QnAviArchiveDelegate());
             thumbnailsReader->setRange(startTimeUs, endTimeUs, timelapseFrameStepUs, 0);
             dataProvider.reset(thumbnailsReader);
@@ -178,7 +178,7 @@ private:
         }
 
         const auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
-                mediaResource->toResourcePtr());
+                mediaResource);
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(tmpReader);
         if (!archiveReader)
@@ -198,7 +198,7 @@ private:
         {
             // 'Slow' open mode. Send DESCRIBE and SETUP to server. It is required for av_streams
             // in output file - we should know all codec context immediately.
-            const auto camera = mediaResource->toResourcePtr()
+            const auto camera = mediaResource
                 .dynamicCast<QnVirtualCameraResource>();
             NX_ASSERT(camera);
             rtspClient->setCamera(camera);
@@ -214,11 +214,10 @@ private:
     bool initExportRecorder(qint64 timelapseFrameStepUs, QnAbstractMediaStreamDataProvider* mediaProvider)
     {
         NX_ASSERT(!exportRecorder);
-        const auto resource = mediaResource->toResourcePtr();
         if (timelapseFrameStepUs > 0)
-            exportRecorder.reset(new ExportTimelapseRecorder(resource, mediaProvider, timelapseFrameStepUs));
+            exportRecorder.reset(new ExportTimelapseRecorder(mediaResource, mediaProvider, timelapseFrameStepUs));
         else
-            exportRecorder.reset(new ExportStorageStreamRecorder(resource, mediaProvider));
+            exportRecorder.reset(new ExportStorageStreamRecorder(mediaResource, mediaProvider));
         return true;
     }
 

@@ -68,7 +68,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
             return providerLayout;
     }
 
-    QString strVal = toResource()->getProperty(ResourcePropertyKey::kVideoLayout);
+    QString strVal = getProperty(ResourcePropertyKey::kVideoLayout);
     if (strVal.isEmpty())
     {
         return defaultVideoLayout;
@@ -93,7 +93,7 @@ AudioLayoutConstPtr QnMediaResource::getAudioLayout(
 
 void QnMediaResource::initMediaResource()
 {
-    toResource()->addFlags(Qn::media);
+    addFlags(Qn::media);
 }
 
 nx::vms::api::dewarping::MediaData QnMediaResource::getDewarpingParams() const
@@ -118,12 +118,12 @@ void QnMediaResource::setDewarpingParams(const nx::vms::api::dewarping::MediaDat
         m_cachedDewarpingParams.reset();
         m_userAttributes.dewarpingParams = dewarpData;
     }
-    emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
+    emit mediaDewarpingParamsChanged(toSharedPointer());
 }
 
 QnAspectRatio QnMediaResource::customAspectRatio() const
 {
-    const QString propertyValue = this->toResource()->getProperty(::customAspectRatioKey);
+    const QString propertyValue = this->getProperty(::customAspectRatioKey);
     if (propertyValue.isEmpty())
         return QnAspectRatio();
 
@@ -140,17 +140,17 @@ void QnMediaResource::setCustomAspectRatio(const QnAspectRatio& value)
     if (!value.isValid())
         clearCustomAspectRatio();
     else
-        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value.toFloat()));
+        this->setProperty(::customAspectRatioKey, QString::number(value.toFloat()));
 }
 
 void QnMediaResource::clearCustomAspectRatio()
 {
-    this->toResource()->setProperty(::customAspectRatioKey, QString());
+    this->setProperty(::customAspectRatioKey, QString());
 }
 
 std::optional<int> QnMediaResource::forcedRotation() const
 {
-    const auto rotation = toResource()->getProperty(kRotationKey);
+    const auto rotation = getProperty(kRotationKey);
     if (rotation.isEmpty())
         return std::nullopt;
 
@@ -162,7 +162,7 @@ void QnMediaResource::setForcedRotation(std::optional<int> value)
     QString stringValue;
     if (value)
         stringValue = QString::number(*value);
-    toResource()->setProperty(kRotationKey, stringValue);
+    setProperty(kRotationKey, stringValue);
 }
 
 Ptz::Capabilities QnMediaResource::getPtzCapabilities(ptz::Type ptzType) const
@@ -170,11 +170,11 @@ Ptz::Capabilities QnMediaResource::getPtzCapabilities(ptz::Type ptzType) const
     switch (ptzType)
     {
         case ptz::Type::operational:
-            return Ptz::Capabilities(toResource()->getProperty(
+            return Ptz::Capabilities(getProperty(
                 ResourcePropertyKey::kPtzCapabilities).toInt());
 
         case ptz::Type::configurational:
-            return Ptz::Capabilities(toResource()->getProperty(
+            return Ptz::Capabilities(getProperty(
                 ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");
@@ -198,7 +198,7 @@ void QnMediaResource::setPtzCapabilities(
         case ptz::Type::operational:
         {
             // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
-            toResource()->setProperty(
+            setProperty(
                 ResourcePropertyKey::kPtzCapabilities,
                 QString::number((int) capabilities));
             break;
@@ -206,7 +206,7 @@ void QnMediaResource::setPtzCapabilities(
         case ptz::Type::configurational:
         {
             // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
-            toResource()->setProperty(
+            setProperty(
                 ResourcePropertyKey::kConfigurationalPtzCapabilities,
                 QString::number((int) capabilities));
             break;

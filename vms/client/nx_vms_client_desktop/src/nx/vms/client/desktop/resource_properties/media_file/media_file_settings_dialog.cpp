@@ -98,16 +98,15 @@ void MediaFileSettingsDialog::updateFromResource(const QnMediaResourcePtr& resou
     QScopedValueRollback<bool> updateRollback(d->updating, true);
 
     d->resource = resource;
-    const auto resourcePtr = resource->toResourcePtr();
 
     static const QString kWindowTitlePattern("%1 - %2");
     const QString caption = tr("File Settings");
 
-    setWindowTitle(resourcePtr
-        ? kWindowTitlePattern.arg(caption, resourcePtr->getName())
+    setWindowTitle(resource
+        ? kWindowTitlePattern.arg(caption, resource->getName())
         : caption);
 
-    d->mediaPreview->setResource(resourcePtr);
+    d->mediaPreview->setResource(resource);
     if (!d->resource)
         return;
 

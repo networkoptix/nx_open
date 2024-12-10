@@ -227,7 +227,7 @@ CameraButtonManager::Private::Private(
     connect(controller.get(), &core::AbstractCameraButtonController::actionCancelled,
         this, &Private::handleActionCancelled);
 
-    controller->setResource(mediaResourceWidget->resource()->toResourcePtr());
+    controller->setResource(mediaResourceWidget->resource());
 }
 
 void CameraButtonManager::Private::addObjectTrackingButton(const CameraButtonData& data)

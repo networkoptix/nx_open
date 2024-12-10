@@ -38,11 +38,6 @@ public:
     virtual AudioLayoutConstPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const = 0;
 
-    virtual const QnResource* toResource() const = 0;
-    virtual QnResource* toResource() = 0;
-    virtual const QnResourcePtr toResourcePtr() const = 0;
-    virtual QnResourcePtr toResourcePtr() = 0;
-
     virtual nx::vms::api::dewarping::MediaData getDewarpingParams() const;
     virtual void setDewarpingParams(const nx::vms::api::dewarping::MediaData& params);
 

@@ -22,7 +22,7 @@ using namespace nx::vms::api;
 using namespace nx::vms::common::ptz;
 
 QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget* widget):
-    base_type(widget->resource()->toResourcePtr()),
+    base_type(widget->resource()),
     m_animationMode(NoAnimation),
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
@@ -51,7 +51,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget* widget):
 }
 
 QnFisheyePtzController::QnFisheyePtzController(const QnMediaResourcePtr& mediaRes):
-    base_type(mediaRes->toResourcePtr()),
+    base_type(mediaRes),
     m_animationMode(NoAnimation),
     m_mediaDewarpingParams(mediaRes->getDewarpingParams())
 {
