@@ -571,11 +571,11 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>User tidak memiliki akses ke layout yang dipilih</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Beberapa user tidak memiliki akses ke layout yang dipilih</translation>
     </message>
   </context>
   <context>
@@ -1279,7 +1279,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Tampilan live</translation>
     </message>
   </context>
   <context>
@@ -1837,7 +1837,7 @@
     </message>
     <message>
       <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <translation>Lokal default untuk user baru</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>

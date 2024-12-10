@@ -13311,15 +13311,15 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>Limitation</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>Autorisé</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>Actuel</translation>
     </message>
   </context>
   <context>

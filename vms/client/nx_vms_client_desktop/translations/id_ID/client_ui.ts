@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Server Site</translation>
     </message>
   </context>
   <context>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>Aksi site</translation>
     </message>
   </context>
   <context>
@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Gunakan preset site</translation>
     </message>
   </context>
   <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>Site ini terkoneksi ke</translation>
     </message>
   </context>
   <context>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>Buat backup data manajemen Site, atau pulihkan data manajemen Site dari backup yang ada</translation>
     </message>
   </context>
   <context>
@@ -1426,14 +1426,14 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Koneksikan ke site sebelumnya saat startup</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Pengaturan Site</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>Tampilkan timestamp di LIVE</translation>
     </message>
   </context>
   <context>
@@ -1856,7 +1856,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Gabungkan Site...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1941,7 +1941,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>Alamat atau Subnet Mask</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1969,7 +1969,7 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>Cari Perangkat</translation>
     </message>
     <message>
       <source>

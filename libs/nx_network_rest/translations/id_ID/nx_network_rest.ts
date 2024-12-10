@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>Kata sandi sudah kadaluarsa. Silakan hubungi administrator Site Anda.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>User ini telah dinonaktifkan oleh administrator Site.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Metode otorisasi ini dilarang. Silakan hubungi administrator Site Anda.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -64,11 +64,11 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Error server internal (%1). Silakan hubungi administrator Site Anda.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>Permintaan tidak diotorisasi karena error yang tidak diketahui.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
@@ -136,11 +136,11 @@
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>Sesi terlalu lama menurut konfigurasi Site.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>Resource tidak lagi ada di server.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Layanan tidak diotorisasi.</translation>
     </message>
   </context>
 </TS>
