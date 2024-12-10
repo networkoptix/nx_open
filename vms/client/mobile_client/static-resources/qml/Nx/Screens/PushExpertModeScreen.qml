@@ -15,11 +15,8 @@ Page
     opacity: enabled ? 1.0 : 0.3
     enabled: !pushManager.userUpdateInProgress
 
-    customBackHandler:
-        function()
-        {
-            d.handleBackClicked()
-        }
+    customBackHandler: () => d.handleBackClicked()
+    onLeftButtonClicked: () => d.handleBackClicked()
 
     title: !simpleModeRadioButton.checked && d.selectionModel
         ? "%1: %2".arg(qsTr("Sites")).arg(d.selectionModel.selectedSystems.length)
@@ -149,7 +146,8 @@ Page
     Connections
     {
         target: pushManager
-        onUserUpdateInProgressChanged:
+
+        function onUserUpdateInProgressChanged()
         {
             if (pushManager.userUpdateInProgress)
                 preloaderOverlay.open()
