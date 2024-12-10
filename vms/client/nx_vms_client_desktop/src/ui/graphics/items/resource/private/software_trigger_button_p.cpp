@@ -8,21 +8,20 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsDropShadowEffect>
 
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/core/skin/icon.h>
+#include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/utils/geometry.h>
+#include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/slider_tooltip_widget.h>
 #include <ui/processors/hover_processor.h>
-#include <nx/vms/client/core/skin/icon.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/software_trigger_pixmaps.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
-
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 
 namespace {
 
@@ -220,7 +219,7 @@ void SoftwareTriggerButtonPrivate::updateToolTipVisibility()
 
     const bool showToolTip = m_toolTipHoverProcessor->isHovered()
         && !m_toolTip->text().isEmpty()
-        && !(m_prolonged && q->isPressed());
+        && !(q->prolonged() && q->isPressed());
 
     static constexpr qreal kToolTipAnimationSpeedFactor = 1000.0 / kToolTipFadeTimeMs;
 
@@ -292,7 +291,7 @@ void SoftwareTriggerButtonPrivate::updateState()
         case State::WaitingForActivation:
         case State::WaitingForDeactivation:
         {
-            if (m_prolonged)
+            if (q->prolonged())
             {
                 /* Immediately reset to normal for released prolonged triggers: */
                 if (!q->isPressed())
@@ -318,7 +317,7 @@ void SoftwareTriggerButtonPrivate::updateState()
 
         case State::Activate:
         {
-            if (m_prolonged)
+            if (q->prolonged())
             {
                 /* Immediately reset to normal for prolonged triggers: */
                 setDefaultState();
@@ -331,7 +330,7 @@ void SoftwareTriggerButtonPrivate::updateState()
 
         case State::Failure:
         {
-            if (m_prolonged)
+            if (q->prolonged())
             {
                 if (q->isPressed())
                 {
@@ -360,7 +359,7 @@ void SoftwareTriggerButtonPrivate::updateState()
     }
 
     /* Restart animation timer for active prolonged trigger: */
-    if (m_prolonged && q->isPressed() && state == State::Default)
+    if (q->prolonged() && q->isPressed() && state == State::Default)
         m_animationTime.start();
 }
 
@@ -397,7 +396,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
     }
 
     const auto effectiveState =
-        m_prolonged && q->isPressed() && state != State::Failure
+        q->prolonged() && q->isPressed() && state != State::Failure
             ? State::Default
             : state;
 
@@ -420,7 +419,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
         case State::Default:
         {
             q->SoftwareTriggerButton::base_type::paint(painter, option, widget);
-            if (m_prolonged && q->isPressed())
+            if (q->prolonged() && q->isPressed())
             {
                 painter->setOpacity(painter->opacity() * currentOpacity());
                 paintPixmapSharp(painter, m_activityFramePixmap);
@@ -444,7 +443,7 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
         case State::Failure:
         {
             paintPixmapSharp(painter, m_failurePixmap);
-            if (m_prolonged && !q->isPressed())
+            if (q->prolonged() && !q->isPressed())
                 painter->setOpacity(painter->opacity() * currentOpacity());
 
             paintPixmapSharp(painter, m_failureFramePixmap);

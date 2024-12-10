@@ -36,8 +36,6 @@ public:
     Qt::Edge toolTipEdge() const;
     void setToolTipEdge(Qt::Edge edge);
 
-    void setIcon(const QString& name);
-
     void updateState();
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
@@ -63,7 +61,6 @@ private:
 private:
     Qt::Edge m_toolTipEdge = Qt::LeftEdge;
     QString m_toolTipText;
-    bool m_prolonged = false;
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
