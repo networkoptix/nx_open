@@ -112,6 +112,11 @@ struct AccountData
 
     /**%apidoc[readonly] The AWS region to which the user belongs. */
     std::string accountLocation;
+
+    /**%apidoc Account locale.
+     * ISO 639-1 locale code paired with ISO 3166-1 alpha-2 country code via underscore: `en_GB`, `fr_FR` and so on.
+     */
+    std::string locale;
 };
 
 struct AccountStatusData
@@ -152,6 +157,11 @@ struct AccountUpdateData
 
     /**%apidoc One-time password from the authenticator app or any other source. */
     std::optional<std::string> mfaCode;
+
+    /**%apidoc Account locale.
+     * ISO 639-1 locale code paired with ISO 3166-1 alpha-2 country code via underscore: `en_GB`, `fr_FR` and so on.
+     */
+    std::optional<std::string> locale;
 };
 
 struct AccountOrganizationAttrs
@@ -274,6 +284,7 @@ struct AccountForSharing
     bool account2faEnabled = false;
     std::string intermediateResponse;
     bool remote = false;
+    std::string locale;
 };
 
 } // namespace nx::cloud::db::api

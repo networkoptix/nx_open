@@ -48,7 +48,7 @@ NX_REFLECTION_INSTRUMENT(AccountRegistrationData, AccountRegistrationData_Fields
 #define AccountData_Fields \
     (id)(email)(fullName)(customization)(statusCode)(registrationTime)(activationTime)\
     (httpDigestAuthEnabled)(account2faEnabled)(authSessionLifetime)(accountBelongsToOrganization)\
-    (securitySequence)(accountLocation)
+    (securitySequence)(accountLocation)(locale)
 
 NX_REFLECTION_INSTRUMENT(AccountData, AccountData_Fields)
 
@@ -71,7 +71,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
 void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
 
 #define AccountUpdateData_Fields \
-    (passwordHa1)(password)(fullName)(customization)(currentPassword)(totp)(mfaCode)
+    (passwordHa1)(password)(fullName)(customization)(currentPassword)(totp)(mfaCode)(locale)
 
 NX_REFLECTION_INSTRUMENT(AccountUpdateData, AccountUpdateData_Fields)
 

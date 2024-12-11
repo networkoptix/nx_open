@@ -394,6 +394,9 @@ struct SystemSharing: ShareSystemRequest
     /**%apidoc Account full name. */
     std::string accountFullName;
 
+    /**%apidoc Account locale. */
+    std::string locale;
+
     /**%apidoc Shows how often user accesses given system in comparison to other user's systems. */
     float usageFrequency = 0.0;
 
@@ -427,10 +430,10 @@ struct SystemSharing: ShareSystemRequest
     }
 };
 
-#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(usageFrequency)(lastLoginTime) \
+#define SystemSharing_Fields (systemId)(accountId)(accountFullName)(locale)(usageFrequency)(lastLoginTime) \
     (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(type)(readonly)(hidden)
 
-NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(usageFrequency) \
+NX_REFLECTION_INSTRUMENT(SystemSharing, (systemId)(accountId)(accountFullName)(locale)(usageFrequency) \
     (lastLoginTime)(type)(readonly)(hidden))
 
 using SystemSharingList = std::vector<SystemSharing>;
