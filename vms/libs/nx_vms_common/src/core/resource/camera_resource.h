@@ -861,6 +861,8 @@ public:
     int backupMegapixels() const;
     int backupMegapixels(nx::vms::api::CameraBackupQuality quality) const;
 
+    QnLiveStreamParams streamConfiguration(nx::vms::api::StreamIndex stream) const;
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);
@@ -976,6 +978,8 @@ private:
     mutable nx::Lockable<std::map<nx::Uuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
     nx::utils::CachedValue<CameraMediaStreams> m_cachedMediaStreams;
     nx::utils::CachedValue<int> m_cachedBackupMegapixels;
+    nx::utils::CachedValue<QnLiveStreamParams> m_primaryStreamConfiguration;
+    nx::utils::CachedValue<QnLiveStreamParams> m_secondaryStreamConfiguration;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);

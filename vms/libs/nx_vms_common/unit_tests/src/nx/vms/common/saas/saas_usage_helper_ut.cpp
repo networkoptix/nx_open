@@ -341,6 +341,24 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
 
 }
 
+TEST_F(SaasServiceUsageHelperTest, backupMegapixels)
+{
+    using namespace nx::vms::api;
+
+    auto camera = addCameras(/*size*/ 1, /* megapixels*/ 5, /*useBackup*/ true)[0];
+    ASSERT_EQ(5, camera->backupMegapixels());
+
+    // Set target parameters to a value that different with current(actual) stream parameters.
+    QnLiveStreamParams targetParams;
+    targetParams.resolution = QSize(1'000'000, 3);
+    camera->setProperty(
+        ResourcePropertyKey::kPrimaryStreamConfiguration, QJson::serialized(targetParams));
+    camera->setProperty(
+        ResourcePropertyKey::kSecondaryStreamConfiguration, QJson::serialized(targetParams));
+    camera->saveProperties();
+    ASSERT_EQ(3, camera->backupMegapixels());
+}
+
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasMapping)
 {
     using namespace nx::vms::api;

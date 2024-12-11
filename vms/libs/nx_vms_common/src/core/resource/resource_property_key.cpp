@@ -61,6 +61,9 @@ const QString kBitratePerGOP("bitratePerGOP");
 const QString kUseMedia2ToFetchProfiles("useMedia2ToFetchProfiles");
 const QString kIoSettings("ioSettings");
 
+const QString kPrimaryStreamConfiguration("primaryStreamConfiguration");
+const QString kSecondaryStreamConfiguration("secondaryStreamConfiguration");
+
 const QString kVideoLayout("VideoLayout");
 
 const QString kMotionStreamKey("motionStream");

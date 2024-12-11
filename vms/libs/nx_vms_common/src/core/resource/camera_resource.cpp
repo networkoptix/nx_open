@@ -264,7 +264,19 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             }
             return supportedMediaStreams;
         }),
-    m_cachedBackupMegapixels([this]() { return backupMegapixels(getActualBackupQualities()); })
+    m_cachedBackupMegapixels([this]() { return backupMegapixels(getActualBackupQualities()); }),
+    m_primaryStreamConfiguration(
+        [this]()
+        {
+            return QJson::deserialized<QnLiveStreamParams>(
+                getProperty(ResourcePropertyKey::kPrimaryStreamConfiguration).toUtf8());
+        }),
+    m_secondaryStreamConfiguration(
+        [this]()
+        {
+            return QJson::deserialized<QnLiveStreamParams>(
+                getProperty(ResourcePropertyKey::kSecondaryStreamConfiguration).toUtf8());
+        })
 {
     NX_VERBOSE(this, "Creating");
     addFlags(Qn::live_cam);
@@ -1941,6 +1953,8 @@ void QnVirtualCameraResource::resetCachedValues()
     m_cachedHasVideo.reset();
     m_cachedBackupMegapixels.reset();
     m_cachedMediaStreams.reset();
+    m_primaryStreamConfiguration.reset();
+    m_secondaryStreamConfiguration.reset();
 }
 
 bool QnVirtualCameraResource::useBitratePerGop() const
@@ -2455,6 +2469,16 @@ void QnVirtualCameraResource::emitPropertyChanged(
     else if (key == ResourcePropertyKey::kMediaStreams)
     {
         m_cachedMediaStreams.reset();
+        m_cachedBackupMegapixels.reset();
+    }
+    else if (key == ResourcePropertyKey::kPrimaryStreamConfiguration)
+    {
+        m_primaryStreamConfiguration.reset();
+        m_cachedBackupMegapixels.reset();
+    }
+    else if (key == ResourcePropertyKey::kSecondaryStreamConfiguration)
+    {
+        m_secondaryStreamConfiguration.reset();
         m_cachedBackupMegapixels.reset();
     }
 
@@ -2975,18 +2999,50 @@ int QnVirtualCameraResource::backupMegapixels() const
     return m_cachedBackupMegapixels.get();
 }
 
+QnLiveStreamParams QnVirtualCameraResource::streamConfiguration(
+    nx::vms::api::StreamIndex stream) const
+{
+    using namespace nx::vms::api;
+    switch (stream)
+    {
+        case StreamIndex::primary:
+            return m_primaryStreamConfiguration.get();
+        case StreamIndex::secondary:
+            return m_secondaryStreamConfiguration.get();
+        default:
+            return QnLiveStreamParams();
+    }
+}
+
 int QnVirtualCameraResource::backupMegapixels(nx::vms::api::CameraBackupQuality quality) const
 {
+    using namespace nx::vms::api;
+
     int result = 0;
-    for (const auto& s: mediaStreams().streams)
-    {
-        using namespace nx::vms::api;
-        if (s.getEncoderIndex() == StreamIndex::primary && isHiQualityEnabled(quality)
-            || s.getEncoderIndex() == StreamIndex::secondary && isLowQualityEnabled(quality))
+
+    const auto mediaStreams = this->mediaStreams().streams;
+
+    auto getMediaResolution =
+        [&mediaStreams](StreamIndex stream)
         {
-            const auto resolution = ResolutionData(s.getResolution());
-            result = std::max(result, resolution.megaPixels());
-        }
+            const int streamIndex = (int) stream;
+            if (streamIndex < mediaStreams.size())
+                return mediaStreams[streamIndex].getResolution();
+            return QSize();
+        };
+
+    for (const auto& stream: {StreamIndex::primary, StreamIndex::secondary})
+    {
+        if (!isQualityEnabledForStream(quality, stream))
+            continue;
+        QSize targetResolution = streamConfiguration(stream).resolution;
+        if (targetResolution.isEmpty())
+            targetResolution = getMediaResolution(stream);
+        if (targetResolution.isEmpty())
+            continue;
+
+        result = std::max(result, ResolutionData(targetResolution).megaPixels());
     }
+
     return result;
 }

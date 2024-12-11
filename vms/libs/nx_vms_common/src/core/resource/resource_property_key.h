@@ -95,6 +95,8 @@ NX_VMS_COMMON_API extern const QString kBitratePerGOP;
  */
 NX_VMS_COMMON_API extern const QString kUseMedia2ToFetchProfiles;
 NX_VMS_COMMON_API extern const QString kIoSettings;
+NX_VMS_COMMON_API extern const QString kPrimaryStreamConfiguration;
+NX_VMS_COMMON_API extern const QString kSecondaryStreamConfiguration;
 
 NX_VMS_COMMON_API extern const QString kVideoLayout;
 

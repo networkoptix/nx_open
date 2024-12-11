@@ -8,6 +8,7 @@
 #include <QtCore/Qt>
 
 #include <nx/reflect/enum_instrument.h>
+#include <nx/vms/api/types/motion_types.h>
 #include <nx/utils/serialization/flags.h>
 
 namespace nx::vms::api {
@@ -218,6 +219,16 @@ inline bool isLowQualityEnabled(const nx::vms::api::CameraBackupQuality& quality
 {
     return quality == nx::vms::api::CameraBackupQuality::CameraBackupLowQuality
         || quality == nx::vms::api::CameraBackupQuality::CameraBackupBoth;
+}
+
+inline bool isQualityEnabledForStream(
+    const nx::vms::api::CameraBackupQuality& quality, const nx::vms::api::StreamIndex& stream)
+{
+    if (stream == nx::vms::api::StreamIndex::primary)
+        return isHiQualityEnabled(quality);
+    if (stream == nx::vms::api::StreamIndex::secondary)
+        return isLowQualityEnabled(quality);
+    return false;
 }
 
 template<typename Visitor>
