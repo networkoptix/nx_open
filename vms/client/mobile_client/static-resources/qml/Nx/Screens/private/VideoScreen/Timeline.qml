@@ -109,7 +109,8 @@ Item
             {
                 pressX = mouseX
             }
-            onMouseXChanged:
+
+            onMouseXChanged: (mouse) =>
             {
                 if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold)
                 {
@@ -121,7 +122,8 @@ Item
                 }
                 timeline.updateDrag(mouse.x)
             }
-            onReleased:
+
+            onReleased: (mouse) =>
             {
                 preventStealing = false
                 pressX = -1
@@ -136,7 +138,8 @@ Item
                     positionTapped(timeline.positionAtX(mouse.x))
                 }
             }
-            onWheel:
+
+            onWheel: (wheel) =>
             {
                 if (wheel.angleDelta.y > 0)
                     timeline.zoomIn()

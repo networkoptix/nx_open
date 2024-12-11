@@ -30,6 +30,7 @@ Item
     property real aspectRatio: 1.0
 
     readonly property alias previewState: loader.previewState
+    readonly property bool cannotDecryptMedia: player?.cannotDecryptMediaError ?? false
 
     property bool audioEnabled: false
     property bool autoRepeat: true
@@ -102,6 +103,7 @@ Item
 
         active: false
         anchors.fill: control
+        visible: !cannotDecryptMedia
 
         property int previewState: { return EventSearch.PreviewState.initial }
 
@@ -239,7 +241,7 @@ Item
         anchors.centerIn: parent
         visible:
         {
-            if (!hasPreloader)
+            if (!hasPreloader || cannotDecryptMedia)
                 return false
 
            if (loader.item && loader.item.content.mediaPlayer.loading)

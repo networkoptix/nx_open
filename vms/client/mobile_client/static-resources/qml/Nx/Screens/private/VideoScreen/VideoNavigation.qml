@@ -380,7 +380,7 @@ Item
                     }
                 }
 
-                onPositionTapped: controller.forcePosition(position, true)
+                onPositionTapped: (position) => controller.forcePosition(position, true)
 
                 onPositionChanged:
                 {

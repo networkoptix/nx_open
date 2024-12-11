@@ -130,8 +130,8 @@ Control
             anchors.centerIn: parent
             color: preview.foregroundColor
 
-            running: previewState == EventSearch.PreviewState.busy
-                || previewState == EventSearch.PreviewState.initial
+            running: previewState === EventSearch.PreviewState.busy
+                || previewState === EventSearch.PreviewState.initial
         }
     }
 }

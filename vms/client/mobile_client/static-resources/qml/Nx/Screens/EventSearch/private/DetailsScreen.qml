@@ -4,14 +4,15 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 
-import Nx.Core
 import Nx.Controls
+import Nx.Core
 import Nx.Core.Controls
 import Nx.Core.Items
 import Nx.Core.Ui
 import Nx.Items
 import Nx.Mobile
 import Nx.Models
+import Nx.Screens
 import Nx.Ui
 
 import nx.vms.client.core
@@ -145,7 +146,7 @@ Page
             y: parent.height - height
             width: 48
             height: 48
-            visible: d.isPortraitLayout
+            visible: d.isPortraitLayout && !preview.cannotDecryptMedia
 
             icon.source: lp("images/fullscreen_view_mode.svg")
             icon.width: 24
@@ -160,6 +161,13 @@ Page
                     [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
             }
         }
+    }
+
+    VideoDummy
+    {
+        anchors.fill: preview
+        visible: preview.cannotDecryptMedia
+        state: "cannotDecryptMedia"
     }
 
     Flickable
@@ -251,7 +259,7 @@ Page
         id: playbackPanel
 
         readonly property real navigationHeight: mainWindow.height - eventDetailsScreen.height
-        visible: opacity > 0
+        visible: opacity > 0 && !preview.cannotDecryptMedia
         opacity:
         {
             if (!d.hasControls)
@@ -342,6 +350,7 @@ Page
             ? preview
             : playbackPanel
 
+        visible: !preview.cannotDecryptMedia
         x: d.isPortraitLayout
             ? 16
             : parent.width - width - 16 - (headerButton.visible ? headerButton.width + 16 : 0)
@@ -364,6 +373,7 @@ Page
             ? preview
             : playbackPanel
 
+        visible: !preview.cannotDecryptMedia
         x: d.isPortraitLayout
             ? parent.width - width - goFullscreenModeButton.width
             : parent.width - width - 16;
@@ -414,7 +424,7 @@ Page
 
         property bool playerWasPlaying: false
 
-        visible: opacity > 0
+        visible: opacity > 0 && !preview.cannotDecryptMedia
         opacity: d.hasControls ? 1 : 0
 
 
