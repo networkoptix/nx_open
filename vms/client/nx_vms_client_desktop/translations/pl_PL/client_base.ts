@@ -5175,7 +5175,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Wybierz zasady odczytu i zapisu, aby określić sposób interakcji z katalogami pamięci masowej.</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -5191,24 +5191,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>Serwery witryn mają różne zasady odczytu i zapisu dla pamięci masowej</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>Ekskluzywny - serwer odczytuje ze wszystkich folderów, ale zapisuje tylko do własnego folderu. Usuwa stare dane ze wszystkich folderów.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Udostępniony - serwer odczytuje ze wszystkich folderów, ale zapisuje tylko do własnego folderu. Usuwa stare dane tylko z własnego folderu.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Izolowany - serwer odczytuje i zapisuje wyłącznie do swojego własnego folderu. Usuwa stare dane tylko ze swojego własnego folderu.</translation>
     </message>
   </context>
   <context>
@@ -6432,7 +6432,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>Osiągnięto maksymalną liczbę urządzeń dla tego serwera</translation>
     </message>
   </context>
   <context>
@@ -6623,15 +6623,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
+      <translation>Informacje o trybie deweloperskim</translation>
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>Jest wymieniony</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>Nie jest wymieniony</translation>
     </message>
     <message>
       <source>In</source>
@@ -6643,24 +6643,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation>%n usuniętych urządzeń</translation>
     </message>
     <message>
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation>%n usuniętych kamer</translation>
     </message>
     <message>
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation>%n usuniętych serwerów</translation>
     </message>
     <message>
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation>%n usuniętych układów</translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
       <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
+        <numerusform>%n tematów więcej</numerusform>
         <numerusform>%n subjects more</numerusform>
         <numerusform>%n subjects more</numerusform>
         <numerusform>%n subjects more</numerusform>
@@ -6668,38 +6668,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation>%n urządzeń więcej</translation>
     </message>
     <message>
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation>%n kamer więcej</translation>
     </message>
     <message>
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation>%n serwerów więcej</translation>
     </message>
     <message>
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation>%n układów więcej</translation>
     </message>
   </context>
   <context>
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Liczba serwerów na witrynę</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>Liczba urządzeń na serwer</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>Liczba elementów w układzie</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>Liczba dni archiwum</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -6719,7 +6719,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Uwzględnij również</translation>
     </message>
     <message>
       <source>Begin</source>
@@ -6729,7 +6729,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation> Przed zdarzeniem</translation>
     </message>
     <message>
       <source>End</source>
@@ -6739,7 +6739,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Po zdarzeniu</translation>
     </message>
   </context>
   <context>
@@ -6932,7 +6932,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n rules?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
+        <numerusform>Usunąć %n reguł?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
@@ -7029,11 +7029,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Odtwórz dźwięk</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>Pozwala użytkownikom na dostęp do strumienia audio z urządzenia. Używane w połączeniu z widokiem na żywo i/lub przeglądaniem archiwum.</translation>
     </message>
   </context>
   <context>
@@ -7397,11 +7397,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>Aby wykonać kopię zapasową w chmurze, witryna musi być aktywna. %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>Witryna zawieszona. Aby dokonać zmian w konfiguracji kopii zapasowej, witryna powinna być w stanie aktywnym. %1</translation>
     </message>
   </context>
   <context>
@@ -7593,7 +7593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>Nie zmieniaj tych ustawień, chyba że jesteś całkowicie pewny ich potencjalnego wpływu na wydajność systemu</translation>
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
@@ -7616,7 +7616,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>Otwórz układ w nowej karcie</translation>
     </message>
   </context>
   <context>
@@ -7662,11 +7662,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>Zasób docelowy nie istnieje</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Wybierz kamerę lub układ...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -8348,17 +8348,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>Właściciel witryny lokalnej jest nieobecny lub wyłączony.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>Witryna połączona z %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>Nie udało się połączyć witryny z %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
@@ -8373,7 +8373,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>Wprowadź hasło do swojego konta, aby połączyć witrynę z %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8402,11 +8402,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>Połącz serwer z witryną</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>Wprowadź hasło do swojego konta, aby połączyć serwer z witryną</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9291,15 +9291,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>Łączenie z bieżącą witryną...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>Serwer zostanie wkrótce połączony z witryną</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>Nie udało się połączyć %1 z naszą witryną.</translation>
     </message>
   </context>
   <context>
@@ -9379,7 +9379,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>To ID jest już używane. Użyj przycisku Generuj, aby wyszukać dostępne ID.</translation>
     </message>
   </context>
   <context>
@@ -9675,7 +9675,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>Poziom logowania obniża wydajność</translation>
     </message>
   </context>
   <context>
@@ -9707,35 +9707,35 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>Rejestrowanie debugowania jest włączone na kliencie</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>Rejestrowanie debugowania jest włączone.
+Wydajność klienta jest obniżona.</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>Tryb debugowania jest włączony</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>Rejestrowanie debugowania jest włączone.
+Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>Pobieranie logów anulowane</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>Pobieranie logów...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>Pobieranie logów nie powiodło się</translation>
     </message>
   </context>
   <context>
@@ -9746,15 +9746,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>Pobieranie…</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>Pobieranie zakończone z błędami</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>Pobieranie zakończone sukcesem</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>

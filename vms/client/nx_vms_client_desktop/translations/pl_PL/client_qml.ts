@@ -1413,19 +1413,19 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Połącz swoją witrynę z serwerem LDAP, aby ułatwić zarządzanie użytkownikami</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Ciągły import z serwera LDAP jest wyłączony dla tej witryny. Aktualizacje grup i członkostwa użytkowników i grup będą wykonywane wyłącznie poprzez ręczną synchronizację.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Żaden użytkownik ani grupa nie pasuje do ustawień synchronizacji i nie jest dodawany do bazy danych witryny. Upewnij się, że parametry serwera LDAP i filtry są poprawnie skonfigurowane.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Proszę zachować ostrożność podczas zmiany ustawień LDAP. Nieprawidłowa konfiguracja może zakłócić dostępność witryny dla dużej liczby użytkowników jednocześnie.</translation>
     </message>
   </context>
   <context>
@@ -1488,11 +1488,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Importuj listę</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Opcje importu</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1504,7 +1504,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Separator:</translation>
     </message>
     <message>
       <source>Data contains header</source>
@@ -1524,31 +1524,31 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importowanie</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Nie można otworzyć pliku</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Upewnij się, że plik istnieje i masz dostęp do wybranego pliku</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Naprawianie zaimportowanych wpisów</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Nie można zaimportować wybranego pliku</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Plik wygląda na pusty.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Upewnij się, że wybrany plik istnieje i masz do niego dostęp.</translation>
     </message>
   </context>
   <context>
@@ -1575,7 +1575,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 wybrano:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1591,7 +1591,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Nie udało się zapisać pliku</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
@@ -1603,7 +1603,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Eksportuj wybrane</translation>
     </message>
   </context>
   <context>
@@ -1721,7 +1721,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message numerus="yes">
       <source>with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+        <numerusform>z atrybutami %n</numerusform>
         <numerusform>with %n attributes</numerusform>
         <numerusform>with %n attributes</numerusform>
         <numerusform>with %n attributes</numerusform>
@@ -1867,11 +1867,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Zobacz uprawnienia</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Ukryj uprawnienia</translation>
     </message>
   </context>
   <context>
@@ -1909,11 +1909,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Wybierz obiekty</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Wszystkie obiekty</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2010,14 +2010,14 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtruj według</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Wybierz atrybut</translation>
     </message>
   </context>
   <context>
@@ -2150,11 +2150,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Serwer nie jest skonfigurowany do obsługi zdalnego dostępu</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Narzędzie zdalnego dostępu jest obecnie wyłączone. Włącz je lub skontaktuj się z administratorem, aby je włączyć.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2166,11 +2166,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Połącz aplikację kliencką %1 z hostem lokalnym:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Port lokalny</translation>
     </message>
     <message>
       <source>An error occurred</source>
@@ -2400,7 +2400,7 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Witryna została zawieszona. Aby włączyć/wyłączyć korzystanie z integracji dla bieżącego urządzenia, witryna musi być w stanie aktywnym. Skontaktuj się ze swoim partnerem kanałowym, aby uzyskać szczegółowe informacje</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
