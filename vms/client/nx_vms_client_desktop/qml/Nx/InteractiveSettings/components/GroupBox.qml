@@ -77,10 +77,8 @@ Group
                 "disable": Panel.SwitchButtonBehavior.Disable,
             })[control.switchButtonBehavior] ?? Panel.SwitchButtonBehavior.None
 
-            onTriggered: (checked) => control.value = checked
-
+            y: 1
             topPadding: contentHeight > 0 ? 36 : 0
-
             bottomPadding: 16
 
             contentItem: LabeledColumnLayout
@@ -88,6 +86,8 @@ Group
                 id: column
                 layoutControl: control
             }
+
+            onTriggered: (checked) => control.value = checked
         }
     }
 
