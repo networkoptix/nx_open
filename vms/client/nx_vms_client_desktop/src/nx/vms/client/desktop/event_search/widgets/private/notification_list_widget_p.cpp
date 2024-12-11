@@ -297,7 +297,7 @@ void NotificationListWidget::Private::setupFilterNotificationsButton()
         tr("Event Notifications"),
         &NotificationListWidget::Private::onEventNotificationsActionTriggered);
     addAction(
-        tr("System Notifications"),
+        tr("Site Notifications"),
         &NotificationListWidget::Private::onSystemNotificationsActionTriggered);
 
     menu->addSeparator();
