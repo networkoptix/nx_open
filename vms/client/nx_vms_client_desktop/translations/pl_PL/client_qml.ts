@@ -1657,7 +1657,7 @@
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Wtyczki to programy działające na serwerze %1 , które umożliwiają bezproblemową integrację analiz wideo.</translation>
     </message>
   </context>
   <context>

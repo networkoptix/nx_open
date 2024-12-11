@@ -2623,7 +2623,7 @@
     </message>
     <message>
       <source>The following licenses were not migrated:</source>
-      <translation type="unfinished">The following licenses were not migrated:</translation>
+      <translation>Następujące licencje nie zostały przeniesione:</translation>
     </message>
     <message>
       <source>License</source>
