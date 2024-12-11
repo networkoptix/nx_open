@@ -35,11 +35,11 @@ public:
         return QnDeviceDependentStrings::getNameFromSet(
             context->resourcePool(),
             QnCameraDeviceStringSet(
-                tr("%1 of %n devices", "", totalCount),
-                tr("%1 of %n cameras", "", totalCount),
-                tr("%1 of %n I/O modules", "", totalCount)
+                tr("%n of %1 devices", "", count),
+                tr("%n of %1 cameras", "", count),
+                tr("%n of %1 I/O modules", "", count)
             ), total
-        ).arg(count);
+        ).arg(totalCount);
     }
 
     static QString anyCamera(nx::vms::common::SystemContext* context)

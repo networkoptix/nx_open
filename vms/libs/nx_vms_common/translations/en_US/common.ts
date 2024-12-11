@@ -5,35 +5,35 @@
     <name>AccessRightHelper</name>
     <message>
         <source>View Live</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Play Audio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>View Archive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Export Archive</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>View Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Manage Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>User Input</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Edit Settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -55,12 +55,12 @@
     <name>BookmarkFacadeStrings</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site Event</source>
         <comment>Shows that the bookmark was created by a site event</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -180,91 +180,91 @@
     </message>
     <message>
         <source>Site Health Viewers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
         <comment>%1 is the cloud name (like Nx Cloud)</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-        <source>%1 of %n devices</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 of %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 of %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Any Device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Any Camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 devices</source>
+        <translation>
+            <numerusform>%n of %1 device</numerusform>
+            <numerusform>%n of %1 devices</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 cameras</source>
+        <translation>
+            <numerusform>%n of %1 camera</numerusform>
+            <numerusform>%n of %1 cameras</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 I/O modules</source>
+        <translation>
+            <numerusform>%n of %1 I/O module</numerusform>
+            <numerusform>%n of %1 I/O modules</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnBuzzerPolicy</name>
     <message>
         <source>Servers that support buzzer</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
         <source>Analytics is not available for %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
         <source>Select device</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%1 does not support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 does not support two-way audio</numerusform>
+            <numerusform>%1 do not support two-way audio</numerusform>
         </translation>
     </message>
 </context>
@@ -499,9 +499,9 @@
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
         <source>%1 have no input ports</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 has no input ports</numerusform>
+            <numerusform>%1 have no input ports</numerusform>
         </translation>
     </message>
 </context>
@@ -509,7 +509,7 @@
     <name>QnCameraMotionPolicy</name>
     <message>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -523,9 +523,9 @@
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
         <source>%1 have no output relays</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 has no output relays</numerusform>
+            <numerusform>%1 have no output relays</numerusform>
         </translation>
     </message>
 </context>
@@ -533,7 +533,7 @@
     <name>QnCameraRecordingPolicy</name>
     <message>
         <source>Recording is disabled for %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -541,9 +541,9 @@
     <message numerus="yes">
         <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
         <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n of %1 selected user is not %2 user and will not get mobile notifications.</numerusform>
+            <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
         </translation>
     </message>
 </context>
@@ -551,44 +551,44 @@
     <name>QnExecPtzPresetPolicy</name>
     <message>
         <source>Select exactly one camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 has no PTZ presets</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnFanErrorPolicy</name>
     <message>
         <source>Servers that support fan diagnostic</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnFullscreenCameraPolicy</name>
     <message>
         <source>Select exactly one camera</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This camera is not currently on the selected layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>This camera is not currently on some of the selected layouts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
         <source>Users do not have access to the selected layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Some users do not have access to the selected layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -920,55 +920,55 @@
     <name>QnPoeOverBudgetPolicy</name>
     <message>
         <source>Servers that support PoE monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
         <source>%n groups</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n group</numerusform>
+            <numerusform>%n groups</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
         <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n groups do not have %1 permission for some of selected cameras</source>
         <comment>%1 is the permission name</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n group does not have %1 permission for some of selected cameras</numerusform>
+            <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 group does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n users do not have %1 permission for some of selected cameras</source>
         <comment>%1 is the permission name</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n user does not have %1 permission for some of selected cameras</numerusform>
+            <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 user does not have %2 permission for some of selected cameras</source>
         <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1043,7 +1043,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
         <source>None of selected user roles contain users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1323,11 +1323,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
         <source>Email address is not set for all the selected users.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Email address is not set for some selected users.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1346,7 +1346,7 @@
     </message>
     <message>
         <source>Live view</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1364,7 +1364,7 @@
     <name>SystemHelpers</name>
     <message>
         <source>New Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1459,7 +1459,7 @@
     </message>
     <message>
         <source>File write error.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1859,59 +1859,59 @@
     </message>
     <message>
         <source>Site alive update interval (seconds, 1s-1h)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Proxy connection access policy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cloud Site ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enable 2FA for the Site</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Site name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Local Site ID, null means the Site is not set up yet.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last master Site merge ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Last slave Site merge ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pixelation settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Apply session limit for Cloud tokens</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Enable or disable the creation of new Integration registration requests</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Anonymous Crash Report Server API URL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Default locale for new users</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Check video stream permissions on VMS server period (milliseconds)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2621,15 +2621,15 @@
     </message>
     <message>
         <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Call Request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Call Request Missed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
