@@ -1001,6 +1001,7 @@ void DataManager::processQueue(std::queue<Data>& dataQueue, std::unique_lock<std
     *needToFlush<Data>() = false;
     lock.unlock();
     m_saveHandler(metadataType<Data>(), nx::sdk::ErrorCode::noError);
+    lock.lock();
 }
 
 void DataManager::setSaveHandler(SaveHandler handler)
