@@ -1024,18 +1024,27 @@ struct ModifyStorageAccess
                 "Empty Storage URL is not allowed."));
         }
 
-        const auto existingResource = systemContext->resourcePool()->getResourceById(param.id);
+        const auto resourcePool = systemContext->resourcePool();
+        const auto existingResource = resourcePool->getResourceById(param.id);
         if (!hasSystemAccess(accessData)
             && !validateResourceNameOrEmpty(param, existingResource))
         {
-
             return invalidParameterError("name");
         }
 
         transaction_descriptor::CanModifyStorageData data;
+        for (const auto& s: resourcePool->getResources<QnStorageResource>())
+        {
+            if (s->getStorageType() == nx::vms::api::kCloudStorageType
+                && s->isBackup()
+                && s->isUsedForWriting())
+            {
+                data.hasUsedCloudStorage = true;
+                break;
+            }
+        }
+
         data.hasExistingStorage = (bool) existingResource;
-        data.storageType = param.storageType;
-        data.isBackup = param.isBackup;
         data.getExistingStorageDataFunc =
             [&]()
             {
@@ -3098,7 +3107,8 @@ Result canModifyStorage(const CanModifyStorageData& data)
         return data.modifyResourceResult;
 
     // For now only backup cloud storages are supported. It may change later.
-    if (data.storageType == nx::vms::api::kCloudStorageType && !data.isBackup)
+    if (data.request.storageType == nx::vms::api::kCloudStorageType
+        && !data.request.isBackup)
     {
         return Result(
             ErrorCode::forbidden,
@@ -3107,6 +3117,16 @@ Result canModifyStorage(const CanModifyStorageData& data)
                     "%1 storage can be only in the backup storage pool.",
                     /*comment*/ "%1 is the short cloud name (like Cloud)"),
                 nx::branding::shortCloudName()));
+    }
+
+    if (data.request.storageType != nx::vms::api::kCloudStorageType
+        && data.hasUsedCloudStorage
+        && data.request.usedForWriting
+        && data.request.isBackup)
+    {
+        const auto errorMessage = detail::ServerApiErrors::tr(
+            "Can't enable UsedForWriting because used Cloud Storage is present");
+        return Result(ErrorCode::forbidden, errorMessage);
     }
 
     if (!data.hasExistingStorage)

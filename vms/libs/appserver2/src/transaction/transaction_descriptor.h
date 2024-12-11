@@ -89,8 +89,7 @@ struct CanModifyStorageData
     nx::vms::api::StorageData request;
     std::function<void(const QString&)> logErrorFunc;
     std::function<nx::vms::api::ResourceData()> getExistingStorageDataFunc;
-    QString storageType;
-    bool isBackup = false;
+    bool hasUsedCloudStorage = false;
 };
 
 Result canModifyStorage(const CanModifyStorageData& data);

@@ -75,8 +75,8 @@ TEST_F(CanModifyStorageTest, ForbiddenMainCloudStorage)
     data.hasExistingStorage = false;
     data.request.parentId = existingResource.parentId;
     data.request.url = existingResource.url;
-    data.storageType = nx::vms::api::kCloudStorageType;
-    data.isBackup = false;
+    data.request.storageType = nx::vms::api::kCloudStorageType;
+    data.request.isBackup = false;
     ASSERT_EQ(ErrorCode::forbidden, canModifyStorage(data));
 }
 
@@ -86,9 +86,22 @@ TEST_F(CanModifyStorageTest, AllowedBackupCloudStorage)
     data.hasExistingStorage = false;
     data.request.parentId = existingResource.parentId;
     data.request.url = existingResource.url;
-    data.storageType = nx::vms::api::kCloudStorageType;
-    data.isBackup = true;
+    data.request.storageType = nx::vms::api::kCloudStorageType;
+    data.request.isBackup = true;
     ASSERT_EQ(ErrorCode::ok, canModifyStorage(data));
+}
+
+TEST_F(CanModifyStorageTest, SetUsedForWritingForbiddenForLocalWhenCloudIsActive)
+{
+    data.modifyResourceResult = ErrorCode::ok;
+    data.hasExistingStorage = false;
+    data.hasUsedCloudStorage = true;
+    data.request.parentId = existingResource.parentId;
+    data.request.url = existingResource.url;
+    data.request.storageType = "local";
+    data.request.isBackup = true;
+    data.request.usedForWriting = true;
+    ASSERT_EQ(ErrorCode::forbidden, canModifyStorage(data));
 }
 
 } // namespace ec2::transaction_descriptor::test
