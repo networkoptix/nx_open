@@ -36,7 +36,7 @@ void registerRuleHandlers(
     reg("rest/v3/servers/:serverId/events", GlobalPermission::viewLogs,
         std::move(v3LogHandler));
 
-    /**%apidoc[proprietary] GET /rest/v{4-}/events/manifest/events
+    /**%apidoc GET /rest/v{4-}/events/manifest/events
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Get Event manifest
      * %ingroup Events
@@ -47,7 +47,7 @@ void registerRuleHandlers(
     reg("rest/v{4-}/events/manifest/events", GlobalPermission::powerUser,
         std::make_unique<EventManifestHandler>(engine));
 
-    /**%apidoc[proprietary] GET /rest/v{4-}/events/manifest/actions
+    /**%apidoc GET /rest/v{4-}/events/manifest/actions
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Get Action manifest
      * %ingroup Events
@@ -174,7 +174,7 @@ void registerRuleHandlers(
     reg("rest/v{4-}/events/create", GlobalPermission::none,
         std::make_unique<SendEventHandler>(serverModule->systemContext()));
 
-    /**%apidoc[proprietary] POST /rest/v{4-}/events/rules
+    /**%apidoc POST /rest/v{4-}/events/rules
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Create Rule
      * %ingroup Events
@@ -184,7 +184,7 @@ void registerRuleHandlers(
      * %permissions Power User.
      * %return:{RuleV4}
      *
-     **%apidoc[proprietary] PUT /rest/v{4-}/events/rules/{id}
+     **%apidoc PUT /rest/v{4-}/events/rules/{id}
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Replace Rule
      * %ingroup Events
@@ -193,7 +193,7 @@ void registerRuleHandlers(
      * %permissions Power User.
      * %return:{RuleV4}
      *
-     **%apidoc[proprietary] PATCH /rest/v{4-}/events/rules/{id}
+     **%apidoc PATCH /rest/v{4-}/events/rules/{id}
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Modify Rule
      * %ingroup Events
@@ -202,7 +202,7 @@ void registerRuleHandlers(
      * %permissions Power User.
      * %return:{RuleV4}
      *
-     **%apidoc[proprietary] GET /rest/v{4-}/events/rules/{id}
+     **%apidoc GET /rest/v{4-}/events/rules/{id}
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Get Rule
      * %ingroup Events
@@ -211,7 +211,7 @@ void registerRuleHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{RuleV4}
      *
-     **%apidoc[proprietary] GET /rest/v{4-}/events/rules
+     **%apidoc GET /rest/v{4-}/events/rules
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Get all Rules
      * %ingroup Events
@@ -219,7 +219,7 @@ void registerRuleHandlers(
      * %permissions Depends on Resource access rights.
      * %return:{RuleV4List}
      *
-     **%apidoc[proprietary] DELETE /rest/v{4-}/events/rules/{id}
+     **%apidoc DELETE /rest/v{4-}/events/rules/{id}
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Remove Rule
      * %ingroup Events
@@ -231,7 +231,7 @@ void registerRuleHandlers(
         std::make_unique<SimpleRuleHandler<QueryProcessor>>(
             serverModule->directConnection()->queryProcessor(), serverModule->systemContext()));
 
-    /**%apidoc[proprietary] POST /rest/v{4-}/events/rules/%2A/reset
+    /**%apidoc POST /rest/v{4-}/events/rules/%2A/reset
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
      * %caption Reset all rules to default
      * %ingroup Events
