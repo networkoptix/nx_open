@@ -26,6 +26,7 @@ using namespace nx::vms::client::desktop;
 class CellWidget: public QWidget
 {
     using base_type = QWidget;
+    Q_DECLARE_TR_FUNCTIONS(CellWidget)
 
 public:
     CellWidget(QWidget* parent = nullptr);

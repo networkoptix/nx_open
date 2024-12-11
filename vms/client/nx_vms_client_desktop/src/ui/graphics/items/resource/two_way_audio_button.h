@@ -11,6 +11,7 @@ namespace nx::vms::client::desktop {
 class TwoWayAudioButton: public CameraButton
 {
     using base_type = CameraButton;
+    Q_OBJECT
 
 public:
     TwoWayAudioButton(QGraphicsItem* parent = nullptr);

@@ -87,6 +87,7 @@ private:
 class NX_VMS_COMMON_API QnLayoutAccessValidationPolicy: public QnSubjectValidationPolicy
 {
     using base_type = QnSubjectValidationPolicy;
+    Q_DECLARE_TR_FUNCTIONS(QnLayoutAccessValidationPolicy)
 
 public:
     using QnSubjectValidationPolicy::QnSubjectValidationPolicy;
