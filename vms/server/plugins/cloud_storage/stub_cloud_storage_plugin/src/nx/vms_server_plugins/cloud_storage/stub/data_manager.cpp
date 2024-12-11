@@ -1170,6 +1170,7 @@ std::string DataManager::queryBookmarks(const nx::sdk::cloud_storage::BookmarkFi
 {
     using namespace nx::sdk::cloud_storage;
     std::vector<Bookmark> result;
+    std::lock_guard<std::mutex> lock(*m_mutex);
     for (const auto& candidate: m_cloudBookmarks)
     {
         if (bookmarkMatches(candidate, filter))
