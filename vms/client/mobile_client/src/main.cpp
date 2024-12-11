@@ -210,7 +210,7 @@ int runUi(QGuiApplication* application)
     maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
     static constexpr int kSingleHardwareDecoderCount = 1;
-    static constexpr int kMultipleHardwareDecoderCount = 2;
+    static constexpr int kMultipleHardwareDecoderCount = 3;
     const int hardwareDecodersCount = qnSettings->useMaxHardwareDecodersCount()
         ? kMultipleHardwareDecoderCount
         : kSingleHardwareDecoderCount;
