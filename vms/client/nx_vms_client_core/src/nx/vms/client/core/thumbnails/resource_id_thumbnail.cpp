@@ -254,8 +254,8 @@ ResourceIdentificationThumbnail::ResourceIdentificationThumbnail(QObject* parent
     connect(this, &AbstractResourceThumbnail::resourceChanged, this,
         [this]()
         {
-            d->online = resource() && resource()->isOnline();
             d->camera = resource().objectCast<QnVirtualCameraResource>();
+            d->online = d->camera && d->camera->isOnline();
             d->fallbackImage = {};
             d->elapsed.invalidate();
             d->preloadTimer.reset();

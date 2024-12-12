@@ -49,22 +49,18 @@ static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
 
-QString getConfiguredVideoLayout(const QnResourcePtr& resource)
+QString getConfiguredVideoLayout(const QnVirtualCameraResourcePtr& device)
 {
-    QString configuredLayout;
-    auto secResource = resource.dynamicCast<QnVirtualCameraResource>();
-    if (secResource)
+    if (auto layout = device->resourceData().value<QString>(ResourceDataKey::kVideoLayout);
+        !layout.isEmpty())
     {
-        configuredLayout = secResource->resourceData().value<QString>(
-            ResourceDataKey::kVideoLayout);
+        return layout;
     }
-    if (configuredLayout.isEmpty())
-    {
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(resource->getTypeId());
-        if (resType)
-            configuredLayout = resType->defaultValue(ResourcePropertyKey::kVideoLayout);
-    }
-    return configuredLayout;
+
+    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(device->getTypeId()))
+        return resType->defaultValue(ResourcePropertyKey::kVideoLayout);
+
+    return {};
 }
 
 bool isEmptyMediaAllowed(const QnResourcePtr& res)

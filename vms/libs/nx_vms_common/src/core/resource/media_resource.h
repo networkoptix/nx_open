@@ -4,12 +4,10 @@
 
 #include <QtCore/QSize>
 
-#include <core/ptz/ptz_constants.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout_fwd.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/dewarping_data.h>
-#include <nx/vms/common/ptz/type.h>
 #include <utils/common/aspect_ratio.h>
 
 class QnAbstractStreamDataProvider;
@@ -52,26 +50,6 @@ public:
     virtual std::optional<int> forcedRotation() const;
 
     void setForcedRotation(std::optional<int> value);
-
-    /**
-        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
-    */
-    Ptz::Capabilities getPtzCapabilities(
-        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational) const;
-
-    /** Check if camera has any of provided capabilities. */
-    bool hasAnyOfPtzCapabilities(
-        Ptz::Capabilities capabilities,
-        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational) const;
-    void setPtzCapabilities(
-        Ptz::Capabilities capabilities,
-        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational);
-    void setPtzCapability(
-        Ptz::Capabilities capability,
-        bool value,
-        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational);
-
-    bool canSwitchPtzPresetTypes() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();

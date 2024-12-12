@@ -528,7 +528,7 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
             if (m_considerOnlineServersOnly)
             {
                 auto server = camera->getParentResource();
-                if (server && !server->isOnline())
+                if (server && server->getStatus() != nx::vms::api::ResourceStatus::online)
                     continue;
             }
             oldCameras[groupId(camera)].insert(camera);

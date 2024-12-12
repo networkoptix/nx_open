@@ -31,13 +31,9 @@ static const QString panicRecordingKey("panic_mode");
 
 const QString QnMediaResource::kRotationKey("rotation");
 
-QnMediaResource::QnMediaResource()
-{
-}
+QnMediaResource::QnMediaResource() = default;
 
-QnMediaResource::~QnMediaResource()
-{
-}
+QnMediaResource::~QnMediaResource() = default;
 
 Qn::StreamQuality QnMediaResource::getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const
 {
@@ -163,83 +159,6 @@ void QnMediaResource::setForcedRotation(std::optional<int> value)
     if (value)
         stringValue = QString::number(*value);
     setProperty(kRotationKey, stringValue);
-}
-
-Ptz::Capabilities QnMediaResource::getPtzCapabilities(ptz::Type ptzType) const
-{
-    switch (ptzType)
-    {
-        case ptz::Type::operational:
-            return Ptz::Capabilities(getProperty(
-                ResourcePropertyKey::kPtzCapabilities).toInt());
-
-        case ptz::Type::configurational:
-            return Ptz::Capabilities(getProperty(
-                ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
-        default:
-            NX_ASSERT(false, "Wrong ptz type, we should never be here");
-            return Ptz::NoPtzCapabilities;
-    }
-}
-
-bool QnMediaResource::hasAnyOfPtzCapabilities(
-    Ptz::Capabilities capabilities,
-    ptz::Type ptzType) const
-{
-    return getPtzCapabilities(ptzType) & capabilities;
-}
-
-void QnMediaResource::setPtzCapabilities(
-    Ptz::Capabilities capabilities,
-    ptz::Type ptzType)
-{
-    switch (ptzType)
-    {
-        case ptz::Type::operational:
-        {
-            // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
-            setProperty(
-                ResourcePropertyKey::kPtzCapabilities,
-                QString::number((int) capabilities));
-            break;
-        }
-        case ptz::Type::configurational:
-        {
-            // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
-            setProperty(
-                ResourcePropertyKey::kConfigurationalPtzCapabilities,
-                QString::number((int) capabilities));
-            break;
-        }
-        default:
-            NX_ASSERT(false, "Wrong ptz type, we should never be here");
-    }
-
-}
-
-void QnMediaResource::setPtzCapability(
-    Ptz::Capabilities capability,
-    bool value,
-    ptz::Type ptzType)
-{
-    setPtzCapabilities(value
-        ? (getPtzCapabilities(ptzType) | capability)
-        : (getPtzCapabilities(ptzType) & ~capability),
-        ptzType);
-}
-
-bool QnMediaResource::canSwitchPtzPresetTypes() const
-{
-    const auto capabilities = getPtzCapabilities();
-    if (!(capabilities & Ptz::NativePresetsPtzCapability))
-        return false;
-
-    if (capabilities & Ptz::NoNxPresetsPtzCapability)
-        return false;
-
-    // Check if our server can emulate presets.
-    return (capabilities & Ptz::AbsolutePtrzCapabilities)
-        && (capabilities & Ptz::PositioningPtzCapabilities);
 }
 
 QString QnMediaResource::customAspectRatioKey()

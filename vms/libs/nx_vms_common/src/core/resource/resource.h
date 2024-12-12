@@ -173,7 +173,6 @@ public:
      */
     QnResourcePtr getParentResource() const;
 
-
     /**
      * Identifier of the Device type. Actually used only for Camera Resources - to access
      * Device read-only or default properties (e.g. the maximum fps value or sensor configuration).
@@ -181,13 +180,13 @@ public:
      * reads it, updates the internal values and provides them to the connecting Clients. See
      * QnResourceType.
      */
-    nx::Uuid getTypeId() const;
+    virtual nx::Uuid getTypeId() const;
 
     /**
      * Updates the Resource type id. Actual only for Cameras, when the same Camera is found by a
      * new more actual driver, or when a new Resource type is added to the Resource Type Pool.
      */
-    void setTypeId(const nx::Uuid& id);
+    virtual void setTypeId(const nx::Uuid& id);
 
     /**
      * Availability of the Resource. Actual mostly for the network Resources: Devices, Servers, Web
@@ -289,8 +288,8 @@ public:
      * enforced though), but the same logical id for a Camera and a Layout is perfectly OK as they
      * are used in different API calls.
      */
-    virtual int logicalId() const;
-    virtual void setLogicalId(int value);
+    virtual int logicalId() const { return 0; }
+    virtual void setLogicalId(int /*value*/) { /*Base implementation does not keep logical Id. */ }
 
     //---------------------------------------------------------------------------------------------
     // Properties.

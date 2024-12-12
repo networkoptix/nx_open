@@ -334,40 +334,21 @@ void QnResource::setUrl(const QString& url)
     emit urlChanged(toSharedPointer(this));
 }
 
-int QnResource::logicalId() const
-{
-    return 0;
-}
-
-void QnResource::setLogicalId(int /*value*/)
-{
-    // Base implementation does not keep logical Id.
-}
-
 QString QnResource::getProperty(const QString& key) const
 {
-    QString value;
+    if (useLocalProperties())
     {
-        if (useLocalProperties())
-        {
-            NX_MUTEX_LOCKER lk(&m_mutex);
-            auto itr = m_locallySavedProperties.find(key);
-            if (itr != m_locallySavedProperties.end())
-                value = itr->second;
-        }
-        else if (auto* context = systemContext(); context && context->resourcePropertyDictionary())
-        {
-            value = context->resourcePropertyDictionary()->value(m_id, key);
-        }
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        auto itr = m_locallySavedProperties.find(key);
+        if (itr != m_locallySavedProperties.end())
+            return itr->second;
+    }
+    else if (auto* context = systemContext(); context && context->resourcePropertyDictionary())
+    {
+        return context->resourcePropertyDictionary()->value(m_id, key);
     }
 
-    if (value.isNull())
-    {
-        // Find the default value in the Resource type.
-        if (QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()))
-            return resType->defaultValue(key);
-    }
-    return value;
+    return {};
 }
 
 bool QnResource::setProperty(const QString& key, const QString& value, bool markDirty)

@@ -11,6 +11,7 @@
 #include <common/common_globals.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/misc/schedule_task.h>
+#include <core/ptz/ptz_constants.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/network_resource.h>
@@ -26,6 +27,7 @@
 #include <nx/vms/api/data/device_profile.h>
 #include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <nx/vms/common/ptz/type.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
@@ -103,12 +105,61 @@ public:
 
     QnMediaServerResourcePtr getParentServer() const;
 
+    /**
+     * Identifier of the Device type. Used to access Device read-only or default properties (e.g.
+     * the maximum fps value or sensor configuration). Such parameters are stored in a separate
+     * json file, available online. The Server regularly reads it, updates the internal values and
+     * provides them to the connecting Clients.
+     */
+    virtual nx::Uuid getTypeId() const override;
+
+    /**
+     * Updates the Device type id. Actual when the same Device is found by a
+     * new more actual driver, or when a new Resource type is added to the Device Type Pool.
+     */
+    virtual void setTypeId(const nx::Uuid& id) override;
+
+    /**
+     * Helper function to check if the Device status is "online" or "recording". Must not be used
+     * anywhere else.
+     */
+    virtual bool isOnline() const { return isOnline(getStatus()); }
+
+    /**
+     * Helper function to check if the Device status is "online" or "recording". Must not be used
+     * anywhere else.
+     */
+    static bool isOnline(nx::vms::api::ResourceStatus status)
+    {
+        return status == nx::vms::api::ResourceStatus::online
+            || status == nx::vms::api::ResourceStatus::recording;
+    }
+
+    virtual QString getProperty(const QString& key) const override;
+
     bool isAudioSupported() const;
     bool isIOModule() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
     bool hasTwoWayAudio() const;
+
+    Ptz::Capabilities getPtzCapabilities(
+        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational) const;
+
+    /** Check if device has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational) const;
+    void setPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational);
+    void setPtzCapability(
+        Ptz::Capabilities capability,
+        bool value,
+        nx::vms::common::ptz::Type ptzType = nx::vms::common::ptz::Type::operational);
+
+    bool canSwitchPtzPresetTypes() const;
 
     /**
      * Actual motion type used when the `MotionType::default_` value is selected.
@@ -165,35 +216,35 @@ public:
 
     /**
      * If motion detection in the remote archive is enabled. Actual for the virtual
-     * cameras and for the edge cameras (with RemoteArchiveCapability).
+     * devices and for the edge devices (with RemoteArchiveCapability).
      */
     bool isRemoteArchiveMotionDetectionEnabled() const;
 
     /**
      * Enable or disable motion detection in the remote archive. Actual for the virtual
-     * cameras and for the edge cameras (with RemoteArchiveCapability).
+     * devices and for the edge devices (with RemoteArchiveCapability).
      */
     void setRemoteArchiveMotionDetectionEnabled(bool value);
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
 
-    /** @return Whether dual streaming is supported by the camera internally. */
+    /** @return Whether dual streaming is supported by the device internally. */
     virtual bool hasDualStreamingInternal() const;
 
     /**
-     * @return Whether dual streaming is supported by the camera and is not forcefully disabled by
+     * @return Whether dual streaming is supported by the device and is not forcefully disabled by
      * a user (@see `isDualStreamingDisabled()`).
      */
     virtual bool hasDualStreaming() const;
 
-    /** Returns true if camera stores archive on a external system */
+    /** Returns true if device stores archive on a external system */
     bool isDtsBased() const;
 
     /** @return True if recording schedule can be configured for this device. */
     bool supportsSchedule() const;
 
-    /** Returns true if it is a analog camera */
+    /** Returns true if it is a analog device */
     bool isAnalog() const;
 
     /** Returns true if it is a analog encoder (described in resource_data.json) */
@@ -382,6 +433,17 @@ public:
     QString getVendor() const;
     void setVendor(const QString &value);
 
+    // TODO: #skolesnik There are just a couple of places where `logicalId()` is used from
+    // `QnResource` (including Desktop client's code)
+    /**
+     * User-defined id which primary usage purpose is to support different integrations. By using
+     * this id, the user can easily switch one Device with another, and all API requests continue
+     * to work as usual.
+     *
+     * Supported for Devices and Layouts only. Ids should be unique between the same types (not
+     * enforced though), but the same logical id for a Device and a Layout is perfectly OK as they
+     * are used in different API calls.
+     */
     virtual int logicalId() const override;
     virtual void setLogicalId(int value) override;
 
@@ -879,6 +941,9 @@ private:
     nx::vms::api::StreamIndex analyzedStreamIndexInternal(const nx::Uuid& engineId) const;
 
 private:
+    /** Identifier of the type of this Device. */
+    nx::Uuid m_typeId;
+
     QString m_groupName;
     QString m_groupId;
     Qn::CameraStatusFlags m_statusFlags;

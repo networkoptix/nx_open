@@ -8,6 +8,7 @@ namespace nx::vms::common {
 namespace utils {
 namespace camera_replacement {
 
+// TODO: Use QnVirtualCameraResourcePtr for the argument.
 /**
  * Predicate that determines if camera has capability of being replaced or vice versa if camera can
  * act as replacement device. Having this capability for both of devices involved is a necessary
@@ -24,6 +25,7 @@ namespace camera_replacement {
  */
 bool NX_VMS_COMMON_API cameraSupportsReplacement(const QnResourcePtr& resource);
 
+// TODO: Use QnVirtualCameraResourcePtr for the argument.
 /**
  * Predicate which determines if camera can actually be replaced with another one right now.
  * @param resource Valid pointer to the camera resource expected.
@@ -32,6 +34,7 @@ bool NX_VMS_COMMON_API cameraSupportsReplacement(const QnResourcePtr& resource);
  */
 bool NX_VMS_COMMON_API cameraCanBeReplaced(const QnResourcePtr& resource);
 
+// TODO: Use QnVirtualCameraResourcePtr for the argument.
 /**
  * Predicate which determines if camera can actually be used as a replacement for another one
  * right now.
@@ -44,6 +47,7 @@ bool NX_VMS_COMMON_API cameraCanBeUsedAsReplacement(
     const QnResourcePtr& cameraToBeReplaced,
     const QnResourcePtr& replacementCamera);
 
+// TODO: Use QnVirtualCameraResourcePtr for the argument.
 /**
  * @param resource Valid pointer to the camera resource expected.
  * @return True if given camera is used as replacement one for some another camera.

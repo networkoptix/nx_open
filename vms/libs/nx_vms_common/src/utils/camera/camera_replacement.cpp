@@ -8,16 +8,43 @@
 
 namespace {
 
+using namespace nx::vms::api;
+
 // Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
 static constexpr auto kArchiveCameraResourceTypeName = "ARCHIVE_CAMERA";
 
 // Constant redefinition. The same constant defined in the nx_vms_server module is unreachable.
 static constexpr auto kReplacedWithIdPropertyName = "replaceWithId";
 
-bool isArchiveCamera(const QnVirtualCameraResourcePtr& camera)
+bool isArchiveCamera(const QnVirtualCameraResource& device)
 {
-    const auto resourceTypeName = qnResTypePool->getResourceType(camera->getTypeId())->getName();
+    const auto resourceTypeName = qnResTypePool->getResourceType(device.getTypeId())->getName();
     return resourceTypeName.compare(kArchiveCameraResourceTypeName, Qt::CaseSensitive) == 0;
+}
+
+bool cameraSupportsReplacement(const QnVirtualCameraResource& device)
+{
+    return !device.flags().testFlag(Qn::removed)
+           && !device.flags().testFlag(Qn::virtual_camera)
+           && !device.flags().testFlag(Qn::desktop_camera)
+           && !device.flags().testFlag(Qn::cross_system)
+           && !device.isMultiSensorCamera()
+           && !device.isNvr()
+           && !device.isIOModule()
+           && device.hasVideo()
+           && !isArchiveCamera(device);
+}
+
+bool cameraCanBeReplaced(const QnVirtualCameraResource& device)
+{
+    if (!cameraSupportsReplacement(device))
+        return false;
+
+    if (device.getStatus() != ResourceStatus::offline)
+        return false;
+
+    const auto parentResource = device.getParentResource();
+    return parentResource && parentResource->getStatus() == ResourceStatus::online;
 }
 
 } // namespace
@@ -30,31 +57,20 @@ using namespace nx::vms::api;
 
 bool cameraSupportsReplacement(const QnResourcePtr& resource)
 {
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
+    const auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!device)
         return false;
 
-    return !camera->flags().testFlag(Qn::removed)
-        && !camera->flags().testFlag(Qn::virtual_camera)
-        && !camera->flags().testFlag(Qn::desktop_camera)
-        && !camera->flags().testFlag(Qn::cross_system)
-        && !camera->isMultiSensorCamera()
-        && !camera->isNvr()
-        && !camera->isIOModule()
-        && camera->hasVideo()
-        && !isArchiveCamera(camera);
+    return ::cameraSupportsReplacement(*device);
 }
 
 bool cameraCanBeReplaced(const QnResourcePtr& resource)
 {
-    if (!cameraSupportsReplacement(resource))
+    const auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!device)
         return false;
 
-    if (resource->getStatus() != ResourceStatus::offline)
-        return false;
-
-    const auto parentResource = resource->getParentResource();
-    return parentResource && parentResource->getStatus() == ResourceStatus::online;
+    return ::cameraCanBeReplaced(*device);
 }
 
 bool cameraCanBeUsedAsReplacement(

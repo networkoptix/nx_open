@@ -54,6 +54,8 @@
 
 namespace {
 
+using namespace nx::vms::common;
+
 using StreamFpsSharingMethod = QnVirtualCameraResource::StreamFpsSharingMethod;
 
 const QString kPowerRelayPortName =
@@ -449,6 +451,33 @@ nx::vms::api::DeviceType QnVirtualCameraResource::deviceType() const
 
 QnMediaServerResourcePtr QnVirtualCameraResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
+nx::Uuid QnVirtualCameraResource::getTypeId() const
+{
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    return m_typeId;
+}
+
+void QnVirtualCameraResource::setTypeId(const nx::Uuid& id)
+{
+    if (!NX_ASSERT(!id.isNull()))
+        return;
+
+    NX_MUTEX_LOCKER mutexLocker(&m_mutex);
+    m_typeId = id;
+}
+
+QString QnVirtualCameraResource::getProperty(const QString& key) const
+{
+    if (auto value = QnResource::getProperty(key); !value.isEmpty())
+        return value;
+
+    // Find the default value in the Resource type.
+    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()))
+        return resType->defaultValue(key);
+
+    return {};
 }
 
 bool QnVirtualCameraResource::isGroupPlayOnly() const
@@ -879,6 +908,81 @@ int QnVirtualCameraResource::motionSensWindowCount() const
 bool QnVirtualCameraResource::hasTwoWayAudio() const
 {
     return hasCameraCapabilities(nx::vms::api::DeviceCapability::audioTransmit);
+}
+
+Ptz::Capabilities QnVirtualCameraResource::getPtzCapabilities(ptz::Type ptzType) const
+{
+    switch (ptzType)
+    {
+        case ptz::Type::operational:
+            return Ptz::Capabilities(getProperty(
+                ResourcePropertyKey::kPtzCapabilities).toInt());
+
+        case ptz::Type::configurational:
+            return Ptz::Capabilities(getProperty(
+                ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+            return Ptz::NoPtzCapabilities;
+    }
+}
+
+bool QnVirtualCameraResource::hasAnyOfPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    ptz::Type ptzType) const
+{
+    return getPtzCapabilities(ptzType) & capabilities;
+}
+
+void QnVirtualCameraResource::setPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    ptz::Type ptzType)
+{
+    switch (ptzType)
+    {
+        case ptz::Type::operational:
+        {
+            // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
+            setProperty(
+                ResourcePropertyKey::kPtzCapabilities,
+                QString::number((int) capabilities));
+            return;
+        }
+        case ptz::Type::configurational:
+        {
+            // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
+            setProperty(
+                ResourcePropertyKey::kConfigurationalPtzCapabilities,
+                QString::number((int) capabilities));
+            return;
+        }
+    }
+    NX_ASSERT(false, "Wrong ptz type, we should never be here");
+}
+
+void QnVirtualCameraResource::setPtzCapability(
+    Ptz::Capabilities capability,
+    bool value,
+    ptz::Type ptzType)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities(ptzType) | capability)
+        : (getPtzCapabilities(ptzType) & ~capability),
+        ptzType);
+}
+
+bool QnVirtualCameraResource::canSwitchPtzPresetTypes() const
+{
+    const auto capabilities = getPtzCapabilities();
+    if (!(capabilities & Ptz::NativePresetsPtzCapability))
+        return false;
+
+    if (capabilities & Ptz::NoNxPresetsPtzCapability)
+        return false;
+
+    // Check if our server can emulate presets.
+    return (capabilities & Ptz::AbsolutePtrzCapabilities)
+        && (capabilities & Ptz::PositioningPtzCapabilities);
 }
 
 bool QnVirtualCameraResource::isAudioSupported() const
@@ -2068,6 +2172,7 @@ nx::media::StreamEvent QnVirtualCameraResource::checkForErrors() const
     return nx::media::StreamEvent::noEvent;
 }
 
+// TODO: #skolesnik Seems like it can be simplified.
 QnResourceData QnVirtualCameraResource::resourceData() const
 {
     if (const auto context = systemContext())
