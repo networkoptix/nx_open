@@ -707,6 +707,14 @@
       <source>Early access to new features</source>
       <translation>Yeni özelliklere erken erişim</translation>
     </message>
+    <message>
+      <source>Enable software decoder fallback</source>
+      <translation type="unfinished">Enable software decoder fallback</translation>
+    </message>
+    <message>
+      <source>Decode some rare video formats using software decoder</source>
+      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+    </message>
   </context>
   <context>
     <name>SideNavigation</name>

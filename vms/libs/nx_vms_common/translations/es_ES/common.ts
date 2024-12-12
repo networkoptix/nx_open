@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Editar ajustes</translation>
     </message>
   </context>
   <context>
