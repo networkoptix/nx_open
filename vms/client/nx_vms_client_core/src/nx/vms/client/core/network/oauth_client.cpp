@@ -257,7 +257,11 @@ void OauthClient::setCredentials(const nx::network::http::Credentials& credentia
 
 void OauthClient::setLocale(const QString& locale)
 {
+    if (locale == d->locale)
+        return;
+
     d->locale = locale;
+    emit urlChanged();
 }
 
 void OauthClient::setSystemName(const QString& value)

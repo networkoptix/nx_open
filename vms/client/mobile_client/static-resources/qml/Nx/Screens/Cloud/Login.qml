@@ -30,7 +30,7 @@ Page
 
         onUrlChanged: d.handleUrlChanged(url)
 
-        onLoadingChanged:
+        onLoadingChanged: (loadRequest) =>
         {
             switch (loadRequest.status)
             {
@@ -65,6 +65,7 @@ Page
             const closePage = ()=>Workflow.popCurrentScreen()
             helper.authDataReady.connect(closePage)
             helper.cancelled.connect(closePage)
+            helper.setLocale(locale.name)
             return helper
         }
 

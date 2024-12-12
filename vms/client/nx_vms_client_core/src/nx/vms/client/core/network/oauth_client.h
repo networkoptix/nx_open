@@ -25,7 +25,7 @@ class NX_VMS_CLIENT_CORE_API OauthClient: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QUrl url READ url CONSTANT)
+    Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
 
 public:
     static void registerQmlType();
@@ -57,7 +57,7 @@ public:
     void setCredentials(const nx::network::http::Credentials& credentials);
 
     /** Set locale code for URL construction. */
-    void setLocale(const QString& locale);
+    Q_INVOKABLE void setLocale(const QString& locale);
 
     /**
      * Set system name. Setting a system name change web dialog behaviour.
@@ -91,6 +91,7 @@ signals:
     void cloudTokensReady();
     void authDataReady();
     void cancelled();
+    void urlChanged();
 
 private:
     struct Private;
