@@ -354,7 +354,7 @@ TreeView
                     return true; //< All child resources offline or uninitialized.
                 }
 
-                return false //< There is no resource to check status.
+                return !enabled //< There is no resource to check status.
             }
 
             ResourceIdentificationThumbnail

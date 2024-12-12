@@ -392,7 +392,6 @@ FocusScope
                 implicitHeight: Math.max(button.implicitHeight, delegateLoader.implicitHeight)
                 enabled: inUse && (itemFlags & Qt.ItemIsEnabled)
                 clip: treeView.clipDelegates
-                opacity: enabled ? 1.0 : 0.3
                 visible: inUse
 
                 readonly property bool isSelectable: treeView.selectionEnabled
