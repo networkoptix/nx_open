@@ -876,21 +876,21 @@ void ActionHandler::changeDefaultPasswords(
             auto explanation =
                 [errorResultsStorage]()
                 {
-                    nx::network::rest::Result::Error error = errorResultsStorage->first().second.error;
+                    nx::network::rest::ErrorId error = errorResultsStorage->first().second.errorId;
                     if (errorResultsStorage->size() != 1)
                     {
                         const bool hasAnotherError = std::any_of(
                             errorResultsStorage->begin() + 1, errorResultsStorage->end(),
                             [error](const PasswordChangeResult& result)
                             {
-                                return error != result.second.error;
+                                return error != result.second.errorId;
                             });
 
                         if (hasAnotherError)
-                            error = nx::network::rest::Result::NoError;
+                            error = nx::network::rest::ErrorId::ok;
                     }
 
-                    return error == nx::network::rest::Result::NoError
+                    return error == nx::network::rest::ErrorId::ok
                         ? QString() //< NoError means different or unspecified error
                         : errorResultsStorage->first().second.errorString;
                 }();
@@ -2799,7 +2799,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 n = resources.size()](
                     bool result,
                     const QnResourcePtr& resource,
-                    nx::network::rest::Result::Error /*errorCode*/) mutable
+                    nx::network::rest::ErrorId /*errorCode*/) mutable
             {
                 if (result)
                     resourcesSuccess << resource;

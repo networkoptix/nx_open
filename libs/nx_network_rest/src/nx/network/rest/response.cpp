@@ -43,7 +43,7 @@ void Response::insertOrReplaceCorsHeaders(
 Response Response::result(const JsonResult& jsonResult)
 {
     Response response;
-    response.statusCode = Result::toHttpStatus(jsonResult.error);
+    response.statusCode = Result::toHttpStatus(jsonResult.errorId);
     response.content = Content{
         http::header::ContentType::kJson,
         QJson::serialized(jsonResult)};
@@ -53,7 +53,7 @@ Response Response::result(const JsonResult& jsonResult)
 Response Response::result(const UbjsonResult& ubjsonResult)
 {
     Response response;
-    response.statusCode = Result::toHttpStatus(ubjsonResult.error);
+    response.statusCode = Result::toHttpStatus(ubjsonResult.errorId);
     response.content = Content{
         http::header::ContentType::kUbjson,
         QnUbjson::serialized(ubjsonResult)};

@@ -61,13 +61,13 @@ public:
 
     static UnauthorizedException sessionExpired(QString message = {})
     {
-        return UnauthorizedException(Result(Result::Error::SessionExpired, std::move(message)),
+        return UnauthorizedException(Result(ErrorId::sessionExpired, std::move(message)),
             AuthResult::Auth_WrongSessionToken);
     }
 
     static UnauthorizedException truncatedSessionToken(QString message = {})
     {
-        return UnauthorizedException(Result(Result::Error::SessionTruncated, std::move(message)),
+        return UnauthorizedException(Result(ErrorId::sessionTruncated, std::move(message)),
             AuthResult::Auth_TruncatedSessionToken);
     }
 

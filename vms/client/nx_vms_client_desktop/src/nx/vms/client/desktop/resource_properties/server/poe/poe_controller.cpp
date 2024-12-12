@@ -109,7 +109,7 @@ void PoeController::Private::handleReply(
 
     setInitialUpdateInProgress(false);
 
-    if (success && result.error == nx::network::rest::Result::NoError)
+    if (success && result.errorId == nx::network::rest::ErrorId::ok)
         setBlockData(result.deserialized<BlockData>());
 
     runningHandles.remove(replyHandle);

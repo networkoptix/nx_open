@@ -110,7 +110,7 @@ void ManualDeviceSearcher::stop()
         [this](bool success, rest::Handle /*handle*/, rest::ServerConnection::ErrorOrEmpty result)
         {
             auto error = std::get_if<nx::network::rest::Result>(&result);
-            if (!success || (error && error->error != nx::network::rest::Result::NoError))
+            if (!success || (error && error->errorId != nx::network::rest::ErrorId::ok))
                 stop(); //< Try to stop one more time.
             else if (m_status.state != QnManualResourceSearchStatus::Finished)
                 abort();
@@ -207,7 +207,7 @@ void ManualDeviceSearcher::searchForDevices(
             const rest::ErrorOrData<api::DeviceSearch>& errorOrData)
         {
             auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-            if (!success || (error && error->error != nx::network::rest::Result::NoError))
+            if (!success || (error && error->errorId != nx::network::rest::ErrorId::ok))
             {
                 setLastErrorText(tr("Can not start the search process"));
                 abort();
@@ -304,7 +304,7 @@ void ManualDeviceSearcher::updateStatus()
             const rest::ErrorOrData<api::DeviceSearch>& errorOrData)
         {
             auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-            if (!success || (error && error->error != nx::network::rest::Result::NoError))
+            if (!success || (error && error->errorId != nx::network::rest::ErrorId::ok))
                 return;
 
             NX_ASSERT(!m_searchProcessId.isEmpty());

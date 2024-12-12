@@ -227,7 +227,7 @@ void ModuleConnector::InformationReader::readUntilError()
 
         nx::network::rest::JsonResult restResult;
         if (!QJson::deserialize(*object, &restResult)
-            || restResult.error != nx::network::rest::Result::Error::NoError)
+            || restResult.errorId != nx::network::rest::ErrorId::ok)
         {
             return nx::utils::swapAndCall(m_handler, std::nullopt, restResult.errorString);
         }

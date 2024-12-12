@@ -777,9 +777,9 @@ void UserListWidget::Private::deleteUsers(const QnUserResourceList& usersToDelet
 
     chain->start(nx::utils::guarded(this,
         [this, chain, usersToDelete, rollback = std::move(rollback)](
-            bool success, nx::network::rest::Result::Error errorCode, const QString& errorString)
+            bool success, nx::network::rest::ErrorId errorCode, const QString& errorString)
         {
-            if (!success && errorCode != nx::network::rest::Result::Error::SessionExpired)
+            if (!success && errorCode != nx::network::rest::ErrorId::sessionExpired)
             {
                 QnResourceList nonDeletedUsers;
                 for (const auto& user: usersToDelete)
@@ -924,12 +924,12 @@ void UserListWidget::Private::editSelected(BatchEditSettings initialSettings)
 
     requestChain->start(
         [this, rollback = std::move(rollback), settings](
-            bool success,  nx::network::rest::Result::Error errorCode, const QString& errorString)
+            bool success,  nx::network::rest::ErrorId errorCode, const QString& errorString)
         {
             if (success)
                 return;
 
-            if (errorCode == nx::network::rest::Result::Error::SessionExpired)
+            if (errorCode == nx::network::rest::ErrorId::sessionExpired)
             {
                 // Reopen the dialog with the last settings.
                 executeLater([this, settings](){ editSelected(settings); }, this);

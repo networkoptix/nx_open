@@ -181,7 +181,7 @@ void QnSystemAdministrationDialog::applyChanges()
             if (const auto error = std::get_if<nx::network::rest::Result>(&response))
             {
                 NX_DEBUG(this, "Can't save system settings, code: %1, error: %2",
-                    error->error, error->errorString);
+                    error->errorId, error->errorString);
                 QnSessionAwareMessageBox::critical(
                     this, tr("Failed to save site settings"), error->errorString);
             }

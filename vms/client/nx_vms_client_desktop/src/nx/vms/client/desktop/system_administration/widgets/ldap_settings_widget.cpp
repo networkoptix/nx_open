@@ -425,7 +425,7 @@ bool LdapSettingsWidget::requestLdapReset()
 
             if (auto error = std::get_if<nx::network::rest::Result>(&result))
             {
-                if (error->error != nx::network::rest::Result::SessionExpired)
+                if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
                     showError(error->errorString);
             }
             else
@@ -522,7 +522,7 @@ void LdapSettingsWidget::applyChanges()
 
                 if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
-                    if (error->error != nx::network::rest::Result::SessionExpired)
+                    if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
                         showError(error->errorString);
                 }
                 else
@@ -574,7 +574,7 @@ void LdapSettingsWidget::requestSync()
             }
             else if (auto error = std::get_if<nx::network::rest::Result>(&result))
             {
-                if (error->error != nx::network::rest::Result::SessionExpired)
+                if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
                     showError(error->errorString);
             }
             else
@@ -630,7 +630,7 @@ void LdapSettingsWidget::testConnection(
                 d->testState = TestState::ok;
             }
             else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                error && error->error != network::rest::Result::ServiceUnavailable)
+                error && error->errorId != network::rest::ErrorId::serviceUnavailable)
             {
                 d->testMessage = error->errorString;
                 d->testState = TestState::error;

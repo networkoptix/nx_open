@@ -73,7 +73,7 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
         [this, active, callback](
             bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& result)
         {
-            const bool ok = success && result.error == nx::network::rest::Result::NoError;
+            const bool ok = success && result.errorId == nx::network::rest::ErrorId::ok;
             setStarted(active && ok);
             if (callback)
                 callback(ok);

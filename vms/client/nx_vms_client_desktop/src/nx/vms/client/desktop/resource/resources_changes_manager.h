@@ -41,7 +41,7 @@ public:
     using GenericCallbackFunction = std::function<void(bool)>;
     using GenericCallbackWithErrorFunction = std::function<void(bool, const QString&)>;
     using DeleteResourceCallbackFunction = std::function<void(bool, const QnResourcePtr&,
-        nx::network::rest::Result::Error)>;
+        nx::network::rest::ErrorId)>;
 
     /** Generic function to delete resources. */
     void deleteResource(const QnResourcePtr& resource,

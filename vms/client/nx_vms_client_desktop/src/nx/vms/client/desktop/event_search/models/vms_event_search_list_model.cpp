@@ -238,7 +238,7 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
             if (const auto error = std::get_if<nx::network::rest::Result>(&data))
             {
                 NX_WARNING(this, "Event log request: %1 failed: %2, %3",
-                    handle, error->error, error->errorString);
+                    handle, error->errorId, error->errorString);
 
                 callback(false, handle, {});
             }

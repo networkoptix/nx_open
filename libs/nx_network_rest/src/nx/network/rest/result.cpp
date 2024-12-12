@@ -6,79 +6,51 @@
 
 namespace nx::network::rest {
 
-QString Result::errorToString(Result::Error value)
-{
-    switch (value)
-    {
-        case Result::NoError: return "ok";
-        case Result::MissingParameter: return "missingParameter";
-        case Result::InvalidParameter: return "invalidParameter";
-        case Result::CantProcessRequest: return "cantProcessRequest";
-        case Result::Forbidden: return "forbidden";
-        case Result::BadRequest: return "badRequest";
-        case Result::InternalServerError: return "internalServerError";
-        case Result::Conflict: return "conflict";
-        case Result::NotAllowed: return "notAllowed";
-        case Result::NotImplemented: return "notImplemented";
-        case Result::NotFound: return "notFound";
-        case Result::UnsupportedMediaType: return "unsupportedMediaType";
-        case Result::ServiceUnavailable: return "serviceUnavailable";
-        case Result::ServiceUnauthorized: return "serviceUnauthorized";
-        case Result::Unauthorized: return "unauthorized";
-        case Result::SessionExpired: return "sessionExpired";
-        case Result::SessionRequired: return "sessionRequired";
-        case Result::SessionTruncated: return "sessionTruncated";
-        case Result::Gone: return "gone";
-    };
-
-    return NX_FMT("Unknown_%1", static_cast<int>(value));
-}
-
-nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
+nx::network::http::StatusCode::Value Result::toHttpStatus(ErrorId code)
 {
     using namespace nx::network;
     switch (code)
     {
-        case Error::NoError:
+        case ErrorId::ok:
             return http::StatusCode::ok;
 
-        case Error::InvalidParameter:
-        case Error::MissingParameter:
-        case Error::CantProcessRequest:
+        case ErrorId::invalidParameter:
+        case ErrorId::missingParameter:
+        case ErrorId::cantProcessRequest:
             return http::StatusCode::unprocessableEntity;
 
-        case Error::Forbidden:
-        case Error::SessionExpired:
-        case Error::SessionRequired:
-        case Error::SessionTruncated:
-        case Error::ServiceUnauthorized:
+        case ErrorId::forbidden:
+        case ErrorId::sessionExpired:
+        case ErrorId::sessionRequired:
+        case ErrorId::sessionTruncated:
+        case ErrorId::serviceUnauthorized:
             return http::StatusCode::forbidden;
 
-        case Error::Conflict:
+        case ErrorId::conflict:
             return http::StatusCode::conflict;
 
-        case Error::NotAllowed:
+        case ErrorId::notAllowed:
             return http::StatusCode::notAllowed;
 
-        case Error::NotImplemented:
+        case ErrorId::notImplemented:
             return http::StatusCode::notImplemented;
 
-        case Error::NotFound:
+        case ErrorId::notFound:
             return http::StatusCode::notFound;
 
-        case Error::UnsupportedMediaType:
+        case ErrorId::unsupportedMediaType:
             return http::StatusCode::unsupportedMediaType;
 
-        case Error::ServiceUnavailable:
+        case ErrorId::serviceUnavailable:
             return http::StatusCode::serviceUnavailable;
 
-        case Error::Unauthorized:
+        case ErrorId::unauthorized:
             return http::StatusCode::unauthorized;
 
-        case Error::InternalServerError:
+        case ErrorId::internalServerError:
             return http::StatusCode::internalServerError;
 
-        case Error::Gone:
+        case ErrorId::gone:
             return http::StatusCode::gone;
 
         default:
@@ -86,51 +58,51 @@ nx::network::http::StatusCode::Value Result::toHttpStatus(Error code)
     }
 }
 
-Result::Error Result::errorFromHttpStatus(int status)
+ErrorId Result::errorFromHttpStatus(int status)
 {
     using namespace nx::network::http;
     switch (status)
     {
         case StatusCode::ok:
-            return Error::NoError;
+            return ErrorId::ok;
 
         case StatusCode::unprocessableEntity:
-            return Error::CantProcessRequest;
+            return ErrorId::cantProcessRequest;
 
         case StatusCode::forbidden:
-            return Error::Forbidden;
+            return ErrorId::forbidden;
 
         case StatusCode::conflict:
-            return Error::Conflict;
+            return ErrorId::conflict;
 
         case StatusCode::notAllowed:
-            return Error::NotAllowed;
+            return ErrorId::notAllowed;
 
         case StatusCode::notImplemented:
-            return Error::NotImplemented;
+            return ErrorId::notImplemented;
 
         case StatusCode::notFound:
-            return Error::NotFound;
+            return ErrorId::notFound;
 
         case StatusCode::unsupportedMediaType:
-            return Error::UnsupportedMediaType;
+            return ErrorId::unsupportedMediaType;
 
         case StatusCode::serviceUnavailable:
-            return Error::ServiceUnavailable;
+            return ErrorId::serviceUnavailable;
 
         case StatusCode::internalServerError:
-            return Error::InternalServerError;
+            return ErrorId::internalServerError;
 
         case StatusCode::unauthorized:
-            return Error::Unauthorized;
+            return ErrorId::unauthorized;
 
         default:
-            return Error::BadRequest;
+            return ErrorId::badRequest;
     }
 }
 
-Result::Result(Error error, QString errorString):
-    error(error),
+Result::Result(ErrorId error, QString errorString):
+    errorId(error),
     errorString(std::move(errorString))
 {
 }
@@ -142,12 +114,12 @@ QString Result::invalidParameterTemplate()
 
 Result Result::missingParameter(const QString& name)
 {
-    return Result{MissingParameter, tr("Missing required parameter: %1.").arg(name)};
+    return Result{ErrorId::missingParameter, tr("Missing required parameter: %1.").arg(name)};
 }
 
 Result Result::cantProcessRequest(std::optional<QString> customMessage)
 {
-    return Result{CantProcessRequest, customMessage
+    return Result{ErrorId::cantProcessRequest, customMessage
         ? *customMessage
         : tr("Failed to process request.")};
 }
@@ -155,110 +127,99 @@ Result Result::cantProcessRequest(std::optional<QString> customMessage)
 Result Result::forbidden(std::optional<QString> customMessage)
 {
     return Result{
-        Forbidden,
+        ErrorId::forbidden,
         customMessage ? *customMessage : tr("Forbidden.", /*comment*/ "Generic HTTP response")};
 }
 
 Result Result::conflict(std::optional<QString> customMessage)
 {
-    return Result{Conflict,
+    return Result{ErrorId::conflict,
         customMessage ? *customMessage : tr("Conflict.", /*comment*/ "Generic HTTP response")};
 }
 
 Result Result::badRequest(std::optional<QString> customMessage)
 {
     return Result{
-        BadRequest,
+        ErrorId::badRequest,
         customMessage ? *customMessage : tr("Bad request.",/*comment*/ "Generic HTTP response")};
 }
 
 Result Result::notAllowed(std::optional<QString> customMessage)
 {
-    return Result{NotAllowed,
+    return Result{ErrorId::notAllowed,
         customMessage ? *customMessage : tr("Not allowed.", /*comment*/ "Generic HTTP response")};
 }
 
 Result Result::notImplemented(std::optional<QString> customMessage)
 {
-    return Result{NotImplemented,
+    return Result{ErrorId::notImplemented,
         customMessage ? *customMessage : tr("Not implemented.",/*comment*/ "Generic HTTP response")};
 }
 
 Result Result::notFound(std::optional<QString> customMessage)
 {
     return Result{
-        NotFound,
+        ErrorId::notFound,
         customMessage ? *customMessage : tr("Not found.",/*comment*/ "Generic HTTP response")};
 }
 
 Result Result::internalServerError(std::optional<QString> customMessage)
 {
-    return Result{InternalServerError, customMessage
+    return Result{ErrorId::internalServerError, customMessage
         ? *customMessage
         : tr("Internal error.")};
 }
 
 Result Result::unsupportedMediaType(std::optional<QString> customMessage)
 {
-    return Result{UnsupportedMediaType, customMessage
+    return Result{ErrorId::unsupportedMediaType, customMessage
         ? *customMessage
         : tr("Unsupported media type.")};
 }
 
 Result Result::serviceUnavailable(std::optional<QString> customMessage)
 {
-    return Result{ServiceUnavailable, customMessage ? *customMessage : tr("Service unavailable.")};
+    return Result{ErrorId::serviceUnavailable, customMessage ? *customMessage : tr("Service unavailable.")};
 }
 
 Result Result::serviceUnauthorized(std::optional<QString> customMessage)
 {
-    return Result{ServiceUnauthorized, customMessage ? *customMessage : tr("Service unauthorized.")};
+    return Result{ErrorId::serviceUnauthorized, customMessage ? *customMessage : tr("Service unauthorized.")};
 }
 
 Result Result::unauthorized(std::optional<QString> customMessage)
 {
-    return Result{Unauthorized, customMessage ? *customMessage : tr("Unauthorized.")};
+    return Result{ErrorId::unauthorized, customMessage ? *customMessage : tr("Unauthorized.")};
 }
 
 Result Result::sessionExpired(std::optional<QString> customMessage)
 {
-    return Result{SessionExpired, customMessage ? *customMessage : tr("Session expired.")};
+    return Result{ErrorId::sessionExpired, customMessage ? *customMessage : tr("Session expired.")};
 }
 
 Result Result::sessionRequired(std::optional<QString> customMessage)
 {
-    return Result{SessionRequired,
+    return Result{ErrorId::sessionRequired,
         customMessage ? *customMessage : tr("Session authorization required.")};
 }
 
 Result Result::sessionTruncated(std::optional<QString> customMessage)
 {
-    return Result{SessionTruncated,
+    return Result{ErrorId::sessionTruncated,
         customMessage ? *customMessage : tr("Session is too old according to the Site config.")};
 }
 
 Result Result::gone(std::optional<QString> customMessage)
 {
-    return Result{Gone,
+    return Result{ErrorId::gone,
         customMessage ? *customMessage : tr("Resource no longer present on server.")};
-}
-
-void serialize(const Result::Error& value, QString* target)
-{
-    *target = QString::number(static_cast<int>(value));
-}
-
-bool deserialize(const QString& value, Result::Error* target)
-{
-    *target = static_cast<Result::Error>(value.toInt());
-    return true;
 }
 
 void serialize(QnJsonContext* /*context*/, const Result& value, QJsonValue* outTarget)
 {
     *outTarget = QJsonObject{
-        {"error", QJsonValue(QString::number(static_cast<int>(value.error)))},
-        {"errorId", QJsonValue(Result::errorToString(value.error))},
+        {"error", QJsonValue(QString::number(static_cast<int>(value.errorId)))},
+        {"errorId", QJsonValue(QString::fromStdString(nx::reflect::toString(value.errorId)))},
         {"errorString", QJsonValue(value.errorString)},
     };
 }
@@ -277,7 +238,7 @@ bool deserialize(QnJsonContext* context, QnConversionWrapper<QJsonValue> value, 
     if (error.isString())
     {
         bool isOk = false;
-        outTarget->error = static_cast<Result::Error>(error.toString().toInt(&isOk));
+        outTarget->errorId = static_cast<ErrorId>(error.toString().toInt(&isOk));
         if (!isOk)
         {
             context->setFailedKeyValue({"error", "Not an integer"});
@@ -286,7 +247,7 @@ bool deserialize(QnJsonContext* context, QnConversionWrapper<QJsonValue> value, 
     }
     else if (error.isDouble())
     {
-        outTarget->error = static_cast<Result::Error>(error.toInt());
+        outTarget->errorId = static_cast<ErrorId>(error.toInt());
     }
     else
     {
@@ -320,12 +281,12 @@ JsonResult::JsonResult(const Result& result):
 {
 }
 
-JsonResult::JsonResult(Error error, QString errorString):
+JsonResult::JsonResult(ErrorId error, QString errorString):
     Result(error, std::move(errorString))
 {
 }
 
-void JsonResult::writeError(QByteArray* outBody, Error error, const QString& errorMessage)
+void JsonResult::writeError(QByteArray* outBody, ErrorId error, const QString& errorMessage)
 {
     JsonResult jsonRestResult(Result(error, errorMessage));
     *outBody = QJson::serialized(jsonRestResult);
@@ -361,7 +322,7 @@ UbjsonResult::UbjsonResult(const Result& result):
 {
 }
 
-UbjsonResult::UbjsonResult(Error error, QString errorString):
+UbjsonResult::UbjsonResult(ErrorId error, QString errorString):
     Result(error, std::move(errorString))
 {
 }

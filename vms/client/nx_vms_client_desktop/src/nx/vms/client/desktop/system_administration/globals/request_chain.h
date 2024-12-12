@@ -19,7 +19,7 @@ class RequestChain
 {
 public:
     using ChainCompleteCallback =
-        nx::utils::MoveOnlyFunc<void(bool, nx::network::rest::Result::Error, const QString&)>;
+        nx::utils::MoveOnlyFunc<void(bool, nx::network::rest::ErrorId, const QString&)>;
 
 public:
     virtual ~RequestChain()
@@ -32,8 +32,8 @@ public:
         m_chainComplete(
             success,
             success
-                ? nx::network::rest::Result::Error::NoError
-                : nx::network::rest::Result::Error::InternalServerError,
+                ? nx::network::rest::ErrorId::ok
+                : nx::network::rest::ErrorId::internalServerError,
             /*errorString*/ {});
     }
 
@@ -60,7 +60,7 @@ public:
 
     void requestComplete(
         bool success,
-        nx::network::rest::Result::Error errorCode,
+        nx::network::rest::ErrorId errorCode,
         const QString& errorString = {})
     {
         if (!success)
@@ -94,7 +94,7 @@ private:
         {
             if (m_chainComplete)
             {
-                m_chainComplete(true, nx::network::rest::Result::Error::NoError, {});
+                m_chainComplete(true, nx::network::rest::ErrorId::ok, {});
                 m_chainComplete = {};
             }
             return;

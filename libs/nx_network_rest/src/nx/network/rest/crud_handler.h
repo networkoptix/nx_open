@@ -244,7 +244,7 @@ protected:
     template<typename Id>
     Response responseById(Id id, const Request& request, ResponseAttributes responseAttributes = {})
     {
-        auto resource = readById(id, request, &responseAttributes, Result::InternalServerError);
+        auto resource = readById(id, request, &responseAttributes, ErrorId::internalServerError);
         if constexpr (DoesMethodExist_fillMissingParamsForResponse<Derived>::value)
             static_cast<Derived*>(this)->fillMissingParamsForResponse(&resource, request);
         return response(std::move(resource), request, std::move(responseAttributes));
@@ -252,7 +252,7 @@ protected:
 
     template<typename Id>
     auto readById(
-        Id id, const Request& request, ResponseAttributes* responseAttributes, Result::Error emptyError)
+        Id id, const Request& request, ResponseAttributes* responseAttributes, ErrorId emptyError)
     {
         auto list = call(&Derived::read, id, request, responseAttributes);
         if (list.empty())
@@ -420,7 +420,7 @@ protected:
             else if constexpr (std::is_base_of_v<Model, ReadItemType>)
             {
                 Model existing{(request.forceSystemAccess(),
-                    readById(std::move(id), request, responseAttributes, Result::NotFound))};
+                    readById(std::move(id), request, responseAttributes, ErrorId::notFound))};
                 d->mergeModel(request, &model, &existing, std::move(parseInfo));
                 if (useReflect)
                     return existing;

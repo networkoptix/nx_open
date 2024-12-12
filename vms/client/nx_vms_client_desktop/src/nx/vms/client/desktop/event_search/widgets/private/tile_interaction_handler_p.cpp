@@ -379,7 +379,7 @@ void TileInteractionHandler::executePluginAction(
             rest::Handle /*requestId*/,
             nx::network::rest::JsonResult result)
         {
-            if (result.error != nx::network::rest::Result::NoError)
+            if (result.errorId != nx::network::rest::ErrorId::ok)
             {
                 QnMessageBox::warning(mainWindowWidget(), tr("Failed to execute plugin action"),
                     result.errorString);

@@ -98,7 +98,7 @@ void LdapStatusWatcher::refresh()
             }
             else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
             {
-                NX_DEBUG(this, "Request error: %1 (%2).", error->error, error->errorString);
+                NX_DEBUG(this, "Request error: %1 (%2).", error->errorId, error->errorString);
                 setStatus({});
             }
 

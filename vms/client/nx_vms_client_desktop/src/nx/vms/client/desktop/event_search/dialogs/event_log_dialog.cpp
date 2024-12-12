@@ -626,7 +626,7 @@ void EventLogDialog::query(
                 const auto& result = std::get<nx::network::rest::Result>(response);
 
                 NX_ERROR(this, "Can't read event log, success: %1, code: %2, error: %3",
-                    success, result.error, result.errorString);
+                    success, result.errorId, result.errorString);
 
                 requestFinished({}, /*success*/ false);
             }

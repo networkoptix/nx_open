@@ -917,7 +917,7 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
         auto callback = nx::utils::guarded(this,
             [this, id = server->getId()](bool success, rest::Handle handle, UbjsonResult result)
             {
-                success &= (result.error == UbjsonResult::Result::Error::NoError);
+                success &= (result.errorId == nx::network::rest::ErrorId::ok);
                 if (!success)
                     NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
                 at_gotdata(success, handle, id, result.deserialized<QnLegacyAuditRecordList>());

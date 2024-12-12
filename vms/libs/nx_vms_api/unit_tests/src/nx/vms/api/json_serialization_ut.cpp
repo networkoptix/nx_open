@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/rest/json_reflect_result.h>
+#include <nx/network/rest/result.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/audit.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
@@ -72,34 +72,36 @@ TEST(Json, AuditRecord)
 {
     AuditRecord record{{{nx::Uuid{}}}};
     record.details = ResourceDetails{{{nx::Uuid()}}, {"detailed description"}};
-    nx::network::rest::JsonReflectResult<AuditRecordList> result;
-    result.reply.push_back(record);
+    AuditRecordList outputData{record};
+    nx::network::rest::JsonResult result;
+    result.setReply(outputData);
     const std::string expected = /*suppress newline*/ 1 + R"json(
 {
     "error": "0",
+    "errorId": "ok",
     "errorString": "",
     "reply": [
         {
-            "serverId": "{00000000-0000-0000-0000-000000000000}",
-            "eventType": "notDefined",
-            "createdTimeS": 0,
             "authSession": {
                 "id": "{00000000-0000-0000-0000-000000000000}",
-                "userName": "",
+                "userAgent": "",
                 "userHost": "",
-                "userAgent": ""
+                "userName": ""
             },
+            "createdTimeS": "0",
             "details": {
+                "description": "detailed description",
                 "ids": [
                     "{00000000-0000-0000-0000-000000000000}"
-                ],
-                "description": "detailed description"
-            }
+                ]
+            },
+            "eventType": "notDefined",
+            "serverId": "{00000000-0000-0000-0000-000000000000}"
         }
     ]
 })json";
     ASSERT_EQ(
-        expected, nx::utils::formatJsonString(nx::reflect::json::serialize(result)).toStdString());
+        expected, nx::utils::formatJsonString(QJson::serialized(result)).toStdString());
 }
 
 } // namespace test

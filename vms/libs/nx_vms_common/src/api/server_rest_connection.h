@@ -80,7 +80,7 @@ struct RestResultWithData
 {
     RestResultWithData() {}
     RestResultWithData(const nx::network::rest::Result& restResult, T data):
-        error(restResult.error),
+        error(restResult.errorId),
         errorString(restResult.errorString),
         data(std::move(data))
     {
@@ -91,7 +91,7 @@ struct RestResultWithData
     RestResultWithData& operator=(const RestResultWithData&) = delete;
     RestResultWithData& operator=(RestResultWithData&&) = default;
 
-    nx::network::rest::Result::Error error = nx::network::rest::Result::NoError;
+    nx::network::rest::ErrorId error = nx::network::rest::ErrorId::ok;
     QString errorString;
     T data;
 };

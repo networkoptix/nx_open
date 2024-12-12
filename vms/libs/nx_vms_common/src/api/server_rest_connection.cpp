@@ -159,7 +159,7 @@ nx::network::rest::Result parseMessageBody(
 {
     auto result = nx::vms::common::api::parseRestResult(statusLine.statusCode, format,
         messageBody);
-    *success = (result.error == nx::network::rest::Result::NoError);
+    *success = (result.errorId == nx::network::rest::ErrorId::ok);
 
     return result;
 }
@@ -272,10 +272,10 @@ rest::ServerConnection::Result<nx::network::rest::JsonResult>::type extractJsonR
         };
 }
 
-static bool isSessionExpiredError(int code)
+static bool isSessionExpiredError(nx::network::rest::ErrorId code)
 {
-    return code == nx::network::rest::Result::SessionExpired
-        || code == nx::network::rest::Result::SessionRequired;
+    return code == nx::network::rest::ErrorId::sessionExpired
+        || code == nx::network::rest::ErrorId::sessionRequired;
 }
 
 static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
@@ -289,7 +289,7 @@ static bool isSessionExpiredError(const nx::vms::api::JsonRpcResponse& response)
     if (!QJson::deserialize(*response.error->data, &result))
         return false;
 
-    return isSessionExpiredError(result.error);
+    return isSessionExpiredError(result.errorId);
 }
 
 std::string prepareUserAgent()
@@ -2765,20 +2765,20 @@ Handle ServerConnection::executeDelete(
 }
 
 template<typename ResultType>
-nx::network::rest::Result::Error getError(const ResultType& result)
+nx::network::rest::ErrorId getError(const ResultType& result)
 {
     auto error = std::get_if<nx::network::rest::Result>(&result);
-    return error ? error->error : nx::network::rest::Result::NoError;
+    return error ? error->errorId : nx::network::rest::ErrorId::ok;
 }
 
-nx::network::rest::Result::Error getError(
+nx::network::rest::ErrorId getError(
     const QByteArray& body,
     const nx::network::http::HttpHeaders&)
 {
     nx::network::rest::Result result;
     return QJson::deserialize(body, &result)
-        ? result.error
-        : nx::network::rest::Result::NoError; //< We check 'success' explicitly.
+        ? result.errorId
+        : nx::network::rest::ErrorId::ok; //< We check 'success' explicitly.
 }
 
 // Allows to add extra fields to context struct in template specialization.
@@ -2868,7 +2868,7 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                     requestNewSession = !ctx->expiredIds.empty();
                 }
             }
-            else if (const auto error = getError(result...))
+            else if (const auto error = getError(result...); error != nx::network::rest::ErrorId::ok)
             {
                 requestNewSession = isSessionExpiredError(error);
             }

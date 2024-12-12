@@ -440,10 +440,10 @@ protected:
                     nx::network::rest::JsonResult result)
                 {
                     if (sysErrorCode != SystemError::noError ||
-                        (result.error == nx::network::rest::Result::Error::NoError &&
+                        (result.errorId == nx::network::rest::ErrorId::ok &&
                             !nx::network::http::StatusCode::isSuccessCode(statusCode)))
                     {
-                        result.error = toApiErrorCode(sysErrorCode, statusCode);
+                        result.errorId = toApiErrorCode(sysErrorCode, statusCode);
                     }
                     completionHandler(std::move(result));
                 }));
@@ -468,10 +468,10 @@ protected:
                     nx::network::rest::JsonResult result)
                 {
                     if (sysErrorCode != SystemError::noError ||
-                        (result.error == nx::network::rest::Result::Error::NoError &&
+                        (result.errorId == nx::network::rest::ErrorId::ok &&
                             !nx::network::http::StatusCode::isSuccessCode(statusCode)))
                     {
-                        result.error = toApiErrorCode(sysErrorCode, statusCode);
+                        result.errorId = toApiErrorCode(sysErrorCode, statusCode);
                     }
 
                     reportApiRequestResult(std::move(result), std::move(completionHandler));
@@ -484,7 +484,7 @@ protected:
         std::function<void(nx::network::rest::JsonResult, Output)> completionHandler)
     {
         Output output;
-        if (result.error == nx::network::rest::Result::NoError)
+        if (result.errorId == nx::network::rest::ErrorId::ok)
             output = result.deserialized<Output>();
 
         completionHandler(std::move(result), std::move(output));
@@ -497,15 +497,15 @@ protected:
         completionHandler(std::move(result));
     }
 
-    nx::network::rest::Result::Error toApiErrorCode(
+    nx::network::rest::ErrorId toApiErrorCode(
         SystemError::ErrorCode sysErrorCode,
         nx::network::http::StatusCode::Value statusCode)
     {
         if (sysErrorCode != SystemError::noError)
-            return nx::network::rest::Result::CantProcessRequest;
+            return nx::network::rest::ErrorId::cantProcessRequest;
         if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
-            return nx::network::rest::Result::CantProcessRequest;
-        return nx::network::rest::Result::NoError;
+            return nx::network::rest::ErrorId::cantProcessRequest;
+        return nx::network::rest::ErrorId::ok;
     }
 
     template<typename Input, typename ... Output>

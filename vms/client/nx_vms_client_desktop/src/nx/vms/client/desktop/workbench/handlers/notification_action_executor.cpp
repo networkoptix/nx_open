@@ -172,7 +172,7 @@ void NotificationActionExecutor::handleAcknowledgeAction()
             if (const auto error = std::get_if<nx::network::rest::Result>(&response))
             {
                 NX_WARNING(this, "Can't acknowledge action id: %1, code: %2, error: %3",
-                    id, error->error, error->errorString);
+                    id, error->errorId, error->errorString);
                 return;
             }
 

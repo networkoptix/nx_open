@@ -279,7 +279,7 @@ bool ExtendedOutputCameraButtonController::setButtonActionState(
             rest::Handle /*requestId*/,
             nx::network::rest::JsonResult result)
         {
-            success = success && result.error == nx::network::rest::Result::NoError;
+            success = success && result.errorId == nx::network::rest::ErrorId::ok;
             safeEmitActionStarted(buttonId, success);
         });
 

@@ -425,7 +425,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
             {
                 const auto error = std::get<nx::network::rest::Result>(errorOrData);
                 NX_ERROR(this, "Can't rebuld archive, error: %1, text: %2",
-                    error.error, error.errorString);
+                    error.errorId, error.errorString);
 
                 at_archiveRebuildReply(success, handle, {});
             }
@@ -456,7 +456,7 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
                 if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrEmpty))
                 {
                     NX_ERROR(this, "Can't cancel archive rebuld, error: %1, text: %2",
-                        error->error, error->errorString);
+                        error->errorId, error->errorString);
                 }
 
                 at_archiveRebuildReply(success, handle, {});
@@ -580,7 +580,7 @@ int QnServerStorageManager::requestStorageStatus(
             rest::Handle /*requestId*/,
             rest::RestResultWithData<StorageStatusReply> result)
         {
-            if (!success || result.error != nx::network::rest::Result::NoError)
+            if (!success || result.error != nx::network::rest::ErrorId::ok)
             {
                 callback(StorageStatusReply());
                 return;

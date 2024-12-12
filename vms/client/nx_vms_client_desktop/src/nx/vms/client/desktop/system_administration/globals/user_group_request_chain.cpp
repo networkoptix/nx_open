@@ -25,7 +25,7 @@ namespace {
 
 static constexpr int kMaxRequestsPerBatch = 500;
 
-std::tuple<nx::network::rest::Result::Error, QString> extractError(
+std::tuple<nx::network::rest::ErrorId, QString> extractError(
     const nx::vms::api::JsonRpcError& error)
 {
     using JsonRpcError = nx::vms::api::JsonRpcError;
@@ -33,10 +33,10 @@ std::tuple<nx::network::rest::Result::Error, QString> extractError(
     {
         nx::network::rest::Result result;
         if (QJson::deserialize(*error.data, &result))
-            return {result.error, result.errorString};
+            return {result.errorId, result.errorString};
     }
 
-    static const auto kRestApiError = nx::network::rest::Result::ServiceUnavailable;
+    static const auto kRestApiError = nx::network::rest::ErrorId::serviceUnavailable;
 
     if (!error.message.empty())
         return {kRestApiError, QString::fromStdString(error.message)};
@@ -327,7 +327,7 @@ void UserGroupRequestChain::Private::runRequests(
     {
         // Use SessionExpired to suppress showing error message box - this is the same error as if
         // user cancels session refresh dialog.
-        q->requestComplete(/*success*/ false, nx::network::rest::Result::SessionExpired, {});
+        q->requestComplete(/*success*/ false, nx::network::rest::ErrorId::sessionExpired, {});
         return;
     }
 
@@ -342,7 +342,7 @@ void UserGroupRequestChain::Private::runRequests(
                 if (NX_ASSERT(handle == currentRequest))
                     currentRequest = 0;
 
-                nx::network::rest::Result::Error errorCode = nx::network::rest::Result::NoError;
+                nx::network::rest::ErrorId errorCode = nx::network::rest::ErrorId::ok;
                 QString errorString;
 
                 if (success)
@@ -383,7 +383,7 @@ void UserGroupRequestChain::Private::runRequests(
                     else
                     {
                         errorString = tr("Connection failure");
-                        errorCode = nx::network::rest::Result::ServiceUnavailable;
+                        errorCode = nx::network::rest::ErrorId::serviceUnavailable;
                     }
                 }
 

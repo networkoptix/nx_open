@@ -136,7 +136,7 @@ void QnMediaServerStatisticsStorage::handleStatisticsReply(
     bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
 {
     NX_VERBOSE(this, "Reply received. Handle: %1, success: %2, code: %3, error: %4",
-        handle, success, result.error, result.errorString);
+        handle, success, result.errorId, result.errorString);
 
     if (handle != m_updateRequestHandle)
         return;

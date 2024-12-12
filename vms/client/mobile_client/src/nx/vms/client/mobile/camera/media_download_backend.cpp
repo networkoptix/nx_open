@@ -256,7 +256,7 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
                     }
 
                     if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                        NX_DEBUG(this, "Can't get authorization ticket, error %1", error->error);
+                        NX_DEBUG(this, "Can't get authorization ticket, error %1", error->errorId);
                     else
                         NX_ASSERT(false, "Shouldn't get here");
 

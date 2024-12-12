@@ -323,7 +323,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
 
             const auto& error = std::get<nx::network::rest::Result>(reply);
             NX_DEBUG(
-                this, "Server bind failed, error: %1, string: %2", error.error, error.errorString);
+                this, "Server bind failed, error: %1, string: %2", error.errorId, error.errorString);
 
             QString errorMessage = tr("Internal error. Please try again later.");
             if (ini().developerMode)

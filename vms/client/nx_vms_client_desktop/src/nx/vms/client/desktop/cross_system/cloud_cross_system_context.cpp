@@ -235,10 +235,10 @@ struct CloudCrossSystemContext::Private
                 }
                 else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
-                    if (error->error == nx::network::rest::Result::SessionTruncated)
+                    if (error->errorId == nx::network::rest::ErrorId::sessionTruncated)
                         needsCloudAuthorization = true;
 
-                    NX_VERBOSE(this, "Update token error: %1", error->error);
+                    NX_VERBOSE(this, "Update token error: %1", error->errorId);
                 }
             });
 

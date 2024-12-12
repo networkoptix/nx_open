@@ -262,7 +262,7 @@ std::future<UpdateContents> ServerUpdateTool::checkMediaserverUpdateInfo()
 
             if (success)
             {
-                if (result.error != network::rest::Result::NoError)
+                if (result.errorId != network::rest::ErrorId::ok)
                 {
                     NX_DEBUG(this,
                         "checkMediaserverUpdateInfo: "
@@ -924,11 +924,11 @@ bool ServerUpdateTool::requestRetryAction()
             rest::Handle handle,
             const network::rest::JsonResult result)
         {
-            if (result.error != network::rest::Result::NoError)
+            if (result.errorId != network::rest::ErrorId::ok)
             {
                 NX_VERBOSE(this,
                     "requestRetryAction: Error in response /ec2/retryUpdate: code=%1, error=%2",
-                    result.error, result.errorString);
+                    result.errorId, result.errorString);
                 return;
             }
 
@@ -982,7 +982,7 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
                 NX_ERROR(this, "requestFinishUpdate(%1) - failed to send a request",
                     skipActivePeers);
             }
-            else if (result.error != network::rest::Result::NoError)
+            else if (result.errorId != network::rest::ErrorId::ok)
             {
                 success = false;
                 error = InternalError::serverError;
@@ -1120,7 +1120,7 @@ bool ServerUpdateTool::requestInstallAction(
                 error = InternalError::networkError;
                 m_serversAreInstalling = {};
             }
-            else if (result.error != network::rest::Result::NoError)
+            else if (result.errorId != network::rest::ErrorId::ok)
             {
                 success = false;
                 error = InternalError::serverError;
@@ -1241,12 +1241,12 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
             if (!tool)
                 return;
 
-            if (result.error != network::rest::Result::NoError)
+            if (result.errorId != network::rest::ErrorId::ok)
             {
                 NX_VERBOSE(this,
                     "requestRemoteUpdateStateAsync: "
                         "Error in response to /ec2/updateStatus: code=%1, error=%2",
-                    result.error, result.errorString);
+                    result.errorId, result.errorString);
             }
 
             tool->atUpdateStatusResponse(
@@ -1265,7 +1265,7 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
 
             tool->m_activeRequests.remove(handle);
 
-            if (!success || result.error != network::rest::Result::NoError)
+            if (!success || result.errorId != network::rest::ErrorId::ok)
                 return;
 
             if (tool->m_skippedRequests.contains(handle))
@@ -1297,7 +1297,7 @@ std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdat
                  rest::Handle handle,
                  const network::rest::JsonResult& result)
             {
-                if (result.error != network::rest::Result::NoError)
+                if (result.errorId != network::rest::ErrorId::ok)
                 {
                     NX_DEBUG(this,
                         "requestRemoteUpdateState: Error in response to /ec2/updateStatus: %1",

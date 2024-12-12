@@ -580,7 +580,7 @@ TEST_F(RestResponseTest, JsonResult)
 TEST_F(RestResponseTest, JsonError)
 {
     expectJsonResponse(
-        rest::Response::result(JsonResult{Result::MissingParameter, "Error string"}),
+        rest::Response::result(JsonResult{ErrorId::missingParameter, "Error string"}),
         http::StatusCode::unprocessableEntity,
         R"json({"error":"1","errorId":"missingParameter","errorString":"Error string"})json");
 }
@@ -588,7 +588,7 @@ TEST_F(RestResponseTest, JsonError)
 TEST_F(RestResponseTest, RestError)
 {
     expectJsonResponse(
-        rest::Response(Result{Result::InternalServerError, "Something went wrong"}),
+        rest::Response(Result{ErrorId::internalServerError, "Something went wrong"}),
         http::StatusCode::internalServerError,
         R"json({"error":"6","errorId":"internalServerError","errorString":"Something went wrong"})json");
 }
@@ -613,19 +613,19 @@ class RestResultTest:
     public ::testing::Test
 {
 protected:
-    void baseTest(const QByteArray& data, rest::Result::Error error, const QString& errorString = "")
+    void baseTest(const QByteArray& data, rest::ErrorId error, const QString& errorString = "")
     {
         NX_INFO(NX_SCOPE_TAG, data);
         const auto result = QJson::deserializeOrThrow<rest::Result>(data);
-        EXPECT_EQ(result.error, error) << data.toStdString();
+        EXPECT_EQ(result.errorId, error) << data.toStdString();
         EXPECT_EQ(result.errorString, errorString) << data.toStdString();
     }
 
-    void jsonErrorTest(const QByteArray& data, rest::Result::Error error, const QString& errorString)
+    void jsonErrorTest(const QByteArray& data, rest::ErrorId error, const QString& errorString)
     {
         NX_INFO(NX_SCOPE_TAG, data);
         const auto result = QJson::deserializeOrThrow<rest::JsonResult>(data);
-        EXPECT_EQ(result.error, error) << data.toStdString();
+        EXPECT_EQ(result.errorId, error) << data.toStdString();
         EXPECT_EQ(result.errorString, errorString) << data.toStdString();
         EXPECT_EQ(result.reply, QJsonValue()) << data.toStdString();
     }
@@ -634,7 +634,7 @@ protected:
     {
         NX_INFO(NX_SCOPE_TAG, data);
         const auto result = QJson::deserializeOrThrow<rest::JsonResult>(data);
-        EXPECT_EQ(result.error, rest::Result::NoError) << data.toStdString();
+        EXPECT_EQ(result.errorId, rest::ErrorId::ok) << data.toStdString();
         EXPECT_EQ(result.errorString, "") << data.toStdString();
         EXPECT_EQ(result.reply, reply) << data.toStdString();
     }
@@ -642,35 +642,35 @@ protected:
 
 TEST_F(RestResultTest, ResultDeserialize)
 {
-    baseTest(R"json({"error":"0"})json", rest::Result::NoError);
-    baseTest(R"json({"error":"0","errorId":"ok"})json", rest::Result::NoError);
-    baseTest(R"json({"error":"0","errorId":"ok","errorString":""})json", rest::Result::NoError);
-    baseTest(R"json({"error":"0","errorString":""})json", rest::Result::NoError);
+    baseTest(R"json({"error":"0"})json", rest::ErrorId::ok);
+    baseTest(R"json({"error":"0","errorId":"ok"})json", rest::ErrorId::ok);
+    baseTest(R"json({"error":"0","errorId":"ok","errorString":""})json", rest::ErrorId::ok);
+    baseTest(R"json({"error":"0","errorString":""})json", rest::ErrorId::ok);
 
-    baseTest(R"json({"error":0})json", rest::Result::NoError);
-    baseTest(R"json({"error":0,"errorId":"ok"})json", rest::Result::NoError);
-    baseTest(R"json({"error":0,"errorId":"ok","errorString":""})json", rest::Result::NoError);
-    baseTest(R"json({"error":0,"errorString":""})json", rest::Result::NoError);
+    baseTest(R"json({"error":0})json", rest::ErrorId::ok);
+    baseTest(R"json({"error":0,"errorId":"ok"})json", rest::ErrorId::ok);
+    baseTest(R"json({"error":0,"errorId":"ok","errorString":""})json", rest::ErrorId::ok);
+    baseTest(R"json({"error":0,"errorString":""})json", rest::ErrorId::ok);
 
     baseTest(
         R"json({"error":"1","errorId":"missingParameter","errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     baseTest(
         R"json({"error":"1","errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     baseTest(
         R"json({"error":"1","errorString":"Error string","reply":null})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
 
     baseTest(
         R"json({"error":1,"errorId":"missingParameter","errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     baseTest(
         R"json({"error":1,"errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     baseTest(
         R"json({"error":1,"errorString":"Error string","reply":null})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
 }
 
 TEST_F(RestResultTest, JsonResultDeserialize)
@@ -682,23 +682,23 @@ TEST_F(RestResultTest, JsonResultDeserialize)
 
     jsonErrorTest(
         R"json({"error":"1","errorId":"missingParameter","errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     jsonErrorTest(
         R"json({"error":"1","errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     jsonErrorTest(
         R"json({"error":"1","errorString":"Error string","reply":null})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
 
     jsonErrorTest(
         R"json({"error":1,"errorId":"missingParameter","errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     jsonErrorTest(
         R"json({"error":1,"errorString":"Error string"})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
     jsonErrorTest(
         R"json({"error":1,"errorString":"Error string","reply":null})json",
-        rest::Result::MissingParameter, "Error string");
+        rest::ErrorId::missingParameter, "Error string");
 }
 
 } // namespace nx::network::rest::test

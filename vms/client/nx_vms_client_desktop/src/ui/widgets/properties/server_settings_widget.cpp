@@ -125,7 +125,7 @@ public:
         auto callback = nx::utils::guarded(q,
             [this](bool success, rest::Handle handle, UbjsonResult result)
             {
-                success &= (result.error == UbjsonResult::Result::Error::NoError);
+                success &= (result.errorId == nx::network::rest::ErrorId::ok);
                 if (!success)
                     NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
 

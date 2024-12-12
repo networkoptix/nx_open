@@ -28,15 +28,15 @@ MergeSystemsStatus mergeStatusFromResult(const nx::network::rest::Result& result
 {
     using namespace nx::network::rest;
 
-    switch (result.error)
+    switch (result.errorId)
     {
-        case Result::NoError:
+        case ErrorId::ok:
             return MergeSystemsStatus::ok;
-        case Result::Forbidden:
+        case ErrorId::forbidden:
             return MergeSystemsStatus::forbidden;
-        case Result::NotFound:
+        case ErrorId::notFound:
             return MergeSystemsStatus::notFound;
-        case Result::Unauthorized:
+        case ErrorId::unauthorized:
             return MergeSystemsStatus::unauthorized;
         default:
             return MergeSystemsStatus::unknownError;
@@ -333,9 +333,9 @@ void MergeSystemsTool::at_serverInfoReceived(Context& ctx,
     {
         NX_WARNING(this, "Can't get server info, rest result: %1", QJson::serialized(*error));
         // Older versions responds with {"error" : 404 } special processing is required.
-        if ((static_cast<nx::network::http::StatusCode::Value>(error->error)
+        if ((static_cast<nx::network::http::StatusCode::Value>(error->errorId)
             == nx::network::http::StatusCode::notFound)
-            || (error->error == nx::network::rest::Result::NotFound))
+            || (error->errorId == nx::network::rest::ErrorId::notFound))
         {
             reportSystemFound(ctx, MergeSystemsStatus::incompatibleInternal, QString(), true);
         }

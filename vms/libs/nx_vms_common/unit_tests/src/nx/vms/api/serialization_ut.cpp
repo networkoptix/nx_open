@@ -6,7 +6,6 @@
 #include <api/model/configure_system_data.h>
 #include <api/resource_property_adaptor.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/network/rest/json_reflect_result.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/system_setting_description.h>
 #include <nx/vms/api/data/system_settings.h>

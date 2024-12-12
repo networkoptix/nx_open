@@ -468,7 +468,7 @@ struct UserSettingsDialog::Private
         if (!success)
         {
             if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                error && error->error != nx::network::rest::Result::SessionExpired)
+                error && error->errorId != nx::network::rest::ErrorId::sessionExpired)
             {
                 showServerError(tr("Failed to apply changes"), *error);
             }
@@ -762,11 +762,11 @@ void UserSettingsDialog::onDeleteRequested()
         [this](
             bool success,
             const QnResourcePtr& /*resource*/,
-            nx::network::rest::Result::Error errorCode)
+            nx::network::rest::ErrorId errorCode)
         {
             d->isSaving = false;
 
-            if (errorCode == nx::network::rest::Result::SessionExpired)
+            if (errorCode == nx::network::rest::ErrorId::sessionExpired)
                 return;
 
             if (success)
@@ -858,7 +858,7 @@ void UserSettingsDialog::onTerminateLink()
 
                 if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
                 {
-                    if (error->error != nx::network::rest::Result::SessionExpired)
+                    if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
                         d->showServerError(tr("Failed to apply changes"), *error);
                     return;
                 }
@@ -921,7 +921,7 @@ void UserSettingsDialog::onResetLink(
                 if (!success)
                 {
                     if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                        error && error->error != nx::network::rest::Result::SessionExpired)
+                        error && error->errorId != nx::network::rest::ErrorId::sessionExpired)
                     {
                         d->showServerError(tr("Failed to apply changes"), *error);
                     }

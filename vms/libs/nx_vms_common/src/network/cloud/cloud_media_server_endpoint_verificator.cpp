@@ -130,7 +130,7 @@ bool CloudMediaServerEndpointVerificator::verifyHostResponse(
 
     nx::network::rest::JsonResult restResult;
     if (!QJson::deserialize(httpClient->fetchMessageBodyBuffer(), &restResult)
-        || restResult.error != nx::network::rest::Result::Error::NoError)
+        || restResult.errorId != nx::network::rest::ErrorId::ok)
     {
         NX_VERBOSE(this, nx::format("cross-nat %1. Error response '%2' from %3")
             .args(m_connectSessionId, restResult.errorString, httpClient->url()));

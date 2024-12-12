@@ -129,7 +129,7 @@ UpdateContents getUpdateContents(
         {
             if (success)
             {
-                if (result.error != nx::network::rest::Result::NoError)
+                if (result.errorId != nx::network::rest::ErrorId::ok)
                 {
                     NX_DEBUG(NX_SCOPE_TAG,
                         "getUpdateContents: "

@@ -93,17 +93,17 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
                     systemContext->resourcePool()->removeResource(resource);
             }
 
-            nx::network::rest::Result::Error errorCode = success
-                ? nx::network::rest::Result::NoError
-                : nx::network::rest::Result::InternalServerError;
+            nx::network::rest::ErrorId errorCode = success
+                ? nx::network::rest::ErrorId::ok
+                : nx::network::rest::ErrorId::internalServerError;
 
             if (auto error = std::get_if<nx::network::rest::Result>(&result))
-                errorCode = error->error;
+                errorCode = error->errorId;
 
             if (callback)
                 callback(success, resource, errorCode);
 
-            if (!success && errorCode != nx::network::rest::Result::SessionExpired)
+            if (!success && errorCode != nx::network::rest::ErrorId::sessionExpired)
                 emit resourceDeletingFailed({resource});
         };
 
