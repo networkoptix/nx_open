@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Reproducir audio</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Editar configuración</translation>
     </message>
   </context>
   <context>
@@ -541,9 +541,9 @@
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n de %1 usuarios seleccionados non son %2 usuarios e non recibirán notificacións móbiles.</numerusform>
+        <numerusform>%n de %1 usuarios seleccionados non son %2 usuarios e non recibirán notificacións móbiles.</numerusform>
       </translation>
     </message>
   </context>
@@ -1349,7 +1349,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Novo sitio web</translation>
     </message>
   </context>
   <context>

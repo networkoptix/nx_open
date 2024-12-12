@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Novo sitio web</translation>
     </message>
     <message>
       <source>Your Site</source>
@@ -281,7 +281,7 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Sitio web</translation>
     </message>
     <message>
       <source>Site (%1)</source>
