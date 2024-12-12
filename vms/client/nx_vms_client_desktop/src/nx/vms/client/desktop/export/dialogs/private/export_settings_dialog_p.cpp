@@ -582,7 +582,7 @@ ExportSettingsDialog::BarDescs ExportSettingsDialog::Private::generateMessageBar
                         "You do not have a permission to export "
                         "archive for some of the selected cameras. Video from those cameras will "
                         "not be exported to the resulting file."),
-                    .level = BarDescription::BarLevel::Error};
+                    .level = BarDescription::BarLevel::Warning};
 
             default:
                 NX_ASSERT(false); //<= Unexpected result code.
