@@ -415,6 +415,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libappserver2
         libcloud_db_client
         libnx_vms_server
+        libnx_vms_server_branding
         libnx_vms_server_db
         libnx_speech_synthesizer
         libnx_email
