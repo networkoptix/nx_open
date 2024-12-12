@@ -707,6 +707,14 @@
         <source>Early access to new features</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable software decoder fallback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decode some rare video formats using software decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SideNavigation</name>
