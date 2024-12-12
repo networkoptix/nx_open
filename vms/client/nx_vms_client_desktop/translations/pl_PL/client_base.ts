@@ -5656,7 +5656,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>Zdalna synchronizacja archiwum nie powiodła się</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -7824,7 +7824,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be removed from the Site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
+      <translation>%1 zostanie usunięta z witryny i zastąpiona wybraną kamerą</translation>
     </message>
   </context>
   <context>
@@ -8251,7 +8251,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 Układy to &lt;b&gt;układy międzywitrynowe&lt;/b&gt;, które umożliwiają pracę z urządzeniami z różnych witryn. Obecnie dostępne są tylko niektóre funkcje zwykłych układów, ale w przyszłych wersjach będziemy nadal rozszerzać możliwości %1 układów</translation>
     </message>
   </context>
   <context>
@@ -8328,7 +8328,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>Czy na pewno chcesz się rozłączyć?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8487,11 +8487,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Ta kamera wymaga hasła do skonfigurowania. Poproś administratora witryny, aby to zrobił.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Niektóre z wybranych kamer wymagają hasła do skonfigurowania. Poproś administratora witryny, aby to zrobił.</translation>
     </message>
   </context>
   <context>
