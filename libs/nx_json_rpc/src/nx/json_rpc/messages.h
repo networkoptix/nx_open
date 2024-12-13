@@ -65,7 +65,13 @@ struct NX_JSON_RPC_API Request
     static Request create(
         std::optional<std::variant<QString, int>> id, std::string method, const T& data)
     {
-        auto serialized{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        return create(std::move(id), std::move(method),
+            nx::utils::serialization::json::serialized(data, /*stripDefault*/ false));
+    }
+
+    static Request create(
+        std::optional<std::variant<QString, int>> id, std::string method, rapidjson::Document serialized)
+    {
         auto allocator{serialized.GetAllocator()};
         Request r{
             .document = std::make_shared<rapidjson::Document>(&allocator),
@@ -256,7 +262,12 @@ struct NX_JSON_RPC_API Response
     template<typename T>
     static Response makeError(ResponseId id, int code, std::string message, const T& data)
     {
-        auto serialized{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        return makeError(std::move(id), code, std::move(message),
+            nx::utils::serialization::json::serialized(data, /*stripDefault*/ false));
+    }
+
+    static Response makeError(ResponseId id, int code, std::string message, rapidjson::Document serialized)
+    {
         auto allocator{serialized.GetAllocator()};
         Response r{
             .document = std::make_shared<rapidjson::Document>(&allocator), .id = std::move(id)};

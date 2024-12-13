@@ -44,12 +44,14 @@ auto front(Container&& c)
 NX_NETWORK_REST_API nx::reflect::ArrayOrder orderFromParams(const Params& params);
 NX_NETWORK_REST_API nx::reflect::Filter filterFromParams(const Params& params);
 
-NX_NETWORK_REST_API QByteArray responseContentBody(QJsonValue value,
+NX_NETWORK_REST_API void setResponseContent(Response* response,
+    QJsonValue value,
     Qn::SerializationFormat format,
     const json::OpenApiSchemas* schemas,
     const Request& request);
 
-NX_NETWORK_REST_API QByteArray responseContentBody(rapidjson::Document value,
+NX_NETWORK_REST_API void setResponseContent(Response* response,
+    rapidjson::Document value,
     Qn::SerializationFormat format,
     const json::OpenApiSchemas* schemas,
     const Request& request);
@@ -218,25 +220,21 @@ protected:
         json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing)
     {
         const auto format = request.responseFormatOrThrow();
-        const auto contentType = Qn::serializationFormatToHttpContentType(format);
         Response response{
             responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
         if (useReflect(request))
         {
             detail::filter(&data, filters);
             detail::orderBy(&data, filters);
-            response.content = {{contentType},
-                detail::responseContentBody(
-                    json::serialize(
-                        std::forward<Data>(data), std::move(filters), defaultValueAction),
-                    format, m_schemas.get(), request)};
+            detail::setResponseContent(&response,
+                json::serialize(std::forward<Data>(data), std::move(filters), defaultValueAction),
+                format, m_schemas.get(), request);
         }
         else
         {
-            response.content = {{contentType},
-                detail::responseContentBody(
-                    json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction),
-                    format, m_schemas.get(), request)};
+            detail::setResponseContent(&response,
+                json::filter(std::forward<Data>(data), std::move(filters), defaultValueAction),
+                format, m_schemas.get(), request);
         }
         return response;
     }

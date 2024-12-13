@@ -161,7 +161,8 @@ nx::reflect::ArrayOrder orderFromParams(const Params& params)
     return order;
 }
 
-QByteArray responseContentBody(QJsonValue value,
+void setResponseContent(Response* response,
+    QJsonValue value,
     Qn::SerializationFormat format,
     const json::OpenApiSchemas* schemas,
     const Request& request)
@@ -171,17 +172,22 @@ QByteArray responseContentBody(QJsonValue value,
         schemas->postprocessResponse(
             request.method(), request.params(), request.decodedPath(), &value);
     }
-    return json::serialized(value, format);
+    auto body{json::serialized(value, format)};
+    response->content = {Qn::serializationFormatToHttpContentType(format), std::move(body)};
+    response->contentBodyJson = std::move(value);
 }
 
-QByteArray responseContentBody(rapidjson::Document value,
+void setResponseContent(Response* response,
+    rapidjson::Document value,
     Qn::SerializationFormat format,
     const json::OpenApiSchemas* schemas,
     const Request& request)
 {
     if (NX_ASSERT(schemas))
         schemas->postprocessResponse(request.method(), request.decodedPath(), &value);
-    return json::serialized(value, format);
+    auto body{json::serialized(value, format)};
+    response->content = {Qn::serializationFormatToHttpContentType(format), std::move(body)};
+    response->contentBodyJson = std::move(value);
 }
 
 } // namespace nx::network::rest::detail
