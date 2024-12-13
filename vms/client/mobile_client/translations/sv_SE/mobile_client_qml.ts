@@ -709,11 +709,11 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>Aktivera reserv för programvaruavkodare</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>Avkoda några sällsynta videoformat med hjälp av programvaruavkodare</translation>
     </message>
   </context>
   <context>
