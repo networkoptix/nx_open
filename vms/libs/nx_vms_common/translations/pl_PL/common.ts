@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>Odtwórz dźwięk</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -1498,7 +1498,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Nowa strona</translation>
     </message>
   </context>
   <context>
@@ -2793,7 +2793,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Nie udało się wymusić użycia czasu kamery, ponieważ jest on zbyt opóźniony. Zamiast tego zostanie użyty czas systemowy.</translation>
     </message>
     <message>
       <source>Call Request</source>

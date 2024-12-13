@@ -573,11 +573,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Den här kameran är för närvarande inte på den valda layouten</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Den här kameran är för närvarande inte på den valda layouten</translation>
     </message>
   </context>
   <context>
@@ -1043,7 +1043,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Ingen av de valda användarrollerna innehåller användare</translation>
     </message>
   </context>
   <context>
@@ -1323,11 +1323,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>E-postadressen är inte inställd för alla valda användare.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>E-postadress är inte inställd för vissa valda användare.</translation>
     </message>
   </context>
   <context>
@@ -1364,7 +1364,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Ny webbplats</translation>
     </message>
   </context>
   <context>
@@ -1859,11 +1859,11 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>Systemets uppdateringsintervall (sekunder, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
+      <translation>Åtkomstpolicy för proxyanslutning</translation>
     </message>
     <message>
       <source>Cloud Site ID</source>
