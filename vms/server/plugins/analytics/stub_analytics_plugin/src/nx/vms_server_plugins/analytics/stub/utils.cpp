@@ -51,7 +51,7 @@ std::string imageFormatFromPath(const std::string& path)
     if (endsWith(path, ".png"))
         return "image/png";
 
-    if (endsWith(path, ".tiff"))
+    if (endsWith(path, ".tiff") || endsWith(path, ".tif"))
         return "image/tiff";
 
     return "";
