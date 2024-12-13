@@ -7,6 +7,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
+#include <QtCore/QVariant>
 
 #include <nx/utils/time/timer_event_handler.h>
 #include <nx/utils/uuid.h>
@@ -101,10 +102,10 @@ private:
 
     void setAggregationInterval(std::chrono::microseconds interval);
     void toggleAggregationTimer(bool on);
-    Actions buildActionsForTargetUsers(const AggregatedEventPtr& aggregatedEvent);
-    ActionPtr buildAction(const AggregatedEventPtr& aggregatedEvent);
+    Actions buildActionsForTargetUsers(const AggregatedEventPtr& aggregatedEvent) const;
+    Actions buildActionsForAdditionalRecipients(const AggregatedEventPtr& aggregatedEvent) const;
+    ActionPtr buildAction(const AggregatedEventPtr& event, const QVariantMap& override = {}) const;
     Engine* engine() const;
-
 
     nx::Uuid m_id;
     QString m_actionType;

@@ -22,6 +22,7 @@ const ItemDescriptor& PushNotificationAction::manifest()
         .id = utils::type<PushNotificationAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Send Mobile Notification")),
         .description = "Sends a mobile notification via the cloud.",
+        .flags = {ItemFlag::instant, ItemFlag::eventPermissions},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::cloud},
         .fields = {
             makeFieldDescriptor<TargetUsersField>(

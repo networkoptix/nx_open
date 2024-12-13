@@ -21,7 +21,7 @@ const ItemDescriptor& SpeakAction::manifest()
         .id = utils::type<SpeakAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Speak")),
         .description = "Speak text on specified resource(s).",
-        .flags = {ItemFlag::instant},
+        .flags = {ItemFlag::instant, ItemFlag::eventPermissions},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {

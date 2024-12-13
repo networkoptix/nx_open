@@ -25,7 +25,7 @@ const ItemDescriptor& RepeatSoundAction::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Repeat Sound")),
         .description = "Play sound repeatedly on the specified device(s) "
             "and display desktop notification.",
-        .flags = {ItemFlag::prolonged},
+        .flags = {ItemFlag::prolonged, ItemFlag::eventPermissions},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {

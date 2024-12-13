@@ -120,6 +120,7 @@ public:
     virtual bool match(const QVariant& value) const override;
 };
 
+// TODO: #amalov Remove this base class, acceptAll flag used by users field only.
 class NX_VMS_RULES_API ResourceFilterActionField:
     public ActionBuilderField,
     public ResourceFilterFieldBase<ResourceFilterActionField>

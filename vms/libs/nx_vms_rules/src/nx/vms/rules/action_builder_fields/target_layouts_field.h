@@ -17,24 +17,8 @@ struct TargetLayoutsFieldProperties
 
     bool allowEmptySelection{false};
 
-    QVariantMap toVariantMap() const
-    {
-        QVariantMap result;
-
-        result.insert("value", QVariant::fromValue(value));
-        result.insert("visible", visible);
-        result.insert("allowEmptySelection", allowEmptySelection);
-
-        return result;
-    }
-
-    static TargetLayoutsFieldProperties fromVariantMap(const QVariantMap& properties)
-    {
-        return TargetLayoutsFieldProperties{
-            .visible = properties.value("visible").toBool(),
-            .value = properties.value("value").value<UuidSet>(),
-            .allowEmptySelection = properties.value("allowEmptySelection").toBool()};
-    }
+    QVariantMap toVariantMap() const;
+    static TargetLayoutsFieldProperties fromVariantMap(const QVariantMap& properties);
 };
 
 /** Stores selected layout ids. Displayed as a layout selection button. */
@@ -49,17 +33,11 @@ class NX_VMS_RULES_API TargetLayoutsField:
 public:
     using SimpleTypeActionField<UuidSet, TargetLayoutsField>::SimpleTypeActionField;
 
-    TargetLayoutsFieldProperties properties() const
-    {
-        return TargetLayoutsFieldProperties::fromVariantMap(descriptor()->properties);
-    }
+    TargetLayoutsFieldProperties properties() const;
 
-    static QJsonObject openApiDescriptor(const QVariantMap& properties)
-    {
-        auto descriptor = SimpleTypeActionField::openApiDescriptor(properties);
-        descriptor[utils::kDescriptionProperty] = "Specifies the target layouts for the action.";
-        return descriptor;
-    }
+    static QJsonObject openApiDescriptor(const QVariantMap& properties);
+
+    virtual QVariant build(const AggregatedEventPtr& event) const override;
 
 signals:
     void valueChanged();

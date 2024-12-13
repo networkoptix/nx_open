@@ -44,7 +44,10 @@ const ItemDescriptor& PtzPresetAction::manifest()
                 }.toVariantMap()),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, {}, {}, FieldFlag::target}},
+            {
+                utils::kCameraIdFieldName,
+                {ResourceType::device, {Qn::ViewContentPermission}, {}, FieldFlag::target}
+            },
             {utils::kUsersFieldName, {ResourceType::user}},
         },
     };

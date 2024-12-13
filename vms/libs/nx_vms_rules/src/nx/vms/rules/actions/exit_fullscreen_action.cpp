@@ -34,7 +34,7 @@ const ItemDescriptor& ExitFullscreenAction::manifest()
                 }.toVariantMap()),
         },
         .resources = {
-            {utils::kLayoutIdsFieldName, {ResourceType::layout}},
+            {utils::kLayoutIdsFieldName, {ResourceType::layout, Qn::ReadPermission}},
             {utils::kUsersFieldName, {ResourceType::user}},
         },
     };

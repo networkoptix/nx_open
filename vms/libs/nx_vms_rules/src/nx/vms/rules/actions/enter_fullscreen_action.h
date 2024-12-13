@@ -14,7 +14,7 @@ class NX_VMS_RULES_API EnterFullscreenAction: public nx::vms::rules::BasicAction
 
     FIELD(nx::Uuid, cameraId, setCameraId)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
-    FIELD(UuidSet, layoutIds, setLayoutIds)
+    FIELD(UuidList, layoutIds, setLayoutIds)
     FIELD(std::chrono::microseconds, playbackTime, setPlaybackTime)
 
 public:

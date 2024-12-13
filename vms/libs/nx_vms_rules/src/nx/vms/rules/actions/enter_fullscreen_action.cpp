@@ -42,8 +42,8 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device}},
-            {utils::kLayoutIdsFieldName, {ResourceType::layout}},
+            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kLayoutIdsFieldName, {ResourceType::layout, Qn::ReadPermission}},
             {utils::kUsersFieldName, {ResourceType::user}},
         },
     };

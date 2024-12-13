@@ -312,6 +312,29 @@ TEST_F(ActionBuilderTest, builderProperlyHandleUserRoles)
     builder->process(makeInstantEvent(camera->getId()));
 }
 
+TEST_F(ActionBuilderTest, eventGlobalPermission)
+{
+    const auto camera = addCamera();
+    const auto user = addUser(
+        NoGroup,
+        kTestUserName,
+        UserType::local,
+        /*globalPermissions*/{},
+        {{camera->getId(), AccessRight::view}});
+
+    UuidSelection selection{
+        .ids = {user->getId()},
+        .all = false};
+
+    auto builder = makeBuilderWithTargetUserField(selection);
+
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(0);
+
+    builder->process(makeEventWithPermissions(camera->getId()));
+}
+
 TEST_F(ActionBuilderTest, builderWithTargetUsersWithoutAppropriateRightsProducedNoAction)
 {
     const auto user = addUser(NoGroup, kTestUserName, UserType::local, GlobalPermission::viewLogs);
@@ -633,6 +656,29 @@ TEST_F(ActionBuilderTest, actionPermissionUserGrouping)
         UuidSet{user4->getId()}, UuidSet{cameraA->getId(), cameraB->getId()})).Times(1);
 
     auto eventAggregator = AggregatedEventPtr::create(makeSimpleEvent());
+    builder->process(eventAggregator);
+}
+
+TEST_F(ActionBuilderTest, actionWithoutEventPermissions)
+{
+    // Action does not require event permission check.
+
+    auto camera1 = addCamera();
+    auto user1 = addUser(NoGroup,
+        kTestUserName,
+        UserType::local,
+        GlobalPermission::generateEvents, //< No event global permission.
+        {{camera1->getId(), AccessRight::edit}});
+
+    UuidSelection selection{ .all = true };
+    auto builder = makeBuilderWithPermissions(selection);
+    MockActionBuilderEvents mock{builder.get()};
+
+    EXPECT_CALL(mock, actionReceived()).Times(1);
+    EXPECT_CALL(mock, targetedUsers(testing::_)).Times(1);
+    EXPECT_CALL(mock, targetedCameraId(testing::_)).Times(1);
+
+    auto eventAggregator = AggregatedEventPtr::create(makeEventWithPermissions(camera1->getId()));
     builder->process(eventAggregator);
 }
 

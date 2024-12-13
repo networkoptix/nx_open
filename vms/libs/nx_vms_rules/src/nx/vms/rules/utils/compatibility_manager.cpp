@@ -211,7 +211,6 @@ void CompatibilityManager::onDurationChanged()
     // is fixing such a values.
 
     const auto actionBuilder = m_rule->actionBuilders().first();
-    const auto eventFilter = m_rule->eventFilters().first();
 
     const auto durationField = actionBuilder->fieldByName<vms::rules::OptionalTimeField>(
         vms::rules::utils::kDurationFieldName);

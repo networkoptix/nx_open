@@ -18,6 +18,7 @@
 #include <nx/utils/qobject.h>
 #include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/migration_utils.h>
 
 #include "action_builder_field.h"
@@ -60,8 +61,11 @@ QByteArray permissionHash(const ItemDescriptor& manifest, const T& object)
 {
     QByteArray result;
 
-    for (const auto& [fieldName, _]: manifest.resources)
+    for (const auto& [fieldName, resourceDesc]: manifest.resources)
     {
+        if (!resourceDesc.readPermissions)
+            continue;
+
         const auto property = object->property(fieldName.c_str());
         if (property.template canConvert<nx::Uuid>())
             result.push_back(property.template value<nx::Uuid>().toRfc4122());
@@ -92,13 +96,13 @@ bool requireReadPermissions(const ItemDescriptor& manifest)
 
 FiltrationResult filterResourcesByPermission(
     const QObject* object,
-    const QString& type,
     const QnUserResourcePtr& user,
     const ItemDescriptor& manifest)
 {
     if (!requireReadPermissions(manifest))
         return {FiltrationAction::Accept};
 
+    const auto& type = manifest.id;
     const auto context = user->systemContext();
     const auto accessManager = context->resourceAccessManager();
     const auto globalPermissions = manifest.readPermissions;
@@ -172,7 +176,7 @@ FiltrationResult filterResourcesByPermission(
         }
         else
         {
-            NX_ASSERT(false, "Unexpected field type: %1", value.typeName());
+            NX_ASSERT(false, "Unexpected resource field type: %1, id: %2", value.typeName(), type);
             return {FiltrationAction::Discard};
         }
     }
@@ -188,7 +192,7 @@ EventPtr filterEventPermissions(
     const QnUserResourcePtr& user,
     const ItemDescriptor& manifest)
 {
-    auto result = filterResourcesByPermission(event.get(), event->type(), user, manifest);
+    auto result = filterResourcesByPermission(event.get(), user, manifest);
     if (result.action == FiltrationAction::Accept)
         return event;
 
@@ -224,7 +228,7 @@ ActionBuilder::Actions filterActionPermissions(
         context->resourcePool()->getResourcesByIds<QnUserResource>(selection.ids))
     {
         auto filterResult =
-            filterResourcesByPermission(action.get(), action->type(), user, manifest);
+            filterResourcesByPermission(action.get(), user, manifest);
 
         if (filterResult.action == FiltrationAction::Discard)
             continue;
@@ -262,6 +266,37 @@ ActionBuilder::Actions filterActionPermissions(
     }
 
     return result;
+}
+
+QVariantMap makeOverride(UuidSelection users, QString emails)
+{
+    return QVariantMap{
+        {rules::utils::kUsersFieldName, QVariant::fromValue(std::move(users))},
+        {rules::utils::kEmailsFieldName, std::move(emails)},
+    };
+}
+
+[[nodiscard]] nx::i18n::ScopedLocalePtr installScopedLocale(const QString& locale)
+{
+    // User resource returns default locale if not set explicitly.
+    if (!NX_ASSERT(!locale.isEmpty()))
+        return {};
+
+    // TODO: https://networkoptix.atlassian.net/browse/VMS-55348: This code leads to ~5
+    // second delay in action generation during unit tests.  Added a flag in the test
+    // to bypass this, but it should be fixed properly.
+    if (ActionBuilder::bypassScopedLocaleForTest)
+        return {};
+
+    // Application context is not initialized in unit tests.
+    if (auto appContext = nx::vms::common::appContext())
+    {
+        // Some unit tests do not have translations manager.
+        if (auto translationManager = appContext->translationManager())
+            return translationManager->installScopedLocale(locale);
+    }
+
+    return {};
 }
 
 } // namespace
@@ -465,22 +500,14 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
 }
 
 ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
-    const AggregatedEventPtr& aggregatedEvent)
+    const AggregatedEventPtr& aggregatedEvent) const
 {
     auto targetUsersField = fieldByNameImpl<TargetUsersField>(utils::kUsersFieldName);
     if (!NX_ASSERT(targetUsersField))
         return {};
 
     const auto eventManifest = engine()->eventDescriptor(aggregatedEvent->type());
-    if (!NX_ASSERT(eventManifest))
-        return {};
-
     const auto actionManifest = engine()->actionDescriptor(actionType());
-
-    UuidSelection initialTargetUsersValue {
-        .ids = targetUsersField->ids(),
-        .all = targetUsersField->acceptAll()
-    };
 
     struct EventUsers
     {
@@ -492,6 +519,7 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     // Group users by permissions and locale, so only limited number of actions will be produced.
     std::unordered_map<QByteArray, EventUsers> eventUsersMap;
     const bool userFiltered = actionManifest->flags.testFlag(ItemFlag::userFiltered);
+    const bool eventPermissions = actionManifest->flags.testFlag(ItemFlag::eventPermissions);
 
     // If the action should be shown to some users it is required to check if the user has
     // appropriate rights to see the event details.
@@ -504,28 +532,35 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
             continue;
         }
 
-        auto filteredAggregatedEvent = aggregatedEvent->filtered(
-            [&user, &eventManifest](const EventPtr& event)
-            {
-                return filterEventPermissions(event, user, *eventManifest);
-            });
+        auto locale = user->locale();
+        AggregatedEventPtr filteredAggregatedEvent;
+        QByteArray hash = locale.toUtf8();
 
-        if (!filteredAggregatedEvent)
-            continue;
-
-        const auto locale = user->locale();
-        // Grouping users with the same permissions and same locale.
-        auto hash = permissionHash(*eventManifest, filteredAggregatedEvent)
-            .append(locale.toUtf8());
-
-        auto it = eventUsersMap.find(hash);
-
-        if (it == eventUsersMap.end())
+        if (eventPermissions)
         {
-            eventUsersMap.emplace(hash, EventUsers{
-                filteredAggregatedEvent,
+            filteredAggregatedEvent = aggregatedEvent->filtered(
+                [&user, &eventManifest](const EventPtr& event)
+                {
+                    return filterEventPermissions(event, user, *eventManifest);
+                });
+
+            if (!filteredAggregatedEvent)
+                continue;
+
+            // Grouping users with the same permissions and same locale.
+            hash.append(permissionHash(*eventManifest, filteredAggregatedEvent));
+        }
+        else
+        {
+            filteredAggregatedEvent = aggregatedEvent;
+        }
+
+        if (auto it = eventUsersMap.find(hash); it == eventUsersMap.end())
+        {
+            eventUsersMap.emplace(std::move(hash), EventUsers{
+                std::move(filteredAggregatedEvent),
                 {user->getId()},
-                locale
+                std::move(locale)
             });
         }
         else
@@ -534,85 +569,55 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
         }
     }
 
-    auto additionalRecipientsField = fieldByNameImpl<ActionTextField>(utils::kEmailsFieldName);
-    QString initialAdditionalRecipientsValue;
-
-    QSignalBlocker targetUsersSignalBlocker{targetUsersField};
-    QSignalBlocker additionalRecipientsSignalBlocker{additionalRecipientsField};
-
-    Actions result;
-    if (additionalRecipientsField && !additionalRecipientsField->value().isEmpty())
-    {
-        // It is required to take separate action for the additional recipients. The additional
-        // recipients will be treated as power users, i.e., filtration is not required.
-
-        NX_VERBOSE(
-            this,
-            "Building action for additional recipients: %1",
-            additionalRecipientsField->value());
-
-        targetUsersField->setSelection({}); //< Only additional recipients must be in the action.
-
-        result.push_back(buildAction(aggregatedEvent));
-
-        // All the rest actions must be created without additional recipients, to prevent action
-        // duplication.
-        initialAdditionalRecipientsValue = additionalRecipientsField->value();
-        additionalRecipientsField->setValue({});
-    }
+    Actions result = buildActionsForAdditionalRecipients(aggregatedEvent);
 
     for (auto& [key, value]: eventUsersMap)
     {
         NX_VERBOSE(this, "Building action for users: %1", value.userIds);
 
         // Substitute the initial target users with the user the aggregated event has been filtered.
-        targetUsersField->setSelection({
-            .ids = std::move(value.userIds),
-            .all = false});
+        const auto override = makeOverride(
+            UuidSelection{.ids = std::move(value.userIds)}, /*emails*/{});
 
-        nx::i18n::ScopedLocalePtr scopedLocale;
-        const auto locale = value.locale;
-        if (locale.isEmpty())
-        {
-            NX_VERBOSE(
-                this, "User language is not set, customization language will be used");
-        }
-        else
-        {
-            auto appContext = nx::vms::common::appContext();
-            if (appContext) //< Application context is not initialized in unit tests.
-            {
-                // TODO: https://networkoptix.atlassian.net/browse/VMS-55348: This code leads to ~5
-                // second delay in action generation during unit tests.  Added a flag in the test
-                // to bypass this, but it should be fixed properly.
-                if (!bypassScopedLocaleForTest)
-                {
-                    auto translationManager = appContext->translationManager();
-                    if (translationManager) // Some unit tests do not have translations manager.
-                        scopedLocale = translationManager->installScopedLocale(locale);
-                }
-            }
-        }
+        auto scopedLocale = installScopedLocale(value.locale);
 
         auto actions = filterActionPermissions(
-            buildAction(value.event),
-            targetUsersField->systemContext(),
-            *actionManifest);
+            buildAction(value.event, override), engine()->systemContext(), *actionManifest);
 
         result.insert(result.end(), actions.begin(), actions.end());
     }
 
-    // Recover initial target users selection.
-    targetUsersField->setSelection(initialTargetUsersValue);
-
-    // Recover initial additional recipients value.
-    if (additionalRecipientsField)
-        additionalRecipientsField->setValue(initialAdditionalRecipientsValue);
-
     return result;
 }
 
-ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
+ActionBuilder::Actions ActionBuilder::buildActionsForAdditionalRecipients(
+    const AggregatedEventPtr & aggregatedEvent) const
+{
+    auto additionalRecipientsField = fieldByNameImpl<ActionTextField>(utils::kEmailsFieldName);
+    if (!additionalRecipientsField || additionalRecipientsField->value().isEmpty())
+        return {};
+
+    // It is required to take separate action for the additional recipients. The additional
+    // recipients will be treated as power users, i.e., filtration is not required.
+
+    NX_VERBOSE(
+        this,
+        "Building action for additional recipients: %1",
+        additionalRecipientsField->value());
+
+    auto scopedLocale = installScopedLocale(
+        engine()->systemContext()->globalSettings()->defaultUserLocale());
+
+    // Only additional recipients must be in the action.
+    return {buildAction(
+        aggregatedEvent, makeOverride(/*users*/ {}, additionalRecipientsField->value()))};
+
+    // All the rest actions must be created without additional recipients, to prevent action
+    // duplication.
+}
+
+ActionPtr ActionBuilder::buildAction(
+    const AggregatedEventPtr& aggregatedEvent, const QVariantMap& override) const
 {
     ActionPtr action(m_constructor());
     if (!action)
@@ -625,10 +630,13 @@ ActionPtr ActionBuilder::buildAction(const AggregatedEventPtr& aggregatedEvent)
         nx::utils::propertyNames(action.get(), nx::utils::PropertyAccess::writable);
     for (const auto& propertyName: propertyNames)
     {
-        if (m_fields.contains(propertyName))
+        if (auto value = override.value(propertyName); value.isValid())
         {
-            auto& field = m_fields.at(propertyName);
-            const auto value = field->build(aggregatedEvent);
+            action->setProperty(propertyName, std::move(value));
+        }
+        else if (const auto it = m_fields.find(propertyName); it != m_fields.end())
+        {
+            const auto value = it->second->build(aggregatedEvent);
             action->setProperty(propertyName, value);
         }
         else

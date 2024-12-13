@@ -18,7 +18,7 @@ const ItemDescriptor& PlaySoundAction::manifest()
         .id = utils::type<PlaySoundAction>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Play Sound")),
         .description = "Play sound on the specified device(s) and display desktop notification.",
-        .flags = {ItemFlag::instant},
+        .flags = {ItemFlag::instant, ItemFlag::eventPermissions},
         .executionTargets = {ExecutionTarget::clients, ExecutionTarget::servers},
         .targetServers = TargetServers::resourceOwner,
         .fields = {

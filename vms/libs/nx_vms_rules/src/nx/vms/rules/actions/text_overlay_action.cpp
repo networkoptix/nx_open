@@ -58,7 +58,7 @@ const ItemDescriptor& TextOverlayAction::manifest()
                 utils::kDetailingDetailName),
         },
         .resources = {
-            {utils::kDeviceIdsFieldName, {ResourceType::device}},
+            {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kUsersFieldName, {ResourceType::user}},
         },
     };

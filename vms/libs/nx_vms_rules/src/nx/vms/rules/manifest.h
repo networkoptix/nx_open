@@ -41,7 +41,10 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
     localLicense = 1 << 6,
 
     /** User event filtration is used for action delivery. */
-    userFiltered = 1 << 7
+    userFiltered = 1 << 7,
+
+    /** Event global and resource read permissions check is performed for the action recipient */
+    eventPermissions = 1 << 8
 )
 
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
