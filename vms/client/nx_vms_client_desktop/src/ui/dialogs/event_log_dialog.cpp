@@ -643,25 +643,26 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     QnResourceList resources = m_model->resourcesForPlayback(idx).filtered(
         [this](const QnResourcePtr& resource)
         {
-            return systemContext()->accessController()->hasPermissions(resource, Qn::ReadPermission);
+            return accessController()->hasPermissions(resource, Qn::ViewContentPermission);
         });
 
-    if (!resources.isEmpty())
-    {
-        action::Parameters params(resources);
+    if (resources.isEmpty())
+        return;
 
-        const auto timePos = m_model->eventTimestamp(idx.row());
-        if (timePos != AV_NOPTS_VALUE)
+    const auto archiveCameras = resources.filtered(
+        [this](const QnResourcePtr& resource)
         {
-            qint64 pos = timePos / 1000;
-            params.setArgument(Qn::ItemTimeRole, pos);
-        }
+            return accessController()->hasPermissions(resource, Qn::ViewFootagePermission);
+        });
 
-        context()->menu()->trigger(action::OpenInNewTabAction, params);
+    action::Parameters params(resources);
+    if (resources.size() == archiveCameras.size())
+        params.setArgument(Qn::ItemTimeRole, m_model->eventTimestamp(idx.row()).count());
 
-        if (isMaximized())
-            showNormal();
-    }
+    menu()->trigger(action::OpenInNewTabAction, params);
+
+    if (isMaximized())
+        showNormal();
 }
 
 void QnEventLogDialog::setEventType(EventType value)

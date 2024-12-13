@@ -8,11 +8,10 @@
 #include <QtGui/QBrush>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/event/action_parameters.h>
+#include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/descriptors_fwd.h>
 #include <nx/vms/event/event_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/id.h>
 
 namespace nx {
 namespace vms {
@@ -64,7 +63,7 @@ public:
     nx::vms::api::EventType eventType(int row) const;
     nx::vms::api::analytics::EventTypeId analyticsEventType(int row) const;
     QnResourcePtr eventResource(int row) const;
-    qint64 eventTimestamp(int row) const;
+    std::chrono::milliseconds eventTimestamp(int row) const;
 
 public slots:
     void clear();
@@ -79,6 +78,7 @@ private:
     QVariant mouseCursorData(Column column, const nx::vms::event::ActionData& action) const;
     QString textData(Column column, const nx::vms::event::ActionData& action) const;
     QString tooltip(Column column, const nx::vms::event::ActionData& action) const;
+    QString description(const nx::vms::event::ActionData& action) const;
 
     static int helpTopicIdData(Column column, const nx::vms::event::ActionData& action);
 
@@ -89,8 +89,6 @@ private:
     QString getResourceNameString(const nx::Uuid& id) const;
 
     bool hasVideoLink(const nx::vms::event::ActionData& action) const;
-    bool hasAccessToCamera(const nx::Uuid& cameraId) const;
-    bool hasAccessToArchive(const nx::Uuid& cameraId) const;
 
 private:
     QList<Column> m_columns;
