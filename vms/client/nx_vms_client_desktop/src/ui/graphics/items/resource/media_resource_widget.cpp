@@ -3541,7 +3541,10 @@ bool QnMediaResourceWidget::hasAudio() const
         return d->camera->isAudioSupported() && d->camera->isAudioEnabled();
 
     if (d->mediaResource) // Handle local files.
-        return !d->mediaResource->getAudioLayout(d->display()->dataProvider())->tracks().empty();
+    {
+        if (auto audioLayout = d->mediaResource->getAudioLayout(d->display()->dataProvider()))
+            return !audioLayout->tracks().empty();
+    }
 
     return false;
 }
