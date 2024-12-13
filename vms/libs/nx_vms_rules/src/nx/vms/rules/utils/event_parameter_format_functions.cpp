@@ -7,6 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/datetime.h>
@@ -189,9 +190,13 @@ QString eventTimeEnd(SubstitutionContext* substitution, common::SystemContext* c
 
 QString eventSource(SubstitutionContext* substitution, common::SystemContext* context)
 {
+    const auto source = propertyToString(substitution->event, kCaptionFieldName);
+    if (!source.isEmpty())
+        return source;
+
     const auto sourceId = eventSourceId(substitution->event);
     if (const auto resource = context->resourcePool()->getResourceById(sourceId))
-        return resource->getName();
+        return QnResourceDisplayInfo(resource).name();
 
     return sourceId.toSimpleString();
 }
@@ -201,7 +206,7 @@ QString deviceIp(SubstitutionContext* substitution, common::SystemContext* conte
     if (const auto resource = context->resourcePool()->getResourceById<QnNetworkResource>(
             eventSourceId(substitution->event)))
     {
-        return resource->getHostAddress();
+        return QnResourceDisplayInfo(resource).host();
     }
     return {};
 }
@@ -230,7 +235,7 @@ QString deviceName(SubstitutionContext* substitution, common::SystemContext* con
 {
     const auto sourceId = eventSourceId(substitution->event);
     if (const auto resource = context->resourcePool()->getResourceById(sourceId))
-        return resource->getName();
+        return QnResourceDisplayInfo(resource).name();
     return {};
 }
 
