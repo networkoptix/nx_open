@@ -372,7 +372,6 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
     int mib[6];
     size_t needed;
-    char *lim, *buf, *next;
 
     mib[0] = CTL_NET;
     mib[1] = PF_ROUTE;
@@ -387,19 +386,18 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
         return nx::utils::MacAddress();
     }
 
-    if ((buf = (char*)malloc(needed)) == NULL)
-    {
+    std::unique_ptr<char[]> buf(new (std::nothrow) char[needed]);
+    if (!buf)
         return nx::utils::MacAddress();
-    }
 
-    if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
+    if (sysctl(mib, 6, buf.get(), &needed, NULL, 0) < 0)
     {
         NX_ERROR(kLogTag, "actual retrieval of routing table failed");
         return nx::utils::MacAddress();
     }
 
-    lim = buf + needed;
-    next = buf;
+    char* lim = buf.get() + needed;
+    char* next = buf.get();
     while (next < lim)
     {
         struct rt_msghdr *rtm = (struct rt_msghdr *)next;
@@ -411,16 +409,11 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
             /* complete ARP entry */
             NX_DEBUG(kLogTag, nx::format("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)));
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr))
-            {
-                free(buf);
                 return nx::utils::MacAddress::fromRawData((unsigned char*)LLADDR(sdl));
-            }
         }
 
         next += rtm->rtm_msglen;
     }
-
-    free(buf);
 
     return nx::utils::MacAddress();
 }
