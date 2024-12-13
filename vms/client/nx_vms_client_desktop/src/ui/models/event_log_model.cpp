@@ -244,28 +244,19 @@ QModelIndex QnEventLogModel::parent(const QModelIndex& /*parent*/) const
 
 bool QnEventLogModel::hasVideoLink(const vms::event::ActionData& action) const
 {
-    vms::api::EventType eventType = action.eventParams.eventType;
-    if (action.hasFlags(vms::event::ActionData::VideoLinkExists)
-        && hasAccessToCamera(action.eventParams.eventResourceId))
-    {
-        return true;
-    }
+    if (!action.hasFlags(vms::event::ActionData::VideoLinkExists))
+        return false;
 
-    if (eventType >= EventType::userDefinedEvent)
+    if (const auto sourceResources = nx::vms::event::sourceResources(
+        action.eventParams, resourcePool()))
     {
-        const auto sourceResources = nx::vms::event::sourceResources(
-            action.eventParams,
-            resourcePool());
-
-        if (sourceResources)
+        for (const auto& camera: sourceResources->filtered<QnVirtualCameraResource>())
         {
-            for (const auto& resource: *sourceResources)
-            {
-                if (hasAccessToCamera(resource->getId()))
-                    return true;
-            }
+            if (accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+                return true;
         }
     }
+
     return false;
 }
 
@@ -467,72 +458,80 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             }
         }
         case DescriptionColumn:
-        {
-            switch (action.actionType)
-            {
-                case ActionType::showOnAlarmLayoutAction:
-                    return getResourceNameString(action.actionParams.actionResourceId);
+            return description(action);
 
-                // TODO: Future: Rework code to use bookmark.description field for bookmark action.
-                case ActionType::acknowledgeAction:
-                    /*fallthrough*/
-                case ActionType::showTextOverlayAction:
-                {
-                    const auto text = action.actionParams.text.trimmed();
-                    if (!text.isEmpty())
-                        return nx::vms::common::html::toPlainText(text);
-                }
-                default:
-                    break;
-            }
-
-            vms::api::EventType eventType = action.eventParams.eventType;
-            QString result;
-
-            if (eventType ==EventType::cameraMotionEvent)
-            {
-                if (hasVideoLink(action))
-                {
-                    const auto cameraId = action.eventParams.eventResourceId;
-                    result = hasAccessToArchive(cameraId) ? tr("Motion video") : tr("Open camera");
-                }
-            }
-            else
-            {
-                result = nx::vms::common::html::toPlainText(m_stringsHelper->eventDetails(
-                    action.eventParams,
-                    nx::vms::event::AttrSerializePolicy::singleLine
-                ).join('\n'));
-            }
-
-            if (!vms::event::hasToggleState(eventType, action.eventParams, systemContext()))
-            {
-                int count = action.aggregationCount;
-
-                // For Ldap Sync Issue events we print detailed (aggregated by subtypes) data that
-                // already contains the number of event occurances in the event description. For
-                // all other event types we add aggregation count to the result, if necessary.
-                if (count > 1 && eventType != EventType::ldapSyncIssueEvent)
-                {
-                    QString countString;
-                    if (isAggregationDoneByCameras(action))
-                    {
-                        countString = tr("%1 (%n cameras)",
-                            "%1 is description of event. Will be replaced in runtime", count);
-                    }
-                    else
-                    {
-                        countString = tr("%1 (%n times)",
-                            "%1 is description of event. Will be replaced in runtime", count);
-                    }
-                    return countString.arg(result);
-                }
-            }
-            return result;
-        }
         default:
             return QString();
     }
+}
+
+QString QnEventLogModel::description(const nx::vms::event::ActionData& action) const
+{
+    switch (action.actionType)
+    {
+        case ActionType::showOnAlarmLayoutAction:
+            return getResourceNameString(action.actionParams.actionResourceId);
+
+        // TODO: Future: Rework code to use bookmark.description field for bookmark action.
+        case ActionType::acknowledgeAction:
+            /*fallthrough*/
+        case ActionType::showTextOverlayAction:
+        {
+            const auto text = action.actionParams.text.trimmed();
+            if (!text.isEmpty())
+                return nx::vms::common::html::toPlainText(text);
+        }
+        default:
+            break;
+    }
+
+    const auto eventType = action.eventParams.eventType;
+    QString result = nx::vms::common::html::toPlainText(m_stringsHelper->eventDetails(
+            action.eventParams,
+            nx::vms::event::AttrSerializePolicy::singleLine
+        ).join('\n'));;
+
+    if (result.isEmpty() && hasVideoLink(action))
+    {
+        bool accessToArchive = false;
+        for (const auto& camera : nx::vms::event::sourceResources(
+            action.eventParams, resourcePool())->filtered<QnVirtualCameraResource>())
+        {
+            if (accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
+            {
+                accessToArchive = true;
+                break;
+            }
+        }
+
+        result = accessToArchive ? tr("Open Event video") : tr("Open Event camera");
+    }
+
+    if (!vms::event::hasToggleState(eventType, action.eventParams, systemContext()))
+    {
+        int count = action.aggregationCount;
+
+        // For Ldap Sync Issue events we print detailed (aggregated by subtypes) data that
+        // already contains the number of event occurances in the event description. For
+        // all other event types we add aggregation count to the result, if necessary.
+        if (count > 1 && eventType != EventType::ldapSyncIssueEvent)
+        {
+            QString countString;
+            if (isAggregationDoneByCameras(action))
+            {
+                countString = tr("%1 (%n cameras)",
+                    "%1 is description of event. Will be replaced in runtime", count);
+            }
+            else
+            {
+                countString = tr("%1 (%n times)",
+                    "%1 is description of event. Will be replaced in runtime", count);
+            }
+            return countString.arg(result);
+        }
+    }
+
+    return result;
 }
 
 QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& action) const
@@ -599,27 +598,6 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
     return result;
 }
 
-
-bool QnEventLogModel::hasAccessToCamera(const nx::Uuid& cameraId) const
-{
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
-    NX_ASSERT(camera, "Resource is not a camera");
-    if (!camera)
-        return false;
-
-    return systemContext()->accessController()->hasPermissions(camera, Qn::ReadPermission);
-}
-
-bool QnEventLogModel::hasAccessToArchive(const nx::Uuid& cameraId) const
-{
-    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
-    NX_ASSERT(camera, "Resource is not a camera");
-    if (!camera)
-        return false;
-
-    return systemContext()->accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
-}
-
 int QnEventLogModel::helpTopicIdData(Column column, const vms::event::ActionData& action)
 {
     switch (column)
@@ -658,7 +636,6 @@ QString QnEventLogModel::motionUrl(Column column, const vms::event::ActionData& 
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const
 {
-    QnResourceList result;
     if (!index.isValid() || index.column() != DescriptionColumn)
         return QnResourceList();
 
@@ -670,9 +647,10 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
             resourcePool());
 
         if (sourceResources)
-            result << *sourceResources;
+            return *sourceResources;
     }
-    return result;
+
+    return {};
 }
 
 int QnEventLogModel::columnCount(const QModelIndex &parent) const
@@ -798,15 +776,13 @@ QnResourcePtr QnEventLogModel::eventResource(int row) const
     return QnResourcePtr();
 }
 
-qint64 QnEventLogModel::eventTimestamp(int row) const
+std::chrono::milliseconds QnEventLogModel::eventTimestamp(int row) const
 {
-    if (row >= 0)
-    {
-        const vms::event::ActionData& action = m_index->at(row);
-        const bool accessDenied = ((action.eventParams.eventType == EventType::cameraMotionEvent)
-            && !hasAccessToArchive(action.eventParams.eventResourceId));
+    using namespace std::chrono;
 
-        return (accessDenied ? AV_NOPTS_VALUE : action.eventParams.eventTimestampUsec);
-    }
-    return AV_NOPTS_VALUE;
+    if (row < 0 || row >= m_index->size())
+        return milliseconds::zero();
+
+    return duration_cast<milliseconds>(
+        microseconds(m_index->at(row).eventParams.eventTimestampUsec));
 }
