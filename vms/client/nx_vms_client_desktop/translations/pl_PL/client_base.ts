@@ -7065,7 +7065,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Dodaj do listy</translation>
     </message>
     <message>
       <source>Create New List...</source>
@@ -7597,7 +7597,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+      <translation>Automatycznie zaimportowane zostaną tylko te okresy, w których kamera lub serwer były niedostępne po pierwszym dodaniu do witryny.</translation>
     </message>
   </context>
   <context>
@@ -7643,7 +7643,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>Wybierz cel...</translation>
     </message>
   </context>
   <context>
@@ -7677,7 +7677,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>Wybierz cel punktu aktywnego</translation>
     </message>
   </context>
   <context>
@@ -8640,7 +8640,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>Osiągnięto maksymalną liczbę urządzeń dla witryny</translation>
     </message>
   </context>
   <context>
@@ -9283,11 +9283,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Witryny zostaną wkrótce połączone</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>Serwery z innej witryny pojawią się w drzewie zasobów.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
@@ -9488,7 +9488,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Wszyscy użytkownicy i grupy LDAP zostaną usunięci.&lt;br&gt;&lt;br&gt; Ustawienia LDAP również zostaną usunięte.</translation>
     </message>
   </context>
   <context>
@@ -9608,8 +9608,8 @@ Poziom rejestrowania &quot;%1&quot; zapewni bardziej szczegółowych informacji.
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>Wybrany poziom rejestrowania może pogorszyć wydajność.
+Pamiętaj, aby przywrócić poziom rejestrowania do ustawienia domyślnego po zebraniu wystarczającej liczby logów.</translation>
     </message>
   </context>
   <context>
@@ -9760,7 +9760,7 @@ Wydajność witryny jest obniżona.</translation>
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
       <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
+        <numerusform>%n wybrano:</numerusform>
         <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
@@ -9768,7 +9768,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>Ponów (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -9787,19 +9787,19 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>Nie można dodać obiektu do listy</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Obiekt nie ma atrybutów pasujących do wybranej listy</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>Obiekt został dodany do listy</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>Obiekt został pomyślnie dodany do &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -10044,17 +10044,17 @@ Wydajność witryny jest obniżona.</translation>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>%1 Witrynę można połączyć tylko z witrynami innymi niż%1. Nazwa witryny i hasło pochodzą z witryny %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>Obie witryny są połączone z %1. Łączenie nie jest dozwolone.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>%1 witryn ma różnych właścicieli. Scalanie nie jest dozwolone.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
@@ -11397,8 +11397,8 @@ Nadal możesz zmienić jakość i FPS bezpośrednio w kamerze.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Jakość i ustawienia FPS są wyłączone z powodu opcji &quot; Zezwalaj na optymalizację ustawień kamery &quot; w oknie &quot; Administracja witryny&quot;.
+Nadal możesz zmienić jakość i FPS bezpośrednio w kamerze.</translation>
     </message>
   </context>
   <context>
@@ -11502,7 +11502,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Może być wymagana dodatkowa konfiguracja na serwerze.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
