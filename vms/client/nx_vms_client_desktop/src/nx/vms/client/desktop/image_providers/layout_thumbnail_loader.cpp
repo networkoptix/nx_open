@@ -188,7 +188,9 @@ struct LayoutThumbnailLoader::Private
         qreal rotation = qMod(item->rotation, 180.0);
         QRectF cellRect = item->outCellRect;
 
-        const bool exportAllowed = skipExportPermissionCheck || hasExportPermission(item->resource);
+        const bool exportAllowed = skipExportPermissionCheck
+            || item->resource->hasFlags(Qn::web_page)
+            || hasExportPermission(item->resource);
 
         // Aspect ratio is invalid when there is no image. No need to rotate in this case.
         if (qFuzzyIsNull(rotation) || !aspectRatio.isValid())

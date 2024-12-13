@@ -184,6 +184,9 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
         if (!NX_ASSERT(systemContext))
             continue;
 
+        if (resource->hasFlags(Qn::web_page))
+            continue;
+
         if (!systemContext->accessController()->hasPermissions(resource, Qn::ExportPermission))
         {
             results.set((int) Result::exportNotAllowed);
