@@ -136,7 +136,7 @@ Item
                 hintControl.hideDelayed()
         }
 
-        onEnabledChanged: (index, buttonEnabled) =>
+        onButtonEnabledChanged: (index, buttonEnabled) =>
         {
             if (!buttonEnabled && buttonsController.actionIsActive(d.id(index)))
                 d.stopButtonAction(index)

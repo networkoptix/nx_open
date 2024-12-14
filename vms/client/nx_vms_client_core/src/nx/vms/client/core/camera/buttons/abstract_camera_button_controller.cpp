@@ -62,14 +62,40 @@ void AbstractCameraButtonController::setRawResource(QnResource* value)
 void AbstractCameraButtonController::safeEmitActionStarted(const nx::Uuid& id, bool success)
 {
     executeLater(
-        nx::utils::guarded(this, [=]() { emit actionStarted(id, success, QPrivateSignal()); }),
+        nx::utils::guarded(this,
+            [this, id, success]()
+            {
+                const auto button = buttonData(id);
+                if (!NX_ASSERT(button))
+                    return;
+
+                if (!success
+                    || button->type != CameraButtonData::Type::prolonged
+                    || actionIsActive(id)) //< Avoid excessive signal for the prolonged triggers.
+                {
+                    emit actionStarted(id, success, QPrivateSignal());
+                }
+            }),
         this);
 }
 
 void AbstractCameraButtonController::safeEmitActionStopped(const nx::Uuid& id, bool success)
 {
     executeLater(
-        nx::utils::guarded(this, [=]() { emit actionStopped(id, success, QPrivateSignal()); }),
+        nx::utils::guarded(this,
+            [this, id, success]()
+            {
+                const auto button = buttonData(id);
+                if (!NX_ASSERT(button))
+                    return;
+
+                if (!success
+                    || button->type != CameraButtonData::Type::prolonged
+                    || !actionIsActive(id)) //< Avoid excessive signal for the prolonged triggers.
+                {
+                    emit actionStopped(id, success, QPrivateSignal());
+                }
+            }),
         this);
 }
 
