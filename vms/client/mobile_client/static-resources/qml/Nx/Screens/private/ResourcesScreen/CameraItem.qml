@@ -102,68 +102,27 @@ Control
                     if (d.showTumbnailDummy)
                         return "dummyContent"
 
-                    if (initialLoadingTimer.running)
-                        return "preloaderContent"
+                    const allowVideoContent = !initialLoadingTimer.running
+                        && cameraItem.active
+                        && settings.liveVideoPreviews
 
-                    if (settings.liveVideoPreviews)
-                    {
-                        return cameraItem.active
-                            ? "videoContent"
-                            : "preloaderContent"
-                    }
-
-                    return cameraItem.thumbnail
-                        ? "thumbnailContent"
-                        : "thumbnailPreloaderContent"
+                    return allowVideoContent
+                        ? "videoContent"
+                        : "thumbnailContent"
                 }
 
-                states:
-                [
-                    State
+                sourceComponent:
+                {
+                    switch (state)
                     {
-                        name: "preloaderContent";
-                        PropertyChanges
-                        {
-                            thumbnailContentLoader.sourceComponent: preloaderComponent
-                        }
-                    },
-
-                    State
-                    {
-                        name: "thumbnailPreloaderContent";
-                        PropertyChanges
-                        {
-                            thumbnailContentLoader.sourceComponent: preloaderComponent
-                        }
-                    },
-
-                    State
-                    {
-                        name: "dummyContent";
-                        PropertyChanges
-                        {
-                            thumbnailContentLoader.sourceComponent: thumbnailDummyComponent
-                        }
-                    },
-
-                    State
-                    {
-                        name: "thumbnailContent";
-                        PropertyChanges
-                        {
-                            thumbnailContentLoader.sourceComponent: thumbnailComponent
-                        }
-                    },
-
-                    State
-                    {
-                        name: "videoContent";
-                        PropertyChanges
-                        {
-                            thumbnailContentLoader.sourceComponent: videoComponent
-                        }
+                        case "thumbnailContent":
+                            return thumbnailComponent
+                        case "videoContent":
+                            return videoComponent
+                        default:
+                            return dummyComponent
                     }
-                ]
+                }
             }
         }
 
@@ -211,7 +170,7 @@ Control
 
     Component
     {
-        id: thumbnailDummyComponent
+        id: dummyComponent
 
         Column
         {
@@ -270,13 +229,6 @@ Control
 
     Component
     {
-        id: preloaderComponent
-
-        NxDotPreloader {}
-    }
-
-    Component
-    {
         id: thumbnailComponent
 
         Image
@@ -290,6 +242,12 @@ Control
             {
                 anchors.fill: parent
                 sourceSize: Qt.size(parent.width, parent.height)
+            }
+
+            NxDotPreloader
+            {
+                anchors.centerIn: parent
+                visible: !cameraItem.thumbnail
             }
         }
     }
@@ -341,17 +299,9 @@ Control
                 resourceHelper: mediaResourceHelper
             }
 
-            Watermark
-            {
-                parent: video.videoOutput
-                anchors.fill: parent
-
-                sourceSize: Qt.size(parent.width, parent.height)
-            }
-
             Image
             {
-                id: image
+                id: videoThumbnail
 
                 anchors.fill: parent
                 source: mediaPlayer.audioOnlyMode
@@ -361,10 +311,20 @@ Control
                 visible: !video.visible && status === Image.Ready
             }
 
+            Watermark
+            {
+                parent: video.videoOutput
+                anchors.fill: parent
+
+                sourceSize: Qt.size(parent.width, parent.height)
+            }
+
             NxDotPreloader
             {
                 anchors.centerIn: parent
-                visible: !video.visible && !image.visible && !mediaPlayer.audioOnlyMode
+                visible:!video.visible
+                    && !videoThumbnail.visible
+                    && !mediaPlayer.audioOnlyMode
             }
         }
     }
@@ -380,8 +340,7 @@ Control
         repeat: true
         running: active
             && sessionManager.hasConnectedSession
-            && (thumbnailContentLoader.state === "thumbnailContent"
-                || thumbnailContentLoader.state === "thumbnailPreloaderContent")
+            && thumbnailContentLoader.state !== "dummyContent"
 
         onTriggered:
         {
