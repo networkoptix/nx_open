@@ -1,8 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
-import Nx.Core 1.0
+import Nx.Core
+
+import nx.vms.client.core
 
 ListView
 {
@@ -20,7 +22,7 @@ ListView
     signal buttonClicked(int index)
     signal longPressedChanged(int index, bool pressed, bool down)
     signal actionCancelled(int index)
-    signal enabledChanged(int index, bool buttonEnabled)
+    signal buttonEnabledChanged(int index, bool buttonEnabled)
 
     pressDelay: 100
 
@@ -87,7 +89,7 @@ ListView
     {
         id: button
 
-        readonly property bool instantAction: !model.prolonged
+        readonly property bool instantAction: model.type === CameraButton.Type.instant
         property bool buttonLongPressed: false
         property bool active: false
         property bool filteringPressing: false
@@ -104,7 +106,7 @@ ListView
         }
 
         onDownChanged: pressedSignalOrderTimer.restart()
-        onEnabledMaskChanged: control.enabledChanged(index, enabledMask)
+        onEnabledMaskChanged: control.buttonEnabledChanged(index, enabledMask)
 
         Connections
         {
