@@ -53,13 +53,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchItem* item)
     const bool itemIsIntercomLayout = resource->hasFlags(Qn::media)
         && layoutResource && layoutResource->layoutType() == LayoutResource::LayoutType::intercom;
 
-    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
-        ? Qn::ViewContentPermission
-        : Qn::ReadPermission;
-
     // Intercom cameras can be placed on layout even if there are no permissions.
     if (!itemIsIntercomLayout
-            && !systemContext->accessController()->hasPermissions(resource, requiredPermission))
+        && !systemContext->accessController()->hasPermissions(resource, Qn::ViewContentPermission))
     {
         NX_DEBUG(typeid(ResourceWidgetFactory), lit("ResourceWidgetFactory: insufficient permissions"));
         return nullptr;

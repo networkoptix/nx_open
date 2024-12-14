@@ -442,11 +442,7 @@ void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
 
 void MediaResourceWidgetPrivate::updateAccess()
 {
-    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
-        ? Qn::ViewContentPermission
-        : Qn::ReadPermission;
-
-    setHasAccess(m_accessController->hasPermissions(resource, requiredPermission));
+    setHasAccess(m_accessController->hasPermissions(resource, Qn::ViewContentPermission));
 }
 
 void MediaResourceWidgetPrivate::setHasAccess(bool value)
