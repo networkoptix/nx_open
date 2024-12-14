@@ -227,6 +227,8 @@ NxObject
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()
         allowHardwareAcceleration: settings.enableHardwareDecoding
+        allowSoftwareDecoderFallback: settings.enableSoftwareDecoderFallback
+
         onPositionChanged:
         {
             if (d.waitForLastPosition)
