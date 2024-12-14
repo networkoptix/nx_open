@@ -468,11 +468,7 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
 
     for (const auto& resource: *resources)
     {
-        const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
-            ? Qn::ViewContentPermission
-            : Qn::ReadPermission;
-
-        if (context->resourceAccessManager()->hasPermission(user, resource, requiredPermission))
+        if (context->resourceAccessManager()->hasPermission(user, resource, Qn::ViewContentPermission))
         {
             NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, resource);
             return true;

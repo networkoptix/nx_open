@@ -759,7 +759,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 if (hasPowerUserPermissions(subject))
                     return Qn::FullLayoutPermissions;
 
-                return Qn::ModifyLayoutPermission;
+                return Qn::ModifyLayoutPermissions;
             }
 
             // Access to videowall layouts.

@@ -414,7 +414,7 @@ TEST_F(ResourceAccessManagerTest, checkIntercomLayoutPermissionsAsCustom)
         {{intercomId, AccessRight::view | AccessRight::userInput}});
 
     // `view | userInput` permissions to intercom grant access to its layout.
-    ASSERT_EQ(permissions(intercomLayout), Qn::ModifyLayoutPermission);
+    ASSERT_EQ(permissions(intercomLayout), Qn::ModifyLayoutPermissions);
 
     auto camera = addCamera();
     addToLayout(intercomLayout, camera);

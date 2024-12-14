@@ -234,11 +234,7 @@ struct Workbench::Private
 
     void removeInaccessibleItems(const QnResourcePtr& resource)
     {
-        const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
-            ? Qn::ViewContentPermission
-            : Qn::ReadPermission;
-
-        if (currentLayout && !ResourceAccessManager::hasPermissions(resource, requiredPermission))
+        if (currentLayout && !ResourceAccessManager::hasPermissions(resource, Qn::ViewContentPermission))
             currentLayout->removeItems(resource);
     }
 };
