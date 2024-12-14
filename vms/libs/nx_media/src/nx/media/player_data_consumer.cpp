@@ -292,6 +292,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
             auto videoDecoder = new SeamlessVideoDecoder(m_renderContextSynchronizer);
             videoDecoder->setAllowOverlay(m_allowOverlay);
             videoDecoder->setAllowHardwareAcceleration(m_allowHardwareAcceleration);
+            videoDecoder->setAllowSoftwareDecoderFallback(m_allowSoftwareDecoderFallback);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
         }
