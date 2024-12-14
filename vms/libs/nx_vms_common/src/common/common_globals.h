@@ -451,8 +451,15 @@ namespace Qn {
         FullGenericPermissions = ReadWriteSavePermission | RemovePermission | WriteNamePermission,
 
         /**
-         * Generic permission to view actual resource content. Actually that means we can open
-         * widget with this resource's content on the scene. For servers: health monitor access.
+         * Generic permission to view actual resource content.
+         * Actually that means we can open widget with this resource's content on the scene.
+         *  - cameras & devices: can be opened on the scene with live and/or archive access
+         *      (comes with ViewLivePermission or ViewFootagePermission or both)
+         *  - servers: health monitor widgets can be opened on the scene
+         *  - web pages: can be opened on the scene
+         *  - layouts: can be opened on the scene or placed on a showreel
+         *      (doesn't mean that layout items also have this permission)
+         *  - videowalls: can be opened on the scene as a videowall review layout
          */
         ViewContentPermission = 1 << 5,
 
@@ -483,7 +490,10 @@ namespace Qn {
         EditLayoutSettingsPermission = 1 << 7,
 
         // Permission set to modify without saving.
-        ModifyLayoutPermission = ReadPermission | WritePermission | AddRemoveItemsPermission,
+        ModifyLayoutPermissions = ReadPermission
+            | WritePermission
+            | ViewContentPermission
+            | AddRemoveItemsPermission,
 
         // Full set of permissions which can be available for the layout resource.
         FullLayoutPermissions = FullGenericPermissions
@@ -563,10 +573,10 @@ namespace Qn {
         // Mode-specific permissions.
 
         // Layout access permission for the running videowall instance.
-        VideoWallLayoutPermissions = ModifyLayoutPermission,
+        VideoWallLayoutPermissions = ModifyLayoutPermissions,
 
         // Locked layout access permission for the running videowall instance.
-        VideoWallLockedLayoutPermissions = ModifyLayoutPermission
+        VideoWallLockedLayoutPermissions = ModifyLayoutPermissions
             &~ (AddRemoveItemsPermission | WriteNamePermission),
 
         // Media access permission for the running videowall instance.

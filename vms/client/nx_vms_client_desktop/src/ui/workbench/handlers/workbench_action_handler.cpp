@@ -462,7 +462,7 @@ void ActionHandler::addToLayout(
     if (!layout)
         return;
 
-    if (!ResourceAccessManager::hasPermissions(layout, Qn::ModifyLayoutPermission))
+    if (!ResourceAccessManager::hasPermissions(layout, Qn::ModifyLayoutPermissions))
     {
         m_accessDeniedMessage = SceneBanner::show(tr("Not enough access rights"));
         return;
