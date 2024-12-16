@@ -708,11 +708,11 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>Aktifkan fallback dekoder software</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
     </message>
   </context>
   <context>
