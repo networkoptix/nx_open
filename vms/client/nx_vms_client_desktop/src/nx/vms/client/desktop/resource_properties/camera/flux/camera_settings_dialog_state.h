@@ -102,7 +102,7 @@ struct CombinedProperties
     CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;
     CombinedValue canForcePanTiltCapabilities = CombinedValue::None;
     CombinedValue canForceZoomCapability = CombinedValue::None;
-    CombinedValue hasPanTiltCapabilities = CombinedValue::None;
+    CombinedValue hasStoppablePtz = CombinedValue::None;
     CombinedValue canAdjustPtzSensitivity = CombinedValue::None;
     CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
     CombinedValue hasCustomMediaPort = CombinedValue::None;
@@ -117,7 +117,7 @@ NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (supportsWebPage)
     (isAudioForced)(supportsAudioOutput)(hasMotion)(hasObjectDetection)(hasDualStreamingCapability)
     (hasRemoteArchiveCapability)(canSwitchPtzPresetTypes)(canForcePanTiltCapabilities)
-    (canForceZoomCapability)(hasPanTiltCapabilities)(canAdjustPtzSensitivity)
+    (canForceZoomCapability)(hasStoppablePtz)(canAdjustPtzSensitivity)
     (hasCustomMediaPortCapability)
     (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)
     (streamCapabilitiesInitialized)(maxFps))
@@ -475,7 +475,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool canSwitchPtzPresetTypes() const;
     bool canForcePanTiltCapabilities() const;
     bool canForceZoomCapability() const;
-    bool hasPanTiltCapabilities() const;
+    bool hasStoppablePtz() const;
     bool canShowWebPage() const;
     bool canAdjustPtzSensitivity() const;
     bool cameraControlEnabled() const;

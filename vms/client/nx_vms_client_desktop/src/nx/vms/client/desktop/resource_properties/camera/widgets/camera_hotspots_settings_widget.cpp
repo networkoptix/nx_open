@@ -267,7 +267,7 @@ CameraHotspotsSettingsWidget::CameraHotspotsSettingsWidget(
                 d->ui->hotspotsItemView->scrollToTop();
             }
 
-            d->ui->alertBar->setDisplayed(hotspotsEnabled && state.hasPanTiltCapabilities());
+            d->ui->alertBar->setDisplayed(hotspotsEnabled && state.hasStoppablePtz());
         });
 
     connect(d->ui->addHotspotButton, &QPushButton::clicked, this,

@@ -494,7 +494,7 @@ bool isDefaultExpertSettings(const State& state)
     if (state.canForcePanTiltCapabilities() && state.expert.forcedPtzZoomCapability.valueOr(true))
         return false;
 
-    if (state.hasPanTiltCapabilities() && state.expert.doNotSendStopPtzCommand.valueOr(true))
+    if (state.hasStoppablePtz() && state.expert.doNotSendStopPtzCommand.valueOr(true))
         return false;
 
     if (!state.expert.customWebPagePort.equals(0))
@@ -687,11 +687,11 @@ bool canForceZoomCapability(const Camera& camera)
         .testFlag(Ptz::Capability::ContinuousZoomCapability);
 };
 
-bool hasPanTiltCapabilities(const Camera& camera)
+bool hasStoppablePtz(const Camera& camera)
 {
     return camera->getPtzCapabilities().testAnyFlags({
-        Ptz::Capability::AbsolutePanTiltCapabilities,
-        Ptz::Capability::ContinuousPanTiltCapabilities});
+        Ptz::Capability::AbsolutePtzCapabilities,
+        Ptz::Capability::ContinuousPtzCapabilities});
 }
 
 bool canSwitchPtzPresetTypes(const Camera& camera)
@@ -1076,8 +1076,8 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
     state.devicesDescription.canForceZoomCapability =
         combinedValue(cameras, canForceZoomCapability);
 
-    state.devicesDescription.hasPanTiltCapabilities =
-        combinedValue(cameras, hasPanTiltCapabilities);
+    state.devicesDescription.hasStoppablePtz =
+        combinedValue(cameras, hasStoppablePtz);
 
     if (state.canSwitchPtzPresetTypes())
     {
@@ -1106,7 +1106,7 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
             });
     }
 
-    if (state.hasPanTiltCapabilities())
+    if (state.hasStoppablePtz())
     {
         fetchFromCameras<bool>(state.expert.doNotSendStopPtzCommand, cameras,
             [](const Camera& camera)
@@ -2508,7 +2508,7 @@ State CameraSettingsDialogStateReducer::setDoNotSendStopPtzCommand(State state, 
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
-    if (state.devicesDescription.hasPanTiltCapabilities != CombinedValue::All)
+    if (state.devicesDescription.hasStoppablePtz != CombinedValue::All)
         return state;
 
     state.expert.doNotSendStopPtzCommand.setUser(value);
