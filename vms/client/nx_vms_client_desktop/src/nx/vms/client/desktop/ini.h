@@ -73,9 +73,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Dev] Display analytics debug overlay, based on the log file parsing. The absolute path\n"
         "to an Analytics Log file recorded via analytics_logging.ini must be specified here.");
 
-    NX_INI_FLAG(false, showDebugTimeInformationInRibbon,
-        "[Dev] Whether to show extra timestamp information in the event ribbon.");
-
     NX_INI_FLOAT(1.0f, elementHighlighterOverlayOpacity,
         "[Dev] Opacity for element highlighter overlay (default is 1.0).");
 

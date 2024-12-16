@@ -20,7 +20,7 @@ using namespace std::chrono;
 namespace {
 
 // Allowed timestamp error when pre-looking an existing frame in the global VideoCache.
-static constexpr microseconds kAllowedTimeDeviation = 35ms;
+static constexpr microseconds kAllowedTimeDeviation = 150ms;
 
 } // namespace
 
@@ -124,12 +124,25 @@ bool CameraThumbnailProvider::tryLoad()
 
     const auto image = cache->image(m_request.camera->getId(), requiredTime, &actualTime);
     if (image.isNull() || abs(requiredTime - actualTime) > kAllowedTimeDeviation)
+    {
+        if (image.isNull())
+        {
+            NX_VERBOSE(this, "tryLoad(%1) - got no image from the cache",
+                m_request.camera->getName());
+        }
+        else
+        {
+            NX_VERBOSE(this, "tryLoad(%1) - got image from the cache, deviation is too big: %2 ms",
+                m_request.camera->getName(), (requiredTime - actualTime).count() / 1000);
+        }
+
         return false;
+    }
 
     setStatus(ThumbnailStatus::Loading);
 
-    NX_VERBOSE(this, "doLoadAsync(%1) - got image from the cache, error is %2 us",
-        m_request.camera->getName(), requiredTime - actualTime);
+    NX_VERBOSE(this, "tryLoad(%1) - got image from the cache, deviation is %2 ms",
+        m_request.camera->getName(), (requiredTime - actualTime).count() / 1000);
 
     const int rotation = m_request.rotation < 0
         ? m_request.camera->forcedRotation().value_or(0)
@@ -137,6 +150,7 @@ bool CameraThumbnailProvider::tryLoad()
 
     m_image = image.transformed(QTransform().rotate(rotation));
     m_timestampUs = actualTime.count();
+    m_requestId = 0;
 
     emit imageChanged(m_image);
     emit sizeHintChanged(sizeHint());
@@ -155,6 +169,9 @@ void CameraThumbnailProvider::doLoadAsync()
         setStatus(ThumbnailStatus::NoData);
         return;
     }
+
+    if (tryLoad())
+        return;
 
     const bool isLiveRequest =
         nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampMs);
@@ -195,10 +212,13 @@ void CameraThumbnailProvider::doLoadAsync()
     const auto callback = nx::utils::guarded(this,
         [this](
             bool success,
-            rest::Handle /*requestId*/,
+            rest::Handle requestId,
             QByteArray imageData,
             const nx::network::http::HttpHeaders& headers)
         {
+            if (requestId != m_requestId)
+                return;
+
             ThumbnailStatus nextStatus =
                 success ? ThumbnailStatus::Loaded : ThumbnailStatus::NoData;
 
@@ -222,11 +242,12 @@ void CameraThumbnailProvider::doLoadAsync()
                     headers, Qn::FRAME_ENCODED_BY_PLUGIN));
             }
 
+            m_requestId = 0;
             emit imageDataLoadedInternal(imageData, nextStatus, timestampUs, frameFromPlugin);
         });
 
-    auto handle = api->cameraThumbnailAsync(m_request, callback, thread());
-    if (handle <= 0)
+    m_requestId = api->cameraThumbnailAsync(m_request, callback, thread());
+    if (m_requestId <= 0)
     {
         // It will change to status NoData as well
         emit imageDataLoadedInternal(

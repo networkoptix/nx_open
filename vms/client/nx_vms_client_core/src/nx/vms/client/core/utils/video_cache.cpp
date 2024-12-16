@@ -109,7 +109,7 @@ void VideoCache::add(const nx::Uuid& resourceId, const CLConstVideoDecoderOutput
     while (!queue.empty() && frame->pkt_dts - queue.front()->pkt_dts >= m_cacheSize.count())
         queue.pop_front();
 
-    NX_VERBOSE(this, "queue duration=%1us, size=%2",
+    NX_TRACE(this, "queue duration=%1us, size=%2",
         queue.empty() ? 0 : frame->pkt_dts - queue.front()->pkt_dts,
         queue.size());
 
@@ -123,7 +123,7 @@ void VideoCache::add(const nx::Uuid& resourceId, const CLConstVideoDecoderOutput
 
     if (queue.size() > kCacheHardLimit)
     {
-        NX_DEBUG(this, "Drop image from video cache, the hard limit has been exceeded");
+        NX_VERBOSE(this, "Drop image from video cache, the hard limit has been exceeded");
         queue.pop_front();
     }
 }

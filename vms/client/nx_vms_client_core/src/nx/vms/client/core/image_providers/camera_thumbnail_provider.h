@@ -53,6 +53,7 @@ private:
     QImage m_image;
     ThumbnailStatus m_status;
     qint64 m_timestampUs = 0;
+    int m_requestId = 0;
 };
 
 } // namespace nx::vms::client::core

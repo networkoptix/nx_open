@@ -407,9 +407,6 @@ void EventTile::setImageProvider(core::ImageProvider* value, bool forceUpdate)
     if (imageProvider())
         imageProvider()->disconnect(this);
 
-    if (value)
-        value->loadAsync();
-
     ui->imagePreviewWidget->setImageProvider(value);
     d->updatePreviewsVisibility();
 
@@ -435,6 +432,10 @@ void EventTile::setImageProvider(core::ImageProvider* value, bool forceUpdate)
             if (core::ini().showDebugTimeInformationInEventSearchData)
                 d->showDebugPreviewTimestamp();
         });
+
+    // We don't initiate image loading here because it's controlled externally, from EventRibbon,
+    // in accordance with several ini-config settings, to be able to reduce server load by preview
+    // requests when they cause server performance drops.
 }
 
 void EventTile::setVideoPreviewResource(const QnVirtualCameraResourcePtr& camera)
