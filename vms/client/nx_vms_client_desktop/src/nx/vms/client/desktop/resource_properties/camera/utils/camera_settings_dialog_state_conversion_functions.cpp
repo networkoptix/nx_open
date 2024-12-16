@@ -762,7 +762,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.canSwitchPtzPresetTypes() && state.expert.preferredPtzPresetType.hasValue())
         setPreferredPtzPresetType(state.expert.preferredPtzPresetType(), cameras);
 
-    if (state.hasPanTiltCapabilities() && state.expert.doNotSendStopPtzCommand.hasValue())
+    if (state.hasStoppablePtz() && state.expert.doNotSendStopPtzCommand.hasValue())
         setDoNotSendStopPtzCommand(state.expert.doNotSendStopPtzCommand.get(), cameras);
 
     if (state.canForcePanTiltCapabilities() || state.canForceZoomCapability())
