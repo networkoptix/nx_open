@@ -72,7 +72,7 @@ struct NX_JSON_RPC_API Request
     static Request create(
         std::optional<std::variant<QString, int>> id, std::string method, rapidjson::Document serialized)
     {
-        auto allocator{serialized.GetAllocator()};
+        auto& allocator{serialized.GetAllocator()};
         Request r{
             .document = std::make_shared<rapidjson::Document>(&allocator),
             .id = std::move(id),
@@ -102,7 +102,7 @@ struct NX_JSON_RPC_API Request
             .document = std::make_shared<rapidjson::Document>(rapidjson::kObjectType),
             .id = std::move(id),
             .method = std::move(method)};
-        auto allocator{r.document->GetAllocator()};
+        auto& allocator{r.document->GetAllocator()};
         r.document->AddMember("jsonrpc", r.jsonrpc, allocator);
         if (r.id)
         {
@@ -268,7 +268,7 @@ struct NX_JSON_RPC_API Response
 
     static Response makeError(ResponseId id, int code, std::string message, rapidjson::Document serialized)
     {
-        auto allocator{serialized.GetAllocator()};
+        auto& allocator{serialized.GetAllocator()};
         Response r{
             .document = std::make_shared<rapidjson::Document>(&allocator), .id = std::move(id)};
         rapidjson::Value value;
@@ -298,7 +298,7 @@ struct NX_JSON_RPC_API Response
         Response r{
             .document = std::make_shared<rapidjson::Document>(rapidjson::kObjectType),
             .id = std::move(id)};
-        auto allocator{r.document->GetAllocator()};
+        auto& allocator{r.document->GetAllocator()};
         r.document->AddMember("jsonrpc", r.jsonrpc, allocator);
         r.document->AddMember("id",
             std::holds_alternative<std::nullptr_t>(r.id) ? rapidjson::Value{}
@@ -318,7 +318,7 @@ struct NX_JSON_RPC_API Response
     static Response makeResult(ResponseId id, T&& data)
     {
         auto serialized{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
-        auto allocator{serialized.GetAllocator()};
+        auto& allocator{serialized.GetAllocator()};
         Response r{
             .document = std::make_shared<rapidjson::Document>(&allocator), .id = std::move(id)};
         rapidjson::Value value;
