@@ -2522,11 +2522,11 @@ Handle ServerConnection::undoReplaceDevice(
 }
 
 Handle ServerConnection::recordedTimePeriods(
-    const QnChunksRequestData& request,
+    const QnChunksRequestData& requestData,
     Result<MultiServerPeriodDataList>::type&& callback,
     QThread* targetThread)
 {
-    QnChunksRequestData fixedFormatRequest(request);
+    QnChunksRequestData fixedFormatRequest(requestData);
     fixedFormatRequest.format = Qn::SerializationFormat::compressedPeriods;
     auto internalCallback =
         [callback=std::move(callback)](
@@ -2543,8 +2543,16 @@ Handle ServerConnection::recordedTimePeriods(
             }
             callback(false, requestId, {});
         };
-    return executeGet("/ec2/recordedTimePeriods", fixedFormatRequest.toParams(), internalCallback,
-        targetThread);
+
+    auto request = prepareRequest(nx::network::http::Method::get,
+        prepareUrl("/ec2/recordedTimePeriods", fixedFormatRequest.toParams()));
+    request.priority = nx::network::http::ClientPool::Request::Priority::high;
+    const auto handle = request.isValid()
+        ? this->executeRequest(request, std::move(internalCallback), targetThread)
+        : Handle{};
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
 }
 
 Handle ServerConnection::getExtendedPluginInformation(
