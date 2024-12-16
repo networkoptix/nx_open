@@ -63,7 +63,6 @@ QnMaskedProxyWidget* makeMaskedProxy(
     const auto result = new QnMaskedProxyWidget(parentItem);
     result->setWidget(source);
     result->setAcceptDrops(false);
-    result->setCacheMode(QGraphicsItem::NoCache);
 
     if (transparent)
         makeTransparentForMouse(result);
