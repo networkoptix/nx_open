@@ -11,6 +11,9 @@
 
 #include <QtCore/QMarginsF>
 #include <QtCore/QPointer>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtQml/QtQml>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QWidget>
@@ -89,24 +92,6 @@ EmbeddedPopup::EmbeddedPopup(QObject* parent):
     d->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     d->quickWidget->setAttribute(Qt::WA_TransparentForMouseEvents);
     d->quickWidget->setVisible(d->visible);
-
-    d->geometry = d->quickWidget->geometry();
-
-    // Resizing QQuickWidget internal framebuffer sometimes causes an issue with Intel Xe drivers
-    // (the whole windows becomes black and stops updating). Resizing at specific point - just
-    // after the frame is submitted - seems to mitigate this issue.
-    connect(d->quickWidget->quickWindow(), &QQuickWindow::afterFrameEnd, this,
-        [this]()
-        {
-            if (!NX_ASSERT(qApp->thread() == QThread::currentThread()))
-                return;
-
-            const auto requiredSize = d->geometry.toAlignedRect().size();
-
-            if (d->quickWidget->size() != requiredSize)
-                d->quickWidget->resize(requiredSize);
-        },
-        Qt::DirectConnection);
 }
 
 EmbeddedPopup::~EmbeddedPopup()
@@ -497,19 +482,32 @@ void EmbeddedPopup::Private::updateGeometry()
         {
             if (!quickWidget || !quickWidget->parentWidget())
                 return;
-            const auto offset = quickWidget->parentWidget()->mapToGlobal(QPoint{0, 0});
-            const auto aligned = windowGeometry.toAlignedRect().translated(-offset);
 
-            quickWidget->move(aligned.topLeft());
+            const auto offset = quickWidget->parentWidget()->mapToGlobal(QPoint{ 0, 0 });
+            const auto newGeometry = windowGeometry.toAlignedRect().translated(-offset);
 
-            if (quickWidget->size() == aligned.size())
+            if (newGeometry == quickWidget->geometry())
                 return;
 
-            // When resizing on QQuickWindow::afterFrameEnd (see above) the QQuickWidget does not
-            // update its internal framebuffer size when exposed for the first time.
-            // Sending a resize event fixes that.
-            QResizeEvent resizeEvent(aligned.size(), quickWidget->size());
-            QCoreApplication::sendEvent(quickWidget.get(), &resizeEvent);
+            const auto mainWindow = qobject_cast<MainWindow*>(viewport);
+            const auto glViewport = qobject_cast<QOpenGLWidget*>(mainWindow->viewport());
+
+            if (glViewport && glViewport->context())
+            {
+                // There is a long-term bug with Qt and Intel Graphics drivers: when QQuickWidget
+                // and QOpenGLWidget exist in the same window, sometimes QQuickWidget's FBO resize
+                // (in its own GL context) and read (in QOpenGLWidget's context) are not properly
+                // synchronized and cause the application to freeze or crash. This workaround
+                // ensures that before EmbeddedPopup's FBO is resized a potential read from its
+                // texture in the main window context is finished.
+
+                const auto gl = glViewport->context()->functions();
+                glViewport->makeCurrent();
+                gl->glFlush();
+                gl->glFinish();
+            }
+
+            quickWidget->setGeometry(newGeometry);
         },
         q);
 }
