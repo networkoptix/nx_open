@@ -68,12 +68,14 @@ ObjectLookupField::ObjectLookupField(
         this,
         [this](const nx::vms::api::LookupListData& data)
         {
-            if (m_checkType != ObjectLookupCheckType::hasAttributes)
-            {
-                if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == data.id)
-                    m_listOrMatcher.reset();
-            }
+            onListChanged(data.id);
         });
+
+    connect(
+        connection->lookupListNotificationManager().get(),
+        &ec2::AbstractLookupListNotificationManager::removed,
+        this,
+        &ObjectLookupField::onListChanged);
 }
 
 QString ObjectLookupField::value() const
@@ -142,6 +144,15 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
     const auto& lookupListData = std::any_cast<api::LookupListData&>(m_listOrMatcher);
     const auto hasEntry = checkForListEntries(lookupListData, attributes);
     return m_checkType == ObjectLookupCheckType::inList ? hasEntry : !hasEntry;
+}
+
+void ObjectLookupField::onListChanged(Uuid id)
+{
+    if (m_checkType != ObjectLookupCheckType::hasAttributes)
+    {
+        if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == id)
+            m_listOrMatcher.reset();
+    }
 }
 
 QJsonObject ObjectLookupField::openApiDescriptor(const QVariantMap&)

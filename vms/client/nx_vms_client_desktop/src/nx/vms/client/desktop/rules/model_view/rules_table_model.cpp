@@ -21,6 +21,7 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/target_device_field.h>
@@ -32,9 +33,11 @@
 #include <nx/vms/rules/action_builder_fields/text_field.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_fields/object_lookup_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>
 #include <nx/vms/rules/event_filter_fields/source_user_field.h>
+#include <nx/vms/rules/event_filter_fields/text_lookup_field.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/action.h>
@@ -67,6 +70,21 @@ bool isRuleValid(const vms::rules::ConstRulePtr& rule)
     return rule->isCompatible()
         && vms::rules::utils::visibleFieldsValidity(
             rule.get(), appContext()->currentSystemContext()).isValid();
+}
+
+bool hasLookupList(const vms::rules::ItemDescriptor& eventDescriptor)
+{
+    static const auto kTextLookupFieldId = vms::rules::fieldMetatype<vms::rules::TextLookupField>();
+    static const auto kObjectLookupFieldId =
+        vms::rules::fieldMetatype<vms::rules::ObjectLookupField>();
+
+    return std::ranges::any_of(
+        eventDescriptor.fields,
+        [](const vms::rules::FieldDescriptor& fieldDescriptor)
+        {
+            return fieldDescriptor.id == kTextLookupFieldId
+                || fieldDescriptor.id == kObjectLookupFieldId;
+        });
 }
 
 constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow";
@@ -109,6 +127,13 @@ RulesTableModel::RulesTableModel(QObject* parent):
         &core::AccessController::permissionsMaybeChanged,
         this,
         &RulesTableModel::onPermissionsChanged);
+
+    const auto lookupListManager = appContext()->currentSystemContext()->lookupListManager();
+    connect(
+        lookupListManager,
+        &common::LookupListManager::removed,
+        this,
+        &RulesTableModel::onLookupListRemoved);
 }
 
 void RulesTableModel::onRuleAddedOrUpdated(nx::Uuid ruleId, bool added)
@@ -198,6 +223,32 @@ void RulesTableModel::onPermissionsChanged(const QnResourceList& resources)
             if (hasAnyOf(row, resourceIds))
                 emit dataChanged(createIndex(row, StateColumn), createIndex(row, TargetColumn));
         }
+    }
+}
+
+void RulesTableModel::onLookupListRemoved(nx::Uuid id)
+{
+    for (int row = 0; row < rowCount({}); ++row)
+    {
+        const auto rule = m_engine->rule(m_ruleIds[row]);
+        const auto eventFilter = rule->eventFilters().first();
+        const auto eventDescriptor = m_engine->eventDescriptor(eventFilter->eventType());
+
+        if (!hasLookupList(eventDescriptor.value()))
+            continue;
+
+        const auto predicate = [id](auto field) { return Uuid{field->value()} == id; };
+
+        const auto objectLookupFields = eventFilter->fieldsByType<vms::rules::ObjectLookupField>();
+        if (std::ranges::any_of(objectLookupFields, predicate))
+        {
+            emit dataChanged(createIndex(row, StateColumn), createIndex(row, StateColumn));
+            return;
+        }
+
+        const auto textLookupFields = eventFilter->fieldsByType<vms::rules::TextLookupField>();
+        if (std::ranges::any_of(textLookupFields.begin(), textLookupFields.end(), predicate))
+            emit dataChanged(createIndex(row, StateColumn), createIndex(row, StateColumn));
     }
 }
 

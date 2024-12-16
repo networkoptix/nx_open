@@ -72,6 +72,7 @@ private:
     void onRulesReset();
     void onResourcePoolChanged(const QnResourceList& resources);
     void onPermissionsChanged(const QnResourceList& resources);
+    void onLookupListRemoved(nx::Uuid id);
 
     void initialise();
     bool isIndexValid(const QModelIndex& index) const;

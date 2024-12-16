@@ -25,6 +25,16 @@ namespace nx::vms::client::desktop::rules {
 
 using LookupCheckType = vms::rules::ObjectLookupCheckType;
 
+namespace {
+
+bool isListCheck(LookupCheckType l, LookupCheckType r)
+{
+    return (l == LookupCheckType::inList || l == LookupCheckType::notInList)
+        && (r == LookupCheckType::inList || r == LookupCheckType::notInList);
+}
+
+} // namespace
+
 ObjectLookupPicker::ObjectLookupPicker(
     vms::rules::ObjectLookupField* field,
     SystemContext* context,
@@ -124,8 +134,12 @@ ObjectLookupPicker::ObjectLookupPicker(
         this,
         [this]
         {
-            m_field->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
-            m_field->setValue({});
+            const auto oldCheckType = m_field->checkType();
+            const auto newCheckType = m_checkTypeComboBox->currentData().value<LookupCheckType>();
+
+            m_field->setCheckType(newCheckType);
+            if (!isListCheck(oldCheckType, newCheckType))
+                m_field->setValue({});
 
             setEdited();
         });

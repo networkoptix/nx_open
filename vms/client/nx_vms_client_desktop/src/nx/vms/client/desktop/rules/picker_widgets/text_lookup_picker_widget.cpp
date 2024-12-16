@@ -24,6 +24,16 @@ namespace nx::vms::client::desktop::rules {
 
 using LookupCheckType = vms::rules::TextLookupCheckType;
 
+namespace {
+
+bool isListCheck(LookupCheckType l, LookupCheckType r)
+{
+    return (l == LookupCheckType::inList || l == LookupCheckType::notInList)
+        && (r == LookupCheckType::inList || r == LookupCheckType::notInList);
+}
+
+} // namespace
+
 TextLookupPicker::TextLookupPicker(
     vms::rules::TextLookupField* field,
     SystemContext* context,
@@ -128,7 +138,12 @@ TextLookupPicker::TextLookupPicker(
         this,
         [this]
         {
-            m_field->setCheckType(m_checkTypeComboBox->currentData().value<LookupCheckType>());
+            const auto oldCheckType = m_field->checkType();
+            const auto newCheckType = m_checkTypeComboBox->currentData().value<LookupCheckType>();
+
+            m_field->setCheckType(newCheckType);
+            if (!isListCheck(oldCheckType, newCheckType))
+                m_field->setValue({});
 
             setEdited();
         });
@@ -187,9 +202,6 @@ void TextLookupPicker::updateUi()
             return;
         case LookupCheckType::inList:
         case LookupCheckType::notInList:
-            if (!nx::Uuid::isUuidString(m_field->value()))
-                m_field->setValue({});
-
             const auto matches = m_lookupListComboBox->model()->match(
                 m_lookupListComboBox->model()->index(0, 0),
                 LookupListsModel::LookupListIdRole,

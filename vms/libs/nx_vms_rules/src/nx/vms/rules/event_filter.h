@@ -59,13 +59,28 @@ public:
     template<class T>
     const T* fieldByType() const
     {
-        return fieldByTypeImpl<T>();
+        const auto result = fieldsByTypeImpl<T>(/*stopOnFirstHit*/ true);
+        return result.empty() ? nullptr : result.front();
     }
 
     template<class T>
     T* fieldByType()
     {
-        return fieldByTypeImpl<T>();
+        const auto result = fieldsByTypeImpl<T>(/*stopOnFirstHit*/ true);
+        return result.empty() ? nullptr : result.front();
+    }
+
+    template<class T>
+    std::vector<const T*> fieldsByType() const
+    {
+        auto fields = fieldsByTypeImpl<T>(/*stopOnFirstHit*/ false);
+        return std::vector<const T*>(fields.begin(), fields.end());
+    }
+
+    template<class T>
+    std::vector<T*> fieldsByType()
+    {
+        return fieldsByTypeImpl<T>(/*stopOnFirstHit*/ false);
     }
 
 signals:
@@ -83,17 +98,26 @@ private:
         return (it == m_fields.end()) ? nullptr : dynamic_cast<T*>(it->second.get());
     }
 
-    /** Returns first field with the given type T. */
+    /**
+     * Returns fields with the given type T. If stopOnFirstHit is set, returns only
+     * the first matched field.
+     */
     template<class T>
-    T* fieldByTypeImpl() const
+    std::vector<T*> fieldsByTypeImpl(bool stopOnFirstHit) const
     {
+        std::vector<T*> result;
         for (const auto& [_, field]: m_fields)
         {
             if (auto targetField = dynamic_cast<T*>(field.get()))
-                return targetField;
+            {
+                result.push_back(targetField);
+
+                if (stopOnFirstHit)
+                    break;
+            }
         }
 
-        return {};
+        return result;
     }
 
     nx::Uuid m_id;

@@ -46,6 +46,8 @@ private:
     QString m_value;
     ObjectLookupCheckType m_checkType{ObjectLookupCheckType::hasAttributes};
     mutable std::any m_listOrMatcher;
+
+    void onListChanged(Uuid id);
 };
 
 } // namespace nx::vms::rules

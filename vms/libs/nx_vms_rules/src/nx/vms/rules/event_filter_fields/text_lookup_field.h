@@ -44,6 +44,8 @@ private:
     QString m_value;
     TextLookupCheckType m_checkType{TextLookupCheckType::containsKeywords};
     mutable std::optional<QStringList> m_list;
+
+    void onLookupListChanged(Uuid id);
 };
 
 } // namespace nx::vms::rules

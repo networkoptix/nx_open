@@ -33,13 +33,14 @@ TextLookupField::TextLookupField(
         this,
         [this](const nx::vms::api::LookupListData& data)
         {
-            if (m_checkType == TextLookupCheckType::inList
-                || m_checkType == TextLookupCheckType::notInList)
-            {
-                if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == data.id)
-                    m_list.reset();
-            }
+            onLookupListChanged(data.id);
         });
+
+    connect(
+        connection->lookupListNotificationManager().get(),
+        &ec2::AbstractLookupListNotificationManager::removed,
+        this,
+        &TextLookupField::onLookupListChanged);
 }
 
 QString TextLookupField::value() const
@@ -111,6 +112,15 @@ bool TextLookupField::match(const QVariant& eventValue) const
     }
 
     return {};
+}
+
+void TextLookupField::onLookupListChanged(Uuid id)
+{
+    if (m_checkType == TextLookupCheckType::inList || m_checkType == TextLookupCheckType::notInList)
+    {
+        if (NX_ASSERT(nx::Uuid::isUuidString(m_value)) && nx::Uuid{m_value} == id)
+            m_list.reset();
+    }
 }
 
 QJsonObject TextLookupField::openApiDescriptor(const QVariantMap&)
