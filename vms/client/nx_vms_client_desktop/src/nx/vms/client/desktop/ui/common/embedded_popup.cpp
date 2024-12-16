@@ -11,9 +11,12 @@
 
 #include <QtCore/QMarginsF>
 #include <QtCore/QPointer>
-#include <QtWidgets/QWidget>
-#include <QtQuickWidgets/QQuickWidget>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtQml/QtQml>
+#include <QtQuickWidgets/QQuickWidget>
+#include <QtWidgets/QWidget>
 
 #include <client_core/client_core_module.h>
 #include <nx/utils/log/assert.h>
@@ -480,8 +483,32 @@ void EmbeddedPopup::Private::updateGeometry()
         {
             if (!quickWidget || !quickWidget->parentWidget())
                 return;
+
             const auto offset = quickWidget->parentWidget()->mapToGlobal(QPoint{0, 0});
-            quickWidget->setGeometry(windowGeometry.toAlignedRect().translated(-offset));
+            const auto newGeometry = windowGeometry.toAlignedRect().translated(-offset);
+
+            if (newGeometry == quickWidget->geometry())
+                return;
+
+            const auto mainWindow = qobject_cast<MainWindow*>(viewport);
+            const auto glViewport = qobject_cast<QOpenGLWidget*>(mainWindow->viewport());
+
+            if (glViewport && glViewport->context())
+            {
+                // There is a long-term bug with Qt and Intel Graphics drivers: when QQuickWidget
+                // and QOpenGLWidget exist in the same window, sometimes QQuickWidget's FBO resize
+                // (in its own GL context) and read (in QOpenGLWidget's context) are not properly
+                // synchronized and cause the application to freeze or crash. This workaround
+                // ensures that before EmbeddedPopup's FBO is resized a potential read from its
+                // texture in the main window context is finished.
+
+                const auto gl = glViewport->context()->functions();
+                glViewport->makeCurrent();
+                gl->glFlush();
+                gl->glFinish();
+            }
+
+            quickWidget->setGeometry(newGeometry);
         },
         q);
 }
