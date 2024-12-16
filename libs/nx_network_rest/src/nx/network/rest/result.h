@@ -37,6 +37,7 @@ NX_REFLECTION_ENUM_CLASS(ErrorId,
 
 /**%apidoc JSON object including the error status.
  * %param:string error Numeric string representation of `errorId`.
+ *     %deprecated Use `errorId` instead.
  *     %value "0" ok
  *     %value "1" missingParameter
  *     %value "2" invalidParameter
@@ -56,7 +57,6 @@ NX_REFLECTION_ENUM_CLASS(ErrorId,
  *     %value "16" gone
  *     %value "17" notAllowed
  *     %value "18" serviceUnauthorized
- *     %deprecated Use `errorId` instead.
  *
  * %// The typical apidoc comment for the result of a function looks like (without `//`):
  * %//return
