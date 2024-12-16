@@ -26,6 +26,12 @@ public:
      */
     struct NX_VMS_COMMON_API Request
     {
+        enum class Priority
+        {
+            normal,
+            high
+        };
+
         Request():
             authType(nx::network::http::AuthType::authBasicAndDigest)
         {
@@ -43,6 +49,7 @@ public:
         nx::String messageBody;
         nx::network::http::AuthType authType;
         std::optional<nx::network::http::Credentials> credentials;
+        Priority priority = Priority::normal;
 
         /** Server id if request is being proxied through another server. */
         std::optional<nx::Uuid> gatewayId;
