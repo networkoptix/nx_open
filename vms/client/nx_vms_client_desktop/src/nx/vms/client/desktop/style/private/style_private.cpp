@@ -36,10 +36,12 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight4Theme = {
     {QIcon::Normal, {.primary = "light4"}},
+    {QIcon::Disabled, {.primary = "dark17"}}
 };
 
 const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight10Theme = {
     {QIcon::Normal, {.primary = "light10"}},
+    {QIcon::Disabled, {.primary = "dark17"}}
 };
 
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon, "20x20/Outline/arrow_down.svg", kIconSubstitutions)
@@ -275,15 +277,19 @@ void StylePrivate::drawCheckBox(
 {
     Q_UNUSED(widget)
 
-    const int size = Metrics::kCheckIndicatorSize - 5;
-    QRect rect = Geometry::aligned(QSize(size, size), option->rect, Qt::AlignCenter);
+    const auto iconMode = option->state.testFlag(QStyle::State_Enabled)
+        ? QIcon::Normal
+        : QIcon::Disabled;
+
+    const auto iconSize = QSize(12, 12);
+    const auto rect = Geometry::aligned(iconSize, option->rect, Qt::AlignCenter);
 
     if (option->state.testFlag(QStyle::State_On))
-        painter->drawPixmap(rect, qnSkin->icon(kCheckedIcon).pixmap(12, 12));
+        painter->drawPixmap(rect, qnSkin->icon(kCheckedIcon).pixmap(iconSize, iconMode));
     else if (option->state.testFlag(QStyle::State_NoChange))
-        painter->drawPixmap(rect, qnSkin->icon(kPartiallyCheckedIcon).pixmap(12, 12));
+        painter->drawPixmap(rect, qnSkin->icon(kPartiallyCheckedIcon).pixmap(iconSize, iconMode));
     else
-        painter->drawPixmap(rect, qnSkin->icon(kUncheckedIcon).pixmap(12, 12));
+        painter->drawPixmap(rect, qnSkin->icon(kUncheckedIcon).pixmap(iconSize, iconMode));
 }
 
 void StylePrivate::drawRadioButton(
