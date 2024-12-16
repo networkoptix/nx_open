@@ -299,7 +299,8 @@ struct ClientPool::Private
         {
             HttpConnection* connection = itr->second.get();
             if (connection->getHandle() == kInvalidHandle
-                && connection->idleTimeout.hasExpired(kHttpDisconnectTimeout))
+                && (connection->idleTimeout.hasExpired(kHttpDisconnectTimeout)
+                    || connectionPool.size() > maxPoolSize))
             {
                 connection->client->post(
                     [connection = std::move(itr->second)]() mutable
@@ -347,12 +348,12 @@ struct ClientPool::Private
         stoppedClients.clear();
     }
 
-    HttpConnection* getUnusedConnection(const nx::utils::Url& url)
+    HttpConnection* getUnusedConnection(const ContextPtr& context)
     {
         cleanupDisconnectedUnsafe();
 
         HttpConnection* result = nullptr;
-        const auto requestAddress = AsyncClient::endpointWithProtocol(url);
+        const auto requestAddress = AsyncClient::endpointWithProtocol(context->getUrl());
 
         auto range = connectionPool.equal_range(requestAddress.c_str());
         int count = 0;
@@ -366,11 +367,14 @@ struct ClientPool::Private
                 {
                     result = itr->second.get();
                     connection->idleTimeout.restart();
+                    return result;
                 }
             }
         }
 
-        if (!result && count < maxPoolSize)
+        /** Allow to insert in the pool another maxPoolSize of requests with high priority. */
+        if (count < maxPoolSize
+            || (context->request.priority == Request::Priority::high && count < maxPoolSize * 2))
         {
             NX_VERBOSE(this, "getUnusedConnection(%1) - creating new connection");
             result = new HttpConnection();
@@ -420,8 +424,7 @@ struct ClientPool::Private
         for (auto itr = awaitingRequests.begin(); itr != awaitingRequests.end();)
         {
             ContextPtr context = itr->second;
-            auto url = context->getUrl();
-            if (auto connection = getUnusedConnection(url))
+            if (auto connection = getUnusedConnection(context))
             {
                 setAdapterFuncToConnection(connection,
                     context->adapterFuncId, context->adapterFunc);
