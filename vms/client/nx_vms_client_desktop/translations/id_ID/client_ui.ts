@@ -1976,9 +1976,9 @@
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
+      <translation>
+              Masukkan alamat, rentang subnet atau subnet mask, login dan kata sandi
+              dan klik tombol &quot;Cari&quot;
           </translation>
     </message>
   </context>
@@ -2051,7 +2051,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Tertanda</translation>
     </message>
   </context>
   <context>
@@ -2150,7 +2150,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notifikasi Site</translation>
     </message>
   </context>
   <context>
@@ -2317,14 +2317,14 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>Menghapus opsi koneksi ini dapat mengakibatkan kegagalan fungsi Site.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administrasi Site</translation>
     </message>
   </context>
   <context>
@@ -2519,7 +2519,7 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>Batas pelanggaran organisasi&apos;</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2652,7 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>Redaksi Video</translation>
     </message>
     <message>
       <source>Configure...</source>
@@ -2660,19 +2660,19 @@
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>Blur</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>Kecualikan Kamera</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>Terapkan durasi sesi ke user Cloud</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>Alat Akses Remote</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2684,7 +2684,7 @@
     </message>
     <message>
       <source>Power users</source>
-      <translation type="unfinished">Power users</translation>
+      <translation>Power user</translation>
     </message>
   </context>
   <context>
@@ -2764,11 +2764,11 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>Akses Remote</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>Aktifkan decoding hardware</translation>
     </message>
   </context>
   <context>
@@ -3104,11 +3104,11 @@
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>Setiap</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>Buka paksa di window khusus</translation>
     </message>
   </context>
   <context>

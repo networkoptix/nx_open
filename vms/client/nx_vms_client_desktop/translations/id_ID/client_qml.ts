@@ -1741,7 +1741,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Kode pairing integrasi</translation>
     </message>
   </context>
   <context>
@@ -1833,15 +1833,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Izin grup diperlukan</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Lihat Izin</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Sembunyikan Izin</translation>
     </message>
   </context>
   <context>
@@ -1879,11 +1879,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Pilih Objek</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Semua Objek</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1974,14 +1974,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filter berdasarkan</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Pilih atribut</translation>
     </message>
   </context>
   <context>
@@ -2114,11 +2114,11 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Server tidak dikonfigurasi untuk fitur remote</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Alat akses remote saat ini dinonaktifkan. Harap aktifkan atau hubungi administrator Anda untuk mengaktifkannya.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2130,15 +2130,15 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Koneksikan aplikasi klien %1 ke localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Port lokal</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Terjadi error</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2150,7 +2150,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Akses remote tidak tersedia</translation>
     </message>
   </context>
   <context>
@@ -2361,19 +2361,19 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Site telah disuspensi. Untuk mengaktifkan/menonaktifkan penggunaan integrasi pada perangkat saat ini, Site harus dalam keadaan aktif. Hubungi channel partner Anda untuk mengetahui detailnya</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Site telah disuspensi. Untuk mengaktifkan/menonaktifkan penggunaan integrasi untuk beberapa perangkat, Site harus dalam keadaan aktif. Hubungi channel partner Anda untuk keterangan lebih lanjut</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Site telah ditutup. Untuk mengaktifkan penggunaan integrasi ini pada perangkat saat ini, Site harus dalam keadaan aktif. Hubungi channel partner Anda untuk keterangan lebih lanjut</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Site telah ditutup. Untuk mengaktifkan penggunaan integrasi ini pada beberapa perangkat, Site harus dalam keadaan aktif. Hubungi channel partner Anda untuk keterangan lebih lanjut</translation>
     </message>
   </context>
   <context>
@@ -2456,7 +2456,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Terima permintaan pendaftaran Integrasi API</translation>
     </message>
   </context>
   <context>
@@ -2652,19 +2652,19 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Tidak Ada Site Favorit</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Tidak Ada Site Tersembunyi</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Anda dapat menambahkan site ke favorit dari menu konteks</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Anda dapat menyembunyikan site dari daftar utama dari menu konteks</translation>
     </message>
   </context>
   <context>
@@ -2825,11 +2825,11 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Site yang ditambahkan akan segera terlihat oleh user yang memiliki akun cloud, sementara user yang tidak memiliki akun cloud akan menerima petunjuk melalui Email.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Bahasa Notifikasi</translation>
     </message>
   </context>
   <context>
@@ -2969,11 +2969,11 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Bahasa Notifikasi</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Bahasa Antarmuka</translation>
     </message>
   </context>
   <context>
@@ -3023,7 +3023,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 dipilih:</translation>
     </message>
     <message>
       <source>Schedule</source>
