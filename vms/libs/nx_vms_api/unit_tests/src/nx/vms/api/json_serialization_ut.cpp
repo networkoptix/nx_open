@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/rest/result.h>
+#include <nx/network/rest/json_reflect_result.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/audit.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
@@ -72,36 +72,37 @@ TEST(Json, AuditRecord)
 {
     AuditRecord record{{{nx::Uuid{}}}};
     record.details = ResourceDetails{{{nx::Uuid()}}, {"detailed description"}};
-    AuditRecordList outputData{record};
-    nx::network::rest::JsonResult result;
-    result.setReply(outputData);
+    nx::network::rest::JsonReflectResult<AuditRecordList> result;
+    result.errorId = nx::network::rest::ErrorId::unauthorized;
+    result.reply.push_back(record);
     const std::string expected = /*suppress newline*/ 1 + R"json(
 {
-    "error": "0",
-    "errorId": "ok",
+    "errorId": "unauthorized",
     "errorString": "",
+    "error": "12",
     "reply": [
         {
+            "serverId": "{00000000-0000-0000-0000-000000000000}",
+            "eventType": "notDefined",
+            "createdTimeS": 0,
             "authSession": {
                 "id": "{00000000-0000-0000-0000-000000000000}",
-                "userAgent": "",
+                "userName": "",
                 "userHost": "",
-                "userName": ""
+                "userAgent": ""
             },
-            "createdTimeS": "0",
             "details": {
-                "description": "detailed description",
                 "ids": [
                     "{00000000-0000-0000-0000-000000000000}"
-                ]
-            },
-            "eventType": "notDefined",
-            "serverId": "{00000000-0000-0000-0000-000000000000}"
+                ],
+                "description": "detailed description"
+            }
         }
     ]
 })json";
     ASSERT_EQ(
-        expected, nx::utils::formatJsonString(QJson::serialized(result)).toStdString());
+        expected,
+        nx::utils::formatJsonString(nx::reflect::json::serialize(result)).toStdString());
 }
 
 } // namespace test
