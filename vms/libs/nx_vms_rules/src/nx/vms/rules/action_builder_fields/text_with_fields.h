@@ -36,7 +36,8 @@ struct TextWithFieldsFieldProperties
 
         result.base = FieldProperties::fromVariantMap(properties);
         result.validationPolicy = properties.value("validationPolicy").toString();
-        result.highlightErrors = properties.value("highlightErrors").toBool();
+        result.highlightErrors =
+            properties.value("highlightErrors", result.highlightErrors).toBool();
 
         return result;
     }
