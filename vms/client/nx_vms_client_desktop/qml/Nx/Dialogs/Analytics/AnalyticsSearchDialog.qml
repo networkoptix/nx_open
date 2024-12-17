@@ -373,6 +373,10 @@ Window
                         ? "image://skin/20x20/Outline/table_view.svg"
                         : "image://skin/20x20/Outline/card_view.svg"
                     borderColor: ColorTheme.button
+
+                    GlobalToolTip.text: checked
+                        ? qsTr("Switch to table view")
+                        : qsTr("Switch to card view")
                 }
             }
 
