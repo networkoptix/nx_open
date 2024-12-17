@@ -2,6 +2,7 @@
 
 #include "camera_settings_dialog_state_reducer.h"
 
+#include <algorithm>
 #include <chrono>
 #include <limits>
 
@@ -588,10 +589,21 @@ State fixupRecordingBrush(State state)
     return state;
 }
 
+/**
+ * Utility function to filter only those entities, which are supported by the provided engines.
+ */
+std::map<nx::Uuid, std::set<QString>> filterByEngineIds(
+    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const QSet<nx::Uuid>& engineIds)
+{
+    std::erase_if(entitiesByEngine,
+        [&engineIds](const auto& i) { return !engineIds.contains(i.first); });
+    return entitiesByEngine;
+}
+
 /** Calculate if camera support object detection concerning planning changes on engines tab. */
 CombinedValue calculateSingleCameraObjectDetectionSupport(const State& state)
 {
-    const bool hasObjects = !QnVirtualCameraResource::filterByEngineIds(
+    const bool hasObjects = !filterByEngineIds(
         state.singleCameraProperties.supportedAnalyicsObjectTypes,
         state.analytics.enabledEngines()).empty();
     return hasObjects

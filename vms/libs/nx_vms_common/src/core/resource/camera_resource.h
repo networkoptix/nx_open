@@ -14,11 +14,11 @@
 #include <core/ptz/ptz_constants.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/lockable.h>
+#include <nx/utils/mac_address.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/utils/value_cache.h>
@@ -34,19 +34,16 @@
 #include <recording/time_period_list.h>
 #include <utils/common/aspect_ratio.h>
 
+class QAuthenticator;
 class QnAbstractArchiveDelegate;
 class QnResourceData;
 class QnMotionRegion;
 
-namespace nx::vms::rules { struct NetworkIssueInfo; }
 namespace nx::core::resource { class AbstractRemoteArchiveManager; }
 namespace nx::media { enum class StreamEvent; }
 namespace nx::core::ptz { enum class PresetType; }
 
-class CameraBitrates;
-class CameraBitrateInfo;
-
-class NX_VMS_COMMON_API QnVirtualCameraResource: public QnNetworkResource
+class NX_VMS_COMMON_API QnVirtualCameraResource: public QnMediaResource
 {
     Q_OBJECT
     Q_FLAGS(Ptz::Capabilities)
@@ -54,7 +51,7 @@ class NX_VMS_COMMON_API QnVirtualCameraResource: public QnNetworkResource
         READ getCameraCapabilities WRITE setCameraCapabilities)
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities
         READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
-    using base_type = QnNetworkResource;
+    using base_type = QnMediaResource;
 
 public:
     static constexpr int kDefaultMaxFps = 15;
@@ -123,7 +120,7 @@ public:
      * Helper function to check if the Device status is "online" or "recording". Must not be used
      * anywhere else.
      */
-    virtual bool isOnline() const { return isOnline(getStatus()); }
+    virtual bool isOnline() const override { return isOnline(getStatus()); }
 
     /**
      * Helper function to check if the Device status is "online" or "recording". Must not be used
@@ -137,6 +134,74 @@ public:
 
     virtual QString getProperty(const QString& key) const override;
 
+    virtual void setUrl(const QString& url) override;
+
+    virtual QString getHostAddress() const;
+    virtual void setHostAddress(const QString &ip);
+
+    nx::utils::MacAddress getMAC() const;
+    void setMAC(const nx::utils::MacAddress &mac);
+
+    virtual QString getPhysicalId() const;
+    void setPhysicalId(const QString& physicalId);
+
+    void setAuth(const QString &user, const QString &password);
+    void setAuth(const QAuthenticator &auth);
+
+    void setDefaultAuth(const QString &user, const QString &password);
+    void setDefaultAuth(const QAuthenticator &auth);
+
+    /**
+     * Parse user and password from the colon-delimited string.
+     */
+    static QAuthenticator parseAuth(const QString& value);
+
+    QAuthenticator getAuth() const;
+    QAuthenticator getDefaultAuth() const;
+
+    virtual int httpPort() const;
+    virtual void setHttpPort(int newPort);
+
+    /* By default, it is rtsp port (554). */
+    virtual int mediaPort() const;
+    void setMediaPort(int value);
+
+    // This value is updated by discovery process.
+    QDateTime getLastDiscoveredTime() const;
+    void setLastDiscoveredTime(const QDateTime &time);
+
+    // All data readers and any sockets will use this number as timeout value in ms.
+    void setNetworkTimeout(unsigned int timeout);
+    virtual unsigned int getNetworkTimeout() const;
+
+    // In some cases it is necessary to update only a couple of field from just discovered resource.
+    virtual bool mergeResourcesIfNeeded(const QnVirtualCameraResourcePtr& source);
+
+    virtual int getChannel() const;
+
+    /**
+     * Returns true if camera is accessible
+     * Default implementation just establishes connection to \a getHostAddress() : \a httpPort()
+     * TODO: #akolesnikov This method is used in diagnostics only. Throw it away and use \a
+     *     QnVirtualCameraResource::checkIfOnlineAsync instead.
+     */
+    virtual bool ping();
+
+    /**
+     * Checks if camera is online
+     * \param completionHandler Invoked on check completion. Check result is passed to the functor
+     * \return true if async operation has been started. false otherwise
+     * \note Implementation MUST check not only camera address:port accessibility, but also check
+     * some unique parameters of camera
+     * \note Default implementation returns false
+     */
+    virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler);
+
+    static nx::Uuid physicalIdToId(const QString& uniqId);
+
+    virtual QString idForToStringFromPtr() const override;
+
+    static QString mediaPortKey();
     bool isAudioSupported() const;
     bool isIOModule() const;
     int motionWindowCount() const;
@@ -209,9 +274,7 @@ public:
     virtual MotionStreamIndex motionStreamIndex() const;
     MotionStreamIndex motionStreamIndexInternal() const;
 
-    /**
-     * Enable forced motion detection on a selected stream or switch to automatic mode.
-     */
+    /** Enable forced motion detection on a selected stream or switch to automatic mode. */
     void setMotionStreamIndex(MotionStreamIndex value);
 
     /**
@@ -291,19 +354,20 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
-    //!Returns user-defined camera name (if not empty), default name otherwise
+    // Returns user-defined camera name (if not empty), default name otherwise
     QString getUserDefinedName() const;
 
-    //!Returns user-defined group name (if not empty) or default group name
+    // Returns user-defined group name (if not empty) or default group name
     virtual QString getUserDefinedGroupName() const;
-    //!Returns default group name
+    // Returns default group name
     QString getDefaultGroupName() const;
     virtual void setDefaultGroupName(const QString& value);
-    //!Set group name (the one is show to the user in client)
-    /*!
-        This name is set by user.
-        \a setDefaultGroupName name is generally set automatically (e.g., by server)
-    */
+
+    /**
+     * Set group name (the one is show to the user in client)
+     * This name is set by user.
+     * \a setDefaultGroupName name is generally set automatically (e.g., by server)
+     */
     void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
@@ -330,9 +394,7 @@ public:
      */
     bool isAudioRequired() const;
 
-    /**
-     * @returns True if the audio should not be disabled
-     */
+    /** @returns True if the audio should not be disabled */
     bool isAudioForced() const;
 
     /**
@@ -348,9 +410,7 @@ public:
      */
     void setAudioEnabled(bool enabled);
 
-    /**
-     * @return ID of device which used as audio input override for the camera.
-     */
+    /** @return ID of device which used as audio input override for the camera. */
     nx::Uuid audioInputDeviceId() const;
 
     /**
@@ -366,19 +426,13 @@ public:
      */
     bool isTwoWayAudioEnabled() const;
 
-    /**
-     * Sets whether audio transmitting should be enabled or disabled.
-     */
+    /** Sets whether audio transmitting should be enabled or disabled. */
     void setTwoWayAudioEnabled(bool value);
 
-    /**
-     * @return ID of device which used as audio output override for the camera.
-     */
+    /** @return ID of device which used as audio output override for the camera. */
     nx::Uuid audioOutputDeviceId() const;
 
-    /**
-     * @return Redirected audio output (if any) or self.
-     */
+    /** @return Redirected audio output (if any) or self. */
     QnVirtualCameraResourcePtr audioOutputDevice() const;
 
     /**
@@ -397,19 +451,13 @@ public:
     /** Get backup qualities, substantiating default value. */
     nx::vms::api::CameraBackupQuality getActualBackupQualities() const;
 
-    /**
-     * @return Whether camera hotspots enabled or not.
-     */
+    /** @return Whether camera hotspots enabled or not. */
     bool cameraHotspotsEnabled() const;
 
-    /**
-     * Sets whether camera hotspots enabled or not.
-     */
+    /** Sets whether camera hotspots enabled or not. */
     void setCameraHotspotsEnabled(bool enabled);
 
-    /**
-     * @return List of camera hotspots description data structures.
-     */
+    /** @return List of camera hotspots description data structures. */
     nx::vms::common::CameraHotspotDataList cameraHotspots() const;
 
     /**
@@ -531,18 +579,18 @@ public:
     void setManualRemoteArchiveSynchronizationTriggered(bool isTriggered = true);
     bool isManualRemoteArchiveSynchronizationTriggered() const;
 
-    /**
-     * If preferred server is not set, assigns current server as preferred.
-     */
+    /** If preferred server is not set, assigns current server as preferred. */
     void updatePreferredServerId();
 
-    //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
-    /*!
-        \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
-            Two time periods lying closer to each other than \a detailLevel usec SHOULD be reported as one
-        \note Used only if \a QnVirtualCameraResource::isDtsBased() is \a true
-        \note Default implementation does nothing
-    */
+    /**
+     * Returns list of time periods of DTS archive, containing motion at specified \a regions with
+     * timestamp in region [\a msStartTime; \a msEndTime)
+     * \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
+     * Two time periods lying closer to each other than \a detailLevel usec SHOULD be reported as
+     * one
+     * \note Used only if \a QnVirtualCameraResource::isDtsBased() is \a true
+     * \note Default implementation does nothing
+     */
     virtual QnTimePeriodList getDtsTimePeriodsByMotionRegion(
         const QList<QRegion>& regions,
         qint64 msStartTime,
@@ -552,9 +600,6 @@ public:
         int limit,
         Qt::SortOrder sortOrder);
 
-    // in some cases I just want to update couple of field from just discovered resource
-    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
-
     /**
      * @param ports Ports data to save into resource property.
      * @param needMerge If true, overrides new ports description with saved state, because it might
@@ -563,9 +608,7 @@ public:
      */
     virtual bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
 
-    /**
-     * @param type Filters ports by type, does not filter if Qn::PT_Unknown.
-     */
+    /** @param type Filters ports by type, does not filter if Qn::PT_Unknown. */
     QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
     bool isIntercom() const;
@@ -579,9 +622,7 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-    /**
-     * Return non zero media event error if camera resource has an issue.
-     */
+    /** Return non zero media event error if camera resource has an issue. */
     nx::media::StreamEvent checkForErrors() const;
 
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
@@ -606,9 +647,7 @@ public:
     virtual bool setCameraCredentialsSync(
         const QAuthenticator& auth, QString* outErrorString = nullptr);
 
-    /**
-     * Returns true if camera credential was auto detected by media server.
-     */
+    /** Returns true if camera credential was auto detected by media server. */
     bool isDefaultAuth() const;
 
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps,
@@ -749,13 +788,6 @@ public:
     using AnalyticsEntitiesByEngine = std::map<nx::Uuid, std::set<QString>>;
 
     /**
-     * Utility function to filter only those entities, which are supported by the provided engines.
-     */
-    static AnalyticsEntitiesByEngine filterByEngineIds(
-        AnalyticsEntitiesByEngine entitiesByEngine,
-        const QSet<nx::Uuid>& engineIds);
-
-    /**
      * @return Map of supported Event types by the Engine id. Only actually compatible with the
      *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
@@ -800,32 +832,24 @@ public:
      */
     bool isMotionDetectionActive() const;
 
-    /**
-     * Checks if schedule task is applicable: recording mode and metadata types are supported.
-     */
+    /** Checks if schedule task is applicable: recording mode and metadata types are supported. */
     static bool canApplyScheduleTask(
         const QnScheduleTask& task,
         bool dualStreamingAllowed,
         bool motionDetectionAllowed,
         bool objectDetectionAllowed);
 
-    /**
-     * Checks if schedule task is applicable: recording mode and metadata types are supported.
-     */
+    /** Checks if schedule task is applicable: recording mode and metadata types are supported. */
     bool canApplyScheduleTask(const QnScheduleTask& task) const;
 
-    /**
-     * Checks if all schedule tasks are applicable.
-     */
+    /** Checks if all schedule tasks are applicable. */
     static bool canApplySchedule(
         const QnScheduleTaskList& schedule,
         bool dualStreamingAllowed,
         bool motionDetectionAllowed,
         bool objectDetectionAllowed);
 
-    /**
-     * Checks if all schedule tasks are applicable.
-     */
+    /** Checks if all schedule tasks are applicable. */
     bool canApplySchedule(const QnScheduleTaskList& schedule) const;
 
     static constexpr QSize kMaximumSecondaryStreamResolution{1024, 768};
@@ -838,22 +862,14 @@ public:
      */
     void setAvailableProfiles(const nx::vms::api::DeviceProfiles& value);
 
-    /**
-     * Get a list of available device profiles.
-     */
+    /** Get a list of available device profiles. */
     nx::vms::api::DeviceProfiles availableProfiles() const;
 
-    /**
-     * Manually setup a profile ID to use.
-     */
+    /** Manually setup a profile ID to use. */
     void setForcedProfile(const QString& id, nx::vms::api::StreamIndex index);
 
-    /**
-     * Read manually configured profile ID to use. Can be empty.
-     */
+    /** Read manually configured profile ID to use. Can be empty. */
     QString forcedProfile(nx::vms::api::StreamIndex index) const;
-
-    static QSet<nx::Uuid> calculateUserEnabledAnalyticsEngines(const QString& value);
 
     using DeviceAgentManifestMap = std::map<nx::Uuid, nx::vms::api::analytics::DeviceAgentManifest>;
     DeviceAgentManifestMap deviceAgentManifests() const;
@@ -919,29 +935,17 @@ protected:
     nx::vms::api::DeviceType enforcedDeviceType() const;
 
 private:
-    using ManifestItemIdsFetcher =
-        std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
+    nx::utils::MacAddress m_macAddress;
+    QString m_physicalId;
 
-private:
-    nx::vms::api::MotionTypes calculateSupportedMotionTypes() const;
-    nx::vms::api::MotionType calculateMotionType() const;
-    MotionStreamIndex calculateMotionStreamIndex() const;
-    QPointF storedPtzPanTiltSensitivity() const;
+    unsigned int m_networkTimeout = 1000 * 10;
 
-    QSet<nx::Uuid> calculateUserEnabledAnalyticsEngines() const;
+    // Initialized in cpp to avoid transitional includes.
+    int m_httpPort;
 
-    QSet<nx::Uuid> calculateCompatibleAnalyticsEngines() const;
+    QDateTime m_lastDiscoveredTime;
 
-    std::map<nx::Uuid, std::set<QString>> calculateSupportedEntities(
-        ManifestItemIdsFetcher fetcher) const;
-    std::map<nx::Uuid, std::set<QString>> calculateSupportedEventTypes() const;
-    std::map<nx::Uuid, std::set<QString>> calculateSupportedObjectTypes() const;
-
-
-    std::optional<nx::vms::api::StreamIndex> obtainUserChosenAnalyzedStreamIndex(
-        nx::Uuid engineId) const;
-    nx::vms::api::StreamIndex analyzedStreamIndexInternal(const nx::Uuid& engineId) const;
-
+    nx::utils::CachedValue<QString> m_cachedHostAddress;
 private:
     /** Identifier of the type of this Device. */
     nx::Uuid m_typeId;

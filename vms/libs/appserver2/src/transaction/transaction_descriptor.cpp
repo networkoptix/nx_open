@@ -4,12 +4,13 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QSet>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_property_key.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
@@ -18,6 +19,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/data/auth_data.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/media/motion_detection.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/utils/qt_helpers.h>
@@ -1745,7 +1747,7 @@ struct ModifyResourceParamAccess
         const nx::network::rest::UserAccessData&,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
-        QSet<nx::Uuid> newEngines = QnVirtualCameraResource::calculateUserEnabledAnalyticsEngines(param.value);
+        auto newEngines = QJson::deserialized<QSet<nx::Uuid>>(param.value.toUtf8());
         nx::vms::common::saas::IntegrationServiceUsageHelper helper(systemContext);
         helper.proposeChange(param.resourceId, newEngines);
         if (helper.isOverflow())

@@ -8,7 +8,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -254,7 +253,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             continue;
 
         removedResourcesIds.insert(resource->getId());
-        if (auto networkResource = resource.dynamicCast<QnNetworkResource>())
+        if (auto networkResource = resource.dynamicCast<QnVirtualCameraResource>())
             removedResourcesPhysicalIds.insert(networkResource->getPhysicalId());
     }
 
@@ -332,14 +331,14 @@ QnVirtualCameraResourcePtr QnResourcePool::getCameraByPhysicalId(const QString& 
     return d->camerasByPhysicalId.value(physicalId);
 }
 
-QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
+QnVirtualCameraResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
 {
     nx::utils::MacAddress macAddress(mac);
     if (macAddress.isNull())
         return {};
 
-    return getResource<QnNetworkResource>(
-        [&macAddress](const QnNetworkResourcePtr& resource)
+    return getResource<QnVirtualCameraResource>(
+        [&macAddress](const QnVirtualCameraResourcePtr& resource)
         {
             return resource->getMAC() == macAddress;
         });
@@ -423,11 +422,11 @@ QnResourceList QnResourcePool::getResourcesByParentId(const nx::Uuid& parentId) 
         });
 }
 
-QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(
+QnVirtualCameraResourceList QnResourcePool::getAllNetResourceByHostAddress(
     const nx::String& hostAddress) const
 {
-    return getResources<QnNetworkResource>(
-        [&hostAddress](const QnNetworkResourcePtr& resource)
+    return getResources<QnVirtualCameraResource>(
+        [&hostAddress](const QnVirtualCameraResourcePtr& resource)
         {
             return resource->getHostAddress() == hostAddress;
         });

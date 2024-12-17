@@ -1193,7 +1193,7 @@ Handle ServerConnection::addVirtualCamera(
 }
 
 Handle ServerConnection::prepareVirtualCameraUploads(
-    const QnNetworkResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QnVirtualCameraPrepareData& data,
     GetCallback callback,
     QThread* targetThread)
@@ -1210,7 +1210,7 @@ Handle ServerConnection::prepareVirtualCameraUploads(
 }
 
 Handle ServerConnection::virtualCameraStatus(
-    const QnNetworkResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     GetCallback callback,
     QThread* targetThread)
 {
@@ -1223,7 +1223,7 @@ Handle ServerConnection::virtualCameraStatus(
 }
 
 Handle ServerConnection::lockVirtualCamera(
-    const QnNetworkResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QnUserResourcePtr& user,
     qint64 ttl,
     GetCallback callback,
@@ -1241,7 +1241,7 @@ Handle ServerConnection::lockVirtualCamera(
 }
 
 Handle ServerConnection::extendVirtualCameraLock(
-    const QnNetworkResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const QnUserResourcePtr& user,
     const nx::Uuid& token,
     qint64 ttl,
@@ -1261,7 +1261,7 @@ Handle ServerConnection::extendVirtualCameraLock(
 }
 
 Handle ServerConnection::releaseVirtualCameraLock(
-    const QnNetworkResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const nx::Uuid& token,
     GetCallback callback,
     QThread* targetThread)
@@ -1277,7 +1277,7 @@ Handle ServerConnection::releaseVirtualCameraLock(
 }
 
 Handle ServerConnection::consumeVirtualCameraFile(
-    const QnNetworkResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     const nx::Uuid& token,
     const QString& uploadId,
     qint64 startTimeMs,
@@ -1452,7 +1452,7 @@ Handle ServerConnection::changeCameraPassword(
 
 int ServerConnection::checkCameraList(
     const nx::Uuid& serverId,
-    const QnNetworkResourceList& cameras,
+    const QnVirtualCameraResourceList& cameras,
     Result<QnCameraListReply>::type callback,
     QThread* targetThread)
 {

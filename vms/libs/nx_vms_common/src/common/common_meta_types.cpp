@@ -130,7 +130,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnMediaServerResourcePtr>();
     qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnVirtualCameraResourceList>();
-    qRegisterMetaType<QnSecurityCamResourcePtr>();
     qRegisterMetaType<QnStorageResourcePtr>();
     qRegisterMetaType<QnVideoWallResourcePtr>();
 

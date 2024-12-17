@@ -203,7 +203,7 @@ QString eventSource(SubstitutionContext* substitution, common::SystemContext* co
 
 QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto resource = context->resourcePool()->getResourceById<QnNetworkResource>(
+    if (const auto resource = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
             eventSourceId(substitution->event)))
     {
         return QnResourceDisplayInfo(resource).host();
@@ -223,7 +223,7 @@ QString deviceId(SubstitutionContext* substitution, common::SystemContext* conte
 
 QString deviceMac(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto resource = context->resourcePool()->getResourceById<QnNetworkResource>(
+    if (const auto resource = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
             eventSourceId(substitution->event)))
     {
         return resource->getMAC().toString();

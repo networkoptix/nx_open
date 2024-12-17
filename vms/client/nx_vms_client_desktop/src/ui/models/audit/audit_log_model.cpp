@@ -9,7 +9,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
@@ -60,7 +59,7 @@ namespace
 
         if (d1->resources.empty())
             return QString();
-        if (QnNetworkResourcePtr res = resourcePool->getResourceById<QnNetworkResource>(d1->resources[0]))
+        if (QnVirtualCameraResourcePtr res = resourcePool->getResourceById<QnVirtualCameraResource>(d1->resources[0]))
             return res->getHostAddress();
         else
             return QString();

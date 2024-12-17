@@ -9,7 +9,6 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/fusion/serialization/json_functions.h>

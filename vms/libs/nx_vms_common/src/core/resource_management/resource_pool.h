@@ -226,7 +226,7 @@ public:
         return false;
     }
 
-    QnNetworkResourceList getAllNetResourceByHostAddress(const nx::String& hostAddress) const;
+    QnVirtualCameraResourceList getAllNetResourceByHostAddress(const nx::String& hostAddress) const;
 
     QnVirtualCameraResourceList getAllCameras(
         const nx::Uuid& parentId = {}, bool ignoreDesktopCameras = false) const;
@@ -316,7 +316,7 @@ public:
         const QString& url, const nx::Uuid& parentServerId = nx::Uuid()) const;
 
     QnVirtualCameraResourcePtr getCameraByPhysicalId(const QString& physicalId) const;
-    QnNetworkResourcePtr getResourceByMacAddress(const QString& mac) const;
+    QnVirtualCameraResourcePtr getResourceByMacAddress(const QString& mac) const;
 
     QnUserResourcePtr getAdministrator() const;
 

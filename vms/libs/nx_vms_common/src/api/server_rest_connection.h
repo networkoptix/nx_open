@@ -437,7 +437,7 @@ public:
      */
     int checkCameraList(
         const nx::Uuid& serverId,
-        const QnNetworkResourceList& cameras,
+        const QnVirtualCameraResourceList& cameras,
         Result<QnCameraListReply>::type callback,
         QThread* targetThread = nullptr);
 
@@ -453,25 +453,25 @@ public:
         QThread* targetThread = nullptr);
 
     Handle prepareVirtualCameraUploads(
-        const QnNetworkResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnVirtualCameraPrepareData& data,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
     Handle virtualCameraStatus(
-        const QnNetworkResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
     Handle lockVirtualCamera(
-        const QnNetworkResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnUserResourcePtr& user,
         qint64 ttl,
         GetCallback callback,
         QThread* targetThread = nullptr);
 
     Handle extendVirtualCameraLock(
-        const QnNetworkResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const QnUserResourcePtr& user,
         const nx::Uuid& token,
         qint64 ttl,
@@ -479,7 +479,7 @@ public:
         QThread* targetThread = nullptr);
 
     Handle releaseVirtualCameraLock(
-        const QnNetworkResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const nx::Uuid& token,
         GetCallback callback,
         QThread* targetThread = nullptr);
@@ -500,7 +500,7 @@ public:
      * @see addFileUpload
      */
     Handle consumeVirtualCameraFile(
-        const QnNetworkResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         const nx::Uuid& token,
         const QString& uploadId,
         qint64 startTimeMs,

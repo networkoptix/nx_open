@@ -7,7 +7,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>

@@ -61,15 +61,6 @@ class QnAbstractArchiveResource;
 typedef QnSharedResourcePointer<QnAbstractArchiveResource> QnAbstractArchiveResourcePtr;
 typedef QnSharedResourcePointerList<QnAbstractArchiveResource> QnAbstractArchiveResourceList;
 
-class QnNetworkResource;
-typedef QnSharedResourcePointer<QnNetworkResource> QnNetworkResourcePtr;
-typedef QnSharedResourcePointerList<QnNetworkResource> QnNetworkResourceList;
-
-class QnSecurityCamResource;
-typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
-typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
-
-
 class QnStorageResource;
 typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
 typedef QnSharedResourcePointerList<QnStorageResource> QnStorageResourceList;

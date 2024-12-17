@@ -13,7 +13,6 @@
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/storage_resource.h>
@@ -282,7 +281,7 @@ QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
         for (const QnResourcePtr& res: resList)
         {
             QString key;
-            if (auto networkResource = res.dynamicCast<QnNetworkResource>())
+            if (auto networkResource = res.dynamicCast<QnVirtualCameraResource>())
                 key = networkResource->getPhysicalId();
             else
                 key = res->getUrl();
@@ -369,7 +368,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                     continue;
                 }
 
-                const QnNetworkResource* networkRes = dynamic_cast<QnNetworkResource*>(it->data());
+                const QnVirtualCameraResource* networkRes = dynamic_cast<QnVirtualCameraResource*>(it->data());
                 if( networkRes )
                 {
                     //checking that resource do not duplicate already found ones
@@ -402,7 +401,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         switch( it->second->discoveryMode() )
         {
             case DiscoveryMode::partiallyEnabled:
-                if (auto networkResource = it->first.dynamicCast<QnNetworkResource>())
+                if (auto networkResource = it->first.dynamicCast<QnVirtualCameraResource>())
                 {
                     if (!resPool->getCameraByPhysicalId(networkResource->getPhysicalId()))
                         continue;   //ignoring newly discovered camera
@@ -436,7 +435,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         }
 
         //if camera is already in resource pool and it was added manually, then ignoring it...
-        QnNetworkResourcePtr existingRes = resPool->getCameraByPhysicalId(camRes->getPhysicalId());
+        QnVirtualCameraResourcePtr existingRes = resPool->getCameraByPhysicalId(camRes->getPhysicalId());
         if( existingRes )
         {
 
@@ -474,7 +473,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         {
             for (int i = resources.size() - 1; i >= 0; --i)
             {
-                if (auto networkResource = resources[i].dynamicCast<QnNetworkResource>())
+                if (auto networkResource = resources[i].dynamicCast<QnVirtualCameraResource>())
                 {
                     if (m_resourcesToIgnore.contains(networkResource->getPhysicalId()))
                         resources.removeAt(i);
@@ -508,7 +507,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         if (needToStop())
             return false;
 
-        auto newNetworkResource = (*it).dynamicCast<QnNetworkResource>();
+        auto newNetworkResource = (*it).dynamicCast<QnVirtualCameraResource>();
         if (!newNetworkResource)
         {
             ++it; // new resource => should keep it

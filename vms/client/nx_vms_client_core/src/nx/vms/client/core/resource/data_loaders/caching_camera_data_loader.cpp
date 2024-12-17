@@ -69,7 +69,7 @@ bool CachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &resour
 
 void CachingCameraDataLoader::init() {
     // TODO: #sivanov Move to camera history.
-    if (m_resource.dynamicCast<QnNetworkResource>())
+    if (m_resource.dynamicCast<QnVirtualCameraResource>())
     {
         connect(qnSyncTime, &QnSyncTime::timeChanged,
                 this, &CachingCameraDataLoader::discardCachedData);

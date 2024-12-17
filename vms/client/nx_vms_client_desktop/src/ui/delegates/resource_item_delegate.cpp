@@ -11,7 +11,6 @@
 #include <common/common_globals.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>

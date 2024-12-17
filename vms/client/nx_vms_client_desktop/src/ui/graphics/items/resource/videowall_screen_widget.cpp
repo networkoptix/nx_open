@@ -9,7 +9,6 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>

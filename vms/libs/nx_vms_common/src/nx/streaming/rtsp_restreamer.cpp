@@ -3,7 +3,6 @@
 #include "rtsp_restreamer.h"
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/network_resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/http/http_client.h>

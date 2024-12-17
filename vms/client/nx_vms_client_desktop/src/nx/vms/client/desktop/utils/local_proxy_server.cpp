@@ -4,7 +4,6 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/http/custom_headers.h>
@@ -87,7 +86,7 @@ bool VmsServerConnector::auth(const std::string& user, const std::string& passwo
         // enabled on the server.
         m_exitNodeId = resourceId;
     }
-    else if (resource.dynamicCast<QnNetworkResource>() || resource.dynamicCast<QnWebPageResource>())
+    else if (resource.dynamicCast<QnVirtualCameraResource>() || resource.dynamicCast<QnWebPageResource>())
     {
         m_exitNodeId = resource->getParentId();
         m_resourceId = resourceId;

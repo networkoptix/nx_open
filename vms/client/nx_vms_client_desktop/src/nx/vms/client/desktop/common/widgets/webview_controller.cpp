@@ -25,7 +25,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include <client_core/client_core_module.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/nx_network_ini.h>
@@ -83,7 +83,7 @@ QUrl urlFromResource(const QnResourcePtr& resource)
         return {};
 
     QUrl result = resource->getUrl();
-    if (const auto networkResource = resource.dynamicCast<QnNetworkResource>())
+    if (const auto networkResource = resource.dynamicCast<QnVirtualCameraResource>())
         result.setPort(networkResource->httpPort());
     return result;
 }
