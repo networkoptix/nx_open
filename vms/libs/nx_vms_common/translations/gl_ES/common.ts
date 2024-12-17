@@ -179,27 +179,27 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administradores</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Usuarios/as avanzados/as</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Visualizadores avanzados</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Espectadores</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Espectadores en directo</translation>
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation type="unfinished">System Health Viewers</translation>
+      <translation>Visores do estado (saúde) do sistema</translation>
     </message>
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to  %1.</source>
@@ -208,23 +208,23 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the System configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Os membros deste grupo poden, ademais dos permisos concedidos polo grupo de visores avanzados, controlar a maior parte da configuración do sistema, pero non se lles permite cambiar ningunha configuración relacionada co administrador, como eliminar ou cambiar os seus propios grupos e permisos, e non poden crear nin crear nin editar outros usuarios avanzados.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Os membros deste grupo poden, ademais dos permisos concedidos polo grupo de espectadores, ver e activar posicións PTZ e percorridos PTZ, usar audio bidireccional, operar botóns do módulo de E/S (I/O), crear e editar marcadores e ver o rexistro de eventos.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Os membros deste grupo poden, ademais dos permisos concedidos polo grupo Live Viewers (Espectadores en directo), ver e exportar arquivos e marcadores.</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Os membros deste grupo poden ver vídeos en directo, módulos de E/S (I/O) e páxinas web.</translation>
     </message>
     <message>
       <source>Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view System Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Os membros deste grupo poden ver a información de Monitorización do estado do sistema e a carga do procesador do servidor en tempo real (Monitorización do servidor).</translation>
     </message>
   </context>
   <context>
@@ -473,7 +473,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Non se puido inicializar o codificador de audio.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -535,7 +535,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Non se puido inicializar o codificador de vídeo.</translation>
     </message>
   </context>
   <context>
@@ -562,7 +562,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>Start</source>
@@ -907,7 +907,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -1309,7 +1309,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Non autorizado.</translation>
     </message>
     <message>
       <source>Session expired.</source>

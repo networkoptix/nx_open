@@ -1369,7 +1369,7 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>Wiele grup</translation>
     </message>
   </context>
   <context>
@@ -1814,7 +1814,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Włącz zasady międzydomenowe</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1830,7 +1830,7 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Udostępnij adresy IP do automatycznego wykrywania</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
@@ -1874,11 +1874,11 @@
     </message>
     <message>
       <source>LDAP settings</source>
-      <translation type="unfinished">LDAP settings</translation>
+      <translation>Ustawienia LDAP</translation>
     </message>
     <message>
       <source>SMTP settings</source>
-      <translation type="unfinished">SMTP settings</translation>
+      <translation>Ustawienia SMTP</translation>
     </message>
     <message>
       <source>Organization Id</source>
@@ -2012,7 +2012,7 @@
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Odblokuj tę część archiwum, aby wyeksportować jego zawartość.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -2668,28 +2668,28 @@
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>Problem z synchronizacją LDAP</translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Nie udało się połączyć z serwerem LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Nie udało się ukończyć synchronizacji w limicie czasu %1.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a given timeout.</source>
-      <translation type="unfinished">Failed to complete the sync within a given timeout.</translation>
+      <translation>Nie udało się ukończyć synchronizacji w określonym czasie.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Żadne konto użytkownika na serwerze LDAP nie odpowiada ustawieniom synchronizacji.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Niektórzy użytkownicy lub grupy LDAP nie zostały znalezione w bazie danych LDAP.</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
