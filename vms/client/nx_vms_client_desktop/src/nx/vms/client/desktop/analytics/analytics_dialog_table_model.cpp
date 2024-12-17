@@ -151,7 +151,10 @@ QHash<int, QByteArray> AnalyticsDialogTableModel::roleNames() const
     if (roleNames.isEmpty())
     {
         roleNames = base_type::roleNames();
-        roleNames.insert({{Qn::ResourceIconKeyRole, "iconKey"}});
+        roleNames.insert({
+            {Qt::ForegroundRole, "colors"},
+            {Qn::ResourceIconKeyRole, "iconKey"},
+        });
     }
     return roleNames;
 }

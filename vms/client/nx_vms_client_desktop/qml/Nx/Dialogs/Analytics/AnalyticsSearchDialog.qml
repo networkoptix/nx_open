@@ -762,16 +762,16 @@ Window
 
                                 Repeater
                                 {
-                                    model: tableDelegate.modelData.foregroundColor
+                                    model: tableDelegate.modelData.colors
 
                                     Rectangle
                                     {
                                         width: 16
                                         height: 16
                                         color: modelData ?? "transparent"
-                                        border.color:
-                                            ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                                        radius: 1
+                                        border.color: ColorTheme.colors.dark5
+                                        border.width: 1
+                                        radius: 2
                                     }
                                 }
 
