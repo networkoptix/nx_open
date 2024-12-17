@@ -240,7 +240,7 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
         (m_sound->state() != QAudio::State::ActiveState && decodeMode() != AudioDecodeMode::spectrumOnly);
 
     bool bufferOverflow = bufferSizeMs > appContext()->localSettings()->maximumLiveBufferMs();
-    if (bufferOverflow)
+    if (bufferOverflow && data->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
     {
         NX_DEBUG(this,
             "Skip audio packet: %1, since buffer is full: %2ms", data->timestamp, bufferSizeMs);
