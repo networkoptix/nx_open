@@ -30,7 +30,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Funkcje beta</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -703,7 +703,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Funkcje beta</translation>
     </message>
     <message>
       <source>Early access to new features</source>
