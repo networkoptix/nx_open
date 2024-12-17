@@ -620,7 +620,11 @@ utils::DotNotationString extractWithParam(Params* params)
 }
 
 void filter(
-    QJsonValue* value, const QJsonValue* defaultValue, DefaultValueAction action, Params params, utils::DotNotationString withParam)
+    QJsonValue* value,
+    const QJsonValue* defaultValue,
+    DefaultValueAction action,
+    Params params,
+    const nx::utils::DotNotationString& withParam)
 {
     if (!params.empty())
     {
@@ -658,7 +662,7 @@ void filter(
     }
 }
 
-void filter(rapidjson::Document* value, nx::utils::DotNotationString with)
+void filter(rapidjson::Document* value, const nx::utils::DotNotationString& with)
 {
     if (!with.isEmpty())
         filterAny(with, value);

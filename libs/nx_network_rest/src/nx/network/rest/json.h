@@ -54,10 +54,11 @@ NX_NETWORK_REST_API void filter(
     const QJsonValue* defaultValue,
     DefaultValueAction action,
     Params filters = {},
-    nx::utils::DotNotationString with = {});
+    const nx::utils::DotNotationString& with = {});
 
 NX_NETWORK_REST_API nx::utils::DotNotationString extractWithParam(Params* filters);
-NX_NETWORK_REST_API void filter(rapidjson::Document* value, nx::utils::DotNotationString with);
+NX_NETWORK_REST_API void filter(
+    rapidjson::Document* value, const nx::utils::DotNotationString& with);
 
 } // namespace details
 

@@ -59,7 +59,7 @@ void registerRuleHandlers(
         std::make_unique<ActionManifestHandler>(engine));
 
     /**%apidoc GET /rest/v{4-}/events/log
-     * Read Event Log from all servers
+     * Read Event Log from all Servers.
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
@@ -68,7 +68,7 @@ void registerRuleHandlers(
      * %return:{EventLogRecordList} Server event log.
      *
      **%apidoc GET /rest/v{4-}/events/log/{serverId}
-     * Read Event Log from single server
+     * Read Event Log from single Server.
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
@@ -91,10 +91,10 @@ void registerRuleHandlers(
      * %return:{EventLogRecordList} Notifications to acknowledge
      *
      **%apidoc GET /rest/v{4-}/events/acknowledges/{id}
-     * Retrieves notification with the given action ID.
+     * Retrieves notification with the given event ID.
      * %caption Notification to acknowledge
      * %ingroup Events
-     * %param:uuid id Action ID.
+     * %param:uuid id Event ID.
      * %param[ref] _format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
      * %permissions Any User.
      * %return:{EventLogRecord} Notification to acknowledge

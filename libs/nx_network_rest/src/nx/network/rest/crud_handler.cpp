@@ -172,9 +172,11 @@ void setResponseContent(Response* response,
         schemas->postprocessResponse(
             request.method(), request.params(), request.decodedPath(), &value);
     }
-    auto body{json::serialized(value, format)};
-    response->content = {Qn::serializationFormatToHttpContentType(format), std::move(body)};
-    response->contentBodyJson = std::move(value);
+    response->content = {Qn::serializationFormatToHttpContentType(format), QByteArray{}};
+    if (request.jsonRpcContext())
+        response->contentBodyJson = std::move(value);
+    else
+        response->content->body = json::serialized(value, format);
 }
 
 void setResponseContent(Response* response,
@@ -185,9 +187,11 @@ void setResponseContent(Response* response,
 {
     if (NX_ASSERT(schemas))
         schemas->postprocessResponse(request.method(), request.decodedPath(), &value);
-    auto body{json::serialized(value, format)};
-    response->content = {Qn::serializationFormatToHttpContentType(format), std::move(body)};
-    response->contentBodyJson = std::move(value);
+    response->content = {Qn::serializationFormatToHttpContentType(format), QByteArray{}};
+    if (request.jsonRpcContext())
+        response->contentBodyJson = std::move(value);
+    else
+        response->content->body = json::serialized(value, format);
 }
 
 } // namespace nx::network::rest::detail

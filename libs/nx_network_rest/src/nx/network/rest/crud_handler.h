@@ -351,7 +351,7 @@ protected:
         return {std::move(filter), std::move(params), defaultValueAction};
     }
 
-    static bool useReflect(const Request& r) { return !r.isApiVersionOlder(4); }
+    static bool useReflect(const Request& r) { return !r.useReflect(); }
 
     template<typename T>
     void mergeModel(const Request& request, T* model, T* existing, Request::ParseInfo parseInfo)
@@ -739,12 +739,12 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
 
 template<typename Derived>
 nx::utils::Guard CrudHandler<Derived>::subscribe(
-    const QString& id, const Request&, SubscriptionCallback callback)
+    const QString& id, const Request& request, SubscriptionCallback callback)
 {
     NX_ASSERT(!id.isEmpty(), "Id must be obtained by subscriptionId()");
     if constexpr (DoesMethodExist_addSubscription<Derived>::value)
     {
-        return static_cast<Derived*>(this)->addSubscription(id, std::move(callback));
+        return static_cast<Derived*>(this)->addSubscription(id, request, std::move(callback));
     }
     else
     {

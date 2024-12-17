@@ -120,7 +120,7 @@ public:
         {
             if (parseInfo)
             {
-                if (isApiVersionOlder(4))
+                if (useReflect())
                     parseInfo->emplace<NxFusionContent>();
                 else
                     parseInfo->emplace<NxReflectFields>();
@@ -129,7 +129,7 @@ public:
         }
         else
         {
-            if (isApiVersionOlder(4))
+            if (useReflect())
             {
                 NxFusionContent* content = nullptr;
                 if (parseInfo)
@@ -181,6 +181,8 @@ public:
     {
         return !m_apiVersion || *m_apiVersion < version;
     }
+
+    bool useReflect() const { return isApiVersionOlder(4); }
 
     class NX_NETWORK_REST_API SystemAccessGuard
     {
