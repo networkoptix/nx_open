@@ -340,7 +340,7 @@ Rectangle
             anchors.right: parent.right
             anchors.rightMargin: -12
 
-            spacing: 16
+            spacing: 24
 
             Column
             {
