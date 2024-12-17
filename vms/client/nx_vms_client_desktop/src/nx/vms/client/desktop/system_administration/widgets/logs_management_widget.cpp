@@ -18,6 +18,7 @@
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/common/widgets/obtain_button.h>
 #include <nx/vms/client/desktop/common/widgets/search_line_edit.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
@@ -149,6 +150,9 @@ void LogsManagementWidget::setupUi()
 
     ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));
     ui->unitsTable->setItemDelegate(new LogsManagementTableDelegate(this));
+
+    auto scrollBar = new SnappedScrollBar(this);
+    ui->unitsTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     auto header = new CheckableHeaderView(LogsManagementModel::Columns::CheckBoxColumn,
         this);

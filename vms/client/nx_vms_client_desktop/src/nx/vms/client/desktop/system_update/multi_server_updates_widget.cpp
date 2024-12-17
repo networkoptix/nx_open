@@ -26,6 +26,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/message_bar.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -275,6 +276,8 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         horizontalHeader->setStretchLastSection(true);
     }
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, false);
+    auto scrollBar = new SnappedScrollBar(this);
+    ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(m_clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
         m_stateTracker.get(), &PeerStateTracker::atClientUpdateStateChanged);
