@@ -33,7 +33,7 @@ public:
         const QnConstCompressedVideoDataPtr& data,
         CLVideoDecoderOutputPtr* const outFrame) override;
 
-    bool hardwareDecoder() const override {return true; }
+    bool hardwareDecoder() const override {return m_hardwareMode; }
     void setLightCpuMode(DecodeMode) override {}
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy) override {}
     int getWidth() const override;
@@ -54,6 +54,7 @@ private:
 private:
     AVHWDeviceType m_type;
     InitFunc m_initFunc;
+    bool m_hardwareMode = true;
     AVCodecContext* m_decoderContext = nullptr;
     AVBufferRef* m_hwDeviceContext = nullptr;
     AVPixelFormat m_targetPixelFormat = AV_PIX_FMT_NONE;

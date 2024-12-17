@@ -189,7 +189,6 @@ public:
     AnnexbToMp4 m_annexbToMp4;
     CLVideoDecoderOutputPtr outFramePtr;
     qint64 lastPts;
-    bool isHardwareAccelerated = false;
 };
 
 void MacVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -307,8 +306,6 @@ int MacVideoDecoder::decode(
         return ret;
     }
 
-    d->isHardwareAccelerated = (bool) d->outFramePtr->hw_frames_ctx;
-
     const qint64 startTimeMs = d->outFramePtr->pkt_dts / 1000;
 
     if (qtPixelFormatForFrame(d->outFramePtr.get()) == QVideoFrameFormat::Format_Invalid)
@@ -331,7 +328,10 @@ int MacVideoDecoder::decode(
 AbstractVideoDecoder::Capabilities MacVideoDecoder::capabilities() const
 {
     Q_D(const MacVideoDecoder);
-    return d->isHardwareAccelerated ? Capability::hardwareAccelerated : Capability::noCapability;
+    if (d->decoder && !d->decoder->hardwareDecoder())
+        Capability::noCapability;
+
+    return Capability::hardwareAccelerated;
 }
 
 } // namespace nx::media

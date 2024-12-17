@@ -12,7 +12,7 @@ extern "C" {
 #include <libavutil/hwcontext.h>
 } // extern "C"
 
-namespace {
+namespace nx::media::ffmpeg {
 
 static enum AVPixelFormat getHwFormat(AVCodecContext *ctx, const enum AVPixelFormat *pix_fmts)
 {
@@ -31,12 +31,15 @@ static enum AVPixelFormat getHwFormat(AVCodecContext *ctx, const enum AVPixelFor
             return *p;
     }
 
+    if (pix_fmts)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Failed to get HW surface format, use software one: %1", *pix_fmts);
+        return *pix_fmts;
+    }
+
     NX_DEBUG(NX_SCOPE_TAG, "Failed to get HW surface format");
     return AV_PIX_FMT_NONE;
 }
-
-}
-namespace nx::media::ffmpeg {
 
 HwVideoDecoder::HwVideoDecoder(
     AVHWDeviceType type,
@@ -273,6 +276,7 @@ bool HwVideoDecoder::decode(
     if (data)
         m_lastChannel = data->channelNumber;
 
+    m_hardwareMode = (bool) frame->hw_frames_ctx;
     return true;
 }
 
