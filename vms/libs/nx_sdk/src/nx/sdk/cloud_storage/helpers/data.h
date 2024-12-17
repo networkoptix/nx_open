@@ -271,11 +271,11 @@ struct BookmarkFilter
         description,
     };
 
-    BookmarkFilter(const char* jsonData) noexcept(false);
+    BookmarkFilter(const char* urlParams) noexcept(false);
     BookmarkFilter(const nx::kit::Json& json) noexcept(false);
     BookmarkFilter() = default;
 
-    static ValueOrError<BookmarkFilter> fromJson(const char* jsonStr) noexcept;
+    static ValueOrError<BookmarkFilter> fromUrlParams(const char *urlParams) noexcept;
     static ValueOrError<BookmarkFilter> fromJson(const nx::kit::Json& json) noexcept;
 
     template<typename T>
@@ -284,6 +284,7 @@ struct BookmarkFilter
     bool operator==(const BookmarkFilter&) const;
 
     nx::kit::Json to_json() const;
+    std::string toUrlParams() const;
 
     static std::string sortColumnToString(SortColumn column);
     static SortColumn sortColumnFromString(const std::string& s);

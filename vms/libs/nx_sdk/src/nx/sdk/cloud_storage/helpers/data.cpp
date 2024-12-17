@@ -678,8 +678,38 @@ BookmarkFilter::SortColumn BookmarkFilter::sortColumnFromString(const std::strin
 }
 
 
-BookmarkFilter::BookmarkFilter(const char* jsonData): BookmarkFilter(parseJson(jsonData))
-{}
+BookmarkFilter::BookmarkFilter(const char* urlParams)
+{
+    std::vector<std::string> params = split(urlParams, "&");
+    for (int i = 0; i < params.size(); i++) {
+        std::vector<std::string> param = split(params[i], "=");
+        if (param.size() != 2)
+            continue;
+
+        if (param[0].compare("id") == 0)
+            id = param[1];
+        else if (param[0].compare("startTimestamp") == 0)
+            startTimestamp = std::optional<std::chrono::milliseconds>(std::stoi(param[1]));
+        else if (param[0].compare("endTimestamp") == 0)
+            endTimestamp = std::optional<std::chrono::milliseconds>(std::stoi(param[1]));
+        else if (param[0].compare("text") == 0)
+            text = param[1];
+        else if (param[0].compare("limit") == 0)
+            limit = std::optional<int>(std::stoi(param[1]));
+        else if (param[0].compare("order") == 0)
+            order = sortOrderFromString(param[1]);
+        else if (param[0].compare("column") == 0)
+            column = sortColumnFromString(param[1]);
+        else if (param[0].compare("minVisibleLength") == 0)
+            minVisibleLength = std::optional<std::chrono::milliseconds>(std::stoi(param[1]));
+        else if (param[0].compare("deviceIds") == 0)
+            deviceIds = split(param[1], ",");
+        else if (param[0].compare("creationStartTimestamp") == 0)
+            creationStartTimestamp = std::optional<std::chrono::milliseconds>(std::stoi(param[1]));
+        else if (param[0].compare("creationEndTimestamp") == 0)
+            creationEndTimestamp = std::optional<std::chrono::milliseconds>(std::stoi(param[1]));
+    }
+}
 
 BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
 {
@@ -697,11 +727,11 @@ BookmarkFilter::BookmarkFilter(const nx::kit::Json& json)
     creationEndTimestamp = getOptionalDurationValue<milliseconds>(json, "creationEndTimestamp");
 }
 
-ValueOrError<BookmarkFilter> BookmarkFilter::fromJson(const char* jsonStr) noexcept
+ValueOrError<BookmarkFilter> BookmarkFilter::fromUrlParams(const char* urlParams) noexcept
 {
     try
     {
-        return ValueOrError<BookmarkFilter>::makeValue(BookmarkFilter(jsonStr));
+        return ValueOrError<BookmarkFilter>::makeValue(BookmarkFilter(urlParams));
     }
     catch (const std::exception& e)
     {
@@ -763,6 +793,47 @@ nx::kit::Json BookmarkFilter::to_json() const
 
     result["deviceIds"] = objectListToJson(deviceIds);
     return result;
+}
+
+std::string BookmarkFilter::toUrlParams() const
+{
+    std::stringstream ss;
+    ss << "order=" << sortOrderToString(order);
+    ss << "&column=" << sortColumnToString(column);
+
+    if (id)
+        ss << "&id=" << *id;
+
+    if (startTimestamp)
+        ss << "&startTimestamp=" << startTimestamp->count();
+
+    if (endTimestamp)
+        ss << "&endTimestamp=" << endTimestamp->count();
+
+    if (text)
+        ss << "&text=" << *text;
+
+    if (limit)
+        ss << "&limit=" << *limit;
+
+    if (minVisibleLength)
+        ss << "&minVisibleLength=" << minVisibleLength->count();
+
+    if (creationStartTimestamp)
+        ss << "&creationStartTimestamp=" << creationStartTimestamp->count();
+
+    if (creationEndTimestamp)
+        ss << "&creationEndTimestamp=" << creationEndTimestamp->count();
+
+    if (!deviceIds.empty()) {
+        ss << "&deviceIds=";
+        for (int i = 0; i < deviceIds.size(); i++) {
+            if (i > 0) ss << ',';
+            ss << deviceIds[i];
+        }
+    }
+
+    return ss.str();
 }
 
 Motion::Motion(const char* jsonData): Motion(parseJson(jsonData))
