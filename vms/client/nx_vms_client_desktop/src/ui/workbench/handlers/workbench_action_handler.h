@@ -25,7 +25,6 @@
 #include <recording/time_period.h>
 #include <ui/dialogs/audit_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
-#include <ui/dialogs/event_log_dialog.h>
 #include <ui/dialogs/search_bookmarks_dialog.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -37,7 +36,6 @@ class QnProgressDialog;
 class QnResourcePool;
 class QnWorkbenchContext;
 class ActionHandler;
-class QnBusinessRulesDialog;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
@@ -141,10 +139,6 @@ protected:
 
     void setCurrentLayoutCellSpacing(Qn::CellSpacing spacing);
 
-    QnBusinessRulesDialog *businessRulesDialog() const;
-
-    QnEventLogDialog *businessEventsLogDialog() const;
-
     QnCameraListDialog *cameraListDialog() const;
 
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
@@ -178,11 +172,8 @@ protected:
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
-    void at_businessEventsAction_triggered();
-    void at_openBusinessRulesAction_triggered();
     void at_openBookmarksSearchAction_triggered();
     void openIntegrationsActionTriggered();
-    void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
 
@@ -193,7 +184,6 @@ protected:
     void replaceCameraActionTriggered();
     void undoReplaceCameraActionTriggered();
     void at_cameraIssuesAction_triggered();
-    void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
@@ -303,8 +293,6 @@ private:
     void muteUnmuteWidgets(const QnResourceWidgetList& widgets, bool muted) const;
 
 private:
-    QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
-    QPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;

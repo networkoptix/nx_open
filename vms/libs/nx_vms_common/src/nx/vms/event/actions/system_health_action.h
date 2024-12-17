@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QSharedPointer>
+
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/actions/common_action.h>
 
@@ -17,5 +19,7 @@ public:
         nx::Uuid eventResourceId = {},
         const nx::common::metadata::Attributes& attributes = {});
 };
+
+using SystemHealthActionPtr = QSharedPointer<SystemHealthAction>;
 
 } // namespace nx::vms::event

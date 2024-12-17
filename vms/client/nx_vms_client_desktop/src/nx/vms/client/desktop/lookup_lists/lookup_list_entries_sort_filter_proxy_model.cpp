@@ -9,7 +9,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/rules/ini.h>
 
 #include "lookup_list_entries_model.h"
 

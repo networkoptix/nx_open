@@ -3,7 +3,6 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/test_support/run_test.h>
-#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/metatypes.h>
 
 int main(int argc, char** argv)
@@ -16,14 +15,7 @@ int main(int argc, char** argv)
         [](const nx::ArgumentParser& /*args*/)
         {
             nx::vms::rules::Metatypes::initialize();
-
-            auto iniTweaks = std::make_unique<nx::vms::rules::Ini::Tweaks>();
-            iniTweaks->set(&nx::vms::rules::ini().rulesEngine, "new");
-
-            nx::utils::test::DeinitFunctions deinitFunctions;
-            deinitFunctions.push_back(
-                [iniTweaks = std::move(iniTweaks)]() mutable { iniTweaks.reset(); });
-            return deinitFunctions;
+            return nx::utils::test::DeinitFunctions{};
         },
         nx::utils::test::TestRunFlag::throwOnFailure);
 }

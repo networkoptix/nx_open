@@ -190,20 +190,6 @@ enum IDType
     BrowseUrlAction,
 
     /**
-     * Opens the Business Events Log dialog.
-     * Supports cameras list in the resources field as a cameras filter.
-     * Parameters:
-     * <tt>nx::vms::api::EventType EventTypeRole</tt> --- filter by event type.
-     */
-    OpenBusinessLogAction,
-
-    /**
-     * Opens the Business Rules dialog.
-     * Supports cameras list in the resources field as a cameras filter.
-     */
-    OpenBusinessRulesAction,
-
-    /**
      * Opens the Failover Priority dialog.
      */
     OpenFailoverPriorityAction,
@@ -463,11 +449,6 @@ enum IDType
      * Opens web admin for given server in the default browser.
      */
     WebAdminAction,
-
-    /**
-     * Opens business events editing dialog.
-     */
-    BusinessEventsAction,
 
     /**
      * Opens bookmarks dialog.
@@ -737,11 +718,6 @@ enum IDType
      * Opens event log dialog with filter for current cameras issues
      */
     CameraIssuesAction,
-
-    /**
-     * Opens business rules dialog with filter for current cameras rules
-     */
-    CameraBusinessRulesAction,
 
     /**
      * Opens vms rules dialog with filter for current cameras rules
@@ -1245,8 +1221,6 @@ enum IDType
      */
     RemoveBookmarksAction,
 
-    AcknowledgeEventAction,
-
     /**
      * Opens new layout for Quick Search.
      *
@@ -1453,9 +1427,7 @@ enum IDType
     OpenNewSceneAction,
 
     /**
-     * Opens new "VMS Rules" dialog which should replace the old one at certain point.
-     * @note Developer Mode and presence of new Event Rules Engine are required.
-     * @note Will replace 'OpenBusinessRulesAction'.
+     * Opens "VMS Rules" dialog.
      */
     OpenVmsRulesDialogAction,
 
@@ -1547,12 +1519,11 @@ enum IDType
      */
     OpenImportFromDevices,
 
-    /** Open Event Log dialog. Should replace OpenBusinessLogAction. */
+    /** Open Event Log dialog. */
     OpenEventLogAction,
 
     /**
      * Create bookmark, event log record & hide notification.
-     * Should replace AcknowledgeEventAction.
      */
     AcknowledgeNotificationAction,
 

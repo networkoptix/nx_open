@@ -30,7 +30,6 @@
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/vms/client/desktop/event_search/widgets/event_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/notification_counter_label.h>
 #include <nx/vms/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/overlappable_search_widget.h>
@@ -116,8 +115,6 @@ public:
 
         m_panel->m_bookmarksTab->searchWidget()->setPreviewToggled(
             state.value(kBookmarksPreviewKey).toBool(true));
-        m_panel->m_eventsTab->searchWidget()->setPreviewToggled(
-            state.value(kEventsPreviewKey).toBool(true));
         m_panel->m_vmsEventsTab->searchWidget()->setPreviewToggled(
             state.value(kEventsPreviewKey).toBool(true));
         m_panel->m_motionTab->setPreviewToggled(state.value(kMotionPreviewKey).toBool(true));
@@ -131,8 +128,7 @@ public:
         reportStatistics("right_panel_active_tab", tab);
         reportStatistics(
             "right_panel_event_thumbnails",
-            m_panel->m_eventsTab->searchWidget()->previewToggled());
-        // TODO: #amalov Report stats for new event panel.
+            m_panel->m_vmsEventsTab->searchWidget()->previewToggled());
         reportStatistics(
             "right_panel_motion_thumbnails",
             m_panel->m_motionTab->previewToggled());
@@ -156,8 +152,7 @@ public:
             DelegateState result;
             result[kBookmarksPreviewKey] =
                 m_panel->m_bookmarksTab->searchWidget()->previewToggled();
-            result[kEventsPreviewKey] = m_panel->m_eventsTab->searchWidget()->previewToggled();
-            // TODO: #amalov Save state for new event panel.
+            result[kEventsPreviewKey] = m_panel->m_vmsEventsTab->searchWidget()->previewToggled();
             result[kMotionPreviewKey] = m_panel->m_motionTab->previewToggled();
             result[kObjectsPreviewKey] =
                 m_panel->m_analyticsTab->searchWidget()->previewToggled();
@@ -189,7 +184,7 @@ EventPanel::Private::Private(EventPanel* q):
             if (workbench()->currentLayout()->resource()->isCrossSystem()
                 && (index == static_cast<int>(Tab::analytics)
                     || index == static_cast<int>(Tab::bookmarks)
-                    || index == static_cast<int>(Tab::events)))
+                    || index == static_cast<int>(Tab::vmsEvents)))
             {
                 return false;
             }
@@ -205,7 +200,6 @@ EventPanel::Private::Private(EventPanel* q):
     m_counterLabel = new NotificationCounterLabel(m_tabs->tabBar());
     m_motionTab = new SimpleMotionSearchWidget(context, m_tabs);
     m_bookmarksTab = new OverlappableSearchWidget(new BookmarkSearchWidget(context), m_tabs);
-    m_eventsTab = new OverlappableSearchWidget(new EventSearchWidget(context), m_tabs);
     m_vmsEventsTab = new OverlappableSearchWidget(new VmsEventSearchWidget(context), m_tabs);
     m_analyticsTab = new OverlappableSearchWidget(new AnalyticsSearchWidget(context), m_tabs);
 
@@ -224,7 +218,6 @@ EventPanel::Private::Private(EventPanel* q):
         {m_notificationsTab, Tab::notifications},
         {m_motionTab, Tab::motion},
         {m_bookmarksTab, Tab::bookmarks},
-        {m_eventsTab, Tab::events},
         {m_vmsEventsTab, Tab::vmsEvents},
         {m_analyticsTab, Tab::analytics}};
 
@@ -297,9 +290,8 @@ EventPanel::Private::Private(EventPanel* q):
     connect(action(menu::BookmarksTabAction), &QAction::triggered, this,
         [this] { setCurrentTab(Tab::bookmarks); });
 
-    // TODO: #amalov Support new vms events tab.
     connect(action(menu::EventsTabAction), &QAction::triggered, this,
-        [this] { setCurrentTab(Tab::events); });
+        [this] { setCurrentTab(Tab::vmsEvents); });
 
     connect(action(menu::ObjectsTabAction), &QAction::triggered, this,
         [this] { setCurrentTab(Tab::analytics); });
@@ -321,7 +313,6 @@ EventPanel::Private::Private(EventPanel* q):
 
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
     for (const auto tab: Tabs{
-        m_eventsTab->searchWidget(),
         m_vmsEventsTab->searchWidget(),
         m_motionTab,
         m_bookmarksTab->searchWidget(),
@@ -355,7 +346,6 @@ EventPanel::Private::Private(EventPanel* q):
                     : appearance);
 
             // Events are not supported for the cross systems at the moment.
-            m_eventsTab->setAppearance(appearance);
             m_vmsEventsTab->setAppearance(appearance);
         });
 
@@ -484,8 +474,6 @@ void EventPanel::Private::rebuildTabs()
         };
 
     const auto resource = navigator()->currentResource();
-    // TODO: #amalov Remove the prefix with old event engine and tab.
-    const QString eventTabPrefix = m_eventsTab->searchWidget()->isAllowed() ? "New " : "";
 
     updateTab(m_notificationsTab,
         true,
@@ -502,15 +490,10 @@ void EventPanel::Private::rebuildTabs()
         qnSkin->icon(kBookmarkIcon),
         tr("Bookmarks", "Bookmarks tab title"));
 
-    updateTab(m_eventsTab,
-        m_eventsTab->searchWidget()->isAllowed(),
-        qnSkin->icon(kEventIcon),
-        tr("Events", "Events tab title"));
-
     updateTab(m_vmsEventsTab,
         m_vmsEventsTab->searchWidget()->isAllowed(),
         qnSkin->icon(kEventIcon),
-        eventTabPrefix + tr("Events", "Events tab title"));
+        tr("Events", "Events tab title"));
 
     updateTab(m_analyticsTab,
         m_analyticsTab->searchWidget()->isAllowed(),
@@ -549,8 +532,6 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
     QMenu contextMenu;
     const auto actions = {
         menu::OpenEventLogAction,
-        menu::OpenBusinessLogAction,
-        menu::BusinessEventsAction,
         menu::OpenVmsRulesDialogAction};
 
     for (const auto actionId: actions)

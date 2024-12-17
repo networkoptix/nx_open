@@ -15,6 +15,8 @@
 
 class AudioPlayer;
 
+namespace nx::vms::event { class StringsHelper; }
+
 namespace nx::vms::rules {
 
 class NotificationActionBase;
@@ -66,14 +68,6 @@ private:
 
     void updateCloudItems(const QString& systemId);
     void removeCloudItems(const QString& systemId);
-
-    void setupAcknowledgeAction(EventData& eventData, const nx::Uuid& cameraId,
-        const nx::vms::event::AbstractActionPtr& action);
-
-    void setupIntercomAcknowledgeAction(
-        EventData& eventData,
-        const nx::Uuid& cameraId,
-        const nx::vms::event::AbstractActionPtr& action);
 
     QString caption(const nx::vms::event::EventParameters& parameters,
         const QnVirtualCameraResourcePtr& camera) const;

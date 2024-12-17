@@ -35,7 +35,6 @@ public:
         notifications,
         motion,
         bookmarks,
-        events,
         vmsEvents,
         analytics
     )

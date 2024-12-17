@@ -256,7 +256,6 @@ using AllAuditDetails =
         details::map<AuditRecordType::settingsChange, DescriptionDetails>,
         details::map<AuditRecordType::emailSettings, DescriptionDetails>,
         details::map<AuditRecordType::siteMerge, std::nullptr_t>,
-        details::map<AuditRecordType::eventReset, std::nullptr_t>,
         details::map<AuditRecordType::databaseRestore, std::nullptr_t>,
         details::map<AuditRecordType::updateInstall, UpdateDetails>,
         details::map<AuditRecordType::mitmAttack, MitmDetails>,

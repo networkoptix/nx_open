@@ -87,10 +87,7 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
         [this]() { emit actionRequested(menu::CameraIssuesAction); });
 
     connect(ui->cameraRulesButton, &QPushButton::clicked, this,
-        [this]()
-            {   emit actionRequested(menu::CameraBusinessRulesAction);
-                emit actionRequested(menu::CameraVmsRulesAction);
-            });
+        [this]() { emit actionRequested(menu::CameraVmsRulesAction); });
 
     connect(ui->showOnLayoutButton, &QPushButton::clicked, this,
         [this]() { emit actionRequested(menu::OpenInNewTabAction); });

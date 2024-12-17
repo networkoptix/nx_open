@@ -241,7 +241,6 @@ namespace Qn {
         AR_ServerRemove = static_cast<int>(nx::vms::api::AuditRecordType::serverRemove),
         AR_BEventRemove = static_cast<int>(nx::vms::api::AuditRecordType::eventRemove),
         AR_UserRemove = static_cast<int>(nx::vms::api::AuditRecordType::userRemove),
-        AR_BEventReset = static_cast<int>(nx::vms::api::AuditRecordType::eventReset),
         AR_DatabaseRestore = static_cast<int>(nx::vms::api::AuditRecordType::databaseRestore),
         AR_CameraInsert = static_cast<int>(nx::vms::api::AuditRecordType::deviceInsert),
         AR_UpdateInstall = static_cast<int>(nx::vms::api::AuditRecordType::updateInstall),

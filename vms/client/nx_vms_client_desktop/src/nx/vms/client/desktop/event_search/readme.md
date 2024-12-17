@@ -11,12 +11,12 @@
 [ConcatenationListModel]: @ref nx::vms::client::desktop::ConcatenationListModel
 [SimpleMotionSearchListModel]: @ref nx::vms::client::desktop::SimpleMotionSearchListModel
 [BookmarkSearchListModel]: @ref nx::vms::client::desktop::BookmarkSearchListModel
-[EventSearchListModel]: @ref nx::vms::client::desktop::EventSearchListModel
+[VmsEventSearchListModel]: @ref nx::vms::client::desktop::VmsEventSearchListModel
 [AnalyticsSearchListModel]: @ref nx::vms::client::desktop::AnalyticsSearchListModel
 [NotificationListWidget]: @ref nx::vms::client::desktop::NotificationListWidget
 [SimpleMotionSearchWidget]: @ref nx::vms::client::desktop::SimpleMotionSearchWidget
 [BookmarkSearchWidget]: @ref nx::vms::client::desktop::BookmarkSearchWidget
-[EventSearchWidget]: @ref nx::vms::client::desktop::EventSearchWidget
+[VmsEventSearchWidget]: @ref nx::vms::client::desktop::VmsEventSearchWidget
 [AnalyticsSearchWidget]: @ref nx::vms::client::desktop::AnalyticsSearchWidget
 [MotionSearchSynchronizer]: @ref nx::vms::client::desktop::MotionSearchSynchronizer
 [BookmarkSearchSynchronizer]: @ref nx::vms::client::desktop::BookmarkSearchSynchronizer
@@ -55,8 +55,8 @@ Represented by [BookmarkSearchWidget]. Displays bookmarks. Uses [BookmarkSearchL
 Is synchronized with **Workbench** state by [BookmarkSearchSynchronizer].
 
 ## Events tab
-Represented by [EventSearchWidget]. Displays events recorded to system event log. Uses
-[EventSearchListModel]. Does not require a **Workbench** state synchronizer.
+Represented by [VmsEventSearchWidget]. Displays events recorded to system event log. Uses
+[VmsEventSearchListModel]. Does not require a **Workbench** state synchronizer.
 
 ## Detected objects tab
 Represented by [AnalyticsSearchWidget]. Displays object detection events recorded to the

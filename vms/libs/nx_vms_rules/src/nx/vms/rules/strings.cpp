@@ -195,15 +195,20 @@ QString Strings::urlForCamera(
     return url.toWebClientStandardViolatingUrl();
 }
 
-QString Strings::eventName(common::SystemContext* context, const QString& type)
+QString Strings::eventName(Engine* engine, const QString& type)
 {
-    if (const auto engine = context->vmsRulesEngine(); NX_ASSERT(engine))
+    if (NX_ASSERT(engine))
     {
         if (const auto descriptor = engine->eventDescriptor(type))
             return descriptor->displayName;
     }
 
     return tr("Unknown event");
+}
+
+QString Strings::eventName(common::SystemContext* context, const QString& type)
+{
+    return eventName(context->vmsRulesEngine(), type);
 }
 
 QStringList Strings::eventDetails(const QVariantMap& details)
@@ -221,15 +226,20 @@ QStringList Strings::eventDetails(const QVariantMap& details)
     return result;
 }
 
-QString Strings::actionName(common::SystemContext* context, const QString& type)
+QString Strings::actionName(Engine* engine, const QString& type)
 {
-    if (const auto engine = context->vmsRulesEngine(); NX_ASSERT(engine))
+    if (NX_ASSERT(engine))
     {
         if (const auto descriptor = engine->actionDescriptor(type))
             return descriptor->displayName;
     }
 
     return tr("Unknown action");
+}
+
+QString Strings::actionName(common::SystemContext* context, const QString& type)
+{
+    return actionName(context->vmsRulesEngine(), type);
 }
 
 QString Strings::anyEvent()

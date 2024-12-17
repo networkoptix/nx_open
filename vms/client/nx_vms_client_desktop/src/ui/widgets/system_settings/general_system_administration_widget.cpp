@@ -151,11 +151,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
     setHelpTopic(m_buttons[kIntegrationsButton], HelpTopic::Id::PluginsAndAnalytics);
 
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
-        [this]
-            {
-                menu()->trigger(menu::OpenBusinessRulesAction);
-                menu()->trigger(menu::OpenVmsRulesDialogAction);
-            });
+        [this] { menu()->trigger(menu::OpenVmsRulesDialogAction); });
 
     connect(m_buttons[kDeviceListButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::CameraListAction); });
@@ -164,11 +160,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(
         [this] { menu()->trigger(menu::OpenAuditLogAction); });
 
     connect(m_buttons[kEventLogButton], &QPushButton::clicked, this,
-        [this]
-            {
-                menu()->trigger(menu::OpenBusinessLogAction);
-                menu()->trigger(menu::OpenEventLogAction);
-            });
+        [this] { menu()->trigger(menu::OpenEventLogAction); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(menu::OpenBookmarksSearchAction); });
@@ -219,10 +211,10 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(menu::BusinessEventsAction,
+    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(menu::OpenVmsRulesDialogAction,
         tr("Open Event Rules Management")));
 
-    m_buttons[kEventLogButton]->setToolTip(shortcutString(menu::OpenBusinessLogAction,
+    m_buttons[kEventLogButton]->setToolTip(shortcutString(menu::OpenEventLogAction,
         tr("Open Event Log")));
 
     m_buttons[kAuditLogButton]->setToolTip(shortcutString(menu::OpenAuditLogAction,

@@ -36,7 +36,6 @@
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/events/soft_trigger_event.h>
-#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/rule.h>
 #include <nx/vms/rules/utils.h>
 #include <nx/vms/rules/utils/action.h>
@@ -251,11 +250,8 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
     for (const auto& rule: q->systemContext()->eventRuleManager()->rules())
         handleRule(rule);
 
-    if (nx::vms::rules::ini().fullSupport)
-    {
-        for (const auto& [_, rule]: q->systemContext()->vmsRulesEngine()->rules())
-            handleRule(rule.get());
-    }
+    for (const auto& [_, rule]: q->systemContext()->vmsRulesEngine()->rules())
+        handleRule(rule.get());
 
     for (const auto& id: removedIds)
         tryRemoveButton(id);
@@ -495,18 +491,15 @@ void SoftwareTriggerCameraButtonController::setResourceInternal(const QnResource
     d->connections << connect(
         ruleManager, &vms::event::RuleManager::ruleAddedOrUpdated, this, updateButtonByRule);
 
-    if (nx::vms::rules::ini().fullSupport)
-    {
-        auto engine = systemContext->vmsRulesEngine();
+    auto engine = systemContext->vmsRulesEngine();
+    d->connections << connect(
+        engine, &nx::vms::rules::Engine::rulesReset, this, updateButtons);
+    d->connections << connect(
+        engine, &nx::vms::rules::Engine::ruleRemoved, this, tryRemoveButton);
+    d->connections << connect(
+        engine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
+        [engine, updateButtonByRule](auto id) { updateButtonByRule(engine->rule(id).get()); });
 
-        d->connections << connect(
-            engine, &nx::vms::rules::Engine::rulesReset, this, updateButtons);
-        d->connections << connect(
-            engine, &nx::vms::rules::Engine::ruleRemoved, this, tryRemoveButton);
-        d->connections << connect(
-            engine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
-            [engine, updateButtonByRule](auto id) { updateButtonByRule(engine->rule(id).get()); });
-    }
 
     d->updateButtons();
 }

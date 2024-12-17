@@ -9,6 +9,8 @@
 #include "../call_notifications_list_model.h"
 #include "sound_controller.h"
 
+namespace nx::vms::event { class StringsHelper; }
+
 namespace nx::vms::client::desktop {
 
 class CallNotificationsListModel::Private:

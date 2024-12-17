@@ -26,16 +26,6 @@ AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
 }
 
 void AnalyticsSdkEventModel::loadFromCameras(
-    const QnVirtualCameraResourceList& cameras,
-    const nx::vms::event::EventParameters& currentEventParameters)
-{
-    loadFromCameras(
-        cameras,
-        currentEventParameters.getAnalyticsEngineId(),
-        currentEventParameters.getAnalyticsEventTypeId());
-}
-
-void AnalyticsSdkEventModel::loadFromCameras(
         const QnVirtualCameraResourceList& cameras,
         nx::Uuid engineId,
         QString eventTypeId)

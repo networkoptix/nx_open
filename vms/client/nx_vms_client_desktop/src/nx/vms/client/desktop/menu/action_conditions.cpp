@@ -68,7 +68,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/ini.h>
 #include <nx/vms/utils/platform/autorun.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -2351,25 +2350,6 @@ ConditionWrapper hasOtherWindows()
         [](const Parameters& /*parameters*/, WindowContext* /*context*/)
         {
             return appContext()->sharedMemoryManager()->runningInstancesIndices().size() > 1;
-        });
-}
-
-ConditionWrapper hasOldEventRulesEngine()
-{
-    return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, WindowContext* context)
-        {
-            return context->system()->vmsRulesEngine()->isOldEngineEnabled();
-        });
-}
-
-ConditionWrapper hasNewEventRulesEngine()
-{
-    return new CustomBoolCondition(
-        [](const Parameters& /*parameters*/, WindowContext* context)
-        {
-            return nx::vms::rules::ini().fullSupport
-                && context->system()->vmsRulesEngine()->isEnabled();
         });
 }
 

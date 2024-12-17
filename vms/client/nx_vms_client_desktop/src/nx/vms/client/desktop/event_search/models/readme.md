@@ -16,7 +16,7 @@ to QMenu. In the future it might be refactored to completely remove *QtWidgets* 
 [ConcatenationListModel]: @ref nx::vms::client::desktop::ConcatenationListModel
 [MotionSearchListModel]: @ref nx::vms::client::desktop::MotionSearchListModel
 [BookmarkSearchListModel]: @ref nx::vms::client::desktop::BookmarkSearchListModel
-[EventSearchListModel]: @ref nx::vms::client::desktop::EventSearchListModel
+[VmsEventSearchListModel]: @ref nx::vms::client::desktop::VmsEventSearchListModel
 [AnalyticsSearchListModel]: @ref nx::vms::client::desktop::AnalyticsSearchListModel
 [LocalNotificationsManager]: @ref nx::vms::client::desktop::LocalNotificationsManager
 
@@ -75,8 +75,8 @@ notifications about remote bookmark changes, has
 [dynamicUpdate](@ref nx::vms::client::desktop::BookmarkSearchListModel::dynamicUpdate) method
 which should be called periodically to reload bookmarks within specified time period.
 
-### nx::vms::client::desktop::EventSearchListModel
-Performs event log lookup via ***/ec2/getEvents*** request. Allows to apply specified event type
+### nx::vms::client::desktop::VmsEventSearchListModel
+Performs event log lookup via REST API v4. Allows to apply specified event type
 filter. To emulate realtime updates periodically sends extra requests to fetch newly happening
 events.
 

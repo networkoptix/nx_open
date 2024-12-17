@@ -311,17 +311,18 @@ namespace Qn
         ModifiedRole,                               /**< Role for modified state. Value of type bool. */
         DisabledRole,                               /**< Role for disabled state. Value of type bool. */
         ValidRole,                                  /**< Role for valid state. Value of type bool. */
-        ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
+
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::api::EventType. */
-        EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<nx::Uuid>. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::api::ActionType. */
-        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<nx::Uuid>. */
-        ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
-        RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
-        EventParametersRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
+        /** Role for an event type. Value of type QString. */
+        EventTypeRole,
+
+        /** Role for an action type. Value of type QString. */
+        ActionTypeRole,
+
+        /** Role for an action. Value of type nx::vms::rules::ActionPtr. */
+        ActionDataRole,
 
         LookupListEntryRole,                        /**< Role for value of Lookup List Entry object (nx::vms::api::LookupListEntry) */
 

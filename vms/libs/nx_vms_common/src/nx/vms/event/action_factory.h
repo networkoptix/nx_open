@@ -16,24 +16,8 @@ class AggregationInfo;
 class NX_VMS_COMMON_API ActionFactory
 {
 public:
-    static AbstractActionPtr instantiateAction(
-        nx::vms::common::SystemContext* systemContext,
-        const RulePtr& rule,
-        const AbstractEventPtr& event,
-        const nx::Uuid& moduleGuid,
-        EventState state);
-
-    static AbstractActionPtr instantiateAction(
-        nx::vms::common::SystemContext* systemContext,
-        const RulePtr& rule,
-        const AbstractEventPtr& event,
-        const nx::Uuid& moduleGuid,
-        const AggregationInfo& aggregationInfo);
-
     static AbstractActionPtr createAction(const ActionType actionType,
         const EventParameters& runtimeParams);
-
-    static AbstractActionPtr cloneAction(AbstractActionPtr action);
 };
 
 } // namespace event

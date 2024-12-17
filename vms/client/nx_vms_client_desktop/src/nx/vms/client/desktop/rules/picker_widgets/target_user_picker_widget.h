@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <business/business_resource_validation.h>
 #include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/user_validation_policy.h>
 

@@ -266,6 +266,7 @@ LookupListManager* SystemContext::lookupListManager() const
     return d->lookupListManager.get();
 }
 
+//FIXME: #sivanov Old rules engine, should be cleaned up also.
 nx::vms::event::RuleManager* SystemContext::eventRuleManager() const
 {
     return d->eventRuleManager.get();

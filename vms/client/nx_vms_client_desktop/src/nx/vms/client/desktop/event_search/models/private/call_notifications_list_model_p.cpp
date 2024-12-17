@@ -20,7 +20,6 @@
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/intercom/utils.h>
-#include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/strings_helper.h>

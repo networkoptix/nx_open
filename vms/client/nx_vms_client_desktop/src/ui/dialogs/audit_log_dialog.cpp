@@ -623,7 +623,7 @@ void QnAuditLogDialog::setupCheckboxes()
             | Qn::AR_StorageRemove | Qn::AR_ProxySession);
     setupFilterCheckbox(ui->checkBoxBRules,
         colorTheme()->color("auditLog.actions.rules"),
-        Qn::AR_BEventUpdate | Qn::AR_BEventRemove | Qn::AR_BEventReset);
+        Qn::AR_BEventUpdate | Qn::AR_BEventRemove);
     setupFilterCheckbox(
         ui->checkBoxEmail,
         colorTheme()->color("auditLog.actions.emailSettings"),

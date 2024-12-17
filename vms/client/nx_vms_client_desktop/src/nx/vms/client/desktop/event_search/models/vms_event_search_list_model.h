@@ -35,8 +35,8 @@ public:
     void setSelectedSubType(const QString& value);
 
     // Event type list used when selectedEventType() == EventType::undefined.
-    const QStringList& defaultEventTypes() const;
-    void setDefaultEventTypes(const QStringList& value);
+    const std::vector<QString>& defaultEventTypes() const;
+    void setDefaultEventTypes(const std::vector<QString>& value);
 
     virtual bool isConstrained() const override;
     virtual bool hasAccessRights() const override;

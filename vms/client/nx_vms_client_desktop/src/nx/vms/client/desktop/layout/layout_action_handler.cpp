@@ -20,8 +20,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/string.h>
-#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
@@ -52,7 +52,6 @@
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx_ec/abstract_ec_connection.h>

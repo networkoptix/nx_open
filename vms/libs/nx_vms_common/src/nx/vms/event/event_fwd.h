@@ -20,21 +20,14 @@ typedef QSharedPointer<AbstractAction> AbstractActionPtr;
 typedef QList<AbstractActionPtr> AbstractActionList;
 
 class PanicAction;
-typedef QSharedPointer<PanicAction> PanicActionPtr;
-typedef QList<PanicAction> PanicActionList;
-
-struct ActionData;
-typedef std::vector<ActionData> ActionDataList;
 
 class Rule;
 typedef QSharedPointer<Rule> RulePtr;
 typedef QList<RulePtr> RuleList;
 
 struct EventParameters;
-struct ActionParameters;
 struct EventMetaData;
-
-class StringsHelper;
+struct ActionParameters;
 
 using EventReason = nx::vms::api::EventReason;
 using EventState = nx::vms::api::EventState;

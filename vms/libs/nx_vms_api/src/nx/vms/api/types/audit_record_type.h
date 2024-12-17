@@ -25,7 +25,7 @@ NX_REFLECTION_ENUM_CLASS(AuditRecordType,
     serverRemove = 0x4000,
     eventRemove = 0x8000,
     userRemove = 0x10000,
-    eventReset = 0x20000,
+    // 0x20000 - unused
     databaseRestore = 0x40000,
     deviceInsert = 0x80000,
     updateInstall = 0x100000,

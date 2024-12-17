@@ -99,7 +99,6 @@ struct RestResultWithData
 template<typename Data>
 using ErrorOrData = std::variant<nx::network::rest::Result, Data>;
 
-using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
 
 struct ServerConnectionBase
@@ -381,16 +380,6 @@ public:
 
     Handle getTimeOfServersAsync(
         Result<MultiServerTimeData>::type callback,
-        QThread* targetThread = nullptr);
-
-    Handle getEvents(
-        const nx::Uuid& serverId,
-        QnEventLogRequestData request,
-        Result<EventLogData>::type callback,
-        QThread* targetThread = nullptr);
-
-    Handle getEvents(const QnEventLogMultiserverRequestData& request,
-        Result<EventLogData>::type callback,
         QThread* targetThread = nullptr);
 
     Handle eventLog(

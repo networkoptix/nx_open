@@ -25,6 +25,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/utils/audit_log_conversion.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/text/time_strings.h>
 #include <nx/vms/time/formatter.h>
@@ -82,9 +83,6 @@ NX_DECLARE_COLORIZED_ICON(kCameraIcon, "20x20/Solid/camera.svg", \
 
 } // namespace
 
-// -------------------------------------------------------------------------- //
-// QnEventLogModel::DataIndex
-// -------------------------------------------------------------------------- //
 class QnAuditLogModel::DataIndex
 {
 public:
@@ -253,11 +251,6 @@ private:
     const QnResourcePool* m_resourcePool;
 };
 
-
-// -------------------------------------------------------------------------- //
-// QnEventLogModel
-// -------------------------------------------------------------------------- //
-
 bool QnAuditLogModel::hasDetail(const QnLegacyAuditRecord* record)
 {
     return record->extractParam("detail") == "1";
@@ -405,8 +398,6 @@ QString QnAuditLogModel::eventTypeToString(Qn::LegacyAuditRecordType eventType)
             return tr("Event rule removed");
         case Qn::AR_UserRemove:
             return tr("User removed");
-        case Qn::AR_BEventReset:
-            return tr("Event rules reset to default");
         case Qn::AR_DatabaseRestore:
             return tr("Database restored");
         case Qn::AR_UpdateInstall:
@@ -459,14 +450,17 @@ QString QnAuditLogModel::eventDescriptionText(const QnLegacyAuditRecord* data) c
     {
         case Qn::AR_CameraRemove:
         case Qn::AR_StorageRemove:
-            result = QString::fromUtf8(data->extractParam("description"));
-            break;
         case Qn::AR_ServerRemove:
-        case Qn::AR_BEventRemove:
-        case Qn::AR_BEventUpdate:
         case Qn::AR_UserRemove:
         case Qn::AR_SystemNameChanged:
             result = QString::fromUtf8(data->extractParam("description"));
+            break;
+
+        case Qn::AR_BEventRemove:
+        case Qn::AR_BEventUpdate:
+            result = nx::vms::rules::utils::detailedTextFromAuditLogFormat(
+                QString::fromUtf8(data->extractParam("description")),
+                systemContext()->vmsRulesEngine());
             break;
 
         case Qn::AR_UnauthorizedLogin:
@@ -904,7 +898,6 @@ QVariant QnAuditLogModel::colorForType(Qn::LegacyAuditRecordType actionType) con
     case Qn::AR_ServerRemove:
     case Qn::AR_ProxySession:
         return core::colorTheme()->color("auditLog.actions.updateServer");
-    case Qn::AR_BEventReset:
     case Qn::AR_BEventUpdate:
     case Qn::AR_BEventRemove:
         return core::colorTheme()->color("auditLog.actions.rules");

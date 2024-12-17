@@ -40,7 +40,7 @@
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_health/system_health_data_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
@@ -119,7 +119,6 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     base_type(),
     WindowContextAware(q),
     q(q),
-    m_helper(new nx::vms::event::StringsHelper(system())),
     m_popupSystemHealthFilter(system()->userNotificationSettingsManager()->watchedMessages())
 {
     // Handle system health state.

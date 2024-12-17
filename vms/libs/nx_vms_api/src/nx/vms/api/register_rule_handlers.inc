@@ -13,13 +13,6 @@ void registerRuleHandlers(
     const auto engine = serverModule->vmsRulesEngine();
     const auto reg = processorPool->createRegisterHandlerFunctor();
 
-    // TODO: #amalov Fix the handle apidoc return type when removing old engine handler.
-    std::unique_ptr<nx::network::rest::Handler> v3LogHandler;
-    if (std::string_view{nx::vms::rules::ini().rulesEngine} != "new")
-        v3LogHandler = std::make_unique<EventLogHandlerOldEngine>(serverModule, serverConnector);
-    else
-        v3LogHandler = std::make_unique<EventLogHandlerOldFilter>(serverModule, serverConnector);
-
     /**%apidoc GET /rest/v3/servers/{serverId}/events
      * %caption Read Server Event Log
      * %ingroup Servers
@@ -31,10 +24,10 @@ void registerRuleHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Event log and audit trail view.
-     * %return Server event log.
+     * %return:{EventLogRecordV3List} Server event log.
      */
     reg("rest/v3/servers/:serverId/events", GlobalPermission::viewLogs,
-        std::move(v3LogHandler));
+        std::make_unique<EventLogHandlerOldFilter>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/events/manifest/events
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.

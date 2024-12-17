@@ -210,44 +210,17 @@ void initialize(Manager* manager, Action* root)
                 MatchMode::any)
             && !condition::showreelIsRunning());
 
-    // VMS Rules and Event log actions.
-
-    // TODO: #amalov Remove the flag with the old engine.
-    static const bool isOldEngineEnabled =
-        condition::hasOldEventRulesEngine()->check(Parameters(), manager->windowContext());
-
-    factory(OpenBusinessLogAction)
-        .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget
-            | LayoutItemTarget | WidgetTarget | GlobalHotkey)
-        .mode(DesktopMode)
-        .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .shortcut(isOldEngineEnabled ? "Ctrl+L" : "")
-        .condition(!condition::showreelIsRunning() && condition::hasOldEventRulesEngine())
-        .text(ContextMenu::tr("Event Log...")); //< To be displayed on button tooltip
+//-------------------------------------------------------------------------------------------------
+// VMS Rules and Event log actions.
 
     factory(OpenEventLogAction)
         .flags(GlobalHotkey | NoTarget | SingleTarget | MultiTarget
             | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .mode(DesktopMode)
         .requiredGlobalPermission(GlobalPermission::viewLogs)
-        .shortcut(isOldEngineEnabled ? "Ctrl+Alt+L" : "Ctrl+L")
+        .shortcut("Ctrl+L")
         .text("Event log...")
-        .condition(!condition::showreelIsRunning()
-            && condition::hasNewEventRulesEngine());
-
-    factory(OpenBusinessRulesAction)
-        .mode(DesktopMode)
-        .flags(NoTarget | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
-        .condition(condition::hasOldEventRulesEngine())
-        .requiredPowerUserPermissions();
-
-    factory(BusinessEventsAction)
-        .flags(GlobalHotkey)
-        .mode(DesktopMode)
-        .requiredPowerUserPermissions()
-        .text(ContextMenu::tr("Event Rules..."))
-        .shortcut(isOldEngineEnabled ? "Ctrl+E" : "")
-        .condition(!condition::showreelIsRunning() && condition::hasOldEventRulesEngine());
+        .condition(!condition::showreelIsRunning());
 
     factory(OpenVmsRulesDialogAction)
             .flags(GlobalHotkey | NoTarget | SingleTarget | MultiTarget | ResourceTarget
@@ -255,24 +228,17 @@ void initialize(Manager* manager, Action* root)
             .mode(DesktopMode)
             .requiredPowerUserPermissions()
             .text(ContextMenu::tr("Event Rules..."))
-            .shortcut(isOldEngineEnabled ? "Ctrl+Alt+E" : "Ctrl+E")
-            .condition(!condition::showreelIsRunning()
-                && condition::hasNewEventRulesEngine());
-
-    factory(AcknowledgeEventAction)
-        .mode(DesktopMode)
-        .flags(NoTarget | SingleTarget | ResourceTarget)
-        .condition(
-            condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
-            && condition::hasFlags(Qn::live_cam, MatchMode::all));
+            .shortcut("Ctrl+E")
+            .condition(!condition::showreelIsRunning());
 
     factory(AcknowledgeNotificationAction)
         .mode(DesktopMode)
         .flags(NoTarget | SingleTarget | ResourceTarget)
         .condition(
             condition::hasPermissionsForResources(Qn::ManageBookmarksPermission)
-            && condition::hasFlags(Qn::live_cam, MatchMode::all)
-            && condition::hasNewEventRulesEngine());
+            && condition::hasFlags(Qn::live_cam, MatchMode::all));
+
+//-------------------------------------------------------------------------------------------------
 
     factory(OpenFailoverPriorityAction)
         .mode(DesktopMode)
@@ -1742,27 +1708,6 @@ void initialize(Manager* manager, Action* root)
                 !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));
 
-    factory(CameraBusinessRulesAction)
-        .mode(DesktopMode)
-        .flags(Scene | Tree | Table | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .dynamicText(new DevicesNameTextFactory(
-            QnCameraDeviceStringSet(
-                ContextMenu::tr("Device Rules..."),
-                ContextMenu::tr("Camera Rules..."),
-                ContextMenu::tr("I/O Module Rules...")
-            ), manager))
-        .requiredPowerUserPermissions()
-        .condition(
-            condition::hasFlags(
-                /*require*/ Qn::live_cam,
-                /*exclude*/ Qn::cross_system | Qn::virtual_camera,
-                MatchMode::any)
-            && !condition::showreelIsRunning()
-            && condition::hasOldEventRulesEngine()
-            && condition::scoped(SceneScope,
-                !condition::isShowreelReviewMode()
-                && !condition::isPreviewSearchMode()));
-
     factory(CameraVmsRulesAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | Table | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1779,7 +1724,6 @@ void initialize(Manager* manager, Action* root)
                 /*exclude*/ Qn::cross_system | Qn::virtual_camera,
                 MatchMode::any)
             && !condition::showreelIsRunning()
-            && condition::hasNewEventRulesEngine()
             && condition::scoped(SceneScope,
                 !condition::isShowreelReviewMode()
                 && !condition::isPreviewSearchMode()));

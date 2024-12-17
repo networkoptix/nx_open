@@ -14,7 +14,6 @@
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/utils/schedule.h>
-#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/event.h>
 #include <utils/common/delayed.h>
@@ -80,8 +79,6 @@ Engine::Engine(
 {
     systemContext->setVmsRulesEngine(this);
 
-    setEnabledFieldsFromIni();
-
     m_aggregationTimer->setInterval(1s);
     connect(m_aggregationTimer, &QTimer::timeout, this,
         [this]()
@@ -92,7 +89,7 @@ Engine::Engine(
                 handler->onTimer(0);
         });
 
-    if (m_router) //< Router may absent in test scenarios.
+    if (m_router) //< Router may be absent in test scenarios.
     {
         connect(m_router.get(), &Router::eventReceived, this, &Engine::onEventReceived);
         connect(m_router.get(), &Router::actionReceived, this, &Engine::processAcceptedAction);
@@ -135,23 +132,6 @@ Engine::~Engine()
 Router* Engine::router() const
 {
     return m_router.get();
-}
-
-void Engine::setEnabledFieldsFromIni()
-{
-    const QString rulesVersion(ini().rulesEngine);
-    m_enabled = (rulesVersion == "new" || rulesVersion == "both");
-    m_oldEngineEnabled = (rulesVersion != "new");
-}
-
-bool Engine::isEnabled() const
-{
-    return m_enabled;
-}
-
-bool Engine::isOldEngineEnabled() const
-{
-    return m_oldEngineEnabled;
 }
 
 bool Engine::addEventConnector(EventConnector *eventConnector)
@@ -841,9 +821,6 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(
 
 size_t Engine::processEvent(const EventPtr& event)
 {
-    if (!m_enabled)
-        return 0;
-
     checkOwnThread();
     NX_VERBOSE(this, "Processing Event: %1, state: %2", event->type(), event->state());
 

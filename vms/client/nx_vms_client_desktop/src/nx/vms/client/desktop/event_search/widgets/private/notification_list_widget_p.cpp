@@ -12,7 +12,6 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
-#include <business/business_resource_validation.h>
 #include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -47,7 +46,6 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/rules/ini.h>
 #include <ui/common/palette.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workaround/hidpi_workarounds.h>

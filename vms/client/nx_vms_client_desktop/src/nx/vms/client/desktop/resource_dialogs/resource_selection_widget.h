@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <business/business_resource_validation.h>
 #include <core/resource/resource.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_dialogs/detailed_resource_tree_widget.h>

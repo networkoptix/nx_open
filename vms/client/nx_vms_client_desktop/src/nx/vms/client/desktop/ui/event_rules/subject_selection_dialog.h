@@ -8,7 +8,6 @@
 #include <QtCore/QScopedPointer>
 #include <QtGui/QValidator>
 
-#include <business/business_resource_validation.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>

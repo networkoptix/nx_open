@@ -8,7 +8,6 @@
 #include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
-#include <business/business_resource_validation.h>
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_message_processor.h>
@@ -124,69 +123,6 @@ AlarmLayoutHandler::AlarmLayoutHandler(QObject *parent):
                 workbench()->removeLayout(d->alarmLayout);
                 d->alarmLayout.clear();
             }
-        });
-
-    const auto messageProcessor = qnClientMessageProcessor;
-
-    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const vms::event::AbstractActionPtr& action)
-        {
-            if (action->actionType() != vms::api::ActionType::showOnAlarmLayoutAction)
-                return;
-
-            if (!context()->user())
-                return;
-
-            const auto params = action->getParams();
-            const auto runtimeParams = action->getRuntimeParams();
-
-            /* Skip action if it contains list of users and we are not on the list. */
-            if (!QnBusiness::actionAllowedForUser(action, context()->user()))
-                return;
-
-            auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                action->getResources());
-            if (action->getParams().useSource)
-            {
-                targetCameras << action->getSourceResources(
-                    resourcePool()).filtered<QnVirtualCameraResource>();
-            }
-
-            // Remove duplicates.
-            std::sort(targetCameras.begin(), targetCameras.end());
-            targetCameras.erase(std::unique(targetCameras.begin(), targetCameras.end()),
-                targetCameras.end());
-
-            targetCameras = targetCameras.filtered(
-                [this](const auto& camera)
-                {
-                    return systemContext()->accessController()->hasPermissions(camera,
-                        Qn::ViewContentPermission);
-                });
-
-            if (targetCameras.isEmpty())
-                return;
-
-            ActionKey key{action->getRuleId(), action->getRuntimeParams().eventTimestampUsec};
-            if (d->processingActions.contains(key))
-                return; /* See d->processingActions comment. */
-
-            d->processingActions.append(key);
-            executeDelayedParented(
-                [this, key] { d->processingActions.removeOne(key); },
-                kProcessingActionTimeout,
-                this);
-
-            bool switchToLayoutNeeded = params.forced;
-            int rewindForMs = params.recordBeforeMs;
-            auto camerasPositionUs = (rewindForMs == 0)
-                ? DATETIME_NOW
-                : duration_cast<microseconds>(
-                    microseconds(runtimeParams.eventTimestampUsec) - milliseconds(rewindForMs)
-                ).count();
-
-            if ((params.forced && currentInstanceIsMain()) || alarmLayoutExists())
-                openCamerasInAlarmLayout(targetCameras, switchToLayoutNeeded, camerasPositionUs);
         });
 
     connect(

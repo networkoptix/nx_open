@@ -2,9 +2,6 @@
 
 #include "plugin.h"
 
-#include <nx/vms/rules/ini.h>
-#include <nx/vms/rules/utils/openapi_doc.h>
-
 namespace nx::vms::rules {
 
 Plugin::Plugin()

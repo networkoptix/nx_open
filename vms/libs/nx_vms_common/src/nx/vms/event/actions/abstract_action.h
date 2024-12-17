@@ -53,57 +53,6 @@ NX_VMS_COMMON_API bool isActionProlonged(ActionType actionType, const ActionPara
 NX_VMS_COMMON_API QList<ActionType> userAvailableActions();
 NX_VMS_COMMON_API QList<ActionType> allActions();
 
-struct NX_VMS_COMMON_API ActionData
-{
-    // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
-    enum Flags {
-        VideoLinkExists = 1
-    };
-
-    ActionData(): actionType(ActionType::undefinedAction), flags(0) {}
-    ActionData(const ActionData&) = default;
-    ActionData(ActionData&&) = default;
-    ActionData& operator=(const ActionData&) = default;
-    ActionData& operator=(ActionData&&) = default;
-
-    bool hasFlags(int value) const { return flags & value; }
-
-    /**%apidoc Type of the Action. */
-    ActionType actionType;
-
-    /**%apidoc
-     * Parameters of the Action. Only fields which are applicable to the particular Action are used.
-     */
-    ActionParameters actionParams;
-
-    /**%apidoc Parameters of the Event which triggered the Action. */
-    EventParameters eventParams;
-
-    /**%apidoc Id of the Event Rule. */
-    nx::Uuid businessRuleId; //< TODO: Should be renamed to eventRuleId, considering compatibility.
-
-    /**%apidoc Number of identical Events grouped into one. */
-    int aggregationCount;
-
-    /**%apidoc Combination of the flags:
-     * - 1 indicates that the Action has a video link.
-     */
-    int flags{0};
-    QString compareString; //< TODO: This string is used on a client side for internal purpose. Need to move it to separate class.
-
-    QString toString() const;
-
-    bool canHaveVideoLink() const;
-};
-
-#define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
-
-QN_FUSION_DECLARE_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record), NX_VMS_COMMON_API)
-NX_REFLECTION_INSTRUMENT(ActionData, ActionData_Fields)
-
-// Helper function for log data sorting & merging.
-inline qint64 getTimestamp(const ActionData& data) { return data.eventParams.eventTimestampUsec; }
-
 /**
  * Base class for business actions
  */

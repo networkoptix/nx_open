@@ -15,7 +15,6 @@
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/ini.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -121,8 +120,7 @@ struct DelayedDataLoader::Private
         if (ini().lookupLists && q->accessController()->hasPowerUserPermissions())
             loadLookupLists();
 
-        if (q->systemContext()->vmsRulesEngine()->isEnabled() && nx::vms::rules::ini().fullSupport)
-            loadAcknowledge();
+        loadAcknowledge();
     }
 };
 

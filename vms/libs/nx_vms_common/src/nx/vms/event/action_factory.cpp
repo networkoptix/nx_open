@@ -13,55 +13,6 @@ namespace nx {
 namespace vms {
 namespace event {
 
-AbstractActionPtr ActionFactory::instantiateAction(
-    SystemContext* systemContext,
-    const RulePtr& rule,
-    const AbstractEventPtr& event,
-    const nx::Uuid& moduleGuid,
-    EventState state)
-{
-    EventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
-    runtimeParams.sourceServerId = moduleGuid;
-
-    AbstractActionPtr result = createAction(rule->actionType(), runtimeParams);
-
-    result->setParams(rule->actionParams());
-    result->setResources(rule->actionResources());
-
-    if (hasToggleState(event->getEventType(), runtimeParams, systemContext) &&
-        hasToggleState(rule->actionType()))
-    {
-        EventState value = (state != EventState::undefined) ? state : event->getToggleState();
-        result->setToggleState(value);
-    }
-
-    result->setRuleId(rule->id());
-    return result;
-}
-
-AbstractActionPtr ActionFactory::instantiateAction(
-    SystemContext* systemContext,
-    const RulePtr& rule,
-    const AbstractEventPtr& event,
-    const nx::Uuid& moduleGuid,
-    const AggregationInfo& aggregationInfo)
-{
-    auto result =
-        instantiateAction(systemContext, rule, event, moduleGuid, EventState::undefined);
-    if (!result)
-        return result;
-
-    result->setAggregationCount(aggregationInfo.totalCount());
-
-    if (event->getEventType() == EventType::ldapSyncIssueEvent)
-        LdapSyncIssueEvent::encodeReasons(aggregationInfo, result->getRuntimeParams());
-
-    if (auto sendMailAction = result.dynamicCast<class SendMailAction>())
-        sendMailAction->setAggregationInfo(aggregationInfo);
-
-    return result;
-}
-
 AbstractActionPtr ActionFactory::createAction(
     const ActionType actionType,
     const EventParameters& runtimeParams)
@@ -100,13 +51,6 @@ AbstractActionPtr ActionFactory::createAction(
             NX_ASSERT(false, "Unexpected action type: %1", actionType);
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
     }
-}
-
-AbstractActionPtr ActionFactory::cloneAction(AbstractActionPtr action)
-{
-    AbstractActionPtr result = createAction(action->actionType(), action->getRuntimeParams());
-    result->assign(*action);
-    return result;
 }
 
 } // namespace event

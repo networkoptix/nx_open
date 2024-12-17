@@ -9,8 +9,6 @@ struct QnThumbnailRequestData;
 struct QnSendStatisticsRequestData;
 struct QnUpdateFreeSpaceReply;
 struct QnCloudHostCheckReply;
-struct QnEventLogRequestData;
-struct QnEventLogMultiserverRequestData;
 
 namespace nx::vms::common {
 

@@ -3,7 +3,6 @@
 #include "notification_list_model_p.h"
 
 #include <analytics/common/object_metadata.h>
-#include <business/business_resource_validation.h>
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -457,6 +456,7 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     m_uuidHashes[action->ruleId()][actionSourceId(action)].insert(eventData.id);
 }
 
+//FIXME: #sivanov Old rules engine, should be cleaned up also.
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
 {
     using namespace std::chrono;
@@ -641,8 +641,9 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 break;
         }
 
-        if (camera)
-            setupAcknowledgeAction(eventData, camera->getId(), action);
+        // FIXME: #sivanov investigate whether this can be called.
+        /*if (camera)
+            setupAcknowledgeAction(eventData, camera->getId(), action);*/
     }
     else
     {
@@ -766,58 +767,6 @@ void NotificationListModel::Private::removeAllItems(nx::Uuid ruleId)
         for (const auto id: itemsToRemove)
             q->removeEvent(id);
     }
-}
-
-void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData,
-    const nx::Uuid& cameraId, const nx::vms::event::AbstractActionPtr& action)
-{
-    if (action->actionType() != vms::api::ActionType::showPopupAction)
-    {
-        NX_ASSERT(false, "Invalid action type");
-        return;
-    }
-
-    auto& actionParams = action->getParams();
-    if (!actionParams.requireConfirmation(action->getRuntimeParams().eventType))
-        return;
-
-    if (!NX_ASSERT(!cameraId.isNull()))
-        return;
-
-    const auto camera = system()->resourcePool()->getResourceById(cameraId);
-    if (!camera || !system()->accessController()->hasPermissions(camera,
-        Qn::ManageBookmarksPermission))
-    {
-        return;
-    }
-
-    eventData.removable = false;
-    eventData.level = QnNotificationLevel::Value::CriticalNotification;
-
-    eventData.extraAction = CommandActionPtr(new CommandAction());
-
-    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
-    eventData.extraAction->setText(tr("Acknowledge"));
-
-    // TODO: #sivanov Fix hardcoded action parameters.
-    static const auto kDurationMs = std::chrono::milliseconds(std::chrono::seconds(10));
-    actionParams.durationMs = kDurationMs.count();
-    actionParams.recordBeforeMs = 0;
-
-    const auto actionHandler =
-        [this, cameraId, action]()
-        {
-            // TODO: FIXME! Could permissions have changed by this moment?
-            menu::Parameters params;
-            const auto camera = system()->resourcePool()->getResourceById(cameraId);
-            if (camera && camera->systemContext() && !camera->hasFlags(Qn::removed))
-                params.setResources({camera});
-            params.setArgument(Qn::ActionDataRole, action);
-            menu()->trigger(menu::AcknowledgeEventAction, params);
-        };
-
-    connect(eventData.extraAction.data(), &CommandAction::triggered,
-        [this, actionHandler]() { executeLater(actionHandler, this); });
 }
 
 void NotificationListModel::Private::setupAcknowledgeAction(

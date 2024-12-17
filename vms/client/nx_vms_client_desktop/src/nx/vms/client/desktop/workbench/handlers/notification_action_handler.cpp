@@ -7,7 +7,6 @@
 #include <QtGui/QAction>
 #include <QtGui/QGuiApplication>
 
-#include <business/business_resource_validation.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
@@ -29,6 +28,7 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
@@ -54,6 +54,72 @@ using namespace std::chrono;
 using namespace nx::vms::event;
 
 namespace {
+
+bool actionAllowedForUser(
+    const nx::vms::event::AbstractActionPtr& action,
+    const QnUserResourcePtr& user)
+{
+    if (!user)
+        return false;
+
+    const auto eventType = action->getRuntimeParams().eventType;
+    if (eventType >= nx::vms::api::EventType::siteHealthEvent
+        && eventType <= nx::vms::api::EventType::maxSiteHealthEvent)
+    {
+        const auto healthMessage = nx::vms::common::system_health::MessageType(
+            eventType - nx::vms::api::EventType::siteHealthEvent);
+
+        if (healthMessage == nx::vms::common::system_health::MessageType::showIntercomInformer
+            || healthMessage == nx::vms::common::system_health::MessageType::showMissedCallInformer)
+        {
+            const auto& runtimeParameters = action->getRuntimeParams();
+
+            const auto systemContext =
+                qobject_cast<nx::vms::client::desktop::SystemContext*>(user->systemContext());
+            if (!NX_ASSERT(systemContext))
+                return false;
+
+            const QnResourcePtr cameraResource =
+                systemContext->resourcePool()->getResourceById(runtimeParameters.eventResourceId);
+
+            const bool hasViewPermission = cameraResource &&
+                systemContext->accessController()->hasPermissions(
+                    cameraResource,
+                    Qn::ViewContentPermission);
+
+            if (hasViewPermission)
+                return true;
+        }
+    }
+
+    switch (action->actionType())
+    {
+        case nx::vms::event::ActionType::fullscreenCameraAction:
+        case nx::vms::event::ActionType::exitFullscreenAction:
+            return true;
+        default:
+            break;
+    }
+
+    const auto params = action->getParams();
+    if (params.allUsers)
+        return true;
+
+    const auto userId = user->getId();
+    const auto& subjects = params.additionalResources;
+
+    if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
+        return true;
+
+    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
+    for (const auto& groupId: userGroups)
+    {
+        if (std::find(subjects.cbegin(), subjects.cend(), groupId) != subjects.cend())
+            return true;
+    }
+
+    return false;
+}
 
 QString toString(AbstractActionPtr action)
 {
@@ -107,9 +173,6 @@ NotificationActionHandler::NotificationActionHandler(
             setSystemHealthEventVisible(MessageType::replacedDeviceDiscovered, resource, false);
         });
 
-    connect(action(menu::AcknowledgeEventAction), &QAction::triggered,
-        this, &NotificationActionHandler::handleAcknowledgeEventAction);
-
     connect(this, &NotificationActionHandler::notificationAdded,
         this,
         [this](const AbstractActionPtr& action)
@@ -127,75 +190,6 @@ NotificationActionHandler::NotificationActionHandler(
 
 NotificationActionHandler::~NotificationActionHandler()
 {
-}
-
-void NotificationActionHandler::handleAcknowledgeEventAction()
-{
-    const auto actionParams = menu()->currentParameters(sender());
-    const auto businessAction =
-        actionParams.argument<AbstractActionPtr>(Qn::ActionDataRole);
-    const auto camera = actionParams.resource().dynamicCast<QnVirtualCameraResource>();
-
-    const auto creationCallback =
-        [this, businessAction, parentThreadId = QThread::currentThreadId()](bool success)
-        {
-            if (QThread::currentThreadId() != parentThreadId)
-            {
-                NX_ASSERT(false, "Invalid thread!");
-                return;
-            }
-
-            if (!success)
-                return;
-
-            const auto action = CommonAction::createBroadcastAction(
-                ActionType::showPopupAction, businessAction->getParams());
-            action->setToggleState(nx::vms::api::EventState::inactive);
-
-            if (const auto connection = system()->messageBusConnection())
-            {
-                const auto manager = connection->getEventRulesManager(nx::network::rest::kSystemSession);
-                nx::vms::api::EventActionData actionData;
-                ec2::fromResourceToApi(action, actionData);
-                manager->broadcastEventAction(actionData, [](int /*handle*/, ec2::ErrorCode) {});
-            }
-        };
-
-    if (!camera || !camera->systemContext())
-    {
-        QnMessageBox::warning(mainWindowWidget(),
-            tr("Unable to acknowledge event on removed camera."));
-
-        creationCallback(true);
-
-        // Hiding notification instantly to keep UX smooth.
-        removeNotification(businessAction);
-        return;
-    }
-
-    auto bookmark = nx::vms::common::bookmarkFromAction(businessAction, camera);
-    if (!bookmark.isValid())
-        return;
-
-    const auto bookmarksDialog = std::make_unique<QnCameraBookmarkDialog>(
-        /*mandatoryDescription*/ true, mainWindowWidget());
-
-    bookmark.description = {}; //< Force user to fill description out.
-    bookmarksDialog->loadData(bookmark);
-    if (bookmarksDialog->exec() != QDialog::Accepted)
-        return;
-
-    bookmarksDialog->submitData(bookmark);
-    bookmark.creationTimeStampMs = qnSyncTime->value();
-
-    const auto systemContext = nx::vms::client::desktop::SystemContext::fromResource(camera);
-    systemContext->cameraBookmarksManager()->addAcknowledge(
-        bookmark,
-        businessAction->getRuleId(),
-        creationCallback);
-
-    // Hiding notification instantly to keep UX smooth.
-    removeNotification(businessAction);
 }
 
 void NotificationActionHandler::handleFullscreenCameraAction(
@@ -263,9 +257,10 @@ void NotificationActionHandler::clear()
 void NotificationActionHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
     const auto eventType = action->getRuntimeParams().eventType;
+    const bool isSystemHealthEvent = eventType >= vms::api::EventType::siteHealthEvent
+        && eventType <= vms::api::EventType::maxSiteHealthEvent;
 
-    if (eventType >= vms::api::EventType::siteHealthEvent
-        && eventType <= vms::api::EventType::maxSiteHealthEvent)
+    if (NX_ASSERT(isSystemHealthEvent, "Events from the old rules engine must not occur"))
     {
         int healthMessage = eventType - vms::api::EventType::siteHealthEvent;
         addSystemHealthEvent(MessageType(healthMessage), action);
@@ -385,6 +380,9 @@ void NotificationActionHandler::at_context_userChanged()
 void NotificationActionHandler::at_businessActionReceived(
     const vms::event::AbstractActionPtr& action)
 {
+    NX_ASSERT(action->actionType() == nx::vms::api::ActionType::showPopupAction,
+        "Old engine is disabled, so only system health events should get here.");
+
     NX_VERBOSE(this, "An action is received: %1", toString(action));
 
     const auto user = system()->user();
@@ -394,7 +392,7 @@ void NotificationActionHandler::at_businessActionReceived(
         return;
     }
 
-    if (!QnBusiness::actionAllowedForUser(action, user))
+    if (!actionAllowedForUser(action, user))
     {
         NX_VERBOSE(this, "The action is not allowed for the user %1", user->getName());
 
@@ -425,6 +423,7 @@ void NotificationActionHandler::at_businessActionReceived(
             break;
         }
 
+        // IMPORTANT: System Health Events are coming as showPopupAction.
         case vms::api::ActionType::showPopupAction: //< Fallthrough
         case vms::api::ActionType::playSoundAction:
         {

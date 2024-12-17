@@ -151,17 +151,13 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(ModifiedRole),
         IDR_ITEM(DisabledRole),
         IDR_ITEM(ValidRole),
-        IDR_ITEM(ActionIsInstantRole),
+
         IDR_ITEM(ShortTextRole),
         IDR_ITEM(PriorityRole),
 
         IDR_ITEM(EventTypeRole),
-        IDR_ITEM(EventResourcesRole),
         IDR_ITEM(ActionTypeRole),
-        IDR_ITEM(ActionResourcesRole),
         IDR_ITEM(ActionDataRole),
-        IDR_ITEM(RuleModelRole),
-        IDR_ITEM(EventParametersRole),
 
         IDR_ITEM(StorageUrlRole),
 

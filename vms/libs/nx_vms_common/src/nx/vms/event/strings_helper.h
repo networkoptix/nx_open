@@ -69,36 +69,10 @@ public:
     QStringList eventDetails(
         const EventParameters& params, AttrSerializePolicy policy) const;
 
-    enum Url { localIp, publicIp, cloud };
-
-    /**
-     * Construct url, opening webadmin view for the given camera at the given time.
-     * @param id Camera id.
-     * @param timestamp Timestamp.
-     * @param urlType Url type. Actual for server-side only.
-     * @param proxyAddress Force proxy address to be used. Actual for the client side only.
-     */
-    QString urlForCamera(
-        const nx::Uuid& id,
-        std::chrono::milliseconds timestamp,
-        Url urlType,
-        const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt) const;
-
-    QString toggleStateToString(EventState state) const;
-    QString ruleDescriptionText(const RulePtr& rule) const;
-    QString sourceCameraCheckboxText(ActionType actionType) const;
-
-    QString eventTypeString(
-        EventType eventType,
-        EventState eventState,
-        ActionType actionType,
-        const ActionParameters& actionParams) const;
-
     QnResourcePtr eventSource(const EventParameters &params) const;
     QString eventReason(const EventParameters& params) const;
     QString resourceTypeName(const EventParameters& params) const;
 
-    QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
     QString eventTimestampTime(const EventParameters &params) const;
     QString eventTimestampDate(const EventParameters &params) const;
 

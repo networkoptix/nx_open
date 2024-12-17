@@ -15,6 +15,7 @@ namespace nx {
 namespace vms {
 namespace event {
 
+//FIXME: #sivanov Old rules engine, should be cleaned up also.
 class NX_VMS_COMMON_API RuleManager: public QObject
 {
     Q_OBJECT

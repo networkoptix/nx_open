@@ -974,6 +974,7 @@ APPLY(805, execAction, nx::vms::api::EventActionData, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
+/**%apidoc[proprietary] */ \
 APPLY(810, getVmsRules, nx::vms::api::rules::RuleList, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \
@@ -985,7 +986,7 @@ APPLY(810, getVmsRules, nx::vms::api::rules::RuleList, \
     FilterListByAccess<AllowForAllAccess>(), /*< filter read func */ \
     ReadListAccessOut<AllowForAllAccess>(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
+/**%apidoc[proprietary] */ \
 APPLY(811, saveVmsRule, nx::vms::api::rules::Rule, \
     true, /*< isPersistent */ \
     false, /*< isSystem */ \
@@ -997,7 +998,7 @@ APPLY(811, saveVmsRule, nx::vms::api::rules::Rule, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
+/**%apidoc[proprietary] */ \
 APPLY(812, removeVmsRule, nx::vms::api::IdData, \
     true, /*< isPersistent */ \
     false, /*< isSystem */ \
@@ -1009,7 +1010,7 @@ APPLY(812, removeVmsRule, nx::vms::api::IdData, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
+/**%apidoc[proprietary] */ \
 APPLY(813, resetVmsRules, nx::vms::api::rules::ResetRules, \
     true, /*< isPersistent */ \
     false, /*< isSystem */ \
@@ -1024,7 +1025,7 @@ APPLY(813, resetVmsRules, nx::vms::api::rules::ResetRules, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
+/**%apidoc[proprietary] */ \
 APPLY(814, transmitVmsEvent, nx::vms::api::rules::EventInfo, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \
@@ -1036,7 +1037,7 @@ APPLY(814, transmitVmsEvent, nx::vms::api::rules::EventInfo, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
+/**%apidoc[proprietary] */ \
 APPLY(815, transmitVmsAction, nx::vms::api::rules::ActionInfo, \
     false, /*< isPersistent */ \
     false, /*< isSystem */ \

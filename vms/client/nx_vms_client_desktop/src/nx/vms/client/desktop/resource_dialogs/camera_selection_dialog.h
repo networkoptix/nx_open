@@ -4,7 +4,6 @@
 
 #include <optional>
 
-#include <business/business_resource_validation.h>
 #include <core/resource/resource.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_widget.h>
@@ -273,6 +272,31 @@ bool CameraSelectionDialog::resourceValidator(
         return true;
 
     return policy.isResourceValid(context, target);
+}
+
+template<typename ResourcePolicy>
+static bool isResourcesListValid(
+    SystemContext* context,
+    const ResourcePolicy& policy,
+    const QnResourceList& resources)
+{
+    typedef typename ResourcePolicy::resource_type ResourceType;
+
+    auto filtered = resources.filtered<ResourceType>();
+
+    if (filtered.isEmpty())
+        return ResourcePolicy::emptyListIsValid();
+
+    if (filtered.size() > 1 && !ResourcePolicy::multiChoiceListIsValid())
+        return false;
+
+    for (const auto& resource: filtered)
+    {
+        if (!policy.isResourceValid(context, resource))
+            return false;
+    }
+
+    return true;
 }
 
 template<typename ResourcePolicy>

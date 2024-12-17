@@ -311,32 +311,14 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(
     SystemContextAware(systemContext),
     cachedEventTypesTree(makeNode(NodeType::root, {}))
 {
+    using Engine = nx::vms::rules::Engine;
     const auto engine = systemContext->vmsRulesEngine();
-
-    if (engine->isOldEngineEnabled())
-    {
-        using RuleManager = nx::vms::event::RuleManager;
-        const auto ruleManager = systemContext->eventRuleManager();
-
-        connect(ruleManager, &RuleManager::rulesReset,
-            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-        connect(ruleManager, &RuleManager::ruleAddedOrUpdated,
-            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-        connect(ruleManager, &RuleManager::ruleRemoved,
-            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-    }
-
-    if (engine->isEnabled())
-    {
-        using Engine = nx::vms::rules::Engine;
-
-        connect(engine, &Engine::rulesReset,
-            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-        connect(engine, &Engine::ruleAddedOrUpdated,
-            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-        connect(engine, &Engine::ruleRemoved,
-            this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
-    }
+    connect(engine, &Engine::rulesReset,
+        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    connect(engine, &Engine::ruleAddedOrUpdated,
+        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    connect(engine, &Engine::ruleRemoved,
+        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
 
     auto notifyAboutResourceListChanges =
         [this](const QnResourceList& resources)
@@ -408,25 +390,12 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
 
     QSet<api::analytics::EventTypeId> actuallyUsedEventTypes;
     const auto engine = systemContext()->vmsRulesEngine();
-
-    if (engine->isOldEngineEnabled())
+    for (const auto& [_, rule]: engine->rules())
     {
-        for (const auto& rule: systemContext()->eventRuleManager()->rules())
+        for (const auto& filter: rule->eventFiltersByType(kAnalyticsEventType))
         {
-            if (rule->eventType() == EventType::analyticsSdkEvent)
-                actuallyUsedEventTypes.insert(rule->eventParams().getAnalyticsEventTypeId());
-        }
-    }
-
-    if (engine->isEnabled())
-    {
-        for (const auto& [_, rule] : systemContext()->vmsRulesEngine()->rules())
-        {
-            for (const auto& filter : rule->eventFiltersByType(kAnalyticsEventType))
-            {
-                actuallyUsedEventTypes.insert(
-                    filter->fieldByType<rules::AnalyticsEventTypeField>()->typeId());
-            }
+            actuallyUsedEventTypes.insert(
+                filter->fieldByType<rules::AnalyticsEventTypeField>()->typeId());
         }
     }
 

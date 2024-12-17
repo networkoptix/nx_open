@@ -213,7 +213,6 @@ struct CameraSettingsDialog::Private: public QObject
                 break;
 
             case menu::CameraIssuesAction:
-            case menu::CameraBusinessRulesAction:
             case menu::CameraVmsRulesAction:
             case menu::OpenInNewTabAction:
                 q->menu()->trigger(action, cameras);

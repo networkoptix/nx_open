@@ -19,6 +19,7 @@ namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::rules {
 
 struct UuidSelection;
+class Engine;
 
 class NX_VMS_RULES_API Strings
 {
@@ -60,10 +61,12 @@ public:
         Url urlType,
         const std::optional<nx::network::SocketAddress>& proxyAddress = std::nullopt);
 
+    static QString eventName(Engine* engine, const QString& type);
     static QString eventName(common::SystemContext* context, const QString& type);
     // Keep in sync with StringsHelper::eventDetails(). Includes reason.
     static QStringList eventDetails(const QVariantMap& details);
 
+    static QString actionName(Engine* engine, const QString& type);
     static QString actionName(common::SystemContext* context, const QString& type);
 
     static QString anyEvent();

@@ -143,7 +143,6 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/adjust_video_dialog.h>
-#include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/camera_password_change_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -296,18 +295,12 @@ ActionHandler::ActionHandler(QObject *parent) :
             openSystemAdministrationDialog(QnSystemAdministrationDialog::Analytics, url);
         });
 
-    connect(action(menu::BusinessEventsAction), &QAction::triggered, this,
-        &ActionHandler::at_businessEventsAction_triggered);
-    connect(action(menu::OpenBusinessRulesAction), &QAction::triggered, this,
-        &ActionHandler::at_openBusinessRulesAction_triggered);
     connect(action(menu::OpenFailoverPriorityAction), &QAction::triggered, this,
         &ActionHandler::openFailoverPriorityDialog);
     connect(action(menu::OpenBookmarksSearchAction), &QAction::triggered, this,
         &ActionHandler::at_openBookmarksSearchAction_triggered);
     connect(action(menu::OpenIntegrationsAction), &QAction::triggered, this,
         &ActionHandler::openIntegrationsActionTriggered);
-    connect(action(menu::OpenBusinessLogAction), &QAction::triggered, this,
-        &ActionHandler::at_openBusinessLogAction_triggered);
     connect(action(menu::OpenAuditLogAction), &QAction::triggered, this,
         &ActionHandler::at_openAuditLogAction_triggered);
     connect(action(menu::CameraListAction), &QAction::triggered, this
@@ -355,8 +348,7 @@ ActionHandler::ActionHandler(QObject *parent) :
         this, &ActionHandler::undoReplaceCameraActionTriggered);
     connect(action(menu::CameraIssuesAction), &QAction::triggered, this,
         &ActionHandler::at_cameraIssuesAction_triggered);
-    connect(action(menu::CameraBusinessRulesAction), &QAction::triggered, this,
-        &ActionHandler::at_cameraBusinessRulesAction_triggered);
+
     connect(action(menu::CameraDiagnosticsAction), &QAction::triggered, this,
         &ActionHandler::at_cameraDiagnosticsAction_triggered);
     connect(action(menu::PingAction), &QAction::triggered, this,
@@ -738,15 +730,6 @@ void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
         layout->setPredefinedCellSpacing(spacing);
         action(actionId())->setChecked(true);
     }
-}
-
-QnBusinessRulesDialog *ActionHandler::businessRulesDialog() const
-{
-    return m_businessRulesDialog.data();
-}
-
-QnEventLogDialog *ActionHandler::businessEventsLogDialog() const {
-    return m_businessEventsLogDialog.data();
 }
 
 QnCameraListDialog *ActionHandler::cameraListDialog() const {
@@ -1948,26 +1931,6 @@ void ActionHandler::at_aboutAction_triggered() {
     dialog->exec();
 }
 
-void ActionHandler::at_businessEventsAction_triggered() {
-    menu()->trigger(menu::OpenBusinessRulesAction);
-}
-
-void ActionHandler::at_openBusinessRulesAction_triggered()
-{
-    QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindowWidget());
-
-    QStringList filter;
-    const auto parameters = menu()->currentParameters(sender());
-    QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-    if (!cameras.isEmpty())
-    {
-        NX_ASSERT(cameras.size() == 1); // currently filter is not implemented for several cameras
-        for (const auto& camera: cameras)
-            filter.append(camera->getId().toSimpleString());
-    }
-    businessRulesDialog()->setFilter(filter.join(' '));
-}
-
 void ActionHandler::at_webClientAction_triggered()
 {
     const auto server = currentServer();
@@ -2125,30 +2088,6 @@ void ActionHandler::openIntegrationsActionTriggered()
 
     m_integrationsDialog->open();
     m_integrationsDialog->raise();
-}
-
-void ActionHandler::at_openBusinessLogAction_triggered() {
-    QnNonModalDialogConstructor<QnEventLogDialog> dialogConstructor(m_businessEventsLogDialog, mainWindowWidget());
-
-    const auto parameters = menu()->currentParameters(sender());
-
-    vms::api::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::api::EventType::anyEvent);
-    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-    QSet<nx::Uuid> ids;
-    for (auto camera: cameras)
-        ids << camera->getId();
-
-    // show diagnostics if Issues action was triggered
-    if (eventType != vms::api::EventType::anyEvent || !ids.isEmpty())
-    {
-        businessEventsLogDialog()->disableUpdateData();
-        businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(vms::api::ActionType::diagnosticsAction);
-        auto now = QDateTime::currentMSecsSinceEpoch();
-        businessEventsLogDialog()->setDateRange(now, now);
-        businessEventsLogDialog()->setCameraList(ids);
-        businessEventsLogDialog()->enableUpdateData();
-    }
 }
 
 void ActionHandler::at_openAuditLogAction_triggered()
@@ -2497,10 +2436,6 @@ void ActionHandler::undoReplaceCameraActionTriggered()
 
 void ActionHandler::at_cameraIssuesAction_triggered()
 {
-    menu()->trigger(menu::OpenBusinessLogAction,
-        menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, vms::api::EventType::anyCameraEvent));
-
     auto parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::EventTypeRole, QString(nx::vms::rules::kDeviceIssueEventGroup));
     parameters.setArgument(
@@ -2511,11 +2446,6 @@ void ActionHandler::at_cameraIssuesAction_triggered()
     parameters.setArgument(Qn::TimePeriodRole, QnTimePeriod::fromInterval(now, now));
 
     menu()->trigger(menu::OpenEventLogAction, parameters);
-}
-
-void ActionHandler::at_cameraBusinessRulesAction_triggered() {
-    menu()->trigger(menu::OpenBusinessRulesAction,
-        menu()->currentParameters(sender()));
 }
 
 void ActionHandler::at_cameraDiagnosticsAction_triggered() {
@@ -2540,9 +2470,6 @@ void ActionHandler::at_serverLogsAction_triggered()
 
 void ActionHandler::at_serverIssuesAction_triggered()
 {
-    menu()->trigger(menu::OpenBusinessLogAction,
-        {Qn::EventTypeRole, vms::api::EventType::anyServerEvent});
-
     auto parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::EventTypeRole, QString(nx::vms::rules::kServerIssueEventGroup));
     parameters.setArgument(
@@ -3460,13 +3387,8 @@ void ActionHandler::at_openImportFromDevicesDialog_triggered()
     dialog->exec();
 }
 
-void ActionHandler::deleteDialogs() {
-    if (businessRulesDialog())
-        delete businessRulesDialog();
-
-    if (businessEventsLogDialog())
-        delete businessEventsLogDialog();
-
+void ActionHandler::deleteDialogs()
+{
     if (adjustVideoDialog())
         delete adjustVideoDialog();
 

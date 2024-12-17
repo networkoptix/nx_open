@@ -196,7 +196,6 @@ constexpr auto visitAllConversions(Visitor&& visitor)
         Conversion<AuditRecordType::storageRemove>{detailsToParams::resource, paramsToDetails::resource},
         Conversion<AuditRecordType::eventUpdate>{detailsToParams::resource, paramsToDetails::resource},
         Conversion<AuditRecordType::eventRemove>{detailsToParams::resource, paramsToDetails::resource},
-        Conversion<AuditRecordType::eventReset>{detailsToParams::nothing, paramsToDetails::nothing},
         Conversion<AuditRecordType::serverUpdate>{detailsToParams::resource, paramsToDetails::resource},
         Conversion<AuditRecordType::serverRemove>{detailsToParams::resource, paramsToDetails::resource},
         Conversion<AuditRecordType::siteNameChanged>{detailsToParams::description, paramsToDetails::description},

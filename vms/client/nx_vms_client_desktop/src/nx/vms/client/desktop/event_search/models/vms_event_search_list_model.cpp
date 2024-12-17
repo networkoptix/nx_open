@@ -127,7 +127,7 @@ struct VmsEventSearchListModel::Private
     QString selectedEventType;
     QString selectedSubType;
 
-    QStringList defaultEventTypes;
+    std::vector<QString> defaultEventTypes;
 
     std::deque<nx::vms::api::rules::EventLogRecord> data;
 
@@ -220,7 +220,7 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
     if (!selectedEventType.isEmpty())
         filter.eventType = {selectedEventType};
     else if (!defaultEventTypes.empty())
-        filter.eventType = nx::toStdVector(defaultEventTypes);
+        filter.eventType = defaultEventTypes;
 
     NX_VERBOSE(q, "Requesting events:\n"
         "    from: %1\n    to: %2\n    type: %3\n    subtype: %4\n    sort: %5\n    limit: %6",
@@ -382,12 +382,12 @@ void VmsEventSearchListModel::setSelectedSubType(const QString& value)
     emit selectedSubTypeChanged();
 }
 
-const QStringList& VmsEventSearchListModel::defaultEventTypes() const
+const std::vector<QString>& VmsEventSearchListModel::defaultEventTypes() const
 {
     return d->defaultEventTypes;
 }
 
-void VmsEventSearchListModel::setDefaultEventTypes(const QStringList& value)
+void VmsEventSearchListModel::setDefaultEventTypes(const std::vector<QString>& value)
 {
     d->defaultEventTypes = value;
     clear();

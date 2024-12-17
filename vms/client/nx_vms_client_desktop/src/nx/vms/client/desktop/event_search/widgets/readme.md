@@ -10,7 +10,7 @@
 [AbstractSearchListModel]: @ref nx::vms::client::desktop::LocalNotificationsListModel
 [SimpleMotionSearchListModel]: @ref nx::vms::client::desktop::MotionSearchListModel
 [BookmarkSearchListModel]: @ref nx::vms::client::desktop::BookmarkSearchListModel
-[EventSearchListModel]: @ref nx::vms::client::desktop::EventSearchListModel
+[VmsEventSearchListModel]: @ref nx::vms::client::desktop::VmsEventSearchListModel
 [AnalyticsSearchListModel]: @ref nx::vms::client::desktop::AnalyticsSearchListModel
 [MotionSearchSynchronizer]: @ref nx::vms::client::desktop::MotionSearchSynchronizer
 [BookmarkSearchSynchronizer]: @ref nx::vms::client::desktop::BookmarkSearchSynchronizer
@@ -56,8 +56,8 @@ updates by calling [BookmarkSearchListModel::dynamicUpdate]
 currently in view. This widget is syncronized with **Workbench** state by
 [BookmarkSearchSynchronizer].
 
-### nx::vms::client::desktop::EventSearchWidget
-Events tab widget. Owns [EventSearchListModel]. Implements additional filter by event type.
+### nx::vms::client::desktop::VmsEventSearchWidget
+Events tab widget. Owns [VmsEventSearchListModel]. Implements additional filter by event type.
 
 ### nx::vms::client::desktop::AnalyticsSearchWidget
 Analytics tab widget. Owns [AnalyticsSearchListModel]. Implements additional filters by

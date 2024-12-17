@@ -50,9 +50,9 @@
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
-#include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/notification_tab_model.h>
 #include <nx/vms/client/desktop/event_search/models/simple_motion_search_list_model.h>
+#include <nx/vms/client/desktop/event_search/models/vms_event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/analytics_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
@@ -70,6 +70,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/migration_utils.h>
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/strings.h>
 #include <ui/workbench/workbench_context.h>
@@ -567,8 +568,6 @@ void RightPanelModelsAdapter::showOnLayout(int row)
 void RightPanelModelsAdapter::showEventLog()
 {
     if (NX_ASSERT(d->context()))
-        d->context()->menu()->trigger(menu::OpenBusinessLogAction);
-    if (NX_ASSERT(d->context()))
         d->context()->menu()->trigger(menu::OpenEventLogAction);
 }
 
@@ -1033,18 +1032,21 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
 
         case core::EventSearch::SearchType::events:
         {
-            const auto eventsModel = new EventSearchListModel(m_context, visualItemDecorator);
+            const auto eventsModel = new VmsEventSearchListModel(m_context, visualItemDecorator);
             visualItemDecorator->setSourceModel(eventsModel);
 
+            // TODO: #sivanov #amalov Probably we should use metadata from event class instead.
             using nx::vms::api::EventType;
+            using namespace nx::vms::event;
             eventsModel->setDefaultEventTypes({
-                EventType::analyticsSdkEvent,
-                EventType::cameraDisconnectEvent,
-                EventType::cameraInputEvent,
-                EventType::cameraIpConflictEvent,
-                EventType::networkIssueEvent,
-                EventType::softwareTriggerEvent,
-                EventType::userDefinedEvent});
+                eventTypesMap[EventType::analyticsSdkEvent],
+                eventTypesMap[EventType::cameraDisconnectEvent],
+                eventTypesMap[EventType::cameraInputEvent],
+                eventTypesMap[EventType::cameraIpConflictEvent],
+                eventTypesMap[EventType::networkIssueEvent],
+                eventTypesMap[EventType::softwareTriggerEvent],
+                eventTypesMap[EventType::userDefinedEvent]
+            });
 
             m_analyticsEvents.reset(
                 new AnalyticsEventModel(

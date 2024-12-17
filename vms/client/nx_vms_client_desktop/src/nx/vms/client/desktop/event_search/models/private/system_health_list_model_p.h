@@ -87,7 +87,6 @@ private:
 
 private:
     SystemHealthListModel* const q = nullptr;
-    QScopedPointer<vms::event::StringsHelper> m_helper;
     std::deque<Item> m_items; //< Kept sorted.
     QList<MessageType> m_popupSystemHealthFilter;
 };

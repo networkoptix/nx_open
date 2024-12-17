@@ -69,11 +69,6 @@ public:
     void setId(nx::Uuid id);
     Router* router() const;
 
-    void setEnabledFieldsFromIni();
-
-    bool isEnabled() const;
-    bool isOldEngineEnabled() const;
-
     bool addEventConnector(EventConnector* eventConnector);
     bool addActionExecutor(const QString& actionType, ActionExecutor* actionExecutor);
 
@@ -250,9 +245,6 @@ private:
     void stopRunningAction(const ActionPtr& action);
 
 private:
-    bool m_enabled = false;
-    bool m_oldEngineEnabled = true;
-
     nx::Uuid m_id;
     std::unique_ptr<Router> m_router;
 

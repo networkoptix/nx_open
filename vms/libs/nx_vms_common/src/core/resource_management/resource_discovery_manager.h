@@ -137,10 +137,6 @@ protected:
 signals:
     void localSearchDone();
     void localInterfacesChanged();
-    void CameraIPConflict(
-        std::chrono::microseconds timestamp,
-        const QHostAddress& addr,
-        const QStringList& macAddrList);
 
 protected:
     /** Allows Server's descendant to trigger specific behavior on Edge devices. */

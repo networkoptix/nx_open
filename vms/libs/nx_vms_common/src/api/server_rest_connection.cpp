@@ -9,8 +9,6 @@
 
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/empty_request_data.h>
-#include <api/helpers/event_log_multiserver_request_data.h>
-#include <api/helpers/event_log_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/model/cloud_credentials_data.h>
@@ -1320,23 +1318,6 @@ Handle ServerConnection::getAuditLogRecords(
         std::move(callback),
         targetThread,
         proxyToServer);
-}
-
-Handle ServerConnection::getEvents(
-    const nx::Uuid& serverId,
-    QnEventLogRequestData request,
-    Result<EventLogData>::type callback,
-    QThread* targetThread)
-{
-    request.format = Qn::SerializationFormat::ubjson;
-    return executeGet("/api/getEvents", request.toParams(), callback, targetThread, serverId);
-}
-
-Handle ServerConnection::getEvents(const QnEventLogMultiserverRequestData& request,
-    Result<EventLogData>::type callback,
-    QThread* targetThread)
-{
-    return executeGet(lit("/ec2/getEvents"), request.toParams(), callback, targetThread);
 }
 
 Handle ServerConnection::eventLog(

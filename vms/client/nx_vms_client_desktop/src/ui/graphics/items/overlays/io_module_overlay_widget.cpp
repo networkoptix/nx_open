@@ -17,7 +17,6 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx_ec/data/api_conversion_functions.h>

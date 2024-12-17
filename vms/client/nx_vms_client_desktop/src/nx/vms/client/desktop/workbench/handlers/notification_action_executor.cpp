@@ -24,7 +24,6 @@
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/engine.h>
-#include <nx/vms/rules/ini.h>
 #include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/field.h>
