@@ -119,7 +119,7 @@ namespace Mustache
         virtual QString eval(const QString& key, const QString& _template, Mustache::Renderer* renderer);
 
         /** Set of keys which were not found in the provided context. */
-        QSet<QString> missingKeys() const
+        const QSet<QString>& missingKeys() const
         {
             return m_missingKeys;
         }

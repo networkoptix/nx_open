@@ -142,7 +142,7 @@ QVariant QtVariantContext::value(const QString& key) const
             return value;
         }
     }
-    m_missingKeys.insert(key);
+
     return QVariant();
 }
 
@@ -176,7 +176,12 @@ bool QtVariantContext::isFalse(const QString& key) const
 
 QString QtVariantContext::stringValue(const QString& key) const
 {
-    return value(key).toString();
+    const auto& value = this->value(key);
+
+    if (!value.isValid())
+        m_missingKeys.insert(key);
+
+    return value.toString();
 }
 
 void QtVariantContext::push(const QString& key, int index)
