@@ -1725,7 +1725,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation type="unfinished">Enable cross-domain policy</translation>
+      <translation>Włącz zasady międzydomenowe</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1745,7 +1745,7 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery</translation>
+      <translation>Udostępnij adresy IP do automatycznego wykrywania</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>

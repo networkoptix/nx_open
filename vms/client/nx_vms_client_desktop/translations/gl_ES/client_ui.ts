@@ -3077,7 +3077,7 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Papeis/roles</translation>
     </message>
     <message>
       <source>Show all users</source>
