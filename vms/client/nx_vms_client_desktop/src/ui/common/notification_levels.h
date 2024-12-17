@@ -27,6 +27,8 @@ Value valueOf(const nx::vms::event::EventParameters& params);
 Value valueOf(
     nx::vms::common::SystemContext* systemContext,
     nx::vms::common::system_health::MessageType messageType);
+int priority(nx::vms::common::SystemContext* systemContext,
+    nx::vms::common::system_health::MessageType messageType);
 
 QColor notificationTextColor(Value level);
 QColor notificationColor(Value level);

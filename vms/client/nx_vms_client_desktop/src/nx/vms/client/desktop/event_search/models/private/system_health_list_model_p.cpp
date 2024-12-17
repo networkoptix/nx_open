@@ -792,7 +792,7 @@ int SystemHealthListModel::Private::priority(SystemContext* systemContext, Messa
             return priorityValue(kInvalidRecordingSchedulePriority);
 
         default:
-            return int(QnNotificationLevel::valueOf(systemContext, message));
+            return QnNotificationLevel::priority(systemContext, message);
     }
 }
 

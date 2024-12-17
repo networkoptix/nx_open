@@ -2,6 +2,9 @@
 
 #include "notification_levels.h"
 
+#include <algorithm>
+#include <ranges>
+
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/system_context.h>
@@ -22,6 +25,47 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::Ab
 QnNotificationLevel::Value QnNotificationLevel::valueOf(const nx::vms::event::EventParameters& params)
 {
     return convert(nx::vms::event::levelOf(params));
+}
+
+int QnNotificationLevel::priority(nx::vms::common::SystemContext* systemContext,
+    nx::vms::common::system_health::MessageType messageType)
+{
+    using nx::vms::common::system_health::MessageType;
+    // Priority of messages from less important to most important. List is ordered by design
+    // team in the specification.
+    static const std::vector priorityOrder = {
+        // Important priorities.
+        MessageType::notificationLanguageDiffers,
+        MessageType::saasInShutdownState,
+        MessageType::saasInSuspendedState,
+        MessageType::saasIntegrationServicesOverused,
+        MessageType::saasCloudStorageServicesOverused,
+        MessageType::saasLocalRecordingServicesOverused,
+        MessageType::metadataStorageNotSet,
+        MessageType::replacedDeviceDiscovered,
+        MessageType::cameraRecordingScheduleIsInvalid,
+        MessageType::metadataOnSystemStorage,
+        MessageType::usersEmailIsEmpty,
+        MessageType::noInternetForTimeSync,
+        MessageType::defaultCameraPasswords,
+        MessageType::smtpIsNotSet,
+        MessageType::noLicenses,
+        MessageType::emailIsEmpty,
+
+        // Critical priorities.
+        MessageType::showMissedCallInformer,
+        MessageType::remoteArchiveSyncError,
+        MessageType::storagesNotConfigured,
+        MessageType::backupStoragesNotConfigured,
+        MessageType::archiveIntegrityFailed,
+        MessageType::emailSendError};
+
+    const int level = static_cast<int>(valueOf(systemContext, messageType)) << 8;
+    int priority = 0;
+    if (const auto it = std::ranges::find(priorityOrder, messageType); it != priorityOrder.end())
+        priority = std::distance(priorityOrder.begin(), it);
+
+    return level | priority;
 }
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(
