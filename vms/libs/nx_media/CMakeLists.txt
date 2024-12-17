@@ -12,8 +12,16 @@ else()
     set(windows_or_linux_x64 FALSE)
 endif()
 
+# For developerBuild, disable CUDA-based Nvidia decoder by default - for compatibility
+# with the latest MSVC compilers.
+if(windows_or_linux_x64 AND NOT developerBuild)
+    set(with_nvidia_decoder_default ON)
+else()
+    set(with_nvidia_decoder_default OFF)
+endif()
+
 nx_option(withQuickSyncDecoder "Enable QuickSync hardware decoder" ${windows_or_linux_x64})
-nx_option(withNvidiaDecoder "Enable Nvidia hardware decoder" ${windows_or_linux_x64})
+nx_option(withNvidiaDecoder "Enable Nvidia hardware decoder" ${with_nvidia_decoder_default})
 
 nx_configure_file(supported_decoders.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/include/nx/media/supported_decoders.h)
