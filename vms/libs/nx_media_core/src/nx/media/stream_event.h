@@ -19,6 +19,7 @@ enum class StreamEvent
     oldFirmware,
     cannotDecryptMedia,
     incompatibleCodec,
+    cameraNotReady,
 };
 
 template<typename Visitor>
@@ -32,7 +33,8 @@ constexpr auto nxReflectVisitAllEnumItems(StreamEvent*, Visitor&& visitor)
         Item{StreamEvent::forbiddenWithNoLicense, "ForbiddenWithNoLicense"},
         Item{StreamEvent::oldFirmware, "oldFirmare"},
         Item{StreamEvent::cannotDecryptMedia, "cannotDecryptMedia"},
-        Item{StreamEvent::incompatibleCodec, "incompatibleCodec"}
+        Item{StreamEvent::incompatibleCodec, "incompatibleCodec"},
+        Item{StreamEvent::cameraNotReady, "cameraNotInitialized"}
     );
 }
 
