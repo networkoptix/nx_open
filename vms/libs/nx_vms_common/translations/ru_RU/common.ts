@@ -210,33 +210,6 @@
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
-        <numerusform>%1 из %n устройств</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
-        <numerusform>%1 из %n камер</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-        <numerusform>%1 из %n модулей ввода/вывода</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Any Device</source>
       <translation>Любое устройство</translation>
@@ -252,6 +225,33 @@
     <message>
       <source>Select at least one camera</source>
       <translation>Выберите хотя бы одну камеру</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 devices</source>
+      <translation type="unfinished">
+        <numerusform>%n из %1 устройств</numerusform>
+        <numerusform>%n of %1 devices</numerusform>
+        <numerusform>%n of %1 devices</numerusform>
+        <numerusform>%n of %1 devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n из %1 камер</numerusform>
+        <numerusform>%n of %1 cameras</numerusform>
+        <numerusform>%n of %1 cameras</numerusform>
+        <numerusform>%n of %1 cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n из %1 модулей ввода/вывода</numerusform>
+        <numerusform>%n of %1 I/O modules</numerusform>
+        <numerusform>%n of %1 I/O modules</numerusform>
+        <numerusform>%n of %1 I/O modules</numerusform>
+      </translation>
     </message>
   </context>
   <context>

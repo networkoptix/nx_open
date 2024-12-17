@@ -198,27 +198,6 @@
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 di %n dispositivi</numerusform>
-        <numerusform>%1 di %n dispositivi</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 di %n telecamere</numerusform>
-        <numerusform>%1 di %n telecamere</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 di %n Moduli I / O</numerusform>
-        <numerusform>%1 di %n Moduli I / O</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Any Device</source>
       <translation>Qualsiasi dispositivo</translation>
@@ -234,6 +213,27 @@
     <message>
       <source>Select at least one camera</source>
       <translation>Seleziona almeno una telecamera</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 devices</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 devices</numerusform>
+        <numerusform>%n of %1 devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 cameras</numerusform>
+        <numerusform>%n of %1 cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 I/O modules</numerusform>
+        <numerusform>%n of %1 I/O modules</numerusform>
+      </translation>
     </message>
   </context>
   <context>

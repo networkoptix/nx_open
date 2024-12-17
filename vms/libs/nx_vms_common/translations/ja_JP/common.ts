@@ -192,24 +192,6 @@
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 / %n デバイス</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 / %n カメラ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 / %n I/O モジュール</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Any Device</source>
       <translation>全デバイス</translation>
@@ -225,6 +207,24 @@
     <message>
       <source>Select at least one camera</source>
       <translation>カメラを1台以上選択してください</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 devices</source>
+      <translation>
+        <numerusform>%n / %1 デバイス</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 cameras</source>
+      <translation>
+        <numerusform>%n / %1 カメラ</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 I/O modules</source>
+      <translation>
+        <numerusform>%n / %1 I/O モジュール</numerusform>
+      </translation>
     </message>
   </context>
   <context>

@@ -192,24 +192,6 @@
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 ของ%n อุปกรณ์</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 ของ%n กล้อง</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 ของ %n I/O โมดูล</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Any Device</source>
       <translation>อุปกรณ์ใดก็ได้</translation>
@@ -225,6 +207,24 @@
     <message>
       <source>Select at least one camera</source>
       <translation>เลือกอย่างน้อยหนึ่งกล้อง</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 devices</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 I/O modules</numerusform>
+      </translation>
     </message>
   </context>
   <context>

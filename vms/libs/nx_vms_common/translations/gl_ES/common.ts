@@ -148,35 +148,35 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administradores</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Usuarios/as avanzados/as</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Visualizadores avanzados</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Espectadores</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Espectadores en directo</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Os membros deste grupo poden ver vídeos en directo, módulos de E/S (I/O) e páxinas web.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Os membros deste grupo poden, ademais dos permisos concedidos polo grupo de espectadores, ver e activar posicións PTZ e percorridos PTZ, usar audio bidireccional, operar botóns do módulo de E/S (I/O), crear e editar marcadores e ver o rexistro de eventos.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Os membros deste grupo poden, ademais dos permisos concedidos polo grupo Live Viewers (Espectadores en directo), ver e exportar arquivos e marcadores.</translation>
     </message>
     <message>
       <source>Site Health Viewers</source>
@@ -198,27 +198,6 @@
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%1 de %n dispositivos</numerusform>
-        <numerusform>%1 de %n dispositivos</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%1 de %n cámaras</numerusform>
-        <numerusform>%1 de %n cámaras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%1 de %n I/O módulos</numerusform>
-        <numerusform>%1 de %n I/O módulos</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Any Device</source>
       <translation>Calquera dispositivo</translation>
@@ -234,6 +213,27 @@
     <message>
       <source>Select at least one camera</source>
       <translation>Selecciona polo menos unha cámara</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 devices</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 devices</numerusform>
+        <numerusform>%n of %1 devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 cameras</numerusform>
+        <numerusform>%n of %1 cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 I/O modules</numerusform>
+        <numerusform>%n of %1 I/O modules</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -615,7 +615,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>Start</source>

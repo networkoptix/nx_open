@@ -12,7 +12,7 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation type="unfinished">ADVANCED SEARCH</translation>
+      <translation>WYSZUKIWANIE ZAAWANSOWANE</translation>
     </message>
   </context>
   <context>
@@ -30,7 +30,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Funkcje beta</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -703,7 +703,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Funkcje beta</translation>
     </message>
     <message>
       <source>Early access to new features</source>

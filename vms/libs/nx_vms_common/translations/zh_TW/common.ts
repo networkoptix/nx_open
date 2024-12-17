@@ -192,24 +192,6 @@
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message numerus="yes">
-      <source>%1 of %n devices</source>
-      <translation>
-        <numerusform>%n 個裝置中的 %1 個</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n cameras</source>
-      <translation>
-        <numerusform>%n 個攝影機中的 %1 個</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%1 of %n I/O modules</source>
-      <translation>
-        <numerusform>%n 個 I/O 模組中的 %1 個</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Any Device</source>
       <translation>任何設備</translation>
@@ -225,6 +207,24 @@
     <message>
       <source>Select at least one camera</source>
       <translation>請選擇至少一個攝影機</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 devices</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 cameras</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 I/O modules</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 I/O modules</numerusform>
+      </translation>
     </message>
   </context>
   <context>
