@@ -21,12 +21,14 @@ public:
 
     int textChangedSignalFilterMs() const;
     void setTextChangedSignalFilterMs(int filterMs);
-
-    void setGlassVisible(bool visible);
+    void setDarkMode(bool darkMode);
 
 private:
-    QAction* m_glassIcon = nullptr;
+    void setColors();
+    QAction* m_searchAction = nullptr;
+    QIcon::Mode m_currentIconMode = QIcon::Normal;
     const QScopedPointer<nx::utils::PendingOperation> m_emitTextChanged;
+    bool m_darkMode = false;
 };
 
 } // namespace nx::vms::client::desktop

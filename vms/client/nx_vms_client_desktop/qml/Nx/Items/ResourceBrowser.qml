@@ -30,7 +30,7 @@ Item
     {
         id: resourceSearchPane
 
-        width: parent.width - x - 1
+        width: parent.width
         menuEnabled: !resourceTree.localFilesMode
         isFilterRelevant: (type => resourceTree.isFilterRelevant(type))
 
@@ -52,11 +52,21 @@ Item
         }
     }
 
+    Rectangle
+    {
+        id: separator
+
+        width: parent.width
+        height: 1
+        y: resourceSearchPane.y + resourceSearchPane.height
+        color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.4)
+    }
+
     ResourceTree
     {
         id: resourceTree
 
-        y: resourceSearchPane.height
+        y: separator.y + separator.height
         width: parent.width - 1
         height: parent.height - y
 

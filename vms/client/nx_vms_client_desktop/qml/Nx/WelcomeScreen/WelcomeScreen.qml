@@ -27,7 +27,6 @@ Rectangle
         || hasHiddenSystems
         || (systemModel.visibilityFilter !== WelcomeScreen.AllSystemsTileScopeFilter))
         || searchEdit.text
-        || searchEdit.query
 
     property ConnectTilesModel systemModel: context.visibleControls && context.gridEnabled
         ? context.systemModel
@@ -186,20 +185,18 @@ Rectangle
                     : grid.tileWidth
                 height: parent.height
 
-                SearchEdit
+                SearchField
                 {
                     id: searchEdit
 
                     anchors.fill: parent
-
                     visible: welcomeScreen.complexVisibilityMode
+                    darkMode: true
 
-                    delay: 200
-
-                    onQueryChanged:
+                    onTextChanged:
                     {
                         if (systemModel)
-                            systemModel.setFilterWildcard(query)
+                            systemModel.setFilterWildcard(text)
                     }
                 }
 

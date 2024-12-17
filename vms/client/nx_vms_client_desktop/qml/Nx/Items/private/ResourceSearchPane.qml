@@ -33,7 +33,10 @@ FocusScope
         id: column
 
         spacing: 1
-
+        bottomPadding: 8
+        leftPadding: 8
+        rightPadding: 8
+        topPadding: 8
         width: resourceSearchPane.width
         height: resourceSearchPane.height
 
@@ -43,16 +46,13 @@ FocusScope
 
             property var filterType: ResourceTree.FilterType.noFilter
 
-            iconPadding: menuEnabled ? 2 : 12
             spacing: menuEnabled ? 4 : 2
-
+            darkMode: true
             height: 32
-            width: parent.width
-            hoveredButtonColor: ColorTheme.lighter(backgroundRect.color, 2)
+            width: parent.width - parent.leftPadding - parent.rightPadding
             focus: true
 
             menu: menuEnabled ? menuInstance : null
-            placeholderText: qsTr("Search")
 
             Keys.onPressed: (event) =>
             {
@@ -99,20 +99,6 @@ FocusScope
                 onAboutToHide:
                     searchField.forceActiveFocus()
             }
-
-            background: Rectangle
-            {
-                id: backgroundRect
-                color: searchField.activeFocus ? ColorTheme.colors.dark1 : ColorTheme.colors.dark3
-            }
-
-            Rectangle
-            {
-                width: parent.width
-                height: 1
-                anchors.top: parent.bottom
-                color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.4)
-            }
         }
 
         Item
@@ -122,7 +108,7 @@ FocusScope
             property alias text: tagButton.text
 
             width: parent.width
-            height: tagButton.height + 16
+            height: tagButton.height + 8
             visible: !!text
 
             TagButton
@@ -145,14 +131,6 @@ FocusScope
                             tagButton.setState(SelectableTextButton.State.Deactivated)
                     }
                 }
-            }
-
-            Rectangle
-            {
-                width: parent.width
-                height: 1
-                anchors.top: parent.bottom
-                color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.4)
             }
         }
     }

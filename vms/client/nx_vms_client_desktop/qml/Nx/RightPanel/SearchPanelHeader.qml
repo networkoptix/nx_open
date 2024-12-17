@@ -40,32 +40,8 @@ Column
         anchors.leftMargin: 8
         anchors.rightMargin: 8
 
+        darkMode: true
         visible: !!d.textFilter
-        placeholderTextColor: ColorTheme.windowText
-
-        iconSource: ""
-        leftPadding: 8
-
-        background: Rectangle
-        {
-            radius: 2
-
-            color:
-            {
-                if (searchField.activeFocus)
-                    return ColorTheme.colors.dark3
-
-                if (searchField.hovered)
-                    return ColorTheme.colors.dark5
-
-                return ColorTheme.colors.dark4
-            }
-
-            border.width: 1
-            border.color: searchField.activeFocus || searchField.hovered
-                ? ColorTheme.colors.dark7
-                : ColorTheme.colors.dark6
-        }
     }
 
     // Do not remove this Control wrapper.

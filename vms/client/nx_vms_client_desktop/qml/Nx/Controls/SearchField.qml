@@ -13,20 +13,49 @@ TextField
 
     property var menu: null
 
-    property color hoveredButtonColor: activeFocus
-        ? ColorTheme.shadow
-        : ColorTheme.lighter(ColorTheme.shadow, 1)
-
-    property real iconPadding: 1
-    property int spacing: 2
+    property bool darkMode: false
+    property color baseColor: darkMode ? ColorTheme.colors.dark3 : ColorTheme.colors.dark5
+    property color borderColor: darkMode ? ColorTheme.colors.dark7 : ColorTheme.colors.dark4
+    property real iconPadding: 6
+    property int spacing: 4
 
     property alias iconSource: actionButton.icon.source
 
     placeholderText: qsTr("Search")
-    placeholderTextColor: ColorTheme.windowText
+    placeholderTextColor: searchField.activeFocus || searchField.hovered
+        ? ColorTheme.lighter(ColorTheme.windowText, 1)
+        : ColorTheme.windowText
 
     leftPadding: actionButton.visible ? (actionButton.x + actionButton.width + spacing) : 8
     rightPadding: enabled ? (width - clearButton.x) : 8
+
+    background: Rectangle
+    {
+        radius: 2
+
+        color:
+        {
+            if (searchField.hovered)
+                return ColorTheme.lighter(baseColor, 1)
+
+            if (searchField.activeFocus)
+                return darkMode ? baseColor : ColorTheme.darker(baseColor, 1)
+
+            return baseColor
+        }
+
+        border.width: 1
+        border.color:
+        {
+            if (darkMode)
+                return borderColor
+
+            if (searchField.hovered)
+                return ColorTheme.lighter(borderColor, 1)
+
+            return searchField.activeFocus ? ColorTheme.darker(borderColor, 2) : borderColor
+        }
+    }
 
     QC2.Button
     {
@@ -38,13 +67,12 @@ TextField
         height: parent.height - 2
         anchors.left: parent.left
         anchors.leftMargin: searchField.iconPadding
-        anchors.verticalCenter: parent.verticalCenter
         focusPolicy: Qt.NoFocus
         padding: 0
 
         icon.source: searchField.menu
-            ? "image://skin/24x20/Outline/search_drop.svg"
-            : "image://skin/20x20/Outline/search.svg"
+            ? "image://skin/24x16/Outline/search_drop.svg"
+            : "image://skin/16x16/Outline/search.svg"
 
         icon.color: searchField.text ? searchField.color : searchField.placeholderTextColor
 
@@ -63,17 +91,12 @@ TextField
                 height: implicitHeight
 
                 sourcePath: actionButton.icon.source
-                sourceSize: searchField.menu ? Qt.size(24, 20) : Qt.size(20, 20)
-
+                sourceSize: searchField.menu ? Qt.size(24, 16) : Qt.size(16, 16)
                 primaryColor: actionButton.icon.color
             }
         }
 
-        background: Rectangle
-        {
-            radius: 1
-            color: (actionButton.hovered && !actionButton.down) ? hoveredButtonColor : "transparent"
-        }
+        background: Item {}
 
         onClicked:
         {
@@ -96,18 +119,16 @@ TextField
         padding: 0
         focusPolicy: Qt.NoFocus
 
-        icon.source: "image://skin/20x20/Outline/cross_close.svg"
+        icon.source: "image://skin/16x16/Outline/close.svg"
+        icon.width: 16
+        icon.height: 16
         icon.color: searchField.color
 
         enabled: searchField.text
         opacity: searchField.text ? 1.0 : 0.0
         Behavior on opacity { NumberAnimation { duration: 100 }}
 
-        background: Rectangle
-        {
-            radius: 1
-            color: (clearButton.hovered && !clearButton.down) ? hoveredButtonColor : "transparent"
-        }
+        background: Item {}
 
         onClicked:
             searchField.clear()
@@ -119,5 +140,10 @@ TextField
 
         function onAboutToShow() { searchField.cursorVisible = false }
         function onAboutToHide() { searchField.cursorVisible = searchField.activeFocus }
+    }
+
+    Keys.onShortcutOverride: (event) =>
+    {
+        event.accepted = activeFocus && (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
     }
 }

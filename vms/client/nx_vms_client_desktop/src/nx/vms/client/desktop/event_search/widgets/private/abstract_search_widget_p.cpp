@@ -101,7 +101,7 @@ NX_DECLARE_COLORIZED_ICON(kCheckedImageIcon,
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     auto result = new SearchLineEdit(parent);
-    result->setGlassVisible(false);
+    result->setDarkMode(true);
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
     result->setAutoFillBackground(false);
@@ -110,19 +110,6 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
     setPaletteColor(result, QPalette::Shadow, Qt::transparent);
 
     result->setFixedHeight(kTextSearchHeight);
-
-    result->setStyleSheet(
-        nx::format(
-            "QLineEdit { background-color: %1; border: 1px solid %2; border-radius: 2px; padding-left: 4; } "
-            "QLineEdit:hover { background-color: %3; border: 1px solid %4; } "
-            "QLineEdit:focus { background-color: %5; border: 1px solid %6; }",
-            core::colorTheme()->color("dark4").name(),
-            core::colorTheme()->color("dark6").name(),
-            core::colorTheme()->color("dark5").name(),
-            core::colorTheme()->color("dark7").name(),
-            core::colorTheme()->color("dark3").name(),
-            core::colorTheme()->color("dark7").name()));
-
     return result;
 }
 

@@ -34,6 +34,10 @@ bool LookupListEntriesSortFilterProxyModel::filterAcceptsRow(
         return true;
 
     const auto filterRegExp = filterRegularExpression();
+
+    if (!filterRegExp.isValid())
+        return false;
+
     if (filterRegExp.pattern().isEmpty())
         return true;
 
