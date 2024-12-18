@@ -78,8 +78,18 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsI
 NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kButtonsIconTheme)
 NX_DECLARE_COLORIZED_ICON(kAddIcon, "16x16/Outline/plussmall.svg", kButtonsIconTheme);
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon,
-    "16x16/Outline/arrow_down.svg",
-    kTitleBarIconSubstitutions) // TODO: check how it works, now it is white arrow
+    "16x16/Outline/arrow_down.svg", kButtonsIconTheme)
+
+NX_DECLARE_COLORIZED_ICON(kMaximizeIcon,
+    "20x20/Outline/expand_main_window.svg", kButtonsIconTheme,
+    "20x20/Outline/restore.svg", kButtonsIconTheme);
+
+NX_DECLARE_COLORIZED_ICON(kMinimizeIcon,
+    "20x20/Outline/collapse_main_window.svg", kButtonsIconTheme);
+
+NX_DECLARE_COLORIZED_ICON(kWhatsThisIcon,
+    "20x20/Outline/help_main_window.svg", kButtonsIconTheme);
+
 
 class ContextMenu
 {
@@ -198,7 +208,7 @@ void initialize(Manager* manager, Action* root)
     factory(WhatsThisAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Help")) //< To be displayed on button tooltip
-        .icon(qnSkin->icon("20x20/Outline/help_main_window.svg"));
+        .icon(qnSkin->icon(kWhatsThisIcon));
 
     factory(CameraDiagnosticsAction)
         .mode(DesktopMode)
@@ -588,18 +598,18 @@ void initialize(Manager* manager, Action* root)
         .toggledText(ContextMenu::tr("Exit Fullscreen"))
         .shortcut(QKeySequence::FullScreen, Builder::Mac, true)
         .shortcutContext(Qt::ApplicationShortcut)
-        .icon(qnSkin->icon("20x20/Outline/expand_main_window.svg", "20x20/Outline/restore.svg"));
+        .icon(qnSkin->icon(kMaximizeIcon));
 
     factory(MinimizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Minimize"))
-        .icon(qnSkin->icon("20x20/Outline/collapse_main_window.svg"));
+        .icon(qnSkin->icon(kMinimizeIcon));
 
     factory(MaximizeAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Maximize"))
         .toggledText(ContextMenu::tr("Restore Down"))
-        .icon(qnSkin->icon("20x20/Outline/expand_main_window.svg", "20x20/Outline/restore.svg"));
+        .icon(qnSkin->icon(kMaximizeIcon));
 
     factory(FullscreenMaximizeHotkeyAction)
         .flags(GlobalHotkey)
