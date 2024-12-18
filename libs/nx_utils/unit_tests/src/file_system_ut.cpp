@@ -472,6 +472,42 @@ TEST_F(CopyMoveTest, MoveFolderContents_ReplaceExistingTrue)
     ASSERT_EQ(QByteArray("src"), file3.readAll());
 }
 
+TEST_F(CopyMoveTest, MoveFolderContents_TargetIsEmpty)
+{
+    const auto srcDirPath = createPath("src");
+    createPath("src/dir1");
+    createPath("src/dir2");
+    createFile("src/dir1/file1", Location::source, "src");
+    createFile("src/dir2/file2", Location::source, "src");
+    createFile("src/file0", Location::source, "src");
+
+    const auto tgtDirPath = createPath("tgt", Location::target);
+    ASSERT_EQ(
+        file_system::Result::ok,
+        file_system::moveFolderContents(srcDirPath, tgtDirPath, /*replace*/ true).code);
+
+    ASSERT_FALSE(QDir(srcDirPath + "/dir1").exists());
+    ASSERT_FALSE(QDir(srcDirPath + "/dir2").exists());
+    ASSERT_FALSE(QFile(srcDirPath + "/dir1/file1").exists());
+    ASSERT_FALSE(QFile(srcDirPath + "/dir2/file2").exists());
+    ASSERT_FALSE(QFile(srcDirPath + "/file0").exists());
+
+    ASSERT_TRUE(QDir(tgtDirPath + "/dir1").exists());
+    ASSERT_TRUE(QDir(tgtDirPath + "/dir2").exists());
+
+    auto file1 = QFile(tgtDirPath + "/dir1/file1");
+    ASSERT_TRUE(file1.open(QIODevice::ReadOnly));
+    ASSERT_EQ(QByteArray("src"), file1.readAll());
+
+    auto file2 = QFile(tgtDirPath + "/dir2/file2");
+    ASSERT_TRUE(file2.open(QIODevice::ReadOnly));
+    ASSERT_EQ(QByteArray("src"), file2.readAll());
+
+    auto file3 = QFile(tgtDirPath + "/file0");
+    ASSERT_TRUE(file3.open(QIODevice::ReadOnly));
+    ASSERT_EQ(QByteArray("src"), file3.readAll());
+}
+
 TEST_F(CopyMoveTest, MoveFolderContents_ReplaceExistingFalse)
 {
     const auto srcDirPath = createPath("src");
