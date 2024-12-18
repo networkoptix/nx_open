@@ -6,6 +6,7 @@
 
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QPushButton>
 
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -15,7 +16,6 @@
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/transform_listener_instrument.h>
-#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/widgets/word_wrapped_label.h>
 #include <utils/math/color_transformations.h>
 
@@ -55,12 +55,12 @@ void makeTransparentForMouse(QGraphicsItem* item)
     disableFocus(item);
 }
 
-QnMaskedProxyWidget* makeMaskedProxy(
+QGraphicsProxyWidget* makeProxy(
     QWidget* source,
     QGraphicsItem* parentItem,
     bool transparent)
 {
-    const auto result = new QnMaskedProxyWidget(parentItem);
+    const auto result = new QGraphicsProxyWidget(parentItem);
     result->setWidget(source);
     result->setAcceptDrops(false);
 
@@ -343,6 +343,9 @@ void QnStatusOverlayWidget::setCaption(const QString& caption)
 
 void QnStatusOverlayWidget::setButtonText(const QString& text)
 {
+     if(m_button->text() == text)
+        return;
+
     m_button->setText(text);
     updateAreaSizes();
 }
@@ -480,7 +483,7 @@ bool QnStatusOverlayWidget::eventFilter(QObject* obj, QEvent* event)
                 break;
         }
     }
-    return false;
+    return base_type::eventFilter(obj, event);
 }
 
 void QnStatusOverlayWidget::setupPreloader()
@@ -518,7 +521,7 @@ void QnStatusOverlayWidget::setupCentralControls()
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
-    horizontalLayout->addItem(makeMaskedProxy(m_centralContainer, m_centralHolder, false));
+    horizontalLayout->addItem(makeProxy(m_centralContainer, m_centralHolder, false));
     horizontalLayout->addStretch(1);
 
     const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_centralHolder);
@@ -549,7 +552,7 @@ void QnStatusOverlayWidget::setupExtrasControls()
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_extrasHolder);
     horizontalLayout->addStretch(1);
-    horizontalLayout->addItem(makeMaskedProxy(m_extrasContainer, m_extrasHolder, false));
+    horizontalLayout->addItem(makeProxy(m_extrasContainer, m_extrasHolder, false));
     horizontalLayout->addStretch(1);
 
     makeTransparentForMouse(m_extrasHolder);

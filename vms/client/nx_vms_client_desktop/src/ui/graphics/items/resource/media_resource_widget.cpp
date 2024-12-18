@@ -817,7 +817,10 @@ void QnMediaResourceWidget::initStatusOverlayController()
                     processEncryptedArchiveUnlockRequst();
                     break;
                 case Qn::ResourceOverlayButton::Authorize:
-                    processCloudAuthorizationRequest();
+                    if (d->camera.dynamicCast<CrossSystemCameraResource>())
+                        processCloudAuthorizationRequest();
+                    else
+                        processSettingsRequest();
                     break;
                 default:
                     NX_ASSERT("Unexpected button type");
@@ -3171,7 +3174,11 @@ void QnMediaResourceWidget::processCloudAuthorizationRequest()
 {
     const auto camera = d->camera.dynamicCast<CrossSystemCameraResource>();
     if (!camera)
+    {
+        NX_ASSERT(false, tr("Cloud authorization request should only be performed "
+                            "for cloud cross system resources"));
         return;
+    }
 
     appContext()->cloudCrossSystemManager()->systemContext(camera->systemId())->cloudAuthorize();
 }
