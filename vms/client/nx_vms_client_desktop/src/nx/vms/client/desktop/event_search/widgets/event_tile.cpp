@@ -82,11 +82,11 @@ EventTile::EventTile(QWidget* parent):
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    setPaletteColor(this, QPalette::Base, core::colorTheme()->color("dark5"));
     setPaletteColor(this, QPalette::Light, core::colorTheme()->color("light7"));
     setPaletteColor(this, QPalette::WindowText, core::colorTheme()->color("light16"));
     setPaletteColor(this, QPalette::Text, core::colorTheme()->color("light4"));
     setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
+    // Background colors are configured inside of Private::updatePalette().
 
     QSizePolicy sizePolicy = ui->closeButton->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);

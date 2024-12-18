@@ -67,7 +67,7 @@ QColor parseColor(const QString& value)
     return {};
 }
 
-void initializeThemeSpecificColors(QJsonObject* object)
+void initializeThemeSpecificColors(QJsonObject* object, bool invertColors)
 {
     static const QString kDarkTheme = "dark_theme";
     static const QString kLightTheme = "light_theme";
@@ -76,12 +76,12 @@ void initializeThemeSpecificColors(QJsonObject* object)
     if (!object->contains(kDarkTheme) || !object->contains(kLightTheme))
         return;
 
-    const auto theme = ini().invertColors ? kLightTheme : kDarkTheme;
+    const auto theme = invertColors ? kLightTheme : kDarkTheme;
     for (const auto& color: kThemeSpecificColors)
         object->insert(color, QString("%1.%2").arg(theme, color));
 }
 
-QJsonObject generatedColorScheme(const ColorTree& basicColors)
+QJsonObject generatedColorScheme(const ColorTree& basicColors, bool invertColors)
 {
     const auto kBrandStep = 0.03;
     const auto kBrandBackground = 0.15;
@@ -123,7 +123,7 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors)
                 return "#ff6c00";
 
             if (themeName == "gray_white")
-                return ini().invertColors ? "#000000" : "#ffffff";
+                return invertColors ? "#000000" : "#ffffff";
 
             // Default: dark_blue.
             return "#2fa2db";
@@ -232,7 +232,7 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors)
         result.insert(QString("@dark%1").arg(i + 1), dark.name());
         result.insert(QString("@light%1").arg(i + 1), light.name());
 
-        if (ini().invertColors)
+        if (invertColors)
             qSwap(dark, light);
 
         result.insert(QString("dark%1").arg(i + 1), dark.name());
@@ -288,6 +288,8 @@ struct ColorTheme::Private
 {
     ColorTheme* const q;
 
+    bool invertColors = false;
+
     ColorTree::ColorMap colorsByPath;
     QVariantMap colorTree;
     mutable QJSValue jsColorTree;
@@ -328,13 +330,13 @@ void ColorTheme::Private::loadColors(
     const ColorTree originalColorTree = reader.getColorTree();
 
     QJsonObject basicColors = readColorDataFromFile(basicColorsFile);
-    initializeThemeSpecificColors(&basicColors);
+    initializeThemeSpecificColors(&basicColors, invertColors);
 
     reader.addColors(basicColors);
 
     ColorTree actualColorTree = reader.getColorTree();
 
-    const QJsonObject generatedColors = generatedColorScheme(actualColorTree);
+    const QJsonObject generatedColors = generatedColorScheme(actualColorTree, invertColors);
     reader.addColors(generatedColors);
 
     QJsonObject derivedColors = readColorDataFromFile(derivedColorsFile);
@@ -409,7 +411,7 @@ ColorTheme::ColorTheme(
     QObject* parent)
     :
     QObject(parent),
-    d(new Private{.q = this})
+    d(new Private{.q = this, .invertColors = ini().invertColors})
 {
     if (s_instance)
         NX_ERROR(this, "Singleton is created more than once.");
@@ -467,6 +469,11 @@ QColor ColorTheme::color(const QString& name) const
         return QColor();
 
     return std::get<QColor>(colorData);
+}
+
+bool ColorTheme::isInverted() const
+{
+    return d->invertColors;
 }
 
 QColor ColorTheme::color(const QString& name, std::uint8_t alpha) const

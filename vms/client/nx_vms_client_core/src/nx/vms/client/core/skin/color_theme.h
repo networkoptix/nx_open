@@ -38,6 +38,8 @@ public:
      */
     ColorSubstitutions getColorSubstitutions() const;
 
+    bool isInverted() const;
+
     QColor color(const QString& name) const;
     QColor color(const QString& name, std::uint8_t alpha) const;
     bool hasColor(const QString& name) const;

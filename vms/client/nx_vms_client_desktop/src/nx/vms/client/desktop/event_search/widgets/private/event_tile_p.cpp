@@ -151,15 +151,32 @@ void EventTile::Private::handleStateChanged(State state)
 void EventTile::Private::updatePalette()
 {
     auto pal = q->palette();
-    const auto base = pal.color(QPalette::Base);
 
-    int lighterBy = highlighted ? 1 : 0;
-    if (style == Style::informer)
-        lighterBy += 2;
+    if (core::colorTheme()->isInverted())
+    {
+        const auto base = core::colorTheme()->color("@light1");
 
-    pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
-    pal.setColor(QPalette::Midlight, core::colorTheme()->lighter(base, lighterBy + 1));
-    pal.setColor(QPalette::Dark, core::colorTheme()->darker(base, 2 - lighterBy));
+        int darkerBy = highlighted ? 1 : 0;
+        if (style != Style::informer)
+            darkerBy += 3;
+
+        pal.setColor(QPalette::Window, core::colorTheme()->darker(base, darkerBy));
+        pal.setColor(QPalette::Midlight, core::colorTheme()->darker(base, darkerBy + 1));
+        pal.setColor(QPalette::Dark, core::colorTheme()->color("@light3"));
+    }
+    else
+    {
+        const auto base = core::colorTheme()->color("dark5");
+
+        int lighterBy = highlighted ? 1 : 0;
+        if (style == Style::informer)
+            lighterBy += 2;
+
+        pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
+        pal.setColor(QPalette::Midlight, core::colorTheme()->lighter(base, lighterBy + 1));
+        pal.setColor(QPalette::Dark, core::colorTheme()->darker(base, 2 - lighterBy));
+    }
+
     q->setPalette(pal);
 }
 
