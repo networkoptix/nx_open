@@ -25,13 +25,13 @@ bool ValueHelper::isNull() const
     return value.IsNull();
 }
 
-void Path::parse(const std::string& path)
+void Path::parse(std::string_view path)
 {
     if (path.empty())
         return;
 
     auto predPos = path.find(conditionToken);
-    if (predPos != std::string::npos)
+    if (predPos != std::string_view::npos)
     {
         m_valid = false;
         return;
@@ -121,18 +121,21 @@ void Processor::getWithRecursiveSearch(
 
 namespace predicate {
 
-::rapidjson::Pointer pointerFromKey(const std::string& key)
+::rapidjson::Pointer pointerFromKey(std::string_view key)
 {
-    return ::rapidjson::Pointer(key.starts_with('/') ? key : ('/' + key));
+    if (key.starts_with('/'))
+        return ::rapidjson::Pointer(key.data(), key.size());
+
+    return ::rapidjson::Pointer('/' + std::string{key});
 }
 
 bool NameContains::operator()(const ObjectIterator& root) const
 {
     const std::string_view name{root->name.GetString(), root->name.GetStringLength()};
-    return name.find(m_namePart) != std::string::npos;
+    return name.find(m_namePart) != std::string_view::npos;
 }
 
-Compare::Compare(const std::string& key, const QString& val):
+Compare::Compare(std::string_view key, const QString& val):
     m_pointer(pointerFromKey(key)),
     m_value(val)
 {
@@ -149,7 +152,7 @@ bool Compare::operator()(const ArrayIterator& root) const
     return result.has_value() && result.value() == m_value;
 }
 
-ContainedIn::ContainedIn(const std::string& key, const QStringList& values):
+ContainedIn::ContainedIn(std::string_view key, const QStringList& values):
     m_pointer(pointerFromKey(key)),
     m_values(values)
 {

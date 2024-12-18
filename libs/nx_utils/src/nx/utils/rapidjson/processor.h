@@ -601,14 +601,14 @@ public:
 
         template<PredicateType Predicate>
         Token(Predicate pred): token(std::move(pred)) {}
-        Token(const std::string& stringToken): token(Pointer(stringToken)) {}
+        Token(std::string_view stringToken): token(Pointer(stringToken.data(), stringToken.size())) {}
     };
 
 public:
     Path(const Path& path) = default;
 
     template<PredicateType... Predicates>
-    Path(const std::string& path, Predicates... preds)
+    Path(std::string_view path, Predicates... preds)
     {
         m_tokens = std::make_shared<std::vector<Token>>();
 
@@ -621,13 +621,13 @@ public:
         this->parse(path, preds...);
     }
 
-    void parse(const std::string& path);
+    void parse(std::string_view path);
 
     template<PredicateType Predicate, PredicateType... Predicates>
-    void parse(const std::string& path, Predicate pred, Predicates... preds)
+    void parse(std::string_view path, Predicate pred, Predicates... preds)
     {
         auto predPos = path.find(conditionToken);
-        if (predPos == std::string::npos)
+        if (predPos == std::string_view::npos)
         {
             m_valid = false;
             return;
@@ -684,7 +684,7 @@ public:
 class NX_UTILS_API NameContains
 {
 public:
-    explicit NameContains(const std::string& namePart): m_namePart(namePart) {}
+    explicit NameContains(std::string_view namePart): m_namePart(namePart) {}
 
     bool operator()(const ObjectIterator& root) const;
 
@@ -695,7 +695,7 @@ private:
 class NX_UTILS_API HasMember
 {
 public:
-    explicit HasMember(const std::string& name): m_name(name) {}
+    explicit HasMember(std::string_view name): m_name(name) {}
 
     bool operator()(const ArrayIterator& root) const
     {
@@ -709,7 +709,7 @@ private:
 class NX_UTILS_API Compare
 {
 public:
-    explicit Compare(const std::string& key, const QString& val);
+    explicit Compare(std::string_view key, const QString& val);
 
     bool operator()(const ArrayIterator& root) const;
 
@@ -721,7 +721,7 @@ private:
 class NX_UTILS_API ContainedIn
 {
 public:
-    explicit ContainedIn(const std::string& key, const QStringList& values);
+    explicit ContainedIn(std::string_view key, const QStringList& values);
 
     bool operator()(const ArrayIterator& root) const;
 
@@ -777,7 +777,7 @@ public:
     }
 
     template<class T, PredicateType... Predicates>
-    std::optional<T> getValue(const std::string& path, Predicates... preds) const
+    std::optional<T> getValue(std::string_view path, Predicates... preds) const
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -796,7 +796,7 @@ public:
     }
 
     template<class T, PredicateType... Predicates>
-    std::vector<T> getAllValues(const std::string& path, Predicates... preds) const
+    std::vector<T> getAllValues(std::string_view path, Predicates... preds) const
     {
         std::vector<T> outputVector;
         const details::Path parsedPath{path, preds...};
@@ -824,7 +824,7 @@ public:
     }
 
     template<PredicateType... Predicates>
-    bool eraseValue(const std::string& path, Predicates... preds)
+    bool eraseValue(std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -835,7 +835,7 @@ public:
     }
 
     template<PredicateType... Predicates>
-    int eraseAllValues(const std::string& path, Predicates... preds)
+    int eraseAllValues(std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -846,7 +846,7 @@ public:
     }
 
     template<class T, PredicateType... Predicates>
-    bool modifyValue(T&& newValue, const std::string& path, Predicates... preds)
+    bool modifyValue(T&& newValue, std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -858,7 +858,7 @@ public:
     }
 
     template<class T, PredicateType... Predicates>
-    int modifyAllValues(T&& newValue, const std::string& path, Predicates... preds)
+    int modifyAllValues(T&& newValue,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -871,7 +871,7 @@ public:
     }
 
     template<class T, PredicateType... Predicates>
-    bool addValueToArray(T&& newValue, const std::string& path, Predicates... preds)
+    bool addValueToArray(T&& newValue,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -883,7 +883,7 @@ public:
     }
 
     template<class T, PredicateType... Predicates>
-    int addValueToArrayAll(T&& newValue, const std::string& path, Predicates... preds)
+    int addValueToArrayAll(T&& newValue,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -913,7 +913,7 @@ public:
         PredicateType... Predicates
     >
     bool addValueToObject(
-        const std::string& name, T&& newValue, const std::string& path, Predicates... preds)
+        const std::string& name, T&& newValue,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -931,7 +931,7 @@ public:
         PredicateType... Predicates
     >
     int addValueToObjectAll(
-        const std::string& name, T&& newValue, const std::string& path, Predicates... preds)
+        const std::string& name, T&& newValue,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -946,7 +946,7 @@ public:
 
     template<details::CustomActionFuncType CustomActionFunc, PredicateType... Predicates>
     bool applyActionToValue(
-        const CustomActionFunc& customAction, const std::string& path, Predicates... preds)
+        const CustomActionFunc& customAction,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
@@ -958,7 +958,7 @@ public:
 
     template<details::CustomActionFuncType CustomActionFunc, PredicateType... Predicates>
     int applyActionToValues(
-        const CustomActionFunc& customAction, const std::string& path, Predicates... preds)
+        const CustomActionFunc& customAction,std::string_view path, Predicates... preds)
     {
         details::Path parsedPath{path, preds...};
         if (!parsedPath.isValid())
