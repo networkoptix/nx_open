@@ -526,6 +526,13 @@ TEST_F(ResourceGrouping, appendEmptySubIdToEmptyCompositeId)
 // Test cases for insertSubId() function.
 //-------------------------------------------------------------------------------------------------
 
+TEST_F(ResourceGrouping, insertSubIdToNullId)
+{
+    const auto nullId = QString();
+    const auto insertBefore = 0;
+    ASSERT_EQ(insertSubId(nullId, "Inserted", insertBefore), "Inserted");
+}
+
 TEST_F(ResourceGrouping, insertBeforeZeroIndex)
 {
     ASSERT_EQ(insertSubId(

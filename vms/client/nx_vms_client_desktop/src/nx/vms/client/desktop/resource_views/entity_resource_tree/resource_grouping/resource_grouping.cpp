@@ -319,6 +319,9 @@ QString insertSubId(const QString& compositeId, const QString& subId, int insert
         return compositeId;
     }
 
+    if (compositeId.isEmpty())
+        return subId;
+
     const auto begin = std::cbegin(compositeId);
     const auto end = std::cend(compositeId);
 
