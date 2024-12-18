@@ -144,6 +144,13 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
         return false;
     }
 
+    auto codecId = FFmpeg2NvCodecId(frame->compressionType);
+    if (codecId == cudaVideoCodec_NumCodecs)
+    {
+        NX_DEBUG(this, "Unsupported codec: %1", frame->compressionType);
+        return false;
+    }
+
     status = NvidiaDriverApiProxy::instance().cuCtxCreate(&m_impl->context, CU_CTX_SCHED_BLOCKING_SYNC, device);
     if (status != CUDA_SUCCESS)
     {
@@ -155,7 +162,7 @@ bool NvidiaVideoDecoder::initialize(const QnConstCompressedVideoDataPtr& frame)
         m_impl->decoder = std::make_unique<NvDecoder>(
             m_impl->context,
             true,
-            FFmpeg2NvCodecId(frame->compressionType),
+            codecId,
             m_checkMode,
             /*bLowLatency*/ false);
     }
