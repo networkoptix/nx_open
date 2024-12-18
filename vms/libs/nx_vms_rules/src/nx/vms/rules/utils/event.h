@@ -33,7 +33,6 @@ NX_VMS_RULES_API bool hasSourceServer(const vms::rules::ItemDescriptor& eventDes
 
 NX_VMS_RULES_API bool hasSourceUser(const vms::rules::ItemDescriptor& eventDescriptor);
 
-NX_VMS_RULES_API bool hasDeviceField(const vms::rules::ItemDescriptor& eventDescriptor);
 NX_VMS_RULES_API std::string getDeviceField(const vms::rules::ItemDescriptor& eventDescriptor);
 
 enum class EventDurationType

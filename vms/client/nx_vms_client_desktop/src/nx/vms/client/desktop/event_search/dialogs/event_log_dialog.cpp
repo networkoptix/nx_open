@@ -702,18 +702,16 @@ void EventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     const auto resources = m_model->resourcesForPlayback(idx).filtered(
         [this](const QnResourcePtr& resource)
         {
-            return systemContext()->accessController()->hasPermissions(resource, Qn::ReadPermission);
+            return accessController()->hasPermissions(resource, Qn::ViewContentPermission);
         });
 
     if (resources.isEmpty())
         return;
 
-    const auto archiveCameras = resources.filtered(
-        [this](const QnResourcePtr& resource)
+    const auto archiveCameras = resources.filtered<QnVirtualCameraResource>(
+        [this](const auto& camera)
         {
-            const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-            return camera && systemContext()->accessController()->hasPermissions(camera,
-                Qn::ViewFootagePermission);
+            return accessController()->hasPermissions(camera, Qn::ViewFootagePermission);
         });
 
     menu::Parameters params(resources);

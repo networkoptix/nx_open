@@ -79,17 +79,6 @@ QnVirtualCameraResourceList cameras(
         : context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(selection.ids);
 }
 
-bool hasResourceField(const ItemDescriptor& manifest, ResourceType type)
-{
-    for (const auto& [name, desc]: manifest.resources)
-    {
-        if (desc.type == type)
-            return true;
-    }
-
-    return false;
-}
-
 std::string resourceField(const ItemDescriptor& manifest, ResourceType type)
 {
     for (const auto& [name, desc]: manifest.resources)
@@ -113,6 +102,11 @@ UuidList deviceIds(const T& entity)
 }
 
 UuidList getDeviceIds(const AggregatedEventPtr& event)
+{
+    return deviceIds(event);
+}
+
+UuidList getDeviceIds(const EventPtr& event)
 {
     return deviceIds(event);
 }

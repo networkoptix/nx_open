@@ -657,11 +657,17 @@ QString EventLogModel::description(const EventLogModelData& data) const
 
     if (result.isEmpty() && hasVideoLink(systemContext(), data))
     {
-        if (const auto device = eventSource(systemContext(), data)
-            .dynamicCast<QnVirtualCameraResource>())
+        if (const auto devices = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            nx::vms::rules::utils::getDeviceIds(data.event(systemContext())));
+            !devices.empty())
         {
-            if (systemContext()->accessController()->hasPermissions(
-                device, Qn::ViewFootagePermission))
+            const bool hasAccessToArchive = std::ranges::all_of(devices,
+                [this](const auto& device)
+                {
+                    return accessController()->hasPermissions(device, Qn::ViewFootagePermission);
+                });
+
+            if (hasAccessToArchive)
             {
                 result = tr("Open event video");
             }
@@ -670,7 +676,7 @@ QString EventLogModel::description(const EventLogModelData& data) const
                 result = QnDeviceDependentStrings::getNameFromSet(
                     resourcePool(),
                     {tr("Open event device"), tr("Open event camera")},
-                    device);
+                    devices);
             }
         }
     }
@@ -716,8 +722,8 @@ QnResourceList EventLogModel::resourcesForPlayback(const QModelIndex &index) con
     if (!hasVideoLink(systemContext(), data))
         return {};
 
-    return resourcePool()->getResourcesByIds(vms::rules::utils::getDeviceIds(
-        AggregatedEventPtr::create(data.event(systemContext()))));
+    return resourcePool()->getResourcesByIds(
+        nx::vms::rules::utils::getDeviceIds(data.event(systemContext())));
 }
 
 int EventLogModel::columnCount(const QModelIndex &parent) const
