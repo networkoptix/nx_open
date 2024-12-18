@@ -27,6 +27,14 @@ struct NX_VMS_API AnalyticsDeviceSettings
      */
     QJsonObject values;
 
+    /**%apidoc[opt] */
+    QJsonObject model;
+
+    /**%apidoc[opt]
+     * Name-value map with errors that occurred while performing the current settings operation.
+     */
+    std::optional<std::map<QString, QString>> _error;
+
     /**%apidoc[opt]
      * Index of the stream that should be used for the analytics purposes.
      */
@@ -38,18 +46,10 @@ struct NX_VMS_API AnalyticsDeviceSettings
      * preferences (if any) or defaults to the primary stream.
      */
     bool disableStreamSelection = false;
-
-    /**%apidoc[readonly] */
-    QJsonObject model;
-
-    /**%apidoc[readonly]
-     * Name-value map with errors that occurred while performing the current settings operation.
-     */
-    std::optional<std::map<QString, QString>> _error;
 };
 
 #define AnalyticsDeviceSettings_Fields (deviceId)(engineId)(values) \
-    (analyzedStream)(disableStreamSelection)(model)(_error)
+    (model)(_error)(analyzedStream)(disableStreamSelection)
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDeviceSettings, (json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(AnalyticsDeviceSettings, AnalyticsDeviceSettings_Fields);
 

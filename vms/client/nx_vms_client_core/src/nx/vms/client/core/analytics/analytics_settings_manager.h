@@ -49,7 +49,8 @@ public:
     virtual rest::Handle applySettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QJsonObject& settings,
+        const QJsonObject& settingsValues,
+        const QJsonObject& settingsModel,
         AnalyticsSettingsCallback callback) = 0;
     virtual rest::Handle activeSettingsChanged(
         const QnVirtualCameraResourcePtr& device,
@@ -134,9 +135,10 @@ public:
     DeviceAgentData data(const DeviceAgentId& agentId) const;
 
     /**
-     * Send changed actual values to the server.
+     * Send the potentially new values and model to the Server.
      */
-    Error applyChanges(const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId);
+    Error applyChanges(const QHash<DeviceAgentId,
+        QPair</*settingsValues*/ QJsonObject, /*settingsModel*/ QJsonObject>>& settingsByAgentId);
 
 private:
     struct Private;

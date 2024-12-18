@@ -187,11 +187,14 @@ TEST_F(AnalyticsSettingsManagerTest, immediateUpdateOnApplyChanges)
 
     auto actualValues = kData1Reply.settingsValues;
     actualValues["generateCars"] = false;
-    manager()->applyChanges({{deviceAgentId(), actualValues}});
+    const auto actualModel = kData1Reply.settingsModel;
+    manager()->applyChanges({{deviceAgentId(), {actualValues, actualModel}}});
     EXPECT_TRUE(requestWasSent());
     ASSERT_EQ(listener()->data().status, core::DeviceAgentData::Status::applying);
     ASSERT_EQ(QJson::serialized(listener()->data().values),
         QJson::serialized(actualValues));
+    ASSERT_EQ(QJson::serialized(listener()->data().model),
+        QJson::serialized(actualModel));
 }
 
 // Explicit refresh must be handled

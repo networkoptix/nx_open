@@ -119,18 +119,19 @@ void DeviceAgentSettingsAdapter::applySettings()
     const nx::Uuid& cameraId = d->camera->getId();
 
     const auto& settingsByEngineId = d->store->state().analytics.settingsByEngineId;
-    QHash<core::DeviceAgentId, QJsonObject> valuesToSet;
+    QHash<core::DeviceAgentId, QPair<QJsonObject, QJsonObject>> settingsToSet;
 
     for (auto it = settingsByEngineId.begin(); it != settingsByEngineId.end(); ++it)
     {
         if (it->values.hasUser())
         {
-            valuesToSet.insert(core::DeviceAgentId{cameraId, it.key()}, it->values.get());
-            NX_VERBOSE(this, "Applying changes:\n%1", it->values.get());
+            settingsToSet.insert(core::DeviceAgentId{cameraId, it.key()},
+                {it->values.get(), it->model});
+            NX_VERBOSE(this, "Applying changes:\nValues: %1\nModel: %2", it->values.get(), it->model);
         }
     }
 
-    d->settingsManager->applyChanges(valuesToSet);
+    d->settingsManager->applyChanges(settingsToSet);
 }
 
 void DeviceAgentSettingsAdapter::refreshSettings()

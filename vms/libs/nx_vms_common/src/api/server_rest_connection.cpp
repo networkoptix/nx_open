@@ -1565,12 +1565,14 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
 Handle ServerConnection::setDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    const QJsonObject& settings,
+    const QJsonObject& settingsValues,
+    const QJsonObject& settingsModel,
     Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     nx::vms::api::analytics::DeviceAgentSettingsRequest request;
-    request.settingsValues = settings;
+    request.settingsValues = settingsValues;
+    request.settingsModel = settingsModel;
     request.analyticsEngineId = engine->getId();
     request.deviceId = device->getId().toString();
 

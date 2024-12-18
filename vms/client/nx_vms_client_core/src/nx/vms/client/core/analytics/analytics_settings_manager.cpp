@@ -215,17 +215,17 @@ void AnalyticsSettingsManager::Private::updateStatus(
 void AnalyticsSettingsManager::Private::updateStatusAndSettings(
     const DeviceAgentId& id,
     DeviceAgentData::Status status,
-    const QJsonObject& settings)
+    const QJsonObject& settingsValues)
 {
     if (!hasSubscription(id))
         return;
 
     auto& data = dataByAgentIdRef(id);
-    if (data.status == status && data.values == settings)
+    if (data.status == status && data.values == settingsValues)
         return;
 
     data.status = status;
-    data.values = settings;
+    data.values = settingsValues;
     if (auto listener = data.listener.lock())
         emit listener->dataChanged(data);
 }
@@ -398,7 +398,7 @@ DeviceAgentData AnalyticsSettingsManager::data(const DeviceAgentId& agentId) con
 }
 
 AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
-    const QHash<DeviceAgentId, QJsonObject>& valuesByAgentId)
+    const QHash<DeviceAgentId, QPair<QJsonObject, QJsonObject>>& settingsByAgentId)
 {
     if (!d->pendingApplyRequests.isEmpty())
         return Error::busy;
@@ -406,7 +406,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
     if (!NX_ASSERT(d->serverInterface))
         return Error::noError;
 
-    for (auto it = valuesByAgentId.begin(); it != valuesByAgentId.end(); ++it)
+    for (auto it = settingsByAgentId.begin(); it != settingsByAgentId.end(); ++it)
     {
         const auto agentId = it.key();
         auto [device, engine] = d->toResources(agentId);
@@ -414,11 +414,14 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
             continue;
 
         const auto settings = it.value();
+        const auto& settingsValues = settings.first;
+        const auto& settingsModel = settings.second;
 
         const auto handle = d->serverInterface->applySettings(
             device,
             engine,
-            settings,
+            settingsValues,
+            settingsModel,
             [this, agentId](
                 bool success,
                 rest::Handle requestId,
@@ -437,7 +440,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
             d->updateStatusAndSettings(
                 agentId,
                 DeviceAgentData::Status::applying,
-                settings);
+                settingsValues);
         }
     }
 
