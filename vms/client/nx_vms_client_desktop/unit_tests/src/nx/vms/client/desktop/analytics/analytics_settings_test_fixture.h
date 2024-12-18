@@ -35,7 +35,8 @@ public:
     virtual rest::Handle applySettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QJsonObject& settings,
+        const QJsonObject& settingsValues,
+        const QJsonObject& settingsModel,
         const nx::Uuid& settingsModelId,
         AnalyticsSettingsCallback callback) override;
 

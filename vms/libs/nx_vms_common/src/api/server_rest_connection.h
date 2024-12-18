@@ -620,7 +620,8 @@ public:
     Handle setDeviceAnalyticsSettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QJsonObject& settings,
+        const QJsonObject& settingsValues,
+        const QJsonObject& settingsModel,
         const nx::Uuid& settingsModelId,
         Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
         QThread* targetThread = nullptr);
