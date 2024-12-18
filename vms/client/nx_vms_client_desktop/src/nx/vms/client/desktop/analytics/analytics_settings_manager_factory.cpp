@@ -54,7 +54,8 @@ public:
     virtual rest::Handle applySettings(
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-        const QJsonObject& settings,
+        const QJsonObject& settingsValues,
+        const QJsonObject& settingsModel,
         const nx::Uuid& settingsModelId,
         AnalyticsSettingsCallback callback) override
     {
@@ -66,7 +67,8 @@ public:
             return api->setDeviceAnalyticsSettings(
                 device,
                 engine,
-                settings,
+                settingsValues,
+                settingsModel,
                 settingsModelId,
                 nx::utils::guarded(m_owner, callback),
                 m_owner->thread());

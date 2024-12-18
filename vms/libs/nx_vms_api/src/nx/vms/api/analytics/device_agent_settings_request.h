@@ -4,6 +4,8 @@
 
 #include <QtCore/QJsonObject>
 
+#include <optional>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/motion_types.h>
@@ -38,13 +40,19 @@ struct NX_VMS_API DeviceAgentSettingsRequest
      * Id of the Settings Model the values supposed to be applied to.
      */
     nx::Uuid settingsModelId;
+
+    /**%apidoc
+     * Settings model.
+     */
+    std::optional<SettingsModel> settingsModel;
 };
 #define nx_vms_api_analytics_DeviceAgentSettingsRequest_Fields \
     (deviceId) \
     (analyticsEngineId) \
     (analyzedStreamIndex) \
     (settingsValues) \
-    (settingsModelId)
+    (settingsModelId) \
+    (settingsModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsRequest, (json), NX_VMS_API)
 

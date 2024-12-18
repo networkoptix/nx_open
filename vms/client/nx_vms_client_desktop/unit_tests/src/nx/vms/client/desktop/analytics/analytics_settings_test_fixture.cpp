@@ -31,7 +31,8 @@ rest::Handle AnalyticsSettingsMockApiInterface::getSettings(
 rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,
-    const QJsonObject& /*settings*/,
+    const QJsonObject& /*settingsValues*/,
+    const QJsonObject& /*settingsModel*/,
     const nx::Uuid& /*settingsModelId*/,
     AnalyticsSettingsCallback callback)
 {
