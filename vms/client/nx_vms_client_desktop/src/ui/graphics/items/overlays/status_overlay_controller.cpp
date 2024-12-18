@@ -96,7 +96,7 @@ const OverlayInfoMap& overlayInfo()
         {Qn::NoExportPermissionOverlay,
             {QnStatusOverlayWidget::ErrorStyle::white,
                 QnStatusOverlayWidget::tr("NO EXPORT PERMISSION"),
-                kLockIconPath}},
+                kRestrictIconPath}},
         {Qn::TooManyOpenedConnectionsOverlay,
             {QnStatusOverlayWidget::ErrorStyle::white,
                 QnStatusOverlayWidget::tr("TOO MANY CONNECTIONS")}},
@@ -122,14 +122,6 @@ QnStatusOverlayWidget::ErrorStyle overlayErrorStyle(Qn::ResourceStatusOverlay ov
         return it->second.style;
 
     return QnStatusOverlayWidget::ErrorStyle::red;
-}
-
-QString captionText(Qn::ResourceStatusOverlay overlay)
-{
-    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
-        return it->second.caption;
-
-    return {};
 }
 
 QString statusIconPath(Qn::ResourceStatusOverlay overlay)
@@ -275,7 +267,7 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     QnScopedTypedPropertyRollback<bool, QGraphicsWidget> visibilityRollback(
         m_widget.data(), &QGraphicsWidget::setVisible, isVisibleToParent, false);
 
-    m_widget->setCaption(captionText(m_statusOverlay));
+    m_widget->setCaption(caption(m_statusOverlay));
 
     m_widget->setIcon(statusIcon(m_statusOverlay));
     m_widget->setTooltip(tooltip(m_statusOverlay));
@@ -399,7 +391,8 @@ QString QnStatusOverlayController::currentButtonText() const
     return extractValue(currentButton(), m_buttonTexts);
 }
 
-const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions QnStatusOverlayController::statusIconColors(Qn::ResourceStatusOverlay overlay)
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions&
+    QnStatusOverlayController::statusIconColors(Qn::ResourceStatusOverlay overlay)
 {
     if (isErrorOverlayCheck(overlay)
         && overlayErrorStyle(overlay) == QnStatusOverlayWidget::ErrorStyle::white)
@@ -421,6 +414,14 @@ QPixmap QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay status)
     constexpr QSize kIconSize = {48, 48};
     return colorTheme.isEmpty() ? qnSkin->pixmap(pixmapPath, true, kIconSize)
                                 : qnSkin->icon(pixmapPath, colorTheme).pixmap(kIconSize);
+}
+
+QString QnStatusOverlayController::caption(Qn::ResourceStatusOverlay overlay)
+{
+    if (auto it = overlayInfo().find(overlay); NX_ASSERT(it != overlayInfo().end()))
+        return it->second.caption;
+
+    return {};
 }
 
 QnStatusOverlayController::IntStringHash

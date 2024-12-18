@@ -31,13 +31,14 @@
 #include <ui/common/palette.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
+#include "private/thumbnail_widget.h"
+
 using nx::vms::client::core::Geometry;
 
 namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QMargins kMinIndicationMargins(4, 2, 4, 2);
 static const QSize kBackgroundPreviewSize(200, 200);
 
 // TODO: #vkutin Put into utility class/namespace. Get rid of duplicates.
@@ -51,6 +52,9 @@ bool hasExportPermission(const QnResourcePtr& resource)
     const auto accessController = SystemContext::fromResource(resource)->accessController();
     return accessController->hasPermissions(resource, Qn::ExportPermission);
 }
+
+constexpr auto kRestrictIconPath = "48x48/Outline/restrict.svg";
+const core::SvgIconColorer::ThemeSubstitutions kRestrictIconTheme = {{QIcon::Normal, {.primary = "light16"}}};
 
 } // namespace
 
@@ -105,56 +109,14 @@ struct LayoutThumbnailLoader::Private
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
         skipExportPermissionCheck(skipExportPermissionCheck),
-        noDataWidget(new AutoscaledPlainText()),
-        offlineWidget(new QWidget()),
-        noExportPermissionWidget(new QWidget()),
-        nonCameraWidget(new AutoscaledPlainText())
+        noDataWidget(new Thumbnail{
+            ini().debugDisableCameraThumbnails ? tr("DISABLED") : tr("NO DATA"),
+            kRestrictIconPath,
+            kRestrictIconTheme}),
+        offlineWidget(new Thumbnail{Qn::ResourceStatusOverlay::OfflineOverlay}),
+        noExportPermissionWidget(new Thumbnail{Qn::ResourceStatusOverlay::NoExportPermissionOverlay})
     {
-        QFont font;
-        font.setPixelSize(88);
-        font.setWeight(QFont::Light);
-
-        noDataWidget->setText(ini().debugDisableCameraThumbnails ? tr("DISABLED") : tr("NO DATA"));
-        noDataWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
-        noDataWidget->setContentsMargins(kMinIndicationMargins);
-        noDataWidget->setFont(font);
-
-        auto offlineWidgetLayout = new QVBoxLayout(offlineWidget.get());
-        offlineWidgetLayout->setSpacing(0);
-        offlineWidgetLayout->setContentsMargins(6, 2, 6, 6);
-        auto noSignalImage = new ScalableImageWidget("48x48/Outline/error.svg");
-        offlineWidgetLayout->addWidget(noSignalImage, 3, Qt::AlignHCenter);
-
-        auto noSignalText = new AutoscaledPlainText();
-        noSignalText->setText(tr("OFFLINE"));
-        noSignalText->setProperty(style::Properties::kDontPolishFontProperty, true);
-        noSignalText->setContentsMargins(kMinIndicationMargins);
-        noSignalText->setFont(font);
-        setPaletteColor(noSignalText, QPalette::WindowText, core::colorTheme()->color("red"));
-        offlineWidgetLayout->addWidget(noSignalText, 1, Qt::AlignHCenter);
-
-        auto noExportPermissionLayout = new QVBoxLayout(noExportPermissionWidget.get());
-        noExportPermissionLayout->setSpacing(0);
-        noExportPermissionLayout->setContentsMargins(6, 2, 6, 6);
-        noExportPermissionLayout->addWidget(new ScalableImageWidget(
-            "48x48/Outline/lock.svg"), 3, Qt::AlignHCenter);
-
-        auto noExportPermissionText = new AutoscaledPlainText();
-        noExportPermissionText->setText(tr("NO EXPORT PERMISSION"));
-        noExportPermissionText->setProperty(style::Properties::kDontPolishFontProperty, true);
-        noExportPermissionText->setContentsMargins(kMinIndicationMargins);
-        noExportPermissionText->setFont(font);
-        setPaletteColor(noExportPermissionText,
-            QPalette::WindowText,
-            core::colorTheme()->color("red"));
-        noExportPermissionLayout->addWidget(noExportPermissionText, 1, Qt::AlignHCenter);
-
-        nonCameraWidget->setText(tr("NOT A CAMERA"));
-        nonCameraWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
-        nonCameraWidget->setContentsMargins(kMinIndicationMargins);
-        setPaletteColor(nonCameraWidget.data(), QPalette::WindowText,
-            core::colorTheme()->color("red"));
-        nonCameraWidget->setFont(font);
+        setPaletteColor(offlineWidget.data(), QPalette::WindowText, core::colorTheme()->color("red"));
     }
 
     // ItemPtr trackLoader(const QnResourcePtr& resource, ImageProviderPtr loader)
@@ -378,27 +340,28 @@ struct LayoutThumbnailLoader::Private
         pixmap.setDevicePixelRatio(outputImage.devicePixelRatio());
         pixmap.fill(Qt::transparent);
 
-        auto noDataStatusWidget = exportAllowed
-            ? (isOnline || msecSinceEpoch != DATETIME_NOW)
-                ? noDataWidget.get()
-                : offlineWidget.get()
-            : noExportPermissionWidget.get();
-
+        Thumbnail* thumbnailWidget{};
         switch (status)
         {
             case core::ThumbnailStatus::NoData:
-                noDataStatusWidget->resize(size);
-                noDataStatusWidget->render(&pixmap);
+                thumbnailWidget = exportAllowed
+                    ? (isOnline || msecSinceEpoch != DATETIME_NOW)
+                        ? noDataWidget.get()
+                        : offlineWidget.get()
+                    : noExportPermissionWidget.get();
                 break;
 
             case core::ThumbnailStatus::Invalid:
-                nonCameraWidget->resize(size);
-                nonCameraWidget->render(&pixmap);
+                thumbnailWidget = noDataWidget.get();
                 break;
 
             default:
                 NX_ASSERT(false);
+                return pixmap;
         }
+
+        thumbnailWidget->updateToSize(size);
+        thumbnailWidget->render(&pixmap);
 
         return pixmap;
     }
@@ -451,10 +414,9 @@ struct LayoutThumbnailLoader::Private
     bool tolerant = false; //< See nx::api::ImageRequest::tolerant.
 
     // We need this widgets to draw special states, like 'NoData'.
-    QScopedPointer<AutoscaledPlainText> noDataWidget;
-    QScopedPointer<QWidget> offlineWidget;
-    QScopedPointer<QWidget> noExportPermissionWidget;
-    QScopedPointer<AutoscaledPlainText> nonCameraWidget;
+    QScopedPointer<Thumbnail> noDataWidget;
+    QScopedPointer<Thumbnail> offlineWidget;
+    QScopedPointer<Thumbnail> noExportPermissionWidget;
 };
 
 LayoutThumbnailLoader::LayoutThumbnailLoader(

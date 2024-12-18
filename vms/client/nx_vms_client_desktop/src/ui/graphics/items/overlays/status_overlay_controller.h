@@ -37,8 +37,10 @@ public:
 public:
     QString currentButtonText() const;
 
-    static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions statusIconColors(Qn::ResourceStatusOverlay overlay);
+    static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions& statusIconColors(
+        Qn::ResourceStatusOverlay overlay);
     static QPixmap statusIcon(Qn::ResourceStatusOverlay overlay);
+    static QString caption(Qn::ResourceStatusOverlay overlay);
 
 signals:
     void statusOverlayChanged(bool animated);
