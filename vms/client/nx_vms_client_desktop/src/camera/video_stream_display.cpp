@@ -460,17 +460,20 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
 {
     QnAbstractVideoDecoder* decoder = nullptr;
 
-    if (canAddIntel(data, m_reverseMode))
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_StillImage))
     {
-        #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
-            decoder = new QuickSyncVideoDecoderOldPlayer();
-        #endif
-    }
-    else if (canAddNvidia(data, m_reverseMode))
-    {
-        #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
-            decoder = new NvidiaVideoDecoderOldPlayer();
-        #endif
+        if (canAddIntel(data, m_reverseMode))
+        {
+            #if NX_MEDIA_QUICK_SYNC_DECODER_SUPPORTED
+                decoder = new QuickSyncVideoDecoderOldPlayer();
+            #endif
+        }
+        else if (canAddNvidia(data, m_reverseMode))
+        {
+            #if NX_MEDIA_NVIDIA_DECODER_SUPPORTED
+                decoder = new NvidiaVideoDecoderOldPlayer();
+            #endif
+        }
     }
     if (!decoder)
     {
