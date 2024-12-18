@@ -173,8 +173,8 @@
         "hudElementsBackground": "dark1.setAlpha(128)",
         "motion": "red.setAlpha(51)",
         "titleGradient": {
-            "top": "dark1.setAlpha(178)",
-            "bottom": "dark1.setAlpha(0)"
+            "top": "@dark1.setAlpha(178)",
+            "bottom": "@dark1.setAlpha(0)"
         },
         "motionSelection": {
             "pen": "red",

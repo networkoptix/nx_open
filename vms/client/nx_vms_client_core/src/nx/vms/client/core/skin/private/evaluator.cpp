@@ -70,6 +70,7 @@ namespace Qee {
                 m_pos++;
                 break;
             case L'_':
+            case L'@':
                 return readVariableToken();
             case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
                 return readNumberToken();
@@ -152,7 +153,7 @@ namespace Qee {
         int startPos = m_pos;
         while(true) {
             QChar c = m_source[m_pos];
-            if(c.isLetterOrNumber() || c.unicode() == L'_') {
+            if(c.isLetterOrNumber() || c.unicode() == L'_' || c.unicode() == L'@') {
                 m_pos++;
                 continue;
             } else {
