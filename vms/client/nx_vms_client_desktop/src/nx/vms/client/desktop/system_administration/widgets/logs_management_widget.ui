@@ -232,7 +232,7 @@
                                     <item>
                                         <widget class="QPushButton" name="openFolderButton">
                                             <property name="text">
-                                                <string>Open Files Folder</string>
+                                                <string>Open files folder</string>
                                             </property>
                                         </widget>
                                     </item>
