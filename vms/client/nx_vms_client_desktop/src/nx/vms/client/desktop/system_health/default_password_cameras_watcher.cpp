@@ -24,7 +24,7 @@ struct DefaultPasswordCamerasWatcher::Private
             changed = !camerasWithDefaultPassword.contains(camera);
             camerasWithDefaultPassword.insert(camera);
         }
-        else
+        else if (camera->isOnline())
         {
             changed = camerasWithDefaultPassword.remove(camera);
         }
