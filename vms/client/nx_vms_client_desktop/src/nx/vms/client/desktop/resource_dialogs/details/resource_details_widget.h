@@ -36,8 +36,9 @@ public:
     /*
      * Sets text of information message, optionally in user defined color.
      */
-    void setMessage(const QString& text,
-        const QColor& color = nx::vms::client::core::colorTheme()->color("light10"));
+    void setMessage(const QString& message,
+        const QColor& color = nx::vms::client::core::colorTheme()->color("light10"),
+        const QString& subMessage = {});
 
     /*
      * Removes information message, equivalent of setMessage({}) call.

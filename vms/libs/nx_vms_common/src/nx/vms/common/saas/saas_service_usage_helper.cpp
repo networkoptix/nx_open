@@ -2,6 +2,8 @@
 
 #include "saas_service_usage_helper.h"
 
+#include <QtCore/QTimer>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -233,22 +235,45 @@ bool CloudStorageServiceUsageHelper::ServiceInfo::operator<(
 
 CloudStorageServiceUsageHelper::CloudStorageServiceUsageHelper(
     SystemContext* context,
+    std::optional<std::chrono::milliseconds> cacheAutoUpdateInterval,
     QObject* parent)
     :
     CloudServiceUsageHelper(context, parent)
 {
+    if (!cacheAutoUpdateInterval.has_value())
+        return;
+
+    const auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &CloudStorageServiceUsageHelper::updateCache);
+    timer->start(cacheAutoUpdateInterval.value());
 }
 
 void CloudStorageServiceUsageHelper::updateCache()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    updateCacheUnsafe();
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        updateCacheUnsafe();
+    }
+    emit cacheUpdated();
 }
 
 void CloudStorageServiceUsageHelper::invalidateCache()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_cache.reset();
+}
+
+int CloudStorageServiceUsageHelper::licenseDeficit() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    int defecit = 0;
+    if (!m_cache)
+        updateCacheUnsafe();
+    std::map<int, LicenseSummaryData> result;
+    for (const auto& [key, value]: *m_cache)
+        defecit += (value.inUse - value.available);
+
+    return defecit;
 }
 
 void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const

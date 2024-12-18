@@ -2,13 +2,15 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/api/data/license_data.h>
-#include <nx/vms/common/system_context_aware.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/data/license_data.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx::vms::common::saas {
 
@@ -90,9 +92,12 @@ private:
  */
 class NX_VMS_COMMON_API CloudStorageServiceUsageHelper: public CloudServiceUsageHelper
 {
+    Q_OBJECT
+
 public:
     CloudStorageServiceUsageHelper(
         SystemContext* context,
+        std::optional<std::chrono::milliseconds> cacheAutoUpdateInterval = std::nullopt,
         QObject* parent = nullptr);
 
     /*
@@ -139,6 +144,10 @@ public:
         const std::set<nx::Uuid>& devicesToRemove);
 
     void invalidateCache();
+    int licenseDeficit() const;
+
+signals:
+    void cacheUpdated();
 
 private:
     void updateCache();

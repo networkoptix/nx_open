@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 
+#include <QtCore/QAbstractListModel>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
@@ -66,7 +67,7 @@ public:
     ResourceDetailsWidget* detailsPanelWidget() const;
 
     using DetailsPanelUpdateFunction =
-        std::function<void(const QModelIndex&, ResourceDetailsWidget*)>;
+        std::function<void(const QModelIndexList&, ResourceDetailsWidget*)>;
 
     /**
      * @param updateFunction Function wrapper which will be called whenever hovered tree view item
@@ -92,8 +93,6 @@ protected:
     virtual QAbstractItemModel* model() const;
     virtual void showEvent(QShowEvent* event) override;
     virtual void setupHeader();
-
-private:
     void updateDetailsPanel();
 
 private:

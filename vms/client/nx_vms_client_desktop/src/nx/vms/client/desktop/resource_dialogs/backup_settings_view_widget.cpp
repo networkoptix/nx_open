@@ -10,6 +10,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
+#include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/tree_view.h>
@@ -23,57 +24,20 @@
 #include <nx/vms/client/desktop/resource_properties/server/widgets/backup_settings_picker_widget.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <ui/common/indents.h>
 
 namespace {
 
+using namespace std::chrono;
 using namespace nx::vms::client::desktop;
 using namespace backup_settings_view;
 
 using AbstractEntityPtr = entity_item_model::AbstractEntityPtr;
 using ResourceTreeEntityBuilder = entity_resource_tree::ResourceTreeEntityBuilder;
 
-void detailsPanelUpdateFunction(const QModelIndex& index, ResourceDetailsWidget* detailsWidget)
-{
-    if (!index.isValid())
-    {
-        detailsWidget->clear();
-        return;
-    }
-
-    const auto resourceIndex = index.siblingAtColumn(backup_settings_view::ResourceColumn);
-    detailsWidget->setCaption(backup_settings_view::isNewAddedCamerasRow(index)
-        ? QString()
-        : resourceIndex.data(Qt::DisplayRole).toString());
-
-    detailsWidget->setThumbnailCameraResource(
-        resourceIndex.data(nx::vms::client::core::ResourceRole).value<QnResourcePtr>());
-
-    const auto infoMessageData = index.data(InfoMessageRole);
-    if (!infoMessageData.isNull())
-    {
-        const auto accentColor = nx::vms::client::core::colorTheme()->color("red");
-        const auto availableServicesData = index.data(AvailableCloudStorageServices);
-        if (!availableServicesData.isNull() && availableServicesData.toInt() < 1)
-            detailsWidget->setMessage(infoMessageData.toString(), accentColor);
-        else
-            detailsWidget->setMessage(infoMessageData.toString());
-    }
-    else
-    {
-        detailsWidget->clearMessage();
-    }
-
-    detailsWidget->clearWarningMessages();
-    const auto warningMessagesData = index.data(WarningMessagesRole);
-    if (!warningMessagesData.isNull())
-    {
-        const auto warningMessages =
-            warningMessagesData.value<QVector<std::pair<QString, QString>>>();
-        for (const auto& [caption, message]: warningMessages)
-            detailsWidget->addWarningMessage(caption, message);
-    }
-}
+static constexpr auto kCloudStorageInfoUpdateInterval = 1min;
 
 QModelIndexList filterSelectedIndexes(const QModelIndexList& selectedIndexes)
 {
@@ -92,14 +56,14 @@ QModelIndexList filterSelectedIndexes(const QModelIndexList& selectedIndexes)
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;
+using namespace nx::vms::common::saas;
 
 BackupSettingsViewWidget::BackupSettingsViewWidget(
-    ServerSettingsDialogStore* store,
-    QWidget* parent)
-    :
+    ServerSettingsDialogStore* store, QWidget* parent):
     base_type(backup_settings_view::ColumnCount, parent),
     m_backupSettingsDecoratorModel(new BackupSettingsDecoratorModel(store, systemContext())),
-    m_viewItemDelegate(new BackupSettingsItemDelegate(resourceViewWidget()->itemViewHoverTracker()))
+    m_viewItemDelegate(
+        new BackupSettingsItemDelegate(resourceViewWidget()->itemViewHoverTracker()))
 {
     resourceViewWidget()->itemViewHoverTracker()->setMouseCursorRole(Qn::ItemMouseCursorRole);
     m_viewItemDelegate->setShowRecordingIndicator(true);
@@ -109,7 +73,95 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
     resourceViewWidget()->setVisibleItemPredicate(
         [](const QModelIndex& index) { return index.isValid(); }); //< Expand all.
 
-    setDetailsPanelUpdateFunction(detailsPanelUpdateFunction);
+    auto cloudStorageUsageHelper = std::make_shared<CloudStorageServiceUsageHelper>(
+        systemContext(), kCloudStorageInfoUpdateInterval, this);
+
+    connect(cloudStorageUsageHelper.get(),
+        &CloudStorageServiceUsageHelper::cacheUpdated,
+        this,
+        &BackupSettingsViewWidget::updateDetailsPanel);
+
+    auto updateFunction = [this, cloudStorageUsageHelper](
+        const QModelIndexList& indexes, ResourceDetailsWidget* detailsWidget)
+    {
+        if (indexes.size() != 1)
+        {
+            detailsWidget->clear();
+            if (indexes.size() == 0 || !m_isCloudBackupStorage)
+                return;
+
+            auto toAdd = m_backupSettingsDecoratorModel->backupEnabledCameras();
+            for (const auto& index: indexes)
+            {
+                if (const auto camera = m_backupSettingsDecoratorModel->cameraResource(index); camera &&
+                    !toAdd.contains(camera->getId()))
+                {
+                    toAdd.insert(camera->getId());
+                }
+            }
+
+            cloudStorageUsageHelper->proposeChange(toAdd, {});
+            const auto deficit = cloudStorageUsageHelper->licenseDeficit();
+             if (deficit < 1)
+                return;
+
+            const auto accentColor = nx::vms::client::core::colorTheme()->color("red");
+            detailsWidget->setMessage(
+                tr("%1 more suitable cloud storage services are required to activate back up for "
+                    "all selected devices", "%1 is the number of cameras for which there are not "
+                    "enough licenses in the cloud storage.")
+                    .arg(deficit),
+                accentColor,
+                tr("But you can still use a common switch to enable backups for those cameras for "
+                    "which this is possible"));
+            detailsWidget->setThumbnailCameraResource({});
+
+            return;
+        }
+
+        const auto index = indexes[0];
+
+        if (!index.isValid())
+        {
+            detailsWidget->clear();
+            return;
+        }
+
+        const auto resourceIndex = index.siblingAtColumn(backup_settings_view::ResourceColumn);
+        detailsWidget->setCaption(backup_settings_view::isNewAddedCamerasRow(index)
+            ? QString()
+            : resourceIndex.data(Qt::DisplayRole).toString());
+
+        detailsWidget->setThumbnailCameraResource(
+            resourceIndex.data(nx::vms::client::core::ResourceRole).value<QnResourcePtr>());
+
+        const auto infoMessageData = index.data(InfoMessageRole);
+        if (!infoMessageData.isNull())
+        {
+            const auto accentColor = nx::vms::client::core::colorTheme()->color("red");
+            const auto availableServicesData = index.data(AvailableCloudStorageServices);
+            if (!availableServicesData.isNull() && availableServicesData.toInt() < 1)
+                detailsWidget->setMessage(infoMessageData.toString(), accentColor);
+            else
+                detailsWidget->setMessage(infoMessageData.toString());
+        }
+        else
+        {
+            detailsWidget->clearMessage();
+        }
+
+        detailsWidget->clearWarningMessages();
+        const auto warningMessagesData = index.data(WarningMessagesRole);
+        if (!warningMessagesData.isNull())
+        {
+            const auto warningMessages =
+                warningMessagesData.value<QVector<std::pair<QString, QString>>>();
+            for (const auto& [caption, message]: warningMessages)
+                detailsWidget->addWarningMessage(caption, message);
+        }
+    };
+
+    setDetailsPanelUpdateFunction(updateFunction);
 
     // Force default height to be the minimum to avoid unwanted vertical resizes when
     // detailsPanelWidget() shrinks.

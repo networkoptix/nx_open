@@ -29,6 +29,10 @@
 
 namespace {
 
+using namespace std::chrono;
+
+static constexpr auto kCloudStorageInfoUpdateInterval = 1min;
+
 static constexpr auto kAllMetadataContentTypes = nx::vms::api::BackupContentTypes({
     nx::vms::api::BackupContentType::motion,
     nx::vms::api::BackupContentType::analytics,
@@ -747,6 +751,23 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
     }
 }
 
+std::set<nx::Uuid> BackupSettingsDecoratorModel::backupEnabledCameras() const
+{
+    std::set<nx::Uuid> result;
+    const auto leafIndexes = item_model::getLeafIndexes(this);
+    for (const auto& index: leafIndexes)
+    {
+        const auto camera = cameraResource(index);
+        if (!camera.isNull() && d->changedEnabledState.contains(camera)
+            && d->changedEnabledState.value(camera))
+        {
+            result.insert(camera->getId());
+        }
+    }
+
+    return result;
+}
+
 QVariant BackupSettingsDecoratorModel::headerData(
     int section,
     Qt::Orientation orientation,
@@ -795,7 +816,8 @@ void BackupSettingsDecoratorModel::loadState(const ServerSettingsDialogState& st
     d->isCloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
 
     d->cloudStorageUsageHelper.reset(d->isCloudBackupStorage
-        ? new nx::vms::common::saas::CloudStorageServiceUsageHelper(systemContext())
+        ? new nx::vms::common::saas::CloudStorageServiceUsageHelper(
+            systemContext(), kCloudStorageInfoUpdateInterval)
         : nullptr);
 
     fixBackupContentTypesForCloudStorage();

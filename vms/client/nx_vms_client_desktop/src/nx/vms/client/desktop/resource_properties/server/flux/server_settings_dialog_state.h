@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/client/desktop/common/flux/abstract_flux_state.h>
@@ -45,6 +46,8 @@ struct NX_VMS_CLIENT_DESKTOP_API ServerSettingsDialogState: AbstractFluxState
 
         return plugins.modules[plugins.current];
     }
+
+    QnMediaServerResourcePtr server;
 };
 
 } // namespace nx::vms::client::desktop

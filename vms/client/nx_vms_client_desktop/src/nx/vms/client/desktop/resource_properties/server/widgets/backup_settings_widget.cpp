@@ -212,31 +212,34 @@ void BackupSettingsWidget::loadState(const ServerSettingsDialogState& state)
         }
 
         ui->stackedWidget->setCurrentWidget(ui->settingsPage);
-        m_backupSettingsViewWidget->setTreeEntityFactoryFunction(
-            [this, cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage]
-            (const entity_resource_tree::ResourceTreeEntityBuilder* builder)
-            {
-                using namespace entity_item_model;
+        if (state.server != m_server)
+        {
+            m_backupSettingsViewWidget->setTreeEntityFactoryFunction(
+                [this, cloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage]
+                (const entity_resource_tree::ResourceTreeEntityBuilder* builder)
+                {
+                    using namespace entity_item_model;
 
-                auto serverCamerasEntity =
-                    builder->createDialogServerCamerasEntity(m_server, {});
+                    auto serverCamerasEntity =
+                        builder->createDialogServerCamerasEntity(m_server, {});
 
-                if (cloudBackupStorage)
-                    return serverCamerasEntity;
+                    if (cloudBackupStorage)
+                        return serverCamerasEntity;
 
-                AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
-                    .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
-                    .withRole(Qt::DisplayRole, tr("New added cameras"))
-                    .withRole(Qn::ExtraInfoRole, QString("\u2013 ") //< EnDash
-                        + tr("Applies to all servers"))
-                    .withRole(Qn::ForceExtraInfoRole, true)
-                    .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
-                    .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
+                    AbstractItemPtr newAddedCamerasItem = GenericItemBuilder()
+                        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(QnResourceIconCache::Cameras))
+                        .withRole(Qt::DisplayRole, tr("New added cameras"))
+                        .withRole(Qn::ExtraInfoRole, QString("\u2013 ") //< EnDash
+                            + tr("Applies to all servers"))
+                        .withRole(Qn::ForceExtraInfoRole, true)
+                        .withRole(ResourceDialogItemRole::NewAddedCamerasItemRole, true)
+                        .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
 
-                return builder->addPinnedItem(
-                    std::move(serverCamerasEntity),
-                    std::move(newAddedCamerasItem));
-            });
+                    return builder->addPinnedItem(
+                        std::move(serverCamerasEntity),
+                        std::move(newAddedCamerasItem));
+                });
+        }
 
         QString alertBarMessage;
         if (cloudBackupStorage && saasState == nx::vms::api::SaasState::suspended)

@@ -18,16 +18,25 @@
 #include <nx/vms/client/desktop/resource_views/models/resource_tree_icon_decorator_model.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/workbench/workbench_context.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
 
 void defaultDetailsPanelUpdateFunction(
-    const QModelIndex& index,
+    const QModelIndexList& indexes,
     ResourceDetailsWidget* detailsWidget)
 {
     static constexpr int kResourceColumn = 0;
+
+    if (indexes.size() > 1)
+    {
+        detailsWidget->clear();
+        return;
+    }
+
+    auto index = indexes[0];
 
     if (!index.isValid())
     {
@@ -101,7 +110,19 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     connect(resourceViewWidget()->itemViewHoverTracker(), &ItemViewHoverTracker::itemEnter,
         this, &DetailedResourceTreeWidget::updateDetailsPanel);
 
-    connect(resourceViewWidget()->itemViewHoverTracker(), &ItemViewHoverTracker::itemLeave,
+    connect(resourceViewWidget()->itemViewHoverTracker(),
+        &ItemViewHoverTracker::itemLeave,
+        this,
+        [this]()
+        {
+            updateDetailsPanel();
+
+            // If the mouse cursor is not moved to a new item soon, the information in the details
+            // panel should be updated according to the selected items.
+            executeLater([this] { updateDetailsPanel(); }, this);
+        });
+
+    connect(resourceViewWidget(), &FilteredResourceViewWidget::selectionChanged,
         this, &DetailedResourceTreeWidget::updateDetailsPanel);
 
     m_treeEntityBuilder->setUser(accessController()->user());
@@ -160,7 +181,7 @@ ResourceDetailsWidget* DetailedResourceTreeWidget::detailsPanelWidget() const
 
 void DetailedResourceTreeWidget::updateDetailsPanel()
 {
-    if (isDetailsPanelHidden())
+    if (isDetailsPanelHidden() || !resourceViewWidget()->sourceModel())
         return;
 
     if (m_detailsPanelUpdateFunction)
@@ -169,7 +190,16 @@ void DetailedResourceTreeWidget::updateDetailsPanel()
 
         const auto sourceIndex = resourceViewWidget()->toSourceIndex(
             resourceViewWidget()->itemViewHoverTracker()->hoveredIndex());
-        m_detailsPanelUpdateFunction(sourceIndex, detailsPanelWidget());
+
+        if (sourceIndex.isValid())
+        {
+            m_detailsPanelUpdateFunction({sourceIndex}, detailsPanelWidget());
+        }
+        else if (auto selectedIndexes = resourceViewWidget()->selectedRows(0);
+            !selectedIndexes.empty())
+        {
+            m_detailsPanelUpdateFunction(selectedIndexes, detailsPanelWidget());
+        }
 
         detailsPanelWidget()->setUpdatesEnabled(true);
     }

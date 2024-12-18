@@ -3,7 +3,6 @@
 #include "server_settings_dialog_state_reducer.h"
 
 #include <core/resource/media_server_resource.h>
-
 #include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
@@ -35,6 +34,7 @@ State ServerSettingsDialogStateReducer::loadServer(State state, const Server& se
 {
     state.isOnline = false;
     state.plugins = {};
+    state.server = server;
     return state;
 }
 

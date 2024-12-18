@@ -45,6 +45,7 @@ public:
     void setBackupContentTypes(const QModelIndexList& indexes, BackupContentTypes contentTypes);
     void setBackupQuality(const QModelIndexList& indexes, CameraBackupQuality quality);
     void setBackupEnabled(const QModelIndexList& indexes, bool enabled);
+    std::set<nx::Uuid> backupEnabledCameras() const;
 
     /**
      * If loaded state indicates that cloud backup storage is used, calling this method is

@@ -25,6 +25,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="subMessageLabel">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QWidget" name="warningContainer" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="leftMargin">

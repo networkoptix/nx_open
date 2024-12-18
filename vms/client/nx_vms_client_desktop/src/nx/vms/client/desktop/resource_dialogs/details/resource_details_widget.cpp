@@ -141,13 +141,20 @@ void ResourceDetailsWidget::setCaption(const QString& caption)
 
 void ResourceDetailsWidget::setMessage(
     const QString& message,
-    const QColor& color)
+    const QColor& color,
+    const QString& subMessage)
 {
     setPaletteColor(ui->messageLabel, QPalette::WindowText, color);
 
     const auto trimmedMessage = message.trimmed();
     ui->messageLabel->setText(trimmedMessage);
     ui->messageLabel->setHidden(trimmedMessage.isEmpty());
+
+    static const QColor subMessageColor = nx::vms::client::core::colorTheme()->color("light10");
+    setPaletteColor(ui->subMessageLabel, QPalette::WindowText, subMessageColor);
+    const auto trimmedSubMessage = subMessage.trimmed();
+    ui->subMessageLabel->setText(trimmedSubMessage);
+    ui->subMessageLabel->setHidden(trimmedSubMessage.isEmpty());
 }
 
 void ResourceDetailsWidget::clearMessage()
