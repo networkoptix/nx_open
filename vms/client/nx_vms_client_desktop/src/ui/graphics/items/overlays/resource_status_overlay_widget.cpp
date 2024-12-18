@@ -104,9 +104,9 @@ void setupButton(QPushButton& button)
         }
     )";
 
-    static const auto kBaseColor = core::colorTheme()->color("light1");
+    static const auto kBaseColor = core::colorTheme()->color("@light1");
 
-    static const auto kTextColor = core::colorTheme()->color("light4").name(QColor::HexArgb);
+    static const auto kTextColor = core::colorTheme()->color("@light4").name(QColor::HexArgb);
     static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
 
     static const auto kBackground = toTransparent(kBaseColor, 0.1).name(QColor::HexArgb);
@@ -402,8 +402,8 @@ void QnStatusOverlayWidget::generateBackgrounds()
                 kBackgroundHeight,
                 kHorizontalRect,
                 kMaskSize,
-                colorTheme()->color("light16"),
-                colorTheme()->color("dark4"));
+                colorTheme()->color("@light16"),
+                colorTheme()->color("@dark4"));
         });
     s_threadPool.start(
         [kVerticalRect]
@@ -412,8 +412,8 @@ void QnStatusOverlayWidget::generateBackgrounds()
                 kBackgroundWidth,
                 kVerticalRect,
                 kMaskSize,
-                colorTheme()->color("light16"),
-                colorTheme()->color("dark4"));
+                colorTheme()->color("@light16"),
+                colorTheme()->color("@dark4"));
         });
     s_threadPool.start(
         [kHorizontalRect]
@@ -423,7 +423,7 @@ void QnStatusOverlayWidget::generateBackgrounds()
                 kHorizontalRect,
                 kMaskSize,
                 colorTheme()->color("red"),
-                colorTheme()->color("dark4"));
+                colorTheme()->color("@dark4"));
         });
     s_threadPool.start(
         [kVerticalRect]
@@ -433,7 +433,7 @@ void QnStatusOverlayWidget::generateBackgrounds()
                 kVerticalRect,
                 kMaskSize,
                 colorTheme()->color("red"),
-                colorTheme()->color("dark4"));
+                colorTheme()->color("@dark4"));
         });
 }
 
