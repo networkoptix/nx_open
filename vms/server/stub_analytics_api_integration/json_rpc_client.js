@@ -67,7 +67,6 @@ const resolveJsonRpcCallPromises = (jsonRpcResponse, pendingCallPromises) => {
     delete pendingCallPromises[jsonRpcResponse.id];
 }
 
-
 class JsonRpcClient {
     webSocket = null;
     pendingCallPromises = {};
@@ -84,6 +83,8 @@ class JsonRpcClient {
         });
 
         this.webSocket.on("close", () => {
+            console.log("JsonRpcClient: webSocket.on\"close\"");
+
             if (this.onCloseHandler)
                 this.onCloseHandler();
         });
@@ -131,7 +132,10 @@ class JsonRpcClient {
 
     disconnect() {
         if (this.webSocket)
+        {
+            this.onCloseHandler = null;
             this.webSocket.close();
+        }
 
         this.webSocket = null;
     }
@@ -151,8 +155,7 @@ class JsonRpcClient {
 
     notify(method, data) {
         let request = makeJsonRpcRequest(method, data);
-        console.log("JsonRpcClient: Sending notification: ",
-            JSON.stringify(request, null, 4));
+        console.log("JsonRpcClient: Sending notification: ", JSON.stringify(request, null, 4));
         this.webSocket.send(JSON.stringify(request));
     }
 

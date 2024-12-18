@@ -52,8 +52,8 @@ class EngineContext {
     engine = null;
     deviceAgentsByDeviceId = {};
 
-    constructor(engineId, mouseMovableObjectMetadata, rpcClient, manifests) {
-        this.engine = new Engine(engineId, mouseMovableObjectMetadata, rpcClient, manifests);
+    constructor(engineId, mouseMovableObjectMetadata, appContext, manifests) {
+        this.engine = new Engine(engineId, mouseMovableObjectMetadata, appContext, manifests);
     }
 }
 
@@ -116,7 +116,7 @@ function findOrCreateEngineContextById(engineId)
     if (!engineContexts.hasOwnProperty(engineId))
     {
         engineContexts[engineId] =
-            new EngineContext(engineId, appContext.mouseMovableObjectMetadata, appContext.rpcClient,
+            new EngineContext(engineId, appContext.mouseMovableObjectMetadata, appContext,
                 appContext.manifests);
     }
 
@@ -251,7 +251,37 @@ const getSessionToken = async (user, password) => {
 
 }
 
+const authorizeIntegrationAndConnect = async () => {
+    console.log("Authorizing integration and connecting.");
+    const url =
+        "wss://"
+        + appContext.config.vmsHost
+        + ":"
+        + appContext.config.vmsPort
+        + "/jsonrpc";
+
+    appContext.integrationUserSessionToken = await getSessionToken(
+        appContext.integrationContext.integrationUserName,
+        appContext.integrationContext.integrationPassword);
+
+    if (!appContext.integrationUserSessionToken)
+    {
+        console.log("Failed to get integration user session token.");
+        return false;
+    }
+
+    appContext.rpcClient.connect(url.toString(), {
+        rejectUnauthorized: false,
+        headers: {
+            "Authorization": "Bearer " + appContext.integrationUserSessionToken
+        }
+    });
+
+    return true;
+}
+
 const initializeRpcClient = async () => {
+    console.log("Initializing RPC client.");
     let rpcClient = new JsonRpcClient();
 
     rpcClient.on(constants.CREATE_DEVICE_AGENT_METHOD, async (data) => {
@@ -448,14 +478,20 @@ const initializeRpcClient = async () => {
         return result;
     });
 
-    rpcClient.onClose(() => {
-        console.log("Connection closed");
+    rpcClient.onClose(async () => {
+        // This handler will be called only when the server closes the websocket connection.
+        console.log("Executing onClose handler.");
+
+        // In case the session is expired, try to refresh the session and reconnect.
+        if (await authorizeIntegrationAndConnect())
+            return;
+
         appContext.viewModel.connectionState = "disconnected";
         appContext.window.webContents.send("state-changed", appContext.viewModel);
     });
 
     rpcClient.onOpen(() => {
-        console.log("Opening connection");
+        console.log("Executing onOpen handler.");
 
         if (!appContext.integrationContext.integrationUserId)
         {
@@ -513,6 +549,10 @@ const initializeNotifications = () => {
         if (appContext.viewModel.connectionState == "connected")
         {
             console.log("Disconnecting.");
+            // Disconnect without executing the onClose handler.
+            // When the onClose handler is executed, it will try to reconnect, but we don't need
+            // to reconnect when the user explicitly disconnects by pressing a button, we only
+            // need to reconnect when the websocket connection is closed by the server.
             appContext.rpcClient.disconnect();
             appContext.viewModel.connectionState = "disconnected";
             appContext.window.webContents.send("state-changed", appContext.viewModel);
@@ -533,25 +573,9 @@ const initializeNotifications = () => {
                 return;
             }
 
-            const url =
-                "wss://"
-                + appContext.config.vmsHost
-                + ":"
-                + appContext.config.vmsPort
-                + "/jsonrpc";
+            appContext.rpcClient = await initializeRpcClient();
 
-            appContext.integrationUserSessionToken = await getSessionToken(
-                appContext.integrationContext.integrationUserName,
-                appContext.integrationContext.integrationPassword);
-
-            if (!appContext.integrationUserSessionToken) return;
-
-            appContext.rpcClient.connect(url.toString(), {
-                rejectUnauthorized: false,
-                headers: {
-                    "Authorization": "Bearer " + appContext.integrationUserSessionToken
-                }
-            });
+            await authorizeIntegrationAndConnect();
         }
     });
 

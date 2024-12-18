@@ -11,15 +11,15 @@ class Engine {
     manifests = {}
     engineId = "";
     mouseMovableObjectMetadata = null;
-    rpcClient = null;
+    appContext = null;
     engineSettingsModel = {};
 
-    constructor(engineId, mouseMovableObjectMetadata, rpcClient, manifests) {
+    constructor(engineId, mouseMovableObjectMetadata, appContext, manifests) {
         this.manifests = manifests;
         this.engineSettingsModel = manifests.integrationManifest.engineSettingsModel;
         this.engineId = engineId;
         this.mouseMovableObjectMetadata = mouseMovableObjectMetadata;
-        this.rpcClient = rpcClient;
+        this.appContext = appContext;
         this.target = {
             id: engineId // Engine Id
         };
@@ -35,7 +35,7 @@ class Engine {
         return new DeviceAgent(this.engineId,
             deviceInfo,
             this.mouseMovableObjectMetadata,
-            this.rpcClient,
+            this.appContext,
             this.manifests);
     }
 
@@ -177,7 +177,7 @@ class Engine {
 
         console.log(method, JSON.stringify(parameters, null, 4));
 
-        this.rpcClient.notify(method, parameters);
+        this.appContext.rpcClient.notify(method, parameters);
     }
 
     executeAction(action)
@@ -231,7 +231,7 @@ class Engine {
 
         console.log(method, JSON.stringify(parameters, null, 4));
 
-        this.rpcClient.notify(method, parameters);
+        this.appContext.rpcClient.notify(method, parameters);
     }
 
     getIntegrationSideSettings()

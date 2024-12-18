@@ -79,7 +79,7 @@ class DeviceAgent {
     };
     lastDataTimestampUs = -1;
     mouseMovableObjectMetadata = null;
-    rpcClient = null;
+    appContext = null;
     frameCounter = 0;
     lastTrackId = null;
     objectActionMetadata = {
@@ -93,14 +93,14 @@ class DeviceAgent {
         }
     };
 
-    constructor(engineId, deviceInfo, mouseMovableObjectMetadata, rpcClient, manifests)
+    constructor(engineId, deviceInfo, mouseMovableObjectMetadata, appContext, manifests)
     {
         this.manifests = manifests;
         this.deviceAgentSettingsModel = manifests.engineManifest.deviceAgentSettingsModel;
         this.target.id = engineId;
         this.target.deviceId = deviceInfo.id;
         this.mouseMovableObjectMetadata = mouseMovableObjectMetadata;
-        this.rpcClient = rpcClient;
+        this.appContext = appContext;
     }
 
     manifest()
@@ -126,7 +126,7 @@ class DeviceAgent {
         for (let packet of objectMetadataPackets)
         {
             let parameters = mergeMaps(this.target, packet);
-            this.rpcClient.notify(method, parameters);
+            this.appContext.rpcClient.notify(method, parameters);
         }
 
         // Send event metadata, best shot metadata and object title metadata only once per track,
@@ -136,15 +136,13 @@ class DeviceAgent {
 
         this.lastTrackId = this.objectActionMetadata.trackId;
 
-
-
         {
             let method = constants.PUSH_DEVICE_AGENT_OBJECT_TITLE_METADATA_METHOD;
 
             let packet = makeObjectTitleMetadataPacket(this.objectActionMetadata.trackId,
                 this.lastDataTimestampUs);
             let parameters = mergeMaps(this.target, packet);
-            this.rpcClient.notify(method, parameters);
+            this.appContext.rpcClient.notify(method, parameters);
         }
     }
 
@@ -162,7 +160,7 @@ class DeviceAgent {
 
         console.log(method, JSON.stringify(parameters, null, 4));
 
-        this.rpcClient.notify(
+        this.appContext.rpcClient.notify(
             method,
             parameters);
     }
@@ -295,7 +293,7 @@ class DeviceAgent {
 
         console.log(method, JSON.stringify(parameters, null, 4));
 
-        this.rpcClient.notify(method, parameters);
+        this.appContext.rpcClient.notify(method, parameters);
     }
 
     getIntegrationSideSettings()
