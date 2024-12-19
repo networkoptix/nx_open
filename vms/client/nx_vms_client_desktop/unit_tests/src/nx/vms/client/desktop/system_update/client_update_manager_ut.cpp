@@ -41,8 +41,7 @@ const milliseconds kNextSunday = kSaturday + kDay;
 
 TEST(ClientUpdateManagerTest, trivialPlanning)
 {
-    const auto date = ClientUpdateManager::calculateUpdateDate(
-        kMonday, makeInfo(kTuesday, 1), {}, {});
+    const auto date = ClientUpdateManager::calculateUpdateDate(makeInfo(kTuesday, 1), {}, {});
 
     EXPECT_GE(dt(date.date), dt(kTuesday));
     EXPECT_LE(dt(date.date), dt(kWednesday));
@@ -50,55 +49,28 @@ TEST(ClientUpdateManagerTest, trivialPlanning)
     EXPECT_LE(date.shift, kDay);
 }
 
-TEST(ClientUpdateManagerTest, releaseDatePassed)
-{
-    const auto date = ClientUpdateManager::calculateUpdateDate(
-        kWednesday, makeInfo(kSunday, 1), {}, {});
-
-    EXPECT_EQ(dt(date.date), dt(kWednesday));
-    EXPECT_GE(date.shift, 0ms);
-    EXPECT_LE(date.shift, kDay);
-}
-
-TEST(ClientUpdateManagerTest, releaseDatePassedRecently)
-{
-    const auto date = ClientUpdateManager::calculateUpdateDate(
-        kMonday, makeInfo(kMonday - 3h, 1), {}, {});
-
-    EXPECT_GE(dt(date.date), dt(kMonday));
-    EXPECT_GE(date.shift, 0ms);
-    EXPECT_LE(date.shift, kDay);
-}
-
 TEST(ClientUpdateManagerTest, updateInTheEndOfWeek)
 {
     const auto date = ClientUpdateManager::calculateUpdateDate(
-        kMonday, makeInfo(kFriday, 1), {}, {});
+        makeInfo(kFriday, 1), {}, {});
 
     EXPECT_GE(dt(date.date), dt(kNextSunday));
-    EXPECT_GE(date.shift, 0ms);
-    EXPECT_LE(date.shift, kDay);
 }
 
-TEST(ClientUpdateManagerTest, updateInTheEndOfWeekWhenReleaseDatePassed)
+TEST(ClientUpdateManagerTest, updatesEnabledWhenRolloutPeriodEnded)
 {
     const auto date = ClientUpdateManager::calculateUpdateDate(
-        kFriday, makeInfo(kThursday, 1), {}, {});
+        makeInfo(kMonday, 1), {}, kWednesday);
 
-    EXPECT_GE(dt(date.date), dt(kNextSunday));
-    EXPECT_GE(date.shift, 0ms);
-    EXPECT_LE(date.shift, kDay);
+    EXPECT_EQ(dt(date.date), dt(kWednesday));
 }
 
-TEST(ClientUpdateManagerTest, justATest)
+TEST(ClientUpdateManagerTest, updatesEnabledInTheEndOfWeekWhenRolloutPeriodEnded)
 {
     const auto date = ClientUpdateManager::calculateUpdateDate(
-        sys_days(February/20/2023).time_since_epoch(),
-        makeInfo(sys_days(February/22/2023).time_since_epoch(), 1), {}, {});
+        makeInfo(kMonday, 1), {}, kFriday);
 
-    EXPECT_GE(dt(date.date), dt(sys_days(February/22/2023).time_since_epoch()));
-    EXPECT_GE(date.shift, 0ms);
-    EXPECT_LE(date.shift, kDay);
+    EXPECT_EQ(dt(date.date), dt(kNextSunday));
 }
 
 } // namespace nx::vms::client::desktop::test

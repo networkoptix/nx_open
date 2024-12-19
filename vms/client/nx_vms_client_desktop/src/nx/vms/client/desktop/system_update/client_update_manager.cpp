@@ -484,7 +484,6 @@ void ClientUpdateManager::Private::planUpdate()
         + kUpdatesProhibitedSinceActivationPeriod;
 
     const UpdateDate plannedDate = calculateUpdateDate(
-        qnSyncTime->value(),
         updateContents.info,
         systemSettings()->localSystemId(),
         updateAllowedSince);
@@ -519,7 +518,8 @@ void ClientUpdateManager::Private::handleClientUpdateSettingsChanged()
     const auto settings = globalClientUpdateSettings();
 
     NX_VERBOSE(this,
-        "Global client update settings chaged. Enabled: %1, pending version: %2, planned date: %3",
+        "Global client update settings changed. "
+            "Enabled: %1, pending version: %2, planned date: %3",
         settings.enabled,
         settings.pendingVersion,
         QDateTime::fromMSecsSinceEpoch(settings.plannedInstallationDateMs.count()));
@@ -787,7 +787,6 @@ QUrl ClientUpdateManager::releaseNotesUrl() const
 }
 
 ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
-    milliseconds currentDateTime,
     const common::update::Information& updateInfo,
     const nx::Uuid& localSystemId,
     milliseconds minimumAllowedUpdateDate)
@@ -795,6 +794,7 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
     // IMPORTANT! This function must generate the same timestamp on all Clients in the system
     // independently on the Client timezone. Thus all QDateTime <-> std::chrono conversion calls
     // must be done with QTimeZone::UTC specification.
+    // Also this function should not depend on the current date.
 
     const auto isSuitableDay =
         [](const QDate& day)
@@ -809,15 +809,13 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
 
     const milliseconds endOfDeliveryPeriod =
         updateInfo.releaseDate + updateInfo.releaseDeliveryDays * 24h;
-    const milliseconds minDate =
-        std::max(std::max(updateInfo.releaseDate, minimumAllowedUpdateDate), currentDateTime);
+    const milliseconds minDate = std::max(updateInfo.releaseDate, minimumAllowedUpdateDate);
     const milliseconds maxDate = std::max(minDate, endOfDeliveryPeriod);
 
     NX_VERBOSE(typeid(ClientUpdateManager),
         "calculatePlannedUpdateDate(): Planning update date. "
-            "Now: %1, release date: %2, delivery days: %3, minimum allowed date: %4, "
-            "end of delivery: %5, min date: %6, max date: %7",
-        qdt(currentDateTime),
+            "Release date: %1, delivery days: %2, minimum allowed date: %3, "
+            "end of delivery: %4, min date: %5, max date: %6",
         qdt(updateInfo.releaseDate),
         updateInfo.releaseDeliveryDays,
         qdt(minimumAllowedUpdateDate),
@@ -825,54 +823,37 @@ ClientUpdateManager::UpdateDate ClientUpdateManager::calculateUpdateDate(
         qdt(minDate),
         qdt(maxDate));
 
-    QDate date;
+    QDate date = qdt(milliseconds(nx::utils::random::number(
+        randomGenerator, minDate.count(), maxDate.count()))).date();
 
-    if (endOfDeliveryPeriod <= currentDateTime) //< Update rollout period has already passed.
+    if (!isSuitableDay(date))
     {
-        date = qdt(minDate).date();
-        if (!isSuitableDay(date))
-            date = date.addDays(Qt::Sunday - date.dayOfWeek());
+        // Pick a random suitable day in the current or next week.
 
-        NX_DEBUG(typeid(ClientUpdateManager),
-            "calculatePlannedUpdateDate(): Update rollout period has already passed. "
-                "Period ended at %1, now: %2",
-            endOfDeliveryPeriod,
-            qdt(currentDateTime));
-    }
-    else
-    {
-        date = qdt(milliseconds(nx::utils::random::number(
-            randomGenerator, minDate.count(), maxDate.count()))).date();
+        constexpr int kChoiceDays = 6;
 
-        if (!isSuitableDay(date))
+        std::vector<QDate> days;
+        days.reserve(2 * kChoiceDays);
+
+        for (int i = -kChoiceDays; i <= kChoiceDays; ++i)
         {
-            // Pick a random suitable day in the current or next week.
-
-            constexpr int kChoiceDays = 6;
-
-            std::vector<QDate> days;
-            days.reserve(2 * kChoiceDays);
-
-            for (int i = -kChoiceDays; i <= kChoiceDays; ++i)
+            const auto day = date.addDays(i);
+            if (isSuitableDay(day)
+                && day.endOfDay(QTimeZone::UTC).toMSecsSinceEpoch() > minDate.count()
+                && day.startOfDay(QTimeZone::UTC).toMSecsSinceEpoch() < maxDate.count())
             {
-                const auto day = date.addDays(i);
-                if (isSuitableDay(day)
-                    && day.endOfDay(QTimeZone::UTC).toMSecsSinceEpoch() > minDate.count()
-                    && day.startOfDay(QTimeZone::UTC).toMSecsSinceEpoch() < maxDate.count())
-                {
-                    days.push_back(day);
-                }
+                days.push_back(day);
             }
-
-            // Pick the next suitable day if there are no suitable days in the rollout period.
-            for (auto day = date.addDays(1); days.empty(); day = day.addDays(1))
-            {
-                if (isSuitableDay(day))
-                    days.push_back(day);
-            }
-
-            date = days[randomGenerator.bounded((int) days.size())];
         }
+
+        // Pick the next suitable day if there are no suitable days in the rollout period.
+        for (auto day = date.addDays(1); days.empty(); day = day.addDays(1))
+        {
+            if (isSuitableDay(day))
+                days.push_back(day);
+        }
+
+        date = days[randomGenerator.bounded((int) days.size())];
     }
 
     NX_VERBOSE(typeid(ClientUpdateManager), "calculatePlannedUpdateDate(): Picked date: %1", date);
