@@ -3450,10 +3450,6 @@ Kunci Lisensi: %2</translation>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Motion video</source>
-      <translation>Video bergerak</translation>
-    </message>
-    <message>
       <source>Date/Time</source>
       <translation>Tanggal/Waktu</translation>
     </message>
@@ -3488,10 +3484,6 @@ Kunci Lisensi: %2</translation>
         <numerusform>%1 (%n kali)</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Buka kamera</translation>
-    </message>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
@@ -3520,6 +3512,14 @@ Kunci Lisensi: %2</translation>
       <translation>
         <numerusform>%1 (%n kamera)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Open Event video</source>
+      <translation>Buka Event video</translation>
+    </message>
+    <message>
+      <source>Open Event camera</source>
+      <translation>Buka Event kamera</translation>
     </message>
   </context>
   <context>

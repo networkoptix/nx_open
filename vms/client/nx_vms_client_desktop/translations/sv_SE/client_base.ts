@@ -3495,10 +3495,6 @@ Licensnyckel: %2</translation>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Motion video</source>
-      <translation>Rörelsevideo</translation>
-    </message>
-    <message>
       <source>Date/Time</source>
       <translation>Datum/Tid</translation>
     </message>
@@ -3534,10 +3530,6 @@ Licensnyckel: %2</translation>
         <numerusform>%1 (%n gånger)</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Öppna kameran</translation>
-    </message>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
@@ -3570,6 +3562,14 @@ Licensnyckel: %2</translation>
         <numerusform>%1 (%n kameror)</numerusform>
         <numerusform>%1 (%n kameror)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Open Event video</source>
+      <translation>Öppna händelsevideo</translation>
+    </message>
+    <message>
+      <source>Open Event camera</source>
+      <translation>Öppna händelsekamera</translation>
     </message>
   </context>
   <context>

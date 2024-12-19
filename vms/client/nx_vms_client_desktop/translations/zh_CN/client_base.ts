@@ -3450,10 +3450,6 @@ License Key: %2</translation>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Motion video</source>
-      <translation>移动侦测视频</translation>
-    </message>
-    <message>
       <source>Date/Time</source>
       <translation>日期/时间</translation>
     </message>
@@ -3488,10 +3484,6 @@ License Key: %2</translation>
         <numerusform>%1 (%n 时间)</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Open camera</source>
-      <translation>打开摄像机</translation>
-    </message>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
@@ -3520,6 +3512,14 @@ License Key: %2</translation>
       <translation>
         <numerusform>%1 (%n 摄像机)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Open Event video</source>
+      <translation type="unfinished">Open Event video</translation>
+    </message>
+    <message>
+      <source>Open Event camera</source>
+      <translation type="unfinished">Open Event camera</translation>
     </message>
   </context>
   <context>
