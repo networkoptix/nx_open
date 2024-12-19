@@ -113,7 +113,7 @@ QString SoftwareTriggerPixmaps::effectivePixmapPath(const QString& name)
         return pixmapPath(type) + fileName + kPixmapExtension;
     }
 
-    return {};
+    return effectivePixmapPath(defaultPixmapName());
 }
 
 const QStringList& SoftwareTriggerPixmaps::pixmapNames()
