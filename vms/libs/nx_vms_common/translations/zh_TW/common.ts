@@ -1410,11 +1410,11 @@
     </message>
     <message>
       <source>Last master System merge ID</source>
-      <translation type="unfinished">Last master System merge ID</translation>
+      <translation>最後的主系統合併ID</translation>
     </message>
     <message>
       <source>Last slave System merge ID</source>
-      <translation type="unfinished">Last slave System merge ID</translation>
+      <translation>最後的附屬系統合併ID</translation>
     </message>
     <message>
       <source>Disable Device vendors</source>
