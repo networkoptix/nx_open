@@ -241,11 +241,16 @@ QString deviceName(SubstitutionContext* substitution, common::SystemContext* con
 
 QString deviceType(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto resource =
-            context->resourcePool()->getResourceById(eventSourceId(substitution->event)))
+    const auto sourceId = eventSourceId(substitution->event);
+    if (const auto camera =
+            context->resourcePool()->getResourceById<QnVirtualCameraResource>(sourceId))
     {
-        if (const auto resType = qnResTypePool->getResourceType(resource->getTypeId()))
-            return resType->getName();
+        return QString::fromStdString(nx::reflect::toString(camera->deviceType()));
+    }
+    if (const auto resource =
+            context->resourcePool()->getResourceById<QnMediaServerResource>(sourceId))
+    {
+        return "Server";
     }
     return {};
 }
