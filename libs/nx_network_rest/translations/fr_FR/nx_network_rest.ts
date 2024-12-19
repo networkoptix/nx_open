@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>Le mot de passe a expiré. Veuillez contacter l'administrateur du site.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>Cet utilisateur a été désactivé par un administrateur du site.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Cette méthode d'autorisation est interdite. Veuillez contacter l'administrateur du site.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -64,15 +64,15 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Erreur interne du serveur (%1). Veuillez contacter l'administrateur du site.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>La requête est non autorisée en raison d'une erreur inconnue.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>La clé de session est trop ancienne pour ce site.</translation>
     </message>
   </context>
   <context>
@@ -136,11 +136,11 @@
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>La session est trop ancienne selon la configuration du site.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>La ressource n'est plus présente sur le serveur.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Service non autorisé.</translation>
     </message>
   </context>
 </TS>

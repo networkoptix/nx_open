@@ -210,20 +210,20 @@
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 devices</numerusform>
+      <translation>
+        <numerusform>%n ของ%1 อุปกรณ์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 cameras</numerusform>
+      <translation>
+        <numerusform>%n ของ%1 กล้อง</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 I/O modules</numerusform>
+      <translation>
+        <numerusform>%n ของ %1 I/O โมดูล</numerusform>
       </translation>
     </message>
   </context>

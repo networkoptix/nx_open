@@ -16,7 +16,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Este usuario no existe o no puede iniciar sesión.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -56,11 +56,11 @@
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Se presentan más de un usuario con el mismo inicio de sesión.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>No se puede verificar el certificado SSL/TLS del servidor LDAP.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>

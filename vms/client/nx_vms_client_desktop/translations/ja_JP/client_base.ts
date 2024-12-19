@@ -5397,7 +5397,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation>時刻同期のためのインターネット接続ができません</translation>
+      <translation>時刻同期用インターネット接続不可</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
@@ -5441,7 +5441,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation>録画スケジュールが無効です。</translation>
+      <translation>無効な録画スケジュール</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>

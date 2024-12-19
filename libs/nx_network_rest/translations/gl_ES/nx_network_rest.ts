@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Non autorizado.</translation>
     </message>
     <message>
       <source>Session expired.</source>

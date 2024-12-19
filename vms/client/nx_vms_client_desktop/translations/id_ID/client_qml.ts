@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Bahasa Notifikasi</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Update klien offline</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Update offline diaktifkan dan file disimpan di server.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Mengaktifkan opsi ini akan mengaktifkan pendownloadan file tambahan ke server yang dapat digunakan untuk update klien yang terkoneksi bahkan tanpa akses internet.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Ini akan menghapus semua file update pada server.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Lanjut diproses?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Pilih / Tidak Pilih Semua</translation>
     </message>
   </context>
   <context>
@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Pengaturan Tile</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Pengaturan Tabel</translation>
     </message>
   </context>
   <context>
@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Periksa pengaturan Administrasi Site untuk mengkonfigurasi plugin ini.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Plugin ini tidak memiliki pengaturan di tingkat Site.</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Integrasi memungkinkan pemanfaatan analitik video yang lancar pada berbagai perangkat dari VMS.
+Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
   </context>
   <context>
@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Kode pairing salah</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -404,7 +404,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Dibagikan melalui link</translation>
     </message>
   </context>
   <context>
@@ -693,24 +693,24 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Pilih jenis</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Menghapus atribut akan menghapus semua data terkait</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Menghapus daftar akan menghapus semua data di dalamnya.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Hapus Daftar?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Daftar ini dikaitkan dengan Aturan Event %n. Apakah Anda yakin ingin menghapusnya?</numerusform>
       </translation>
     </message>
   </context>
@@ -736,15 +736,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Daftar Ekspor</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Mengekspor</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Buka File Folder...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -820,7 +820,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filter membantu mengontrol akses ke site dan sinkronisasi dengan menentukan user dan/atau grup mana dari Base DN yang diizinkan.</translation>
     </message>
   </context>
   <context>
@@ -917,7 +917,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Beberapa nilai tidak dapat dicocokkan secara otomatis. Harap petakan secara manual.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -939,11 +939,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Pada tingkat site, anggota grup memiliki izin untuk:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Pada tingkat site, user memiliki izin untuk:</translation>
     </message>
   </context>
   <context>
@@ -1067,7 +1067,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Ada grup lain dengan nama yang sama. Sebaiknya berikan nama yang unik pada grup tersebut.</translation>
     </message>
   </context>
   <context>
@@ -1218,7 +1218,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Kelola Integrasi</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1233,7 +1233,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Plugin ini tidak memiliki pengaturan di tingkat Site.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1325,7 +1325,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Masuk ke situs untuk mengkonfigurasi cara membuka layout</translation>
     </message>
   </context>
   <context>
@@ -1395,19 +1395,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Koneksikan Site Anda ke server LDAP untuk memudahkan manajemen user</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Impor berkelanjutan dari server LDAP dinonaktifkan untuk site ini. Update pada grup, user, dan keanggotaan grup akan dilakukan hanya melalui sinkronisasi manual.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Tidak ada user atau grup yang cocok dengan pengaturan sinkronisasi dan ditambahkan ke DB situs. Pastikan parameter dan filter server LDAP dikonfigurasi dengan benar.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Mohon berhati-hati saat mengubah pengaturan LDAP. Konfigurasi yang salah dapat mengganggu ketersediaan site untuk sejumlah besar user secara bersamaan.</translation>
     </message>
   </context>
   <context>
@@ -1464,11 +1464,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Daftar Impor</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Opsi Impor</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1480,11 +1480,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Pemisah:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Data berisi header</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1500,31 +1500,31 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Mengimpor</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Tidak dapat membuka file</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Pastikan file tersebut ada dan Anda memiliki akses ke file yang dipilih</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Memperbaiki entri yang diimpor</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Tidak dapat mengimpor file yang dipilih</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>File tampaknya kosong.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Pastikan file yang dipilih ada dan Anda memiliki akses.</translation>
     </message>
   </context>
   <context>
@@ -1551,7 +1551,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 dipilih:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1567,11 +1567,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Tidak dapat menyimpan file</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Pastikan Anda memiliki akses ke folder yang dipilih dan ruang disk yang cukup</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1579,7 +1579,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Ekspor yang Dipilih</translation>
     </message>
   </context>
   <context>
@@ -1693,8 +1693,8 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>dengan atribut %n</numerusform>
       </translation>
     </message>
     <message>

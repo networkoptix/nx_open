@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Teks keterangan alat</translation>
     </message>
   </context>
   <context>
@@ -87,11 +87,11 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Jenis bidang yang tidak valid diberikan</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Kebijakan validasi yang tidak terduga</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Tidak semua server cocok</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Event Perangkat</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -188,19 +188,19 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Nilai bidang %1 harus diberikan untuk kebijakan validasi yang diberikan</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>Layout lokal yang dipilih hanya dapat ditampilkan kepada pemiliknya %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Tidak ada user yang dipilih memiliki akses ke layout yang dipilih</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Beberapa user tidak memiliki akses ke layout yang dipilih</translation>
     </message>
     <message>
       <source>For</source>
@@ -208,43 +208,43 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Perangkat yang dipilih telah dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Kamera yang dipilih telah dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Server yang dipilih telah dihapus</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>Layout yang dipilih telah dihapus</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>Nilai waktu tidak boleh kurang dari nol</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>Durasi tidak boleh kurang dari nol</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>Nilai tidak boleh kurang dari %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>Nilai tidak boleh lebih dari %1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -262,7 +262,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Teks kosong tidak diperbolehkan</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -291,7 +291,7 @@
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Jenis event analitik tidak dipilih</translation>
     </message>
   </context>
   <context>
@@ -318,7 +318,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Jenis objek analitik tidak dipilih</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     <message>
       <source>%1 was disconnected</source>
       <comment>Device name will be substituted</comment>
-      <translation type="unfinished">%1 was disconnected</translation>
+      <translation>%1 tidak terkoneksi</translation>
     </message>
   </context>
   <context>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <translation>Event Generik di %1</translation>
     </message>
   </context>
   <context>
@@ -537,25 +537,25 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>Otentikasi HTTP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Bidang user &amp; kata sandi harus diisi jika metode otentikasi basic atau digest dipilih</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Bidang token harus diisi jika jenis otentikasi bearer dipilih</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
-      <translation type="unfinished">HTTP Method should be known</translation>
+      <translation>Metode HTTP harus diketahui</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
+      <translation>Event Masalah Sinkronisasi LDAP</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -617,7 +617,7 @@
     <message>
       <source>%1 has a license problem</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation>%1 memiliki masalah lisensi</translation>
     </message>
   </context>
   <context>
@@ -717,15 +717,15 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Daftar tidak dipilih</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Daftar dengan id yang diberikan &apos;%1&apos; tidak ada</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>Daftar dengan id yang diberikan &apos;%1&apos; memiliki tipe objek yang tidak valid - &apos;%2&apos;, yang diharapkan - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -739,11 +739,11 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>Durasi nol tidak dapat ditetapkan untuk status event `%1`</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>Durasi bukan nol tidak dapat ditetapkan untuk status event `%1`</translation>
     </message>
   </context>
   <context>
@@ -792,23 +792,23 @@
     <message>
       <source>Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
+      <translation>Batas daya terlampaui (%1)</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>PoE melebihi budget pada %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>Konsumsi daya saat ini: %1 watt</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>Batas konsumsi atas: %1 watt</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>Batas konsumsi bawah: %1 watt</translation>
     </message>
   </context>
   <context>
@@ -860,19 +860,19 @@
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>`%1` peringatan bidang filter event:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>`%1` peringatan bidang pembuat aksi:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>Aturan belum selesai. Diperlukan satu filter dan satu builder</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>Filter yang diberikan tidak kompatibel dengan builder yang diberikan</translation>
     </message>
   </context>
   <context>
@@ -940,7 +940,7 @@
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>%1 sertifikat error</translation>
     </message>
   </context>
   <context>
@@ -966,7 +966,7 @@
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 Konflik</translation>
     </message>
   </context>
   <context>
@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 Gagal</translation>
     </message>
   </context>
   <context>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Dimulai</translation>
     </message>
   </context>
   <context>
@@ -1042,14 +1042,14 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>User: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>Suara tidak dipilih</translation>
     </message>
   </context>
   <context>
@@ -1071,7 +1071,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>Keadaan `%1` tidak berlaku untuk event `%2` dan aksi `%3` dengan parameter yang diberikan</translation>
     </message>
   </context>
   <context>
@@ -1129,7 +1129,7 @@
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Gagal mendapatkan deskriptor event</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>

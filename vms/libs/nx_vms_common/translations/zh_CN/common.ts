@@ -210,20 +210,20 @@
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 devices</numerusform>
+      <translation>
+        <numerusform>%1 设备的 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 cameras</numerusform>
+      <translation>
+        <numerusform>%1 摄像机的 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 的 %n I/O模块</numerusform>
       </translation>
     </message>
   </context>

@@ -216,23 +216,23 @@
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 devices</numerusform>
-        <numerusform>%n of %1 devices</numerusform>
+      <translation>
+        <numerusform>%n sur %1 appareil</numerusform>
+        <numerusform>%n sur %1 appareils</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 cameras</numerusform>
-        <numerusform>%n of %1 cameras</numerusform>
+      <translation>
+        <numerusform>%n sur %1 caméra</numerusform>
+        <numerusform>%n sur %1 caméras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 I/O modules</numerusform>
-        <numerusform>%n of %1 I/O modules</numerusform>
+      <translation>
+        <numerusform>%n sur %1 module d'E/S</numerusform>
+        <numerusform>%n sur %1 modules d'E/S</numerusform>
       </translation>
     </message>
   </context>
@@ -584,11 +584,11 @@
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Les utilisateurs n'ont pas accès à la mise en page sélectionnée</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Certains utilisateurs n'ont pas accès à la mise en page sélectionnée</translation>
     </message>
   </context>
   <context>
@@ -1346,7 +1346,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Vue en direct</translation>
     </message>
   </context>
   <context>
@@ -1909,7 +1909,7 @@
     </message>
     <message>
       <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <translation>Langue par défaut pour les nouveaux utilisateurs</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>

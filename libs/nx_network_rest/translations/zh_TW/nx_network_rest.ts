@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>密碼已過期，請聯繫站點管理員。</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>此使用者已被站點管理員停用。</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>此授權方式不被允許。請聯繫站點管理員。</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -64,7 +64,7 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>內部伺服器錯誤 (%1)。請聯繫站點管理員。</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>

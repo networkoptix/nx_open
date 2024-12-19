@@ -2660,19 +2660,19 @@
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>Flou</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>Exclure les caméras</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>Appliquer la durée de session aux utilisateurs du Cloud</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>Outil d'accès à distance</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2684,7 +2684,7 @@
     </message>
     <message>
       <source>Power users</source>
-      <translation type="unfinished">Power users</translation>
+      <translation>Utilisateurs expérimentés</translation>
     </message>
   </context>
   <context>
@@ -2764,11 +2764,11 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>Accès à distance</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>Activer le décodage matériel</translation>
     </message>
   </context>
   <context>
@@ -3104,11 +3104,11 @@
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>Chaque</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>Forcer l'ouverture dans une fenêtre dédiée</translation>
     </message>
   </context>
   <context>

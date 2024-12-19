@@ -216,21 +216,21 @@
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n of %1 devices</numerusform>
         <numerusform>%n of %1 devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n of %1 cameras</numerusform>
         <numerusform>%n of %1 cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n of %1 I/O modules</numerusform>
         <numerusform>%n of %1 I/O modules</numerusform>
       </translation>

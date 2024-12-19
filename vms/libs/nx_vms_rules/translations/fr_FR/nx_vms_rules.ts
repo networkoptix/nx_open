@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Texte de l'infobulle</translation>
     </message>
   </context>
   <context>
@@ -89,11 +89,11 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Le type de champ fourni n'est pas valide</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Politique de validation inattendue</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Tous les serveurs ne sont pas appropriés</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -202,7 +202,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Certains utilisateurs n'ont pas accès à la mise en page sélectionnée</translation>
     </message>
     <message>
       <source>For</source>

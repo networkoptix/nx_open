@@ -11192,7 +11192,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>La durée de vie illimitée de la session utilisateur menace la sécurité globale du site et peut entraîner une dégradation des performances</translation>
     </message>
   </context>
   <context>
@@ -11203,14 +11203,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>%n objet sélectionné</numerusform>
+        <numerusform>%n objets sélectionnés</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Tous les objets</translation>
     </message>
   </context>
   <context>
@@ -11622,15 +11622,15 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>Le site dépasse les limites de son organisation et pourrait bientôt devenir non fonctionnel. Veuillez ajuster votre utilisation pour éviter toute interruption de service.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Ouvrir les paramètres</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Ouvrir les services</translation>
     </message>
   </context>
   <context>
@@ -11654,12 +11654,12 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Votre accès au Site expire le %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>Votre accès au Site expire dans %1</translation>
     </message>
   </context>
   <context>
@@ -11728,7 +11728,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Cette action n'est pas prise en charge pour les notifications provenant d'autres sites</translation>
     </message>
   </context>
   <context>

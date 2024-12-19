@@ -6130,7 +6130,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Wyłączenie witryny</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
@@ -7393,7 +7393,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Wyłączenie witryny</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
@@ -7482,7 +7482,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Nieodebrane połączenie</translation>
     </message>
   </context>
   <context>
@@ -9950,7 +9950,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Witryny zostaną wkrótce połączone</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>

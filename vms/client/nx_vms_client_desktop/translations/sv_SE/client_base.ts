@@ -8185,7 +8185,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Ny webbplats</translation>
     </message>
   </context>
   <context>
@@ -9716,7 +9716,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Ny webbplats</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -12646,7 +12646,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Ny webbplats</translation>
     </message>
   </context>
   <context>

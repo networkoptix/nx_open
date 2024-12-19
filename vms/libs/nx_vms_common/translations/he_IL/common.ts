@@ -228,29 +228,29 @@
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 devices</numerusform>
-        <numerusform>%n of %1 devices</numerusform>
-        <numerusform>%n of %1 devices</numerusform>
-        <numerusform>%n of %1 devices</numerusform>
+      <translation>
+        <numerusform>התקנים %n מ %1</numerusform>
+        <numerusform>התקנים %n מ %1</numerusform>
+        <numerusform>התקנים %n מ %1</numerusform>
+        <numerusform>התקנים %n מ %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 cameras</numerusform>
-        <numerusform>%n of %1 cameras</numerusform>
-        <numerusform>%n of %1 cameras</numerusform>
-        <numerusform>%n of %1 cameras</numerusform>
+      <translation>
+        <numerusform>מצלמות %n מ %1</numerusform>
+        <numerusform>מצלמות %n מ %1</numerusform>
+        <numerusform>מצלמות %n מ %1</numerusform>
+        <numerusform>מצלמות %n מ %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 I/O modules</numerusform>
-        <numerusform>%n of %1 I/O modules</numerusform>
-        <numerusform>%n of %1 I/O modules</numerusform>
-        <numerusform>%n of %1 I/O modules</numerusform>
+      <translation>
+        <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
+        <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
+        <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
+        <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
       </translation>
     </message>
   </context>

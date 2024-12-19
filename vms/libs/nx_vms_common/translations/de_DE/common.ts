@@ -216,23 +216,23 @@
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 devices</numerusform>
-        <numerusform>%n of %1 devices</numerusform>
+      <translation>
+        <numerusform>%n von %1 Geräte</numerusform>
+        <numerusform>%n von %1 Geräte</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 cameras</numerusform>
-        <numerusform>%n of %1 cameras</numerusform>
+      <translation>
+        <numerusform>%n von %1 Kamera</numerusform>
+        <numerusform>%n von %1 Kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 I/O modules</numerusform>
-        <numerusform>%n of %1 I/O modules</numerusform>
+      <translation>
+        <numerusform>%n von %1 I/O-Modul</numerusform>
+        <numerusform>%n von %1 I/O-Modul</numerusform>
       </translation>
     </message>
   </context>

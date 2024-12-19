@@ -3068,7 +3068,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 wybrano:</translation>
     </message>
     <message>
       <source>Schedule</source>
