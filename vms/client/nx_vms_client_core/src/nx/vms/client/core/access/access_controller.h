@@ -87,6 +87,7 @@ protected:
     virtual Qn::Permissions calculatePermissions(const UserGroupData& targetUserGroup) const;
 
     void updatePermissions(const QnResourceList& targetResources);
+    void updateAllPermissions();
 
 signals:
     void userChanged();

@@ -214,6 +214,11 @@ void AccessController::updatePermissions(const QnResourceList& targetResources)
     d->updatePermissions(targetResources);
 }
 
+void AccessController::updateAllPermissions()
+{
+    d->updateAllPermissions();
+}
+
 // ------------------------------------------------------------------------------------------------
 // AccessController::Private
 

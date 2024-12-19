@@ -10,6 +10,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -72,9 +73,16 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     base_type(mode, peerId, parent),
     d(new Private)
 {
-    resetAccessController(mode == Mode::client || mode == Mode::unitTests
-        ? new CachingAccessController(this)
-        : new AccessController(this));
+    if (mode == Mode::crossSystem)
+    {
+        resetAccessController(new core::CloudCrossSystemAccessController(this));
+    }
+    else
+    {
+        resetAccessController(mode == Mode::client || mode == Mode::unitTests
+            ? new CachingAccessController(this)
+            : new AccessController(this));
+    }
 
     d->otherServersManager = std::make_unique<OtherServersManager>(this);
 

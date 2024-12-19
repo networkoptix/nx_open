@@ -8,9 +8,9 @@
 #include <client/client_message_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <storage/server_storage_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <nx/vms/rules/initializer.h>
+#include <storage/server_storage_manager.h>
 
 #include "private/system_context_data_p.h"
 
@@ -107,7 +108,9 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         case Mode::unitTests:
             break;
     }
-    resetAccessController(new AccessController(this));
+    resetAccessController(mode == Mode::crossSystem
+        ? new CloudCrossSystemAccessController(this)
+        : new AccessController(this));
 
     if (d->userWatcher)
     {

@@ -19,6 +19,7 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
@@ -74,6 +75,9 @@ struct CloudCrossSystemContext::Private
         systemContext = std::make_unique<SystemContext>(
             SystemContext::Mode::crossSystem,
             appContext()->peerId());
+
+        cloudCrossSystemAccessController = static_cast<core::CloudCrossSystemAccessController*>(
+            systemContext->accessController());
 
         systemContext->startModuleDiscovery(
             new nx::vms::discovery::Manager(systemContext.get()));
@@ -201,6 +205,7 @@ struct CloudCrossSystemContext::Private
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::unique_ptr<SystemContext> systemContext;
+    core::CloudCrossSystemAccessController* cloudCrossSystemAccessController = nullptr;
     core::UserResourcePtr user;
     CrossSystemServerResourcePtr server;
     std::unique_ptr<core::CloudSessionTokenUpdater> tokenUpdater;
@@ -688,7 +693,12 @@ CloudCrossSystemContext::CloudCrossSystemContext(
         this
     );
 
-    const auto update = [this]() { d->updateCameras(); };
+    const auto update =
+        [this]()
+        {
+            d->updateCameras();
+            d->cloudCrossSystemAccessController->updateAllPermissions();
+        };
 
     connect(this, &CloudCrossSystemContext::statusChanged, this, update);
     connect(systemDescription.data(), &SystemDescription::onlineStateChanged, this, update);
