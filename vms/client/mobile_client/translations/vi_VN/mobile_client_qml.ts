@@ -708,11 +708,11 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>Bật chế độ dự phòng giải mã phần mềm</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>Giải mã một số định dạng video hiếm bằng phần mềm giải mã</translation>
     </message>
   </context>
   <context>

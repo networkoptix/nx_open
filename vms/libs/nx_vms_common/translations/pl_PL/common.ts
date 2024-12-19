@@ -192,20 +192,20 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Obserwator systemowy</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Członkowie tej grupy mają nieograniczone uprawnienia systemowe. Administratorzy mogą tworzyć i modyfikować użytkowników zaawansowanych, łączyć witryny oraz podłączać lub odłączać witrynę od %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Członkowie tej grupy mogą, oprócz uprawnień nadanych przez grupę Zaawansowanych Obserwatorów, kontrolować większość konfiguracji witryny, ale nie mogą zmieniać żadnych ustawień powiązanych z administratorem, np. usuń lub zmień własne grupy i uprawnienia, i nie można tworzyć ani edytować innych użytkowników energii.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Członkowie tej grupy mogą przeglądać informacje dotyczące monitorowania stanu witryny oraz obciążenia procesora serwera w czasie rzeczywistym (monitorowanie serwera).</translation>
     </message>
   </context>
   <context>
@@ -599,11 +599,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Ta kamera nie znajduje się obecnie w wybranym układzie</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Ta kamera nie znajduje się obecnie na niektórych wybranych układach</translation>
     </message>
   </context>
   <context>
@@ -2024,7 +2024,7 @@
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>Ustawienia pikselizacji</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>

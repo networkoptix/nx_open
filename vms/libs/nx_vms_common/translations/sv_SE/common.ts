@@ -1860,39 +1860,39 @@
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>ID molnsystem</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>Aktivera 2FA för webbplatsen</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>Webbplatsens namn</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>Lokalt webbplatsID, null betyder att webbplatsen inte har konfigurerats ännu.</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
+      <translation>Senaste huvudsajtens sammanfogningsID</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
+      <translation>Sista slavwebbplatssammanfogningsID</translation>
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>Pixeleringsinställningar</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>Tillämpa sessionsgräns för molntokens</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Aktivera eller inaktivera skapandet av nya förfrågningar för integrationsregistreringar</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
@@ -2606,15 +2606,15 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Det gick inte att tvinga fram kameratid eftersom den släpar för mycket. Systemtid kommer att användas istället.</translation>
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Samtalsförfrågan</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Samtalsbegäran missad</translation>
     </message>
   </context>
 </TS>

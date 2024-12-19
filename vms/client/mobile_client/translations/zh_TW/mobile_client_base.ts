@@ -34,7 +34,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>您的站點 (Site)</translation>
     </message>
   </context>
   <context>
@@ -46,7 +46,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>無法連接到站點 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Unknown</source>
