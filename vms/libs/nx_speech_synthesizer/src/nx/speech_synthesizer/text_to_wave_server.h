@@ -19,8 +19,6 @@ namespace nx::speech_synthesizer {
 /**
  * Synthesizes wav based on a text. Uses Flite engine. Has an internal thread. Holds the queue
  * of texts to synthesize.
- *
- * Can be disabled (becomes a stub) via -DDISABLE_FLITE for the .cpp corresponding to this .h.
  */
 class TextToWaveServer:
     public QnLongRunnable,
@@ -29,9 +27,6 @@ class TextToWaveServer:
     Q_OBJECT
 
 public:
-    /** Whether the Flite was disabled via -DDISABLE_FLITE. */
-    static bool isEnabled();
-
     TextToWaveServer(const QString& binaryPath);
     virtual ~TextToWaveServer();
 
