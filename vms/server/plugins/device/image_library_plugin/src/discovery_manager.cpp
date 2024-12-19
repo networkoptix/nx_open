@@ -77,7 +77,12 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
     static constexpr char kFilePrefix[] = "file://";
     const char* path = address;
     if( strncmp( address, kFilePrefix, sizeof(kFilePrefix) - 1 ) == 0 )
+    if (strncmp(address, kFilePrefix, sizeof(kFilePrefix) - 1) == 0)
+    {
         path += sizeof(kFilePrefix) - 1; //< Skip the prefix.
+        if (path[0] == '/') //< Skip the third slash, if any.
+            ++path;
+    }
 
     const size_t pathLen = strlen( path );
     if( pathLen == 0 || pathLen > FILENAME_MAX )
