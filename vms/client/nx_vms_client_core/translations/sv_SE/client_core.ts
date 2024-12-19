@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Din webbplats</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -151,43 +151,43 @@
     </message>
     <message>
       <source>If this error persists, please contact your site administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your site administrator.</translation>
+      <translation>Om detta fel kvarstår, kontakta din systemadministratör.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a shutdown state is forbidden. You can still connect as local user.</translation>
+      <translation>Logga in som %1 användare till systemet i ett avstängningstillstånd är förbjudet. Du kan fortfarande ansluta som lokal användare.</translation>
     </message>
     <message>
       <source>Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in as a %1 user to the site in a suspended state is forbidden. You can still connect as local user.</translation>
+      <translation>Logga in som %1 användare till systemet i ett avstängningstillstånd är förbjudet. Du kan fortfarande ansluta som lokal användare.</translation>
     </message>
     <message>
       <source>Log in to %1 to log in to this site with %2 user</source>
       <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this site with %2 user</translation>
+      <translation>Logga in på %1 för att logga in på detta system med %2 användare</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by a site administrator.</source>
-      <translation type="unfinished">Session duration limit can be changed by a site administrator.</translation>
+      <translation>Sessionens varaktighetsgräns kan ändras av en systemadministratör.</translation>
     </message>
     <message>
       <source>Your access to this site has expired.</source>
-      <translation type="unfinished">Your access to this site has expired.</translation>
+      <translation>Din åtkomst till det här systemet har upphört att gälla.</translation>
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation type="unfinished">Please contact the site administrator to regain access.</translation>
+      <translation>Kontakta systemadministratören för att återfå åtkomst.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>För att logga in på detta system, inaktivera &quot;Be om en verifieringskod vid varje inloggning med ditt %1 konto&quot; i ditt %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
     </message>
   </context>
   <context>
@@ -255,11 +255,11 @@
     </message>
     <message>
       <source>Review the certificate to ensure you trust the server you are connecting to.</source>
-      <translation type="unfinished">Review the certificate to ensure you trust the server you are connecting to.</translation>
+      <translation>Granska certifikatet för att försäkra dig om att du litar på servern du ansluter till.</translation>
     </message>
     <message>
       <source>Review the certificates of the servers to ensure you trust the site you are connecting to.</source>
-      <translation type="unfinished">Review the certificates of the servers to ensure you trust the site you are connecting to.</translation>
+      <translation>Granska certifikaten för servrarna för att se till att du litar på den webbplats du ansluter till.</translation>
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
@@ -286,7 +286,7 @@
     <message>
       <source>Site (%1)</source>
       <comment>%1 is ip and port of the site</comment>
-      <translation type="unfinished">Site (%1)</translation>
+      <translation>Webbplats (%1)</translation>
     </message>
   </context>
   <context>
@@ -350,7 +350,7 @@
     <name>nx::vms::client::core::SingleSystemDescription</name>
     <message>
       <source>Unnamed Site</source>
-      <translation type="unfinished">Unnamed Site</translation>
+      <translation>Namnlös webbplats</translation>
     </message>
   </context>
   <context>

@@ -409,19 +409,19 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>站點 (Sites)</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>所有站點</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation type="unfinished">Selected Sites</translation>
+      <translation>已選擇的站點</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation type="unfinished">At least one site has to be selected</translation>
+      <translation>請至少選擇一個站點(site)</translation>
     </message>
   </context>
   <context>
@@ -621,7 +621,7 @@
     </message>
     <message>
       <source>No Sites found</source>
-      <translation type="unfinished">No Sites found</translation>
+      <translation>未找到任何站點</translation>
     </message>
   </context>
   <context>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>請先於桌面用戶端上輸入密碼以解密此錄影資料，或請您的站點管理員協助。</translation>
     </message>
   </context>
   <context>

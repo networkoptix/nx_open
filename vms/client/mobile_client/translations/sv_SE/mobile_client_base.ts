@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Din webbplats</translation>
     </message>
   </context>
   <context>
@@ -48,7 +48,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Kan inte ansluta till webbplatsen &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -70,7 +70,7 @@
     </message>
     <message>
       <source>Session duration limit can be changed by the site administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the site administrators</translation>
+      <translation>Perioden för sessionens varaktighet kan ändras av systemadministratörerna</translation>
     </message>
   </context>
   <context>
