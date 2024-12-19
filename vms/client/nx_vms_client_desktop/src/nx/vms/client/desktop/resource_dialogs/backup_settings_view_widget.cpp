@@ -4,6 +4,7 @@
 
 #include <QtCore/QPersistentModelIndex>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QTreeView>
@@ -27,6 +28,9 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <ui/common/indents.h>
+#include <ui/delegates/resource_item_delegate.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/widgets/views/resource_list_view.h>
 
 namespace {
 
@@ -203,7 +207,59 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(
         {
             const auto selectedIndexes =
                 filterSelectedIndexes(resourceViewWidget()->selectedIndexes());
+
+            QModelIndexList restoreIndexes;
+            std::copy_if(selectedIndexes.cbegin(),
+                selectedIndexes.cend(),
+                std::back_inserter(restoreIndexes),
+                [](const QModelIndex& index)
+                {
+                    return !index.data(BackupEnabledRole).toBool();
+                });
+
             m_backupSettingsDecoratorModel->setBackupEnabled(selectedIndexes, enabled);
+
+            if (enabled)
+            {
+                QnResourceList cameras;
+                std::map<QnResourcePtr, QString> cameraToResolution;
+
+                for (const auto index: selectedIndexes)
+                {
+                    if (index.data(BackupEnabledRole).toBool())
+                        continue;
+
+                    const auto camera = m_backupSettingsDecoratorModel->cameraResource(index);
+                    cameras << camera;
+                    cameraToResolution[camera] =
+                        index.siblingAtColumn(ResolutionColumn).data(Qt::DisplayRole).toString();
+                }
+
+                if (!cameras.empty())
+                {
+                    QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+                        tr("Backup will not be activated for %1 devices: ").arg(cameras.size()),
+                        tr("%1 suitable cloud storage services are required to activate backup for them.")
+                            .arg(cameras.size()),
+                        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                        QDialogButtonBox::Ok,
+                        this);
+
+                    const auto listView = new QnResourceListView(cameras, &messageBox);
+                    const auto delegate =
+                        dynamic_cast<QnResourceItemDelegate*>(listView->itemDelegate());
+                    delegate->setCustomExtraInfoBuilder(
+                        [cameraToResolution](const QnResourcePtr& resource)
+                        {
+                            const auto value = cameraToResolution.at(resource);
+                            return value.isEmpty() ? value : QString(" (%1)").arg(value);
+                        });
+
+                    messageBox.addCustomWidget(listView, QnMessageBox::Layout::AfterMainLabel);
+                    if (messageBox.exec() == QDialogButtonBox::Cancel)
+                        m_backupSettingsDecoratorModel->setBackupEnabled(restoreIndexes, false);
+                }
+            }
             m_backupSettingsPicker->setupFromSelection(selectedIndexes);
         });
 

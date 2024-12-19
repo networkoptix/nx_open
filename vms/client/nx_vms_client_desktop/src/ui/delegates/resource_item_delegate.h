@@ -6,6 +6,7 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <common/common_globals.h>
+#include <core/resource/resource_fwd.h>
 #include <ui/common/text_pixmap_cache.h>
 
 namespace nx::vms::client::desktop { class Workbench; }
@@ -62,6 +63,10 @@ public:
     int checkBoxColumn() const;
     void setCheckBoxColumn(int value);
 
+    using CustomExtraInfoBuilder = std::function<QString(const QnResourcePtr& resource)>;
+
+    void setCustomExtraInfoBuilder(const CustomExtraInfoBuilder& customExtraInfoBuilder);
+
 protected:
     static const QStyle::StateFlag State_Error
         = QStyle::State_AutoRaise; //< Use unused in item views value.
@@ -108,6 +113,7 @@ private:
     Options m_options;
     int m_checkBoxColumn = -1;
     mutable QnTextPixmapCache m_textPixmapCache;
+    CustomExtraInfoBuilder m_customExtraInfoBuilder;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceItemDelegate::Options)

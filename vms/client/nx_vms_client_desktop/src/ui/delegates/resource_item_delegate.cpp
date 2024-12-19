@@ -727,6 +727,9 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
                     QString::number(state.progress()) + lit("%"));
         }
     }
+
+    if (m_customExtraInfoBuilder)
+        extInfo += m_customExtraInfoBuilder(resource);
 }
 
 int QnResourceItemDelegate::checkBoxColumn() const
@@ -737,6 +740,11 @@ int QnResourceItemDelegate::checkBoxColumn() const
 void QnResourceItemDelegate::setCheckBoxColumn(int value)
 {
     m_checkBoxColumn = value;
+}
+
+void QnResourceItemDelegate::setCustomExtraInfoBuilder(const CustomExtraInfoBuilder& customExtraInfoBuilder)
+{
+    m_customExtraInfoBuilder = customExtraInfoBuilder;
 }
 
 QVariant QnResourceItemDelegate::rowCheckState(const QModelIndex& index) const
