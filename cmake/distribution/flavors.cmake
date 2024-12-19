@@ -13,7 +13,6 @@ set(existing_flavors_linux_arm64 "default" "axis_acap" "hanwha_edge1" "vca_edge1
 set(existing_flavors_macos_arm64 "default")
 set(existing_flavors_macos_x64 "default")
 set(existing_flavors_windows_x64 "default")
-set(existing_flavors_edge1 "default")
 
 # Validates the value of the configuration variable `flavors`, and initializes the
 # distribution_flavor_list variable accordingly.

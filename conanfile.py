@@ -245,8 +245,7 @@ class NxOpenConan(ConanFile):
             self.requires("libjpeg-turbo/3.0.3" "#1e534ce92aac40555ae9fd1184428b04")
 
         if self.haveDesktopClient or self.haveMediaserver:
-            if not self.isEdge1:
-                self.requires("flite/2.2" "#52b50c815dd81e40a21aaabb87d38b50")
+            self.requires("flite/2.2" "#52b50c815dd81e40a21aaabb87d38b50")
 
     def prepare_pkg_config_files(self):
         if self.isLinux:
@@ -380,10 +379,6 @@ class NxOpenConan(ConanFile):
     @property
     def isArm64(self):
         return self.settings.arch == "armv8"
-
-    @property
-    def isEdge1(self):
-        return self.options.targetDevice == "edge1"
 
     @property
     def isIos(self):

@@ -6,9 +6,7 @@ set(_additional_conan_parameters)
 
 # Get dependencies.
 set(conan_profile ${targetDevice})
-if(targetDevice STREQUAL edge1)
-    set(conan_profile linux_arm32)
-elseif(targetDevice MATCHES "^windows")
+if(targetDevice MATCHES "^windows")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(conan_profile "${targetDevice}_debug")
     else()
