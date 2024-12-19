@@ -121,15 +121,22 @@ public:
             if (parseInfo)
             {
                 if (useReflect())
-                    parseInfo->emplace<NxFusionContent>();
-                else
                     parseInfo->emplace<NxReflectFields>();
+                else
+                    parseInfo->emplace<NxFusionContent>();
             }
             return {};
         }
         else
         {
             if (useReflect())
+            {
+                auto [data, fields] = parseContentByReflectOrThrow<T>();
+                if (parseInfo)
+                    parseInfo->emplace<NxReflectFields>(std::move(fields));
+                return data;
+            }
+            else
             {
                 NxFusionContent* content = nullptr;
                 if (parseInfo)
@@ -138,13 +145,6 @@ public:
                     content = &std::get<NxFusionContent>(*parseInfo);
                 }
                 return parseContentByFusionOrThrow<T>(content);
-            }
-            else
-            {
-                auto [data, fields] = parseContentByReflectOrThrow<T>();
-                if (parseInfo)
-                    parseInfo->emplace<NxReflectFields>(std::move(fields));
-                return data;
             }
         }
     }
@@ -182,7 +182,7 @@ public:
         return !m_apiVersion || *m_apiVersion < version;
     }
 
-    bool useReflect() const { return isApiVersionOlder(4); }
+    bool useReflect() const { return !isApiVersionOlder(4); }
 
     class NX_NETWORK_REST_API SystemAccessGuard
     {

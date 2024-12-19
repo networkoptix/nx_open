@@ -351,7 +351,7 @@ protected:
         return {std::move(filter), std::move(params), defaultValueAction};
     }
 
-    static bool useReflect(const Request& r) { return !r.useReflect(); }
+    static bool useReflect(const Request& r) { return r.useReflect(); }
 
     template<typename T>
     void mergeModel(const Request& request, T* model, T* existing, Request::ParseInfo parseInfo)
