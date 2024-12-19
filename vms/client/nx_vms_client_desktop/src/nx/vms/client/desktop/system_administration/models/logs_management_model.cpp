@@ -271,7 +271,7 @@ QString LogsManagementModel::logLevelName(nx::log::Level level)
 {
     switch (level)
     {
-        case nx::log::Level::none: return tr("None");
+        case nx::log::Level::none: return tr("<None>");
         case nx::log::Level::error: return tr("Error");
         case nx::log::Level::warning: return tr("Warning");
         case nx::log::Level::info: return tr("Info");
