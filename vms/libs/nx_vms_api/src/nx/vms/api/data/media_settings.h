@@ -64,7 +64,7 @@ struct NX_VMS_API MediaSettings
      */
     std::string rotation = "0";
 
-    /**%apidoc[opt]
+    /**%apidoc[opt]:string
      * A transcoding option. Item aspect ratio, e.g. '4:3' or '16:9'. If the parameter is `auto`,
      * the video aspect ratio would be taken from the default value defined in the Device Settings
      * dialog. If the parameter is empty, it will force to don't transcode regardless of the
