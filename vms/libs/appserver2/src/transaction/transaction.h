@@ -962,18 +962,6 @@ APPLY(804, broadcastAction, nx::vms::api::EventActionData, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
-APPLY(805, execAction, nx::vms::api::EventActionData, \
-    false, /*< isPersistent */ \
-    false, /*< isSystem */ \
-    false, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), \
-    BusinessEventNotificationManagerHelper(), \
-    PowerUserAccess(), /*< save permission checker */ \
-    AllowForAllAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
-    RegularTransactionType()) /*< regular transaction type */ \
 /**%apidoc[proprietary] */ \
 APPLY(810, getVmsRules, nx::vms::api::rules::RuleList, \
     false, /*< isPersistent */ \

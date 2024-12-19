@@ -14,7 +14,7 @@ void QnBusinessEventNotificationManager::triggerNotification(
     const QnTransaction<nx::vms::api::EventActionData>& tran,
     NotificationSource /*source*/)
 {
-    NX_ASSERT(tran.command == ApiCommand::broadcastAction || tran.command == ApiCommand::execAction);
+    NX_ASSERT(tran.command == ApiCommand::broadcastAction);
     nx::vms::event::AbstractActionPtr businessAction;
     fromApiToResource(tran.params, businessAction);
     businessAction->setReceivedFromRemoteHost(true);
