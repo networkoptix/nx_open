@@ -52,6 +52,9 @@ AudioSpectrumOverlayWidget::AudioSpectrumOverlayWidget(
     layout->setRowStretchFactor(0, 1);
     layout->setRowStretchFactor(2, 1);
     setLayout(layout);
+
+    setErrorStyle(ErrorStyle::white);
+    setShowGlow(true);
 }
 
 AudioSpectrumOverlayWidget::~AudioSpectrumOverlayWidget()

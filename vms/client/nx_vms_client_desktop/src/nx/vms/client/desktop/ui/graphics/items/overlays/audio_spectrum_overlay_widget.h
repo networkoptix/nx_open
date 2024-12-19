@@ -7,6 +7,7 @@
 #include <qt_graphics_items/graphics_widget.h>
 
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 
 class QnMediaResourceWidget;
 
@@ -14,10 +15,10 @@ namespace nx::vms::client::desktop {
 
 class AudioSpectrumWidget;
 
-class AudioSpectrumOverlayWidget: public GraphicsWidget
+class AudioSpectrumOverlayWidget: public QnStatusOverlayWidget
 {
     Q_OBJECT
-    using base_type = GraphicsWidget;
+    using base_type = QnStatusOverlayWidget;
 
 public:
     AudioSpectrumOverlayWidget(QnResourceDisplayPtr display, QGraphicsWidget* parent);
