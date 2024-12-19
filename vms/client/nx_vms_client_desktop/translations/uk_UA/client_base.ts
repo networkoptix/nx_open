@@ -3585,10 +3585,6 @@ License Key: %2</translation>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Motion video</source>
-      <translation>Виявлення Руху відео</translation>
-    </message>
-    <message>
       <source>Date/Time</source>
       <translation>Дата/Час</translation>
     </message>
@@ -3625,10 +3621,6 @@ License Key: %2</translation>
         <numerusform>%1 з (%n раз)</numerusform>
         <numerusform>%1 з (%n раз)</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Відкрити камеру</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
@@ -3670,6 +3662,14 @@ License Key: %2</translation>
         <numerusform>%1 (з %n камер)</numerusform>
         <numerusform>%1 (з %n камер)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Open Event video</source>
+      <translation type="unfinished">Open Event video</translation>
+    </message>
+    <message>
+      <source>Open Event camera</source>
+      <translation type="unfinished">Open Event camera</translation>
     </message>
   </context>
   <context>

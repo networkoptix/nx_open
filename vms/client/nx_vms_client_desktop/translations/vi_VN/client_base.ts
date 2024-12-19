@@ -3450,10 +3450,6 @@ Khóa giấy phép: %2</translation>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Motion video</source>
-      <translation>Chuyển động video</translation>
-    </message>
-    <message>
       <source>Date/Time</source>
       <translation>Ngày / thời gian</translation>
     </message>
@@ -3488,10 +3484,6 @@ Khóa giấy phép: %2</translation>
         <numerusform>%1 (%n thời gian)</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Open camera</source>
-      <translation>Mở camera</translation>
-    </message>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
@@ -3520,6 +3512,14 @@ Khóa giấy phép: %2</translation>
       <translation>
         <numerusform>%1 (%n camera)</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Open Event video</source>
+      <translation type="unfinished">Open Event video</translation>
+    </message>
+    <message>
+      <source>Open Event camera</source>
+      <translation type="unfinished">Open Event camera</translation>
     </message>
   </context>
   <context>
