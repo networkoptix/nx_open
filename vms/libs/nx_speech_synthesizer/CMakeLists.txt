@@ -3,9 +3,6 @@
 set(libs nx_vms_common)
 
 set(_enableSpeechSynthesizer ON)
-if(targetDevice STREQUAL "edge1")
-    set(_enableSpeechSynthesizer OFF)
-endif()
 
 if(_enableSpeechSynthesizer)
     find_package(flite)

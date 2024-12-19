@@ -203,9 +203,8 @@ class NxOpenConan(ConanFile):
             self.requires("hidapi/0.10.1" "#569759f2f39447fe3dbef070243585cc")
             self.requires("pathkit/d776371" "#d1516a12d5e1e70fc8253a501acb3a7f")
 
-            if not self.isEdge1:
-                self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
-                self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
+            self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
+            self.requires("range-v3/0.11.0" "#8d874cb9cdd7b81806d624493b82f9c0")
 
         if self.isLinux or self.isWindows or self.isAndroid:
             self.requires("openal/1.19.1" "#1047ec92368ace234da430098bffa65a")
@@ -346,10 +345,6 @@ class NxOpenConan(ConanFile):
     @property
     def isArm64(self):
         return self.settings.arch == "armv8"
-
-    @property
-    def isEdge1(self):
-        return self.options.targetDevice == "edge1"
 
     @property
     def isIos(self):

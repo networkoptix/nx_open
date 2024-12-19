@@ -120,9 +120,7 @@ if(targetDevice STREQUAL "windows_x64")
         set(buildSamplesEnvironmentSetup ${CMAKE_COMMAND} -E env NX_FORCED_MSVC_VERSION="14.29")
     endif()
 else()
-    if(targetDevice STREQUAL "linux_arm32"
-        OR targetDevice STREQUAL "edge1"
-    )
+    if(targetDevice STREQUAL "linux_arm32")
         set(toolchainFile "linux_arm32")
     elseif(targetDevice STREQUAL "linux_arm64")
         set(toolchainFile "linux_arm64")
