@@ -75,6 +75,7 @@ if(WINDOWS)
         -DNOMINMAX=
         -DUNICODE
         -DWIN32_LEAN_AND_MEAN
+        -D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
     )
 endif()
 
