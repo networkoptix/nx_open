@@ -1,26 +1,13 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-set(libs nx_vms_common)
-
-set(_enableSpeechSynthesizer ON)
-
-if(_enableSpeechSynthesizer)
-    find_package(flite)
-    list(APPEND libs flite::flite)
-endif()
+find_package(flite)
 
 nx_add_target(nx_speech_synthesizer LIBRARY NO_API_MACROS
-    PUBLIC_LIBS ${libs}
+    PUBLIC_LIBS
+        nx_vms_common
+        flite::flite
     FOLDER common/libs
 )
-
-if(NOT _enableSpeechSynthesizer)
-    set_source_files_properties(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/speech_synthesizer/text_to_wave_server.cpp
-        PROPERTIES COMPILE_FLAGS -DDISABLE_FLITE)
-endif()
-
-unset(_enableSpeechSynthesizer)
 
 if(MACOSX)
     find_library(CoreServices_LIBRARY CoreServices)
