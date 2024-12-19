@@ -2,8 +2,6 @@
 
 #include "text_to_wave_server.h"
 
-#if !defined(DISABLE_FLITE)
-
 #include <flite.h>
 
 extern "C" {
@@ -167,12 +165,9 @@ static bool textToWave(
 }
 
 /** Flite wrapper - only this class uses Flite directly via the functions above. */
-struct FliteEngine
+class FliteEngine
 {
-    CustomUniquePtr<cst_voice, unregister_cmu_us_slt> vox; //< Flite voice instance.
-
-    static bool isEnabled() { return true; }
-
+public:
     FliteEngine(const QString& /*binaryPath*/, nx::utils::promise<void>& initializedPromise)
     {
         flite_init();
@@ -194,36 +189,12 @@ struct FliteEngine
     {
         return ::textToWave(text, vox.get(), dest, outFormat);
     }
+
+private:
+    CustomUniquePtr<cst_voice, unregister_cmu_us_slt> vox; //< Flite voice instance.
 };
 
 } // namespace
-
-#else // !defined(DISABLE_FLITE)
-
-/** Stub. */
-struct FliteEngine
-{
-    static bool isEnabled() { return false; }
-
-    FliteEngine(const QString& /*binaryPath*/, nx::utils::promise<void>& /*initializedPromise*/)
-    {
-        NX_ASSERT(false);
-    };
-
-    ~FliteEngine()
-    {
-        NX_ASSERT(false);
-    };
-
-    bool textToWave(
-        const QString& /*text*/, QIODevice* /*dest*/, nx::media::audio::Format* /*outFormat*/) const
-    {
-        NX_ASSERT(false);
-        return false;
-    }
-};
-
-#endif // !defined(DISABLE_FLITE)
 
 //-------------------------------------------------------------------------------------------------
 
@@ -232,11 +203,6 @@ nx::speech_synthesizer::TextToWaveServer*
     Singleton<nx::speech_synthesizer::TextToWaveServer>::s_instance = nullptr;
 
 namespace nx::speech_synthesizer {
-
-/*static*/ bool TextToWaveServer::isEnabled()
-{
-    return FliteEngine::isEnabled();
-}
 
 TextToWaveServer::TextToWaveServer(const QString& binaryPath):
     m_binaryPath(binaryPath),
