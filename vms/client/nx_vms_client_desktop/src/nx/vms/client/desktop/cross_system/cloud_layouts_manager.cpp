@@ -32,7 +32,6 @@
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
-#include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
@@ -458,15 +457,6 @@ CloudLayoutsManager::CloudLayoutsManager(QObject* parent):
             d->setCloudStatus(status);
         });
 
-    connect(appContext()->sharedMemoryManager(),
-        &SharedMemoryManager::clientCommandRequested,
-        this,
-        [this](SharedMemoryData::Command command, const QByteArray& /*data*/)
-        {
-            if (command == SharedMemoryData::Command::updateCloudLayouts)
-                d->updateLayouts();
-        });
-
     appContext()->addSystemContext(d->systemContext.get());
 }
 
@@ -490,6 +480,11 @@ void CloudLayoutsManager::saveLayout(
 void CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
 {
     d->deleteLayout(layout);
+}
+
+void CloudLayoutsManager::updateLayouts()
+{
+    d->updateLayouts();
 }
 
 SystemContext* CloudLayoutsManager::systemContext() const

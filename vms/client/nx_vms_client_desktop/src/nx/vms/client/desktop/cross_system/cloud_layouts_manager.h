@@ -33,6 +33,9 @@ public:
 
     void deleteLayout(const QnLayoutResourcePtr& layout);
 
+    /** Update cloud layout resources by fetching the latest data. */
+    void updateLayouts();
+
     SystemContext* systemContext() const;
 
 private:

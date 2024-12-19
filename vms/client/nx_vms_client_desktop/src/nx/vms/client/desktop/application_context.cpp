@@ -745,6 +745,16 @@ ApplicationContext::ApplicationContext(
             d->localProxyServer = std::make_unique<LocalProxyServer>();
             d->systemsVisibilityManager = std::make_unique<core::SystemsVisibilityManager>();
             d->joystickManager.reset(joystick::Manager::create());
+
+            QObject::connect(d->sharedMemoryManager.get(),
+                &SharedMemoryManager::clientCommandRequested,
+                d->cloudLayoutsManager.get(),
+                [this](SharedMemoryData::Command command, const QByteArray& /*data*/)
+                {
+                    if (command == SharedMemoryData::Command::updateCloudLayouts)
+                        d->cloudLayoutsManager->updateLayouts();
+                });
+
             break;
         }
     }
