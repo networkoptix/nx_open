@@ -119,13 +119,13 @@ void SystemManager::shareSystem(
 {
     m_requestsExecutor->makeAsyncCall<api::SystemSharing>(
         nx::network::http::Method::post,
-        nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
+        nx::network::http::rest::substituteParameters(kSystemUsersPathV2, {systemId}),
         {}, //query
         std::move(sharingData),
         std::move(completionHandler));
 }
 
-void SystemManager::revokeUserAccess(
+void SystemManager::revokeUserAccessDeprecated(
     const std::string& systemId,
     const std::string& email,
     std::function<void(api::ResultCode)> completionHandler)
@@ -137,7 +137,7 @@ void SystemManager::revokeUserAccess(
         std::move(completionHandler));
 }
 
-void SystemManager::getCloudUsersOfSystem(
+void SystemManager::getCloudUsersOfSystemDeprecated(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
@@ -276,6 +276,46 @@ void SystemManager::validateMSSignature(
         nx::network::http::rest::substituteParameters(kSystemsValidateMSSignature, {systemId}),
         {}, //query
         request,
+        std::move(completionHandler));
+}
+
+void SystemManager::getCloudUsersOfSystem(
+    const std::string& systemId,
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::SystemSharingExList>(
+        nx::network::http::Method::get,
+        nx::network::http::rest::substituteParameters(kSystemUsersPathV2, {systemId}),
+        {}, //query
+        [completionHandler = std::move(completionHandler)](
+            api::ResultCode resultCode, api::SystemSharingExList systems)
+        {
+            completionHandler(resultCode, api::SystemSharingExList{std::move(systems)});
+        });
+}
+
+void SystemManager::saveCloudUserOfSystemV2(
+    const std::string& systemId,
+    const api::SystemSharing& userData,
+    std::function<void(api::ResultCode, api::SystemSharing)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::SystemSharing>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(kSystemUsersPathV2, {systemId}),
+        {}, //query
+        userData,
+        std::move(completionHandler));
+}
+
+void SystemManager::revokeUserAccess(
+    const std::string& systemId,
+    const std::string& email,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(
+        nx::network::http::Method::delete_,
+        nx::network::http::rest::substituteParameters(kSystemUserPathV2, {systemId, email}),
+        {}, //query
         std::move(completionHandler));
 }
 

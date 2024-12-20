@@ -325,6 +325,11 @@ struct ShareSystemRequest
      */
     std::vector<std::string> roleIds;
 
+    /**%apidoc[readonly] List of roles assigned to user by organisation
+     * This field is presented only in cdb/v2/systems API
+     */
+    std::vector<std::string> orgRoleIds;
+
     /**%apidoc List of specific permissions to grant to the user. This extends the list of roles.
      * This can be both cloud and VMS-specific permissions. Cloud uses those permissions it
      * recognizes while authorizing user requests.
@@ -342,18 +347,30 @@ struct ShareSystemRequest
     // NOTE: Cannot use operator<=> due to lack of compiler support on some platforms.
     bool operator==(const ShareSystemRequest& rhs) const
     {
-        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
-            == std::tie(rhs.accountEmail, rhs.roleIds, rhs.permissions, rhs.isEnabled, rhs.vmsUserId);
+        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId, orgRoleIds)
+            == std::tie(
+                rhs.accountEmail,
+                rhs.roleIds,
+                rhs.permissions,
+                rhs.isEnabled,
+                rhs.vmsUserId,
+                rhs.orgRoleIds);
     }
 
     bool operator<(const ShareSystemRequest& rhs) const
     {
-        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId)
-            < std::tie(rhs.accountEmail, rhs.roleIds, rhs.permissions, rhs.isEnabled, rhs.vmsUserId);
+        return std::tie(accountEmail, roleIds, permissions, isEnabled, vmsUserId, orgRoleIds)
+            < std::tie(
+                rhs.accountEmail,
+                rhs.roleIds,
+                rhs.permissions,
+                rhs.isEnabled,
+                rhs.vmsUserId,
+                rhs.orgRoleIds);
     }
 };
 
-NX_REFLECTION_INSTRUMENT(ShareSystemRequest, (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId))
+NX_REFLECTION_INSTRUMENT(ShareSystemRequest, (accountEmail)(roleIds)(permissions)(isEnabled)(vmsUserId)(orgRoleIds))
 
 NX_REFLECTION_ENUM_CLASS(UserType,
     system,
@@ -458,6 +475,7 @@ struct SystemSharingEx: SystemSharing
 
 NX_REFLECTION_INSTRUMENT(SystemSharingEx, (systemId)(accountId)(accountFullName)(usageFrequency) \
     (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled)(httpDigestAuthEnabled))
+
 
 using SystemSharingExList = std::vector<SystemSharingEx>;
 

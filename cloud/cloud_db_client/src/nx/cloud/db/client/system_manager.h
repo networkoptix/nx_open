@@ -47,12 +47,12 @@ public:
         api::ShareSystemRequest sharingData,
         std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
 
-    virtual void revokeUserAccess(
+    virtual void revokeUserAccessDeprecated(
         const std::string& systemId,
         const std::string& email,
         std::function<void(api::ResultCode)> completionHandler) override;
 
-    virtual void getCloudUsersOfSystem(
+    virtual void getCloudUsersOfSystemDeprecated(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
 
@@ -100,6 +100,20 @@ public:
     virtual void validateMSSignature(
         const std::string& systemId,
         const api::ValidateMSSignatureRequest& request,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
+    virtual void getCloudUsersOfSystem(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
+
+    virtual void saveCloudUserOfSystemV2(
+        const std::string& systemId,
+        const api::SystemSharing& userData,
+        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) override;
+
+    virtual void revokeUserAccess(
+        const std::string& systemId,
+        const std::string& email,
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void offerSystem(

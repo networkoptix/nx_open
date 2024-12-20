@@ -42,6 +42,8 @@ static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemI
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
 static constexpr char kSystemUsersPath[] = "/cdb/v0/systems/{systemId}/users";
 static constexpr char kSystemUserPath[] = "/cdb/v0/systems/{systemId}/users/{accountEmail}";
+static constexpr char kSystemUsersPathV2[] = "/cdb/v2/systems/{systemId}/users";
+static constexpr char kSystemUserPathV2[] = "/cdb/v2/systems/{systemId}/users/{accountEmail}";
 
 static constexpr char kSystemAttributesPath[] = "/cdb/systems/{systemId}/attributes";
 static constexpr char kSystemAttributePath[] = "/cdb/systems/{systemId}/attributes/{attributeName}";

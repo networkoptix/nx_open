@@ -76,7 +76,7 @@ public:
     /**
      * Revokes user with given email from accessing system with the specified systemId.
      */
-    virtual void revokeUserAccess(
+    virtual void revokeUserAccessDeprecated(
         const std::string& systemId,
         const std::string& email,
         std::function<void(ResultCode)> completionHandler) = 0;
@@ -85,7 +85,7 @@ public:
      * Returns sharings (account email, access role) for the specified system.
      * @note owner or cloudAdmin account credentials MUST be provided.
      */
-    virtual void getCloudUsersOfSystem(
+    virtual void getCloudUsersOfSystemDeprecated(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
 
@@ -157,6 +157,30 @@ public:
         const std::string& systemId,
         const api::ValidateMSSignatureRequest& request,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    /**
+     * Returns sharings (account email, direct and org access roles) for the specified system.
+     * @note owner or cloudAdmin account credentials MUST be provided.
+     */
+    virtual void getCloudUsersOfSystem(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
+
+    /**
+     * Shares the System to the User or modifies User permissions for the System if such User
+     * exists.
+     */
+    virtual void saveCloudUserOfSystemV2(
+        const std::string& systemId,
+        const api::SystemSharing& userData,
+        std::function<void(api::ResultCode, api::SystemSharing)> completionHandler) = 0;
+    /**
+     * Revokes user with given email from accessing system with the specified systemId.
+     */
+    virtual void revokeUserAccess(
+        const std::string& systemId,
+        const std::string& email,
+        std::function<void(ResultCode)> completionHandler) = 0;
 
     //---------------------------------------------------------------------------------------------
     // System ownership transfer methods.
