@@ -7,8 +7,8 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/serialization/format.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "../../buffer_source.h"

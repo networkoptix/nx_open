@@ -9,8 +9,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/os_info.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/api/types/resource_types.h>

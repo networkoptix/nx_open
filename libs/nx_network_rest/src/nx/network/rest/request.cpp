@@ -6,7 +6,7 @@
 
 #include <nx/branding.h>
 #include <nx/network/http/custom_headers.h>
-#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/json/qjson.h>
 
 #include "audit.h"
 

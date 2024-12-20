@@ -8,8 +8,8 @@
 #include <QtCore/QObject>
 
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/json/flags.h>
 #include <nx/utils/mac_address.h>
-#include <nx/utils/serialization/flags.h>
 
 namespace nx::monitoring {
 

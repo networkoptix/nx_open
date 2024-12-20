@@ -5,7 +5,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api::analytics {

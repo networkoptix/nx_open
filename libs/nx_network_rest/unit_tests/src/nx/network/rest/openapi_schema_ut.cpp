@@ -463,7 +463,7 @@ TEST_P(OpenApiSchemaTest, Postprocess)
     else
     {
         using namespace nx::utils::reflect;
-        auto json{nx::utils::serialization::json::serialized(devices, /*stripDefault*/ false)};
+        auto json{nx::json::serialized(devices, /*stripDefault*/ false)};
         postprocessResponse(*request, &json);
         ASSERT_FALSE(getObject(asArray(json)[0], "attributes").HasMember("cameraId"));
     }
@@ -489,7 +489,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariant)
     {
         using namespace nx::utils::reflect;
         detail::orderBy(&data, request->params());
-        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        auto json{nx::json::serialized(data, /*stripDefault*/ false)};
         postprocessResponse(*request, &json);
         auto sorted{getArray(getObject(asObject(json), "map"), "key")};
         ASSERT_EQ(sorted.Size(), 2);
@@ -519,7 +519,7 @@ TEST_P(OpenApiSchemaTest, ArrayOrdererVariantNested)
     {
         using namespace nx::utils::reflect;
         detail::orderBy(&data, request->params());
-        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        auto json{nx::json::serialized(data, /*stripDefault*/ false)};
         postprocessResponse(*request, &json);
         auto sorted{getArray(getObject(asObject(json), "map"), "key")};
         ASSERT_EQ(sorted.Size(), 2);
@@ -560,7 +560,7 @@ TEST_P(OpenApiSchemaTest, EmptyOrderBy)
         auto [data, result] = nx::reflect::json::deserialize<std::vector<TestData>>(kTestJson);
         ASSERT_TRUE(result);
         detail::orderBy(&data, request->params());
-        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        auto json{nx::json::serialized(data, /*stripDefault*/ false)};
         postprocessResponse(*request, &json);
         ASSERT_EQ(asArray(json).Size(), 2);
         ASSERT_EQ(getString(asObject(asArray(json)[0]), "name"), "4");
@@ -593,7 +593,7 @@ TEST_P(OpenApiSchemaTest, OrderByNameAndListName)
         auto [data, result] = nx::reflect::json::deserialize<std::vector<TestData>>(kTestJson);
         ASSERT_TRUE(result);
         detail::orderBy(&data, request->params());
-        auto json{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        auto json{nx::json::serialized(data, /*stripDefault*/ false)};
         postprocessResponse(*request, &json);
         ASSERT_EQ(asArray(json).Size(), 2);
         ASSERT_EQ(getString(asObject(asArray(json)[0]), "name"), "3");

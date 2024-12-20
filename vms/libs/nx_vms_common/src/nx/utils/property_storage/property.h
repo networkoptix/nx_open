@@ -6,7 +6,7 @@
 #include <QtCore/QVariant>
 
 #include <nx/reflect/json.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qt_core_types.h>
 
 namespace nx::utils::property_storage {
 

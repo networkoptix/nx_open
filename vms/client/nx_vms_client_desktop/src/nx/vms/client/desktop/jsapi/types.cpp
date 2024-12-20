@@ -7,8 +7,8 @@
 #include <QtCore/QVariantMap>
 
 #include <nx/reflect/json.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_core_types.h>
 
 #include "detail/globals_structures.h"
 #include "detail/tab_structures.h"

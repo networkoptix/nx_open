@@ -12,8 +12,8 @@
 #include <network/cloud_system_data.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/reflect/instrument.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/property_storage/storage.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>

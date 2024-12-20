@@ -8,8 +8,8 @@
 #include <nx/core/transcoding/timestamp_format.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_core_types.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
+#include <nx/utils/json/qt_core_types.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 #include <nx/vms/client/desktop/skin/font_config.h>

@@ -5,8 +5,8 @@
 #include <QtCore/QJsonValue>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/vms/api/json/value_or_array.h>
 
 #include "../data/server_time_period.h"

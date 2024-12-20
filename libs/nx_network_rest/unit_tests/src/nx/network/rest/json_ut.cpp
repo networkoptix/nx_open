@@ -290,7 +290,7 @@ TEST(Json, ReflectStripDefault)
 {
     std::vector<nx::vms::api::DeviceModel> list{{}};
     ASSERT_EQ(nx::reflect::json_detail::getStringRepresentation(
-            nx::utils::serialization::json::serialized(list, /*stripDefault*/ true)),
+            nx::json::serialized(list, /*stripDefault*/ true)),
         "[]");
 }
 

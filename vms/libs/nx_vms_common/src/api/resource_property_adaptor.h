@@ -273,8 +273,7 @@ public:
         if (const auto typedValue = QJson::deserializeOrThrow<T>(value); isValueValid(typedValue))
             return setValue(typedValue);
 
-        throw nx::utils::serialization::json::InvalidParameterException{
-            {key(), QString{QJson::serialized(value)}}};
+        throw nx::json::InvalidParameterException{{key(), QString{QJson::serialized(value)}}};
     }
 
     void setValue(const T& value)

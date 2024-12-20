@@ -9,7 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qt_core_types.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/json/value_or_array.h>
 

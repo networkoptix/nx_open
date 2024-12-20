@@ -8,8 +8,8 @@
 #include <QtCore/Qt>
 
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/json/flags.h>
 #include <nx/vms/api/types/motion_types.h>
-#include <nx/utils/serialization/flags.h>
 
 namespace nx::vms::api {
 Q_NAMESPACE_EXPORT(NX_VMS_API)

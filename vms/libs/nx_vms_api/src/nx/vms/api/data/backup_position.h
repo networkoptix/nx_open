@@ -8,7 +8,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/json/flags.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/server_and_device_id_data.h>
 

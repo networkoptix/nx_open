@@ -1,18 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/utils/log/to_string.h>
-
-#include <gtest/gtest.h>
-
+#include <QtCore>
 #include <bitset>
 #include <optional>
 
-#include <QtCore>
+#include <gtest/gtest.h>
+
 #include <QtNetwork/QTcpSocket>
 
-#include <nx/utils/uuid.h>
+#include <nx/utils/json/flags.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/log/to_string.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace utils {

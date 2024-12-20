@@ -7,7 +7,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/dot_notation_string.h>
-#include <nx/utils/serialization/json.h>
+#include <nx/utils/json/json.h>
 
 #include "params.h"
 
@@ -130,8 +130,7 @@ template<typename T>
 rapidjson::Document serialize(const T& data, Params params, DefaultValueAction defaultValueAction)
 {
     // TODO: Validate with against data type.
-    auto json = nx::utils::serialization::json::serialized(
-        data, defaultValueAction == DefaultValueAction::removeEqual);
+    auto json = nx::json::serialized(data, defaultValueAction == DefaultValueAction::removeEqual);
     details::filter(&json, details::extractWithParam(&params));
     return json;
 }

@@ -18,10 +18,10 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/serialization/format.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/api/data/access_rights_data_deprecated.h>
 #include <nx/vms/api/data/global_permission_deprecated.h>
 #include <nx/vms/api/data/server_model.h>

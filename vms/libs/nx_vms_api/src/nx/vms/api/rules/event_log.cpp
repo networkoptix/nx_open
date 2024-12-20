@@ -5,9 +5,9 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/buffer.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_containers_reflect.h>
+#include <nx/utils/json/qt_core_types.h>
 
 namespace nx::vms::api::rules {
 

@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/reflect/json.h>
+#include <nx/utils/json/flags.h>
 #include <nx/utils/nx_utils_ini.h>
-#include <nx/utils/serialization/flags.h>
 
 NX_REFLECTION_ENUM_CLASS(Permission, none = 0, read = 0x1, write = 0x2, execute = 0x4)
 Q_DECLARE_FLAGS(Permissions, Permission)

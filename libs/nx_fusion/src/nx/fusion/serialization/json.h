@@ -12,8 +12,8 @@
 
 #include <nx/fusion/serialization/serialization.h>
 #include <nx/utils/buffer.h>
+#include <nx/utils/json/exceptions.h>
 #include <nx/utils/log/log_main.h>
-#include <nx/utils/serialization/json_exceptions.h>
 
 #include "json_fwd.h"
 
@@ -416,7 +416,7 @@ T deserializeOrThrow(QnJsonContext* ctx, const QJsonValue& value)
     T result;
     if (QJson::deserialize(ctx, value, &result))
         return result;
-    throw nx::utils::serialization::json::InvalidParameterException(ctx->getFailedKeyValue());
+    throw nx::json::InvalidParameterException(ctx->getFailedKeyValue());
 }
 
 template<class T>
@@ -424,7 +424,7 @@ T deserializeOrThrow(
     const QJsonValue& value, bool allowStringConversions = false)
 {
     if (value.isUndefined())
-        throw nx::utils::serialization::json::InvalidJsonException("No JSON provided.");
+        throw nx::json::InvalidJsonException("No JSON provided.");
     QnJsonContext ctx;
     ctx.setStrictMode(true);
     ctx.setAllowStringConversions(allowStringConversions);
@@ -437,7 +437,7 @@ T deserializeOrThrow(const QByteArray& value)
     QJsonValue jsonValue;
     QString error;
     if (!QJsonDetail::deserialize_json(value, &jsonValue, &error))
-        throw nx::utils::serialization::json::InvalidJsonException(error);
+        throw nx::json::InvalidJsonException(error);
     QnJsonContext ctx;
     ctx.setStrictMode(true);
     return QJson::deserializeOrThrow<T>(&ctx, jsonValue);

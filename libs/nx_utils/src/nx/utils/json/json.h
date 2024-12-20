@@ -7,7 +7,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
 
-namespace nx::utils::serialization::json {
+namespace nx::json {
 
 namespace details {
 
@@ -150,18 +150,16 @@ template<typename T>
     return result;
 }
 
-} // namespace nx::utils::serialization::json
+} // namespace nx::json
 
 namespace nx::reflect {
 
 template<typename Data>
-class Visitor<nx::utils::serialization::json::StripDefaultSerializationContext, Data>:
-    public GenericVisitor<
-        Visitor<nx::utils::serialization::json::StripDefaultSerializationContext, Data>>
+class Visitor<nx::json::StripDefaultSerializationContext, Data>:
+    public GenericVisitor<Visitor<nx::json::StripDefaultSerializationContext, Data>>
 {
 public:
-    using StripDefaultSerializationContext =
-        nx::utils::serialization::json::StripDefaultSerializationContext;
+    using StripDefaultSerializationContext = nx::json::StripDefaultSerializationContext;
 
     Visitor(StripDefaultSerializationContext* context, const Data& data):
         m_context(context), m_data(data)

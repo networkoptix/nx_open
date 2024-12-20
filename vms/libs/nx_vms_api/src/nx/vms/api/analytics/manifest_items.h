@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/json/flags.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::api::analytics {

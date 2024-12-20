@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/json/flags.h>
 
 class QnFusionTestFixture: public testing::Test
 {

@@ -5,7 +5,7 @@
 #include <QtGui/QVector3D>
 
 #include <core/ptz/ptz_constants.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qt_core_types.h>
 #include <nx/vms/common/ptz/datafield.h>
 #include <nx/vms/common/ptz/vector.h>
 

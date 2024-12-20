@@ -11,8 +11,8 @@
 #include <common/common_globals.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/utils/latin1_array.h>
-#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/translatable_string.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/resource_types.h>

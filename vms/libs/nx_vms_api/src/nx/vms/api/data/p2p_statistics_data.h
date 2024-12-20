@@ -6,7 +6,7 @@
 #include <QtCore/QString>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 
 #include "data_macros.h"
 

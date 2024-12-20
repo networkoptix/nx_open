@@ -16,7 +16,7 @@ static std::variant<Request, Response> deserialize(
 
     return Response::makeError(request.responseId(), Error::invalidRequest,
         r.firstNonDeserializedField
-            ? nx::utils::serialization::json::InvalidParameterException{{
+            ? nx::json::InvalidParameterException{{
                 QString::fromStdString(*r.firstNonDeserializedField),
                 QString::fromStdString(r.firstBadFragment)}}.message().toStdString()
             : r.errorDescription);

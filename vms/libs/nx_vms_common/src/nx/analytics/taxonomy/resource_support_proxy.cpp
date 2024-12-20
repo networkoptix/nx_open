@@ -10,8 +10,8 @@
 #include <nx/analytics/taxonomy/utils.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json/deserializer.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/common/system_context.h>

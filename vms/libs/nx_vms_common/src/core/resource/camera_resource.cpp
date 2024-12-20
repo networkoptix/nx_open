@@ -30,9 +30,9 @@
 #include <nx/network/socket_global.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/crypt/symmetrical.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/backup_settings.h>

@@ -90,12 +90,12 @@ void checkResourceAndJson(
             params.toJson(/*excludeCommon*/ true),
             /*allowStringConversions*/ true);
     }
-    catch (const nx::utils::serialization::json::InvalidParameterException& e)
+    catch (const nx::json::InvalidParameterException& e)
     {
         EXPECT_EQ(std::string(e.what()), expectedError);
         return;
     }
-    catch (const nx::utils::serialization::json::InvalidJsonException& e)
+    catch (const nx::json::InvalidJsonException& e)
     {
         EXPECT_EQ(std::string(e.what()), expectedError);
         return;

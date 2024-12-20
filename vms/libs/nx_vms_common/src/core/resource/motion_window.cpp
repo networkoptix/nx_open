@@ -5,10 +5,10 @@
 #include <nx/media/config.h>
 #include <nx/media/motion_detection.h>
 #include <nx/reflect/json/serializer.h>
+#include <nx/utils/json/qt_containers_reflect.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 
 ////////////////////////////////////////////////////////////
 //// QnRegion class

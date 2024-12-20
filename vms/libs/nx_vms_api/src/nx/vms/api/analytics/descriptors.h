@@ -10,8 +10,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/kit/utils.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_core_types.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 

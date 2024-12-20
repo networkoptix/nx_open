@@ -10,8 +10,8 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/async_handler_executor.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/serialization/qjson.h>
 #include <nx/utils/url.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/desktop/system_context.h>

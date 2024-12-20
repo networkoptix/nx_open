@@ -5,8 +5,8 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 
+#include <nx/utils/json/qjson.h>
 #include <nx/utils/log/log_main.h>
-#include <nx/utils/serialization/qjson.h>
 
 #include "exception.h"
 

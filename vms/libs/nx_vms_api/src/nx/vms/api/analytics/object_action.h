@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/vms/api/analytics/pixel_format.h>
 
 namespace nx::vms::api::analytics {

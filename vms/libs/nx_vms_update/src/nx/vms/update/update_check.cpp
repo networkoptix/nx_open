@@ -8,8 +8,8 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/serialization/qjson.h>
 
 using namespace std::chrono;
 

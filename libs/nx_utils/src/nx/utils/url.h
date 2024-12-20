@@ -8,7 +8,7 @@
 #include <QtCore/QVariantMap>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qt_core_types.h>
 
 namespace nx::utils {
 

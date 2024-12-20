@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/bookmark_models.h>
 

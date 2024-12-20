@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/time/timezone.h>
 

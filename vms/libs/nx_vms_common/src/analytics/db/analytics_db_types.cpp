@@ -9,9 +9,9 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/rest/params.h>
 #include <nx/reflect/string_conversion.h>
+#include <nx/utils/json/qt_core_types.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/serialization/qt_core_types.h>
 #include <nx/utils/std/algorithm.h>
 
 #include "analytics_db_utils.h"

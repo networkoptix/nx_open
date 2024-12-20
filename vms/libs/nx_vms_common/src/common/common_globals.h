@@ -7,7 +7,7 @@
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/string.h>
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/json/flags.h>
 #include <nx/vms/api/types/access_rights_types.h>
 #include <nx/vms/api/types/audit_record_type.h>
 #include <nx/vms/api/types/motion_types.h>

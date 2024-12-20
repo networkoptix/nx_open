@@ -10,7 +10,7 @@
 #include <QtCore/QStringList>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qt_core_types.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 

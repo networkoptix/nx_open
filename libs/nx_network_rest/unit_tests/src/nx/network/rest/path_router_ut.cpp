@@ -5,7 +5,7 @@
 #include <nx/network/rest/handler.h>
 #include <nx/network/rest/handler_pool.h>
 #include <nx/network/rest/path_router.h>
-#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/json/qjson.h>
 
 namespace nx::network::rest::test {
 

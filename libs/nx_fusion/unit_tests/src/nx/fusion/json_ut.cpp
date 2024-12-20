@@ -5,10 +5,10 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/nx_fusion_test_fixture.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/serialization/flags.h>
-#include <nx/utils/serialization/json.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/flags.h>
+#include <nx/utils/json/json.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_core_types.h>
 
 namespace {
 

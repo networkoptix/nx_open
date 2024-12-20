@@ -35,10 +35,10 @@
 #include <nx/utils/buffer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/i18n/translation_manager.h>
+#include <nx/utils/json/qjson.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/utils/serialization/qjson.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_request.h>
 #include <nx/vms/api/analytics/device_agent_settings_request.h>
 #include <nx/vms/api/data/device_actions.h>

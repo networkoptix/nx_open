@@ -19,7 +19,7 @@
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/qt_core_types.h>
+#include <nx/utils/json/qt_core_types.h>
 
 #include "client_process_execution_interface.h"
 #include "session_id.h"

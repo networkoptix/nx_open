@@ -3,12 +3,12 @@
 #include <gtest/gtest.h>
 
 #include <QtCore/QHash>
-#include <QtCore/QVector>
 #include <QtCore/QList>
+#include <QtCore/QVector>
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/utils/string.h>
 
 namespace test {

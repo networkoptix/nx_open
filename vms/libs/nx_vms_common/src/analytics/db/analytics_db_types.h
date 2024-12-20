@@ -12,9 +12,9 @@
 #include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/byte_array.h>
+#include <nx/utils/json/qt_core_types.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/latin1_array.h>
-#include <nx/utils/serialization/qt_core_types.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/utils/url_query.h>
 #include <nx/vms/api/data/analytics_data.h>
 #include <recording/time_period.h>

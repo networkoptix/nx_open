@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/json/qjson.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>

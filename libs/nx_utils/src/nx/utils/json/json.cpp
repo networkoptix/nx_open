@@ -2,7 +2,7 @@
 
 #include "json.h"
 
-namespace nx::utils::serialization::json {
+namespace nx::json {
 
 namespace details {
 
@@ -89,4 +89,4 @@ void StripDefaultComposer::onWriteValue()
 
 } // namespace details
 
-} // namespace nx::utils::serialization::json
+} // namespace nx::json

@@ -4,7 +4,7 @@
 
 #include <nx/branding.h>
 #include <nx/utils/i18n/translation_manager.h>
-#include <nx/utils/serialization/qt_containers_reflect_json.h>
+#include <nx/utils/json/qt_containers_reflect.h>
 
 namespace nx {
 

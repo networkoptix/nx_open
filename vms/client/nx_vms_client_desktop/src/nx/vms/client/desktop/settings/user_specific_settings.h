@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/property_storage/storage.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <recording/time_period.h>

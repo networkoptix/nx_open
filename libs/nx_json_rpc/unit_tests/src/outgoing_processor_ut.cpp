@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/json_rpc/detail/outgoing_processor.h>
-#include <nx/utils/serialization/qjson.h>
+#include <nx/utils/json/qjson.h>
 
 namespace nx::json_rpc::test {
 
@@ -15,8 +15,7 @@ TEST(OutgoingProcessor, batchRequest)
     std::vector<Response> responses{
         Response::makeResult("2", QJsonArray{}),
         Response::makeResult(1, QJsonObject{})};
-    auto responseJson{
-        nx::utils::serialization::json::serialized(responses, /*stripDefault*/ false)};
+    auto responseJson{nx::json::serialized(responses, /*stripDefault*/ false)};
 
     detail::OutgoingProcessor processor(
         [](auto value)

@@ -4,7 +4,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/json/flags.h>
 
 struct NX_VMS_COMMON_API Ptz
 {

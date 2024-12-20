@@ -4,7 +4,7 @@
 
 #include <nx/utils/exception.h>
 
-namespace nx::utils::serialization::json {
+namespace nx::json {
 
 class InvalidParameterException: public nx::utils::Exception
 {
@@ -41,4 +41,4 @@ private:
     const QString m_message;
 };
 
-} // namespace nx::utils::serialization::json
+} // namespace nx::json

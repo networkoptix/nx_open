@@ -9,8 +9,8 @@
 #include <rapidjson/document.h>
 
 #include <nx/reflect/instrument.h>
-#include <nx/utils/serialization/json.h>
-#include <nx/utils/serialization/json_exceptions.h>
+#include <nx/utils/json/exceptions.h>
+#include <nx/utils/json/json.h>
 
 // JSON RPC 2.0 Specification: https://www.jsonrpc.org/specification
 
@@ -22,7 +22,7 @@ template<typename T>
 T deserializedOrThrow(rapidjson::Value& value, std::string_view name)
 {
     using namespace nx::reflect::json;
-    using namespace nx::utils::serialization::json;
+    using namespace nx::json;
 
     T data;
     auto r = nx::reflect::json::deserialize(DeserializationContext{value}, &data);
@@ -65,8 +65,8 @@ struct NX_JSON_RPC_API Request
     static Request create(
         std::optional<std::variant<QString, int>> id, std::string method, const T& data)
     {
-        return create(std::move(id), std::move(method),
-            nx::utils::serialization::json::serialized(data, /*stripDefault*/ false));
+        return create(
+            std::move(id), std::move(method), nx::json::serialized(data, /*stripDefault*/ false));
     }
 
     static Request create(
@@ -122,8 +122,7 @@ struct NX_JSON_RPC_API Request
         if (params)
             return deserializedOrThrow<T>(*params, "params");
 
-        throw nx::utils::serialization::json::InvalidParameterException{
-            {"params", "Must be specified"}};
+        throw nx::json::InvalidParameterException{{"params", "Must be specified"}};
     }
 
     ResponseId responseId() const
@@ -263,7 +262,7 @@ struct NX_JSON_RPC_API Response
     static Response makeError(ResponseId id, int code, std::string message, const T& data)
     {
         return makeError(std::move(id), code, std::move(message),
-            nx::utils::serialization::json::serialized(data, /*stripDefault*/ false));
+            nx::json::serialized(data, /*stripDefault*/ false));
     }
 
     static Response makeError(ResponseId id, int code, std::string message, rapidjson::Document serialized)
@@ -317,7 +316,7 @@ struct NX_JSON_RPC_API Response
     template<typename T>
     static Response makeResult(ResponseId id, T&& data)
     {
-        auto serialized{nx::utils::serialization::json::serialized(data, /*stripDefault*/ false)};
+        auto serialized{nx::json::serialized(data, /*stripDefault*/ false)};
         auto& allocator{serialized.GetAllocator()};
         Response r{
             .document = std::make_shared<rapidjson::Document>(&allocator), .id = std::move(id)};
@@ -343,8 +342,7 @@ struct NX_JSON_RPC_API Response
         if (result)
             return deserializedOrThrow<T>(*result, "result");
 
-        throw nx::utils::serialization::json::InvalidParameterException{
-            {"result", "Must be provided"}};
+        throw nx::json::InvalidParameterException{{"result", "Must be provided"}};
     }
 
     nx::reflect::DeserializationResult deserialize(rapidjson::Value& json)

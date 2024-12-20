@@ -13,8 +13,8 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/json/qt_geometry_reflect.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/utils/serialization/qt_geometry_reflect_json.h>
 #include <nx/vms/client/core/ptz/remote_ptz_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>

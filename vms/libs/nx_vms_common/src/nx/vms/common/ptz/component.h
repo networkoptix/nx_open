@@ -4,7 +4,7 @@
 
 #include <array>
 
-#include <nx/utils/serialization/flags.h>
+#include <nx/utils/json/flags.h>
 
 namespace nx::vms::common {
 namespace ptz {
