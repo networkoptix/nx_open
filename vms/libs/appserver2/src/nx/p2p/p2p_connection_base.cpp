@@ -356,9 +356,12 @@ void ConnectionBase::onHttpClientDone()
         urlPath.replace(kWebsocketUrlPath, kHttpDataUrlPath);
         url.setPath(urlPath);
 
+        auto headers = m_additionalRequestHeaders;
+        headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
+
         m_p2pTransport.reset(new P2PHttpClientTransport(
             std::move(m_httpClient),
-            m_connectionGuid,
+            headers,
             network::websocket::FrameType::binary,
             url,
             pingSupported
