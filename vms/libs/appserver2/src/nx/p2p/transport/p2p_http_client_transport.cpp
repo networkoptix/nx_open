@@ -27,7 +27,7 @@ bool P2PHttpClientTransport::s_pingPongDisabled = false;
 
 P2PHttpClientTransport::P2PHttpClientTransport(
     HttpClientPtr readHttpClient,
-    const nx::String& connectionGuid,
+    const nx::network::http::HttpHeaders& additionalRequestHeaders,
     network::websocket::FrameType messageType,
     const nx::utils::Url& url,
     std::optional<std::chrono::milliseconds> pingTimeout)
@@ -36,7 +36,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     m_readHttpClient(std::move(readHttpClient)),
     m_messageType(messageType),
     m_url(url),
-    m_connectionGuid(connectionGuid),
+    m_additionalRequestHeaders(additionalRequestHeaders),
     m_pingTimeout(pingTimeout)
 {
     using namespace std::chrono_literals;
@@ -52,9 +52,7 @@ P2PHttpClientTransport::P2PHttpClientTransport(
     const auto keepAliveOptions =
         nx::network::KeepAliveOptions(std::chrono::minutes(1), std::chrono::seconds(10), 5);
     m_readHttpClient->setKeepAlive(keepAliveOptions);
-    network::http::HttpHeaders additionalHeaders;
-    additionalHeaders.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
-    m_readHttpClient->setAdditionalHeaders(additionalHeaders);
+    m_readHttpClient->setAdditionalHeaders(additionalRequestHeaders);
 
     bindToAioThread(m_readHttpClient->getAioThread());
     m_writeHttpClient->setCredentials(m_readHttpClient->credentials());
@@ -109,7 +107,7 @@ void P2PHttpClientTransport::sendPing()
                 },
                 network::http::HttpHeaders{}});
 
-            m_outgoingMessageQueue.back().headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
+            m_outgoingMessageQueue.back().headers = m_additionalRequestHeaders;
             m_outgoingMessageQueue.back().headers.emplace(kPingHeaderName, "ping");
             sendNextMessage();
             initiatePing();
@@ -275,7 +273,6 @@ void P2PHttpClientTransport::sendNextMessage()
                 ? nx::utils::toBase64(*next.buffer) : *next.buffer));
     }
 
-    next.headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     m_writeHttpClient->setAdditionalHeaders(next.headers);
 
     NX_VERBOSE(this, "%1: Sending POST request to %2", __func__, m_url);
@@ -330,7 +327,7 @@ void P2PHttpClientTransport::sendAsync(
 
             m_outgoingMessageQueue.push(OutgoingData{
                 buffer, std::move(handler), network::http::HttpHeaders{}});
-
+            m_outgoingMessageQueue.back().headers = m_additionalRequestHeaders;
             sendNextMessage();
         });
 }
