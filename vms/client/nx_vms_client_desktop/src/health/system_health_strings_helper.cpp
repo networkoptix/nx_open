@@ -22,7 +22,7 @@ namespace {
 
 static const int kMaxResourcesLines = 3;
 
-QStringList getCameraList(const QSet<QnResourcePtr>& resources)
+QStringList getSortedCameraList(const QSet<QnResourcePtr>& resources)
 {
     QStringList result;
     for (const auto& cameraResource: resources)
@@ -33,6 +33,7 @@ QStringList getCameraList(const QSet<QnResourcePtr>& resources)
 
         result << camera->getName();
     }
+    result.sort();
     return result;
 }
 
@@ -240,7 +241,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
 
         case MessageType::defaultCameraPasswords:
         {
-            const auto cameras = getCameraList(resources);
+            const auto cameras = getSortedCameraList(resources);
             return cameras.size() > kMaxResourcesLines ? cameras.join("\n") : QString{};
         }
 
@@ -281,7 +282,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(
         {
             messageParts << tr("Some cameras are set to record in a mode they do not support.");
             messageParts << ""; //< Additional line break by design.
-            messageParts += getCameraList(resources);
+            messageParts += getSortedCameraList(resources);
         }
 
         default:
