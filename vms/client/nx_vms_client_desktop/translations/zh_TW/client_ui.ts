@@ -2652,7 +2652,7 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>影像編輯</translation>
     </message>
     <message>
       <source>Configure...</source>

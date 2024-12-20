@@ -1609,7 +1609,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation>カメラ選択...</translation>
+      <translation>カメラを選択してください...</translation>
     </message>
   </context>
   <context>

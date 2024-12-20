@@ -54,7 +54,7 @@
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation type="unfinished">Improve video decoding perfomance using maximum hardware decoders count</translation>
+      <translation>使用最大硬體解碼器數量限制以提升影像解碼效能</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -231,7 +231,7 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
+      <translation>請輸入您的%1 帳號密碼來連線至站點</translation>
     </message>
   </context>
   <context>
@@ -332,7 +332,7 @@
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any Site</source>
-      <translation type="unfinished">You are not connected to any Site</translation>
+      <translation>您尚未連接至任何站點</translation>
     </message>
   </context>
   <context>

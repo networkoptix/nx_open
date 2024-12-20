@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Session duration limit can be changed by the site administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the site administrators</translation>
+      <translation>站點管理員可以更改登入時間限制</translation>
     </message>
   </context>
   <context>

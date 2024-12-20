@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>HTTP 認證</translation>
     </message>
   </context>
   <context>
@@ -617,7 +617,7 @@
     <message>
       <source>%1 has a license problem</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation>%1 有授權問題</translation>
     </message>
   </context>
   <context>
@@ -940,7 +940,7 @@
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>%1 憑證錯誤</translation>
     </message>
   </context>
   <context>
@@ -966,7 +966,7 @@
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 衝突</translation>
     </message>
   </context>
   <context>

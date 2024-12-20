@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>播放音訊</translation>
     </message>
     <message>
       <source>View Archive</source>
@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>站點事件</translation>
     </message>
   </context>
   <context>
@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>站點健康檢查員</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
@@ -560,11 +560,11 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>該攝影機目前不在所選佈局上</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>該攝影機目前不在某些所選佈局上</translation>
     </message>
   </context>
   <context>
@@ -1256,11 +1256,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>所有選定的使用者皆沒有設定Email。</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>部分選定的使用者沒有設定Email。</translation>
     </message>
   </context>
   <context>
@@ -1279,7 +1279,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>即時影像</translation>
     </message>
   </context>
   <context>
@@ -1297,7 +1297,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>新增站點(site)</translation>
     </message>
   </context>
   <context>
@@ -1789,7 +1789,7 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>站點連線偵測更新間隔 (秒, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
@@ -1797,19 +1797,19 @@
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>Cloud站點 ID</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>為此站點啟用 2FA</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>站點(site)名稱</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>本地站點ID，空表示尚未設定。</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
@@ -2535,7 +2535,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>無法強制使用攝影機時間，因其延遲過久，將改用站點時間。</translation>
     </message>
     <message>
       <source>Call Request</source>

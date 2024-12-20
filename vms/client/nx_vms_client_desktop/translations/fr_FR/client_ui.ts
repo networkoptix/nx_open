@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Serveurs du site</translation>
     </message>
   </context>
   <context>
@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>Actions du site</translation>
     </message>
   </context>
   <context>
@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Utiliser les préréglages du site</translation>
     </message>
   </context>
   <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>Ce site est connecté à</translation>
     </message>
   </context>
   <context>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>Créer une sauvegarde des données de gestion du site, ou restaurer les données de gestion du site à partir d'une sauvegarde existante</translation>
     </message>
   </context>
   <context>
@@ -1426,14 +1426,14 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Se connecter au site précédent au démarrage</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Paramètres du site</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>Afficher l'horodatage en direct</translation>
     </message>
   </context>
   <context>
@@ -1856,7 +1856,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Fusionner les sites...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1941,7 +1941,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>Adresse ou masque de sous-réseau</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1969,16 +1969,16 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>Trouver des appareils</translation>
     </message>
     <message>
       <source>
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
+      <translation>
+              Entrez l'adresse, la plage de sous-réseau ou le masque de sous-réseau, le login et le mot de passe
+              et cliquez sur le bouton &quot;Rechercher&quot;
           </translation>
     </message>
   </context>
@@ -2051,7 +2051,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Signature</translation>
     </message>
   </context>
   <context>
@@ -2150,7 +2150,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notifications du site</translation>
     </message>
   </context>
   <context>
@@ -2317,14 +2317,14 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>La suppression de cette option de connexion pourrait entraîner un dysfonctionnement du site.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administration du site</translation>
     </message>
   </context>
   <context>
@@ -2519,7 +2519,7 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>Violation des limites de l'organisation.</translation>
     </message>
   </context>
   <context>
@@ -2652,7 +2652,7 @@
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>Redaction vidéo</translation>
     </message>
     <message>
       <source>Configure...</source>

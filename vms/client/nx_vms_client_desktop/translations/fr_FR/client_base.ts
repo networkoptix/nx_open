@@ -12467,7 +12467,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>Déplacer cette fenêtre vers la mise en page pour utiliser cette fonctionnalité</translation>
     </message>
   </context>
   <context>
@@ -12493,7 +12493,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>Impossible de se connecter au site car il est devenu hors ligne</translation>
     </message>
   </context>
   <context>
@@ -12584,7 +12584,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>Sauter la version</translation>
     </message>
   </context>
   <context>
@@ -12715,7 +12715,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>Autres sites</translation>
     </message>
   </context>
   <context>
@@ -12852,11 +12852,11 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>Ressource introuvable</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>Paramètre introuvable</translation>
     </message>
   </context>
   <context>
@@ -13047,11 +13047,11 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>Ajouter un titre ou un commentaire</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>La règle n'est pas valide et peut ne pas fonctionner</translation>
     </message>
   </context>
   <context>
@@ -13070,7 +13070,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>Jeton</translation>
     </message>
   </context>
   <context>
@@ -13180,7 +13180,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Sélectionnez au moins une mise en page</translation>
     </message>
     <message>
       <source>Select at least one User</source>
@@ -13209,19 +13209,19 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>Quand un événement se produit</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>Quand l'événement démarre</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>Quand l'événement s'arrête</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>Sélectionnez l'état</translation>
     </message>
   </context>
   <context>
@@ -13244,11 +13244,11 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Ne contient pas de mots-clés</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Ne contient pas d'entrées de liste</translation>
     </message>
   </context>
   <context>
@@ -13684,10 +13684,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>La base de données d'analyse ne doit être stockée que sur un disque local et peut occuper beaucoup d'espace.
+Une fois qu'un emplacement de stockage des données d'analyse est sélectionné, il ne peut pas être facilement modifié sans perdre les données existantes. Nous vous recommandons de choisir l'emplacement avec soin et d'éviter d'utiliser la partition système car cela peut provoquer un dysfonctionnement grave.
+Par défaut, les données d'analyse seront stockées sur %1.
+Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;Gestion du stockage&quot; de la boîte de dialogue Paramètres du serveur.</translation>
     </message>
   </context>
   <context>
@@ -13834,7 +13834,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>Mise à jour automatique du client</translation>
     </message>
   </context>
   <context>

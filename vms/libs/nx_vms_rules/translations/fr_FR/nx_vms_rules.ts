@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Appareil d'événements</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -190,15 +190,15 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>La valeur du champ %1 doit être fournie pour la politique de validation donnée</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>La mise en page locale choisie ne peut être affichée qu'à son propriétaire %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Aucun des utilisateurs sélectionnés n'a accès à la mise en page sélectionnée</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
@@ -210,47 +210,47 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>L'appareil sélectionné a été supprimé</numerusform>
+        <numerusform>Les appareils sélectionnés ont été supprimés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>La caméra sélectionnée a été supprimée</numerusform>
+        <numerusform>Les caméras sélectionnées ont été supprimées</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Le serveur sélectionné a été supprimé</numerusform>
+        <numerusform>Les serveurs sélectionnés ont été supprimés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>La mise en page sélectionnée a été supprimée</numerusform>
+        <numerusform>Les mises en page sélectionnées ont été supprimées</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>La valeur du temps ne peut pas être inférieure à zéro</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>La durée ne peut pas être inférieure à zéro</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>La valeur ne peut pas être inférieure à %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>La valeur ne peut pas être supérieure à %1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -268,7 +268,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Le texte vide n'est pas autorisé</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -298,7 +298,7 @@
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Le type d'événement analytique n'est pas sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -325,7 +325,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Le type d'objet analytique n'est pas sélectionné.</translation>
     </message>
   </context>
   <context>
@@ -406,7 +406,7 @@
     <message>
       <source>%1 was disconnected</source>
       <comment>Device name will be substituted</comment>
-      <translation type="unfinished">%1 was disconnected</translation>
+      <translation>%1 a été déconnecté</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     </message>
     <message>
       <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <translation>Événement générique de %1</translation>
     </message>
   </context>
   <context>
@@ -544,25 +544,25 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>Authentification HTTP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Les champs utilisateur et mot de passe doivent être remplis si la méthode d'authentification de base ou digest est sélectionnée</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Le champ du jeton doit être rempli si le type d'authentification Bearer est sélectionné.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
-      <translation type="unfinished">HTTP Method should be known</translation>
+      <translation>La méthode HTTP doit être connue</translation>
     </message>
   </context>
   <context>
@@ -576,7 +576,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
+      <translation>Événement de problème de synchronisation LDAP</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -625,7 +625,7 @@
     <message>
       <source>%1 has a license problem</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation>%1 a un problème de licence</translation>
     </message>
   </context>
   <context>
@@ -726,15 +726,15 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>La liste n'est pas sélectionnée</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>La liste avec l'Id donné &apos;%1&apos; n'existe pas</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>La liste avec l'Id donné &apos;%1&apos; a un type d'objet non valide - &apos;%2&apos;, attendu - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -748,11 +748,11 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>La durée zéro ne peut pas être définie pour l'état d'événement `%1`</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>Une durée différente de zéro ne peut pas être définie pour l'état d'événement `%1`</translation>
     </message>
   </context>
   <context>
@@ -801,23 +801,23 @@
     <message>
       <source>Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
+      <translation>Limite de puissance dépassée (%1)</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>PoE au-dessus du budget sur %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>Consommation d'énergie actuelle: %1 watts</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>Limite de consommation supérieure: %1 watts</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>Limite de consommation inférieure : %1 watts</translation>
     </message>
   </context>
   <context>
@@ -869,19 +869,19 @@
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>Alertes de champ de filtre d'événement `%1` :</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>Alertes du champ de création d'action `%1` : </translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>La règle n'est pas terminée. Un filtre et un constructeur sont requis</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>Le filtre donné n'est pas compatible avec le constructeur donné</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>Erreur de certificat %1</translation>
     </message>
   </context>
   <context>
@@ -978,7 +978,7 @@
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>Conflit de %1</translation>
     </message>
   </context>
   <context>
@@ -997,7 +997,7 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>Échec de %1</translation>
     </message>
   </context>
   <context>
@@ -1008,7 +1008,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Démarré</translation>
     </message>
   </context>
   <context>
@@ -1054,14 +1054,14 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>Utilisateur : %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>Le son n'est pas sélectionné</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>L'état `%1` n'est pas valide pour l'événement `%2` et l'action `%3` avec les paramètres donnés</translation>
     </message>
   </context>
   <context>
@@ -1141,33 +1141,33 @@
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Impossible d'obtenir le descripteur d'événement</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>L'événement n'a pas de caméra source</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Sélectionnez au moins une mise en page</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>La liste n'est pas sélectionnée</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>La liste avec l'ID donné &apos;%1&apos; n'existe pas</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>La liste avec l'ID donné &apos;%1&apos; n'est pas une liste générique</translation>
     </message>
   </context>
   <context>
@@ -1182,22 +1182,22 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>Afficher à</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>L'URL ne peut pas être vide</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>L'URL doit être valide</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>L'URL ne doit pas contenir d'utilisateur ou de mot de passe</translation>
     </message>
   </context>
   <context>

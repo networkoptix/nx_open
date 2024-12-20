@@ -1142,14 +1142,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>將項目靜音</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>將項目取消靜音</numerusform>
       </translation>
     </message>
     <message>
@@ -2080,7 +2080,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>站點關閉。站點須處於活躍狀態才能連接到電視牆。%1</translation>
     </message>
   </context>
   <context>
@@ -3103,7 +3103,7 @@ License Key: %2</source>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>已登入為 %1</translation>
     </message>
   </context>
   <context>
@@ -4044,7 +4044,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;虛擬攝影機&quot; 是一個影像檔案專用的虛擬空間, 可上傳到站點中的任一伺服器並讓所有使用者存取。</translation>
     </message>
   </context>
   <context>
@@ -4813,7 +4813,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
+      <translation>僅音訊</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4841,7 +4841,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>憑證錯誤</translation>
     </message>
   </context>
   <context>
@@ -5417,7 +5417,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>你的帳號尚未設定Email地址</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -5486,11 +5486,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>您無法透過Email收到站點通知.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>他們無法透過Email收到站點通知。</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
@@ -5900,11 +5900,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>站點關閉</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>站點為活躍狀態時才能新增電視牆。%1</translation>
     </message>
   </context>
   <context>
@@ -6706,11 +6706,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>播放音訊</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>允許使用者存取裝置音訊串流。與「查看即時影像」和/或「查看檔案」結合使用。</translation>
     </message>
   </context>
   <context>
@@ -8357,7 +8357,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>開啟事件影像</translation>
     </message>
     <message>
       <source>Open event device</source>
@@ -8762,7 +8762,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>觀看影像而不進行編輯</translation>
     </message>
   </context>
   <context>
@@ -9528,7 +9528,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>目前 (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
@@ -9662,8 +9662,8 @@ You can force it, but it may significantly increase CPU load.</source>
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>該攝影機目前停用位移偵測，因為串流影像超出 %1 * %2 解析度。
+您可以強制啟用位移偵測，但可能會導致CPU負載大幅增加。</translation>
     </message>
   </context>
   <context>
@@ -10480,7 +10480,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>新增伺服器代理連線網頁</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -11115,7 +11115,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>不是憑證的一部分</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
