@@ -283,16 +283,9 @@ Params Request::calculateParams() const
 
 void Request::updateContent(QJsonValue value)
 {
-    if (m_jsonRpcContext)
-    {
-        m_jsonRpcContext->request =
-            nx::json_rpc::Request::create(m_jsonRpcContext->request.id, m_jsonRpcContext->request.method, value);
-    }
-    else
-    {
-        m_content->type = http::header::ContentType::kJson;
-        m_content->body = QJson::serialized(value);
-    }
+    NX_ASSERT(!m_jsonRpcContext);
+    m_content->type = http::header::ContentType::kJson;
+    m_content->body = QJson::serialized(value);
     m_paramsCache.reset();
 }
 

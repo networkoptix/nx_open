@@ -64,6 +64,7 @@ public:
     const std::optional<Content>& content() const { return m_content; }
     const std::optional<JsonRpcContext>& jsonRpcContext() const { return m_jsonRpcContext; }
     void updateContent(QJsonValue value);
+    void resetParamsCache() { m_paramsCache.reset(); }
     const nx::network::http::Request* httpRequest() const { return m_httpRequest; };
     const nx::network::http::HttpHeaders& httpHeaders() const { return m_httpHeaders; }
     const nx::utils::Url& url() const { return m_url; }

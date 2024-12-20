@@ -457,6 +457,143 @@ void validateParameters(const QJsonObject& schema,
     }
 }
 
+void validateParameters(
+    const QJsonObject& schema,
+    const rapidjson::Value& value,
+    const QString& name,
+    std::vector<QString>* unused);
+
+void validateObjectParameters(
+    const QJsonObject& schema,
+    const rapidjson::Value& object,
+    const QString& name,
+    std::vector<QString>* unused)
+{
+    const auto properties = optObject(schema, "properties", name);
+    auto required = optArray(schema, "required", name);
+    for (auto field = object.MemberBegin(); field != object.MemberEnd(); ++field)
+    {
+        const std::string fieldName{field->name.GetString(), field->name.GetStringLength()};
+        const auto fieldNameQ{QString::fromStdString(fieldName)};
+        const auto nestedName{name.isEmpty() ? fieldNameQ : name + '.' + fieldNameQ};
+        if (const auto fieldSchema = properties.find(fieldNameQ); fieldSchema != properties.end())
+        {
+            for (auto requiredValue = required.begin(); requiredValue != required.end();
+                 ++requiredValue)
+            {
+                const auto requiredName{requiredValue->toString()};
+                if (NX_ASSERT(!requiredName.isEmpty(), nestedName) && requiredName == fieldNameQ)
+                {
+                    required.erase(requiredValue);
+                    break;
+                }
+            }
+
+            const auto fieldObject{asObject(*fieldSchema, nestedName)};
+            if (optBool(fieldObject, "readOnly", nestedName))
+                unused->push_back(nestedName);
+            else
+                validateParameters(fieldObject, field->value, nestedName, unused);
+        }
+        // TODO: Input node should not be `unused` if it is allowed by `additionalProperties`.
+        else if (!properties.empty())
+        {
+            unused->push_back(nestedName);
+        }
+    }
+    for (const auto& requiredValue: required)
+    {
+        const auto requiredName{requiredValue.toString()};
+        if (NX_ASSERT(!requiredName.isEmpty(), requiredName))
+        {
+            throw Exception::missingParameter(
+                name.isEmpty() ? requiredName : name + '.' + requiredName);
+        }
+    }
+}
+
+void validateParameters(
+    const QJsonObject& schema,
+    const rapidjson::Value& value,
+    const QString& name,
+    std::vector<QString>* unused)
+{
+    if (schema.isEmpty())
+        return;
+
+    QJsonObject additionalSchema;
+    QString typeName;
+    if (const auto type = schema.find("type"); type == schema.end())
+    {
+        additionalSchema = optObject(schema, "additionalProperties", name);
+        if (additionalSchema.isEmpty())
+            return;
+    }
+    else
+    {
+        typeName = type->toString();
+    }
+
+    const auto nameForError = [&name] { return name.isEmpty() ? QString("Request body") : name; };
+    if (value.IsNull())
+        throw Exception::badRequest(NX_FMT("`%1` must not be null", nameForError()));
+
+    if (typeName.isEmpty() || typeName == "object")
+    {
+        if (!value.IsObject())
+            throw Exception::badRequest(NX_FMT("`%1` must be an object", nameForError()));
+
+        if (!typeName.isEmpty())
+            additionalSchema = optObject(schema, "additionalProperties", name);
+        if (!additionalSchema.isEmpty())
+        {
+            for (auto field = value.MemberBegin(); field != value.MemberEnd(); ++field)
+            {
+                const QByteArray fieldName{
+                    field->name.GetString(), (int) field->name.GetStringLength()};
+                const auto nestedName{name.isEmpty() ? fieldName : name + '.' + fieldName};
+                validateParameters(additionalSchema, field->value, nestedName, unused);
+            }
+            return;
+        }
+
+        validateObjectParameters(schema, value, name, unused);
+    }
+    else if (typeName == "array")
+    {
+        if (!value.IsArray())
+            throw Exception::badRequest(NX_FMT("`%1` must be an array", nameForError()));
+
+        const auto items = getObject(schema, "items");
+        if (!items.isEmpty())
+        {
+            for (size_t i = 0, n = value.Size(); i < n; ++i)
+                validateParameters(items, value[i], name + '[' + nx::toString(i) + ']', unused);
+        }
+    }
+    else if (typeName == "string")
+    {
+        if (!value.IsString())
+            throw Exception::badRequest(NX_FMT("`%1` must be a string", nameForError()));
+        // TODO: Check for the format of the actual values here.
+    }
+    else if (typeName == "number")
+    {
+        if (!value.IsNumber())
+            throw Exception::badRequest(NX_FMT("`%1` must be a number", nameForError()));
+    }
+    else if (typeName == "integer")
+    {
+        if (!value.IsInt())
+            throw Exception::badRequest(NX_FMT("`%1` must be an integer", nameForError()));
+    }
+    else if (typeName == "boolean")
+    {
+        if (!value.IsBool())
+            throw Exception::badRequest(NX_FMT("`%1` must be a boolean", nameForError()));
+    }
+}
+
 bool isRequired(const QJsonObject& object)
 {
     const auto required = object.find("required");
@@ -562,6 +699,54 @@ void removePathFromValue(const QString& path, QJsonValue* value)
     *value = std::move(obj);
 }
 
+void removePathFromValue(const std::string& path, rapidjson::Value* value)
+{
+    const auto separatorIndex = path.find_first_of('.');
+    if (separatorIndex == std::string::npos)
+    {
+        if (!path.ends_with(']'))
+        {
+            if (NX_ASSERT(value->IsObject()))
+            {
+                if (auto it = value->FindMember(path); NX_ASSERT(it != value->MemberEnd()))
+                    value->RemoveMember(it);
+            }
+            return;
+        }
+
+        NX_ASSERT(value->IsArray());
+        return;
+    }
+
+    const auto head{path.substr(0, separatorIndex)};
+    const auto tail{path.substr(separatorIndex + 1)};
+    if (head.ends_with(']'))
+    {
+        const auto bracketIndex = head.find_first_of('[');
+        if (!NX_ASSERT(bracketIndex != std::string::npos))
+            return;
+
+        const auto arrayName{head.substr(0, bracketIndex)};
+        const auto arrayIndex =
+            std::stoul(head.substr(bracketIndex + 1, head.length() - bracketIndex - 2));
+
+        const auto array = value->FindMember(arrayName);
+        if (NX_ASSERT(array != value->MemberEnd())
+            && NX_ASSERT(array->value.IsArray())
+            && NX_ASSERT(arrayIndex < array->value.Size()))
+        {
+            removePathFromValue(tail, &array->value[arrayIndex]);
+        }
+        return;
+    }
+
+    if (NX_ASSERT(value->IsObject()))
+    {
+        if (auto it = value->FindMember(head); it != value->MemberEnd())
+            removePathFromValue(tail, &it->value);
+    }
+}
+
 void removeUnused(const std::vector<QString>& unused, QJsonValue* from)
 {
     // TODO: sort.
@@ -625,22 +810,39 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
             if (body.isEmpty())
                 return;
 
-            auto content = request->content()
-                ? request->content()->parseOrThrow()
-                : request->jsonRpcContext() && request->jsonRpcContext()->request.params
-                    ? serialized(*request->jsonRpcContext()->request.params)
-                    : QJsonValue{QJsonValue::Undefined};
-            if (content.isUndefined())
-            {
-                if (isRequired(body))
-                    throw Exception::badRequest("Missing request content");
-                return;
-            }
-
             std::vector<QString> unused{};
-            json::validateParameters(
-                getObject(getObject(getObject(body, "content"), "application/json"), "schema"),
-                content, /*name*/ {}, &unused);
+            QJsonValue content;
+            rapidjson::Value* params = nullptr;
+            if (request->jsonRpcContext())
+            {
+                params = request->jsonRpcContext()->request.params;
+                if (!params)
+                {
+                    if (isRequired(body))
+                        throw Exception::badRequest("Missing request content");
+                    return;
+                }
+
+                json::validateParameters(
+                    getObject(getObject(getObject(body, "content"), "application/json"), "schema"),
+                    *params, /*name*/ {}, &unused);
+            }
+            else
+            {
+                content = request->content()
+                    ? request->content()->parseOrThrow()
+                    : QJsonValue{QJsonValue::Undefined};
+                if (content.isUndefined())
+                {
+                    if (isRequired(body))
+                        throw Exception::badRequest("Missing request content");
+                    return;
+                }
+
+                json::validateParameters(
+                    getObject(getObject(getObject(body, "content"), "application/json"), "schema"),
+                    content, /*name*/ {}, &unused);
+            }
 
             // Ad hoc to remove url params from `unused` since they are allowed to be passed
             // in the body for historical reasons.
@@ -673,8 +875,17 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
                     nx::format("Parameter '%1' is not allowed by the Schema.", unused[0]));
             }
 
-            removeUnused(unused, &content);
-            request->updateContent(content);
+            if (params)
+            {
+                for (const QString& path: unused)
+                    removePathFromValue(path.toStdString(), params);
+                request->resetParamsCache();
+            }
+            else
+            {
+                removeUnused(unused, &content);
+                request->updateContent(content);
+            }
         }();
     }
 
