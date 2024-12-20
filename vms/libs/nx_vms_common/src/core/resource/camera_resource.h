@@ -413,6 +413,9 @@ public:
     /** @return ID of device which used as audio input override for the camera. */
     nx::Uuid audioInputDeviceId() const;
 
+    /** @return Redirected audio input (if any) or self. */
+    QnVirtualCameraResourcePtr audioInputDevice() const;
+
     /**
      * Sets ID of device which will be used as audio input override for the camera.
      * @param deviceId Valid another device ID expected. Null ID should be set if this device's

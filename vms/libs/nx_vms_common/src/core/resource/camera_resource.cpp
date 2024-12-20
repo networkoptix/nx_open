@@ -1917,6 +1917,17 @@ nx::Uuid QnVirtualCameraResource::audioInputDeviceId() const
     return nx::Uuid::fromStringSafe(getProperty(ResourcePropertyKey::kAudioInputDeviceId));
 }
 
+QnVirtualCameraResourcePtr QnVirtualCameraResource::audioInputDevice() const
+{
+    const auto redirectedInputCamera =
+        resourcePool()->getResourceById<QnVirtualCameraResource>(audioInputDeviceId());
+
+    if (redirectedInputCamera)
+        return redirectedInputCamera;
+
+    return toSharedPointer(this);
+}
+
 void QnVirtualCameraResource::setAudioInputDeviceId(const nx::Uuid& deviceId)
 {
     if (!NX_ASSERT(deviceId != getId(), "Only another device may act as audio input override"))

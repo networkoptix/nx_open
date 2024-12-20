@@ -3565,7 +3565,7 @@ bool QnMediaResourceWidget::hasAudio() const
     // If we don't have PlayAudioPermission for this camera then it effectively doesn't have audio.
     if (d->camera)
     {
-        return d->camera->isAudioSupported()
+        return d->camera->audioInputDevice()->isAudioSupported()
             && d->camera->isAudioEnabled()
             && accessController()->hasPermissions(d->camera, Qn::PlayAudioPermission);
     }
