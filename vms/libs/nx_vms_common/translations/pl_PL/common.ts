@@ -2390,7 +2390,7 @@
     </message>
     <message>
       <source>Show Intercom Informer</source>
-      <translation type="unfinished">Show Intercom Informer</translation>
+      <translation>Pokaż Intercom Informer</translation>
     </message>
     <message>
       <source>Do HTTP(S) request</source>

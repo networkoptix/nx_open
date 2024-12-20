@@ -1217,7 +1217,7 @@
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation>%2の%1</translation>
+      <translation>%2 の %1</translation>
     </message>
   </context>
   <context>
@@ -2549,11 +2549,11 @@ License Key: %2</source>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation>デバイス選択</translation>
+      <translation>デバイスを選択してください</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>カメラを選択</translation>
+      <translation>カメラを選択してください</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -4801,11 +4801,11 @@ to %1</source>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation>デバイス選択...</translation>
+      <translation>デバイスを選択してください...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation>カメラ選択...</translation>
+      <translation>カメラを選択してください...</translation>
     </message>
   </context>
   <context>
@@ -5494,27 +5494,27 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation>メールアドレスが設定されていません</translation>
+      <translation>メールアドレス未設定</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation>ライセンスがありません</translation>
+      <translation>ライセンス未設定</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation>メールサーバーが設定されていません</translation>
+      <translation>メールサーバー未設定</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation>ストレージが設定されていません</translation>
+      <translation>ストレージ未設定</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation>アーカイブインデックスの再構築が完了しました</translation>
+      <translation>アーカイブインデックス再構築の完了</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>アーカイブインデックスの再構築はユーザーによってキャンセルされました</translation>
+      <translation>アーカイブインデックス再構築のユーザーによるキャンセル</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
@@ -5554,7 +5554,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>一部のユーザーにメールアドレスが設定されていません</translation>
+      <translation>一部ユーザーのメールアドレス未設定</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
@@ -5586,7 +5586,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation>アーカイブの整合性の問題が検出されました</translation>
+      <translation>アーカイブ整合性エラー</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
@@ -5608,7 +5608,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation>時刻同期のためのインターネット接続ができません</translation>
+      <translation>時刻同期用インターネット接続不可</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
@@ -5620,11 +5620,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation>バックアップストレージが設定されていません</translation>
+      <translation>バックアップストレージ未設定</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation>カメラの録画スケジュールが無効です</translation>
+      <translation>無効なカメラ録画スケジュール</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been stopped</source>
@@ -5632,11 +5632,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation>分析データ用ストレージが設定されていません</translation>
+      <translation>分析データ用ストレージ未設定</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation>システムストレージが分析データ用に使用されています</translation>
+      <translation>分析データ用にシステムストレージを使用中</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -7050,7 +7050,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation>デバイスを選択...</translation>
+      <translation>デバイスを選択してください...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
@@ -7623,11 +7623,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation>デバイス選択</translation>
+      <translation>デバイスを選択してください</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>カメラ選択</translation>
+      <translation>カメラを選択してください</translation>
     </message>
     <message>
       <source>Select Device</source>

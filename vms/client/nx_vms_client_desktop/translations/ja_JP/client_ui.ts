@@ -859,7 +859,7 @@
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>カメラ選択</translation>
+      <translation>カメラを選択してください</translation>
     </message>
   </context>
   <context>

@@ -1035,14 +1035,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>將項目靜音</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>將項目取消靜音</numerusform>
       </translation>
     </message>
   </context>
