@@ -2701,6 +2701,21 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
         GlobalPermission::powerUser,
         std::make_unique<AnalyticsObjectTracksHandler>(serverModule, serverConnector));
 
+    /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/objectMetadata
+     * Retrieves the Metadata containing rectangles for each frame for an Analytics Object track
+     * from the Archive.
+     *
+     * %caption Get Object Metadata
+     * %ingroup Analytics
+     * %struct AnalyticsObjectMetadataRequest
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %permissions Power User.
+     * %return:{std::vector<AnalyticsObjectMetadata>} Object Metadata.
+     */
+    reg("rest/v{4-}/analytics/objectTracks/:id/objectMetadata",
+        GlobalPermission::powerUser,
+        std::make_unique<AnalyticsObjectMetadataHandler>(serverModule, serverConnector));
+
     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/bestShotImage
      * Retrieves the Best Shot image for an Analytics Object Track. The image is returned with its
      * original MIME type - either one of `image/png`, `image/jpeg`, or `image/tiff`.
@@ -2710,8 +2725,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %param:uuid id Id of the Analytics Object Track.
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %param[ref] _local
+     * %param[ref] _language,_strict,_ticket,_local,
      * %permissions Power User.
      * %return Best Shot image.
      *
@@ -2728,8 +2742,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      *     %value png `image/png`.
      *     %value jpg `image/jpeg`.
      *     %value tif `image/tiff`.
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %param[ref] _local
+     * %param[ref] _language,_strict,_ticket,_local
      * %permissions Power User.
      * %return Best Shot image.
      */
@@ -2737,22 +2750,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
         GlobalPermission::powerUser,
         std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule, serverConnector));
 
-    /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/objectMetadata
-     * Retrieves the Metadata containing rectangles for each frame for an Analytics Object track
-     * from the Archive.
-     *
-     * %caption Get Object Metadata
-     * %ingroup Analytics
-     * %struct AnalyticsObjectMetadataRequest
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Power User.
-     * %return:{std::vector<AnalyticsObjectMetadata>} Object Metadata.
-     */
-    reg("rest/v{4-}/analytics/objectTracks/:id/objectMetadata",
-        GlobalPermission::powerUser,
-        std::make_unique<AnalyticsObjectMetadataHandler>(serverModule, serverConnector));
-
-    /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage
+     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage
      * Retrieves the Title image for an Analytics Object Track. The image is returned with its
      * original MIME type - either one of `image/png`, `image/jpeg`, or `image/tiff`.
      *
@@ -2761,8 +2759,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %param:uuid id Id of the Analytics Object Track.
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %param[ref] _local
+     * %param[ref] _language,_strict,_ticket,_local
      * %permissions Power User.
      * %return Title image.
      *
@@ -2775,8 +2772,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %param:uuid id Id of the Analytics Object Track.
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
-     * %param[ref] _local
+     * %param[ref] _language,_strict,_ticket,_local
      * %param:enum format Defines the MIME type of the image.
      *     %value png `image/png`.
      *     %value jpg `image/jpeg`.
