@@ -1326,7 +1326,7 @@
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation>カメラ選択...</translation>
+      <translation>カメラを選択してください...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
