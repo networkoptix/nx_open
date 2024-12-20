@@ -25,7 +25,7 @@ public:
      */
     P2PHttpClientTransport(
         HttpClientPtr readHttpClient,
-        const nx::String& connectionGuid,
+        const nx::network::http::HttpHeaders& additionalRequestHeaders,
         network::websocket::FrameType frameType,
         const nx::utils::Url& url,
         std::optional<std::chrono::milliseconds> pingTimeout);
@@ -87,7 +87,7 @@ private:
     bool m_failed = false;
     utils::Url m_url;
     utils::InterruptionFlag m_destructionFlag;
-    nx::String m_connectionGuid;
+    const nx::network::http::HttpHeaders m_additionalRequestHeaders;
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onStartHandler;
     std::optional<std::chrono::milliseconds> m_pingTimeout;
     network::aio::Timer m_pingTimer;
