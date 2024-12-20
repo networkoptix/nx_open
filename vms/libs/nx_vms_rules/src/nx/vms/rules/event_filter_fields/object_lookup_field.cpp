@@ -142,6 +142,9 @@ bool ObjectLookupField::match(const QVariant& eventValue) const
     }
 
     const auto& lookupListData = std::any_cast<api::LookupListData&>(m_listOrMatcher);
+    if (lookupListData.id.isNull())
+        return false;
+
     const auto hasEntry = checkForListEntries(lookupListData, attributes);
     return m_checkType == ObjectLookupCheckType::inList ? hasEntry : !hasEntry;
 }

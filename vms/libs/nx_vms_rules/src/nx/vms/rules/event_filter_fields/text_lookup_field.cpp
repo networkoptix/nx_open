@@ -85,11 +85,14 @@ bool TextLookupField::match(const QVariant& eventValue) const
         else
         {
             if (!NX_ASSERT(nx::Uuid::isUuidString(m_value), "Check type and value aren't compatible"))
-                return {};
+                return false;
 
             const auto lookupList = lookupListManager()->lookupList(nx::Uuid{m_value});
+            if (lookupList.id.isNull())
+                return false;
+
             if (!NX_ASSERT(lookupList.objectTypeId.isEmpty(), "Supports only generic lists"))
-                return {};
+                return false;
 
             m_list = QStringList{};
             for (const auto& entry: lookupList.entries)
