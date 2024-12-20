@@ -1097,14 +1097,14 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>將項目靜音</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>將項目取消靜音</numerusform>
       </translation>
     </message>
   </context>
@@ -3157,7 +3157,7 @@ License Key: %2</source>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is the cloud login name (like user@domain.com</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>已登入為 %1</translation>
     </message>
   </context>
   <context>
@@ -3515,11 +3515,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Event video</source>
-      <translation type="unfinished">Open Event video</translation>
+      <translation>開啟事件影像</translation>
     </message>
     <message>
       <source>Open Event camera</source>
-      <translation type="unfinished">Open Event camera</translation>
+      <translation>開啟事件攝影機</translation>
     </message>
   </context>
   <context>
@@ -9636,7 +9636,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>目前 (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
@@ -10479,7 +10479,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>新增伺服器代理連線網頁</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -11090,7 +11090,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>不是憑證的一部分</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
