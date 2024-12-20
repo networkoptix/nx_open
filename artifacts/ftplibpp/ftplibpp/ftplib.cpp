@@ -655,7 +655,7 @@ int ftplib::FtpAccess(const char *path, accesstype type, transfermode mode, ftph
 		dir = FTPLIB_READ;
 		break;
 	case ftplib::dirverbose:
-		strcpy(buf,"LIST -aL");
+		strcpy(buf,"LIST");
 		dir = FTPLIB_READ;
 		break;
 	case ftplib::filereadappend:
@@ -1231,10 +1231,11 @@ int ftplib::FtpXfer(const char *localfile, const char *path, ftphandle *nControl
 	}
 	if (local == NULL) local = ((type == ftplib::filewrite)
 		|| (type == ftplib::filewriteappend)) ? stdin : stdout;
-	if (!FtpAccess(path, type, mode, nControl, &nData)) {
-    if (localfile != NULL) fclose(local);
-    return 0;
-  }
+	if (!FtpAccess(path, type, mode, nControl, &nData))
+	{
+		if (localfile != NULL) fclose(local);
+		return 0;
+  	}
 
 	dbuf = static_cast<char*>(malloc(FTPLIB_BUFSIZ));
 	if ((type == ftplib::filewrite) || (type == ftplib::filewriteappend))

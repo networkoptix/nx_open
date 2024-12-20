@@ -386,7 +386,7 @@ long long getFileSize(const char *fname)
 
 void log(const std::string& message)
 {
-    static bool kLoggingEnabled = false;
+    static bool kLoggingEnabled = true;
     if (kLoggingEnabled)
         std::cout << "ftp storage: " << message << std::endl;
 }
@@ -396,7 +396,6 @@ class FtpLibWrapper
 public:
     FtpLibWrapper(const std::string& url);
     bool isAvailable() const;
-    std::optional<std::vector<std::string>> dir(const std::string& path) const;
     bool put(const std::string& localPath, const std::string& remotePath);
     bool get(const std::string& localPath, const std::string& remotePath);
     bool removeFile(const std::string& remotePath);
@@ -479,17 +478,6 @@ bool FtpLibWrapper::isAvailable() const
     return EXEC_WITH_RETRY(TestControlConnection, ());
 }
 
-std::optional<std::vector<std::string>> FtpLibWrapper::dir(const std::string& path) const
-{
-    const auto fileInfo = aux::localUniqueFilePath();
-    aux::FileRemover fr(fileInfo.fullPath);
-    log("Dir. path: '" + path + "'");
-    if (!EXEC_WITH_RETRY(Dir, (fileInfo.fullPath.data(), path.data())))
-        return std::nullopt;
-
-    return readLines(fileInfo.fullPath);
-}
-
 bool FtpLibWrapper::put(const std::string& localPath, const std::string& remotePath)
 {
     log("Put. path: '" + remotePath + "'");
@@ -568,7 +556,11 @@ bool FtpLibWrapper::pathExists(const std::string& remotePath) const
     }
 
     const bool existsResult = std::any_of(
-        result->cbegin(), result->cend(), [&remotePath](const auto& line) { return line == remotePath; });
+        result->cbegin(), result->cend(),
+        [&remotePath](const auto& line)
+        {
+            return aux::toRelativeFtpPath(line) == remotePath;
+        });
 
     log("pathExists: result: " + std::to_string(existsResult));
     return existsResult;
@@ -624,16 +616,16 @@ bool FtpLibWrapper::makePath(const std::string& dirPath)
 std::optional<FileType> FtpLibWrapper::fileType(const std::string& remotePath)
 {
     log("fileType. path: '" + remotePath +"'");
-    if (const auto dirResult = dir(remotePath + "/"); dirResult && !dirResult->empty())
+    if (const auto dirResult = nlst(remotePath); dirResult && !dirResult->empty())
     {
+        if (dirResult->size() == 1 && aux::toRelativeFtpPath(*dirResult->cbegin()) == remotePath)
+        {
+            log("fileType. path: '" + remotePath + "' is File");
+            return FileType::isFile;
+        }
+
         log("fileType. path: '" + remotePath + "' is Dir");
         return FileType::isDir;
-    }
-
-    if (pathExists(remotePath))
-    {
-        log("fileType. path: '" + remotePath + "' is File");
-        return FileType::isFile;
     }
 
     log("fileType. path: '" + remotePath + "' is UNKNOWN");
@@ -779,7 +771,7 @@ int FtpStorage::getCapabilities() const
         return m_capabilities;
 
     // list
-    if (m_impl->dir("./"))
+    if (m_impl->nlst("./"))
         m_capabilities |= cap::ListFile;
 
     const auto fileInfo = aux::localUniqueFilePath();
