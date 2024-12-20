@@ -245,11 +245,11 @@
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation>デバイス選択</translation>
+      <translation>デバイスを選択してください</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>カメラを選択</translation>
+      <translation>カメラを選択してください</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
