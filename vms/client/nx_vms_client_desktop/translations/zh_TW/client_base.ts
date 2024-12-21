@@ -1190,7 +1190,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>合併站點...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -1222,7 +1222,7 @@
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>合併至目前連接的站點...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -2391,7 +2391,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>站點合併</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
@@ -8022,11 +8022,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>將伺服器合併至此站點</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>請輸入您的帳戶密碼將伺服器合併至此站點</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8873,7 +8873,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>站點很快將會合併</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
@@ -8889,7 +8889,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>無法將 %1 合併到我們的站點。</translation>
     </message>
   </context>
   <context>
@@ -9491,11 +9491,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>合併站點</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>請輸入您的帳戶密碼以合併系統</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9504,23 +9504,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>站點合併中...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>這是目前的站點 URL。</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>當資料庫同步完成時, 來自其他站點的伺服器將顯示在資源列表中。</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>站點很快將會合併</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>合併站點失敗</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9571,7 +9571,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>新站點(site)</translation>
     </message>
     <message>
       <source>Site was not found.</source>

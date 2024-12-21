@@ -8881,7 +8881,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>Odblokuj tę część archiwum, aby wyeksportować jego zawartość.</translation>
     </message>
   </context>
   <context>
@@ -11129,16 +11129,16 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 grupa</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
-        <numerusform>%1 and %n more groups</numerusform>
+      <translation>
+        <numerusform>%1 i %n więcej grup</numerusform>
+        <numerusform>%1 i %n więcej grup</numerusform>
+        <numerusform>%1 i %n więcej grup</numerusform>
+        <numerusform>%1 i %n więcej grup</numerusform>
       </translation>
     </message>
   </context>
@@ -11239,7 +11239,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Zamknięcie</translation>
     </message>
   </context>
   <context>
@@ -11490,7 +11490,7 @@ Nadal możesz zmienić jakość i FPS bezpośrednio w kamerze.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>Szyfrowanie ruchu wideo może znacznie zwiększyć użycie procesora</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>

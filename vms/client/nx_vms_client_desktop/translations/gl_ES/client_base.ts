@@ -3454,7 +3454,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -3484,9 +3484,9 @@ Clave de licenza: %2</translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Temas eliminados</numerusform>
+        <numerusform>%n Temas eliminados</numerusform>
       </translation>
     </message>
     <message>
@@ -4009,7 +4009,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Módulo E/S (I/O)</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -4680,7 +4680,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation type="unfinished">Storage Analytics</translation>
+      <translation>Analítica de almacenamento</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
@@ -4924,7 +4924,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Exportar os eventos seleccionados ao ficheiro</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
@@ -6810,7 +6810,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Editar configuración.</translation>
     </message>
     <message>
       <source>Play Audio</source>
@@ -7321,7 +7321,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Nunca</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -8392,7 +8392,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Contrasinal non válido</translation>
     </message>
   </context>
   <context>
@@ -8539,7 +8539,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Non hai eventos</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -9990,7 +9990,7 @@ Podes forzar a detección de movemento, pero pode provocar un aumento substancia
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Descargar &amp;&amp; Instalar</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -11952,16 +11952,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Usuario local</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 usuario</translation>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>Usuario LDAP</translation>
     </message>
     <message>
       <source>Login</source>
@@ -12825,7 +12825,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Múltiples</translation>
     </message>
   </context>
   <context>
@@ -13095,7 +13095,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
@@ -13333,11 +13333,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias no título con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Se o campo está baleiro, o evento sempre se activará.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
@@ -13374,11 +13374,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>O evento activarase só se hai coincidencias no título con algunha das palabras clave introducidas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Se o campo está baleiro, o evento sempre se activará.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>

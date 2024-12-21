@@ -1794,7 +1794,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Zmień kryteria wyszukiwania lub utwórz nową grupę</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1936,7 +1936,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Wtyczki to programy działające na serwerze %1 , które umożliwiają bezproblemową integrację analiz wideo.</translation>
     </message>
   </context>
   <context>
@@ -2235,7 +2235,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Dziedziczy uprawnienia %1 od</translation>
     </message>
     <message>
       <source>Already inherited from</source>
@@ -2289,7 +2289,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Monitor stanu technicznego</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2779,7 +2779,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nowy użytkownik</translation>
     </message>
     <message>
       <source>General</source>
@@ -2806,7 +2806,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nowy użytkownik</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2976,11 +2976,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Przerwij</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Nowy link...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>

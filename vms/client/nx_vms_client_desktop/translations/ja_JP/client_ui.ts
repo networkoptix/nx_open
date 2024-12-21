@@ -1175,7 +1175,7 @@
     <name>ExecHttpRequestActionWidget</name>
     <message>
       <source>Login to authenticate (optional)</source>
-      <translation>認証のためにログイン（オプション）</translation>
+      <translation>認証用ログイン名 (オプション)</translation>
     </message>
     <message>
       <source>Login</source>

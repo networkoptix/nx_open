@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>A licenza caducou</translation>
     </message>
     <message>
       <source>License is not validated by %1</source>

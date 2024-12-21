@@ -922,29 +922,29 @@
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
+        <numerusform>Nagrywanie na kanałach %n zostało zatrzymane z powodu przeciążenia usługi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
+        <numerusform>Kopia zapasowa w chmurze na kanałach %n została zatrzymana ze względu na nadużywanie usługi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
+        <numerusform>Płatna usługa integracji na %n kanałach została wstrzymana z powodu nadmiernego wykorzystania usługi.</numerusform>
       </translation>
     </message>
     <message>

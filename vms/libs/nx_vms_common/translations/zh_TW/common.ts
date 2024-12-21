@@ -179,7 +179,7 @@
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>此群組的成員擁有無限制的站點權限。管理員可以建立和修改進階使用者、合併系統以及將站點連接到或斷開%1。</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
@@ -1536,7 +1536,7 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>啟用循序 Flir Onvif 搜尋工具</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
@@ -1652,7 +1652,7 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>更多用於儲存錄影的本機 FS 儲存類型</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>

@@ -530,7 +530,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Apagar</translation>
     </message>
   </context>
   <context>
@@ -1281,7 +1281,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Anterior</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1369,7 +1369,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Configuraciones avanzadas</translation>
     </message>
     <message>
       <source>Disconnect</source>

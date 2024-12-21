@@ -161,7 +161,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de obxecto</translation>
     </message>
   </context>
   <context>
@@ -387,7 +387,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Activado</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -530,7 +530,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Apagar</translation>
     </message>
   </context>
   <context>
@@ -685,7 +685,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Xenérico</translation>
     </message>
     <message>
       <source>Type</source>
@@ -730,7 +730,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventsPanel</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Non hai eventos</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
@@ -1369,7 +1369,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Configuración avanzada</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1449,7 +1449,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Calquera %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1633,9 +1633,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n máis</numerusform>
+        <numerusform>%n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -2111,7 +2111,7 @@ Press Alt + Click to follow object</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de obxecto</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -2545,7 +2545,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Non autorizado</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -2610,7 +2610,7 @@ Press Alt + Click to follow object</translation>
     <name>SyncComboBox</name>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Nunca</translation>
     </message>
     <message>
       <source>Always</source>
@@ -2655,7 +2655,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>En</translation>
     </message>
   </context>
   <context>
