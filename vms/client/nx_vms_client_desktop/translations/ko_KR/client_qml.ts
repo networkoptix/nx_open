@@ -1542,7 +1542,7 @@
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>소속</translation>
     </message>
     <message>
       <source>LDAP</source>

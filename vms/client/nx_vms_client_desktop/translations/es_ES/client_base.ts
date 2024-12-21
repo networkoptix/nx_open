@@ -1653,7 +1653,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Activo</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -7062,7 +7062,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Editar ajustes</translation>
     </message>
     <message>
       <source>View Live</source>
@@ -7090,7 +7090,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Editar ajustes.</translation>
     </message>
   </context>
   <context>
@@ -10947,7 +10947,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Activo</translation>
     </message>
     <message>
       <source>Suspended</source>
