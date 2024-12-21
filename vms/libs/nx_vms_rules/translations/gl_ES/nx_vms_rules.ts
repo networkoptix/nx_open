@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
@@ -621,7 +621,7 @@
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>O modo de gravación de pánico cambia a configuración de gravación de todas as cámaras ao máximo FPS e calidade.</translation>
     </message>
     <message>
       <source>Panic Recording</source>
@@ -1130,13 +1130,13 @@
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Todas as persoas usuarias</translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Temas eliminados</numerusform>
+        <numerusform>%n Temas eliminados</numerusform>
       </translation>
     </message>
     <message>
