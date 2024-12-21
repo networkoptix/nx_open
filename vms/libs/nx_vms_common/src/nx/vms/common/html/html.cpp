@@ -183,7 +183,7 @@ QString styledParagraph(const QString& text, int pixelSize, bool isBold, bool is
     const QString boldValue(isBold ? "bold" : "normal");
     const QString italicValue(isItalic ? "italic" : "normal");
 
-    const auto newFormattedText = replaceNewLineToBrTag(text);
+    const auto newFormattedText = mightBeHtml(text) ? text : replaceNewLineToBrTag(text);
     return kTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
@@ -223,7 +223,11 @@ bool mightBeHtml(const QStringList& lines)
 
 QString toHtml(const QString& source, Qt::WhiteSpaceMode whitespaceMode)
 {
-    return mightBeHtml(source) ? source : Qt::convertFromPlainText(source, whitespaceMode);
+    // Change <br> to <br/>, as they are not fully valid XML.
+    // QDomDocument requires strict XML compliance and will reject such tags.
+    return mightBeHtml(source)
+        ? source
+        : Qt::convertFromPlainText(source, whitespaceMode).replace("<br>", kLineBreak);
 }
 
 QString toPlainText(const QString& source)
