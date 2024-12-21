@@ -1490,7 +1490,7 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher</translation>
+      <translation>啟用循序 Flir Onvif 搜尋工具</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB)</source>
@@ -1606,7 +1606,7 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>更多用於儲存錄影的本機 FS 儲存類型</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
