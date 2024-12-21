@@ -6489,15 +6489,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Also set on source camera</source>
-      <translation type="unfinished">Also set on source camera</translation>
+      <translation>소스 카메라에도 설정됨</translation>
     </message>
     <message>
       <source>Also trigger on source camera</source>
-      <translation type="unfinished">Also trigger on source camera</translation>
+      <translation>소스 카메라에서도 트리거</translation>
     </message>
     <message>
       <source>Also record source camera</source>
-      <translation type="unfinished">Also record source camera</translation>
+      <translation>소스 카메라를 기록합니다</translation>
     </message>
     <message>
       <source>Source camera</source>

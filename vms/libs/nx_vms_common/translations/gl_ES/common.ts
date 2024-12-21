@@ -224,7 +224,7 @@
     <message>
       <source>Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited System privileges. Administrators can create and modify Power Users, merge Systems and connect or disconnect System to %1.</translation>
+      <translation>Os membros deste grupo teñen privilexios de sistema ilimitados. Os administradores poden crear e modificar usuarios avanzados, combinar sistemas e conectar ou desconectar o sistema a %1.</translation>
     </message>
   </context>
   <context>

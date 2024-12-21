@@ -176,7 +176,7 @@
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Tipo de obxecto:</translation>
     </message>
   </context>
   <context>
@@ -257,7 +257,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Borrar o filtro</translation>
     </message>
     <message>
       <source>Email settings</source>
@@ -276,7 +276,7 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Sen límite</translation>
     </message>
     <message>
       <source>Fixed</source>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Borrar o filtro</translation>
     </message>
   </context>
   <context>
@@ -780,7 +780,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>en</translation>
     </message>
   </context>
   <context>
@@ -1156,7 +1156,7 @@
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Borrar o filtro</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -1601,7 +1601,7 @@
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Xenérico</translation>
     </message>
     <message>
       <source>Features</source>
@@ -1872,7 +1872,7 @@
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Descargar &amp;&amp; Instalar</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2078,7 +2078,7 @@
     </message>
     <message>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Notificacións do sistema</translation>
     </message>
     <message>
       <source>Events</source>
@@ -2564,7 +2564,7 @@
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>O cifrado dos arquivos aumenta o uso da CPU</translation>
     </message>
     <message>
       <source>Change Password...</source>
