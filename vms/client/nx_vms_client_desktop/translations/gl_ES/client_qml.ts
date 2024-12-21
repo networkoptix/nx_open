@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de obxecto</translation>
     </message>
   </context>
   <context>
@@ -367,7 +367,7 @@
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Non hai eventos</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
@@ -929,7 +929,7 @@ to activate PTZ</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Tipo de obxecto</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -1206,7 +1206,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Non autorizado</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
