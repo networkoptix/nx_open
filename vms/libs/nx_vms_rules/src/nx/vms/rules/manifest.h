@@ -50,16 +50,35 @@ NX_REFLECTION_ENUM_CLASS(ItemFlag,
 Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
 NX_REFLECTION_ENUM_CLASS(ExecutionTarget,
+    /**
+     * Separate action copies are built for the target users according to permissions and locale.
+     * May be routed to desktop clients if cloud target flag is not set.
+     */
     clients = 1 << 0,
+
+    /**
+     * Separate action copy with full resources is build for the server execution.
+     * Action is routed to server according to TargetServers flags.
+     */
     servers = 1 << 1,
+
+    /**
+     * All action copies are routed to the cloud connected server. The executor decides how to
+     * send it further.
+     */
     cloud = 1 << 2
 )
 
 Q_DECLARE_FLAGS(ExecutionTargets, ExecutionTarget)
 
 NX_REFLECTION_ENUM_CLASS(TargetServers,
+    /** The action is executed on the server it was built. */
     currentServer,
+
+    /** The action is routed to target resource parent server. */
     resourceOwner,
+
+    /** The action is routed to server connected to the Internet. */
     serverWithPublicIp
 )
 

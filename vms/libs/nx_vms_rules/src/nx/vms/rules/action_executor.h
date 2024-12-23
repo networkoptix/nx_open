@@ -25,11 +25,6 @@ public:
         QObject(parent)
     {}
 
-    virtual nx::i18n::ScopedLocalePtr translateAction(const QString& /*actionType*/)
-    {
-        return {};
-    };
-
     virtual void initialize(Engine* /*engine*/) {};
     virtual void execute(const ActionPtr& action) = 0;
 };

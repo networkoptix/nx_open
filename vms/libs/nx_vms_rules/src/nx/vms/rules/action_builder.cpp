@@ -285,6 +285,8 @@ QVariantMap makeOverride(UuidSelection users, QString emails)
     // TODO: https://networkoptix.atlassian.net/browse/VMS-55348: This code leads to ~5
     // second delay in action generation during unit tests.  Added a flag in the test
     // to bypass this, but it should be fixed properly.
+    // It may be easier to add QCoreApplication::processEvents() near sleep() call to allow
+    // the main thread to process language switch task.
     if (ActionBuilder::bypassScopedLocaleForTest)
         return {};
 

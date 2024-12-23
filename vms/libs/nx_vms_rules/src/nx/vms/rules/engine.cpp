@@ -922,14 +922,7 @@ void Engine::processAcceptedEvent(const EventPtr& event, const ConstRulePtr& rul
     }
 
     for (const auto builder: rule->actionBuilders())
-    {
-        nx::i18n::ScopedLocalePtr scopedLocale;
-
-        if (auto executor = m_executors.value(builder->actionType()))
-            scopedLocale = executor->translateAction(builder->actionType());
-
         builder->process(event);
-    }
 }
 
 void Engine::processAction(const ActionPtr& action) const
