@@ -1182,7 +1182,7 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Administration du site...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -1198,7 +1198,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Fusionner les sites...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -8377,7 +8377,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Administration du site</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -9636,7 +9636,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Fusionner les sites</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>

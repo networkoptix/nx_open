@@ -5058,7 +5058,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exklusiv</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5066,7 +5066,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Isolerad</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -5190,11 +5190,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Isolerad</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Exklusiv</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5222,7 +5222,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Läs-skriv-policy</translation>
     </message>
   </context>
   <context>
@@ -12713,7 +12713,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>Andra webbplatser</translation>
     </message>
   </context>
   <context>

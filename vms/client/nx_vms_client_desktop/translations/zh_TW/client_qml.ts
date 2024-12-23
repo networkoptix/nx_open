@@ -2985,7 +2985,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>所有站點</translation>
     </message>
   </context>
   <context>

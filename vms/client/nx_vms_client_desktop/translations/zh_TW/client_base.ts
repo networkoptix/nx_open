@@ -2560,7 +2560,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>站點 (Site)</translation>
     </message>
   </context>
   <context>
@@ -5409,7 +5409,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>站點關閉</translation>
     </message>
     <message>
       <source>Reject intercom call</source>
@@ -5498,8 +5498,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ 還有%n 個</numerusform>
       </translation>
     </message>
     <message>
@@ -7052,7 +7052,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>站點關閉</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
@@ -8058,7 +8058,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>新站點(site)</translation>
     </message>
   </context>
   <context>
@@ -12408,7 +12408,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>標題</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12461,7 +12461,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>新站點(site)</translation>
     </message>
   </context>
   <context>
@@ -12528,7 +12528,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>其他站點</translation>
     </message>
   </context>
   <context>
@@ -12998,7 +12998,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>站點 (Site)</translation>
     </message>
   </context>
   <context>

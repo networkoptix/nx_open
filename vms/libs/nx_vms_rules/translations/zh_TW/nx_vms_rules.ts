@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>無法強制使用攝影機時間，因其延遲過久，將改用站點時間。</translation>
     </message>
   </context>
   <context>

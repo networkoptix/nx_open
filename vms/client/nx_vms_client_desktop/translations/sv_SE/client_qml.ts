@@ -3003,7 +3003,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Alla webbplatser</translation>
     </message>
   </context>
   <context>
