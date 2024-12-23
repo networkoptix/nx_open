@@ -82,11 +82,11 @@ QPixmap LoadingIndicator::currentPixmap() const
 
 QPixmap LoadingIndicator::createPixmap(double progress)
 {
-    const static double kDpiFactor = 2.0;
-    const static double kImageSize = 20 * kDpiFactor;
-    const static double kExternalRadius = 7 * kDpiFactor;
-    const static double kInternalRadius = 5.5 * kDpiFactor;
-    const static QPointF kCenter = {kImageSize / 2, kImageSize / 2};
+    const double kDpiFactor = qApp->devicePixelRatio();
+    const double kImageSize = 20 * kDpiFactor;
+    const double kExternalRadius = 7 * kDpiFactor;
+    const double kInternalRadius = 5.5 * kDpiFactor;
+    const QPointF kCenter = {kImageSize / 2, kImageSize / 2};
 
     // Create an empty transparent image.
     QImage img(kImageSize, kImageSize, QImage::Format_RGBA64);
