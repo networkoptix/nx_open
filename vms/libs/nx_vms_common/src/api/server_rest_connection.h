@@ -523,6 +523,13 @@ public:
         Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    Handle patchCamera(
+        const nx::Uuid& targetServerId,
+        const nx::vms::api::DeviceModelGeneral& devices,
+        nx::vms::common::SessionTokenHelperPtr helper,
+        Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle searchCamera(
         const nx::Uuid& targetServerId,
         const nx::vms::api::DeviceSearch& deviceSearchData,
