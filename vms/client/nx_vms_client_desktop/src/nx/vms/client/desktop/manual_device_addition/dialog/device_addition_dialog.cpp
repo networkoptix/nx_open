@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -23,6 +24,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/system_administration_dialog.h>
@@ -622,8 +624,21 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         m_model->setData(stateIndex.siblingAtColumn(FoundDevicesModel::checkboxColumn),
             Qt::Unchecked, Qt::CheckStateRole);
 
-        connectedServerApi()->addCamera(
-            server->getId(),
+        if (const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(device.id))
+        {
+            api::CameraData data;
+            ec2::fromResourceToApi(camera, data);
+            auto originalDevice = api::DeviceModelGeneral::fromCameraData(std::move(data));
+            originalDevice.url = device.url;
+            originalDevice.credentials = device.credentials;
+            connectedServerApi()->patchCamera(server->getId(),
+                originalDevice,
+                systemContext()->getSessionTokenHelper(),
+                /*callback*/ {});
+            return;
+        }
+
+        connectedServerApi()->addCamera(server->getId(),
             device,
             systemContext()->getSessionTokenHelper(),
             /*callback*/ {});
