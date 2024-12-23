@@ -790,18 +790,42 @@ Handle ServerConnection::addFileDownload(
 Handle ServerConnection::addCamera(
     const nx::Uuid& targetServerId,
     const nx::vms::api::DeviceModelForSearch& device,
-    nx::vms::common::SessionTokenHelperPtr helper,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
     QThread* thread)
 {
     auto request = prepareRequest(nx::network::http::Method::post,
-        prepareUrl(QString("/rest/v3/devices"), {}),
+        prepareUrl(QString("/rest/v4/devices"), {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(device));
 
     proxyRequestUsingServer(request, targetServerId);
 
-    auto wrapper = makeSessionAwareCallback(helper, request, std::move(callback));
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
+
+    auto handle = request.isValid()
+        ? executeRequest(request, std::move(wrapper), thread)
+        : Handle();
+
+    NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
+    return handle;
+}
+
+Handle ServerConnection::patchCamera(
+    const nx::Uuid& targetServerId,
+    const nx::vms::api::DeviceModelGeneral& device,
+    nx::vms::common::SessionTokenHelperPtr tokenHelper,
+    Result<ErrorOrData<nx::vms::api::DeviceModelForSearch>>::type&& callback,
+    QThread* thread)
+{
+    auto request = prepareRequest(nx::network::http::Method::patch,
+        prepareUrl(NX_FMT("/rest/v4/devices/%1", device.id), {}),
+        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        nx::reflect::json::serialize(device));
+
+    proxyRequestUsingServer(request, targetServerId);
+
+    auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
 
     auto handle = request.isValid()
         ? executeRequest(request, std::move(wrapper), thread)
