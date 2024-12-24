@@ -219,12 +219,6 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     if (leftVisibilityScope != rightVisibilityScope)
         return leftVisibilityScope > rightVisibilityScope;
 
-    if (sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId)
-        != sourceRight.data(QnSystemsModel::IsCloudSystemRoleId))
-    {
-        return sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
-    }
-
     const bool leftIsConnectable = sourceLeft.data(QnSystemsModel::IsOnlineRoleId).toBool() &&
         sourceLeft.data(QnSystemsModel::IsCompatibleToDesktopClient).toBool();
     const bool rightIsConnectable = sourceRight.data(QnSystemsModel::IsOnlineRoleId).toBool() &&
@@ -232,6 +226,12 @@ bool SystemsVisibilitySortFilterModel::lessThan(
 
     if (leftIsConnectable != rightIsConnectable)
         return leftIsConnectable;
+
+    const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+    const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
+
+    if (leftIsCloud != rightIsCloud)
+        return leftIsCloud;
 
     const bool leftIsLocalhost = isLocalHost(sourceLeft);
     const bool rightIsLocalhost = isLocalHost(sourceRight);
