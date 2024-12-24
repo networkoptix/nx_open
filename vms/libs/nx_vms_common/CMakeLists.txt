@@ -1,6 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 find_package(Qt6 COMPONENTS ShaderTools)
+find_package(libsrtp REQUIRED)
 
 set(date_time_formatter_root "${open_source_root}/artifacts/date_time_formatter")
 file(GLOB_RECURSE date_time_formatter_sources
@@ -42,6 +43,7 @@ nx_add_target(nx_vms_common LIBRARY
         nx_vms_update
         nx_media_core
         nx_codec
+        libsrtp::libsrtp
     FOLDER common/libs
 )
 nx_make_target_translatable(nx_vms_common COMPONENTS "client" "server" "mobile")

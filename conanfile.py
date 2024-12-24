@@ -182,6 +182,7 @@ class NxOpenConan(ConanFile):
         if self.options.onlyUnrevisionedPackages:
             return
 
+        self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#bcc8c366b4291c68913eabe817fb15c7")
         self.requires("qt/6.8.1" "#139adc221374b629f774118e234ed81e")
