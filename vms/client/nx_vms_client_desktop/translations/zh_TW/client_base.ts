@@ -5166,7 +5166,7 @@ to %1</source>
     </message>
     <message>
       <source>RESTRICTED</source>
-      <translation type="unfinished">RESTRICTED</translation>
+      <translation>受限制的</translation>
     </message>
     <message>
       <source>Authorize</source>
@@ -6391,12 +6391,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>伺服器儲存裝置上沒有太多可用空間. 請注意, 如果所選的檔案是伺服器中最舊的資料, 則可能會在上傳後被刪除.</numerusform>
+        <numerusform>伺服器儲存裝置上沒有太多可用空間。 請注意, 如果所選的檔案是伺服器中最舊的資料，則可能會在上傳後被刪除。</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>您可以新增額外的儲存空間來防止這種情況. 也可以調整錄影保存天數來控制哪些錄影資料會先被刪除.</translation>
+      <translation>您可以新增額外的儲存空間來防止這種情況， 也可以調整錄影保存天數來控制哪些錄影資料會先被刪除。</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
@@ -6404,11 +6404,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>因使用者 &quot;%1&quot; 正在將影像上傳至本攝影機, 因此無法開始上傳.</translation>
+      <translation>因使用者 &quot;%1&quot; 正在將影像上傳至本攝影機, 因此無法開始上傳。</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>因其它使用者正在將影像上傳至本攝影機, 因此無法開始上傳.</translation>
+      <translation>因其它使用者正在將影像上傳至本攝影機, 因此無法開始上傳。</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
@@ -10405,7 +10405,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation>不再支援API版本的插件</translation>
+      <translation>不再支援API版本的擴充套件</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -10421,7 +10421,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation>插件位於黑名單中</translation>
+      <translation>擴充套件位於黑名單中</translation>
     </message>
     <message>
       <source>Status</source>
@@ -10977,7 +10977,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>其它使用者正在將影像上傳到此攝影機.</translation>
+      <translation>其它使用者正在將錄影資料上傳到此攝影機。</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>

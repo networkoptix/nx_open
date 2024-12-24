@@ -795,7 +795,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation>未安裝任何外掛程式</translation>
+      <translation>未安裝任何擴充套件</translation>
     </message>
     <message>
       <source>Server is offline</source>

@@ -1503,11 +1503,11 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>遠端連線token快取的更新間隔（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>遠端連線token快取的等待時間（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Default video codec</source>
