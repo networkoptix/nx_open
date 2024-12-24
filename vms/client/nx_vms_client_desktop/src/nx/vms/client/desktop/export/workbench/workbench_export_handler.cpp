@@ -38,7 +38,6 @@
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -343,12 +342,7 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
             resourceDirectoryBrowser,
             &ResourceDirectoryBrowser::layoutUpdatedFromFile,
             this,
-            [](const QnFileLayoutResourcePtr& layout)
-            {
-                auto systemContext = SystemContext::fromResource(layout);
-                if (NX_ASSERT(systemContext))
-                    systemContext->layoutSnapshotManager()->store(layout);
-            });
+            [](const QnFileLayoutResourcePtr& layout) { layout->storeSnapshot(); });
     }
 
     connect(action(menu::ExportVideoAction), &QAction::triggered, this,
@@ -425,11 +419,8 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             const auto fileName = exportContext.fileName();
             const auto resource = d->ensureResourceIsInPool(fileName, resourcePool());
             if (const auto layout = resource.dynamicCast<LayoutResource>())
-            {
-                auto systemContext = SystemContext::fromResource(layout);
-                if (NX_ASSERT(systemContext))
-                    systemContext->layoutSnapshotManager()->store(layout);
-            }
+                layout->storeSnapshot();
+
             menu()->trigger(menu::ExportFinishedEvent,
                 menu::Parameters().withArgument(
                     Qn::FileNameRole, fileName.completeFileName()));

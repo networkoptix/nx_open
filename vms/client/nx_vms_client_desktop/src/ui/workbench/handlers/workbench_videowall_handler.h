@@ -40,14 +40,6 @@ public:
     explicit QnWorkbenchVideoWallHandler(QObject* parent = 0);
     virtual ~QnWorkbenchVideoWallHandler();
 
-    bool saveReviewLayout(
-        const nx::vms::client::desktop::LayoutResourcePtr& layout,
-        std::function<void(int, ec2::ErrorCode)> callback);
-
-    bool saveReviewLayout(
-        QnWorkbenchLayout* layout,
-        std::function<void(int, ec2::ErrorCode)> callback);
-
     void filterAllowedMediaResources(QnResourceList& resources) const;
     void filterAllowedLayoutItems(const nx::vms::client::desktop::LayoutResourcePtr& layout) const;
 

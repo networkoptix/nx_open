@@ -20,7 +20,6 @@ class BookmarkTagsWatcher;
 class DefaultPasswordCamerasWatcher;
 class DesktopCameraConnectionController;
 class DesktopCameraStubController;
-class LayoutSnapshotManager;
 class LdapStatusWatcher;
 class LocalFileCache;
 class LogsManagementWatcher;
@@ -86,7 +85,6 @@ public:
     NonEditableUsersAndGroups* nonEditableUsersAndGroups() const;
     QnCameraDataManager* cameraDataManager() const;
     VirtualCameraManager* virtualCameraManager() const;
-    LayoutSnapshotManager* layoutSnapshotManager() const;
     ShowreelStateManager* showreelStateManager() const;
     LogsManagementWatcher* logsManagementWatcher() const;
     QnMediaServerStatisticsManager* mediaServerStatisticsManager() const;

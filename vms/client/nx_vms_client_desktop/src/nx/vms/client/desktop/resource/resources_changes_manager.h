@@ -76,7 +76,7 @@ public:
     /* User resource management is handled by UserGroupRequestChain class. */
 
     /** Save Video Wall. */
-    void saveVideoWall(const QnVideoWallResourcePtr& videoWall,
+    bool saveVideoWall(const QnVideoWallResourcePtr& videoWall,
         VideoWallCallbackFunction callback = {});
 
     /** Save Web Page. */

@@ -48,7 +48,6 @@
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
@@ -845,9 +844,7 @@ ActionVisibility SaveLayoutCondition::check(
     if (!NX_ASSERT(systemContext))
         return DisabledAction;
 
-    return systemContext->layoutSnapshotManager()->isSaveable(layout)
-        ? EnabledAction
-        : DisabledAction;
+    return layout->canBeSaved() ? EnabledAction : DisabledAction;
 }
 
 LayoutCountCondition::LayoutCountCondition(int minimalRequiredCount):

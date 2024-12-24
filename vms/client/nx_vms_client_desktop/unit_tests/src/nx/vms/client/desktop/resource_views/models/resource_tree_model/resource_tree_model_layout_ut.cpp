@@ -12,7 +12,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/intercom/utils.h>
 
@@ -236,8 +235,8 @@ TEST_F(ResourceTreeModelTest, DISABLED_layoutModificationMark)
     // When owned layout with certain unique name is added to the resource pool.
     const auto layout = addLayout(kUniqueLayoutName, user->getId());
 
-    // When that layout marked as changed in snapshot manager.
-    layoutSnapshotManager()->markChanged(layout->getId(), true);
+    // When that layout is changed.
+    layout->setLocked(!layout->locked());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     // And that node have modification mark "*".

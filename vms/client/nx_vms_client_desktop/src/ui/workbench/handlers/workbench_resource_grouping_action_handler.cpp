@@ -13,7 +13,6 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/desktop/resource_views/resource_tree_settings.h>
@@ -34,11 +33,7 @@ void saveResources(const QnResourceList& resources)
         resource->savePropertiesAsync();
 
         if (const auto layout = resource.objectCast<LayoutResource>())
-        {
-            const auto layoutSnapshotManager =
-                SystemContext::fromResource(layout)->layoutSnapshotManager();
-            layoutSnapshotManager->save(layout);
-        }
+            layout->saveAsync();
     }
 
     appContext()->sharedMemoryManager()->requestUpdateCloudLayouts();

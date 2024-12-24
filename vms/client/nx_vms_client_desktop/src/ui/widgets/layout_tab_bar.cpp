@@ -22,7 +22,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -138,17 +137,6 @@ QnLayoutTabBar::QnLayoutTabBar(
         &QnLayoutTabBar::at_workbench_layoutsChanged);
     connect(workbench(), &Workbench::currentLayoutChanged, this,
         &QnLayoutTabBar::at_workbench_currentLayoutChanged);
-
-    // Layouts can currently be stored only in the current and cloud layouts contexts.
-    connect(appContext()->currentSystemContext()->layoutSnapshotManager(),
-        &LayoutSnapshotManager::layoutFlagsChanged,
-        this,
-        &QnLayoutTabBar::at_snapshotManager_flagsChanged);
-
-    connect(appContext()->cloudLayoutsSystemContext()->layoutSnapshotManager(),
-        &LayoutSnapshotManager::layoutFlagsChanged,
-        this,
-        &QnLayoutTabBar::at_snapshotManager_flagsChanged);
 
     m_submit = m_update = true;
 }
@@ -269,9 +257,7 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     if (layout->locked())
         return baseName;
 
-    return systemContext->layoutSnapshotManager()->isModified(resource)
-        ? baseName + '*'
-        : baseName;
+    return resource->canBeSaved() ? (baseName + '*') : baseName;
 }
 
 QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
@@ -433,12 +419,40 @@ void QnLayoutTabBar::at_workbench_layoutsChanged()
     if (!m_update)
         return;
 
-    QnWorkbenchLayoutList layouts;
+    QList<QPointer<QnWorkbenchLayout>> layouts;
     for (const auto& layout: workbench()->layouts())
         layouts.push_back(layout.get());
 
-    if (m_layouts == layouts)
+    if (layouts == m_layouts)
         return;
+
+    for (const auto& layout: m_layouts)
+    {
+        if (!layout)
+            continue;
+
+        layout->disconnect(this);
+        layout->resource()->disconnect(this);
+    }
+
+    for (const auto& layout: layouts)
+    {
+        connect(layout, &QnWorkbenchLayout::titleChanged, this,
+            [this, layout]()
+            {
+                updateTabText(layout);
+                updateTabIcon(layout);
+            });
+
+        connect(layout->resource().objectCast<LayoutResource>().get(),
+            &LayoutResource::canBeSavedChanged,
+            this,
+            [this, layout = QPointer(layout)]()
+            {
+                if (layout)
+                    updateTabText(layout);
+            });
+    }
 
     {
         QScopedValueRollback<bool> guard(m_submit, false);
@@ -491,26 +505,10 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged()
     checkInvariants();
 }
 
-void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource)
-{
-    auto layout = resource.dynamicCast<LayoutResource>();
-    updateTabText(workbench()->layout(layout));
-}
-
 void QnLayoutTabBar::tabInserted(int index)
 {
     {
         QScopedValueRollback<bool> guard(m_update, false);
-
-        QnWorkbenchLayout* layout = m_layouts[index];
-        connect(layout,
-            &QnWorkbenchLayout::titleChanged,
-            this,
-            [this, layout]
-            {
-                updateTabText(layout);
-                updateTabIcon(layout);
-            });
 
         // FIXME: #sivanov Investigate if this is needed.
         //if (m_submit)
@@ -526,6 +524,7 @@ void QnLayoutTabBar::tabRemoved(int index)
 {
     {
         QScopedValueRollback<bool> guard(m_update, false);
+
         m_layouts.removeAt(index);
         submitCurrentLayout();
 

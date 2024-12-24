@@ -25,9 +25,6 @@ namespace nx::vms::client::core { class AccessController; }
 
 namespace nx::vms::client::desktop {
 
-class SystemContext;
-class LayoutSnapshotManager;
-
 namespace entity_item_model { class EntityItemModel; }
 namespace entity_resource_tree { class ResourceTreeComposer; };
 
@@ -48,7 +45,6 @@ protected:
     QnResourcePool* resourcePool() const;
     AccessController* accessController() const;
     QnResourceAccessManager* resourceAccessManager() const;
-    LayoutSnapshotManager* layoutSnapshotManager() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;
 
     void setSystemName(const QString& name) const;

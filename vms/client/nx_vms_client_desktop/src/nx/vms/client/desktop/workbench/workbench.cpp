@@ -25,7 +25,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/showreel/showreel_actions_handler.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
@@ -207,8 +206,6 @@ struct Workbench::Private
             if (!systemContext)
                 continue;
 
-            auto snapshotManager = systemContext->layoutSnapshotManager();
-
             // Delete unsaved local layouts.
             if (layout->hasFlags(Qn::local)
                 && !layout->isFile()
@@ -216,9 +213,9 @@ struct Workbench::Private
             {
                 systemContext->resourcePool()->removeResource(layout);
             }
-            else if (snapshotManager->isChanged(layout))
+            else if (layout->isChanged())
             {
-                snapshotManager->restore(layout);
+                layout->restoreFromSnapshot();
             }
         }
     }
@@ -536,11 +533,8 @@ void Workbench::setCurrentLayout(QnWorkbenchLayout* layout)
             {
                 layout::reloadFromFile(resource, password);
                 layout->layoutSynchronizer()->update();
-
-                auto systemContext = SystemContext::fromResource(resource);
-                if (NX_ASSERT(systemContext))
-                    systemContext->layoutSnapshotManager()->store(resource);
-            }
+                resource->storeSnapshot();
+           }
         }
     }
 

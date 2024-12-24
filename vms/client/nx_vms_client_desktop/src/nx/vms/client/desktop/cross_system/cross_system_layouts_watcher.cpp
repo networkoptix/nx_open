@@ -6,7 +6,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -24,12 +23,9 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
     auto processLayouts =
         [cloudLayoutsResourcePool](CloudCrossSystemContext* context, const QString& systemId)
         {
-            const auto snapshotManager = appContext()->cloudLayoutsSystemContext()
-                ->layoutSnapshotManager();
-
             for (const auto& layout: cloudLayoutsResourcePool->getResources<LayoutResource>())
             {
-                const bool wasModifiedByUser = snapshotManager->isModified(layout);
+                const bool wasModifiedByUser = layout->canBeSaved();
                 const auto items = layout->getItems(); //< Iterate over local copy.
                 for (const auto& item: items)
                 {
@@ -44,8 +40,8 @@ CrossSystemLayoutsWatcher::CrossSystemLayoutsWatcher(QObject* parent):
                         }
                     }
                 }
-                if (!wasModifiedByUser && snapshotManager->isModified(layout))
-                    snapshotManager->store(layout);
+                if (!wasModifiedByUser && layout->canBeSaved())
+                    layout->storeSnapshot();
             }
         };
 

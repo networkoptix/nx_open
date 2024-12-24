@@ -2,7 +2,9 @@
 
 #include "cross_system_layout_resource.h"
 
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
+#include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 
 #include "cross_system_layout_data.h"
 
@@ -60,6 +62,14 @@ bool CrossSystemLayoutResource::setProperty(
 LayoutResourcePtr CrossSystemLayoutResource::create() const
 {
     return LayoutResourcePtr(new CrossSystemLayoutResource());
+}
+
+bool CrossSystemLayoutResource::doSaveAsync(SaveLayoutResultFunction callback)
+{
+    const auto thisPtr = toSharedPointer(this);
+    appContext()->cloudLayoutsManager()->saveLayout(thisPtr,
+        [layout = thisPtr, callback](bool success) { callback(success, layout); });
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

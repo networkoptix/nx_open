@@ -24,7 +24,6 @@
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -347,21 +346,21 @@ rest::Handle ResourcesChangesManager::saveServer(
         this);
 }
 
-void ResourcesChangesManager::saveVideoWall(
+bool ResourcesChangesManager::saveVideoWall(
     const QnVideoWallResourcePtr& videoWall,
     VideoWallCallbackFunction callback)
 {
     NX_ASSERT(videoWall);
     if (!videoWall)
-        return;
+        return false;
 
     const auto systemContext = SystemContext::fromResource(videoWall);
     if (!NX_ASSERT(systemContext))
-        return;
+        return false;
 
     auto connection = systemContext->messageBusConnection();
     if (!connection)
-        return;
+        return false;
 
     auto handler =
         [this, videoWall, callback](int /*reqID*/, ec2::ErrorCode errorCode)
@@ -378,7 +377,8 @@ void ResourcesChangesManager::saveVideoWall(
     nx::vms::api::VideowallData apiVideowall;
     ec2::fromResourceToApi(videoWall, apiVideowall);
 
-    connection->getVideowallManager(nx::network::rest::kSystemSession)->save(apiVideowall, handler, this);
+    return connection->getVideowallManager(nx::network::rest::kSystemSession)->save(
+        apiVideowall, handler, this) != 0;
 }
 
 void ResourcesChangesManager::saveWebPage(

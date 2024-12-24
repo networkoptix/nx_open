@@ -23,7 +23,6 @@
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
@@ -85,11 +84,6 @@ ResourceTreeModelTest::AccessController* ResourceTreeModelTest::accessController
 QnResourceAccessManager* ResourceTreeModelTest::resourceAccessManager() const
 {
     return systemContext()->resourceAccessManager();
-}
-
-LayoutSnapshotManager* ResourceTreeModelTest::layoutSnapshotManager() const
- {
-    return systemContext()->layoutSnapshotManager();
 }
 
 QnRuntimeInfoManager* ResourceTreeModelTest::runtimeInfoManager() const

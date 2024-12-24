@@ -29,6 +29,8 @@ protected:
     /** Virtual constructor for cloning. */
     virtual LayoutResourcePtr create() const override;
 
+    virtual bool doSaveAsync(SaveLayoutResultFunction callback) override;
+
 private:
     QString m_customGroupId;
 };

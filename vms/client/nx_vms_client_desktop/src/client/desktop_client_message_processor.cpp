@@ -6,7 +6,6 @@
 #include <nx/vms/api/data/showreel_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_factory.h>
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -50,9 +49,9 @@ void QnDesktopClientMessageProcessor::updateResource(
 
     // Update snapshot early to ensure all indirect access rights are resolved by the time
     // the actual resource is updated.
-    systemContext->layoutSnapshotManager()->update(layout, remoteLayout);
+    layout->updateSnapshot(remoteLayout);
     base_type::updateResource(resource, source);
-    systemContext->layoutSnapshotManager()->store(layout);
+    layout->storeSnapshot();
 }
 
 void QnDesktopClientMessageProcessor::handleTourAddedOrUpdated(

@@ -63,6 +63,24 @@ public:
     nx::vms::api::LayoutData snapshot() const;
     void storeSnapshot();
     void updateSnapshot(const QnLayoutResourcePtr& remoteLayout);
+    void restoreFromSnapshot();
+
+    /**
+     * Initiate saving current layout to the server.
+     * Calls virtual doSaveAsync() to perform actual saving.
+     * @param callback Callback with operation result to be called when the operation finishes.
+     * @return True if asynchronous save is started, or false if it failed to start.
+     */
+    using SaveLayoutResultFunction = std::function<void(
+        bool /*success*/,
+        const LayoutResourcePtr& /*layout*/)>;
+    bool saveAsync(SaveLayoutResultFunction callback = SaveLayoutResultFunction());
+
+    /** Checks whether the layout is changed. */
+    bool isChanged() const;
+
+    /** Checks whether the layout is saveable, changed and not being saved. */
+    bool canBeSaved() const;
 
     /** Allowed time period range. Can be applied e.g for exported layout or for audit trail. */
     QnTimePeriod localRange() const;
@@ -135,6 +153,10 @@ signals:
     void dataChanged(int role);
     void itemDataChanged(const nx::Uuid& id, int role, const QVariant& data);
     void layoutTypeChanged(const LayoutResourcePtr& resource);
+    void canBeSavedChanged(const LayoutResourcePtr& resource);
+    void layoutAboutToBeSaved(const LayoutResourcePtr& resource, QPrivateSignal);
+    void layoutSaved(bool success, const LayoutResourcePtr& resource, QPrivateSignal);
+    void layoutRestored(const LayoutResourcePtr& resource, QPrivateSignal); //< From snapshot.
 
 protected:
     /** Virtual constructor for cloning. */
@@ -142,6 +164,9 @@ protected:
 
     virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
+    virtual void handleLayoutChange();
+
+    virtual bool doSaveAsync(SaveLayoutResultFunction callback);
 
 private:
     /** @return Whether data value was changed. */
@@ -162,6 +187,9 @@ private:
 
     std::atomic<LayoutType> m_layoutType{LayoutType::unknown};
     nx::utils::ScopedConnection m_resourcePoolConnection;
+
+    std::atomic_bool m_changed = false;
+    std::atomic_bool m_beingSaved = false;
 };
 
 } // namespace nx::vms::client::desktop

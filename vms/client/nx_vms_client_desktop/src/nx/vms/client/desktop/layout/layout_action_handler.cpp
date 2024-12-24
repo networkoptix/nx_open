@@ -2,7 +2,10 @@
 
 #include "layout_action_handler.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
+#include <QtCore/QWeakPointer>
 #include <QtGui/QAction>
 
 #include <client/client_globals.h>
@@ -37,7 +40,6 @@
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -75,6 +77,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 
+using namespace std::chrono;
 using namespace nx::vms::common::system_health;
 
 namespace nx::vms::client::desktop {
@@ -155,27 +158,16 @@ bool hasCrossSystemItems(const LayoutResourcePtr& layout)
 
 void saveCloudLayoutRetryCallback(bool success, const LayoutResourcePtr& layout)
 {
-    if (success)
+    if (success || !layout->canBeSaved())
         return;
 
-    auto systemContext = SystemContext::fromResource(layout);
-    if (!NX_ASSERT(systemContext))
-        return;
-
-    auto snapshotManager = systemContext->layoutSnapshotManager();
-    if (!snapshotManager->isSaveable(layout))
-        return;
-
-    QTimer* timer = new QTimer(layout.get());
-    timer->setSingleShot(true);
-    QObject::connect(timer, &QTimer::timeout, timer,
-        [snapshotManager, layout]()
+    const auto kSaveAttemptDelay = 5s;
+    QTimer::singleShot(kSaveAttemptDelay,
+        [layoutWeakPtr = QWeakPointer<LayoutResource>(layout)]()
         {
-            snapshotManager->save(layout, saveCloudLayoutRetryCallback);
+            if (auto layout = layoutWeakPtr.toStrongRef())
+                layout->saveAsync(saveCloudLayoutRetryCallback);
         });
-
-    const std::chrono::milliseconds kSaveAttemptDelay(5000);
-    timer->start(kSaveAttemptDelay);
 };
 
 } // namespace
@@ -373,11 +365,7 @@ void LayoutActionHandler::at_forgetLayoutPasswordAction_triggered()
     workbench()->removeLayout(layout);
 
     layout::reloadFromFile(layout); //< Actually reload the file without a password.
-
-    // Clear "modified" flag from layout.
-    auto systemContext = SystemContext::fromResource(layout);
-    if (NX_ASSERT(systemContext))
-        systemContext->layoutSnapshotManager()->store(layout);
+    layout->storeSnapshot();
 }
 
 void LayoutActionHandler::renameLayout(const LayoutResourcePtr &layout, const QString &newName)
@@ -406,12 +394,12 @@ void LayoutActionHandler::renameLayout(const LayoutResourcePtr &layout, const QS
         removeLayouts(existing);
     }
 
-    bool changed = systemContext->layoutSnapshotManager()->isChanged(layout);
+    const bool changed = layout->isChanged();
 
     layout->setName(newName);
 
     if (!changed)
-        systemContext->layoutSnapshotManager()->save(layout);
+        layout->saveAsync();
 }
 
 void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
@@ -431,8 +419,7 @@ void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
     if (!NX_ASSERT(systemContext))
         return;
 
-    auto snapshotManager = systemContext->layoutSnapshotManager();
-    if (!snapshotManager->isSaveable(layout))
+    if (!layout->canBeSaved())
         return;
 
     if (!ResourceAccessManager::hasPermissions(layout, Qn::SavePermission))
@@ -446,7 +433,7 @@ void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
 
     if (layout->isCrossSystem())
     {
-        snapshotManager->save(layout, saveCloudLayoutRetryCallback);
+        layout->saveAsync(saveCloudLayoutRetryCallback);
         return;
     }
 
@@ -456,29 +443,11 @@ void LayoutActionHandler::saveLayout(const LayoutResourcePtr& layout)
 
     if (confirmLayoutChange(change, layoutOwner))
     {
-        if (layout->isVideoWallReviewLayout())
-        {
-            if (workbenchContext()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
-                nx::utils::guarded(this,
-                    [layout, snapshotManager](int /*reqId*/, ec2::ErrorCode errorCode)
-                    {
-                        snapshotManager->markBeingSaved(layout->getId(), false);
-
-                        if (errorCode == ec2::ErrorCode::ok)
-                            snapshotManager->markChanged(layout->getId(), false);
-                    })))
-            {
-                snapshotManager->markBeingSaved(layout->getId(), true);
-            }
-        }
-        else
-        {
-            snapshotManager->save(layout);
-        }
+        layout->saveAsync();
     }
     else if (revertOnCancel)
     {
-        snapshotManager->restore(layout);
+        layout->restoreFromSnapshot();
     }
 }
 
@@ -588,8 +557,6 @@ void LayoutActionHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
     if (!NX_ASSERT(systemContext))
         return;
 
-    auto snapshotManager = systemContext->layoutSnapshotManager();
-
     // Can replace only own or temporary layout.
     const bool canReplaceLayout = isOwnLayout || isTemporaryLayout;
 
@@ -604,10 +571,10 @@ void LayoutActionHandler::saveRemoteLayoutAs(const LayoutResourcePtr& layout)
 
         // If current layout should not be deleted then roll it back
         if (!shouldDelete && !isTemporaryLayout)
-            snapshotManager->restore(layout);
+            layout->restoreFromSnapshot();
     }
 
-    snapshotManager->save(newLayout);
+    newLayout->saveAsync();
 
     const auto radassManager = workbenchContext()->instance<RadassResourceManager>();
     for (auto it = newUuidByOldUuid.begin(); it != newUuidByOldUuid.end(); ++it)
@@ -733,7 +700,7 @@ void LayoutActionHandler::convertLayoutToShared(const LayoutResourcePtr& layout)
         return;
 
     layout->setParentId({});
-    system()->layoutSnapshotManager()->save(layout);
+    layout->saveAsync();
 
     // Re-select the layout in Resource Tree.
     menu()->trigger(menu::SelectNewItemAction, layout);
@@ -1035,7 +1002,7 @@ void LayoutActionHandler::at_newUserLayoutAction_triggered()
     layout->setParentId(user->getId());
     system()->resourcePool()->addResource(layout);
 
-    appContext()->currentSystemContext()->layoutSnapshotManager()->save(layout);
+    layout->saveAsync();
 
     menu()->trigger(menu::OpenInNewTabAction, layout);
 }

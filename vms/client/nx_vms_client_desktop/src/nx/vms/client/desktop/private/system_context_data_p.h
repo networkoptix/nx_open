@@ -8,7 +8,6 @@
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
@@ -46,7 +45,6 @@ struct SystemContext::Private
     std::unique_ptr<StatisticsSender> statisticsSender;
     std::unique_ptr<VirtualCameraManager> virtualCameraManager;
     std::unique_ptr<LocalResourcesInitializer> localResourcesInitializer;
-    std::unique_ptr<LayoutSnapshotManager> layoutSnapshotManager;
     std::unique_ptr<ShowreelStateManager> showreelStateManager;
     std::unique_ptr<LogsManagementWatcher> logsManagementWatcher;
     std::unique_ptr<QnMediaServerStatisticsManager> mediaServerStatisticsManager;

@@ -49,7 +49,6 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -221,11 +220,18 @@ const float defaultReviewAR = 1920.0f / 1080.0f;
 
 const nx::Uuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 
-class QnVideowallReviewLayoutResource: public LayoutResource
+class QnVideowallReviewLayoutResource:
+    public LayoutResource,
+    public QnWorkbenchContextAware
 {
 public:
-    QnVideowallReviewLayoutResource(const QnVideoWallResourcePtr& videowall):
-        LayoutResource()
+    QnVideowallReviewLayoutResource(
+        const QnVideoWallResourcePtr& videowall,
+        QnWorkbenchContext* context)
+        :
+        LayoutResource(),
+        QnWorkbenchContextAware(context),
+        m_videowall(videowall)
     {
         addFlags(Qn::local);
         setName(videowall->getName());
@@ -234,8 +240,51 @@ public:
         setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         setData(Qn::VideoWallResourceRole, QVariant::fromValue(videowall));
 
-        connect(videowall.data(), &QnResource::nameChanged, this, [this](const QnResourcePtr &resource) { setName(resource->getName()); });
+        connect(videowall.data(), &QnResource::nameChanged, this,
+            [this](const QnResourcePtr &resource) { setName(resource->getName()); });
     }
+
+    virtual bool doSaveAsync(SaveLayoutResultFunction callback) override
+    {
+        const auto connection = messageBusConnection();
+        if (!NX_ASSERT(connection))
+            return false;
+
+        const auto thisPtr = toSharedPointer(this);
+        const auto workbenchLayout = workbench()->layout(thisPtr);
+
+        for (const auto workbenchItem: workbenchLayout->items())
+        {
+            const LayoutItemData data = workbenchItem->data();
+            const QnVideoWallItemIndexList indices = getIndices(thisPtr, data);
+            if (indices.isEmpty())
+                continue;
+            const QnVideoWallItemIndex firstIdx = indices.first();
+            NX_ASSERT(firstIdx.videowall() == m_videowall);
+            const QnVideoWallItem item = firstIdx.item();
+            const QSet<int> screenIndices = screensCoveredByItem(item, m_videowall);
+            if (!m_videowall->pcs()->hasItem(item.pcUuid))
+                continue;
+            QnVideoWallPcData pc = m_videowall->pcs()->getItem(item.pcUuid);
+            if (screenIndices.size() < 1)
+                continue;
+            for (int screenIndex: screenIndices)
+                pc.screens[screenIndex].layoutGeometry = data.combinedGeometry.toRect();
+            m_videowall->pcs()->updateItem(pc);
+        }
+
+        return qnResourcesChangesManager->saveVideoWall(m_videowall,
+            [callback, layout = thisPtr](bool success, const QnVideoWallResourcePtr& videowall)
+            {
+                NX_ASSERT(videowall == layout->m_videowall);
+
+                if (callback)
+                    callback(success, layout);
+            });
+    }
+
+private:
+    QnVideoWallResourcePtr m_videowall;
 };
 
 auto offlineItemOnThisPc = []
@@ -254,11 +303,6 @@ QSet<nx::Uuid> layoutResourceIds(const QnLayoutResourcePtr& layout)
     for (const auto& item: layout->getItems())
         result << item.resource.id;
     return result;
-}
-
-LayoutSnapshotManager* snapshotManager()
-{
-    return appContext()->currentSystemContext()->layoutSnapshotManager();
 }
 
 // Main window geometry should have position in physical coordinates and size - in logical.
@@ -563,21 +607,19 @@ void QnWorkbenchVideoWallHandler::resetLayout(
 
     layout->setCellSpacing(0.0);
 
-    const bool needToSave = !layout->isFile()
-        && (layout->hasFlags(Qn::local) || system()->layoutSnapshotManager()->isModified(layout));
-
+    const bool needToSave = !layout->isFile() && layout->canBeSaved();
     if (needToSave)
     {
         auto callback =
-            [this, items](bool success, const LayoutResourcePtr& layout)
+            [this, items, id = layout->getId()](bool success, const LayoutResourcePtr& /*layout*/)
             {
                 if (!success)
                     showFailedToApplyChanges();
                 else
-                    updateItemsLayout(items, layout->getId());
+                    updateItemsLayout(items, id);
                 updateMode();
             };
-        system()->layoutSnapshotManager()->save(layout, callback);
+        layout->saveAsync(callback);
         resourcePropertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
@@ -596,10 +638,10 @@ void QnWorkbenchVideoWallHandler::swapLayouts(
         return;
 
     LayoutResourceList unsavedLayouts;
-    if (firstLayout && (firstLayout->hasFlags(Qn::local) || snapshotManager()->isModified(firstLayout)))
+    if (firstLayout && firstLayout->canBeSaved())
         unsavedLayouts << firstLayout;
 
-    if (secondLayout && (secondLayout->hasFlags(Qn::local) || snapshotManager()->isModified(secondLayout)))
+    if (secondLayout && secondLayout->canBeSaved())
         unsavedLayouts << secondLayout;
 
     auto swap =
@@ -624,10 +666,9 @@ void QnWorkbenchVideoWallHandler::swapLayouts(
 
     if (!unsavedLayouts.isEmpty())
     {
-
         auto callback =
             [this, firstIndex, firstLayout, secondIndex, secondLayout, swap]
-            (bool success, const LayoutResourcePtr& /*layout*/)
+            (bool success, const LayoutResourcePtr& /*layout*/ = {})
             {
                 if (!success)
                     showFailedToApplyChanges();
@@ -637,7 +678,7 @@ void QnWorkbenchVideoWallHandler::swapLayouts(
 
         if (unsavedLayouts.size() == 1)
         {
-            snapshotManager()->save(unsavedLayouts.first(), callback);
+            unsavedLayouts.first()->saveAsync(callback);
         }
         else
         {
@@ -648,7 +689,7 @@ void QnWorkbenchVideoWallHandler::swapLayouts(
             connect(counter, &nx::utils::CounterWithSignal::reachedZero, this,
                 [callback, &bothSuccess, counter]()
                 {
-                    callback(bothSuccess, LayoutResourcePtr());
+                    callback(bothSuccess);
                     counter->deleteLater();
                 });
 
@@ -659,9 +700,8 @@ void QnWorkbenchVideoWallHandler::swapLayouts(
                     counter->decrement();
                 };
             for (const LayoutResourcePtr& layout: unsavedLayouts)
-                snapshotManager()->save(layout, localCallback);
+                layout->saveAsync(localCallback);
         }
-
     }
     else
     {
@@ -1975,7 +2015,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
     }
 
     /* Construct and add a new layout. */
-    LayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall));
+    LayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall, context()));
     layout->setIdUnsafe(nx::Uuid::createUuid());
     if (accessController()->hasPermissions(videoWall, Qn::Permission::VideoWallLayoutPermissions))
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
@@ -3175,59 +3215,6 @@ void QnWorkbenchVideoWallHandler::saveVideowalls(
         saveVideowall(videowall, saveLayout, callback);
 }
 
-bool QnWorkbenchVideoWallHandler::saveReviewLayout(
-    const LayoutResourcePtr& layoutResource,
-    std::function<void(int, ec2::ErrorCode)> callback)
-{
-    return saveReviewLayout(workbench()->layout(layoutResource), callback);
-}
-
-bool QnWorkbenchVideoWallHandler::saveReviewLayout(
-    QnWorkbenchLayout* layout,
-    std::function<void(int, ec2::ErrorCode)> callback)
-{
-    if (!layout)
-        return false;
-
-    auto connection = messageBusConnection();
-    if (!NX_ASSERT(connection))
-        return false;
-
-    auto videoWallManager = connection->getVideowallManager(nx::network::rest::kSystemSession);
-
-    QSet<QnVideoWallResourcePtr> videowalls;
-    for (QnWorkbenchItem* workbenchItem : layout->items())
-    {
-        LayoutItemData data = workbenchItem->data();
-        auto indices = getIndices(layout->resource(), data);
-        if (indices.isEmpty())
-            continue;
-        QnVideoWallItemIndex firstIdx = indices.first();
-        QnVideoWallResourcePtr videowall = firstIdx.videowall();
-        QnVideoWallItem item = firstIdx.item();
-        QSet<int> screenIndices = screensCoveredByItem(item, videowall);
-        if (!videowall->pcs()->hasItem(item.pcUuid))
-            continue;
-        QnVideoWallPcData pc = videowall->pcs()->getItem(item.pcUuid);
-        if (screenIndices.size() < 1)
-            continue;
-        foreach(int screenIndex, screenIndices)
-            pc.screens[screenIndex].layoutGeometry = data.combinedGeometry.toRect();
-        videowall->pcs()->updateItem(pc);
-        videowalls << videowall;
-    }
-
-    // TODO: #sivanov Refactor saving to simplier logic. Sometimes saving is not required.
-    for (const QnVideoWallResourcePtr& videowall: videowalls)
-    {
-        nx::vms::api::VideowallData apiVideowall;
-        ec2::fromResourceToApi(videowall, apiVideowall);
-        videoWallManager->save(apiVideowall, callback, this);
-    }
-
-    return !videowalls.isEmpty();
-}
-
 void QnWorkbenchVideoWallHandler::filterAllowedMediaResources(QnResourceList& resources) const
 {
     const auto isAllowed =
@@ -3649,21 +3636,15 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(
 
     if (reviewLayout)
     {
-        const auto saveLayoutCallback =
-            [id = reviewLayout->getId(), videowall, callback](
-                int /*reqId*/,
-                ec2::ErrorCode errorCode)
+        const auto internalCallback =
+            [callback, videowall](bool success, const LayoutResourcePtr&)
             {
-                snapshotManager()->markBeingSaved(id, false);
-                if (errorCode == ec2::ErrorCode::ok)
-                    snapshotManager()->markChanged(id, false);
-
                 if (callback)
-                    callback(errorCode == ec2::ErrorCode::ok, videowall);
+                    callback(success, videowall);
             };
 
-        if (saveReviewLayout(reviewLayout, saveLayoutCallback))
-            return;
+        if (reviewLayout->saveAsync(internalCallback))
+            return; //< Videowall is already being saved.
     }
 
     qnResourcesChangesManager->saveVideoWall(videowall, callback);

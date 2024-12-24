@@ -6,7 +6,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
+#include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
 #include "resource_tree_model_test_fixture.h"
@@ -552,7 +552,12 @@ TEST_F(ResourceTreeModelTest, DISABLED_videoWallModificationMark)
     // When some video wall screen layout is marked as changed.
     auto videoWallScreensLayouts = resourcePool()->getResourcesByParentId(videoWall->getId());
     ASSERT_FALSE(videoWallScreensLayouts.isEmpty());
-    layoutSnapshotManager()->markChanged(videoWallScreensLayouts.first()->getId(), true);
+
+    const auto firstLayout = videoWallScreensLayouts.first().objectCast<LayoutResource>();
+    ASSERT_FALSE(firstLayout.isNull());
+
+    // Make the layout changed.
+    firstLayout->setLocked(!firstLayout->locked());
 
     // Then exactly one node with corresponding display text appears in the resource tree.
     // And that node have modification mark "*".

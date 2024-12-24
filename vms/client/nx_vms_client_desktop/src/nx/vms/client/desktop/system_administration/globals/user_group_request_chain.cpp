@@ -13,7 +13,6 @@
 #include <nx/utils/scoped_rollback.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -510,7 +509,7 @@ void UserGroupRequestChain::updateLayoutSharing(
         if (!NX_ASSERT(resourceSystemContext))
             continue;
 
-        resourceSystemContext->layoutSnapshotManager()->save(layout);
+        layout->saveAsync();
     }
 }
 

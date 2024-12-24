@@ -20,7 +20,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
@@ -102,10 +101,10 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->cameraDataManager = std::make_unique<QnCameraDataManager>(this);
             d->statisticsSender = std::make_unique<StatisticsSender>(this);
             d->virtualCameraManager = std::make_unique<VirtualCameraManager>(this);
-            // LocalResourcesInitializer must be created before LayoutSnapshotManager to avoid
-            // modifying layouts after they are opened.
+            // TODO: FIXME! #vkutin Investigate whether this affects the new mechanism without
+            // LayoutSnapshotManager. Previously, LocalResourcesInitializer must have been created
+            // before LayoutSnapshotManager to avoid modifying layouts after they are opened.
             d->localResourcesInitializer = std::make_unique<LocalResourcesInitializer>(this);
-            d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
             d->showreelStateManager = std::make_unique<ShowreelStateManager>(this);
             d->logsManagementWatcher = std::make_unique<LogsManagementWatcher>(this);
             d->mediaServerStatisticsManager = std::make_unique<QnMediaServerStatisticsManager>(
@@ -134,7 +133,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             break;
 
         case Mode::cloudLayouts:
-            d->layoutSnapshotManager = std::make_unique<LayoutSnapshotManager>(this);
             break;
 
         case Mode::unitTests:
@@ -211,11 +209,6 @@ QnCameraDataManager* SystemContext::cameraDataManager() const
 VirtualCameraManager* SystemContext::virtualCameraManager() const
 {
     return d->virtualCameraManager.get();
-}
-
-LayoutSnapshotManager* SystemContext::layoutSnapshotManager() const
-{
-    return d->layoutSnapshotManager.get();
 }
 
 ShowreelStateManager* SystemContext::showreelStateManager() const

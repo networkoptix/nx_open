@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QTabBar>
 
 #include <core/resource/resource_fwd.h>
@@ -49,17 +50,15 @@ protected:
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 
-    QString layoutText(QnWorkbenchLayout *layout) const;
-    QIcon layoutIcon(QnWorkbenchLayout *layout) const;
+    QString layoutText(QnWorkbenchLayout* layout) const;
+    QIcon layoutIcon(QnWorkbenchLayout* layout) const;
 
-    void updateTabText(QnWorkbenchLayout *layout);
-    void updateTabIcon(QnWorkbenchLayout *layout);
+    void updateTabText(QnWorkbenchLayout* layout);
+    void updateTabIcon(QnWorkbenchLayout* layout);
 
 private:
     void at_currentChanged(int index);
     void at_tabMoved(int from, int to);
-
-    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
 
     void at_workbench_layoutsChanged();
     void at_workbench_currentLayoutChanged();
@@ -77,7 +76,7 @@ private:
     bool m_update;
 
     /** Tab-to-layout mapping. */
-    QList<QnWorkbenchLayout *> m_layouts;
+    QList<QPointer<QnWorkbenchLayout>> m_layouts;
 
     /** Tab we are trying to close with middle mouse button */
     int m_midClickedTab;

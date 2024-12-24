@@ -6,6 +6,8 @@
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 
+#include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 #include <QtWidgets/QGraphicsWidget>
 
 #include <client/client_runtime_settings.h>
@@ -128,6 +130,16 @@ QnWorkbenchLayout::QnWorkbenchLayout(
             d->icon = calculateIcon();
             emit titleChanged();
         });
+
+    connect(resource.get(), &LayoutResource::layoutAboutToBeSaved, d->synchronizer.get(),
+        [this](const LayoutResourcePtr& layout)
+        {
+            if (NX_ASSERT(QThread::currentThread() == qApp->thread()))
+                submit(layout);
+        }, Qt::DirectConnection);
+
+    connect(resource.get(), &LayoutResource::layoutRestored,
+        d->synchronizer.get(), &QnWorkbenchLayoutSynchronizer::reset);
 
     connect(this, &QnWorkbenchLayout::dataChanged, this,
         [this](int role)

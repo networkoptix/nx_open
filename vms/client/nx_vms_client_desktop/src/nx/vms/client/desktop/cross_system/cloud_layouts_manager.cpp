@@ -30,7 +30,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
-#include <nx/vms/client/desktop/resource/layout_snapshot_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -138,10 +137,10 @@ struct CloudLayoutsManager::Private
                 layoutData.id))
             {
                 layoutsToRemove.remove(existingLayout);
-                if (!systemContext->layoutSnapshotManager()->isChanged(existingLayout))
+                if (!existingLayout->isChanged())
                 {
                     existingLayout->update(layoutData);
-                    systemContext->layoutSnapshotManager()->store(existingLayout);
+                    existingLayout->storeSnapshot();
                 }
             }
             else
