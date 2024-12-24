@@ -45,6 +45,7 @@ public:
     {
         nx::json_rpc::Request request;
         std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
+        bool isSubscription = false;
     };
     Request(
         JsonRpcContext jsonRpcContext,

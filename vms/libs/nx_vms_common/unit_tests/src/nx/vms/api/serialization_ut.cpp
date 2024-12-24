@@ -67,7 +67,19 @@ TEST(IOPortTypes, serialization)
 
 namespace {
 
-const SaveableSettingsBase kDefaultSettingsBase{
+const SettingsBase kDefaultSettingsBase{
+    .cloudAccountName = QString{},
+    .cloudHost = QString{},
+    .lastMergeMasterId = QString{},
+    .lastMergeSlaveId = QString{},
+    .organizationId = nx::Uuid{},
+    .specificFeatures = std::map<QString, int>{},
+    .statisticsReportLastNumber = 0,
+    .statisticsReportLastTime = QString{},
+    .statisticsReportLastVersion = QString{}
+};
+
+const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .defaultExportVideoCodec = QString{"mpeg4"},
     .watermarkSettings = WatermarkSettings{},
     .pixelationSettings = PixelationSettings{},
@@ -179,8 +191,8 @@ const UserSessionSettings kDefaultUserSessionSettings{
     .useSessionLimitForCloud = false
 };
 
-const SaveableSystemSettings kDefaultSystemSettings{
-    kDefaultSettingsBase,
+const SaveableSystemSettings kDefaultSaveableSystemSettings{
+    kDefaultSaveableSettingsBase,
     kDefaultUserSessionSettings,
     /*systemName*/ QString{}};
 
@@ -212,13 +224,14 @@ void checkSystemSettings(
     switch (kind)
     {
         case notReadOnly:
-            QJson::serialize(&context, kDefaultSystemSettings, &qjson);
-            reflect = nx::reflect::json::serialize(kDefaultSystemSettings);
+            QJson::serialize(&context, kDefaultSaveableSystemSettings, &qjson);
+            reflect = nx::reflect::json::serialize(kDefaultSaveableSystemSettings);
             break;
         case notWriteOnly:
         {
             SystemSettings defaultSettings;
-            static_cast<SaveableSystemSettings&>(defaultSettings) = kDefaultSystemSettings;
+            static_cast<SaveableSystemSettings&>(defaultSettings) = kDefaultSaveableSystemSettings;
+            static_cast<SettingsBase&>(defaultSettings) = kDefaultSettingsBase;
             QJson::serialize(&context, defaultSettings, &qjson);
             reflect = nx::reflect::json::serialize(defaultSettings);
             break;

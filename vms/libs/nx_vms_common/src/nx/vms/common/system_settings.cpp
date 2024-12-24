@@ -2600,7 +2600,17 @@ SystemSettings::Errors SystemSettings::update(const api::SystemSettings& value)
             d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(STRUCT.ITEM); \
         else \
             errors.emplace(api::SystemSettingName::ITEM);
-    BOOST_PP_SEQ_FOR_EACH(VALUE, value, UnsaveableSystemSettings_Fields)
+    BOOST_PP_SEQ_FOR_EACH(VALUE, value, NonBaseUnsaveableSystemSettings_Fields)
+    #undef VALUE
+    #define VALUE(R, STRUCT, ITEM) \
+        if (STRUCT.ITEM) \
+        { \
+            if (d->BOOST_PP_CAT(ITEM, Adaptor)->isValueValid(*STRUCT.ITEM)) \
+                d->BOOST_PP_CAT(ITEM, Adaptor)->setValue(*STRUCT.ITEM); \
+            else \
+                errors.emplace(api::SystemSettingName::ITEM); \
+        }
+    BOOST_PP_SEQ_FOR_EACH(VALUE, value, SettingsBase_Fields)
     #undef VALUE
     return errors;
 }

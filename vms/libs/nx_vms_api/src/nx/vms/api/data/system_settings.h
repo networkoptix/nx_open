@@ -207,15 +207,15 @@ struct SaveableSettingsBase
 
 struct NX_VMS_API SettingsBase
 {
-    QString cloudAccountName;
-    QString cloudHost;
-    QString lastMergeMasterId;
-    QString lastMergeSlaveId;
-    nx::Uuid organizationId;
-    std::map<QString, int> specificFeatures;
-    int statisticsReportLastNumber = 0;
-    QString statisticsReportLastTime;
-    QString statisticsReportLastVersion;
+    std::optional<QString> cloudAccountName;
+    std::optional<QString> cloudHost;
+    std::optional<QString> lastMergeMasterId;
+    std::optional<QString> lastMergeSlaveId;
+    std::optional<nx::Uuid> organizationId;
+    std::optional<std::map<QString, int>> specificFeatures;
+    std::optional<int> statisticsReportLastNumber;
+    std::optional<QString> statisticsReportLastTime;
+    std::optional<QString> statisticsReportLastVersion;
 
     bool operator==(const SettingsBase&) const = default;
 };
@@ -250,7 +250,7 @@ constexpr auto nxReflectVisitAllEnumItems(SiteSettingName*, Visitor&& visitor)
 {
     using Item = nx::reflect::enumeration::Item<SiteSettingName>;
     const auto& itemName = nx::reflect::enumeration::detail::itemName;
-    return visitor(Item{SiteSettingName::none, ""}
+    return visitor(Item{SiteSettingName::none, "*"}
         #ifndef Q_MOC_RUN
             #define VALUE(R, ENUM, ITEM) , Item{ENUM::ITEM, itemName(BOOST_PP_STRINGIZE(ITEM))}
             BOOST_PP_SEQ_FOR_EACH(VALUE, SiteSettingName, SiteSettings_Fields)
@@ -301,9 +301,9 @@ NX_VMS_API nx::reflect::DeserializationResult deserialize(
  */
 struct NX_VMS_API SiteSettings: SaveableSiteSettings, SettingsBase
 {
-    QString cloudId;
-    nx::Uuid localId;
-    bool enabled2fa = false;
+    std::optional<QString> cloudId;
+    std::optional<nx::Uuid> localId;
+    std::optional<bool> enabled2fa;
 
     bool operator==(const SiteSettings&) const = default;
     size_t size() const { return 1u; }
@@ -396,9 +396,9 @@ struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
     SystemSettings(SiteSettings settings):
         SaveableSystemSettings(std::move(settings)),
         SettingsBase(std::move(settings)),
-        cloudSystemID(std::move(settings.cloudId)),
-        localSystemId(std::move(settings.localId)),
-        system2faEnabled(settings.enabled2fa)
+        cloudSystemID(std::move(settings.cloudId).value_or(QString{})),
+        localSystemId(std::move(settings.localId).value_or(nx::Uuid{})),
+        system2faEnabled(settings.enabled2fa.value_or(false))
     {
     }
 
@@ -413,8 +413,8 @@ struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
         return result;
     }
 };
-#define UnsaveableSystemSettings_Fields SettingsBase_Fields \
-    (cloudSystemID)(localSystemId)(system2faEnabled)
+#define NonBaseUnsaveableSystemSettings_Fields (cloudSystemID)(localSystemId)(system2faEnabled)
+#define UnsaveableSystemSettings_Fields SettingsBase_Fields NonBaseUnsaveableSystemSettings_Fields
 #define SystemSettings_Fields SaveableSystemSettings_Fields UnsaveableSystemSettings_Fields
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
