@@ -66,7 +66,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kIconSubs
 NX_DECLARE_COLORIZED_ICON(kSystemIcon, "20x20/Outline/system.svg", kIconSubstitutions)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
-    {QnIcon::Normal, {.primary = "dark10"}}};
+    {QnIcon::Normal, {.primary = "dark16"}}};
 
 NX_DECLARE_COLORIZED_ICON(
     kNotificationPlaceholderIcon, "64x64/Outline/notification.svg", kPlaceholderTheme)

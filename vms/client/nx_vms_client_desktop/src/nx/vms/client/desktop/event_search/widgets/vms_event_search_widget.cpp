@@ -66,7 +66,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kLight16T
 NX_DECLARE_COLORIZED_ICON(kEventRulesIcon, "20x20/Outline/event_rules.svg", kLight16Theme)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
-    {QnIcon::Normal, {.primary = "dark10"}}};
+    {QnIcon::Normal, {.primary = "dark16"}}};
 
 NX_DECLARE_COLORIZED_ICON(
     kEventsPlaceholderIcon, "64x64/Outline/events.svg", kPlaceholderTheme)

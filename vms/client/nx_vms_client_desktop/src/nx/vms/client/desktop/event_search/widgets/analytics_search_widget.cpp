@@ -90,7 +90,7 @@ NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitut
 NX_DECLARE_COLORIZED_ICON(kPluginsIcon, "20x20/Outline/plugins.svg", kThemeSubstitutions)
 
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kNoObjectsTheme = {
-    {QnIcon::Normal, {.primary = "dark10"}}};
+    {QnIcon::Normal, {.primary = "dark16"}}};
 
 NX_DECLARE_COLORIZED_ICON(
     kObjectsPlaceholderIcon, "64x64/Outline/noobjects.svg", kNoObjectsTheme)

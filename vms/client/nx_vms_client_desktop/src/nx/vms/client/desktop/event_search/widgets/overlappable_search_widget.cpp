@@ -13,7 +13,7 @@
 
 namespace {
 nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kPlaceholdeTheme = {
-    {QnIcon::Normal, {.primary = "dark10"}}};
+    {QnIcon::Normal, {.primary = "dark16"}}};
 
 NX_DECLARE_COLORIZED_ICON(kFutureIcon, "64x64/Outline/future.svg", kPlaceholdeTheme)
 

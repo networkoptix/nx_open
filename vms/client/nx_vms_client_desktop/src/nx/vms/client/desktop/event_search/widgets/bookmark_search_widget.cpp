@@ -35,7 +35,7 @@ static constexpr milliseconds kDelayAfterViewUpdate = 1s;
 static constexpr milliseconds kUpdateTimerResolution = 500ms;
 
 core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
-    {QnIcon::Normal, {.primary = "dark10"}}};
+    {QnIcon::Normal, {.primary = "dark16"}}};
 
 NX_DECLARE_COLORIZED_ICON(
     kBookmarkPlaceholderIcon, "64x64/Outline/nobookmarks.svg", kPlaceholderTheme)

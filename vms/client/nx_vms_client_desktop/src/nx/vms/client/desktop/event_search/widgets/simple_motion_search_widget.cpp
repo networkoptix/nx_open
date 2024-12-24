@@ -36,7 +36,7 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kThemeSub
 NX_DECLARE_COLORIZED_ICON(kFrameIcon, "20x20/Outline/frame.svg", kThemeSubstitutions)
 
 core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
-    {QnIcon::Normal, {.primary = "dark10"}}};
+    {QnIcon::Normal, {.primary = "dark16"}}};
 
 NX_DECLARE_COLORIZED_ICON(
     kMotionPlaceholderIcon, "64x64/Outline/motion.svg", kPlaceholderTheme)
