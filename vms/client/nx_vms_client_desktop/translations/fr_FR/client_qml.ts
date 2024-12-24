@@ -1751,7 +1751,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Code d'appairage de l'intégration</translation>
     </message>
   </context>
   <context>
@@ -1843,15 +1843,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Groupe d'autorisations requis</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Voir les autorisations</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Cacher les permissions</translation>
     </message>
   </context>
   <context>
@@ -1889,11 +1889,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Sélectionner des objets</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Tous les objets</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1986,14 +1986,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtrer par</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Sélectionner un attribut</translation>
     </message>
   </context>
   <context>
@@ -2126,11 +2126,11 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Le serveur n'est pas configuré pour la fonctionnalité d'accès à distance</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>L'outil d'accès à distance est actuellement désactivé. Veuillez l'activer ou contacter votre administrateur pour l'activer.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2142,15 +2142,15 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Connecter l'application client %1 à localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Port local</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Une erreur s'est produite</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2162,7 +2162,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>L'accès à distance n'est pas disponible</translation>
     </message>
   </context>
   <context>
@@ -2374,19 +2374,19 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Le site a été suspendu. Pour activer/désactiver l'utilisation de l'intégration pour l'appareil actuel, le site doit être en état actif. Contactez votre partenaire de distribution pour plus de détails</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Le site a été suspendu. Pour activer/désactiver l'utilisation de l'intégration pour certains appareils, le site doit être en état actif. Contactez votre partenaire de distribution pour plus de détails</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Le site a été arrêté. Pour activer cette intégration pour l'appareil actuel, le site doit être actif. Contactez votre partenaire de distribution pour plus de détails</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Le site a été arrêté. Pour activer cette intégration sur certains appareils, le site doit être actif. Contactez votre partenaire de distribution pour plus de détails</translation>
     </message>
   </context>
   <context>
@@ -2469,7 +2469,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Accepter les demandes d’enregistrement d’intégration d’API</translation>
     </message>
   </context>
   <context>
@@ -2666,19 +2666,19 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Aucun site favori</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Aucun site caché</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Vous pouvez ajouter un site aux favoris à partir du menu contextuel</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Vous pouvez masquer des sites de la liste principale à partir du menu contextuel</translation>
     </message>
   </context>
   <context>
@@ -2840,11 +2840,11 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Le site ajouté deviendra rapidement visible pour les utilisateurs disposant d'un compte cloud existant, tandis que les utilisateurs sans compte cloud existant recevront des instructions par e-mail.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Langue des notifications</translation>
     </message>
   </context>
   <context>
@@ -2984,11 +2984,11 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Langue des notifications</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Langue de l'interface</translation>
     </message>
   </context>
   <context>
@@ -3038,7 +3038,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 sélectionné:</translation>
     </message>
     <message>
       <source>Schedule</source>

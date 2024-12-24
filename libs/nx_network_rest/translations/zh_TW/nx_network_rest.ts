@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>連線金鑰對於此站點而言太舊。</translation>
     </message>
   </context>
   <context>

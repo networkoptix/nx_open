@@ -77,15 +77,15 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>每個站點只允許啟用一組Starter授權。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>每個站點僅允許使用一組NVR授權。</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>每個站點僅允許使用一組此類型的授權。</translation>
     </message>
   </context>
 </TS>

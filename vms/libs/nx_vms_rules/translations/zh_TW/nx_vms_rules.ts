@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>如果選擇了bearer身份驗證方式，則應填寫token欄位</translation>
     </message>
   </context>
   <context>

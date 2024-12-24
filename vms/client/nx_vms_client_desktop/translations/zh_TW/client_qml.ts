@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>請在站點管理設定中確認並進行套件設定。</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>此套件沒有在站點(site)層級的設定。</translation>
     </message>
   </context>
   <context>
@@ -1218,7 +1218,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>管理整合套件</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1233,7 +1233,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>此套件沒有在站點(site)層級的設定。</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1441,7 +1441,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>任何 %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1913,7 +1913,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation>未安裝任何外掛程式</translation>
+      <translation>未安裝任何擴充套件</translation>
     </message>
     <message>
       <source>Server is offline</source>

@@ -1608,11 +1608,11 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>遠端連線token快取的更新間隔（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>遠端連線token快取的等待時間（其他伺服器和Cloud）</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1821,11 +1821,11 @@
     </message>
     <message>
       <source>Pixelation settings</source>
-      <translation type="unfinished">Pixelation settings</translation>
+      <translation>像素化設定</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>套用連線限制制Cloud token</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL</translation>
+      <translation>匿名當機報告伺服器 API URL</translation>
     </message>
     <message>
       <source>Default locale for new users</source>
@@ -1841,7 +1841,7 @@
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds)</translation>
+      <translation>檢查VMS伺服器的影像串流權限週期（毫秒）</translation>
     </message>
   </context>
   <context>
