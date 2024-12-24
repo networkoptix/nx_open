@@ -1368,7 +1368,7 @@
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>任何 %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1383,7 +1383,7 @@
     <name>LookupListTableCellDelegate</name>
     <message>
       <source>ANY</source>
-      <translation type="unfinished">ANY</translation>
+      <translation>任何</translation>
     </message>
   </context>
   <context>
@@ -1634,7 +1634,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation>未安裝任何外掛程式</translation>
+      <translation>未安裝任何擴充套件</translation>
     </message>
     <message>
       <source>Server is offline</source>
