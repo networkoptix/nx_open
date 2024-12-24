@@ -200,7 +200,7 @@ QString monospace(const QString& text)
 QString elide(const QString& html, int maxLength, const QString& tail)
 {
     QDomDocument dom;
-    dom.setContent(replaceNewLineToBrTag(html));
+    dom.setContent(mightBeHtml(html) ? html : replaceNewLineToBrTag(html));
     auto root = dom.documentElement();
     elideDomNode(root, maxLength, tail);
     return dom.toString();
