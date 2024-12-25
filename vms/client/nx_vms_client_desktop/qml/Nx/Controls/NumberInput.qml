@@ -164,7 +164,11 @@ FocusScope
                 textField.clear()
         }
 
-        onTextChanged: setValue(text)
+        onTextChanged:
+        {
+            if (acceptableInput || !text) //< Empty text is an undefined value.
+                setValue(text)
+        }
 
         onEditingFinished: control.editingFinished()
 
