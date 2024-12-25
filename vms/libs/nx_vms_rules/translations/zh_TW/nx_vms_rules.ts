@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>提示文字</translation>
     </message>
   </context>
   <context>
@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>事件裝置</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -192,15 +192,15 @@
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>所選的本地佈局只能顯示給其擁有者 %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>所選的使用者均不具有所選佈局的存取權限。</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>部分所選的使用者不具有所選佈局的存取權限。</translation>
     </message>
     <message>
       <source>For</source>
@@ -208,8 +208,8 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>所的裝置已移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -792,23 +792,23 @@
     <message>
       <source>Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
+      <translation>超出供電上限（%1）</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>%1 Poe供電過載</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>目前功耗： %1 瓦</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>耗電量上限： %1 瓦</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>耗電量下限： %1 瓦</translation>
     </message>
   </context>
   <context>
