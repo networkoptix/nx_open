@@ -140,6 +140,16 @@ QString getToolTip(const CameraButtonData& data)
     }
 }
 
+void updateTooltip(CameraButton* button, const QString& tooltip)
+{
+    if (auto twoWayAudioButton = dynamic_cast<TwoWayAudioButton*>(button))
+        twoWayAudioButton->setToolTip(tooltip);
+    else if (auto softTriggerButton = dynamic_cast<SoftwareTriggerButton*>(button))
+        softTriggerButton->setToolTip(tooltip);
+    else
+        NX_ASSERT(false, "Unexpected button type");
+}
+
 AggregatedControllerPtr createController()
 {
     auto result = std::make_unique<core::AggregatedCameraButtonController>();
@@ -282,9 +292,9 @@ void CameraButtonManager::Private::handleButtonAdded(const CameraButtonData& dat
         ? static_cast<CameraButton*>(insertButton<TwoWayAudioButton>(data, container))
         : static_cast<CameraButton*>(insertButton<SoftwareTriggerButton>(data, container));
     button->setIconName(data.iconName);
-    button->setToolTip(getToolTip(data));
     button->setProlonged(data.prolonged());
     button->setEnabled(data.enabled);
+    updateTooltip(button, getToolTip(data));
 
     connect(button, &SoftwareTriggerButton::clicked, q,
         [this, button, id = data.id]()
@@ -367,7 +377,7 @@ void CameraButtonManager::Private::handleButtonChanged(
 
     if (fields.testAnyFlags({Field::checked, Field::iconName, Field::checkedIconName}))
     {
-        button->setToolTip(getToolTip(data));
+        updateTooltip(button, getToolTip(data));
         button->setIconName(data.checked
             ? data.checkedIconName
             : data.iconName);
@@ -385,7 +395,7 @@ void CameraButtonManager::Private::handleButtonChanged(
     if (fields.testFlag(Field::enabled))
     {
         button->setEnabled(data.enabled);
-        button->setToolTip(getToolTip(data));
+        updateTooltip(button, getToolTip(data));
     }
 }
 
