@@ -248,36 +248,37 @@ void registerDeviceBaseHandlers(
     reg("rest/v{2-}/devices/:deviceId/advanced/:id?", GlobalPermission::none,
         std::make_unique<DeviceAdvancedParametersHandler>(serverModule, serverConnector));
 
-    /**%apidoc GET /rest/v{4-}/devices/{deviceId}/io/{port}
-     * Returns current IO state from Device and port.
-     * %caption Get IO State
-     * %ingroup Devices
-     * %struct IoPortData
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Depends on Resource access rights.
-     * %return:{IoStateResponseList} IO state.
-     *
-     **%apidoc GET /rest/v{4-}/devices/{deviceId}/io
-     * Returns current IO states from Device for all ports.
+    /**%apidoc GET /rest/v{4-}/devices/{deviceId}/io
+     * Returns current IO states from Device
      * %caption Get IO States
      * %ingroup Devices
-     * %struct IoPortData
-     *     %param[unused] port
+     * %struct DeviceIoFilter
+     * %param:string deviceId
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
      * %param[ref] _local,_strict
      * %permissions Depends on Resource access rights.
-     * %return:{IoStateResponseList} List of IO states.
+     * %return:{DeviceIoState} IO states from Device.
      *
-     **%apidoc PATCH /rest/v{4-}/devices/%2A/io
+     **%apidoc GET /rest/v{4-}/devices/%2A/io
+     * Returns current IO states from Devices
+     * %caption Get IO States
+     * %ingroup Devices
+     * %struct DeviceIoFilter
+     * %param[opt] deviceId
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _local,_strict
+     * %permissions Depends on Resource access rights.
+     * %return:{DeviceIoStateList} List of IO states.
+     *
+     **%apidoc PATCH /rest/v{4-}/devices/{deviceId}/io
      * Update current IO State of Device.
      * %caption Update IO State
      * %ingroup Devices
-     * %struct IoStateUpdateRequestList
+     * %struct DeviceIoUpdateRequest
      * %param[ref] _local,_strict,_ticket
      * %permissions Depends on Resource access rights.
      */
-    reg("rest/v{4-}/devices/:deviceId/io/:port?",
+    reg("rest/v{4-}/devices/:deviceId/io",
         GlobalPermission::none,
         std::make_unique<DeviceIoHandler>(serverConnector));
 

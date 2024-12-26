@@ -4,9 +4,9 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/json/value_or_array.h>
 
 #include "data_macros.h"
-#include "id_data.h"
 #include "resolution_data.h"
 
 namespace nx::vms::api {
@@ -25,51 +25,44 @@ struct NX_VMS_API ConnectedDevicesRequest
 NX_VMS_API_DECLARE_STRUCT_EX(ConnectedDevicesRequest, (json))
 NX_REFLECTION_INSTRUMENT(ConnectedDevicesRequest, ConnectedDevicesRequest_Fields)
 
-struct NX_VMS_API IoPortData
+struct NX_VMS_API DeviceIoFilter
 {
-    /**%apidoc:string
-     * Device id to get input/output state of the port (can be obtained from "id", "physicalId" or
+    /**%apidoc:stringArray
+     * Device id(s) to get input/output state of the port (can be obtained from "id", "physicalId" or
      * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
-     * cameras).
+     * Devices).
      */
-    nx::Uuid deviceId;
-
-    /**%apidoc Port number. */
-    QString port;
-
-    const IoPortData& getId() const { return *this; }
-    bool operator==(const IoPortData&) const = default;
+    nx::vms::api::json::ValueOrArray<QString> deviceId;
 };
-#define IoPortData_Fields (deviceId)(port)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoPortData, (json))
-NX_REFLECTION_INSTRUMENT(IoPortData, IoPortData_Fields)
+#define DeviceIoFilter_Fields (deviceId)
+NX_VMS_API_DECLARE_STRUCT_EX(DeviceIoFilter, (json))
+NX_REFLECTION_INSTRUMENT(DeviceIoFilter, DeviceIoFilter_Fields)
 
-struct NX_VMS_API IoStateResponse: IoPortData
+struct NX_VMS_API IoPortState
 {
     /**%apidoc Indicates if this input/output is active. */
     bool isActive = false;
 
-    /**%apidoc Timestamp in milliseconds since epoch of last activity on the port. */
+    /**%apidoc Timestamp in milliseconds since epoch when information was received or written to a device. */
     std::chrono::milliseconds timestampMs{};
 
-    bool operator==(const IoStateResponse&) const = default;
+    bool operator==(const IoPortState&) const = default;
 };
-#define IoStateResponse_Fields IoPortData_Fields(isActive)(timestampMs)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoStateResponse, (json))
-NX_REFLECTION_INSTRUMENT(IoStateResponse, IoStateResponse_Fields)
+#define IoPortState_Fields (isActive)(timestampMs)
+NX_VMS_API_DECLARE_STRUCT_EX(IoPortState, (json))
+NX_REFLECTION_INSTRUMENT(IoPortState, IoPortState_Fields)
 
-struct NX_VMS_API IoStateUpdateRequest
+struct NX_VMS_API DeviceIoState
 {
-    /**%apidoc
-     * Device id to set input/output state of the port (can be obtained from "id", "physicalId" or
-     * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
-     * cameras).
-     */
-    QString deviceId;
+    nx::Uuid deviceId;
+    std::map<QString, IoPortState> ports;
+};
+#define DeviceIoState_Fields (deviceId)(ports)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DeviceIoState, (json))
+NX_REFLECTION_INSTRUMENT(DeviceIoState, DeviceIoState_Fields)
 
-    /**%apidoc[opt] Port number. If not specified then default Device port is used. */
-    QString port;
-
+struct NX_VMS_API IoPortUpdateRequest
+{
     /**%apidoc Set this input/output active or not. */
     bool isActive = false;
 
@@ -81,9 +74,27 @@ struct NX_VMS_API IoStateUpdateRequest
      */
     std::optional<ResolutionData> targetLock{};
 };
-#define IoStateUpdateRequest_Fields (deviceId)(port)(isActive)(autoResetTimeoutMs) \
-    (targetLock)
-NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(IoStateUpdateRequest, (json))
-NX_REFLECTION_INSTRUMENT(IoStateUpdateRequest, IoStateUpdateRequest_Fields)
+#define IoPortUpdateRequest_Fields (isActive)(autoResetTimeoutMs)(targetLock)
+NX_VMS_API_DECLARE_STRUCT_EX(IoPortUpdateRequest, (json))
+NX_REFLECTION_INSTRUMENT(IoPortUpdateRequest, IoPortUpdateRequest_Fields)
+
+struct NX_VMS_API DeviceIoUpdateRequest
+{
+    /**%apidoc
+     * Device id to set input/output states of ports (can be obtained from "id", "physicalId" or
+     * "logicalId" field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain
+     * cameras).
+     */
+    QString deviceId;
+
+    /**%apidoc
+     * Port number to command map. If the port number is empty string then a default
+     * Device port is used.
+     */
+    std::map<QString, IoPortUpdateRequest> ports;
+};
+#define DeviceIoUpdateRequest_Fields (deviceId)(ports)
+NX_VMS_API_DECLARE_STRUCT_EX(DeviceIoUpdateRequest, (json))
+NX_REFLECTION_INSTRUMENT(DeviceIoUpdateRequest, DeviceIoUpdateRequest_Fields)
 
 } // namespace nx::vms::api
