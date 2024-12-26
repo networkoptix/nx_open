@@ -30,7 +30,8 @@ NX_REFLECTION_ENUM_CLASS(EngineCapability,
     needUncompressedVideoFrames_bgr = 1 << 6,
     deviceDependent = 1 << 7,
     keepObjectBoundingBoxRotation = 1 << 8,
-    noAutoBestShots = 1 << 9
+    noAutoBestShots = 1 << 9,
+    updateMotionSensitivity = 1 << 10
 )
 Q_DECLARE_FLAGS(EngineCapabilities, EngineCapability)
 

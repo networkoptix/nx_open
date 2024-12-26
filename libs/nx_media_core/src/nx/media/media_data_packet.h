@@ -101,7 +101,11 @@ public:
 
         // Media packet from old archive version that should be BOM decoded before decrpyption
         // This flag can be removed in a 5.3
-        MediaFlags_BomDecoding         = 0x100000
+        MediaFlags_BomDecoding         = 0x100000,
+
+        // Flag indicates that motion sensitivity should be temporary increased in region
+        // where object metadata was recently received.
+        MediaFlags_UpdateMotionSensitivity = 0x200000
     )
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)

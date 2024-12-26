@@ -89,6 +89,7 @@ std::string Engine::manifestString() const
     };
 
     Json::object engineManifest = {
+        {"capabilities", "updateMotionSensitivity"},
         {"streamTypeFilter", "compressedVideo"},
         {"deviceAgentSettingsModel", settingsModel}
     };
