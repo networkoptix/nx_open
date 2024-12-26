@@ -136,6 +136,7 @@ static constexpr char kFfmpegCodecName[] = "ffmpeg";
 static constexpr char kFfmpegMetadataCodecName[] = "ffmpeg-metadata";
 constexpr int const kMetadataChannelNumber = 7;
 constexpr int kNxPayloadType = 102;
+constexpr int kNxMetadataPayloadType = 126;
 constexpr int kNxPayloadTypeFallback = 103; //< Use this type to pass proprietary Nx RTP via single ssrc.
 
 } // namespace nx::rtp

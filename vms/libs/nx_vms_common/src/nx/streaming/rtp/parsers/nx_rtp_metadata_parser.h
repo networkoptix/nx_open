@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/rtp/parsers/rtp_stream_parser.h>
 
 namespace nx::rtp {
@@ -28,6 +29,9 @@ public:
     virtual QnAbstractMediaDataPtr nextData() override;
 
     virtual void clear() override {}
+
+private:
+    QByteArray m_rangeHeader;
 };
 
 using NxRtpMetadataParserPtr = QSharedPointer<NxRtpMetadataParser>;

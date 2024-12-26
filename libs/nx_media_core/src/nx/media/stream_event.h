@@ -20,6 +20,7 @@ enum class StreamEvent
     cannotDecryptMedia,
     incompatibleCodec,
     cameraNotReady,
+    archiveRangeChanged,
 };
 
 template<typename Visitor>

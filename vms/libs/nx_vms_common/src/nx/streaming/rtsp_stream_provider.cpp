@@ -885,14 +885,16 @@ void RtspStreamProvider::registerPredefinedTrack(int rtpChannelNumber)
     auto codecParser = channelNumber == nx::rtp::kMetadataChannelNumber
         ? createParser("FFMPEG-METADATA")
         : createParser("FFMPEG");
+    const int payloadType = channelNumber == nx::rtp::kMetadataChannelNumber
+        ? nx::rtp::kNxMetadataPayloadType
+        : nx::rtp::kNxPayloadType;
 
     TrackInfo trackInfo;
     trackInfo.rtpParsers.emplace(
-        nx::rtp::kNxPayloadType,
-        std::make_unique<nx::rtp::RtpParser>(nx::rtp::kNxPayloadType, std::move(codecParser)));
+        payloadType, std::make_unique<nx::rtp::RtpParser>(payloadType, std::move(codecParser)));
 
         if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
-            m_trackIndices[channelNumber] = rtpChannelNumber;
+            m_trackIndices[rtpChannelNumber] = channelNumber;
 
         NX_MUTEX_LOCKER lock(&m_tracksMutex);
         m_tracks.resize(std::max(m_tracks.size(), size_t(channelNumber + 1)));
