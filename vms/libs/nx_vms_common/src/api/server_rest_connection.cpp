@@ -795,7 +795,7 @@ Handle ServerConnection::addCamera(
     QThread* thread)
 {
     auto request = prepareRequest(nx::network::http::Method::post,
-        prepareUrl(QString("/rest/v4/devices"), {}),
+        prepareUrl(QString("/rest/v3/devices"), {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(device));
 
@@ -819,7 +819,7 @@ Handle ServerConnection::patchCamera(
     QThread* thread)
 {
     auto request = prepareRequest(nx::network::http::Method::patch,
-        prepareUrl(NX_FMT("/rest/v4/devices/%1", device.id), {}),
+        prepareUrl(NX_FMT("/rest/v3/devices/%1", device.id), {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(device));
 
