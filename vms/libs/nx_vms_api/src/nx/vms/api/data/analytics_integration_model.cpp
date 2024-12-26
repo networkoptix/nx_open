@@ -13,6 +13,15 @@ const QString kPluginManifestProperty("pluginManifest");
 const QString kIntegrationTypeProperty("integrationType");
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CommonInfo, (json), nx_vms_api_analytics_CommonInfo_Fields);
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    SdkIntegrationInfo, (json), nx_vms_api_analytics_SdkIntegrationInfo_Fields);
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    ApiIntegrationInfo, (json), nx_vms_api_analytics_ApiIntegrationInfo_Fields);
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     IntegrationModel, (json), nx_vms_api_analytics_IntegrationModel_Fields);
 
 } // namespace nx::vms::api::analytics
