@@ -150,8 +150,35 @@ QString updatePayloadType(const QString& line, int payloadType)
     return result;
 }
 
-QList<QString> getSdpAttributesFromContext(AVFormatContext* fmt, int payloadType)
+void fixProfileConstraints(QString& properties)
 {
+    // Check if base or main profile and no constraint flags -> set them(for Safari WebRTC
+    // playback).
+    // #: Convert string like: profile-level-id=420033 to profile-level-id=42C033.
+    const QString profile = "profile-level-id=";
+    auto index = properties.indexOf(profile);
+    if (index != -1)
+    {
+        index = index + profile.length();
+        if (properties.size() < index + 3)
+            return;
+
+        bool status = false;
+        int idc = properties.mid(index, 2).toInt(&status, 16);
+        if (!status)
+            return;
+
+        if (idc == 66 || idc == 77) //< Base or main profile.
+            properties[index + 2] = QChar('C');
+    }
+}
+
+QList<QString> getSdpAttributesFromContext(AVFormatContext* fmt, int payloadType, bool webRtcMode)
+{
+    AVCodecParameters* codecpar = nullptr;
+    if (fmt && fmt->streams[0] && fmt->streams[0]->codecpar)
+        codecpar = fmt->streams[0]->codecpar;
+
     static const int kMaxSdpSize = 1024*16;
     char buffer[kMaxSdpSize];
     memset(buffer, 0, sizeof(buffer));
@@ -159,24 +186,32 @@ QList<QString> getSdpAttributesFromContext(AVFormatContext* fmt, int payloadType
     av_sdp_create(&fmt, 1, buffer, sizeof(buffer));
     QList<QString> lines = QString(buffer).split("\r\n");
     QList<QString> result;
-    for (const auto& line: lines)
+    for (auto& line: lines)
     {
         if (line.startsWith("a=rtpmap") ||
             line.startsWith("a=fmtp") ||
             line.startsWith("a=framesize"))
         {
+            bool isH264 = codecpar && codecpar->codec_id == AV_CODEC_ID_H264;
+            if (webRtcMode && isH264 && line.startsWith("a=fmtp"))
+            {
+                fixProfileConstraints(line);
+                line.append("; level-asymmetry-allowed=1");
+            }
+
             result.push_back(updatePayloadType(line, payloadType));
         }
     }
-    if (fmt && fmt->streams[0] && fmt->streams[0]->codecpar->codec_id == AV_CODEC_ID_MJPEG)
+    if (codecpar && codecpar->codec_id == AV_CODEC_ID_MJPEG)
     {
         result.push_back(nx::format("a=framesize:%1 %2-%3").args(
-            payloadType, fmt->streams[0]->codecpar->width, fmt->streams[0]->codecpar->height));
+            payloadType, codecpar->width, codecpar->height));
     }
     return result;
 }
 
-QList<QString> getSdpAttributesFromMedia(QnConstAbstractMediaDataPtr media, int payloadType)
+QList<QString> getSdpAttributesFromMedia(
+    QnConstAbstractMediaDataPtr media, int payloadType, bool webRtcMode)
 {
     if (!media->context)
         return QList<QString>();
@@ -199,7 +234,7 @@ QList<QString> getSdpAttributesFromMedia(QnConstAbstractMediaDataPtr media, int 
     avcodec_parameters_copy(stream.codecpar, media->context->getAvCodecParameters());
     streams[0] = &stream;
     ctx.streams = streams;
-    QList<QString> sdp = getSdpAttributesFromContext(&ctx, payloadType);
+    QList<QString> sdp = getSdpAttributesFromContext(&ctx, payloadType, webRtcMode);
     avcodec_parameters_free(&stream.codecpar);
     avformat_free_context(fmt);
     return sdp;
@@ -228,7 +263,7 @@ void QnUniversalRtpEncoder::buildSdp(
             : m_transcoder.getAudioCodecParameters());
 
         m_sdpAttributes = getSdpAttributesFromContext(
-            m_transcoder.getFormatContext(), m_payloadType);
+            m_transcoder.getFormatContext(), m_payloadType, m_config.webRtcMode);
     }
     else
     {
@@ -238,9 +273,15 @@ void QnUniversalRtpEncoder::buildSdp(
             std::swap(highPayloadType, lowPayloadType);
 
         if (mediaHigh)
-            m_sdpAttributes.append(getSdpAttributesFromMedia(mediaHigh, highPayloadType));
+        {
+            m_sdpAttributes.append(
+                getSdpAttributesFromMedia(mediaHigh, highPayloadType, m_config.webRtcMode));
+        }
         if (mediaLow)
-            m_sdpAttributes.append(getSdpAttributesFromMedia(mediaLow, lowPayloadType));
+        {
+            m_sdpAttributes.append(
+                getSdpAttributesFromMedia(mediaLow, lowPayloadType, m_config.webRtcMode));
+        }
         m_useSecondaryPayloadType = true;
     }
 }

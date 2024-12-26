@@ -25,6 +25,7 @@ public:
         bool useRealTimeOptimization = false;
         bool useMultipleSdpPayloadTypes = false;
         bool useRtcpNack = false;
+        bool webRtcMode = false;
         QnFfmpegTranscoder::Config transcoderConfig;
     };
 
