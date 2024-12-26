@@ -821,9 +821,24 @@ void AsyncClient::onMessageReceived(Message message)
         return;
     }
 
+    std::string responseText;
+    if (logTraffic())
+    {
+        responseText = m_response.response->toString();
+    }
+    else
+    {
+        responseText = m_response.response->statusLine.toString();
+        if (!isSuccessCode(m_response.response->statusLine.statusCode) &&
+            m_response.response->messageBody.size() > 0)
+        {
+            responseText += ", body: " + m_response.response->messageBody.toString();
+        }
+    }
+
     NX_VERBOSE(this, "Response headers from %1 has been successfully read: %2",
         m_contentLocationUrl,
-        nx::utils::trim(logTraffic() ? response()->toString() : response()->statusLine.toString(), "\r\n"));
+        nx::utils::trim(responseText, "\r\n"));
 
     if (repeatRequestIfNeeded(*m_response.response))
         return;
