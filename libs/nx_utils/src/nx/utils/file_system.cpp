@@ -26,34 +26,46 @@
 
 #include <nx/utils/log/log.h>
 
-namespace {
-
-#ifdef Q_OS_MAC
-
-QString fromCFStringToQString(CFStringRef str)
-{
-    if (!str)
-        return QString();
-
-    CFIndex length = CFStringGetLength(str);
-    if (length == 0)
-        return QString();
-
-    QString string((int) length, Qt::Uninitialized);
-    CFStringGetCharacters(str, CFRangeMake(0, length), reinterpret_cast<UniChar *>
-        (const_cast<QChar *>(string.unicode())));
-    return string;
-}
-
-#endif
-
-} // namespace
-
 namespace nx {
 namespace utils {
 namespace file_system {
 
 nx::log::Tag kLogTag{QString{"FileSystemUtils"}};
+
+/**
+ * QDir::rename might fail if the target path is on a different volume, especially on Windows.
+ * In such cases this function will copy the source pathto the target path and then remove source.
+ */
+static Result moveWithFallback(const QString& sourcePath, const QString& targetPath, bool replaceExisting)
+{
+    const auto result = QDir().rename(sourcePath, targetPath);
+    if (result)
+    {
+        NX_VERBOSE(
+            kLogTag, "%1: Qt successfully renamed %2 to %3",
+            __func__, sourcePath, targetPath);
+        return Result::ok;
+    }
+
+    NX_DEBUG(
+        kLogTag, "%1: Qt failed to rename %2 to %3. Trying to copy and remove",
+        __func__, sourcePath, targetPath);
+    const auto copyOptions = CreateTargetPath | (replaceExisting ? OverwriteExisting : NoOption);
+    if (!file_system::copy(sourcePath, targetPath, copyOptions))
+    {
+        NX_DEBUG(
+            kLogTag, "%1: Failed to copy %2 to %3",
+            __func__, sourcePath, targetPath);
+        return Result::cannotMove;
+    }
+
+    if (!QFile::remove(sourcePath))
+        NX_DEBUG(kLogTag, "%1: Failed to remove %2", __func__, sourcePath);
+    else
+        NX_VERBOSE(kLogTag, "%1: Successfully removed %2", __func__, sourcePath);
+
+    return Result::ok;
+}
 
 static Result moveToExisting(
     const QString& sourcePath, const QString& targetPath, bool replaceExisting)
@@ -69,7 +81,7 @@ static Result moveToExisting(
         NX_VERBOSE(kLogTag, "%1: tgt file path %2 exists", __func__, targetFilePath);
         if (replaceExisting)
         {
-            if (!QFile::remove(targetFilePath))
+            if (!QDir().remove(targetFilePath))
             {
                 NX_VERBOSE(
                     kLogTag, "%1: ReplaceExisting is true but removing %2 failed",
@@ -77,7 +89,7 @@ static Result moveToExisting(
                 return Result::cannotMove;
             }
 
-            if (QFile::rename(sourcePath, targetFilePath))
+            if (moveWithFallback(sourcePath, targetFilePath, replaceExisting))
             {
                 NX_VERBOSE(
                     kLogTag, "%1: Sucessfully renamed %2 to %3",
@@ -97,7 +109,7 @@ static Result moveToExisting(
         return Result::alreadyExists;
     }
 
-    if (QFile::rename(sourcePath, targetFilePath))
+    if (moveWithFallback(sourcePath, targetFilePath, replaceExisting))
     {
         NX_VERBOSE(
             kLogTag, "%1: Target path does not exists. Sucessfully renamed %2 to %3",
@@ -121,7 +133,7 @@ static Result moveIfTargetDoesNotExist(const QString& sourcePath, const QString&
         __func__, sourcePath, targetPath, targetParentDir);
     if (targetParentDir.exists())
     {
-        if (QFile::rename(sourcePath, targetPath))
+        if (moveWithFallback(sourcePath, targetPath, true))
         {
             NX_VERBOSE(
                 kLogTag, "%1: Rename %2 to %3 succeeded",
@@ -165,7 +177,7 @@ Result move(const QString& sourcePath, const QString& targetPath, bool replaceEx
             NX_VERBOSE(kLogTag, "%1: Tgt %2 is existing file", __func__, targetPath);
             if (replaceExisting)
             {
-                if (!QFile::remove(tgtFileInfo.absoluteFilePath()))
+                if (!QDir().remove(tgtFileInfo.absoluteFilePath()))
                 {
                     NX_DEBUG(
                         kLogTag, "%1: ReplaceExisting is true but removing of %2 failed",
@@ -173,7 +185,7 @@ Result move(const QString& sourcePath, const QString& targetPath, bool replaceEx
                     return Result::cannotMove;
                 }
 
-                if (QFile::rename(sourcePath, targetPath))
+                if (moveWithFallback(sourcePath, targetPath, replaceExisting))
                 {
                     NX_VERBOSE(
                         kLogTag, "%1: Successfully renamed %2 to %3",
