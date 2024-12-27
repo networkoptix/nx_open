@@ -63,6 +63,9 @@ struct NX_VMS_API RuntimeData
     /**%apidoc Time point in milliseconds since epoch when the tiers violation grace period ends. */
     std::chrono::milliseconds tierGracePeriodExpirationDateMs{0};
 
+    /**%apidoc:uuidArray */
+    QSet<nx::Uuid> activeIntegrations;
+
     /**
     * This operator must not be replaced with reflection implementation as it skips brand and
     * customization checking.
@@ -91,7 +94,8 @@ struct NX_VMS_API RuntimeData
     (activeAnalyticsEngines) \
     (prematureVideoWallLicenseExpirationDate) \
     (parentServerId) \
-    (tierGracePeriodExpirationDateMs)
+    (tierGracePeriodExpirationDateMs) \
+    (activeIntegrations)
 NX_VMS_API_DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))
 NX_REFLECTION_INSTRUMENT(RuntimeData, RuntimeData_Fields)
 

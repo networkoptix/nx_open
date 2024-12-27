@@ -2566,7 +2566,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/engines/:id/settings",
         GlobalPermission::powerUser,
-        std::make_unique<AnalyticsEngineSettingsHandler>(serverModule->systemContext()));
+        std::make_unique<AnalyticsEngineSettingsHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/analytics/engines/{engineId}/deviceAgents
      * Retrieves the current state of Device Agents.
@@ -2597,7 +2597,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      */
     reg("rest/v{4-}/analytics/engines/:engineId/deviceAgents/:id?",
         GlobalPermission::powerUser,
-        std::make_unique<DeviceAgentHandler>(serverModule->systemContext()));
+        std::make_unique<DeviceAgentManagementHandler>(serverModule->systemContext()));
 
     /**%apidoc GET /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/settings
      * Get settings values of the specified DeviceAgent
