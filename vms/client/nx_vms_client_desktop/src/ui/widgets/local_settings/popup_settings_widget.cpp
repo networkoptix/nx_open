@@ -218,7 +218,23 @@ void QnPopupSettingsWidget::applyChanges()
 
 bool QnPopupSettingsWidget::hasChanges() const
 {
-    return appContext()->localSettings()->popupSystemHealth() != storedSystemHealth()
+    auto supportedLocalSystemHealthMessages =
+        [this]()
+        {
+            std::set<nx::vms::common::system_health::MessageType> result;
+
+            const std::set<nx::vms::common::system_health::MessageType> supported =
+                supportedMessageTypes(systemContext());
+            const std::set<nx::vms::common::system_health::MessageType> existing =
+                appContext()->localSettings()->popupSystemHealth();
+
+            std::set_intersection(
+                supported.begin(), supported.end(), existing.begin(), existing.end(),
+                std::inserter(result, result.begin()));
+            return result;
+        };
+
+    return supportedLocalSystemHealthMessages() != storedSystemHealth()
         || (m_currentUser && userWatchedEvents(m_currentUser) != watchedEvents());
 }
 
