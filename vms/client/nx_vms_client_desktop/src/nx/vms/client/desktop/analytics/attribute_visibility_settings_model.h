@@ -4,13 +4,15 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <nx/utils/scoped_model_operations.h>
+
 Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/attribute_display_manager.h")
 
 namespace nx::vms::client::desktop::analytics::taxonomy {
 
 class AttributeDisplayManager;
 
-class AttributeVisibilitySettingsModel: public QAbstractListModel
+class AttributeVisibilitySettingsModel: public ScopedModelOperations<QAbstractListModel>
 {
     Q_OBJECT
     Q_PROPERTY(nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager*

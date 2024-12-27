@@ -127,7 +127,7 @@ bool AttributeVisibilitySettingsModel::dropMimeData(
     QDataStream stream(&encodedData, QIODevice::ReadOnly);
     stream >> rowFrom;
     if (rowFrom == rowTo)
-        return true;
+        return false;
 
     const int destinationRow = rowTo + (rowFrom < rowTo ? 1 : 0);
 
@@ -136,11 +136,10 @@ bool AttributeVisibilitySettingsModel::dropMimeData(
 
     {
         QScopedValueRollback<bool> guard(m_movingRows, true);
+        ScopedMoveRows moveRows(this, rowFrom, rowFrom, destinationRow);
 
-        beginMoveRows({}, rowFrom, rowFrom, {}, destinationRow);
         m_attributes.move(rowFrom, rowTo);
         m_attributeManager->placeAttributeBefore(attribute, destinationAttribute);
-        endMoveRows();
     }
 
     return true;
