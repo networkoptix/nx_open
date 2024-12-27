@@ -71,6 +71,13 @@ public:
     /** Sets parameters for the item with the specified identifier. */
     Q_INVOKABLE Error setItemParams(const QUuid& itemId, const ItemParams& params);
 
+    /**
+     * Sets the maximized item.
+     * @param itemId Id of the item to maximize. If empty, any currently maximized item will be
+     *     returned to its normal state.
+     */
+    Q_INVOKABLE Error setMaximizedItem(const QString& itemId);
+
     /** Removes the item with the specified identifier. */
     Q_INVOKABLE Error removeItem(const QUuid& itemId);
 

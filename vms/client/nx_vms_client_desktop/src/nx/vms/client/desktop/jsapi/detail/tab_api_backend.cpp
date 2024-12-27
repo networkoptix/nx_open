@@ -69,6 +69,12 @@ Error cantFindItemResult()
         "Cannot find an item with the specified ID"));
 }
 
+Error cantFindWidgetResult()
+{
+    return Error::failed(TabApiBackend::tr(
+        "Cannot find a widget corresponding to the specified item"));
+}
+
 } // namespace
 
 struct TabApiBackend::Private: public QObject
@@ -782,6 +788,32 @@ Error TabApiBackend::setItemParams(
     return Error::success();
 }
 
+Error TabApiBackend::setMaximizedItem(const QString& itemId)
+{
+    if (!NX_ASSERT(d->layout))
+        return Error::failed();
+
+    const auto menu = d->context->menu();
+
+    if (itemId.isEmpty())
+    {
+        menu->triggerForced(menu::UnmaximizeItemAction);
+        return Error::success();
+    }
+
+    const auto item = d->layout->item(QUuid{itemId});
+    if (!item)
+        return cantFindItemResult();
+
+    const auto widget = d->context->workbenchContext()->display()->widget(item);
+    if (!widget)
+        return cantFindWidgetResult();
+
+    return menu->triggerIfPossible(menu::MaximizeItemAction, widget)
+        ? Error::success()
+        : Error::failed(tr("Cannot maximize the item"));
+}
+
 Error TabApiBackend::removeItem(const QUuid& itemId)
 {
     if (!NX_ASSERT(d->layout))
@@ -809,7 +841,7 @@ Error TabApiBackend::syncWith(const QUuid& itemId)
 
     const auto widget = d->context->workbenchContext()->display()->widget(item);
     if (!widget)
-        return Error::failed(tr("Cannot find a widget corresponding to the specified item."));
+        return cantFindWidgetResult();
 
     auto streamSynchronizer = d->context->workbench()->windowContext()->streamSynchronizer();
     streamSynchronizer->setState(widget, /*useWidgetPausedState*/true);

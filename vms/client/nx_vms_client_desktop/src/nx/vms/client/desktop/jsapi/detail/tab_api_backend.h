@@ -45,6 +45,7 @@ public:
         const QUuid& itemId,
         const ItemParams& params);
 
+    Error setMaximizedItem(const QString& itemId);
     Error removeItem(const QUuid& itemId);
     Error syncWith(const QUuid& itemId);
     Error stopSyncPlay();

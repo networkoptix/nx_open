@@ -58,6 +58,11 @@ Error Tab::setItemParams(const QUuid& itemId, const ItemParams& params)
     return ensureSupported() ? d->setItemParams(itemId, params) : Error{};
 }
 
+Error Tab::setMaximizedItem(const QString& itemId)
+{
+    return ensureSupported() ? d->setMaximizedItem(itemId) : Error{};
+}
+
 Error Tab::removeItem(const QUuid& itemId)
 {
     return ensureSupported() ? d->removeItem(itemId) : Error{};
