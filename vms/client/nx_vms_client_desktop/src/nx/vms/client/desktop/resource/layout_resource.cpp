@@ -213,7 +213,7 @@ bool LayoutResource::isChanged() const
 
 bool LayoutResource::canBeSaved() const
 {
-    return ((hasFlags(Qn::local) && !isFile()) || m_changed) && !m_beingSaved;
+    return ((hasFlags(Qn::local) && !hasFlags(Qn::exported_layout)) || m_changed) && !m_beingSaved;
 }
 
 // This function itself is thread-safe, but QnWorkbenchLayout's handler of `layoutAboutToBeSaved`
