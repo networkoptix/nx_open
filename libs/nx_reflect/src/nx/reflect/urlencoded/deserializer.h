@@ -72,7 +72,7 @@ std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& 
     if constexpr (reflect::detail::HasFromStdStringV<T>)
         return {T::fromStdString(str), DeserializationResult{}};
 
-    T data;
+    T data = createDefault<T>();
     auto r1 = json::deserialize(str, &data, json::DeserializationFlag::fields);
     if (r1)
         return {std::move(data), std::move(r1)};
@@ -82,7 +82,7 @@ std::tuple<T, DeserializationResult> defaultDeserialize(const std::string_view& 
     if (r2)
         return {std::move(data), std::move(r2)};
 
-    return {T{}, std::move(r1)};
+    return {std::move(data), std::move(r1)};
 }
 
 template<typename T>
@@ -144,10 +144,10 @@ template<typename T>
 std::tuple<T, DeserializationResult> deserialize(
     const std::string_view& str, std::enable_if_t<IsInstrumentedV<T>>* = nullptr)
 {
-    T data;
+    T data = createDefault<T>();
     UrlencodedDeserializer<T> visitor(str, &data);
     nx::reflect::visitAllFields<T>(visitor);
-    return {data, std::move(visitor).result()};
+    return {std::move(data), std::move(visitor).result()};
 }
 
 template<typename T>

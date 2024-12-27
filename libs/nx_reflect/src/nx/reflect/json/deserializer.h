@@ -61,7 +61,6 @@ DeserializationResult deserialize(const DeserializationContext& ctx, Data* data)
 {
     if (!ctx.value.IsObject())
     {
-        *data = Data();
         return {
             false,
             "Object value expected",
@@ -170,7 +169,7 @@ DeserializationResult deserialize(
     DeserializationResult result;
     for (rapidjson::SizeType i = 0; i < ctx.value.Size(); ++i)
     {
-        typename C::value_type element;
+        auto element = createDefault<typename C::value_type>();
         auto deserializationResult =
             deserializeValue(DeserializationContext{ctx.value[i], ctx.flags}, &element);
         if (!deserializationResult.success)
@@ -219,7 +218,7 @@ DeserializationResult deserialize(
     DeserializationResult result;
     for (auto it = ctx.value.MemberBegin(); it != ctx.value.MemberEnd(); ++it)
     {
-        typename C::mapped_type element;
+        auto element = createDefault<typename C::mapped_type>();
         auto deserializationResult =
             deserializeValue(DeserializationContext{it->value, ctx.flags}, &element);
         if (!deserializationResult.success)
@@ -250,7 +249,7 @@ DeserializationResult deserialize(
                 std::string{std::move(keyStd)}, std::move(deserializationResult.fields));
         }
         if constexpr (HasSquareBracketOperatorV<C, decltype(key)>)
-            (*data)[std::move(key)] = std::move(element); //< E.g., std::map
+            data->insert_or_assign(std::move(key), std::move(element)); //< E.g., std::map
         else
             data->emplace(std::move(key), std::move(element)); //< E.g., std::multimap
     }
@@ -463,7 +462,7 @@ private:
                 return deserializationResult;
             }
 
-            data = T();
+            data.emplace(createDefault<T>());
             auto& dataRef = *data;
             auto curDeserializationResult = deserializeValue(
                 DeserializationContext{valueIter->value, ctx.flags}, &dataRef);
@@ -507,7 +506,7 @@ private:
             return {};
         }
 
-        T data;
+        T data = createDefault<T>();
         auto deserializationResult =
             deserializeValue(DeserializationContext{valueIter->value, ctx.flags}, &data);
 
@@ -560,7 +559,6 @@ DeserializationResult deserialize(const DeserializationContext& ctx, T* data)
     }
     catch (const std::exception& e)
     {
-        *data = T();
         return {
             false,
             "Exception during json deserialization: " + std::string(e.what()),
@@ -607,9 +605,9 @@ std::tuple<Data, DeserializationResult> deserialize(
     const std::string_view& json,
     json::DeserializationFlag skipErrors = json::DeserializationFlag::none)
 {
-    Data data;
+    Data data = createDefault<Data>();
     auto result = deserialize<Data>(json, &data, skipErrors);
-    return std::make_tuple(std::move(result.success ? data : Data()), std::move(result));
+    return std::make_tuple(std::move(data), std::move(result));
 }
 
 } // namespace json

@@ -244,7 +244,7 @@ private:
 private:
     StripDefaultSerializationContext* const m_context;
     const Data& m_data;
-    const Data m_default{};
+    const Data m_default = createDefault<Data>();
 };
 
 } // namespace nx::reflect

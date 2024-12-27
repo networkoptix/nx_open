@@ -207,6 +207,15 @@ struct IsInstrumented<T, detail::void_t<decltype(nxReflectVisitAllFields((T*) nu
 template<typename... U>
 constexpr bool IsInstrumentedV = IsInstrumented<U...>::value;
 
+/**
+ * Use friend to this function if your serialization/deserialization entity is not default
+ * constructible. Usage example:
+ * template<typename T>
+ * friend constexpr T nx::reflect::createDefault();
+ */
+template<typename T>
+constexpr T createDefault() { return T{}; }
+
 } // namespace nx::reflect
 
 //-------------------------------------------------------------------------------------------------
