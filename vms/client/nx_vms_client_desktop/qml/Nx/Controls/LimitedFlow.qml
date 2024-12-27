@@ -66,14 +66,13 @@ Flow
     {
         limitedModel.limit = 1
         groupsRepeater.repositioning = true
-        forceLayout()
+
+        if (!increaseLimit())
+            groupsRepeater.repositioning = false
     }
 
-    onPositioningComplete:
+    function increaseLimit()
     {
-        if (!groupsRepeater.repositioning)
-            return
-
         const rowHeight = moreGroupsButton.height + (control.rowLimit > 1 ? control.spacing : 0)
         const errorMargin = control.rowLimit > 1 ? control.spacing * 0.5 : 0
         const yLimit = control.topPadding + control.rowLimit * rowHeight - errorMargin
@@ -83,8 +82,19 @@ Flow
         if (childrenWithinLimit)
         {
             ++limitedModel.limit
-            return
+            return true
         }
+
+        return false
+    }
+
+    onPositioningComplete:
+    {
+        if (!groupsRepeater.repositioning)
+            return
+
+        if (increaseLimit())
+            return
 
         groupsRepeater.repositioning = false
         limitedModel.limit = Math.max(1, limitedModel.limit - 1)
