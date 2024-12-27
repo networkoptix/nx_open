@@ -84,6 +84,17 @@ void Oauth2ClientMock::introspectSession(
         path, session, std::move(completionHandler));
 }
 
+void Oauth2ClientMock::markSessionMfaVerified(
+    const std::string& sessionId, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler)
+{
+    Oauth2ClientMockManager::RequstPath path = {
+        nx::network::http::rest::substituteParameters(api::kOauthSessionPath, {sessionId}),
+        nx::network::http::Method::post};
+    processRequst<std::string, void>(
+        path, sessionId, std::move(handler));
+}
+
+
 void Oauth2ClientMock::internalLogout(
     const std::string&, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>)
 {
@@ -110,7 +121,6 @@ void Oauth2ClientMock::internalGetSession(const std::string&,
 {
     throw std::logic_error("not implemented");
 }
-
 
 void Oauth2ClientMockManager::setResponse(const RequstPath& requestPath, const Response& response)
 {

@@ -3,6 +3,7 @@
 #include "oauth2_client.h"
 
 #include <nx/network/http/rest/http_rest_client.h>
+#include <nx/utils/log/log_main.h>
 
 #include "api/request_paths.h"
 
@@ -89,6 +90,16 @@ void Oauth2Client::introspectSession(
     base_type::template makeAsyncCall<api::GetSessionResponse>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(api::kOauthSessionPath, {session}),
+        {}, // query
+        std::move(handler));
+}
+
+void Oauth2Client::markSessionMfaVerified(
+    const std::string& sessionId, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler)
+{
+    base_type::template makeAsyncCall<void>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(api::kOauthSessionPath, {sessionId}),
         {}, // query
         std::move(handler));
 }

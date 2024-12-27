@@ -10,6 +10,12 @@
 
 #include "api/data.h"
 
+namespace nx::cloud::utils {
+
+class AbstractJwtFetcher;
+
+} // namespace nx::cloud::utils
+
 namespace nx::cloud::oauth2::client {
 
 /**
@@ -51,6 +57,10 @@ public:
         const std::string& session,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, api::GetSessionResponse)>
             completionHandler) = 0;
+
+    virtual void markSessionMfaVerified(
+        const std::string& sessionId,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) = 0;
 
     // TODO: #anekrasov Do we need this?
     virtual void internalClientLogout(
@@ -136,6 +146,10 @@ public:
         const std::string& sessionId,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
             handler) override;
+
+    void markSessionMfaVerified(
+        const std::string& sessionId,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
 };
 
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(

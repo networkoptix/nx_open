@@ -99,6 +99,11 @@ struct AccountData
     /**%apidoc[readonly] Shows if two-factor authentication is required for this account. */
     bool account2faEnabled = false;
 
+    /**%apidoc[readonly] Shows if two-factor authentication key was generated for the account.
+     * Set in crosservice requests only
+     */
+    std::optional<bool> mfaKeyGenerated;
+
     /**%apidoc Maximum authentication session lifetime. */
     std::optional<std::chrono::seconds> authSessionLifetime;
 

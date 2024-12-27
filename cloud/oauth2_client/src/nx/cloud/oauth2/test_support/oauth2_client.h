@@ -94,6 +94,10 @@ public:
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, nx::cloud::db::api::AuthSession)>
             handler) override;
 
+    void markSessionMfaVerified(
+        const std::string& sessionId,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
+
 private:
     template <class Request, class Response, class CompletionHandler>
     void processRequst(
