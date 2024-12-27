@@ -42,7 +42,11 @@ std::string imageFormatFromPath(const std::string& path)
             if (suffix.size() > str.size())
                 return false;
 
-            return std::equal(suffix.rbegin(), suffix.rend(), str.rbegin());
+            return std::equal(suffix.rbegin(), suffix.rend(), str.rbegin(),
+                [](const auto& left, const auto& right)
+                {
+                    return std::tolower(left) == std::tolower(right);
+                });
         };
 
     if (endsWith(path, ".jpg") || endsWith(path, ".jpeg"))
