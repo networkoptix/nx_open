@@ -54,7 +54,7 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation type="unfinished">Maximum decoders count</translation>
+      <translation>最大解碼器數量</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
@@ -696,7 +696,7 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation type="unfinished">Notifications are turned off in the device settings</translation>
+      <translation>裝置設定中的推播通知已關閉</translation>
     </message>
     <message>
       <source>Beta Features</source>
