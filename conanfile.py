@@ -19,6 +19,12 @@ import yaml
 required_conan_version = ">=1.53.0"
 
 
+# Help packages are not required to be built from the same commit.
+VMS_HELP_VERSION = "6.0.0-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+QUICK_START_GUIDE_VERSION = "6.0.0-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+MOBILE_USER_MANUAL_VERSION = "21.2-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+
+
 # Conan does not provide a generator which makes it possible to easily access package folders for
 # packages in both host and build contexts. This is the replacement.
 def generate_conan_package_paths(conanfile):
@@ -68,6 +74,7 @@ class NxOpenConan(ConanFile):
         "customization": "default",
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
+        "mobile_user_manual:format": "pdf",
         "onlyUnrevisionedPackages": False,
     }
 
@@ -79,6 +86,7 @@ class NxOpenConan(ConanFile):
         self.options["customization"].customization = "opensource-meta"
         self.options["vms_help"].customization = "metavms"
         self.options["quick_start_guide"].customization = "metavms"
+        self.options["mobile_user_manual"].customization = "metavms"
 
     def generate(self):
         generate_conan_package_paths(self)
@@ -162,8 +170,6 @@ class NxOpenConan(ConanFile):
     def requirements(self):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
-        self.requires("vms_help/6.0.0")
-        self.requires("quick_start_guide/6.0.0")
 
         if self.options.onlyUnrevisionedPackages:
             return
@@ -218,6 +224,11 @@ class NxOpenConan(ConanFile):
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/7bd15ea" "#d5c087ce33dbf1425b29d6435284d2c7")
+
+        if self.haveDesktopClient:
+            self.requires("vms_help/" + VMS_HELP_VERSION)
+            self.requires("quick_start_guide/" + QUICK_START_GUIDE_VERSION)
+            self.requires("mobile_user_manual/" + MOBILE_USER_MANUAL_VERSION)
 
     def prepare_pkg_config_files(self):
         if self.isLinux:
