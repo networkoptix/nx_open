@@ -60,6 +60,27 @@ struct Storage: ParameterSet
         NX_METRICS_ADD(DataSentByMessageType, dataSentByMessageType, "Amount of sent data in bytes by p2p message type");
     };
     NX_METRICS_ADD(P2pStatisticsData, p2pCounters, "P2p statistics");
+
+    struct Webrtc: ParameterSet
+    {
+        NX_METRICS_ADD(std::atomic_int, totalTcpConnections,
+            "Total count of WebRTC TCP connection");
+        NX_METRICS_ADD(std::atomic_int, totalUdpConnections,
+            "Total count of WebRTC UDP connection");
+        NX_METRICS_ADD(std::atomic_int, totalSrflxConnections,
+            "Total count of WebRTC Srflx connection");
+        NX_METRICS_ADD(std::atomic_int, totalRelayConnections,
+            "Total count of WebRTC Relay connection");
+        NX_METRICS_ADD(std::atomic_int, activeTcpConnections,
+            "Count of active WebRTC TCP connection");
+        NX_METRICS_ADD(std::atomic_int, activeUdpConnections,
+            "Count of active WebRTC UDP connection");
+        NX_METRICS_ADD(std::atomic_int, activeSrflxConnections,
+            "Count of active WebRTC Srflx connection");
+        NX_METRICS_ADD(std::atomic_int, activeRelayConnections,
+            "Count of active WebRTC Relay connection");
+    };
+    NX_METRICS_ADD(Webrtc, webrtc, "WebRTC statistics");
 };
 
 } // namespace nx::metric
