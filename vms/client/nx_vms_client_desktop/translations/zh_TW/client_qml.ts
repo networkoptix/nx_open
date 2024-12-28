@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
-      <translation type="unfinished">At the system level, the user has permissions to:</translation>
+      <translation>在系統層級，使用者有以下權限：</translation>
     </message>
   </context>
   <context>
