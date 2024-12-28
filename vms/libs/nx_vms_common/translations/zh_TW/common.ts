@@ -1308,7 +1308,7 @@
     </message>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation>請聯絡您的通路合作夥伴了解細節。</translation>
+      <translation>請聯絡您的通路夥伴以了解細節。</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
