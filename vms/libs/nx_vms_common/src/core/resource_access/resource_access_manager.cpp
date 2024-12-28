@@ -638,13 +638,16 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const QnResourceAccessSubject& subject, const QnStorageResourcePtr& storage) const
 {
     const auto parentServer = storage->getParentServer();
+    if (hasPowerUserPermissions(subject))
+    {
+        return parentServer
+            ? Qn::ReadWriteSavePermission | Qn::RemovePermission
+            : Qn::ReadWriteSavePermission;
+    }
 
     //< Cloud storage isn't tied to any server and is readable for all.
     if (!parentServer)
         return Qn::ReadPermission;
-
-    if (hasPowerUserPermissions(subject))
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
 
     if (permissions(subject, parentServer).testFlag(Qn::SavePermission))
         return Qn::ReadWriteSavePermission;
