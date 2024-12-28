@@ -1246,7 +1246,8 @@
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation>システムを LDAP サーバーに接続すると、ユーザー管理が容易になります</translation>
+      <translation>システムを LDAP サーバーに接続すると、
+ユーザー管理が容易になります。</translation>
     </message>
     <message>
       <source>Not configured yet</source>
