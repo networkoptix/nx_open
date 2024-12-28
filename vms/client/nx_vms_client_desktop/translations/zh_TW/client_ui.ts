@@ -2503,7 +2503,7 @@
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation>請聯絡您的通路合作夥伴新增服務</translation>
+      <translation>請聯絡您的通路夥伴新增服務</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>

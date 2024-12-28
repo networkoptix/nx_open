@@ -117,11 +117,11 @@
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>事件開炲</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>事件停止</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -189,7 +189,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>已取消</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1154,39 +1154,39 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>連線到站點</translation>
     </message>
     <message>
       <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
+      <translation>佈局分頁</translation>
     </message>
     <message>
       <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
+      <translation>新佈局分頁</translation>
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>歡迎畫面分頁</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
+      <translation>新的歡迎畫面分頁</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>站點管理...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>站點升級...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>清單管理...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>開啟整合</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1195,7 +1195,7 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>開啟於</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1210,7 +1210,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>專用視窗</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1218,7 +1218,7 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>JavaScript API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
@@ -1617,7 +1617,7 @@ License Key: %2</source>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>連線到站點</translation>
     </message>
   </context>
   <context>
@@ -1732,7 +1732,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>在此輸入簡短的站點描述。</translation>
     </message>
   </context>
   <context>
@@ -2176,32 +2176,32 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些裝置已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些攝影機已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些伺服器已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些使用者已從站點移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>這些資源已從站點移除</numerusform>
       </translation>
     </message>
   </context>
@@ -2387,7 +2387,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>站點名稱變更</translation>
     </message>
     <message>
       <source>Site merge</source>
@@ -2395,25 +2395,25 @@ License Key: %2</source>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>伺服器代理連接</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>站點已更新至版本 %1</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2，持續時間： %3，目標： %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>開始時間: %1, 目標: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>使用者IP</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2425,11 +2425,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>裝置IP</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>攝影機 IP</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2953,58 +2953,58 @@ License Key: %2</source>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>從 %1 中斷開站點</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>將站點連接到 %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>目前您的站點與 %1之間沒有連線。</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>請輸入您的帳號密碼以中斷站點與%1的連線。</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>無法中斷站點與 %1的連線</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>站點已停止與%1的連線。</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>從 %1 中斷開站點?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>錄影將停止，所有服務訂閱將被移除</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>將移除站點所有的%1使用者</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>您將從該站點登出。該站點將只能透過區域網路連線</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>站點將僅允許透過區域網路連線。</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>現有資料（站點設定和存檔）將被保留</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -3199,11 +3199,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>站點不支援雙重驗證</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>無法登入站點 &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3316,11 +3316,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>將從備份中還原站點設定, 伺服器應用程式將重新啟動。</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>請輸入您的帳號密碼以從備份還原站點設定</translation>
     </message>
   </context>
   <context>
@@ -3522,7 +3522,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>通知過濾器移至右側面板</translation>
     </message>
   </context>
   <context>
@@ -3581,7 +3581,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>開啟整合</translation>
     </message>
   </context>
   <context>
@@ -3874,7 +3874,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>設定是唯讀的。請聯絡您的站點管理員。程式關閉後所有變更都將遺失。</translation>
     </message>
   </context>
   <context>
@@ -4374,7 +4374,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>移動到專用視窗</translation>
     </message>
   </context>
   <context>
@@ -4789,7 +4789,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+      <translation>此攝影機需要在Cloud網站或 Nx Witness 桌面用戶端的裝置設定中設定登入資訊。</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -6327,15 +6327,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
+      <translation>開發者模式訊息</translation>
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>包含</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>不包含</translation>
     </message>
     <message>
       <source>In</source>
@@ -6388,19 +6388,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>每個站點的伺服器數量</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>每台伺服器的裝置數量</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>佈局上的項目數</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>存檔天數</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -6412,7 +6412,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>跨站點功能</translation>
     </message>
   </context>
   <context>
@@ -6420,17 +6420,17 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>並包含</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>開始</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>事件之前</translation>
     </message>
     <message>
       <source>End</source>
@@ -6440,7 +6440,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>事件之後</translation>
     </message>
   </context>
   <context>
@@ -6611,8 +6611,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>刪除 %n 規格?</numerusform>
       </translation>
     </message>
   </context>
@@ -7132,7 +7132,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>未接來電</translation>
     </message>
   </context>
   <context>
@@ -7240,7 +7240,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>請避免變更這些設定，除非您清楚該變更對效能可能造成的影響</translation>
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
@@ -7263,7 +7263,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>於分頁中開啟佈局</translation>
     </message>
   </context>
   <context>
@@ -7290,7 +7290,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>選擇目標...</translation>
     </message>
   </context>
   <context>
@@ -7309,11 +7309,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>目標資源不存在</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>選取攝影機或佈局...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -7973,27 +7973,27 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>系統已連接到 %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>未能將站點連接到 %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>將站點連接到 %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>將站點連接到 %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>請輸入您的帳戶密碼來將站點連接至 %1</translation>
     </message>
     <message>
       <source>Connect</source>

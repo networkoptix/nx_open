@@ -1395,7 +1395,8 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation>サイトを LDAP サーバーに接続すると、ユーザー管理が容易になります</translation>
+      <translation>サイトを LDAP サーバーに接続すると、
+ユーザー管理が容易になります。</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>

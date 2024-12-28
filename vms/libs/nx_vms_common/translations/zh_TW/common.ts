@@ -183,11 +183,11 @@
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>該群組的成員除了進階瀏覽者群組授予的權限外，還可以控制大部分站點設定，但不允許更改任何與管理員相關的設定，例如刪除或更改自己的群組和權限，也不能建立或編輯其他進階使用者。</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>該群組的成員可以查看即時的站點健康監控資訊和伺服器處理器負載（伺服器監控）。</translation>
     </message>
   </context>
   <context>
@@ -992,7 +992,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>選定的使用者角色均沒有使用者</translation>
     </message>
   </context>
   <context>
@@ -1286,7 +1286,7 @@
     <name>StringsHelper</name>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation>請聯絡您的通路合作夥伴了解細節。</translation>
+      <translation>請聯絡您的通路夥伴以了解細節。</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>

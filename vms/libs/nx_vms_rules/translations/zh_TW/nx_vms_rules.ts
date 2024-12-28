@@ -220,31 +220,31 @@
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>所選的伺服器已被移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>所選的佈局已被移除</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>時間值不能小於零</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>持續時間不能小於零</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>值不能小於%1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>值不能大於%1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -262,7 +262,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>不允許為空白</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -291,7 +291,7 @@
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>未選擇分析事件種類</translation>
     </message>
   </context>
   <context>
@@ -318,7 +318,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>未選擇分析物件種類</translation>
     </message>
   </context>
   <context>
@@ -399,7 +399,7 @@
     <message>
       <source>%1 was disconnected</source>
       <comment>Device name will be substituted</comment>
-      <translation type="unfinished">%1 was disconnected</translation>
+      <translation>%1 已斷線</translation>
     </message>
   </context>
   <context>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <translation>來自%1的通用事件</translation>
     </message>
   </context>
   <context>
@@ -544,7 +544,7 @@
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>如果選擇基本或摘要身份驗證，則應填寫使用者和密碼</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
@@ -555,7 +555,7 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
-      <translation type="unfinished">HTTP Method should be known</translation>
+      <translation>HTTP 方法應是已知的</translation>
     </message>
   </context>
   <context>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
+      <translation>LDAP 同步問題事件</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -1042,7 +1042,7 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>使用者: %1</translation>
     </message>
   </context>
   <context>
@@ -1177,15 +1177,15 @@
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>URL 不能為空白</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>URL必須有效</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>URL不應包含使用者或密碼</translation>
     </message>
   </context>
   <context>

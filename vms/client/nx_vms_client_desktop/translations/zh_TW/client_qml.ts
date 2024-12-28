@@ -939,11 +939,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>在站點層級，群組成員有以下權限：</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>在站點層級，使用者有以下權限：</translation>
     </message>
   </context>
   <context>
@@ -2358,19 +2358,19 @@ Press Alt + Click to follow object</source>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>站點已暫停。站點必須處於活躍狀態才能將此裝置啟用/停用此整合服務。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>站點已暫停。站點必須處於活躍狀態才能將某些裝置啟用/停用此整合服務。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>站點已關閉。站點必須處於活躍狀態才能將此設備啟用此整合服務。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>站點已關閉。站點必須處於活躍狀態才能將某些裝置啟用此整合服務。請聯絡您的通路夥伴以了解詳情。</translation>
     </message>
   </context>
   <context>
