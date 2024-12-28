@@ -16,6 +16,12 @@ import os
 required_conan_version = ">=1.53.0"
 
 
+# Help packages are not required to be built from the same commit.
+VMS_HELP_VERSION = "6.0.0-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+QUICK_START_GUIDE_VERSION = "6.0.0-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+MOBILE_USER_MANUAL_VERSION = "21.2-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+
+
 # Conan does not provide a generator which makes it possible to easily access package folders for
 # packages in both host and build contexts. This is the replacement.
 def generate_conan_package_paths(conanfile):
@@ -174,11 +180,6 @@ class NxOpenConan(ConanFile):
         if not self.options.skipCustomizationPackage:
             self.requires("customization/1.0")  #< Always use the latest revision.
 
-        if self.haveDesktopClient:
-            self.requires("vms_help/6.0.0")
-            self.requires("quick_start_guide/6.0.0")
-            self.requires("mobile_user_manual/21.2")
-
         if self.options.onlyUnrevisionedPackages:
             return
 
@@ -242,6 +243,11 @@ class NxOpenConan(ConanFile):
         if self.haveDesktopClient or self.haveMediaserver:
             if not self.isEdge1:
                 self.requires("flite/2.2" "#069d57cbc32aa09dcbae1c79e94e48ef")
+
+        if self.haveDesktopClient:
+            self.requires("vms_help/" + VMS_HELP_VERSION)
+            self.requires("quick_start_guide/" + QUICK_START_GUIDE_VERSION)
+            self.requires("mobile_user_manual/" + MOBILE_USER_MANUAL_VERSION)
 
     def prepare_pkg_config_files(self):
         if self.isLinux:
