@@ -249,7 +249,7 @@ itself. The field `"maxItems"` is optional.
         "type": "MultiSelectionComboBox",
         "name": "combobox1",
         "caption": "Combo Box",
-        "description": "Choose one",
+        "description": "Choose one or more",
         "defaultValue": ["v2"],
         "range": ["v1", "v2", "v3"],
         "isActive": true,
