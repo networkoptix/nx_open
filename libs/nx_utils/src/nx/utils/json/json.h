@@ -72,12 +72,9 @@ public:
     virtual void writeAttributeName(const std::string_view& name) override;
 
 private:
-    void onWriteValue();
-
-private:
     struct Structured //< Array or object.
     {
-        std::string_view firstAttributeWritten; //< Empty for arrays.
+        std::string firstAttributeWritten; //< Empty for arrays.
         int writtenCount = 0;
 
         void start(Composer* composer) const
@@ -93,6 +90,12 @@ private:
             }
         }
     };
+
+private:
+    void onWriteValue();
+    void addValue(std::vector<Structured>::reverse_iterator structured);
+
+private:
     std::vector<Structured> m_structured;
 };
 

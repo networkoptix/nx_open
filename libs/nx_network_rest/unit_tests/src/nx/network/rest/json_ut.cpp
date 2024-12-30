@@ -292,6 +292,11 @@ TEST(Json, ReflectStripDefault)
     ASSERT_EQ(nx::reflect::json_detail::getStringRepresentation(
             nx::json::serialized(list, /*stripDefault*/ true)),
         "[]");
+    list.front().parameters.emplace(QString{"parameter1"}, QJsonObject{{"key", "value"}});
+    list.front().parameters.emplace(QString{"parameter2"}, QJsonObject{{"key", "value"}});
+    ASSERT_EQ(nx::reflect::json_detail::getStringRepresentation(
+            nx::json::serialized(list, /*stripDefault*/ true)),
+        "[{\"parameters\":{\"parameter1\":{\"key\":\"value\"},\"parameter2\":{\"key\":\"value\"}}}]");
 }
 
 TEST(Json, KeepDefaultWithVariant)

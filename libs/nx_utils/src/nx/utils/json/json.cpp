@@ -70,21 +70,22 @@ void StripDefaultComposer::writeAttributeName(const std::string_view& name)
 
 void StripDefaultComposer::onWriteValue()
 {
-    if (m_structured.empty())
-        return;
+    if (!m_structured.empty())
+        addValue(m_structured.rbegin());
+}
 
-    if (m_structured.back().writtenCount != 0)
+void StripDefaultComposer::addValue(std::vector<Structured>::reverse_iterator structured)
+{
+    if (structured->writtenCount != 0)
     {
-        ++m_structured.back().writtenCount;
+        ++structured->writtenCount;
         return;
     }
 
-    for (auto& s: m_structured)
-    {
-        if (s.writtenCount == 0)
-            s.start(this);
-        ++s.writtenCount;
-    }
+    if (auto next = std::next(structured); next != m_structured.rend())
+        addValue(next);
+    structured->start(this);
+    ++structured->writtenCount;
 }
 
 } // namespace details
