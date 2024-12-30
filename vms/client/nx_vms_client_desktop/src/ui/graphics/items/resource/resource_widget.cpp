@@ -1205,7 +1205,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(
         return Qn::EmptyOverlay;
 
     if (!hasVideo)
-        return showsAudioSpectrum ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
+        return showsAudioSpectrum ? Qn::EmptyOverlay : Qn::NoDataOverlay;
 
     if (m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender)
         return Qn::LoadingOverlay;

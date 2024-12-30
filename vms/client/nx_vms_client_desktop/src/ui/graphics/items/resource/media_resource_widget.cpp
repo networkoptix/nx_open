@@ -2685,9 +2685,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             if (!d->accessController()->hasPermissions(d->camera, Qn::ViewFootagePermission))
                 return Qn::AccessDeniedOverlay;
 
-            return hasArchive(d->camera)
-                ? Qn::NoVideoDataOverlay
-                : Qn::NoDataOverlay;
+            return Qn::NoDataOverlay;
         }
     }
 
@@ -2740,7 +2738,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
         // Handle export from I/O modules.
         if (!d->hasVideo)
-            return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
+            return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoDataOverlay;
     }
 
     if (d->display()->camDisplay()->isLongWaiting())
@@ -2767,7 +2765,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->display()->isPaused())
     {
         if (!d->hasVideo)
-            return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoVideoDataOverlay;
+            return shouldShowAudioSpectrum() ? Qn::EmptyOverlay : Qn::NoDataOverlay;
 
         return Qn::EmptyOverlay;
     }

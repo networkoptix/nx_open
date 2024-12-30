@@ -67,6 +67,8 @@ signals:
 protected:
     bool eventFilter(QObject* obj, QEvent* ev) override;
 
+    void resetPreloader();
+
 private:
     void setupPreloader();
     void setupCentralControls();

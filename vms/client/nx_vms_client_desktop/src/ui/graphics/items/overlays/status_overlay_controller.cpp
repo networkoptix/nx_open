@@ -83,10 +83,6 @@ const OverlayInfoMap& overlayInfo()
             {QnStatusOverlayWidget::ErrorStyle::white,
                 QnStatusOverlayWidget::tr("INFORMATION REQUIRED"),
                 kRestrictIconPath}},
-        {Qn::NoVideoDataOverlay,
-            {QnStatusOverlayWidget::ErrorStyle::white,
-                QnStatusOverlayWidget::tr("AUDIO ONLY"),
-                kSoundIconPath}},
         {Qn::NoDataOverlay,
             {QnStatusOverlayWidget::ErrorStyle::white, QnStatusOverlayWidget::tr("NO DATA")}},
         {Qn::AccessDeniedOverlay,
@@ -303,8 +299,6 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::normalVisibleItems() 
     {
         case Qn::LoadingOverlay:
             return QnStatusOverlayWidget::Control::kPreloader;
-        case Qn::NoVideoDataOverlay:
-            return QnStatusOverlayWidget::Control::kImageOverlay;
         case Qn::NoDataOverlay:
         case Qn::NoLiveStreamOverlay:
             return QnStatusOverlayWidget::Control::kCaption;

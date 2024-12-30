@@ -747,3 +747,8 @@ QPixmap QnStatusOverlayWidget::redGlowVertical()
 
     return m_redGlowVerticalPixmap;
 }
+
+void QnStatusOverlayWidget::resetPreloader()
+{
+    delete m_preloader;
+}

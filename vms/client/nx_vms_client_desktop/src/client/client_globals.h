@@ -474,7 +474,6 @@ namespace Qn
         EmptyOverlay,
         LoadingOverlay,
         NoDataOverlay,
-        NoVideoDataOverlay,
         UnauthorizedOverlay,
         AccessDeniedOverlay,
         NoExportPermissionOverlay,
