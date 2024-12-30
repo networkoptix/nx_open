@@ -79,4 +79,9 @@ void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password, b
     localPassword = password;
 }
 
+void SetupWizardDialogPrivate::bindToCloud()
+{
+    isBindingToCloudRequested = true;
+}
+
 } // namespace nx::vms::client::desktop

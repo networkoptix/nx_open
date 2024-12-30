@@ -112,4 +112,9 @@ QString SetupWizardDialog::password() const
     return d->localPassword;
 }
 
+bool SetupWizardDialog::isBindingToCloudRequested() const
+{
+    return d->isBindingToCloudRequested;
+}
+
 } // namespace nx::vms::client::desktop

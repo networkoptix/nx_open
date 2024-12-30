@@ -9,6 +9,7 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QApplication>
 
+#include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 #include <client/client_runtime_settings.h>
 #include <client/forgotten_systems_manager.h>
@@ -42,6 +43,7 @@
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_to_cloud_tool.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <nx/vms/discovery/manager.h>
@@ -620,21 +622,47 @@ void WelcomeScreen::setupFactorySystem(
     const nx::Uuid& serverId)
 {
     setVisibleControls(false);
+
+    auto bindToCloudWhenReady =
+        [this](SystemContext* context)
+        {
+            if (!NX_ASSERT(context))
+                return;
+
+            connect(context->messageProcessor(),
+                &QnCommonMessageProcessor::initialResourcesReceived,
+                this,
+                [this, context]()
+                {
+                    auto connectTool = new ConnectToCloudTool(this, context->globalSettings());
+                    connect(connectTool, &ConnectToCloudTool::finished,
+                        connectTool, &QObject::deleteLater);
+
+                    connectTool->start();
+                },
+                Qt::SingleShotConnection);
+        };
+
     const auto controlsGuard = nx::utils::makeSharedGuard(
         [this]() { setVisibleControls(true); });
 
-    const auto showDialogHandler = [this, address, serverId, controlsGuard]()
+    const auto showDialogHandler =
+        [this, address, serverId, controlsGuard, bindToCloudWhenReady]()
         {
             /* We are receiving string with port but without protocol, so we must parse it. */
             const auto dialog = new SetupWizardDialog(address, serverId, mainWindowWidget());
             dialog->setAttribute(Qt::WA_DeleteOnClose);
 
             const auto connectToSystem =
-                [this, dialog, address, serverId, controlsGuard]()
+                [this, dialog, address, serverId, controlsGuard, bindToCloudWhenReady]()
                 {
                     const auto credentials = nx::network::http::PasswordCredentials(
                         helpers::kFactorySystemUser.toStdString(),
                         dialog->password().toStdString());
+
+                    if (dialog->isBindingToCloudRequested())
+                        bindToCloudWhenReady(system());
+
                     connectToSystemInternal(
                         /*systemId*/ QString(),
                         serverId,

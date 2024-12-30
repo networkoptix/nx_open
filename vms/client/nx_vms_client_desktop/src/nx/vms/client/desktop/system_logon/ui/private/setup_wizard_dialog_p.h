@@ -31,6 +31,11 @@ public slots:
     void connectUsingLocalAdmin(const QString& password, bool /*dummy*/);
 
     /**
+     * Binds System to Cloud.
+     */
+    void bindToCloud();
+
+    /**
      * Close dialog.
      */
     void cancel();
@@ -43,6 +48,7 @@ public slots:
 public:
     nx::vms::client::desktop::WebViewWidget* webViewWidget;
     QString localPassword;
+    bool isBindingToCloudRequested = false;
 };
 
 } // namespace nx::vms::client::desktop

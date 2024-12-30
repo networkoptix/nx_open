@@ -30,6 +30,8 @@ public:
     /** Admin password for connection. */
     QString password() const;
 
+    bool isBindingToCloudRequested() const;
+
 private:
     QScopedPointer<SetupWizardDialogPrivate> d;
     const nx::network::SocketAddress m_address;
