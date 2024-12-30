@@ -20,6 +20,7 @@ class NX_VMS_RULES_API NotificationActionBase: public nx::vms::rules::BasicActio
 
     // Common fields.
     FIELD(QString, caption, setCaption)
+    FIELD(QStringList, detailing, setDetailing)
     FIELD(QString, description, setDescription)
     FIELD(QString, tooltip, setTooltip)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)

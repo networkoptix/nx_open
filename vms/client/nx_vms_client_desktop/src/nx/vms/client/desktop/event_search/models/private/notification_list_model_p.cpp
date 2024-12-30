@@ -151,7 +151,9 @@ void fillEventData(
     eventData.id = action->id();
     eventData.ruleId = action->ruleId();
     eventData.title = action->caption();
-    eventData.description = action->description();
+    eventData.description = action->description().isEmpty()
+        ? action->detailing().join(common::html::kLineBreak)
+        : action->description();
     eventData.toolTip = action->tooltip();
     eventData.removable = true;
     eventData.timestamp = action->timestamp();
