@@ -104,7 +104,7 @@ public:
         base_type(parent, windowFlags)
     {
         setFrameShape(Qn::EllipticalFrame);
-        setRelativeFrameWidth(1.0 / 16.0);
+        setRelativeFrameWidth(0.2 / 16.0);
 
         setStateOpacity(Default, 0.4);
         setStateOpacity(Hovered, 0.7);

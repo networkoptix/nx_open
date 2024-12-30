@@ -62,6 +62,7 @@ PtzOverlayWidget::PtzOverlayWidget(QGraphicsItem* parent, Qt::WindowFlags window
     m_focusAutoButton->setIcon(qnSkin->icon(kFocusAutoIcon));
     m_focusAutoButton->setToolTip(tr("Auto Focus"));
     m_focusAutoButton->setFrameShape(Qn::RectangularFrame);
+    m_focusAutoButton->setFrameBorders(Qt::LeftEdge | Qt::RightEdge);
 
     m_modeButton = new PtzImageButtonWidget(this);
     m_modeButton->setToolTip(tr("Change Dewarping Mode"));
