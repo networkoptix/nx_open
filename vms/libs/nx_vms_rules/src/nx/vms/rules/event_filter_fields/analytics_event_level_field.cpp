@@ -6,6 +6,8 @@ namespace nx::vms::rules {
 
 bool AnalyticsEventLevelField::match(const QVariant& eventValue) const
 {
+    if (value() == nx::vms::api::EventLevel::undefined)
+        return true;
     return value() & eventValue.value<nx::vms::api::EventLevel>();
 }
 
