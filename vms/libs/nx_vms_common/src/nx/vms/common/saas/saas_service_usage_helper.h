@@ -182,7 +182,7 @@ public:
     /*
      * @return Information how many Live View service is available and used.
      */
-    nx::vms::api::LicenseSummaryData info() const;
+    nx::vms::api::LicenseSummaryDataEx info() const;
 };
 
 /*

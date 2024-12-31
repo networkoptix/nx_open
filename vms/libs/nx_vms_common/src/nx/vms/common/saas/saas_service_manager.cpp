@@ -90,10 +90,10 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
             {
                 NX_MUTEX_LOCKER mutexLocker(&m_mutex);
                 if (m_data.state != SaasState::active)
-                    return true;
+                    return std::set<nx::Uuid>();
             }
-            const auto info = LiveViewUsageHelper(systemContext()).info();
-            return info.inUse > info.available;
+            auto info = LiveViewUsageHelper(systemContext()).info();
+            return std::move(info.exceedDevices);
         }, kUpdateLiveOveruseTimeout)
 {
     connect(
@@ -576,14 +576,19 @@ bool ServiceManager::isTierGracePeriodExpired() const
     return expiredMs > 0 && qnSyncTime->currentMSecsSinceEpoch() > expiredMs;
 }
 
-bool ServiceManager::hasLiveServiceOveruse() const
+bool ServiceManager::isLiveServiceOveruse(const nx::Uuid& id) const
 {
-    return m_liveOveruse.updated();
+    return m_liveOveruse.updated().contains(id);
 }
 
-bool ServiceManager::hasLiveServiceOveruseCached() const
+bool ServiceManager::hasLiveServiceOveruse() const
 {
-    return m_liveOveruse.get();
+    return !m_liveOveruse.updated().empty();
+}
+
+bool ServiceManager::isLiveServiceOveruseCached(const nx::Uuid& id) const
+{
+    return m_liveOveruse.get().contains(id);
 }
 
 std::optional<int> ServiceManager::tierGracePeriodDaysLeft() const

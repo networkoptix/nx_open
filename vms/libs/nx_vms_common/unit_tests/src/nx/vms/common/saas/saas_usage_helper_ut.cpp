@@ -25,6 +25,7 @@ struct TestPluginData
 static const nx::Uuid kAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524fe");
 static const nx::Uuid kNotPurchasedAnalyticsServiceId("94ca45f8-4859-457a-bc17-f2f9394524ff");
 static const nx::Uuid kLocalRecordingServiceId("46fd4533-16dd-4e07-b285-ef059b4ecb31");
+static const nx::Uuid kLiveViewServiceId("{8A07D17E-73FD-4B21-A716-B02CA36281FF}");
 
 static const nx::Uuid kServiceUnlimitedMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dc");
 static const nx::Uuid kServiceTenMegapixels("60a18a70-452b-46a1-9bfd-e66af6fbd0dd");
@@ -38,6 +39,17 @@ static const std::array<TestPluginData, 3> testPluginData = {
 
 static const std::string kServiceDataJson = R"json(
 [
+  {
+    "id": "{8A07D17E-73FD-4B21-A716-B02CA36281FF}",
+    "type": "live_view",
+    "state": "active",
+    "displayName": "Live view service",
+    "description": "",
+    "createdByChannelPartner": "5f124fdd-9fc7-43c1-898a-0dabde021894",
+    "parameters": {
+      "empty": "empty"
+    }
+  },
   {
     "id": "46fd4533-16dd-4e07-b285-ef059b4ecb31",
     "type": "local_recording",
@@ -130,6 +142,9 @@ static const std::string kSaasDataJson = R"json(
   "cloudSystemId": "2df6b2f1-df31-451d-aac9-6bcb663e210b",
   "state" : "active",
   "services" : {
+    "{8A07D17E-73FD-4B21-A716-B02CA36281FF}": {
+      "quantity": 10
+    },
     "60a18a70-452b-46a1-9bfd-e66af6fbd0de": {
       "quantity": 10
     },
@@ -167,6 +182,7 @@ protected:
         m_cloudeStorageHelper.reset(new CloudStorageServiceUsageHelper(systemContext()));
         m_integrationsHelper.reset(new IntegrationServiceUsageHelper(systemContext()));
         m_localRecordingHelper.reset(new LocalRecordingUsageHelper(systemContext()));
+        m_liveHelper.reset(new LiveViewUsageHelper(systemContext()));
 
         auto manager = systemContext()->saasServiceManager();
         manager->loadServiceData(kServiceDataJson);
@@ -233,6 +249,7 @@ protected:
     QScopedPointer<CloudStorageServiceUsageHelper> m_cloudeStorageHelper;
     QScopedPointer<IntegrationServiceUsageHelper> m_integrationsHelper;
     QScopedPointer<LocalRecordingUsageHelper> m_localRecordingHelper;
+    QScopedPointer<LiveViewUsageHelper> m_liveHelper;
 };
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingServicesLoaded)
@@ -610,6 +627,28 @@ TEST_F(SaasServiceUsageHelperTest, LocalRecordingUsage)
     for (const auto& [id, cameras]: info)
         total += cameras.size();
     ASSERT_EQ(cameras.size(), total);
+}
+
+TEST_F(SaasServiceUsageHelperTest, liveServiceUsage)
+{
+    auto manager = systemContext()->saasServiceManager();
+
+    auto cameras = addCameras(/*size*/ 30);
+    for (const auto& camera: cameras)
+        camera->setStatus(nx::vms::api::ResourceStatus::online);
+
+    auto liveDetails = m_liveHelper->info();
+    ASSERT_EQ(20, liveDetails.available); // < 10 unused localRecording + 10 LiveView.
+    ASSERT_EQ(30, liveDetails.inUse);
+    ASSERT_EQ(10, liveDetails.exceedDevices.size());
+
+    for (int i = 0; i < 5; ++i)
+        cameras[i]->setScheduleEnabled(true);
+
+    liveDetails = m_liveHelper->info();
+    ASSERT_EQ(15, liveDetails.available); // < 5 unused localRecording + 10 LiveView.
+    ASSERT_EQ(25, liveDetails.inUse);
+    ASSERT_EQ(10, liveDetails.exceedDevices.size());
 }
 
 } // nx::vms::common::saas::test

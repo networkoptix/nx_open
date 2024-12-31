@@ -574,24 +574,38 @@ LiveViewUsageHelper::LiveViewUsageHelper(SystemContext* context, QObject* parent
 {
 }
 
-LicenseSummaryData LiveViewUsageHelper::info() const
+LicenseSummaryDataEx LiveViewUsageHelper::info() const
 {
-    LicenseSummaryData result;
+    LicenseSummaryDataEx result;
 
-    for (const auto& [serviceId, parameters]: m_context->saasServiceManager()->liveView())
+    // Add local recording services as well.
+    for (const auto& [serviceId, parameters]:systemContext()->saasServiceManager()->localRecording())
         result.available += parameters.totalChannelNumber;
 
-    systemContext()->resourcePool()->getResources(
-        [&result](const QnResourcePtr& resource)
+    LocalRecordingUsageHelper localRecording(systemContext());
+
+    const auto cameras = getAllCameras();
+    for (const auto& camera: cameras)
+    {
+        if (camera->isScheduleEnabled())
+            --result.available;
+    }
+    result.available = std::max(0, result.available);
+
+    for (const auto& [serviceId, parameters]: systemContext()->saasServiceManager()->liveView())
+        result.available += parameters.totalChannelNumber;
+
+
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::desktop_camera) && !camera->isScheduleEnabled()
+            && camera->isOnline() && camera->hasVideo())
         {
-            auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-            if (camera && !camera->hasFlags(Qn::desktop_camera)
-                && !camera->isScheduleEnabled() && camera->isOnline())
-            {
-                ++result.inUse;
-            }
-            return false;
-        });
+            ++result.inUse;
+            if (result.inUse > result.available)
+                result.exceedDevices.insert(camera->getId());
+        }
+    }
     return result;
 }
 
