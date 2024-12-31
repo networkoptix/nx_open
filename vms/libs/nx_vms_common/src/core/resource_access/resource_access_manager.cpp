@@ -1287,5 +1287,7 @@ bool QnResourceAccessManager::hasAccessToAllCameras(
     const nx::network::rest::UserAccessData& userAccessData,
     nx::vms::api::AccessRights accessRights) const
 {
+    if (userAccessData == nx::network::rest::kSystemAccess)
+        return true;
     return hasAccessToAllCameras(userAccessData.userId, accessRights);
 }
