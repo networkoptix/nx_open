@@ -1863,7 +1863,7 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Wymagana grupa uprawnień</translation>
     </message>
     <message>
       <source>View Permissions</source>
@@ -2186,7 +2186,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Dostęp zdalny jest niedostępny</translation>
     </message>
   </context>
   <context>
@@ -2404,15 +2404,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Witryna została zawieszona. Aby włączyć/wyłączyć korzystanie z integracji dla niektórych urządzeń, witryna musi być w stanie aktywnym. Skontaktuj się ze swoim partnerem kanałowym, aby uzyskać szczegółowe informacje</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Witryna została wyłączona. Aby włączyć tę integrację dla bieżącego urządzenia, witryna musi być w stanie aktywnym. Skontaktuj się ze swoim partnerem kanałowym, aby uzyskać szczegółowe informacje</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Witryna została wyłączona. Aby aktywować tę integrację dla niektórych urządzeń, witryna musi być w stanie aktywnym. Skontaktuj się z partnerem kanału po szczegóły</translation>
     </message>
   </context>
   <context>
@@ -2694,19 +2694,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Brak ulubionych witryn</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Brak ukrytych witryn</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Możesz dodać witrynę do ulubionych z menu kontekstowego</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Możesz ukryć witryny na liście głównej z poziomu menu kontekstowego</translation>
     </message>
   </context>
   <context>
@@ -2870,7 +2870,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Dodana witryna szybko stanie się widoczna dla użytkowników posiadających konto w chmurze, natomiast użytkownicy nieposiadający konta w chmurze otrzymają instrukcje pocztą e-mail.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3018,7 +3018,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Język interfejsu</translation>
     </message>
   </context>
   <context>

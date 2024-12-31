@@ -8752,15 +8752,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>Otwórz wideo zdarzenia</translation>
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>Otwórz urządzenie zdarzenia</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>Otwórz kamerę zdarzenia</translation>
     </message>
   </context>
   <context>
@@ -8822,7 +8822,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>NIEZNANY</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
@@ -9172,7 +9172,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>Obejrzyj wideo bez modyfikacji</translation>
     </message>
   </context>
   <context>
@@ -9844,7 +9844,7 @@ Wydajność witryny jest obniżona.</translation>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>Importuj listę wyszukiwania</translation>
     </message>
     <message>
       <source>Text files</source>
@@ -9929,7 +9929,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>Wprowadź hasło do swojego konta, aby połączyć witryny</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9938,15 +9938,15 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Łączenie witryn...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>Oto aktualny adres URL witryny.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Serwery z innej witryny pojawią się w drzewie zasobów po zakończeniu synchronizacji bazy danych.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
@@ -9954,7 +9954,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>Nie udało się połączyć witryn</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -10009,37 +10009,37 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>Witryna nie została znaleziona.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>Znaleziona witryna %1 ma niezgodną wersję %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>Wybrana witryna ma starszą wersję oprogramowania, która jest niezgodna z bieżącą witryną. Zaktualizuj wybraną witrynę do najnowszej kompilacji, aby połączyć ją z bieżącą.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Zamierzasz scalić witryny z licencjami startowymi.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Tylko jedna licencja startowa jest dozwolona dla każdej witryny, więc druga licencja zostanie zdezaktywowana.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>Zamierzasz połączyć witryny z licencjami NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Tylko jedna licencja NVR jest dozwolona na witrynę, więc druga licencja zostanie zdezaktywowana.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>Nie można skonfigurować zdalnej witryny %1.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
@@ -10058,15 +10058,15 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Nie można połączyć witryn, ponieważ mają co najmniej jeden serwer o tym samym ID. Usuń ten serwer i spróbuj ponownie.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>Nazwa witryny nie została jeszcze skonfigurowana.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>Osiągnięto maksymalną liczbę serwerów dla witryny.</translation>
     </message>
   </context>
   <context>
@@ -11516,7 +11516,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>Nieograniczony czas trwania sesji użytkownika zagraża ogólnemu bezpieczeństwu witryny i może prowadzić do pogorszenia wydajności</translation>
     </message>
   </context>
   <context>
@@ -11528,7 +11528,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n objects selected</source>
       <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
+        <numerusform>Wybrano %n obiektów</numerusform>
         <numerusform>%n objects selected</numerusform>
         <numerusform>%n objects selected</numerusform>
         <numerusform>%n objects selected</numerusform>
@@ -11536,7 +11536,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Wszystkie obiekty</translation>
     </message>
   </context>
   <context>
@@ -11954,15 +11954,15 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>Witryna przekracza limity organizacji i może wkrótce stać się niefunkcjonalna. Dostosuj jej użytkowanie, aby uniknąć zakłóceń w działaniu usługi.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Otwórz ustawienia</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Otwórz usługi</translation>
     </message>
   </context>
   <context>
@@ -11986,12 +11986,12 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Twój dostęp do witryny wygasa %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>Twój dostęp do witryny wygasa za %1</translation>
     </message>
   </context>
   <context>
