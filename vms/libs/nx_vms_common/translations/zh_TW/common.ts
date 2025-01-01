@@ -413,11 +413,11 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation>插件錯誤。 %1</translation>
+      <translation>擴充套件錯誤。 %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation>插件失效</translation>
+      <translation>無法使用擴充套件</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
@@ -1598,7 +1598,7 @@
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>失敗時強制授予分析資料庫儲存掛載點權限</translation>
+      <translation>失敗時強制授予掛載分析資料儲存裝置的權限</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
@@ -1634,7 +1634,7 @@
     </message>
     <message>
       <source>Enable cross-domain policy</source>
-      <translation>啟用跨域策略</translation>
+      <translation>啟用跨域政策</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
@@ -1682,7 +1682,7 @@
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>是否緩存一些主串流幀數。數值：&apos;是&apos; - 永遠啟用(可能占用大量RAM)，&apos;否&apos; - 永遠停用，除非重播影片需要(例如HLS)，&apos;自動&apos; - 類似於&apos;否&apos; ，但會在改善使用者體驗時開啟(例如當某些分析插件在攝影機上運作時)。</translation>
+      <translation>是否暫存一些主串流幀數。值：&apos;是&apos; - 永遠啟用(可能占用大量RAM)，&apos;否&apos; - 永遠停用，除非重播影片需要(例如HLS)，&apos;自動&apos; - 類似於&apos;否&apos; ，但會在改善使用者體驗時開啟(例如當攝影機上有某些擴充套件在運作時)。</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
@@ -2121,11 +2121,11 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>存儲問題</translation>
+      <translation>儲存裝置問題</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>%1 的存儲問題</translation>
+      <translation>%1 的儲存裝置問題</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
@@ -2145,19 +2145,19 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation>儲存空間 &quot;%1&quot; 處於離線狀態。</translation>
+      <translation>分析儲空間 &quot;%1&quot; 處於離線狀態。</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>儲存空間 &quot;%1&quot; 容量即將不足。</translation>
+      <translation>分析儲存空間 &quot;%1&quot; 容量即將不足。</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>插件診斷事件</translation>
+      <translation>擴充套件診斷事件</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation>不明的插件診斷事件</translation>
+      <translation>不明的擴充套件診斷事件</translation>
     </message>
     <message>
       <source>Buzzer</source>
