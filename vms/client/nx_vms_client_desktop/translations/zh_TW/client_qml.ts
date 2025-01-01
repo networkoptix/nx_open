@@ -1389,7 +1389,7 @@
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>查找清單</translation>
     </message>
     <message>
       <source>Add</source>
