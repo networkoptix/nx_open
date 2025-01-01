@@ -2190,11 +2190,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation>存儲空間已更新</translation>
+      <translation>儲存裝置已更新</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation>存儲空間已移除</translation>
+      <translation>儲存裝置已移除</translation>
     </message>
     <message>
       <source>MitM Attack</source>
@@ -4222,7 +4222,7 @@ to %1</source>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;虛擬攝影機&quot; 是一個影像資料專用的虛擬空間, 可上傳到系統中的任一伺服器並讓所有使用者存取.</translation>
+      <translation>&quot;虛擬攝影機&quot; 是一個影像資料專用的虛擬空間, 可上傳到系統中的任一伺服器並讓所有使用者存取。</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
@@ -10393,15 +10393,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation>無效或不兼容的插件函式庫</translation>
+      <translation>無效或不相容的擴充套件函式庫</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>插件函式庫無法初始化</translation>
+      <translation>擴充套件函式庫無法初始化</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>插件回應不良</translation>
+      <translation>擴充套件回應不良</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
@@ -10429,7 +10429,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>插件是可選的且不在白名單中</translation>
+      <translation>擴充套件不是必要的的且不在白名單中</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -11471,7 +11471,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>任何插件</translation>
+      <translation>任何擴充套件</translation>
     </message>
   </context>
   <context>
@@ -11486,7 +11486,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>此欄位有大小寫之區分</translation>
+      <translation>此欄位區分大小寫</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
