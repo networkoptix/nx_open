@@ -269,7 +269,7 @@
     </message>
     <message>
       <source>Site actions</source>
-      <translation type="unfinished">Site actions</translation>
+      <translation>站點操作</translation>
     </message>
   </context>
   <context>
@@ -2519,7 +2519,7 @@
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>違反組織限制</translation>
     </message>
   </context>
   <context>
@@ -2660,19 +2660,19 @@
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>模糊</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>排除攝影機</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>將連線時間限制套用至雲端使用者</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>遠端存取工具</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2684,7 +2684,7 @@
     </message>
     <message>
       <source>Power users</source>
-      <translation type="unfinished">Power users</translation>
+      <translation>進階使用者</translation>
     </message>
   </context>
   <context>
@@ -2764,11 +2764,11 @@
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>遠端存取</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>啟用硬體解碼</translation>
     </message>
   </context>
   <context>
@@ -3104,11 +3104,11 @@
     </message>
     <message>
       <source>Every</source>
-      <translation type="unfinished">Every</translation>
+      <translation>每隔</translation>
     </message>
     <message>
       <source>Force open in a dedicated window</source>
-      <translation type="unfinished">Force open in a dedicated window</translation>
+      <translation>強制在專用視窗中打開</translation>
     </message>
   </context>
   <context>

@@ -91,7 +91,7 @@
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>未預期的驗證政策</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -188,7 +188,7 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>必須為給定的驗證政策提供欄位 %1 值</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
@@ -764,7 +764,7 @@
     <name>nx::vms::rules::PluginDiagnosticEvent</name>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>插件診斷事件</translation>
+      <translation>擴充套件診斷事件</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -1049,7 +1049,7 @@
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>未選擇聲音</translation>
     </message>
   </context>
   <context>
@@ -1129,29 +1129,29 @@
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>無法取得事件描述符</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>事件沒有來源來源攝影機</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>請至少選擇一個佈局</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>未選擇清單</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation> id 為&apos;%1&apos; 的清單不存在</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
@@ -1170,7 +1170,7 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>顯示給</translation>
     </message>
   </context>
   <context>

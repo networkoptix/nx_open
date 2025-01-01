@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>通知語言</translation>
     </message>
   </context>
   <context>
@@ -123,7 +123,7 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>離線客戶端更新</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
@@ -135,11 +135,11 @@
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>這將刪除伺服器上的所有更新檔案。</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>仍要繼續？</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>全選 / 取消全選</translation>
     </message>
   </context>
   <context>
@@ -697,15 +697,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>刪除屬性將刪除所有相關資料</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>刪除清單將清除其中的所有資料。</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>刪除清單？</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
@@ -740,11 +740,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>匯出中</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>開啟檔案資料夾...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1500,11 +1500,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>匯入中</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>無法開啟檔案</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
@@ -1516,22 +1516,22 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>無法匯入所選檔案</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>該檔案似乎是空的。</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>請確認所選檔案存在並且您有權存取。</translation>
     </message>
   </context>
   <context>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>查找清單</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1567,11 +1567,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>無法儲存檔案</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>請確認您有權存取所選資料夾和足夠的磁碟空間</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1837,11 +1837,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>查看權限</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>隱藏權限</translation>
     </message>
   </context>
   <context>
@@ -1879,11 +1879,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>選擇物件</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>所有物件</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2111,7 +2111,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>伺服器未設定遠端存取功能</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
@@ -2135,7 +2135,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>發生錯誤</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2147,7 +2147,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>無法使用遠端存取</translation>
     </message>
   </context>
   <context>
@@ -2649,19 +2649,19 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>沒有收藏的站點</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>沒有隱藏的站點</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>您可以透過選單將站點加入收藏。</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>您可以透過選單來將站點隱藏。</translation>
     </message>
   </context>
   <context>
@@ -2826,7 +2826,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>通知語言</translation>
     </message>
   </context>
   <context>
@@ -2966,11 +2966,11 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>通知語言</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>介面語言</translation>
     </message>
   </context>
   <context>

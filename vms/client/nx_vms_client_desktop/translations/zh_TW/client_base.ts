@@ -105,15 +105,15 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>事件發生期間</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>固定長度</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>事件發生</translation>
     </message>
     <message>
       <source>Event starts</source>
@@ -1182,7 +1182,7 @@
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation>清單管理...</translation>
+      <translation>列表管理...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
@@ -2351,11 +2351,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation>存儲空間已更新</translation>
+      <translation>儲存裝置已更新</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation>存儲空間已移除</translation>
+      <translation>儲存裝置已移除</translation>
     </message>
     <message>
       <source>MitM Attack</source>
@@ -4993,40 +4993,40 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>選擇一個讀寫政策來定義如何與儲存目錄互動。</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>專屬</translation>
     </message>
     <message>
       <source>Shared</source>
-      <translation>已共用</translation>
+      <translation>共用</translation>
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>隔離</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>站點伺服器對儲存裝置有不同的讀寫政策</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL：%1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>專屬 - 伺服器可以讀取所有資料夾，但僅寫入自己的資料夾，並會刪除所有資料夾中的舊資料。</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>共用 - 伺服器可以讀取所有資料夾，但僅寫入自己的資料夾，並僅會刪除自己資料夾中的舊資料。</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>隔離 - 伺服器僅讀取和寫入自己的資料夾，並僅會刪除自己資料夾中的舊資料。</translation>
     </message>
   </context>
   <context>
@@ -5129,11 +5129,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>隔離</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>專屬</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5145,23 +5145,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>可移除的</translation>
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>未知的大小</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>儲存裝置在系統中的各個伺服器上的讀寫政策不同。</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>點擊圖示查看伺服器列表</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>讀寫政策</translation>
     </message>
   </context>
   <context>
@@ -5274,7 +5274,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>無法儲存站點設定</translation>
     </message>
   </context>
   <context>
@@ -5425,28 +5425,28 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>未接來電</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>%n 台伺服器上尚未設定儲存裝置</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>%n 伺服器上尚未設定備份儲存裝置</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>無效的錄影排程</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>有%n台攝影機的錄影排程無效</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5472,8 +5472,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>%n 台伺服使用系統碟來儲存分析資料</numerusform>
       </translation>
     </message>
     <message>
@@ -5504,33 +5504,33 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>站點即將停止運作</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>站點已停止運作</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>站點將於今天停止運作</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>站點將於明天停止運作</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>站點將於%n天內停止運作</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>通知和介面語言不同</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>通知語言與介面語言不同</translation>
     </message>
   </context>
   <context>
@@ -5553,19 +5553,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>啟用後，會不斷搜尋新的攝影機和伺服器，並發送請求到攝影機以更新狀態。</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>包含站點相關資訊, 如攝影機型號和韌體版本、伺服器數量等等</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>允許系統優化裝置設定</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>允許系統優化攝影機設定</translation>
     </message>
   </context>
   <context>
@@ -5680,7 +5680,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>每 %1自動更新</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6147,11 +6147,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>無法移動裝置</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>已達到該伺服器的最大裝置數</translation>
     </message>
   </context>
   <context>
@@ -6347,41 +6347,41 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation>%n 台已移除的裝置</translation>
     </message>
     <message>
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation>%n 台已移除的攝影機</translation>
     </message>
     <message>
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation>%n 台已移除的伺服器</translation>
     </message>
     <message>
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation>%n 個已移除的佈局</translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>再%n 個科目</numerusform>
       </translation>
     </message>
     <message>
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation>再%n個裝置</translation>
     </message>
     <message>
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation>再%n 個攝影機</translation>
     </message>
     <message>
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation>再%n 個伺服器</translation>
     </message>
     <message>
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation>再%n個佈局</translation>
     </message>
   </context>
   <context>
@@ -7056,7 +7056,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>系統必須處於活躍狀態才能執行至雲端備份。 %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
@@ -7948,7 +7948,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>你確定要斷開連接嗎？</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8247,7 +8247,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>站點管理</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8361,11 +8361,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>開啟事件裝置</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>開啟事件攝影機</translation>
     </message>
   </context>
   <context>
@@ -8424,11 +8424,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>未知</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> + %n</numerusform>
       </translation>
     </message>
@@ -8877,15 +8877,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>其它站點的伺服器將顯示在資源列表。</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>連線至目前的站點...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>伺服器很快就會連接到站點</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
@@ -8969,7 +8969,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>該ID已被使用。請使用“產生”按鈕查找可用的ID。</translation>
     </message>
   </context>
   <context>
@@ -9180,8 +9180,8 @@ The Logging Level &quot;%1&quot; will provide you with more granular information
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>目前所選的日誌級別可能會降低系統效能。
+收集足夠的日誌後，建議將日誌級別改回預設值。</translation>
     </message>
   </context>
   <context>
@@ -9247,7 +9247,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>日誌等級會降低效能</translation>
     </message>
   </context>
   <context>
@@ -9276,35 +9276,35 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>在客戶端上已啟用除錯日誌設定</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>除錯日誌已啟用。
+客戶端效能下降。</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>除錯日誌已啟用</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>除錯日誌已啟用。
+站點效能下降。</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>日誌下載已取消</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>正在下載日誌...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>日誌下載失敗</translation>
     </message>
   </context>
   <context>
@@ -9315,26 +9315,26 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>正在下載...</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>下載完成但有錯誤</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>下載成功</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n 個已選：</numerusform>
       </translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>重試 (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -9349,23 +9349,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>
-      <translation type="unfinished">Lookup List remove request failed</translation>
+      <translation>尋找清單刪除請求失敗</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>無法將物件新增至清單中</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>有一個物件不具有符合所選清單的屬性</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>物件已新增至清單中</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>物件已成功加入 &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9388,7 +9388,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>任何 %1</translation>
     </message>
   </context>
   <context>
@@ -9418,7 +9418,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>所有其他文字檔案</translation>
     </message>
   </context>
   <context>
@@ -9575,16 +9575,16 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>找不到站點。</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>搜尋到的站點 %1 運行於不相容的版本 %2</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>選擇的站點版本較舊且與目前的站點版本不相容，請先將其更新至最新版本再做合併動作。</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -9605,34 +9605,34 @@ Site performance is degraded.</translation>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>無法設定遠端站點 %1</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>%1站點只能與非%1站點進行合併，合併後的站點名稱和管理者密碼將取自%1站點。</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>這兩個站點都連接到 %1。無法進行合併。</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>%1站點分屬不同所有者，無法進行合併。</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>站點合併無法執行，因為選定合併的站點中，有一台以上的伺服器具有相同ID。請移除該伺服器後重新嘗試合併。</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>站點名稱尚未設定</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>已達到該站點的伺服器數量限制。</translation>
     </message>
   </context>
   <context>
@@ -9936,7 +9936,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>某些部分的的作業系統已不支援。請從站點中將其刪除或將其作業系統更新為支援版本。</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
@@ -9945,15 +9945,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>不建議在週末時進行更新</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>站點更新至</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>站點更新中</translation>
     </message>
   </context>
   <context>
@@ -9967,7 +9967,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>可能的格式：</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -10086,7 +10086,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>無法確認無法連線的攝影機上的事件。</translation>
     </message>
   </context>
   <context>
@@ -10121,15 +10121,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>目前站點</translation>
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>任何通知</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>事件通知</translation>
     </message>
     <message>
       <source>System Notifications</source>
@@ -10137,16 +10137,16 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>選擇類型...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>任何通知</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n 個通知類型</numerusform>
       </translation>
     </message>
   </context>
@@ -10154,7 +10154,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>選擇通知類型</translation>
     </message>
   </context>
   <context>
@@ -10413,7 +10413,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>站點未連接到 %1。手機通知只有當系統連接到 %1時才能作用。</translation>
     </message>
   </context>
   <context>
@@ -10512,11 +10512,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>自動更新整合</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>自動更新網頁</translation>
     </message>
   </context>
   <context>
@@ -10910,8 +10910,8 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>因關閉了&quot;站點管理頁面&quot;的&quot;允許系統優化攝影機設定&quot;，故畫質與FPS設定已停用。
+您仍然可直接在攝影機介面修改相關設定。</translation>
     </message>
   </context>
   <context>
@@ -11012,21 +11012,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>伺服器電腦上可能需要額外設定。</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>在還原錄影資料時會需要輸入密碼。
+注意: 此密碼無法重置，故請妥善保存。若您遺失此密碼，錄影資料將無法恢復。</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>加密錄影資料可避免影像在站點之外被查看。而在此站點中您無須輸入密碼仍可觀看錄影資料。</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>未限制使用者連線生命週期將可能影響系統效能，並有潛在的安全性問題</translation>
     </message>
   </context>
   <context>
@@ -11037,13 +11037,13 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>已選取%n個物件</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>所有物件</translation>
     </message>
   </context>
   <context>
@@ -11191,15 +11191,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation>無效或不兼容的插件函式庫</translation>
+      <translation>無效或不相容的擴充套件函式庫</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>插件函式庫無法初始化</translation>
+      <translation>擴充套件函式庫無法初始化</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>插件回應不良</translation>
+      <translation>擴充套件回應不良</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
@@ -11227,7 +11227,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>插件是可選的且不在白名單中</translation>
+      <translation>擴充套件不是必要的的且不在白名單中</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -11452,7 +11452,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>該站點超出了組織的限制，可能很快就會無法運作。請調整您的使用量以避免服務中斷。</translation>
     </message>
     <message>
       <source>Open Settings</source>
@@ -11556,7 +11556,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>此動作不支援來自其他站點的通知</translation>
     </message>
   </context>
   <context>
@@ -11714,7 +11714,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>系統中有多個群組使用此名稱。我們建議爲每個群組設定不重複的名稱，來保持清楚且有組織的架構。</translation>
     </message>
   </context>
   <context>
@@ -11773,7 +11773,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>站點錯誤</translation>
     </message>
   </context>
   <context>
@@ -11825,7 +11825,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>系統中已存在具有相同登入名稱的使用者。為了避免問題，所有使用者都需要不重複的登入名稱。</translation>
     </message>
   </context>
   <context>
@@ -11971,7 +11971,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>這將立即移除該使用者登入系統的權限</translation>
     </message>
   </context>
   <context>
@@ -12277,11 +12277,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>在專用視窗模式下不可用</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>將此視窗移至佈局以使用此功能</translation>
     </message>
   </context>
   <context>
@@ -12307,7 +12307,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>無法連接到該站點，因為該站點已離線</translation>
     </message>
   </context>
   <context>
@@ -12397,7 +12397,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>略過此版本</translation>
     </message>
   </context>
   <context>
@@ -12665,11 +12665,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>找不到資源</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>找不到參數</translation>
     </message>
   </context>
   <context>
@@ -12860,11 +12860,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>新增標題或評論</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>規則無效且可能無法作動</translation>
     </message>
   </context>
   <context>
@@ -12990,11 +12990,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>請至少選擇一個佈局</translation>
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>至少選擇一個使用者</translation>
     </message>
     <message>
       <source>Site</source>
@@ -13019,15 +13019,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>事件發生時</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>事件開始時</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>事件停止時</translation>
     </message>
     <message>
       <source>Select state</source>
@@ -13058,14 +13058,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>包含清單項目</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>尋找清單網路請求失敗</translation>
     </message>
   </context>
   <context>
@@ -13178,7 +13178,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>任何插件</translation>
+      <translation>任何擴充套件</translation>
     </message>
   </context>
   <context>
@@ -13193,7 +13193,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>此欄位有大小寫之區分</translation>
+      <translation>此欄位區分大小寫</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -13484,10 +13484,10 @@ We recommend you not to open this web page. If you understand the risks, you can
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>分析資料庫應僅存儲於本地儲存裝置上，並且可能佔用大量空間。
+一旦選擇存儲分析數據的位置後，則無法在不遺失現存資料的情況下輕易更改。建議您謹慎選擇儲存位置並避免使用系統磁碟分割區(partition)， 以免發生嚴重的系統故障。
+分析數據預設將存儲在 %1。
+您可以在“伺服器設定”中的 &quot;儲存裝置管理&quot; 選擇另一個存儲位置。</translation>
     </message>
   </context>
   <context>
