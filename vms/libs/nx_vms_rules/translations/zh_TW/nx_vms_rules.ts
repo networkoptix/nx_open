@@ -739,11 +739,11 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>無法為 `%1` 事件狀態設定零持續時間</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>無法為 `%1` 事件狀態設定非零持續時間</translation>
     </message>
   </context>
   <context>

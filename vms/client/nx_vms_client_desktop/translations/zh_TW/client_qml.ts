@@ -127,11 +127,11 @@
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>離線更新已啟用並且檔案已儲存在伺服器上。</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>開啟此選項將允許將其他檔案下載到伺服器，即使沒有網際網路，這些檔案也可用於更新連接的用戶端。</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
