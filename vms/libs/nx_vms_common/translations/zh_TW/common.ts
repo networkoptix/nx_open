@@ -193,7 +193,7 @@
     </message>
     <message>
       <source>System Health Viewers</source>
-      <translation>系統健康檢查員</translation>
+      <translation>系統健康瀏覽者</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
