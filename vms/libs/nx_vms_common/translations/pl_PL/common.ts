@@ -1904,7 +1904,7 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Odstęp czasu między żądaniami HTTP wysyłanymi do chmury w celu synchronizacji danych.</translation>
     </message>
     <message>
       <source>Local System ID, null means the System is not set up yet.</source>
