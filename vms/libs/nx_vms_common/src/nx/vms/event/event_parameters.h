@@ -74,9 +74,8 @@ struct NX_VMS_COMMON_API EventParameters
     nx::Uuid eventResourceId;
 
     /**%apidoc[opt]
-     * Name of the Device which has triggered the Event. It can be used
-     * in a filter in Event Rules to assign different actions to different Devices. Also, the
-     * user could see this name in the notification panel. Example: "POS terminal 5".
+     * Name of an arbitrary resource that caused the event. Usefull when there is no actual
+     * Resource to fill `eventResourceId`. Used when `eventType` equals to `userDefinedEvent` only.
      */
     QString resourceName;
 
@@ -112,8 +111,11 @@ struct NX_VMS_COMMON_API EventParameters
      */
     bool omitDbLogging = false;
 
-    /**%apidoc[opt] */
-    QString analyticsPluginId; //< #spanasenko: It's unused (?!).
+    /**%apidoc[opt]
+     * String with amount of LDAP sync interval if any, in seconds. Used when `eventType` equals to
+     * `ldapSyncIssueEvent` only.
+     */
+    QString ldapSyncIntervalS;
 
     /**%apidoc[opt] */
     nx::Uuid analyticsEngineId;
@@ -166,7 +168,7 @@ struct NX_VMS_COMMON_API EventParameters
 
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId) \
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(ldapSyncIntervalS) \
     (analyticsEngineId)(objectTrackId)(key)(attributes)(progress)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(xml)(csv_record), NX_VMS_COMMON_API);
 
