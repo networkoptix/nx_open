@@ -82,19 +82,19 @@ private:
     QVariant eventColumnData(const ConstRulePtr& rule, int role) const;
 
     QVariant sourceColumnData(const ConstRulePtr& rule, int role) const;
-    QVariant sourceCameraData(const vms::rules::EventFilter* eventFilter, int role) const;
-    QVariant sourceServerData(const vms::rules::EventFilter* eventFilter, int role) const;
-    QVariant sourceUserData(const vms::rules::EventFilter* eventFilter, int role) const;
+    QVariant sourceCameraData(const ConstRulePtr& rule, int role) const;
+    QVariant sourceServerData(const ConstRulePtr& rule, int role) const;
+    QVariant sourceUserData(const ConstRulePtr& rule, int role) const;
 
     QVariant actionColumnData(const ConstRulePtr& rule, int role) const;
 
     QVariant targetColumnData(const ConstRulePtr& rule, int role) const;
-    QVariant targetCameraData(const vms::rules::ActionBuilder* actionBuilder, int role) const;
-    QVariant targetLayoutData(const vms::rules::ActionBuilder* actionBuilder, int role) const;
-    QVariant targetUserData(const vms::rules::ActionBuilder* actionBuilder, int role) const;
-    QVariant targetServerData(const vms::rules::ActionBuilder* actionBuilder, int role) const;
+    QVariant targetCameraData(const ConstRulePtr& rule, int role) const;
+    QVariant targetLayoutData(const ConstRulePtr& rule, int role) const;
+    QVariant targetUserData(const ConstRulePtr& rule, int role) const;
+    QVariant targetServerData(const ConstRulePtr& rule, int role) const;
 
-    QVariant systemData(int role) const;
+    QVariant systemData(const ConstRulePtr& rule, int role) const;
 
     QVariant editedStateColumnData(const ConstRulePtr& rule, int role) const;
     QVariant enabledStateColumnData(const ConstRulePtr& rule, int role) const;
@@ -104,10 +104,10 @@ private:
     QSet<nx::Uuid> resourceIds(int row, int column) const;
 
     QSet<nx::Uuid> sourceIds(
-        const vms::rules::EventFilter* eventFilter,
+        const ConstRulePtr& rule,
         const vms::rules::ItemDescriptor& descriptor) const;
     QSet<nx::Uuid> targetIds(
-        const vms::rules::ActionBuilder* actionBuilder,
+        const ConstRulePtr& rule,
         const vms::rules::ItemDescriptor& descriptor) const;
 
     // Returns whether the rule under the given row contains source or target device from the
