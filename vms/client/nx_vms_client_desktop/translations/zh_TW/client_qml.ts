@@ -653,7 +653,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation>請嘗試更改過濾條件或者新增事件規則</translation>
+      <translation>請嘗試更改篩選條件或者新增事件規則</translation>
     </message>
     <message>
       <source>Event Log</source>

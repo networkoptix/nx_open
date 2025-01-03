@@ -1101,7 +1101,7 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL 轉碼未被執行.</translation>
+      <translation>OpenCL 轉碼未被實行。</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
@@ -1142,7 +1142,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation>錯誤的要求.</translation>
+      <translation>錯誤的請求。</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1152,11 +1152,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation>找不到.</translation>
+      <translation>找不到。</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>內部錯誤.</translation>
+      <translation>內部錯誤。</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1168,7 +1168,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>未驗證.</translation>
+      <translation>未驗證。</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -1201,7 +1201,7 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation>Cloud儲存空間</translation>
+      <translation>雲端儲存空間</translation>
     </message>
   </context>
   <context>

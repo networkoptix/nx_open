@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation>錄影資料過濾器</translation>
+      <translation>錄影資料篩選器</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
