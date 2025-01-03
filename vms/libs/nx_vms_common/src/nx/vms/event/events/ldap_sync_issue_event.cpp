@@ -21,7 +21,7 @@ LdapSyncIssueEvent::LdapSyncIssueEvent(
 EventParameters LdapSyncIssueEvent::getRuntimeParams() const
 {
     auto result = base_type::getRuntimeParams();
-    result.analyticsPluginId = m_syncInterval
+    result.ldapSyncIntervalS = m_syncInterval
         ? QString::number(m_syncInterval->count())
         : "";
     return result;
@@ -85,7 +85,7 @@ void LdapSyncIssueEvent::encodeReasons(const AggregationInfo& info, EventParamet
 std::optional<std::chrono::seconds> LdapSyncIssueEvent::syncInterval(const EventParameters& params)
 {
     bool ok{false};
-    auto value = params.analyticsPluginId.toInt(&ok);
+    auto value = params.ldapSyncIntervalS.toInt(&ok);
 
     if (ok)
         return std::chrono::seconds(value);
