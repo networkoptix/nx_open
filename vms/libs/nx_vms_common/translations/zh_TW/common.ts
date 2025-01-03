@@ -392,23 +392,23 @@
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation>無法初始化聲音解碼器.</translation>
+      <translation>無法初始化音訊解碼器。</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>找不到 %1 編碼的解碼器。</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
+      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1。</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1.</translation>
+      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1。</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
+      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1。</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
@@ -446,11 +446,11 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>找不到 %1 編碼的編碼器。</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>無法初始化編碼器.</translation>
+      <translation>無法初始化影像編碼器。</translation>
     </message>
   </context>
   <context>
@@ -982,15 +982,15 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL 轉碼未執行.</translation>
+      <translation>OpenCL 轉碼未實行。</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation>未知轉碼模式。</translation>
+      <translation>未知轉碼方式。</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL 轉碼未被執行.</translation>
+      <translation>OpenCL 轉碼未被實行。</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
@@ -1079,7 +1079,7 @@
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation>錯誤的要求.</translation>
+      <translation>錯誤的請求。</translation>
     </message>
     <message>
       <source>Not implemented.</source>
@@ -1089,11 +1089,11 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation>找不到.</translation>
+      <translation>找不到。</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation>內部錯誤.</translation>
+      <translation>內部錯誤。</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>未驗證.</translation>
+      <translation>未驗證。</translation>
     </message>
     <message>
       <source>Session expired.</source>
