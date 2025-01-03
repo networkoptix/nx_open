@@ -134,7 +134,7 @@ bool OauthLoginDialog::validateToken(
 
 void OauthLoginDialog::loadPage()
 {
-    d->load(nx::utils::Url::fromQUrl(d->oauthClient()->url()));
+    d->load(d->oauthClient()->url());
 }
 
 const nx::vms::client::core::CloudAuthData& OauthLoginDialog::authData() const

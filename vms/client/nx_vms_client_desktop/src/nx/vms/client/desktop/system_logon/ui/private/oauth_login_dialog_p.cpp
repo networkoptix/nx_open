@@ -10,9 +10,7 @@
 #include <QtWidgets/QStackedWidget>
 
 #include <client/client_runtime_settings.h>
-#include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/oauth_client.h>
@@ -101,60 +99,17 @@ OauthLoginDialogPrivate::OauthLoginDialogPrivate(
 
 OauthLoginDialogPrivate::~OauthLoginDialogPrivate()
 {
-    stopCheck();
+    m_webViewWidget->controller()->stop();
 }
 
-void OauthLoginDialogPrivate::load(const nx::utils::Url& url)
+void OauthLoginDialogPrivate::load(const QUrl& url)
 {
     m_requestedUrl = url;
     m_stackedWidget->setCurrentWidget(m_progressBar);
-    displayUrl(url);
-    startCheck();
-}
+    displayUrl(m_requestedUrl);
 
-void OauthLoginDialogPrivate::startCheck()
-{
-    m_checkClient = std::make_unique<nx::network::http::AsyncClient>(
-        nx::network::ssl::kDefaultCertificateCheck);
-    auto callback = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this](bool success)
-        {
-            if (!stopCheck())
-                return;
-
-            NX_DEBUG(this, "Ping result: %1, url: %2", success, m_requestedUrl);
-
-            if (success)
-                loadInWebView(m_requestedUrl);
-            else
-                m_stackedWidget->setCurrentWidget(m_placeholder);
-        });
-    auto clientCallback =
-        [client = m_checkClient.get(), callback = std::move(callback)]() mutable
-        {
-            callback(client->hasRequestSucceeded());
-        };
-
-    m_checkClient->setOnResponseReceived(clientCallback);
-    m_checkClient->setOnDone(clientCallback);
-    m_checkClient->doGet(m_requestedUrl);
-}
-
-bool OauthLoginDialogPrivate::stopCheck()
-{
-    if (m_checkClient)
-    {
-        m_checkClient->pleaseStopSync();
-        m_checkClient.reset();
-        return true;
-    }
-    return false;
-}
-
-void OauthLoginDialogPrivate::loadInWebView(const nx::utils::Url& url)
-{
     const QString urlStr = url.toString(QUrl::RemovePassword | QUrl::FullyEncoded);
-    NX_DEBUG(this, "Opening webview URL: %1", urlStr);
+    NX_DEBUG(this, "Opening URL: %1", urlStr);
 
     const QString script = QString("window.location.replace(\'%1\')").arg(urlStr);
     m_webViewWidget->controller()->runJavaScript(script);
@@ -177,12 +132,12 @@ void OauthLoginDialogPrivate::retryLoad()
 
 void OauthLoginDialogPrivate::at_urlChanged()
 {
-    auto url = nx::utils::Url::fromQUrl(m_webViewWidget->controller()->url());
+    const QUrl url = m_webViewWidget->controller()->url();
     NX_DEBUG(this, "Url changed: %1", url);
     displayUrl(url);
 }
 
-void OauthLoginDialogPrivate::displayUrl(const nx::utils::Url& url)
+void OauthLoginDialogPrivate::displayUrl(const QUrl& url)
 {
     if (m_urlLineEdit)
     {

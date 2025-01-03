@@ -6,7 +6,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/url.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 
@@ -15,7 +14,6 @@ class QProgressBar;
 class QStackedWidget;
 
 namespace nx::cloud::db::api { class Connection; }
-namespace nx::network::http { class AsyncClient; }
 
 namespace nx::vms::client::core {
 
@@ -44,9 +42,9 @@ public:
     virtual ~OauthLoginDialogPrivate() override;
 
 public:
-    void load(const nx::utils::Url& url);
-
     // Native client methods.
+    Q_INVOKABLE void load(const QUrl& url);
+
     Q_INVOKABLE void setCode(const QString& code);
 
     Q_INVOKABLE void setBindInfo(const QJsonObject& jsonObject);
@@ -63,24 +61,19 @@ private:
     void at_loadFinished(bool success);
 
     void retryLoad();
-    void loadInWebView(const nx::utils::Url& url);
-    void displayUrl(const nx::utils::Url& url);
-
-    void startCheck();
-    bool stopCheck();
+    void displayUrl(const QUrl& url);
 
 public:
     QLineEdit* m_urlLineEdit = nullptr;
     QStackedWidget* m_stackedWidget = nullptr;
 
 private:
-    nx::utils::Url m_requestedUrl;
+    QUrl m_requestedUrl;
 
     QProgressBar* m_progressBar = nullptr;
     WebViewWidget* m_webViewWidget = nullptr;
     OauthLoginPlaceholder* m_placeholder = nullptr;
 
-    std::unique_ptr<nx::network::http::AsyncClient> m_checkClient;
     std::unique_ptr<core::OauthClient> m_oauthClient;
 };
 
