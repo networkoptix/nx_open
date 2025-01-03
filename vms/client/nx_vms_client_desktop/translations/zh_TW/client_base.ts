@@ -1042,7 +1042,7 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation>錄影資料過濾器</translation>
+      <translation>錄影資料篩選器</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -5458,11 +5458,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>檢查 %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>遠端錄影備份失敗</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -5478,11 +5478,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>從任何地方連到您的站點！</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>系統中沒有在線的伺服器有連上網路能進行時間同步。</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
@@ -5494,7 +5494,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>有些攝影機不支援它們所設定的錄影模式。</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
@@ -7465,7 +7465,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be removed from the Site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
+      <translation> 將從站點刪除%1並以所選攝影機取代</translation>
     </message>
   </context>
   <context>
@@ -7871,7 +7871,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>%1 為&lt;b&gt;跨系統佈局&lt;/b&gt;，你可以加入不同站點的裝置。目前雖僅支援部分功能，但我們會持續在未來版本加入新功能。</translation>
     </message>
   </context>
   <context>
@@ -7968,7 +7968,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>站點中沒有本地擁有者帳號或已被停用。</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
@@ -8107,11 +8107,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>此攝影機需要密碼才能設定。請您的站點管理員來執行此操作。</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>所選的攝影機部分需要密碼才能設定。請您的系統管理員來執行此操作。</translation>
     </message>
   </context>
   <context>
@@ -8251,7 +8251,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>已達到該站點的裝置數量限制。</translation>
     </message>
   </context>
   <context>
@@ -9078,7 +9078,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>所有 LDAP 使用者和群組將被刪除，&lt;br&gt;&lt;br&gt;LDAP 設定也會被刪除。</translation>
     </message>
   </context>
   <context>
@@ -9941,7 +9941,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>不相容 %1 實例。要更新先從 %1 斷開站點。</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
@@ -10071,11 +10071,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>只要站點連接到 LDAP 伺服器，就無法刪除LDAP 預設群組</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>組織使用者管理僅能在組織層級設定，無法在站點層級設定。</translation>
     </message>
   </context>
   <context>
@@ -11456,11 +11456,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>開啟設定</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>開啟服務</translation>
     </message>
   </context>
   <context>
@@ -11484,12 +11484,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>您對該站點的存取權限過期%1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>您對該站點的存取權限即將在%1過期</translation>
     </message>
   </context>
   <context>
@@ -13031,7 +13031,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>請選擇州</translation>
     </message>
   </context>
   <context>
@@ -13054,7 +13054,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>不包含關鍵字</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
@@ -13121,15 +13121,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>限制</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>允許</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>目前</translation>
     </message>
   </context>
   <context>
@@ -13634,7 +13634,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>用戶端自動更新</translation>
     </message>
   </context>
   <context>

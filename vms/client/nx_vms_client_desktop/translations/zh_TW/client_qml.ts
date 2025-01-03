@@ -729,7 +729,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation>請嘗試更改過濾條件或者新增事件規則</translation>
+      <translation>請嘗試更改篩選條件或者新增事件規則</translation>
     </message>
   </context>
   <context>
@@ -820,7 +820,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>透過篩選條件允許Base DN 中特定的使用者和/或群組存取系統和同步。</translation>
     </message>
   </context>
   <context>
@@ -1403,7 +1403,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>因為未符合同步設定，沒有使用者或群組被新增至系統資料庫。請確認 LDAP 伺服器參數和篩選條件設定正確。</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
@@ -1974,7 +1974,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>篩選條件</translation>
     </message>
   </context>
   <context>

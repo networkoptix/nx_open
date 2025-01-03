@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>站點伺服器</translation>
     </message>
   </context>
   <context>
@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>使用站點預設</translation>
     </message>
   </context>
   <context>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>This site is connected to</source>
-      <translation type="unfinished">This site is connected to</translation>
+      <translation>此站點已連接到</translation>
     </message>
   </context>
   <context>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Create a backup of Site management data, or restore Site management data from an existing backup</source>
-      <translation type="unfinished">Create a backup of Site management data, or restore Site management data from an existing backup</translation>
+      <translation>建立站點資料庫的備份，或者從已備份的資料庫還原站點。</translation>
     </message>
   </context>
   <context>
@@ -1426,14 +1426,14 @@
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>啟動後自動連線至先前登入的站點</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>站點設定</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@
     </message>
     <message>
       <source>Show timestamp on LIVE</source>
-      <translation type="unfinished">Show timestamp on LIVE</translation>
+      <translation>在 LIVE 上顯示時間戳記</translation>
     </message>
   </context>
   <context>
@@ -1941,7 +1941,7 @@
     </message>
     <message>
       <source>Address or Subnet Mask</source>
-      <translation type="unfinished">Address or Subnet Mask</translation>
+      <translation>位址或子網路遮罩</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1969,16 +1969,16 @@
     </message>
     <message>
       <source>Find Devices</source>
-      <translation type="unfinished">Find Devices</translation>
+      <translation>搜尋裝置</translation>
     </message>
     <message>
       <source>
               Enter address, subnet range or subnet mask, login and password
               and click on the &quot;Search&quot; button
           </source>
-      <translation type="unfinished">
-              Enter address, subnet range or subnet mask, login and password
-              and click on the &quot;Search&quot; button
+      <translation>
+              輸入位址、子網路範圍或子網路遮罩、登入名稱和密碼
+              然後點選 &quot;搜尋&quot; 按鈕
           </translation>
     </message>
   </context>
@@ -2051,7 +2051,7 @@
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>簽名檔</translation>
     </message>
   </context>
   <context>
@@ -2150,7 +2150,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>站點通知</translation>
     </message>
   </context>
   <context>
@@ -2317,14 +2317,14 @@
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>移除此連線選項可能導致站點異常。</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>站點管理</translation>
     </message>
   </context>
   <context>

@@ -1234,7 +1234,7 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL 轉碼未被執行.</translation>
+      <translation>OpenCL 轉碼未被實行。</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
@@ -1275,7 +1275,7 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation>Cloud儲存空間</translation>
+      <translation>雲端儲存空間</translation>
     </message>
     <message>
       <source>Live view</source>
