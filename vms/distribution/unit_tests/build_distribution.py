@@ -167,6 +167,7 @@ def archiveSdkUnitTests(archiver, conf, src_bin_dir):
 def main():
     isWindows = conf.CMAKE_SYSTEM_NAME == "Windows"
     isMac = conf.CMAKE_SYSTEM_NAME == "Darwin"
+    isLinux = conf.CMAKE_SYSTEM_NAME == "Linux"
     withClient = parse_boolean(conf.WITH_CLIENT)
     withMediaServer = parse_boolean(conf.WITH_MEDIA_SERVER)
     withAnalyticsServer = parse_boolean(conf.WITH_ANALYTICS_SERVER)
@@ -267,6 +268,12 @@ def main():
                 archiveByGlob(a, f"Qt plugins from {plugin_group}", join(bin_dir, plugin_group),
                     join(conf.QT_DIR, "plugins", plugin_group), dll_glob)
             archiveByGlob(a, "Qt dlls", bin_dir, join(conf.QT_DIR, "bin"), dll_glob)
+
+        if isLinux:
+            archiveFiles(a,
+                join(bin_dir, 'imageformats'),
+                join(conf.BUILD_DIR, bin_dir, 'imageformats'),
+                ["libqtiff.so"])
 
         if isMac:
             archiveMacOsFrameworks(a, lib_dir, join(conf.QT_DIR, "lib"))
