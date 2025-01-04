@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
-      <translation>重新加載並跳過緩存</translation>
+      <translation>重新載入並跳過緩存</translation>
     </message>
     <message>
       <source>Open link in this window</source>
