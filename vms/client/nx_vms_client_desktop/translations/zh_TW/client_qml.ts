@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation>API 整合透過 REST API 與 %1 伺服器互動並交換詮釋資料 (metadata)</translation>
+      <translation>API 整合透過 REST API 與 %1 伺服器互動並交換metadata</translation>
     </message>
     <message>
       <source>New requests</source>
@@ -287,7 +287,7 @@
  • 更改攝影機設定
  • 存取錄影資料
  • 處理視訊串流
- • 透過網路交換詮釋資料(metadata)</translation>
+ • 透過網路交換metadata</translation>
     </message>
     <message>
       <source>Enable Integration</source>
