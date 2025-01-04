@@ -1588,7 +1588,7 @@
     </message>
     <message>
       <source>Downloader peers for files</source>
-      <translation type="unfinished">Downloader peers for files</translation>
+      <translation>檔案的的對等下載控制器</translation>
     </message>
     <message>
       <source>Client update settings</source>
