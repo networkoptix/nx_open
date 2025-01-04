@@ -10245,7 +10245,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation>等待同等數據中</translation>
+      <translation>等待其他伺服器數據中</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
@@ -10257,7 +10257,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation>無法下載更新套件.</translation>
+      <translation>無法下載更新套件。</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
@@ -10289,7 +10289,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation>未找到更新檔.</translation>
+      <translation>未找到更新檔。</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
@@ -10301,7 +10301,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation>不再支援此作業系統版本.</translation>
+      <translation>不再支援此作業系統版本。</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
