@@ -9733,11 +9733,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Vous êtes sur le point de fusionner des sites avec des licences de démarrage.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Une seule licence de démarrage est autorisée par site, la deuxième licence sera donc désactivée.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
