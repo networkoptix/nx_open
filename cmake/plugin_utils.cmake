@@ -8,8 +8,6 @@ set_target_properties(server_plugins PROPERTIES FOLDER server/plugins)
 set_property(GLOBAL PROPERTY nx_server_plugins_list)
 set_property(GLOBAL PROPERTY nx_server_plugins_optional_list)
 
-set(nx_add_plugin_to_distribution_if true) #< The default condition.
-
 function(nx_add_server_plugin target)
     cmake_parse_arguments(PLUGIN "OPTIONAL;DEDICATED_DIR" "EXTRA_FILES_SUBDIR"
         "ADD_TO_DISTRIBUTION_IF;EXTRA_FILES" ${ARGN})
@@ -38,7 +36,7 @@ function(nx_add_server_plugin target)
         ${PLUGIN_UNPARSED_ARGUMENTS})
 
     if("${PLUGIN_ADD_TO_DISTRIBUTION_IF}" STREQUAL "")
-        set(PLUGIN_ADD_TO_DISTRIBUTION_IF ${nx_add_plugin_to_distribution_if})
+        set(PLUGIN_ADD_TO_DISTRIBUTION_IF true)
     endif()
     if(${PLUGIN_ADD_TO_DISTRIBUTION_IF})
         set_property(TARGET ${target} PROPERTY add_to_distribution ON)
