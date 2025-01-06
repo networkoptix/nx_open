@@ -172,10 +172,10 @@ public:
     {
         flite_init();
 
-        vox.reset(register_cmu_us_slt()); //< US female voice.
+        m_vox.reset(register_cmu_us_slt()); //< US female voice.
 
-        flite_feat_set_float(vox->features, "duration_stretch", 1.0); //< Speedup/slowdown.
-        flite_feat_set_float(vox->features, "int_f0_target_mean", 180); //< Pitch.
+        flite_feat_set_float(m_vox->features, "duration_stretch", 1.0); //< Speedup/slowdown.
+        flite_feat_set_float(m_vox->features, "int_f0_target_mean", 180); //< Pitch.
 
         initializedPromise.set_value();
     };
@@ -187,11 +187,11 @@ public:
     /** NOTE: Not declared static to emphasize the need for the initialized instance. */
     bool textToWave(const QString& text, QIODevice* const dest, nx::media::audio::Format* outFormat) const
     {
-        return ::textToWave(text, vox.get(), dest, outFormat);
+        return ::textToWave(text, m_vox.get(), dest, outFormat);
     }
 
 private:
-    CustomUniquePtr<cst_voice, unregister_cmu_us_slt> vox; //< Flite voice instance.
+    CustomUniquePtr<cst_voice, unregister_cmu_us_slt> m_vox; //< Flite voice instance.
 };
 
 } // namespace
