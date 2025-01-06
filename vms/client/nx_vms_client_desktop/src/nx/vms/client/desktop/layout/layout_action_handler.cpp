@@ -8,6 +8,7 @@
 #include <QtCore/QWeakPointer>
 #include <QtGui/QAction>
 
+#include <api/server_rest_connection.h>
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <core/resource/camera_resource.h>
@@ -169,6 +170,42 @@ void saveCloudLayoutRetryCallback(bool success, const LayoutResourcePtr& layout)
                 layout->saveAsync(saveCloudLayoutRetryCallback);
         });
 };
+
+void postAcceptIntercomCall(
+    SystemContext* system,
+    nx::Uuid intercomId,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto serverApi = system->connectedServerApi();
+    if (!NX_ASSERT(serverApi))
+        return;
+
+    serverApi->postRest(
+        system->getSessionTokenHelper(),
+        nx::format("/rest/v4/devices/%1/intercom/acceptCall", intercomId.toSimpleString()),
+        nx::network::rest::Params(),
+        /*body*/ QByteArray(),
+        [intercomId](
+            bool success,
+            rest::Handle /*requestId*/,
+            const rest::ServerConnection::ErrorOrEmpty& result)
+        {
+            if (success)
+                return;
+
+            QString error = nx::format(
+                "The call acceptance operation for the %1 intercom has failed", intercomId);
+
+            if (const auto* restResult = std::get_if<nx::network::rest::Result>(&result))
+            {
+                error += nx::format(": %1", restResult->errorId);
+                if (!restResult->errorString.isEmpty())
+                    error += nx::format(", %1", restResult->errorString);
+            }
+            NX_WARNING(NX_SCOPE_TAG, error);
+        },
+        executor);
+}
 
 } // namespace
 
@@ -1249,18 +1286,7 @@ void LayoutActionHandler::at_openIntercomLayoutAction_triggered()
     const auto businessAction =
         parameters.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
 
-    vms::event::SystemHealthActionPtr broadcastAction(new vms::event::SystemHealthAction(
-        MessageType::showIntercomInformer,
-        businessAction->getRuntimeParams().eventResourceId));
-    broadcastAction->setToggleState(nx::vms::api::EventState::inactive);
-
-    if (const auto connection = system()->messageBusConnection())
-    {
-        const auto manager = connection->getEventRulesManager(nx::network::rest::kSystemSession);
-        nx::vms::api::EventActionData actionData;
-        ec2::fromResourceToApi(broadcastAction, actionData);
-        manager->broadcastEventAction(actionData, [](int /*handle*/, ec2::ErrorCode) {});
-    }
+    postAcceptIntercomCall(system(), businessAction->getRuntimeParams().eventResourceId, thread());
 }
 
 void LayoutActionHandler::at_openMissedCallIntercomLayoutAction_triggered()

@@ -79,11 +79,6 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
     showMissedCallInformer = 35,
 
     /**
-     * Informs a server that a user has closed call notification.
-     */
-    rejectIntercomCall = 36,
-
-    /**
      * Show a warning that current user notification language differs from the client application
      * language. Generated on the client side.
      */

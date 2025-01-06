@@ -59,6 +59,42 @@ bool setRelayOutputId(const QnVirtualCameraResourcePtr camera,
     return true;
 }
 
+void postRejectIntercomCall(
+    SystemContext* system,
+    nx::Uuid intercomId,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    auto serverApi = system->connectedServerApi();
+    if (!NX_ASSERT(serverApi))
+        return;
+
+    serverApi->postRest(
+        system->getSessionTokenHelper(),
+        nx::format("/rest/v4/devices/%1/intercom/rejectCall", intercomId.toSimpleString()),
+        nx::network::rest::Params(),
+        /*body*/ QByteArray(),
+        [intercomId](
+            bool success,
+            rest::Handle /*requestId*/,
+            const rest::ServerConnection::ErrorOrEmpty& result)
+        {
+            if (success)
+                return;
+
+            QString error = nx::format(
+                "The call rejection operation for the %1 intercom has failed", intercomId);
+
+            if (const auto* restResult = std::get_if<nx::network::rest::Result>(&result))
+            {
+                error += nx::format(": %1", restResult->errorId);
+                if (!restResult->errorString.isEmpty())
+                    error += nx::format(", %1", restResult->errorString);
+            }
+            NX_WARNING(NX_SCOPE_TAG, error);
+        },
+        executor);
+}
+
 } // namespace
 
 using nx::vms::api::ActionType;
@@ -178,22 +214,9 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.onCloseAction = CommandActionPtr(new CommandAction());
 
             const auto rejectCallActionHandler =
-                [this, camera]()
+                [this, cameraId = camera->getId()]()
                 {
-                    vms::event::SystemHealthActionPtr broadcastAction(
-                        new vms::event::SystemHealthAction(
-                            MessageType::rejectIntercomCall,
-                            camera->getId()));
-
-                    if (const auto connection = system()->messageBusConnection())
-                    {
-                        const auto manager = connection->getEventRulesManager(
-                            nx::network::rest::kSystemSession);
-                        nx::vms::api::EventActionData actionData;
-                        ec2::fromResourceToApi(broadcastAction, actionData);
-                        manager->broadcastEventAction(actionData,
-                            [](int /*handle*/, ec2::ErrorCode) {});
-                    }
+                    postRejectIntercomCall(system(), cameraId, thread());
                 };
 
             connect(eventData.onCloseAction.data(), &CommandAction::triggered,

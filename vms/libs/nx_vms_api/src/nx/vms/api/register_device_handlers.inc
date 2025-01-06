@@ -282,6 +282,32 @@ void registerDeviceBaseHandlers(
         GlobalPermission::none,
         std::make_unique<DeviceIoHandler>(serverConnector));
 
+    /**%apidoc[proprietary] POST /rest/v{4-}/devices/{id}/intercom/rejectCall
+     * Rejects a call from the specified intercom Device if it is in progress.
+     * %caption Reject intercom call
+     * %ingroup Devices
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{4-}/devices/:id/intercom/rejectCall",
+        GlobalPermission::none,
+        std::make_unique<IntercomRejectHandler>(serverModule, serverConnector));
+
+    /**%apidoc[proprietary] POST /rest/v{4-}/devices/{id}/intercom/acceptCall
+     * Accept a call from the specified intercom Device if it is in progress.
+     * %caption Accept intercom call
+     * %ingroup Devices
+     * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     *     `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{4-}/devices/:id/intercom/acceptCall",
+        GlobalPermission::none,
+        std::make_unique<IntercomAcceptHandler>(serverModule, serverConnector));
+
     /**%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/move
      * Starts a continuous PTZ move.
      * %caption Start PTZ move

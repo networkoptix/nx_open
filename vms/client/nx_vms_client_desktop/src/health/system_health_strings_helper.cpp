@@ -107,8 +107,6 @@ QString QnSystemHealthStringsHelper::messageShortTitle(
             return tr("Intercom call");
         case MessageType::showMissedCallInformer:
             return tr("Intercom missed call");
-        case MessageType::rejectIntercomCall:
-            return tr("Reject intercom call");
         case MessageType::notificationLanguageDiffers:
             return tr("Notification and interface languages differ");
 
