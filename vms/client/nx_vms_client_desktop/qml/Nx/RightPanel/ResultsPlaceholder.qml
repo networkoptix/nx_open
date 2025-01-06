@@ -19,7 +19,7 @@ Item
     property alias description: placeholderDescription.text
     property Action action: null
 
-    property color textColor: ColorTheme.colors.dark10
+    property color textColor: ColorTheme.colors.dark16
 
     Column
     {
@@ -49,7 +49,7 @@ Item
         {
             id: placeholderIcon
 
-            primaryColor: ColorTheme.colors.dark17
+            primaryColor: placeholder.textColor
             width: 64
             height: 64
             sourceSize: Qt.size(width, height)
