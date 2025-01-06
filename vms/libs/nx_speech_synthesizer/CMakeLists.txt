@@ -5,6 +5,7 @@ find_package(flite)
 nx_add_target(nx_speech_synthesizer LIBRARY NO_API_MACROS
     PUBLIC_LIBS
         nx_vms_common
+    PRIVATE_LIBS
         flite::flite
     FOLDER common/libs
 )
