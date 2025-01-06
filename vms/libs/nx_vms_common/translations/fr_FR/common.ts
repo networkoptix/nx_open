@@ -566,7 +566,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>Démarrer</translation>
+      <translation>Démarrage</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -602,7 +602,7 @@
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Démarrer Licences</translation>
+      <translation>Licences de démarrage</translation>
     </message>
     <message>
       <source>Invalid</source>
