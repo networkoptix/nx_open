@@ -39,10 +39,6 @@ void saveCacheInfo(
 {
     const auto cloudId = connection->moduleInformation().cloudSystemId;
 
-    const std::string cacheStr =
-        nx::vms::client::core::appContext()->coreSettings()->systemAuthenticationCache(
-            cloudId);
-
     RemoteConnectionContextData customData;
 
     const auto serverIt = std::find_if(servers.begin(), servers.end(),
