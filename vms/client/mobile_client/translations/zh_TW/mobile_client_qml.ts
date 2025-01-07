@@ -708,7 +708,7 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation type="unfinished">Enable software decoder fallback</translation>
+      <translation>啟用退回軟體解碼器</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
