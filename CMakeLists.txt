@@ -7,7 +7,6 @@ set(open_source_root "${CMAKE_SOURCE_DIR}")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(cmake/find_python.cmake)
-find_package(PythonInterp)
 
 include(cmake/open_source/defaults.cmake)
 include(cmake/customization_package.cmake)

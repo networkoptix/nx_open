@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+include_guard(GLOBAL)
+
 function(verify_python_version_is_compatible)
     execute_process(
         COMMAND "${PYTHON_EXECUTABLE}" --version
@@ -65,11 +67,12 @@ function(find_compatible_python_version)
         endif()
     endforeach()
 
-    message(FATAL_ERROR "Python 3.8/9/10/11 executable not found.")
+    message(FATAL_ERROR "Python 3.8/9/10/11/12 executable not found.")
 endfunction()
 
 if(NOT PYTHON_EXECUTABLE)
-    find_compatible_python_version(python3.11 python3.10 python3.9 python3.8 python3 python)
+    find_compatible_python_version(
+        python3.12 python3.11 python3.10 python3.9 python3.8 python3 python)
 endif()
 
 message(STATUS "Found python executable: '${PYTHON_EXECUTABLE}'.")

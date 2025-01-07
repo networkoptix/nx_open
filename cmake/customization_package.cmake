@@ -2,6 +2,7 @@
 
 include_guard(GLOBAL)
 
+include(${open_source_root}/cmake/find_python.cmake)
 include(${open_source_root}/cmake/utils.cmake)
 
 set(customizationPackageFile "" CACHE STRING "Customization package archive")
