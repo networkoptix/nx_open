@@ -1810,7 +1810,7 @@
     </message>
     <message>
       <source>Last slave Site merge ID</source>
-      <translation type="unfinished">Last slave Site merge ID</translation>
+      <translation>最後的附屬站點合併ID</translation>
     </message>
     <message>
       <source>Pixelation settings</source>
@@ -1822,7 +1822,7 @@
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>啟用或停用建立新的整合註冊請求</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
@@ -2524,11 +2524,11 @@
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>呼叫請求</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>未接呼叫請求</translation>
     </message>
   </context>
 </TS>
