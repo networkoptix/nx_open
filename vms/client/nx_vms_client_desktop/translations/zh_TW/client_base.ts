@@ -4697,7 +4697,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>您帳號必須停用不安全(摘要)身份驗證才能用於遠端連線。</translation>
     </message>
   </context>
   <context>
@@ -4762,7 +4762,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>驗證</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -4781,7 +4781,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
+      <translation>無法存取該攝影機。在 Nx Witness 桌面用戶端中執行攝影機診斷以取得更多資訊。</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4793,7 +4793,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>不支援</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4801,11 +4801,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>站點關閉</translation>
     </message>
     <message>
       <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
+      <translation>串流限制</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -5397,15 +5397,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>該站點沒有網路連線無法進行時間同步</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>系統分割區已用於儲存分析資料</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>站點已暫停</translation>
     </message>
     <message>
       <source>Site shut down</source>
@@ -5413,7 +5413,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
+      <translation>拒絕對講呼叫</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
@@ -6742,11 +6742,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>新增至清單</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>建立新清單...</translation>
     </message>
   </context>
   <context>
@@ -7060,7 +7060,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>站點已暫停。站點需要在活躍狀態才能更改備份設定。%1</translation>
     </message>
   </context>
   <context>
@@ -7244,7 +7244,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+      <translation>只有首次新增至站點後的攝影機或伺服器的離線時間段會自動匯入。</translation>
     </message>
   </context>
   <context>
@@ -7324,7 +7324,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>選擇熱點目標</translation>
     </message>
   </context>
   <context>

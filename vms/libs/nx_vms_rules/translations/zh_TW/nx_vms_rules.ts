@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>並非所有伺服器都適合</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -214,8 +214,8 @@
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>所選的攝影機已被移除</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -717,15 +717,15 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>未選擇清單</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>id 為&apos;%1&apos; 的清單不存在</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>id 為&apos;%1&apos; 的清單包含無效的物件類型 - &apos;%2&apos;, 預期為 &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -860,19 +860,19 @@
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>`%1` 事件篩選欄位警報：</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>`%1` 動作生成器欄位警報：</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>規則尚未完成。需要一個篩選條件一個生成器</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>給定的篩選條件與給定的生成器不相容</translation>
     </message>
   </context>
   <context>
@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 失敗</translation>
     </message>
   </context>
   <context>
@@ -996,7 +996,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 開始</translation>
     </message>
   </context>
   <context>
@@ -1071,7 +1071,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>`%1` 狀態對於具有給定參數的 `%2` 事件和 `%3` 動作是無效的</translation>
     </message>
   </context>
   <context>
@@ -1155,7 +1155,7 @@
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>給定 id &apos;%1&apos; 的清單不是通用清單</translation>
     </message>
   </context>
   <context>

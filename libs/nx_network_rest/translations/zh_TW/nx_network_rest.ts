@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>由於未知錯誤，該請求沒有通過身份驗證。</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation>未經身分認証.</translation>
+      <translation>未通過身份驗證。</translation>
     </message>
     <message>
       <source>Session expired.</source>
@@ -136,11 +136,11 @@
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>根據站點配置，連線已過時。</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>伺服器已沒有該資源。</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -150,11 +150,11 @@
     <message>
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+      <translation>無效的參數 `%1`: %2。</translation>
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>服務沒有通過身份驗證。</translation>
     </message>
   </context>
 </TS>

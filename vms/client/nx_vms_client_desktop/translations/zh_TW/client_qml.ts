@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>排列設定</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>表格設定</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>整合允許在各種裝置上無縫利用 VMS 的影像分析。
+選擇一個整合以開始設定其參數。</translation>
     </message>
   </context>
   <context>
@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>配對碼錯誤</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -404,7 +404,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>透過連結分享</translation>
     </message>
   </context>
   <context>
@@ -693,7 +693,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>選擇類型</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
@@ -709,8 +709,8 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>此清單與 %n 個事件規則相關。您確定要刪除它嗎？</numerusform>
       </translation>
     </message>
   </context>
@@ -736,7 +736,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>匯出清單</translation>
     </message>
     <message>
       <source>Exporting</source>
@@ -917,7 +917,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>某些值無法自動配對，請手動配對。</translation>
     </message>
     <message>
       <source>Back</source>
@@ -1067,7 +1067,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>存在另一個同名的群組。建議為群組分配不重複的名稱。</translation>
     </message>
   </context>
   <context>
@@ -1325,7 +1325,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>登入站點來設定開啟佈局的方式</translation>
     </message>
   </context>
   <context>
@@ -1395,11 +1395,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>將您的站點連接到 LDAP 伺服器來簡化使用者管理</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>此站點已停止與 LDAP 伺服器的持續同步。群組、使用者和群組成員的更新將僅透過手動同步進行。</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
@@ -1407,7 +1407,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>更改 LDAP 設定時請小心，不正確的配置可能同時中斷大量使用者至站點的連線。</translation>
     </message>
   </context>
   <context>
@@ -1464,11 +1464,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>匯入清單</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>匯入選項</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1480,11 +1480,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>分隔符：</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>數據包含標頭(header)</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1508,11 +1508,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>請確認該文件存在並且您有權存取所選文件</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>修復匯入的項目</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
@@ -1551,7 +1551,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>已選%1個:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1563,7 +1563,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>新增清單...</translation>
     </message>
     <message>
       <source>Could not save file</source>
@@ -1579,7 +1579,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>匯入所選項目</translation>
     </message>
   </context>
   <context>
@@ -1693,8 +1693,8 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>具有 %n 種屬性</numerusform>
       </translation>
     </message>
     <message>
@@ -1741,7 +1741,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>整合配對代碼</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1833,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>需要權限群組</translation>
     </message>
     <message>
       <source>View Permissions</source>
@@ -1981,7 +1981,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>選擇屬性</translation>
     </message>
   </context>
   <context>
@@ -2115,7 +2115,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>遠端存取工具目前已停用。請將其啟用或聯絡您的管理員將其啟用。</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2127,11 +2127,11 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>將 %1 用戶端應用程式連接到本機：%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>本地埠</translation>
     </message>
     <message>
       <source>An error occurred</source>
@@ -2453,7 +2453,7 @@ Press Alt + Click to follow object</source>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>接受 API 整合註冊請求</translation>
     </message>
   </context>
   <context>
@@ -2822,7 +2822,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>已擁有Cloud帳號的使用者將很快能看到新增的站點，而沒有Cloud帳號的使用者將透過電子郵件收到操作指示。</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3020,7 +3020,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>已選%1個:</translation>
     </message>
     <message>
       <source>Schedule</source>
