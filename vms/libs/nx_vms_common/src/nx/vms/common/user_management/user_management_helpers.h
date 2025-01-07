@@ -146,7 +146,7 @@ QStringList userGroupNames(const SystemContext* systemContext, const IdList& gro
 inline QStringList userGroupNames(const QnUserResourcePtr& user)
 {
     return user && user->systemContext()
-        ? userGroupNames(user->systemContext(), user->groupIds())
+        ? userGroupNames(user->systemContext(), user->allGroupIds())
         : QStringList{};
 }
 
@@ -163,7 +163,7 @@ QSet<nx::Uuid> userGroupsWithParents(SystemContext* systemContext, const IdList&
 
 inline QSet<nx::Uuid> userGroupsWithParents(const QnUserResourcePtr& user)
 {
-    return userGroupsWithParents(user->systemContext(), user->groupIds());
+    return userGroupsWithParents(user->systemContext(), user->allGroupIds());
 }
 
 } // namespace nx::vms::common

@@ -1084,11 +1084,20 @@ struct RemoveResourceAccess
             .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        if (const auto user = target.dynamicCast<QnUserResource>();
-            user && user->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
+        if (auto user = target.dynamicCast<QnUserResource>())
         {
-            return Result(ErrorCode::forbidden, ServerApiErrors::tr(
-                "Removal of the User with readonly attribute is forbidden for VMS."));
+            if (user->attributes().testFlag(nx::vms::api::UserAttribute::readonly))
+            {
+                return Result(ErrorCode::forbidden, ServerApiErrors::tr(
+                    "Removal of the User with readonly attribute is forbidden for VMS"));
+            }
+            if (user->isCloud() && !user->orgGroupIds().empty())
+            {
+                return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "Removal of the User with Groups in an Organization is controlled by the %1",
+                        /*comment*/ "%1 is the short Cloud name"),
+                            nx::branding::shortCloudName()));
+            }
         }
 
         if (!systemContext->resourceAccessManager()->hasPermission(
@@ -1229,6 +1238,9 @@ private:
         if (Result r = checkAdHocCloudCreation(user); !r)
             return r;
 
+        if (Result r = checkEmptyOrgGroupsUserCreation(user); !r)
+            return r;
+
         // TODO: #skolesnik
         //     Check for attempts to assign `administrator` or `powerUser` as custom rights.
         //     Example: new set of `parentIds` doesn't have a `powerUser` group, but `attributes`
@@ -1340,6 +1352,9 @@ private:
         if (existing.externalId != modified.externalId)
             return forbidExternalIdModification();
 
+        if (Result r = checkOrgGroupsModifications(existing, modified); !r)
+            return r;
+
         // TODO: (?) `attributes`
 
         if (Result r = checkDigestModifications(existing, modified); !r)
@@ -1445,6 +1460,24 @@ private:
         return {};
     }
 
+    static Result checkOrgGroupsModifications(const api::UserData& existing, const api::UserData& modified)
+    {
+        if ((existing.orgGroupIds.size() != modified.orgGroupIds.size())
+            || (nx::utils::unique_sorted(existing.orgGroupIds)
+                != nx::utils::unique_sorted(modified.orgGroupIds)))
+        {
+            return forbidOrgGroupsModification();
+        }
+        return {};
+    }
+
+    static Result checkEmptyOrgGroupsUserCreation(const api::UserData& user)
+    {
+        if (!user.orgGroupIds.empty())
+            return forbidOrgGroupsModification();
+        return {};
+    }
+
     static Result forbidSelfModification(const QString& propName, const api::UserData& user)
     {
         return {ErrorCode::forbidden,
@@ -1519,6 +1552,14 @@ private:
                 targetPermission)};
     }
 
+    static Result forbidOrgGroupsModification()
+    {
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User Groups in an Organization are controlled by by the %1",
+                /*comment*/ "%1 is the short Cloud name"),
+                    nx::branding::shortCloudName())};
+    }
+
     // Ad Hoc function to provide error messages when trying to create a Cloud User with values
     // that are supposed to be managed by the Cloud.
     // TODO: Just forbid Cloud User creation?
@@ -1532,7 +1573,6 @@ private:
 
         return {};
     }
-
 };
 
 struct ModifyCameraDataAccess

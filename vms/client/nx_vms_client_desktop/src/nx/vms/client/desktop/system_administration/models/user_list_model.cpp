@@ -111,7 +111,8 @@ QStringList userGroupNamesSorted(const QnUserResourcePtr & user)
     if (!user || !user->systemContext())
         return {};
 
-    return nx::vms::common::userGroupNames(user->systemContext(), user->groupIds(),
+    // TODO: Split Site's and Organization's groups.
+    return nx::vms::common::userGroupNames(user->systemContext(), user->allGroupIds(),
         [](const auto& g1, const auto& g2)
         {
             return ComparableGroup(g1) < ComparableGroup(g2);
@@ -647,7 +648,7 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                 case UserGroupsColumn:
                 {
                     auto groups =
-                        d->systemContext()->userGroupManager()->getGroupsByIds(user->groupIds());
+                        d->systemContext()->userGroupManager()->getGroupsByIds(user->allGroupIds());
                     std::sort(groups.begin(), groups.end(),
                         [](const auto& left, const auto& right)
                         {

@@ -235,7 +235,7 @@ TEST_F(AccessControllerTest, userGroupChangesUpdatePermissionsForTheirMembers)
         new QnUserResource(nx::vms::api::UserType::local, /*externalId*/ {}));
     newLocalUser->setName(userName2);
     newLocalUser->setIdUnsafe(nx::Uuid::createUuid());
-    newLocalUser->setGroupIds({api::kPowerUsersGroupId});
+    newLocalUser->setSiteGroupIds({api::kPowerUsersGroupId});
     resourcePool()->addResource(newLocalUser);
 
     // Target is a member of Power Users.
@@ -243,7 +243,7 @@ TEST_F(AccessControllerTest, userGroupChangesUpdatePermissionsForTheirMembers)
     ASSERT_FALSE(
         systemContext()->accessController()->hasPermissions(newLocalUser, Qn::SavePermission));
 
-    newLocalUser->setGroupIds({});
+    newLocalUser->setSiteGroupIds({});
 
     // Target is not a member of any group.
     // Current user can modify target non-power user.
@@ -256,7 +256,7 @@ TEST_F(AccessControllerTest, userGroupChangesUpdatePermissionsForTheirMembers)
     newGroup.parentGroupIds = {api::kPowerUsersGroupId};
     systemContext()->userGroupManager()->addOrUpdate(newGroup);
 
-    newLocalUser->setGroupIds({newGroup.id});
+    newLocalUser->setSiteGroupIds({newGroup.id});
 
     // Target is member of `test_group` that is a member of Power Users.
     // Current user cannot modify target power user.

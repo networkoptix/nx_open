@@ -102,7 +102,7 @@ QSet<nx::Uuid> ContextCurrentUserWatcher::allParentGroups() const
     if (!m_user)
         return {};
 
-    const auto directParents = m_user->groupIds();
+    const auto directParents = m_user->allGroupIds();
     QSet<nx::Uuid> parentIds = {directParents.begin(), directParents.end()};
     parentIds += systemContext()->accessSubjectHierarchy()->recursiveParents(parentIds);
     parentIds.insert(m_user->getId());

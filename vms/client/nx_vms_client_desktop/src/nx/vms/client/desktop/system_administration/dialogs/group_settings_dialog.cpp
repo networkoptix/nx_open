@@ -540,7 +540,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         {
             UserGroupRequest::ModifyUserParents mod;
             mod.id = id;
-            mod.prevParents = user->groupIds();
+            mod.prevParents = user->allGroupIds();
             for (const auto& groupId: mod.prevParents)
             {
                 if (groupId != updateData.groupData.id)
@@ -576,7 +576,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
         {
             UserGroupRequest::ModifyUserParents mod;
             mod.id = userId;
-            mod.prevParents = user->groupIds();
+            mod.prevParents = user->allGroupIds();
             mod.newParents = mod.prevParents;
             mod.newParents.emplace_back(updateData.groupData.id);
             chain->append(mod);
@@ -672,7 +672,7 @@ void GroupSettingsDialog::removeGroups(
     for (const auto& user: resourcePool->getResources<QnUserResource>())
     {
         UserGroupRequest::ModifyUserParents mod;
-        mod.prevParents = user->groupIds();
+        mod.prevParents = user->allGroupIds();
         for (const auto& groupId: mod.prevParents)
         {
             if (!idsToRemove.contains(groupId) || ldapGroups.contains(groupId))

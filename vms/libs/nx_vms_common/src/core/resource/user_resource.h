@@ -140,8 +140,13 @@ public:
      */
     bool isBuiltInAdmin() const;
 
-    std::vector<nx::Uuid> groupIds() const;
-    void setGroupIds(const std::vector<nx::Uuid>& value);
+    std::vector<nx::Uuid> allGroupIds() const;
+
+    std::vector<nx::Uuid> siteGroupIds() const;
+    void setSiteGroupIds(const std::vector<nx::Uuid>& value);
+
+    std::vector<nx::Uuid> orgGroupIds() const;
+    void setOrgGroupIds(const std::vector<nx::Uuid>& value);
 
     void setResourceAccessRights(const std::map<nx::Uuid, nx::vms::api::AccessRights>& value);
 
@@ -189,7 +194,7 @@ public:
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
-    void userGroupsChanged(const QnUserResourcePtr& user, const std::vector<nx::Uuid>& previousRoleIds);
+    void userGroupsChanged(const QnUserResourcePtr& user);
 
     void enabledChanged(const QnUserResourcePtr& user);
 
@@ -214,7 +219,11 @@ protected:
 
 private:
     bool setPasswordHashesInternal(const PasswordHashes& hashes, bool isNewPassword);
-
+    bool setGroupIdsInternal(
+        std::vector<nx::Uuid>* dst,
+        const std::vector<nx::Uuid>& value,
+        std::vector<nx::Uuid>* previousValue,
+        nx::MutexLocker& lock);
 private:
     nx::vms::api::UserType m_userType;
     QString m_password;
@@ -224,6 +233,7 @@ private:
     QString m_realm;
     std::atomic<GlobalPermissions> m_permissions;
     std::vector<nx::Uuid> m_groupIds;
+    std::vector<nx::Uuid> m_orgGroupIds;
     std::atomic<bool> m_isAdministratorCache{false};
     std::atomic<bool> m_isEnabled{true};
     QString m_email;

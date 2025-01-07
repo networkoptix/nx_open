@@ -657,6 +657,7 @@ void registerRestHandlers(
      * %return:{UserModelV3List} List of all User records.
      *     %param[unused] password
      *     %param[unused] settings
+     *     %param[unused] orgGroupIds
      *
      **%apidoc POST /rest/v3/users
      * Creates a record in the Site for the new User.
@@ -666,11 +667,13 @@ void registerRestHandlers(
      * %param[unused] id
      * %param[unused] externalId
      * %param[unused] settings
+     * %param[unused] orgGroupIds
      * %param[ref] _strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{UserModelV3} User record that was created.
      *     %param[unused] password
      *     %param[unused] settings
+     *     %param[unused] orgGroupIds
      *
      **%apidoc GET /rest/v3/users/{id}
      * Retrieves the specified User record stored in the Site.
@@ -684,6 +687,7 @@ void registerRestHandlers(
      * %return:{UserModelV3} User record.
      *     %param[unused] password
      *     %param[unused] settings
+     *     %param[unused] orgGroupIds
      *
      **%apidoc PUT /rest/v3/users/{id}
      * Replaces all fields of the specified User record stored in the Site.
@@ -696,11 +700,13 @@ void registerRestHandlers(
      * %param[unused] externalId
      * %param[unused] isOwner
      * %param[unused] settings
+     * %param[unused] orgGroupIds
      * %param[ref] _strict,_ticket
      * %permissions Power User or the user themselves with a fresh session.
      * %return:{UserModelV3} User record.
      *     %param[unused] password
      *     %param[unused] settings
+     *     %param[unused] orgGroupIds
      *
      **%apidoc PATCH /rest/v3/users/{id}
      * Modifies certain fields of the specified User record stored in the Site.
@@ -714,11 +720,13 @@ void registerRestHandlers(
      * %param[unused] type
      * %param[unused] isOwner
      * %param[unused] settings
+     * %param[unused] orgGroupIds
      * %param[ref] _strict,_ticket
      * %permissions Power User or the user themselves with a fresh session.
      * %return:{UserModelV3} User record.
      *     %param[unused] password
      *     %param[unused] settings
+     *     %param[unused] orgGroupIds
      *
      **%apidoc DELETE /rest/v3/users/{id}
      * Deletes the specified User record from the Site.

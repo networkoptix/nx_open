@@ -461,9 +461,10 @@ bool QnResourceAccessManager::canCreateResourceInternal(
     // Check new users creating.
     if (const auto targetUser = target.dynamicCast<QnUserResource>())
     {
-        return canCreateUser(subject,
-            targetUser->getRawPermissions(),
-            targetUser->groupIds());
+        return targetUser->orgGroupIds().empty()
+            && canCreateUser(subject,
+                targetUser->getRawPermissions(),
+                targetUser->siteGroupIds());
     }
 
     if (const auto storage = target.dynamicCast<QnStorageResource>())
@@ -1071,6 +1072,8 @@ bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subje
 {
     if (data.type == UserType::cloud && !data.fullName.isEmpty())
         return false; //< Full name for cloud users is allowed to modify via cloud portal only.
+    if (!data.orgGroupIds.empty())
+        return false;
 
     return canCreateUser(subject, data.permissions, data.groupIds);
 }
@@ -1118,8 +1121,11 @@ bool QnResourceAccessManager::canModifyUser(
     if (!subject.isValid() || !NX_ASSERT(userResource))
         return false;
 
+    if (nx::utils::toQSet(userResource->orgGroupIds()) != nx::utils::toQSet(update.orgGroupIds))
+        return false;
+
     const auto oldPermissions = accumulatePermissions(
-        userResource->getRawPermissions(), userResource->groupIds());
+        userResource->getRawPermissions(), userResource->siteGroupIds());
 
     const auto newPermissions = accumulatePermissions(update.permissions, update.groupIds);
 
@@ -1128,7 +1134,7 @@ bool QnResourceAccessManager::canModifyUser(
 
     const bool permissionsChanged = oldPermissions != newPermissions
         || userResource->getRawPermissions() != update.permissions
-        || nx::utils::toQSet(userResource->groupIds()) != nx::utils::toQSet(update.groupIds)
+        || nx::utils::toQSet(userResource->siteGroupIds()) != nx::utils::toQSet(update.groupIds)
         || userResource->isEnabled() != update.isEnabled
         || accessRightMap != QHash<nx::Uuid, AccessRights>{
             update.resourceAccessRights.begin(), update.resourceAccessRights.end()};

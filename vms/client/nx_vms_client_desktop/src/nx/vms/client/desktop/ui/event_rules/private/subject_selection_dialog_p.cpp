@@ -285,7 +285,7 @@ bool UserListModel::systemHasCustomUsers() const
     const auto customUsers = resourcePool()->getResources<QnUserResource>(
         [](const QnUserResourcePtr& user)
         {
-            return isUserVisible(user) && user->groupIds().empty();
+            return isUserVisible(user) && user->allGroupIds().empty();
         });
 
     return !customUsers.empty();
@@ -332,7 +332,7 @@ bool UserListModel::filterAcceptsRow(int sourceRow,
     if (!user || !user->isEnabled())
         return false;
 
-    if (m_customUsersOnly && !user->groupIds().empty())
+    if (m_customUsersOnly && !user->allGroupIds().empty())
         return false;
 
     return base_type::filterAcceptsRow(sourceRow, sourceParent);

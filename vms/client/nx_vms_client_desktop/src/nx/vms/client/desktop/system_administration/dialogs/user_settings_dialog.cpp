@@ -513,7 +513,8 @@ struct UserSettingsDialog::Private
                 user->setRawPermissions(state.globalPermissions);
                 user->setEnabled(state.userEnabled);
                 user->setLocale(state.locale);
-                user->setGroupIds(data->groupIds);
+                user->setSiteGroupIds(data->groupIds);
+                user->setOrgGroupIds(data->orgGroupIds.value_or(std::vector<nx::Uuid>{}));
             }
 
             UserGroupRequestChain::updateLayoutSharing(
@@ -1141,7 +1142,8 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && user->fullName().isEmpty();
 
     // List of groups.
-    for (const nx::Uuid& groupId: user->groupIds())
+    // TODO: Split site's and organization's groups
+    for (const nx::Uuid& groupId: user->allGroupIds())
         state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), groupId));
 
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(

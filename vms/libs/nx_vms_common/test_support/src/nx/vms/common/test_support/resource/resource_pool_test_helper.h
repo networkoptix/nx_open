@@ -46,6 +46,12 @@ public:
         const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
 
+    QnUserResourcePtr addOrgUser(
+        Ids orgGroupIds,
+        const QString& name,
+        GlobalPermissions globalPermissions = GlobalPermission::none,
+        const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {});
+
     virtual QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
     nx::Uuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);

@@ -123,6 +123,9 @@ struct NX_VMS_API UserData: ResourceData
      * %example en_US
      */
     QString locale;
+
+    /**%apidoc[opt] List of groups in the Organization to inherit permissions. */
+    std::vector<nx::Uuid> orgGroupIds;
 };
 #define UserData_Fields \
     ResourceData_Fields \
@@ -138,7 +141,8 @@ struct NX_VMS_API UserData: ResourceData
     (digest) \
     (hash) \
     (cryptSha512Hash) \
-    (locale)
+    (locale) \
+    (orgGroupIds)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(UserData)
 NX_REFLECTION_INSTRUMENT(UserData, UserData_Fields)
 

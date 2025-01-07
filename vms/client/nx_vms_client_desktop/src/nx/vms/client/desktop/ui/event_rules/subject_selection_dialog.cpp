@@ -372,7 +372,7 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<nx::Uuid>& ids)
     for (const auto& user: users)
     {
         userIds.insert(user->getId());
-        nonCustomUsers = nonCustomUsers || !user->groupIds().empty();
+        nonCustomUsers = nonCustomUsers || !user->allGroupIds().empty();
     }
 
     m_users->setCheckedUsers(userIds);

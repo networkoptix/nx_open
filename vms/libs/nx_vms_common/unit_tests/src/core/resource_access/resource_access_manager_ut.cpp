@@ -169,7 +169,7 @@ protected:
     {
         UserData data;
         ec2::fromResourceToApi(target, data);
-        data.groupIds = target->groupIds();
+        data.groupIds = target->siteGroupIds();
         data.groupIds.push_back(powerUserGroupId);
 
         auto info = nx::format("check: %1 -> %2 (inheritance)",
@@ -179,6 +179,14 @@ protected:
             ASSERT_TRUE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
         else
             ASSERT_FALSE(resourceAccessManager()->canModifyUser(source, target, data)) << info;
+    }
+
+    static UserData makeUserDataWithOrgGroup()
+    {
+        UserData data;
+        data.name = "testOrgUser";
+        data.orgGroupIds = {kViewersGroupId};
+        return data;
     }
 
     QnUserResourcePtr m_currentUser;
@@ -826,7 +834,10 @@ TEST_F(ResourceAccessManagerTest, checkAdministratorCanNotEditOtherAdministrator
         kAdministratorsGroupId, "user@mail.com", UserType::cloud);
     resourcePool()->addResource(cloudAdministrator);
 
+    const auto orgAdministrator = addOrgUser(kAdministratorsGroupId, "org@mail.com");
+
     EXPECT_FALSE(hasPermissions(localAdministrator, cloudAdministrator, Qn::WriteDigestPermission));
+    EXPECT_FALSE(hasPermissions(localAdministrator, orgAdministrator, Qn::WriteDigestPermission));
     EXPECT_FALSE(hasPermissions(cloudAdministrator, localAdministrator, Qn::WriteDigestPermission));
 
     for (const auto& permission: {
@@ -839,7 +850,11 @@ TEST_F(ResourceAccessManagerTest, checkAdministratorCanNotEditOtherAdministrator
     {
         const auto label = QJson::serialized(permission).toStdString();
         EXPECT_FALSE(hasPermissions(localAdministrator, cloudAdministrator, permission)) << label;
+        EXPECT_FALSE(hasPermissions(localAdministrator, orgAdministrator, permission)) << label;
         EXPECT_FALSE(hasPermissions(cloudAdministrator, localAdministrator, permission)) << label;
+        EXPECT_FALSE(hasPermissions(cloudAdministrator, orgAdministrator, permission)) << label;
+        EXPECT_FALSE(hasPermissions(orgAdministrator, localAdministrator, permission)) << label;
+        EXPECT_FALSE(hasPermissions(orgAdministrator, cloudAdministrator, permission)) << label;
     }
 }
 
@@ -918,6 +933,7 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
     const auto cloud = addUser(NoGroup, "cloud", UserType::cloud);
     const auto cloudAdministrator = addUser(
         kAdministratorsGroupId, "cloud administrator", UserType::cloud);
+    const auto orgAdministrator = addOrgUser(kAdministratorsGroupId, "org@mail.com");
     const auto powerUser = addUser(kPowerUsersGroupId, "power user");
     const auto transitivelyInheritedPowerUser = addUser(
         powerUsersToo.id, "transitively inherited power user");
@@ -926,7 +942,7 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
     const auto other = addUser(NoGroup, "other");
 
     const QnUserResourceList users = {administrator, cloudAdministrator, powerUser,
-        transitivelyInheritedPowerUser, cloud, ldap, other};
+        transitivelyInheritedPowerUser, cloud, ldap, other, orgAdministrator};
 
     const QVector<std::pair<QnUserResourcePtr, QnUserResourcePtr>> allowedScenariosViaInheritance = {
         {powerUser, powerUser}, //< No change, considered allowed.
@@ -939,7 +955,12 @@ TEST_F(ResourceAccessManagerTest, checkCanGrantPowerUserPermissions)
         {cloudAdministrator, transitivelyInheritedPowerUser},
         {cloudAdministrator, cloud},
         {cloudAdministrator, ldap},
-        {cloudAdministrator, other}};
+        {cloudAdministrator, other},
+        {orgAdministrator, powerUser},
+        {orgAdministrator, transitivelyInheritedPowerUser},
+        {orgAdministrator, cloud},
+        {orgAdministrator, ldap},
+        {orgAdministrator, other}};
 
     for (const auto& editor: users)
     {
@@ -972,6 +993,9 @@ TEST_F(ResourceAccessManagerTest, checkWhatUsersCanViewerCreate)
 
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kAdministratorsGroupId}));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, makeUserDataWithOrgGroup()));
 }
 
 TEST_F(ResourceAccessManagerTest, checkWhatUsersCanPowerUserCreate)
@@ -995,6 +1019,9 @@ TEST_F(ResourceAccessManagerTest, checkWhatUsersCanPowerUserCreate)
 
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kAdministratorsGroupId}));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, makeUserDataWithOrgGroup()));
 }
 
 TEST_F(ResourceAccessManagerTest, checkWhatUsersCanAdministratorCreate)
@@ -1019,6 +1046,9 @@ TEST_F(ResourceAccessManagerTest, checkWhatUsersCanAdministratorCreate)
 
     ASSERT_FALSE(resourceAccessManager()->canCreateUser(
         m_currentUser, GlobalPermission::none, {kAdministratorsGroupId}));
+
+    ASSERT_FALSE(resourceAccessManager()->canCreateUser(
+        m_currentUser, makeUserDataWithOrgGroup()));
 }
 
 TEST_F(ResourceAccessManagerTest, checkParentGroupsValidity)
@@ -1246,9 +1276,21 @@ TEST_F(ResourceAccessManagerTest, checkUserRoleChange)
     ASSERT_FALSE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermissions(user, target, Qn::ViewContentPermission));
 
-    user->setGroupIds({kLiveViewersGroupId});
+    user->setSiteGroupIds({kLiveViewersGroupId});
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermissions(user, target, Qn::ViewContentPermission));
+}
+
+TEST_F(ResourceAccessManagerTest, checkOrgUserRoleChange)
+{
+    const auto user = addOrgUser(kLiveViewersGroupId, "user@mail.com");
+    const auto target = addCamera();
+
+    ASSERT_FALSE(hasPermissions(user, target, Qn::RemovePermission));
+    ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermissions(user, target, Qn::ViewContentPermission));
+    user->setOrgGroupIds({kPowerUsersGroupId});
+    ASSERT_TRUE(hasPermissions(user, target, Qn::RemovePermission));
 }
 
 TEST_F(ResourceAccessManagerTest, checkUserEnabledChange)
@@ -1271,7 +1313,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleAccessChange)
     const auto user = addUser(NoGroup);
     auto group = createUserGroup("test group");
 
-    user->setGroupIds({group.id});
+    user->setSiteGroupIds({group.id});
     ASSERT_FALSE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermissions(user, target, Qn::ViewContentPermission));
 
@@ -1290,7 +1332,7 @@ TEST_F(ResourceAccessManagerTest, checkInheritedGroupAccessChange)
     auto parentGroup = createUserGroup("Parent group");
     auto inheritedGroup = createUserGroup("Inherited group", parentGroup.id);
 
-    user->setGroupIds({inheritedGroup.id});
+    user->setSiteGroupIds({inheritedGroup.id});
     ASSERT_FALSE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermissions(user, target, Qn::ViewContentPermission));
 
@@ -1304,7 +1346,7 @@ TEST_F(ResourceAccessManagerTest, checkInheritedGroupAccessChange)
     ASSERT_FALSE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_FALSE(hasPermissions(user, target, Qn::ViewContentPermission));
 
-    user->setGroupIds({inheritedGroup.id, parentGroup.id});
+    user->setSiteGroupIds({inheritedGroup.id, parentGroup.id});
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermissions(user, target, Qn::ViewContentPermission));
 
@@ -1360,21 +1402,21 @@ TEST_F(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
     EXPECT_FALSE(hasPermissions(user, cameraOfInheritedGroup, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfNoOne, Qn::ReadPermission));
 
-    user->setGroupIds({parentGroup1.id});
+    user->setSiteGroupIds({parentGroup1.id});
     EXPECT_TRUE(hasPermissions(user, cameraOfUser, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(user, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfParentGroup2, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfInheritedGroup, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfNoOne, Qn::ReadPermission));
 
-    user->setGroupIds({parentGroup1.id, parentGroup2.id});
+    user->setSiteGroupIds({parentGroup1.id, parentGroup2.id});
     EXPECT_TRUE(hasPermissions(user, cameraOfUser, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(user, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(user, cameraOfParentGroup2, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfInheritedGroup, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfNoOne, Qn::ReadPermission));
 
-    user->setGroupIds({inheritedGroup.id});
+    user->setSiteGroupIds({inheritedGroup.id});
     EXPECT_TRUE(hasPermissions(user, cameraOfUser, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(user, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_TRUE(hasPermissions(user, cameraOfParentGroup2, Qn::ReadPermission));
@@ -1389,7 +1431,7 @@ TEST_F(ResourceAccessManagerTest, checkUserAndRolesCombinedPermissions)
     EXPECT_TRUE(hasPermissions(user, cameraOfInheritedGroup, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfNoOne, Qn::ReadPermission));
 
-    user->setGroupIds({});
+    user->setSiteGroupIds({});
     EXPECT_TRUE(hasPermissions(user, cameraOfUser, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfParentGroup1, Qn::ReadPermission));
     EXPECT_FALSE(hasPermissions(user, cameraOfParentGroup2, Qn::ReadPermission));
@@ -1415,7 +1457,7 @@ TEST_F(ResourceAccessManagerTest, checkRoleRemoved)
     const auto user = addUser(NoGroup);
     const auto group = createUserGroup("Live viewer group", kLiveViewersGroupId);
 
-    user->setGroupIds({group.id});
+    user->setSiteGroupIds({group.id});
     ASSERT_TRUE(hasPermissions(user, target, Qn::ReadPermission));
     ASSERT_TRUE(hasPermissions(user, target, Qn::ViewContentPermission));
 
@@ -1852,6 +1894,73 @@ TEST_F(ResourceAccessManagerTest, accessRightsIndependency)
     setOwnAccessRights(m_currentUser->getId(), {{layout->getId(), AccessRight::viewArchive}});
     EXPECT_FALSE(hasPermissions(m_currentUser, camera, Qn::ExportPermission));
     EXPECT_TRUE(hasPermissions(m_currentUser, camera, Qn::ViewFootagePermission));
+}
+
+TEST_F(ResourceAccessManagerTest, orgUsersHaveSamePermissions)
+{
+    for (auto groupId: {kAdministratorsGroupId,
+        kPowerUsersGroupId, kViewersGroupId})
+    {
+        auto siteUser = addUser(groupId, NX_FMT("siteUser-%1", groupId));
+        auto orgUser = addOrgUser(groupId, NX_FMT("orgUser-%1@mail.com", groupId));
+        EXPECT_EQ(siteUser->isAdministrator(), orgUser->isAdministrator());
+        EXPECT_EQ(siteUser->allGroupIds(), orgUser->allGroupIds());
+        EXPECT_TRUE(orgUser->siteGroupIds().empty());
+        EXPECT_FALSE(orgUser->orgGroupIds().empty());
+        EXPECT_EQ(
+            resourceAccessManager()->globalPermissions(siteUser),
+            resourceAccessManager()->globalPermissions(orgUser));
+        EXPECT_EQ(
+            resourceAccessManager()->resourceAccessMap(siteUser),
+            resourceAccessManager()->resourceAccessMap(orgUser));
+    }
+    auto orgUser = addOrgUser(kViewersGroupId, "user@mail.com");
+    auto powerUser = addUser(kPowerUsersGroupId, "power user");
+    EXPECT_NE(
+        resourceAccessManager()->globalPermissions(orgUser),
+        resourceAccessManager()->globalPermissions(powerUser));
+    orgUser->setSiteGroupIds({kPowerUsersGroupId});
+    EXPECT_EQ(
+        resourceAccessManager()->globalPermissions(orgUser),
+        resourceAccessManager()->globalPermissions(powerUser));
+    EXPECT_EQ(
+        resourceAccessManager()->resourceAccessMap(orgUser),
+        resourceAccessManager()->resourceAccessMap(powerUser));
+}
+
+TEST_F(ResourceAccessManagerTest, orgUsersHaveReadonlyOrgGroups)
+{
+    const auto user = addOrgUser({kLiveViewersGroupId}, "user@mail.com");
+
+    UserData userData;
+    ec2::fromResourceToApi(user, userData);
+
+    const auto administrator = addUser(kAdministratorsGroupId, "administrator");
+    const auto powerUser = addUser(kPowerUsersGroupId, "power user");
+    const auto orgAdministrator = addOrgUser(kAdministratorsGroupId, "org@mail.com");
+    const auto orgPowerUser = addOrgUser(kPowerUsersGroupId, "power@mail.com");
+
+    const QnUserResourceList users = {administrator, powerUser, orgAdministrator, orgPowerUser};
+    for (const auto& editor: users)
+    {
+        auto update = userData;
+        update.orgGroupIds.push_back(kViewersGroupId);
+        ASSERT_FALSE(resourceAccessManager()->canModifyUser(editor, user, update));
+    }
+    for (const auto& editor: users)
+    {
+        auto update = userData;
+        update.orgGroupIds.clear();
+        ASSERT_FALSE(resourceAccessManager()->canModifyUser(editor, user, update));
+    }
+
+    const auto customGroup = createUserGroup("Viewer group", kViewersGroupId);
+    for (const auto& editor: users)
+    {
+        auto update = userData;
+        update.groupIds = {kLiveViewersGroupId, customGroup.id};
+        ASSERT_TRUE(resourceAccessManager()->canModifyUser(editor, user, update));
+    }
 }
 
 // ------------------------------------------------------------------------------------------------

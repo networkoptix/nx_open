@@ -72,7 +72,7 @@ public:
         user->setIdUnsafe(nx::Uuid::createUuid());
         user->setName(name);
         user->addFlags(Qn::remote);
-        user->setGroupIds(parents);
+        user->setSiteGroupIds(parents);
         systemContext()->resourcePool()->addResource(user);
         return user->getId();
     }
@@ -104,9 +104,9 @@ public:
         const auto allUsers = systemContext()->resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
-            std::vector<nx::Uuid> ids = user->groupIds();
+            std::vector<nx::Uuid> ids = user->siteGroupIds();
             if (nx::utils::erase_if(ids, [&user](auto id){ return id == user->getId(); }))
-                user->setGroupIds(ids);
+                user->setSiteGroupIds(ids);
         }
 
         for (auto group: systemContext()->userGroupManager()->groups())
@@ -124,7 +124,7 @@ public:
         auto resourcePool = systemContext()->resourcePool();
         auto user = resourcePool->getResourceById<QnUserResource>(id);
         ASSERT_TRUE(!user.isNull());
-        user->setGroupIds(parents);
+        user->setSiteGroupIds(parents);
     }
 
     void updateGroup(const nx::Uuid& id, const std::vector<nx::Uuid>& parents)

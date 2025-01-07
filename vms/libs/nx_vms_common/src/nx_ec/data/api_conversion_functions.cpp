@@ -547,7 +547,8 @@ void fromApiToResource(const UserData& src, const QnUserResourcePtr& dst)
 
     dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
-    dst->setGroupIds(src.groupIds);
+    dst->setSiteGroupIds(src.groupIds);
+    dst->setOrgGroupIds(src.orgGroupIds);
     dst->setFullName(src.fullName);
     dst->setRawPermissions(src.permissions);
     dst->setAttributes(src.attributes);
@@ -577,6 +578,7 @@ void fromResourceToApi(const QnUserResource& src, UserData& dst)
     dst.url = src.m_url;
     dst.email = src.m_email;
     dst.groupIds = src.m_groupIds;
+    dst.orgGroupIds = src.m_orgGroupIds;
     dst.externalId = src.m_externalId;
     dst.type = src.m_userType;
     dst.attributes = src.m_attributes;

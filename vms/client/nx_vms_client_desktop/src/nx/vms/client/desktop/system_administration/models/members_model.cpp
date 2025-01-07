@@ -127,8 +127,7 @@ void MembersModel::subscribeToUser(const QnUserResourcePtr& user)
 
     userConnections << connect(user.get(), &QnUserResource::userGroupsChanged, this,
         [updateUser](
-            const QnUserResourcePtr& user,
-            const std::vector<nx::Uuid>&)
+            const QnUserResourcePtr& user)
         {
             updateUser(user->getId());
         });
@@ -357,7 +356,7 @@ void MembersModel::readUsersAndGroups()
                         continue;
 
                     addedIds.insert(user->getId());
-                    const auto groupIds = user->groupIds();
+                    const auto groupIds = user->allGroupIds();
                     modifiedGroups += QSet<nx::Uuid>{groupIds.begin(), groupIds.end()};
 
                     subscribeToUser(user);
@@ -382,7 +381,7 @@ void MembersModel::readUsersAndGroups()
                 {
                     unsubscribeFromUser(user);
                     removedIds.insert(user->getId());
-                    const auto groupIds = user->groupIds();
+                    const auto groupIds = user->allGroupIds();
                     modifiedGroups += QSet<nx::Uuid>{groupIds.begin(), groupIds.end()};
                 }
 

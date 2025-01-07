@@ -538,10 +538,10 @@ void UserGroupRequestChain::Private::applyUser(
     if (!user)
         return;
 
-    if (user->groupIds() != prev)
+    if (user->siteGroupIds() != prev)
         return;
 
-    user->setGroupIds(next);
+    user->setSiteGroupIds(next);
 }
 
 void UserGroupRequestChain::Private::applyUser(

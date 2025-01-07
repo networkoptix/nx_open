@@ -226,7 +226,7 @@ struct CloudLayoutsManager::Private
         user = QnUserResourcePtr(new QnUserResource(api::UserType::cloud, /*externalId*/ {}));
         user->setIdUnsafe(nx::Uuid::createUuid());
         user->setName(cloudStatusWatcher->cloudLogin());
-        user->setGroupIds({api::kAdministratorsGroupId}); //< Avoid resources access calculation.
+        user->setSiteGroupIds({api::kAdministratorsGroupId}); //< Avoid resources access calculation.
 
         auto resourcePool = systemContext->resourcePool();
         resourcePool->addResource(user);

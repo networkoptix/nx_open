@@ -33,7 +33,7 @@ UserResource::UserResource(UserModelV1 data):
         groupIds.push_back(data.userRoleId);
 
     setRawPermissions(permissions);
-    setGroupIds(groupIds);
+    setSiteGroupIds(groupIds);
     setResourceAccessRights(resourceAccessRights);
 
     m_overwrittenData = std::move(data);
@@ -49,7 +49,9 @@ UserResource::UserResource(UserModelV3 data):
     setFullName(data.fullName);
     setAttributes(data.attributes);
     setRawPermissions(data.permissions);
-    setGroupIds(data.groupIds);
+    setSiteGroupIds(data.groupIds);
+    if (data.orgGroupIds)
+        setOrgGroupIds(*data.orgGroupIds);
     setResourceAccessRights(data.resourceAccessRights);
 }
 

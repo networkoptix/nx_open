@@ -103,7 +103,7 @@ QnUserResourcePtr ResourceTreeModelTest::addUser(
     user->setIdUnsafe(nx::Uuid::createUuid());
     user->setName(name);
     if (groupId)
-        user->setGroupIds({*groupId});
+        user->setSiteGroupIds({*groupId});
     user->addFlags(Qn::remote);
     resourcePool()->addResource(user);
     return user;
@@ -504,7 +504,7 @@ QnUserResourcePtr ResourceTreeModelTest::loginAs(
     const auto itr = std::find_if(users.cbegin(), users.cend(),
         [name, &groupIds](const QnUserResourcePtr& user)
         {
-            return user->getName() == name && user->groupIds() == groupIds;
+            return user->getName() == name && user->allGroupIds() == groupIds;
         });
 
     QnUserResourcePtr user;

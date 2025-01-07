@@ -178,6 +178,11 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
     /**%apidoc[opt] User group id, can be obtained from `GET /rest/v{3-}/userGroups`. */
     std::vector<nx::Uuid> groupIds;
 
+    /**%apidoc[readonly]
+     * User group ids in an Organization. Presented only for users with `type` equals to `cloud`.
+     */
+    std::optional<std::vector<nx::Uuid>> orgGroupIds;
+
     /**%apidoc[opt] */
     GlobalPermissions permissions = GlobalPermission::none;
 
@@ -220,8 +225,8 @@ struct NX_VMS_API UserModelV3: public UserModelBase, public ResourceWithParamete
 #define UserModelV3_Fields \
     UserModelBase_Fields \
     ResourceWithParameters_Fields \
-    (groupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes)(account2faEnabled) \
-    (settings)
+    (groupIds)(orgGroupIds)(permissions)(resourceAccessRights)(temporaryToken)(attributes) \
+    (account2faEnabled)(settings)
 
 QN_FUSION_DECLARE_FUNCTIONS(UserModelV3, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(UserModelV3, UserModelV3_Fields)

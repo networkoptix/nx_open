@@ -26,7 +26,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/event/events/abstract_event.h>
-
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 
@@ -36,6 +35,16 @@ const QString QnUserResource::kIntegrationRequestDataProperty("integrationReques
 using nx::vms::api::analytics::IntegrationRequestData;
 using namespace nx::vms::api;
 using namespace nx::vms::event;
+
+namespace {
+
+bool hasAdminGroup(const std::vector<nx::Uuid>& groups, const std::vector<nx::Uuid>& orgGroups)
+{
+    return nx::utils::contains(groups, nx::vms::api::kAdministratorsGroupId)
+        || nx::utils::contains(orgGroups, nx::vms::api::kAdministratorsGroupId);
+}
+
+} // namespace
 
 QByteArray QnUserHash::toString(const Type& type)
 {
@@ -462,30 +471,72 @@ bool QnUserResource::isAdministrator() const
     return m_isAdministratorCache;
 }
 
-std::vector<nx::Uuid> QnUserResource::groupIds() const
+bool QnUserResource::setGroupIdsInternal(
+    std::vector<nx::Uuid>* dst,
+    const std::vector<nx::Uuid>& value,
+    std::vector<nx::Uuid>* previousValue,
+    nx::MutexLocker& lock)
+{
+    if (*dst == value)
+        return false;
+
+    *previousValue = *dst;
+    *dst = value;
+    m_isAdministratorCache = hasAdminGroup(m_groupIds, m_orgGroupIds);
+    return true;
+}
+
+std::vector<nx::Uuid> QnUserResource::allGroupIds() const
+{
+    std::vector<nx::Uuid> groups;
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    groups.reserve(m_groupIds.size() + m_orgGroupIds.size());
+    groups = m_groupIds;
+    groups.insert(groups.end(), m_orgGroupIds.cbegin(), m_orgGroupIds.cend());
+    return groups;
+}
+
+std::vector<nx::Uuid> QnUserResource::siteGroupIds() const
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
     return m_groupIds;
 }
 
-void QnUserResource::setGroupIds(const std::vector<nx::Uuid>& value)
+void QnUserResource::setSiteGroupIds(const std::vector<nx::Uuid>& value)
 {
     std::vector<nx::Uuid> previousValue;
     {
         NX_MUTEX_LOCKER locker(&m_mutex);
-        if (m_groupIds == value)
+        if (!setGroupIdsInternal(&m_groupIds, value, &previousValue, locker))
             return;
-
-        previousValue = m_groupIds;
-        m_groupIds = value;
-        m_isAdministratorCache = nx::utils::contains(
-            m_groupIds, nx::vms::api::kAdministratorsGroupId);
     }
 
     NX_VERBOSE(this, "User groups changed from %1 to %2",
         nx::containerString(previousValue), nx::containerString(value));
 
-    emit userGroupsChanged(::toSharedPointer(this), previousValue);
+    emit userGroupsChanged(::toSharedPointer(this));
+}
+
+std::vector<nx::Uuid> QnUserResource::orgGroupIds() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_orgGroupIds;
+}
+
+void QnUserResource::setOrgGroupIds(const std::vector<nx::Uuid>& value)
+{
+    std::vector<nx::Uuid> previousValue;
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        NX_ASSERT(value.empty() || m_userType == nx::vms::api::UserType::cloud);
+        if (!setGroupIdsInternal(&m_orgGroupIds, value, &previousValue, locker))
+            return;
+    }
+
+    NX_VERBOSE(this, "User org groups changed from %1 to %2",
+        nx::containerString(previousValue), nx::containerString(value));
+
+    emit userGroupsChanged(::toSharedPointer(this));
 }
 
 void QnUserResource::setResourceAccessRights(
@@ -740,14 +791,23 @@ void QnUserResource::updateInternal(const QnResourcePtr& source, NotifierList& n
         if (oldPermissions != newPermissions)
             notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
 
+        bool groupsUpdated = false;
         if (m_groupIds != localOther->m_groupIds)
         {
-            const auto previousGroupIds = m_groupIds;
             m_groupIds = localOther->m_groupIds;
-            m_isAdministratorCache = nx::utils::contains(
-                m_groupIds, nx::vms::api::kAdministratorsGroupId);
-            notifiers << [r = toSharedPointer(this), previousGroupIds]
-                { emit r->userGroupsChanged(r, previousGroupIds); };
+            groupsUpdated = true;
+        }
+        if (m_orgGroupIds != localOther->m_orgGroupIds)
+        {
+            m_orgGroupIds = localOther->m_orgGroupIds;
+            NX_ASSERT(m_orgGroupIds.empty() || m_userType == nx::vms::api::UserType::cloud);
+            groupsUpdated = true;
+        }
+
+        if (groupsUpdated)
+        {
+            m_isAdministratorCache = hasAdminGroup(m_groupIds, m_orgGroupIds);
+            notifiers << [r = toSharedPointer(this)] { emit r->userGroupsChanged(r); };
         }
 
         if (m_email != localOther->m_email)

@@ -135,6 +135,8 @@ UserModelV3::DbUpdateTypes UserModelV3::toDbTypes() &&
     auto parameters = asList(id);
     auto user = std::move(*this).toUserData();
     user.groupIds = std::move(groupIds);
+    if (orgGroupIds)
+        user.orgGroupIds = std::move(*orgGroupIds);
     user.permissions = std::move(permissions);
     user.resourceAccessRights = std::move(resourceAccessRights);
     user.attributes = std::move(attributes);
@@ -161,6 +163,8 @@ std::vector<UserModelV3> UserModelV3::fromDbTypes(DbListTypes data)
         UserModelV3 model;
 
         model.groupIds = std::move(baseData.groupIds);
+        if (!baseData.orgGroupIds.empty())
+            model.orgGroupIds = std::move(baseData.orgGroupIds);
         model.permissions = std::move(baseData.permissions);
         model.attributes = std::move(baseData.attributes);
         if (!baseData.resourceAccessRights.empty())
@@ -220,6 +224,15 @@ void UserModelV3::convertToApiV3()
     {
         QJson::serialize(*settings, &parameters[user_properties::kUserSettings]);
         settings = std::nullopt;
+    }
+    if (orgGroupIds)
+    {
+        if (!orgGroupIds->empty())
+        {
+            groupIds.insert(groupIds.end(), orgGroupIds->begin(), orgGroupIds->end());
+            attributes.setFlag(api::UserAttribute::readonly);
+        }
+        orgGroupIds = std::nullopt;
     }
 }
 

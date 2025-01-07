@@ -795,9 +795,9 @@ void QnCommonMessageProcessor::on_userGroupRemoved(const nx::Uuid& userGroupId)
         const auto isGroupRemoved =
             [&userGroupId](const auto& id) { return id == userGroupId; };
 
-        auto groupIds = user->groupIds();
+        auto groupIds = user->siteGroupIds();
         if (nx::utils::erase_if(groupIds, isGroupRemoved))
-            user->setGroupIds(groupIds);
+            user->setSiteGroupIds(groupIds);
     }
 }
 

@@ -30,7 +30,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::createUser(
     user->setIdUnsafe(nx::Uuid::createUuid());
     user->setName(name);
     user->setPasswordAndGenerateHash(name);
-    user->setGroupIds(parentGroupIds.data);
+    user->setSiteGroupIds(parentGroupIds.data);
     user->setRawPermissions(globalPermissions);
     user->setResourceAccessRights(resourceAccessRights);
     user->addFlags(Qn::remote);
@@ -47,6 +47,19 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(
 {
     const auto user = createUser(
         parentGroupIds, name, userType, globalPermissions, resourceAccessRights, ldapDn);
+    resourcePool()->addResource(user);
+    return user;
+}
+
+QnUserResourcePtr QnResourcePoolTestHelper::addOrgUser(
+    Ids orgGroupIds,
+    const QString& name,
+    GlobalPermissions globalPermissions,
+    const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights)
+{
+    auto user = createUser(
+        NoGroup, name, nx::vms::api::UserType::cloud, globalPermissions, resourceAccessRights);
+    user->setOrgGroupIds(orgGroupIds.data);
     resourcePool()->addResource(user);
     return user;
 }

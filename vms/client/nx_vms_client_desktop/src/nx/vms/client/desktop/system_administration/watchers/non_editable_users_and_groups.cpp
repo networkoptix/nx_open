@@ -327,7 +327,7 @@ void NonEditableUsersAndGroups::updateMembers(const nx::Uuid& groupId)
 
 bool NonEditableUsersAndGroups::addUser(const QnUserResourcePtr& user)
 {
-    const auto ids = user->groupIds();
+    const auto ids = user->allGroupIds();
     QSet<nx::Uuid> parentIds(ids.begin(), ids.end());
 
     const bool newUser = !m_nonEditableUsers.contains(user);
