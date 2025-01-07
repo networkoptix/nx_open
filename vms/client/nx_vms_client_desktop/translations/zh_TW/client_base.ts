@@ -5026,7 +5026,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>驗證</translation>
     </message>
   </context>
   <context>
