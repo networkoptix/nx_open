@@ -3466,7 +3466,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation>ベーシック</translation>
+      <translation>Basic</translation>
     </message>
   </context>
   <context>
