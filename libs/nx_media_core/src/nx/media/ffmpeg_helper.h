@@ -76,4 +76,4 @@ private:
     int m_sample_fmt = 0;
 };
 
-NX_MEDIA_CORE_API QString toString(AVPixelFormat pixelFormat);
+NX_MEDIA_CORE_API QByteArray toString(AVPixelFormat pixelFormat);

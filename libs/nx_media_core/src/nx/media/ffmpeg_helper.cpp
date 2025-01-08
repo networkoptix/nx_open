@@ -274,10 +274,10 @@ void QnFfmpegAudioHelper::copyAudioSamples(quint8* dst, const AVFrame* src) cons
     swr_convert(m_swr,tmpData, src->nb_samples, (const quint8**) src->data, src->nb_samples);
 }
 
-QString toString(AVPixelFormat pixelFormat)
+QByteArray toString(AVPixelFormat pixelFormat)
 {
     const AVPixFmtDescriptor* const descriptor = av_pix_fmt_desc_get(pixelFormat);
     if (!descriptor || !descriptor->name)
-        return "AVPixelFormat(" + QString::number((int) pixelFormat) + ")";
-    return descriptor->name;
+        return "AVPixelFormat(" + QByteArray::number((int) pixelFormat) + ")";
+    return QByteArray(descriptor->name);
 }

@@ -401,7 +401,7 @@ Rectangle
                         if (!selectedItem || !selectedItem.previewResource || !imageTrackId)
                             return ""
 
-                        const path = `rest/v4/analytics/objectTracks/${imageTrackId}/titleImage`
+                        const path = `rest/v4/analytics/objectTracks/${imageTrackId}/titleImage.jpg`
                         const deviceId = selectedItem.previewResource.id.toSimpleString()
                         return `image://remote/${path}?deviceId=${deviceId}`
                     }

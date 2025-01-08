@@ -50,7 +50,17 @@ struct NX_VMS_API ThumbnailFilter
         png,
         jpg,
         tif,
-        raw, /**< Raw video frame. Makes the request much more lightweight for Edge servers. */
+
+        /**%apidoc Raw source image. For frames from video archive source video frame is decoded, but
+         * not encoded. Usually such frames stay in YUV format. For frames provided by video
+         * analytics they stay in source image format same as for value `auto`.
+         */
+        raw,
+
+        /**%apidoc If source frame represented in jpg/png/tif format then keep it.
+         * Otherwise if source frame is video frame, then encode it to the jpg format.
+         */
+        _auto,
     };
 
     template<typename Visitor>
@@ -63,7 +73,8 @@ struct NX_VMS_API ThumbnailFilter
             Item{ThumbnailFormat::jpg, "jpeg"}, //< deprecated
             Item{ThumbnailFormat::tif, "tif"},
             Item{ThumbnailFormat::tif, "tiff"}, //< deprecated
-            Item{ThumbnailFormat::raw, "raw"}
+            Item{ThumbnailFormat::raw, "raw"},
+            Item{ThumbnailFormat::_auto, "auto"}
         );
     }
 
