@@ -2070,7 +2070,7 @@ Alt + クリックを使用してください。</translation>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>レイアウトを選択</translation>
+      <translation>レイアウト選択</translation>
     </message>
   </context>
   <context>
