@@ -3,7 +3,6 @@
 #include "storage_model.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/api/json/uuid_mover.h>
 
 namespace nx {
 namespace vms {
