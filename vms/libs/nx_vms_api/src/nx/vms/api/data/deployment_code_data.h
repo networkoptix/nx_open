@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <chrono>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
@@ -76,7 +74,7 @@ NX_REFLECTION_ENUM_CLASS(QrCodeImageType,
 );
 
 /**%apidoc Qr Code request data. */
-struct NX_VMS_API QrCodeRequestData
+struct NX_VMS_API DeploymentCodeRequestData
 {
     /**%apidoc:string
      * Can be obtained from "id" field via `GET /rest/v{1-}/servers` or be `this` to refer to the
@@ -111,16 +109,21 @@ struct NX_VMS_API QrCodeRequestData
     int pixelSize = 10;
 };
 
-#define QrCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType)(pixelSize)
-NX_REFLECTION_INSTRUMENT(QrCodeRequestData, QrCodeRequestData_Fields)
+#define DeploymentCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType)(pixelSize)
+NX_REFLECTION_INSTRUMENT(DeploymentCodeRequestData, DeploymentCodeRequestData_Fields)
 
 /**%apidoc QR Code response. */
-struct NX_VMS_API QrCodeData
+struct NX_VMS_API DeploymentCodeData
 {
     nx::Uuid serverId;
 
-    /**%apidoc Short code usable for adding a Server during the QR Code Site setting up. */
-    std::string code;
+    /**%apidoc Short code usable for adding Server during the Deployment Code Site set-up. */
+    std::string shortCode;
+
+    /**%apidoc Hardware code which can be optionally used when adding Server during the
+     * Deployment Code Site set-up.
+     */
+    std::string hardwareCode;
 
     /**%apidoc[opt] Complete URL leading to the Cloud Portal QR Code setup section. */
     std::string url;
@@ -129,12 +132,12 @@ struct NX_VMS_API QrCodeData
     std::string imageBase64;
 };
 
-#define QrCodeData_Fields (serverId)(code)(url)(imageBase64)
-NX_REFLECTION_INSTRUMENT(QrCodeData, QrCodeData_Fields)
+#define DeploymentCodeData_Fields (serverId)(shortCode)(hardwareCode)(url)(imageBase64)
+NX_REFLECTION_INSTRUMENT(DeploymentCodeData, DeploymentCodeData_Fields)
 
-QN_FUSION_DECLARE_FUNCTIONS(QrCodeRequestData, (json), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(QrCodeData, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeploymentCodeRequestData, (json), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeploymentCodeData, (json), NX_VMS_API)
 
-using QrCodeDataList = std::vector<QrCodeData>;
+using DeploymentCodeDataList = std::vector<DeploymentCodeData>;
 
 } // namespace nx::vms::api

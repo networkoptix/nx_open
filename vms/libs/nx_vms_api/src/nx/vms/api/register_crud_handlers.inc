@@ -1090,35 +1090,35 @@ static void registerServerRestHandlers(
     reg("rest/v{4-}/servers/:serverId/backupPositions/:deviceId?/:_reset?", GlobalPermission::powerUser,
         std::make_unique<BackupPositionHandler<nx::vms::api::BackupPositionExV4>>(serverModule, serverConnector));
 
-    /**%apidoc GET /rest/v{4-}/servers/{serverId}/qrcode
+    /**%apidoc GET /rest/v{4-}/servers/{serverId}/deploymentCode
      * Get QR Code from the Server specified by {serverId}.
      * %caption Get Server QR code
      * %ingroup Server Data
-     * %struct QrCodeRequestData
+     * %struct DeploymentCodeRequestData
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
-     * %return:{QrCodeData} QR Code data
+     * %return:{DeploymentCodeData} QR Code data
      *
-     **%apidoc GET /rest/v{4-}/servers/%2A/qrcode
+     **%apidoc GET /rest/v{4-}/servers/%2A/deploymentCode
      * Get QR Codes from all Servers.
      * %caption Get all Servers QR codes
      * %ingroup Server Data
-     * %struct QrCodeRequestData
+     * %struct DeploymentCodeRequestData
      * %param[unused] serverId
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
-     * %return:{QrCodeDataList} QR code data per Server.
+     * %return:{DeploymentCodeDataList} QR code data per Server.
      */
-    reg("rest/v{4-}/servers/:serverId/qrcode", GlobalPermission::powerUser,
-        std::make_unique<QrCodeHandler>(serverModule, serverConnector));
+    reg("rest/v{4-}/servers/:serverId/deploymentCode", GlobalPermission::powerUser,
+        std::make_unique<DeploymentCodeHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/servers/{serverId}/qrcode/image
      * Get QR Code image from the Server specified by {serverId}.
      * %caption Get Server QR code image
      * %ingroup Server Data
-     * %struct QrCodeRequestData
+     * %struct DeploymentCodeRequestData
      * %param[ref] _strict,_ticket
      * %param[ref] _local
      * %permissions Power User.

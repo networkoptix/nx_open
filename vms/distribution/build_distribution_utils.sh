@@ -444,7 +444,7 @@ distrib_copyServerLibs() # additional_libs_to_copy...
         libnx_ldap
         libnx_json_rpc
         libnx_cloud_storage_client
-        libnx_qr_code_service_client
+        libnx_mediaserver_deployment_service_client
         libnx_aws_client
         libnx_merge_service_client
 
