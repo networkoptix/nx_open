@@ -272,7 +272,7 @@ def main():
         if isLinux:
             archiveFiles(a,
                 join(bin_dir, 'imageformats'),
-                join(conf.BUILD_DIR, bin_dir, 'imageformats'),
+                join(conf.QT_DIR, 'plugins', 'imageformats'),
                 ["libqtiff.so"])
 
         if isMac:
