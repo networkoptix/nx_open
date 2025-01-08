@@ -15,12 +15,7 @@ namespace {
 
     QString getThumbnailId(const nx::Uuid &id, const qint64 time)
     {
-        QString result = id.toString();
-        if (result.startsWith(QLatin1Char('{')))
-            result = result.mid(1, result.size() - 2);
-        result += ':';
-        result += QString::number(time);
-        return result;
+        return id.toSimpleString() + ':' + QString::number(time);
     }
 
 } // anonymous namespace

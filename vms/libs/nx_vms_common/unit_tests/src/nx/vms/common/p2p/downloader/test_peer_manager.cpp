@@ -112,7 +112,7 @@ QString TestPeerManager::peerString(const nx::Uuid& peerId) const
 {
     auto result = m_peers[peerId].name;
     if (result.isEmpty())
-        result = peerId.toString();
+        result = peerId.toSimpleString();
 
     return result;
 }

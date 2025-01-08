@@ -138,7 +138,7 @@ int LookupListModel::countOfAssociatedVmsRules(SystemContext* systemContext) con
                     ? textLookupField->value()
                     : objectLookupField ? objectLookupField->value() : "";
 
-                if (fieldValue == m_data.id.toString())
+                if (nx::Uuid::fromStringSafe(fieldValue) == m_data.id)
                 {
                     ruleIsChecked = true;
                     countOfRules += 1;

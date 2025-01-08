@@ -185,7 +185,7 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
         return;
 
     NX_ASSERT(false, "Malformed camera id: id = %1; physicalId = %2; uniqueIdToId = %3",
-        dstId.toString(), dstUid, uidToId.toString());
+        dstId, dstUid, uidToId);
 }
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr& src, CameraData& dst)

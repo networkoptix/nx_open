@@ -640,7 +640,7 @@ TEST_P(OpenApiSchemaTest, PerformanceCrudGet)
     pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/layouts/:id?"),
         GlobalPermission::none, std::make_unique<MockCrudHandler<LayoutData>>());
     testPerformance(
-        &pool, {lit("GET /rest/{version}/layouts/%1 HTTP/1.1").arg(nx::Uuid::createUuid().toString())});
+        &pool, {lit("GET /rest/{version}/layouts/%1 HTTP/1.1").arg(nx::Uuid::createUuid().toSimpleString())});
 }
 
 TEST_P(OpenApiSchemaTest, XmlResponse)

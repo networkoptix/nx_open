@@ -113,8 +113,7 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
     if (!cache)
         return QUrl();
 
-    const auto uuid = base_type::data(index, UuidRole).value<nx::Uuid>();
-    const auto id = nx::Uuid::fromStringSafe(uuid.toString());
+    const auto id = base_type::data(index, UuidRole).value<nx::Uuid>();
     if (id.isNull())
         return QUrl();
 

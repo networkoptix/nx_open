@@ -86,15 +86,15 @@ void OrphanCameraWatcher::update()
         {
             nx::Uuid uuid = cam->getId();
             currentOrphanCameras.insert(uuid);
-            NX_DEBUG(this, nx::format("%01 x %2 | %3 | %4 | %5")
-                .args(QString::number(idx).rightJustified(2, '0'),
-                cam->getId().toString(), cam->getModel(), cam->getUrl(), parentId.toString()));
+            NX_DEBUG(this, "%01 x %2 | %3 | %4 | %5",
+                QString::number(idx).rightJustified(2, '0'),
+                cam->getId(), cam->getModel(), cam->getUrl(), parentId);
         }
         else
         {
-            NX_DEBUG(this, nx::format("%1   %2 | %3 | %4 | %5")
-                .args(QString::number(idx).rightJustified(2, '0'),
-                cam->getId().toString(), cam->getModel(), cam->getUrl(), parentId.toString()));
+            NX_DEBUG(this, "%1   %2 | %3 | %4 | %5",
+                QString::number(idx).rightJustified(2, '0'),
+                cam->getId(), cam->getModel(), cam->getUrl(), parentId);
         }
     }
     if (currentOrphanCameras.empty())

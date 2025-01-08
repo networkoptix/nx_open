@@ -1063,11 +1063,9 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
     {
         if (QnResourcePtr resource = resourcePool()->getResourceById(id))
         {
-            NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
-                    .arg(QString::fromLatin1(Q_FUNC_INFO))
-                    .arg(resource->getId().toString())
-                    .arg(resource->getName())
-                    .arg(resource->getUrl()));
+            NX_VERBOSE(this,
+                "%1 Emit statusChanged signal for resource %2, %3, %4",
+                Q_FUNC_INFO, resource->getId(), resource->getName(), resource->getUrl());
             emit resource->statusChanged(resource, Qn::StatusChangeReason::Local);
         }
     }
@@ -1224,8 +1222,7 @@ void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::Not
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
 
-    NX_ASSERT(qnCamera, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
-    if (qnCamera)
+    if (NX_ASSERT(qnCamera, "Unknown resource type: %1", camera.typeId))
     {
         ec2::fromApiToResource(camera, qnCamera);
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getPhysicalId()),

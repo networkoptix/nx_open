@@ -1760,7 +1760,7 @@ nx::Uuid SystemSettings::lastMergeMasterId() const
 
 void SystemSettings::setLastMergeMasterId(const nx::Uuid& value)
 {
-    d->lastMergeMasterIdAdaptor->setValue(value.toString());
+    d->lastMergeMasterIdAdaptor->setValue(value.toSimpleString());
 }
 
 nx::Uuid SystemSettings::lastMergeSlaveId() const
@@ -1770,7 +1770,7 @@ nx::Uuid SystemSettings::lastMergeSlaveId() const
 
 void SystemSettings::setLastMergeSlaveId(const nx::Uuid& value)
 {
-    d->lastMergeSlaveIdAdaptor->setValue(value.toString());
+    d->lastMergeSlaveIdAdaptor->setValue(value.toSimpleString());
 }
 
 nx::utils::Url SystemSettings::clientStatisticsSettingsUrl() const

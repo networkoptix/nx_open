@@ -76,19 +76,19 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
             if (NX_ASSERT(!url.isEmpty()))
             {
                 NX_DEBUG(NX_SCOPE_TAG, "Choosing stored preferred cloud server %1 (%2)",
-                    result.expectedServerId->toString(), url);
+                    result.expectedServerId, url);
             }
         }
         else if (systemHasInitialServerOnly)
         {
             url.setHost(helpers::serverCloudHost(system->id(), result.expectedServerId.value()));
             NX_DEBUG(NX_SCOPE_TAG, "Trying to connect to stored preferred cloud server %1 (%2)",
-                result.expectedServerId->toString(), url);
+                result.expectedServerId, url);
         }
         else
         {
             NX_DEBUG(NX_SCOPE_TAG, "Stored preferred cloud server %1 is not reachable",
-                result.expectedServerId->toString());
+                result.expectedServerId);
         }
     }
 
@@ -107,17 +107,16 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
     if (url.isEmpty())
     {
         const auto debugServersInfo =
-            [&servers, system]() -> QString
-        {
-            QStringList result;
-            for (const auto& server: servers)
+            [&servers, system]()
             {
-                result.push_back(QStringLiteral("   %1 (%2)").arg(
-                    server.id.toString(),
-                    system->getServerHost(server.id).toString()));
-            }
-            return result.join("\n");
-        };
+                QStringList result;
+                for (const auto& server: servers)
+                {
+                    result.push_back(
+                        NX_FMT("   %1 (%2)", server.id, system->getServerHost(server.id)));
+                }
+                return result.join("\n");
+            };
 
         NX_DEBUG(NX_SCOPE_TAG, "Connection options:\n%1", debugServersInfo());
 

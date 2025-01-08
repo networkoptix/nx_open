@@ -1193,7 +1193,7 @@ struct LogsManagementWatcher::Private
             if (auto api = q->connectedServerApi(); NX_ASSERT(api))
             {
                 api->getRawResult(
-                    QString("/rest/v2/servers/%1/logSettings").arg(serverId.toString()),
+                    QString("/rest/v2/servers/%1/logSettings").arg(serverId.toSimpleString()),
                     {},
                     callback,
                     q->thread());

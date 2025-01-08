@@ -196,7 +196,7 @@ void ConnectionBase::addRequestQueryParams(
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 {
     auto message = nx::format("Connection to peer %1 canceled from state %2. Reason: %3",
-        m_remotePeer.id.toString(), toString(state()), reason);
+        m_remotePeer.id, state(), reason);
     NX_DEBUG(this, message);
     m_lastErrorMessage = reason;
     setState(newState, message);
@@ -204,7 +204,7 @@ void ConnectionBase::cancelConnecting(State newState, const QString& reason)
 
 QString ConnectionBase::idForToStringFromPtr() const
 {
-    return remotePeer().id.toString();
+    return remotePeer().id.toSimpleString();
 }
 
 void ConnectionBase::onHttpClientDone()
@@ -282,19 +282,16 @@ void ConnectionBase::onHttpClientDone()
     }
     else if (remotePeer.id != m_remotePeer.id)
     {
-        cancelConnecting(
-            State::Error,
-            nx::format("Remote peer id %1 is not match expected peer id %2")
-            .arg(remotePeer.id.toString())
-            .arg(m_remotePeer.id.toString()));
+        cancelConnecting(State::Error,
+            nx::format("Remote peer id %1 is not match expected peer id %2",
+                remotePeer.id, m_remotePeer.id));
         return;
     }
     else if (!validateRemotePeerData(remotePeer))
     {
-        cancelConnecting(
-            State::Error,
-            nx::format("Remote peer id %1 has inappropriate data to make connection.")
-            .arg(remotePeer.id.toString()));
+        cancelConnecting(State::Error,
+            nx::format(
+                "Remote peer id %1 has inappropriate data to make connection.", remotePeer.id));
         return;
     }
 

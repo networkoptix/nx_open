@@ -76,12 +76,8 @@ int generateRequestID()
 
 QString QnAbstractTransaction::toString() const
 {
-    return nx::format("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
-        .arg(ApiCommand::toString(command))
-        .arg(persistentInfo.timestamp)
-        .arg(peerID.toString())
-        .arg(persistentInfo.dbID.toString())
-        .arg(persistentInfo.sequence);
+    return NX_FMT("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5",
+        command, persistentInfo.timestamp, peerID, persistentInfo.dbID, persistentInfo.sequence);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(

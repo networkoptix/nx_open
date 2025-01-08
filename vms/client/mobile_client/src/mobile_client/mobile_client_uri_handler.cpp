@@ -253,7 +253,7 @@ void QnMobileClientUriHandler::Private::connectedCallback(const SystemUri& uri)
     {
         NX_DEBUG(this,
             "connectedCallback(): end: opening video screen for resource %1 with timestamp <%2>",
-            resourceIds.first().toString(), timestamp);
+            resourceIds.first(), timestamp);
 
         const auto camera = systemContext()->resourcePool()->getResourceById(resourceIds.first());
         uiController->openVideoScreen(nx::vms::client::core::withCppOwnership(camera), timestamp);

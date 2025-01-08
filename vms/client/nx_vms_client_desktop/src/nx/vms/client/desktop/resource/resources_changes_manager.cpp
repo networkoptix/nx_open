@@ -109,32 +109,32 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
     QString action;
     if (resource.dynamicCast<QnMediaServerResource>())
     {
-        action = QString("/rest/v3/servers/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/servers/%1").arg(resource->getId().toSimpleString());
     }
     else if (resource.dynamicCast<QnVirtualCameraResource>())
     {
-        action = QString("/rest/v3/devices/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/devices/%1").arg(resource->getId().toSimpleString());
     }
     else if (resource.dynamicCast<QnStorageResource>())
     {
         action = QString("/rest/v3/servers/%1/storages/%2")
-                     .arg(resource->getParentId().toString(), resource->getId().toString());
+            .arg(resource->getParentId().toSimpleString(), resource->getId().toSimpleString());
     }
     else if (resource.dynamicCast<QnUserResource>())
     {
-        action = QString("/rest/v4/users/%1").arg(resource->getId().toString());
+        action = QString("/rest/v4/users/%1").arg(resource->getId().toSimpleString());
     }
     else if (resource.dynamicCast<QnLayoutResource>())
     {
-        action = QString("/rest/v3/layouts/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/layouts/%1").arg(resource->getId().toSimpleString());
     }
     else if (resource.dynamicCast<QnVideoWallResource>())
     {
-        action = QString("/rest/v3/videoWalls/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/videoWalls/%1").arg(resource->getId().toSimpleString());
     }
     else if (resource.dynamicCast<QnWebPageResource>())
     {
-        action = QString("/rest/v3/webPages/%1").arg(resource->getId().toString());
+        action = QString("/rest/v3/webPages/%1").arg(resource->getId().toSimpleString());
     }
 
     const auto tokenHelper = helper
@@ -338,7 +338,7 @@ rest::Handle ResourcesChangesManager::saveServer(
         body.parameters[key] = QJsonValue(value);
 
     return api->patchRest(systemContext->restApiHelper()->getSessionTokenHelper(),
-        QString("/rest/v3/servers/%1").arg(server->getId().toString()),
+        QString("/rest/v3/servers/%1").arg(server->getId().toSimpleString()),
         network::rest::Params{},
         QByteArray::fromStdString(nx::reflect::json::serialize(body)),
         internalCallback,

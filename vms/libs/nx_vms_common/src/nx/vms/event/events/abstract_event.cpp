@@ -392,7 +392,7 @@ std::optional<QnResourceList> sourceResources(
         {
             NX_DEBUG(NX_SCOPE_TAG, "Unable to find event %1 resource id %2", params.eventType, id);
             if (notFound)
-                notFound(id.toString());
+                notFound(id.toSimpleString());
         }
     }
 

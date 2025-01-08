@@ -379,7 +379,7 @@ std::string prepareUserAgent()
 nx::log::Tag makeLogTag(rest::ServerConnection* instance, const nx::Uuid& serverId)
 {
     return nx::log::Tag(
-        QStringLiteral("%1 [%2]").arg(nx::toString(instance), serverId.toString()));
+        QStringLiteral("%1 [%2]").arg(nx::toString(instance), serverId.toSimpleString()));
 }
 
 } // namespace
@@ -801,7 +801,7 @@ Handle ServerConnection::putServerLogSettings(
     auto request = prepareRequest(
         nx::network::http::Method::put,
         prepareUrl(
-            QString("/rest/v2/servers/%1/logSettings").arg(serverId.toString()),
+            QString("/rest/v2/servers/%1/logSettings").arg(serverId.toSimpleString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(settings));
@@ -2368,7 +2368,7 @@ Handle ServerConnection::saveUserAsync(
     auto request = prepareRequest(
         newUser ? nx::network::http::Method::put : nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v4/users/%1").arg(userData.id.toString()),
+            QString("/rest/v4/users/%1").arg(userData.id.toSimpleString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(userData));
@@ -2395,7 +2395,7 @@ Handle ServerConnection::saveUserAsync(
     auto request = prepareRequest(
         nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v4/users/%1").arg(id.toString()),
+            QString("/rest/v4/users/%1").arg(id.toSimpleString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(QJsonObject{{"settings", serializedSettings}}));
@@ -2417,7 +2417,7 @@ Handle ServerConnection::removeUserAsync(
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
         prepareUrl(
-            QString("/rest/v4/users/%1").arg(userId.toString()),
+            QString("/rest/v4/users/%1").arg(userId.toSimpleString()),
             /*params*/ {}));
 
     auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
@@ -2440,7 +2440,7 @@ Handle ServerConnection::saveGroupAsync(
     auto request = prepareRequest(
         newGroup ? nx::network::http::Method::put : nx::network::http::Method::patch,
         prepareUrl(
-            QString("/rest/v4/userGroups/%1").arg(groupData.id.toString()),
+            QString("/rest/v4/userGroups/%1").arg(groupData.id.toSimpleString()),
             /*params*/ {}),
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         nx::reflect::json::serialize(groupData));
@@ -2464,7 +2464,7 @@ Handle ServerConnection::removeGroupAsync(
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
         prepareUrl(
-            QString("/rest/v4/userGroups/%1").arg(groupId.toString()),
+            QString("/rest/v4/userGroups/%1").arg(groupId.toSimpleString()),
             /*params*/ {}));
 
     auto wrapper = makeSessionAwareCallback(tokenHelper, request, std::move(callback));
@@ -3165,7 +3165,7 @@ Handle ServerConnection::executeRequest(
             NX_ASSERT(!request.url.path().startsWith("/rest/"),
                 "/rest handler responses with Result if request is failed, use ErrorOrData");
         }
-        const QString serverId = d->serverId.toString();
+        const QString serverId = d->serverId.toSimpleString();
         return sendRequest(
             request,
             // Guarded function is used as in some cases callback could be executed when
@@ -3233,7 +3233,7 @@ Handle ServerConnection::executeRequest(
         NX_ASSERT(!request.url.path().startsWith("/rest/"),
             "/rest handler responses with Result if request is failed, use ErrorOrData");
     }
-    const QString serverId = d->serverId.toString();
+    const QString serverId = d->serverId.toSimpleString();
     return sendRequest(
         request,
         // Guarded function is used as in some cases callback could be executed when
@@ -3289,7 +3289,7 @@ Handle ServerConnection::executeRequest(
 {
     if (callback)
     {
-        const QString serverId = d->serverId.toString();
+        const QString serverId = d->serverId.toSimpleString();
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(
             request,
@@ -3340,7 +3340,7 @@ Handle ServerConnection::executeRequest(
 {
     if (callback)
     {
-        const QString serverId = d->serverId.toString();
+        const QString serverId = d->serverId.toSimpleString();
         return sendRequest(
             request,
             // Guarded function is used as in some cases callback could be executed when

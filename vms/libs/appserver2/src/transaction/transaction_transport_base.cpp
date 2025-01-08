@@ -248,7 +248,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
         ConnectionType::incoming
 #endif
         ;
-    m_connectionGuid = nx::Uuid::createUuid().toSimpleString().toStdString();
+    m_connectionGuid = nx::Uuid::createUuid().toSimpleStdString();
 #ifdef ENCODE_TO_BASE64
     m_base64EncodeOutgoingTransactions = true;
 #endif
@@ -670,9 +670,7 @@ void QnTransactionTransportBase::repeatDoGet()
 
 void QnTransactionTransportBase::cancelConnecting()
 {
-    NX_DEBUG(this,
-        "Connection to peer %1 canceled from state %2",
-        m_remotePeer.id.toString(), toString(getState()));
+    NX_DEBUG(this, "Connection to peer %1 canceled from state %2", m_remotePeer.id, getState());
     setState(Error);
 }
 
@@ -693,10 +691,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
     if (errorCode || bytesRead == 0)   //error or connection closed
     {
         if (errorCode == SystemError::timedOut)
-        {
-            NX_DEBUG(this, "Peer %1 timed out. Disconnecting...",
-                m_remotePeer.id.toString());
-        }
+            NX_DEBUG(this, "Peer %1 timed out. Disconnecting...", m_remotePeer.id);
         NX_VERBOSE(this, nx::format("Closing connection due to error %1").args(SystemError::toString(
             errorCode == SystemError::noError
             ? SystemError::connectionReset
@@ -706,9 +701,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
 
     if (m_state >= QnTransactionTransportBase::Closed)
     {
-        NX_VERBOSE(this,
-            "Connection to %1 is closed. Not reading anymore",
-            m_remotePeer.id.toString());
+        NX_VERBOSE(this, "Connection to %1 is closed. Not reading anymore", m_remotePeer.id);
         return;
     }
 
@@ -717,8 +710,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
     //parsing and processing input data
     if (!m_incomingTransactionStreamParser->processData(m_readBuffer))
     {
-        NX_DEBUG(this,
-            "Error parsing data from peer %1. Disconnecting...", m_remotePeer.id.toString());
+        NX_DEBUG(this, "Error parsing data from peer %1. Disconnecting...", m_remotePeer.id);
         return setStateNoLock(State::Error);
     }
 
@@ -751,41 +743,38 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
     switch (m_remotePeer.dataFormat)
     {
         case Qn::SerializationFormat::json:
-            if (!QnJsonTransactionSerializer::deserializeTran(
+            if (!NX_ASSERT(QnJsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.data()),
                     static_cast<int>(tranData.size()),
                     transportHeader,
-                    serializedTran))
+                    serializedTran)))
             {
-                NX_ASSERT(false);
                 NX_WARNING(this,
                     "Error deserializing JSON data from peer %1. Disconnecting...",
-                    m_remotePeer.id.toString());
+                    m_remotePeer.id);
                 setStateNoLock(State::Error);
                 return;
             }
             break;
 
         case Qn::SerializationFormat::ubjson:
-            if (!QnUbjsonTransactionSerializer::deserializeTran(
+            if (!NX_ASSERT(QnUbjsonTransactionSerializer::deserializeTran(
                     reinterpret_cast<const quint8*>(tranData.data()),
                     static_cast<int>(tranData.size()),
                     transportHeader,
-                    serializedTran))
+                    serializedTran)))
             {
-                NX_ASSERT(false);
                 NX_WARNING(this,
                     "Error deserializing Ubjson data from peer %1. Disconnecting...",
-                    m_remotePeer.id.toString());
+                    m_remotePeer.id);
                 setStateNoLock(State::Error);
                 return;
             }
             break;
 
         default:
-            NX_WARNING(this,
-                "Received unknown format from peer %1. Disconnecting...",
-                m_remotePeer.id.toString());
+            NX_WARNING(
+                this, "Received unknown format from peer %1. Disconnecting...", m_remotePeer.id);
             setStateNoLock(State::Error);
             return;
     }
@@ -795,7 +784,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
         NX_ASSERT(!transportHeader.processedPeers.empty());
         NX_DEBUG(this,
             "receivedTransactionNonSafe. Got transaction with seq %1 from %2",
-            transportHeader.sequence, m_remotePeer.id.toString());
+            transportHeader.sequence, m_remotePeer.id);
     }
 
     emit gotTransaction(
@@ -837,9 +826,8 @@ void QnTransactionTransportBase::receivedTransaction(
         }
         if (!m_sizedDecoder->processData(decodedTranData))
         {
-            NX_WARNING(this,
-                "Error parsing data (2) from peer %1. Disconnecting...",
-                m_remotePeer.id.toString());
+            NX_WARNING(
+                this, "Error parsing data (2) from peer %1. Disconnecting...", m_remotePeer.id);
             return setStateNoLock(State::Error);
         }
     }
@@ -899,7 +887,7 @@ void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
     {
         NX_WARNING(this,
             "Error parsing incoming data (3) from peer %1. Disconnecting...",
-            m_remotePeer.id.toString());
+            m_remotePeer.id);
         return setStateNoLock(State::Error);
     }
 
@@ -942,8 +930,7 @@ void QnTransactionTransportBase::waitForNewTransactionsReady()
 
 void QnTransactionTransportBase::connectionFailure()
 {
-    NX_DEBUG(this,
-        "Connection to peer %1 failure. Disconnecting...", m_remotePeer.id.toString());
+    NX_DEBUG(this, "Connection to peer %1 failure. Disconnecting...", m_remotePeer.id);
     setState(Error);
 }
 
@@ -1114,7 +1101,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
     }
 
     NX_VERBOSE(this, "Sending data buffer (%1 bytes) to the peer %2",
-        dataCtx.encodedSourceData.size(), m_remotePeer.id.toString());
+        dataCtx.encodedSourceData.size(), m_remotePeer.id);
 
     if (m_outgoingDataSocket)
     {
@@ -1206,7 +1193,7 @@ void QnTransactionTransportBase::onDataSent(
     {
         NX_DEBUG(this, "Failed to send %1 bytes to %2. %3",
             m_dataToSend.front().encodedSourceData.size(),
-            m_remotePeer.id.toString(), SystemError::toString(errorCode));
+            m_remotePeer.id, SystemError::toString(errorCode));
         m_dataToSend.pop_front();
         return setStateNoLock(State::Error);
     }
@@ -1476,7 +1463,7 @@ void QnTransactionTransportBase::processTransactionData(const nx::Buffer& data)
     {
         NX_WARNING(this,
             "Error processing incoming data (4) from peer %1. Disconnecting...",
-            m_remotePeer.id.toString());
+            m_remotePeer.id);
         return setStateNoLock(State::Error);
     }
 }

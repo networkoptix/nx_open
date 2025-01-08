@@ -233,9 +233,7 @@ struct CloudSystemFinder::Private
         systemDescription->setServerHost(serverId, url);
         NX_DEBUG(this,
             "Cloud system <%1>: set server <%2> url to %3",
-            cloudSystemId,
-            serverId.toString(),
-            url.toString(QUrl::RemovePassword));
+            cloudSystemId, serverId, url.toString(QUrl::RemovePassword));
     }
 
     void updateStateUnderLock(const QnCloudSystemList& targetSystems)

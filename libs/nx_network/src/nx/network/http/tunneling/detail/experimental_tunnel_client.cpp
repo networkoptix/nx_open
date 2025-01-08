@@ -47,7 +47,7 @@ void ExperimentalTunnelClient::setTimeout(
 void ExperimentalTunnelClient::openTunnel(
     OpenTunnelCompletionHandler completionHandler)
 {
-    m_tunnelId = nx::Uuid::createUuid().toSimpleByteArray().toStdString();
+    m_tunnelId = nx::Uuid::createUuid().toSimpleStdString();
     m_completionHandler = std::move(completionHandler);
 
     post(

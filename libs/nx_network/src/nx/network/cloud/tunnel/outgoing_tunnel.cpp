@@ -17,7 +17,7 @@ OutgoingTunnel::OutgoingTunnel(
     const CloudConnectSettings& settings,
     AddressEntry targetPeerAddress)
     :
-    m_tunnelId(nx::Uuid::createUuid().toSimpleByteArray().toStdString()),
+    m_tunnelId(nx::Uuid::createUuid().toSimpleStdString()),
     m_settings(settings),
     m_targetPeerAddress(std::move(targetPeerAddress)),
     m_timer(std::make_unique<aio::Timer>())

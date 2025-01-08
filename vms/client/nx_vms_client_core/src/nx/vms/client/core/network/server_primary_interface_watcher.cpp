@@ -70,9 +70,7 @@ void ServerPrimaryInterfaceWatcher::onResourcesAdded(const QnResourceList& resou
             server->setPrimaryAddress(address);
             NX_DEBUG(this,
                 "Initial set primary address of %1 (%2) to default %3",
-                server->getName(),
-                server->getId().toString(),
-                address.toString());
+                server->getName(), server->getId(), address);
             updatePrimaryInterface(server);
         }
         else if (server->hasFlags(Qn::cross_system))
@@ -111,9 +109,7 @@ void ServerPrimaryInterfaceWatcher::updatePrimaryInterface(const QnMediaServerRe
         server->setPrimaryAddress(module->endpoint);
         NX_DEBUG(this,
             "Update primary address of %1 (%2) to default %3",
-            server->getName(),
-            server->getId().toString(),
-            address.toString());
+            server->getName(), server->getId(), address);
     }
 }
 

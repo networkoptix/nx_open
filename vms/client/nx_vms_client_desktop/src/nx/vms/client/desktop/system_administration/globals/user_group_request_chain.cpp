@@ -96,7 +96,7 @@ QJsonValue getJsonValue(const T& t)
 
 static QJsonObject paramsWithId(const nx::Uuid& id, QJsonObject params = {})
 {
-    params.insert("id", id.toString());
+    params.insert("id", id.toSimpleString());
     return params;
 }
 

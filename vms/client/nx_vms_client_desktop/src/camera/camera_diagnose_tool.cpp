@@ -88,7 +88,7 @@ void DiagnoseTool::onGetServerSystemIdResponse(bool success, int /*handle*/, QSt
 
     if (!success
         || !isConnected
-        || (serverSystemId != currentSystemId.toString()))
+        || (nx::Uuid::fromStringSafe(serverSystemId) != currentSystemId))
     {
         m_errorMessage = mediaServerUnavailableResult(m_camera);
 

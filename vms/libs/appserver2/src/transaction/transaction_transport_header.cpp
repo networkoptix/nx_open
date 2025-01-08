@@ -22,7 +22,7 @@ namespace ec2
 
     QString toString(const QnTransactionTransportHeader& header)
     {
-        return QString("ttSeq=%1 sender=%2:%3").arg(header.sequence).arg(header.sender.toString()).arg(header.senderRuntimeID.toString());
+        return NX_FMT("ttSeq=%1 sender=%2:%3", header.sequence, header.sender, header.senderRuntimeID);
     }
 
     bool QnTransactionTransportHeader::isNull() const

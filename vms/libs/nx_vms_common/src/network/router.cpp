@@ -114,7 +114,7 @@ QString QnRoute::toString() const
     return nx::format("%1 (%2 %3)").args(
         id,
         gatewayId.isNull() ? QString("direct") : (
-            gatewayId.toString() + "+" + QString::number(distance)),
+            gatewayId.toSimpleString() + "+" + QString::number(distance)),
         reverseConnect ? "reverse" : addr.toString());
 }
 

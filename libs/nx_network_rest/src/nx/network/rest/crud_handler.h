@@ -135,7 +135,7 @@ protected:
             const nx::Uuid id = static_cast<const Derived*>(this)->flexibleIdToId(*it);
             if (id.isNull())
                 throw Exception::notFound(NX_FMT("Resource '%1' is not found", *it));
-            result->pathParams.replace(m_idParamName, id.toString());
+            result->pathParams.replace(m_idParamName, id.toSimpleString());
         }
     }
 

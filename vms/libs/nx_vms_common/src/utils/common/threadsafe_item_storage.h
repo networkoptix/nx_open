@@ -207,7 +207,7 @@ private:
     {
         if (m_itemByUuid.contains(item.uuid))
         {
-            NX_ASSERT(false, "Item with UUID %1 is already present.", item.uuid.toString());
+            NX_ASSERT(false, "Item with UUID %1 is already present.", item.uuid);
             return;
         }
 
@@ -222,7 +222,7 @@ private:
         typename ItemMap::iterator pos = m_itemByUuid.find(item.uuid);
         if (pos == m_itemByUuid.end())
         {
-            NX_ASSERT(false, "There is no item with UUID %1.", item.uuid.toString());
+            NX_ASSERT(false, "There is no item with UUID %1.", item.uuid);
             return;
         }
 

@@ -226,9 +226,8 @@ private:
         if (!newNotFound.empty())
         {
             // TODO: (?) Can report all the missing groups.
-            return {ErrorCode::badRequest,
-                nx::format(ServerApiErrors::tr("User Group '%1' does not exist."),
-                    newNotFound.front().toString())};
+            return {ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                "User Group '%1' does not exist."), newNotFound.front())};
         }
 
         const auto [removeParents, removeNotFound] =
@@ -238,9 +237,7 @@ private:
         {
             NX_WARNING(this,
                 "User '%1(%2)' has requested to remove from non-existing User Group '%3'.",
-                accessor.name,
-                accessor.id.toString(),
-                id);
+                accessor.name, accessor.id, id);
         }
 
         const auto accessorPermissions = accessor.permissions;
@@ -252,12 +249,9 @@ private:
 
             if (parent.type != api::UserType::local)
             {
-                return {ErrorCode::badRequest,
-                    nx::format(
-                        ServerApiErrors::tr("Cannot add to a non-local (%1) User Group '%2(%3)'."),
-                        parent.type,
-                        parent.name,
-                        parent.id.toString())};
+                return {ErrorCode::badRequest, nx::format(ServerApiErrors::tr(
+                    "Cannot add to a non-local (%1) User Group '%2(%3)'."),
+                    parent.type, parent.name, parent.id)};
             }
 
             if (!accessorPermissions.testAnyFlags(
@@ -337,7 +331,7 @@ private:
                     auto [selected, notFound] = context.userGroupManager()->mapGroupsByIds(cycledGroups,
                         [](const api::UserGroupData& group) -> QString
                         {
-                            return NX_FMT("%1(%2)", group.name, group.id.toString());
+                            return NX_FMT("%1(%2)", group.name, group.id);
                         });
 
                     return QStringList(std::make_move_iterator(selected.begin()),
@@ -349,9 +343,7 @@ private:
                     ServerApiErrors::tr(
                         "Circular dependencies are forbidden. The User Group '%1(%2)' is already "
                         "inherited by '%3'."),
-                    group.name,
-                    group.id.toString(),
-                    cycledGroupNames.join("', '"))};
+                    group.name, group.id, cycledGroupNames.join("', '"))};
         }
 
         return {};
@@ -379,7 +371,7 @@ private:
                 }
             }();
 
-        return {ErrorCode::forbidden, nx::format(errorTemplate, group.name, group.id.toString())};
+        return {ErrorCode::forbidden, nx::format(errorTemplate, group.name, group.id)};
     }
 
     template<typename Info>
@@ -404,7 +396,7 @@ private:
                 }
             }();
 
-        return {ErrorCode::forbidden, nx::format(errorTemplate, group.name, group.id.toString())};
+        return {ErrorCode::forbidden, nx::format(errorTemplate, group.name, group.id)};
     }
 
     template<typename Info>
@@ -936,7 +928,7 @@ static Result checkExistingResourceAccess(
 
     return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
         "Request of User %1 with %2 permissions for %3 Resource with %4 permissions is forbidden."),
-        userResource ? userResource->getName() : accessData.userId.toString(),
+        userResource ? userResource->getName() : accessData.userId.toSimpleString(),
         accessData.access,
         resourceId,
         permissions));
@@ -1324,8 +1316,7 @@ private:
                 ? "User '%1(%2)' can't disable himself."
                 : "User '%1(%2)' can't enable himself.";
 
-            return {ErrorCode::forbidden,
-                nx::format(errTemplate, existing.name, existing.id.toString())};
+            return {ErrorCode::forbidden, nx::format(errTemplate, existing.name, existing.id)};
         }
 
         if (existing.name != modified.name)
@@ -1480,12 +1471,9 @@ private:
 
     static Result forbidSelfModification(const QString& propName, const api::UserData& user)
     {
-        return {ErrorCode::forbidden,
-            nx::format(ServerApiErrors::tr(
-                           "User '%1(%2)' is not permitted to change his own property '%3'."),
-                user.name,
-                user.id.toString(),
-                propName)};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to change his own property '%3'."),
+            user.name, user.id, propName)};
     };
 
     static Result forbidReadonlyModification()
@@ -1509,47 +1497,32 @@ private:
 
     static Result forbidNonLocalModification(const QString& propName, const api::UserData& user)
     {
-        return {ErrorCode::forbidden,
-            nx::format(ServerApiErrors::tr(
-                           "Cannot modify property '%1' of a non-local (%2) User '%3(%4)'."),
-                propName,
-                user.type,
-                user.name,
-                user.id.toString())};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "Cannot modify property '%1' of a non-local (%2) User '%3(%4)'."),
+            propName, user.type, user.name, user.id)};
     }
 
     static Result forbidUserModification(const UserAccessorInfo& accessor,
         const api::UserData& target,
         GlobalPermission targetPermission)
     {
-        return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "User '%1(%2)' is not permitted to modify User '%3(%4)' with '%5' rights."),
-                accessor.name,
-                accessor.id.toString(),
-                target.name,
-                target.id.toString(),
-                targetPermission)};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to modify User '%3(%4)' with '%5' rights."),
+            accessor.name, accessor.id, target.name, target.id, targetPermission)};
     }
 
     static Result forbidUserCreation(const UserAccessorInfo& accessor)
     {
-        return {ErrorCode::forbidden,
-            nx::format(ServerApiErrors::tr("User '%1(%2)' is not permitted to create new Users."),
-                accessor.name,
-                accessor.id.toString())};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to create new Users."), accessor.name, accessor.id)};
     }
 
     static Result forbidUserCreation(
         const UserAccessorInfo& accessor, const api::UserData&, GlobalPermission targetPermission)
     {
-        return {ErrorCode::forbidden,
-            nx::format(ServerApiErrors::tr(
-                           "User '%1(%2)' is not permitted to create a User with '%3' rights."),
-                accessor.name,
-                accessor.id.toString(),
-                targetPermission)};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to create a User with '%3' rights."),
+            accessor.name, accessor.id, targetPermission)};
     }
 
     static Result forbidOrgGroupsModification()
@@ -1758,7 +1731,7 @@ struct ModifyResourceParamAccess
 
     static QString userNameOrId(const QnUserResourcePtr& user, const nx::network::rest::UserAccessData& accessData)
     {
-        return user ? user->getName() : accessData.userId.toString();
+        return user ? user->getName() : accessData.userId.toSimpleString();
     }
 
     static QString userNameOrId(const nx::network::rest::UserAccessData& accessData, SystemContext* systemContext)
@@ -2274,12 +2247,8 @@ struct ModifyServerAttributesAccess
 private:
     static Result forbidAttributesModification(const UserAccessorInfo& user)
     {
-        return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "User '%1(%2)' is not permitted to modify the Server's attributes."),
-                user.name,
-                user.id.toString())};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to modify the Server's attributes."), user.name, user.id)};
     }
 };
 
@@ -2296,7 +2265,7 @@ Result userHasGlobalAccess(
     {
         return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
             "User %1 with %2 permissions has no %3 permissions."),
-            userResource ? userResource->getName() : accessData.userId.toString(),
+            userResource ? userResource->getName() : accessData.userId.toSimpleString(),
             accessData.access,
             permissions));
     }
@@ -2322,7 +2291,7 @@ Result userHasAccess(
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User %1 does not have %2 access to %3."),
-                userResource ? userResource->getName() : accessData.userId.toString(),
+                userResource ? userResource->getName() : accessData.userId.toSimpleString(),
                 requiredAccess, *group));
         }
     }
@@ -2339,7 +2308,7 @@ Result userHasAccess(
         {
             return Result(ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
                 "User %1 does not have %2 access to %3."),
-                userResource ? userResource->getName() : accessData.userId.toString(),
+                userResource ? userResource->getName() : accessData.userId.toSimpleString(),
                 requiredAccess, targetResourceOrGroupId));
         }
     }
@@ -2434,12 +2403,9 @@ public:
         {
             if (!accessor.permissions.testFlag(GlobalPermission::administrator))
             {
-                return {ErrorCode::forbidden,
-                    nx::format(
-                        ServerApiErrors::tr(
-                            "User '%1(%2)' is not permitted to create a new Server."),
-                        accessor.name,
-                        accessor.id.toString())};
+                return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "User '%1(%2)' is not permitted to create a new Server."),
+                    accessor.name, accessor.id)};
             }
         }
         if (!validateResourceName(param, existing))
@@ -2454,11 +2420,8 @@ private:
     template<typename User>
     static Result forbidSettingsModification(const User& user)
     {
-        return {ErrorCode::forbidden,
-            nx::format(ServerApiErrors::tr(
-                           "User '%1(%2)' is not permitted to modify the Server's settings."),
-                user.name,
-                user.id.toString())};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to modify the Server's settings."), user.name, user.id)};
     }
 };
 
@@ -2605,25 +2568,17 @@ private:
         if (!api::kPredefinedGroupIds.contains(existingGroup.id))
             return {};
 
-        return {ErrorCode::forbidden,
-            nx::format(ServerApiErrors::tr("Cannot modify the built-in User Group %1(%2)."),
-                existingGroup.name,
-                existingGroup.id.toString())};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "Cannot modify the built-in User Group %1(%2)."), existingGroup.name, existingGroup.id)};
     }
 
     static Result forbidUserGroupModification(const UserAccessorInfo& accessor,
         const api::UserGroupData& target,
         GlobalPermission targetPermission)
     {
-        return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr(
-                    "User '%1(%2)' is not permitted to modify User Group '%3(%4)' with '%5' rights."),
-                accessor.name,
-                accessor.id.toString(),
-                target.name,
-                target.id.toString(),
-                highestPermission(targetPermission))};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to modify User Group '%3(%4)' with '%5' rights."),
+            accessor.name, accessor.id, target.name, target.id, highestPermission(targetPermission))};
     }
 };
 
@@ -2651,8 +2606,7 @@ struct RemoveUserRoleAccess
         if (!group)
         {
             return {ErrorCode::notFound,
-                nx::format(
-                    ServerApiErrors::tr("User Group '%1' does not exist."), param.id.toString())};
+                nx::format(ServerApiErrors::tr("User Group '%1' does not exist."), param.id)};
         }
 
         if (Result r = checkPermissionsToDelete(*systemContext, accessor, *group); !r)
@@ -2676,11 +2630,8 @@ private:
         if (accessor.permissions & (GlobalPermission::powerUser | GlobalPermission::administrator))
             return {};
 
-        return {ErrorCode::forbidden,
-            nx::format(
-                ServerApiErrors::tr("User '%1(%2)' is not permitted to delete User Groups."),
-                accessor.name,
-                accessor.id.toString())};
+        return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+            "User '%1(%2)' is not permitted to delete User Groups."), accessor.name, accessor.id)};
     }
 
     // Check whether the accessor has sufficient rights to delete the User Group.
@@ -2691,16 +2642,10 @@ private:
         const auto errorForbidden =
             [](const auto& user, const auto& group, GlobalPermission groupPermissions) -> Result
             {
-                return {ErrorCode::forbidden,
-                    nx::format(
-                        ServerApiErrors::tr("User '%1(%2)' is not permitted to delete the "
-                            "User Group '%3(%4)' with '%5' rights."),
-                        user.name,
-                        user.id.toString(),
-                        group.name,
-                        group.id.toString(),
-                        highestPermission(groupPermissions))};
-        };
+                return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                    "User '%1(%2)' is not permitted to delete the User Group '%3(%4)' with '%5' rights."),
+                    user.name, user.id, group.name, group.id, highestPermission(groupPermissions))};
+            };
 
         const auto groupPermissions =
             static_cast<GlobalPermission>(getGlobalPermissions(context, group.id).toInt());
@@ -2764,12 +2709,8 @@ private:
         if (api::kPredefinedGroupIds.contains(group.id)
             || api::kDefaultLdapGroupId == group.id)
         {
-            return {ErrorCode::forbidden,
-                nx::format(
-                    ServerApiErrors::tr(
-                        "Cannot delete the built-in User Group %1(%2)."),
-                    group.name,
-                    group.id.toString())};
+            return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "Cannot delete the built-in User Group %1(%2)."), group.name, group.id)};
         }
 
         return {};
@@ -2808,10 +2749,9 @@ struct ActionControlAccess
         {
             auto userResource = systemContext->resourcePool()->getResourceById(
                 accessData.userId).dynamicCast<QnUserResource>();
-            return {ErrorCode::forbidden,
-                nx::format(
-                    ServerApiErrors::tr("the User %1 doesn't have 'generateEvents' permission"),
-                    userResource ? userResource->getName() : accessData.userId.toString())};
+            return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
+                "the User %1 doesn't have 'generateEvents' permission"),
+                userResource ? userResource->getName() : accessData.userId.toSimpleString())};
         }
 
         return checkActionPermission(systemContext, accessData, data);

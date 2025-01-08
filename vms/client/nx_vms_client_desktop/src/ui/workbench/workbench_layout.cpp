@@ -326,8 +326,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 
     NX_ASSERT(!d->itemByUuid.contains(item->uuid()),
         "Item with UUID '%1' is already on layout '%2'.",
-        item->uuid().toString(),
-        name());
+        item->uuid(), name());
 
     if (item->layout())
     {

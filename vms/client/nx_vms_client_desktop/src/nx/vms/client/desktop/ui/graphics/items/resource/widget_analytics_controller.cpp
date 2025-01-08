@@ -87,7 +87,7 @@ QString ObjectInfo::toString() const
 {
     auto singleLineDescription = description;
     singleLineDescription.replace('\n', ' ');
-    return QString("Object [%1] %2").arg(trackId.toString()).arg(singleLineDescription);
+    return QString("Object [%1] %2").arg(trackId.toSimpleString()).arg(singleLineDescription);
 }
 
 static constexpr auto kShowPointAttributeName = "nx.sys.showAsPoint";

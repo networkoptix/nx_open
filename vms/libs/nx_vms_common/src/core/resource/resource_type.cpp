@@ -129,7 +129,7 @@ const QnResourceType::ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
             }
             else
             {
-                qWarning() << "parentId is" << parentId.toString() << "but there is no such parent in database";
+                NX_WARNING(this, "parentId is %1 but there is no such parent in database", parentId);
             }
         }
 

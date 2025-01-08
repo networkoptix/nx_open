@@ -131,7 +131,7 @@ bool UserPropertyBackend::sync()
 
     connectedServerApi()->patchRest(
         m_tokenHelperGetter(),
-        "/rest/v4/users/" + user->getId().toString(),
+        "/rest/v4/users/" + user->getId().toSimpleString(),
         {},
         nx::reflect::json::serialize(resourceWithParams),
         [this](bool success, rest::Handle /*requestId*/, rest::ErrorOrData<QByteArray> /*reply*/)

@@ -170,7 +170,7 @@ NX_REFLECTION_INSTRUMENT(EngineDescriptor, nx_vms_api_analytics_EngineDescriptor
 /** GoogleTest printer. */
 inline void PrintTo(const EngineDescriptor& d, std::ostream* s)
 {
-    *s << "EngineDescriptor{id " << d.id.toStdString()
+    *s << "EngineDescriptor{id " << d.id.toSimpleStdString()
         << ", name " << nx::kit::utils::toString(d.name)
         << ", pluginId " << nx::kit::utils::toString(d.pluginId)
         << ", ...}";

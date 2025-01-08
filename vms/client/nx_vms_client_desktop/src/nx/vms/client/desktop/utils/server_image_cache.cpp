@@ -36,8 +36,7 @@ QString ServerImageCache::cachedImageFilename(const QString &sourcePath)
     if (!kAllowedExtensions.contains(ext))
         ext = "png";
 
-    QString uuid = guidFromArbitraryData(sourcePath.toUtf8()).toString();
-    return uuid.mid(1, uuid.size() - 2) + '.' + ext;
+    return guidFromArbitraryData(sourcePath.toUtf8()).toSimpleString() + '.' + ext;
 }
 
 void ServerImageCache::storeImage(const QString &filePath, const QnAspectRatio& aspectRatio)

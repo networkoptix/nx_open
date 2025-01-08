@@ -144,7 +144,7 @@ protected:
         auto peer = new Peer();
         peer->id = peerId;
         peer->peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
-        peer->storage = createStorage(peerId.toString());
+        peer->storage = createStorage(peerId.toSimpleString());
         peer->worker = std::make_shared<TestWorker>(
             kTestFileName, peer->storage, QList<AbstractPeerManager*>{peer->peerManager}, selfId);
         return peer;

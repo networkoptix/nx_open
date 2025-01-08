@@ -1397,7 +1397,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
             ? "Warning: videowall %1 is empty, cannot start videowall on this pc"
             : "Warning: videowall %1 not exists, cannot start videowall on this pc";
 
-        NX_ERROR(this, message.arg(m_videoWallMode.guid.toString()));
+        NX_ERROR(this, message.arg(m_videoWallMode.guid.toSimpleString()));
 
         VideoWallShortcutHelper::setVideoWallAutorunEnabled(m_videoWallMode.guid, false);
         closeInstanceDelayed();
@@ -1408,7 +1408,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     if (pcUuid.isNull())
     {
         NX_ERROR(this, "Warning: pc UUID is null, cannot start videowall %1 on this pc",
-            m_videoWallMode.guid.toString());
+            m_videoWallMode.guid);
 
         closeInstanceDelayed();
         return;

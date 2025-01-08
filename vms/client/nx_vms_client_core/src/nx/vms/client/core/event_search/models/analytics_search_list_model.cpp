@@ -1127,7 +1127,7 @@ void AnalyticsSearchListModel::setSelectedEngine(const nx::Uuid& value)
 
     clear();
     d->selectedEngine = value;
-    NX_VERBOSE(this, "Set selected engine to %1", d->selectedEngine.toString());
+    NX_VERBOSE(this, "Set selected engine to %1", d->selectedEngine);
     emit selectedEngineChanged();
 }
 

@@ -153,7 +153,7 @@ void toDebugString(QStringList& lines, const QString& caption, const QSet<nx::Uu
 {
     QStringList report;
     for (auto id: uids)
-        report << id.toString();
+        report << id.toSimpleString();
 
     if (!report.empty())
     {

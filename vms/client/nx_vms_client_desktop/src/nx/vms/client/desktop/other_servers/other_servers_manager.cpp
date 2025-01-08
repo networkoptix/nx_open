@@ -162,10 +162,9 @@ struct OtherServersManager::Private
 
             otherServers.insert(serverData.id);
 
-            NX_DEBUG(this, lit("Add incompatible server %1 at %2 [%3]")
-                .arg(serverData.id.toString())
-                .arg(serverData.systemName)
-                .arg(QStringList(serverData.remoteAddresses.values()).join(", ")));
+            NX_DEBUG(this,
+                "Add incompatible server %1 at %2 [%3]",
+                serverData.id, serverData.systemName, nx::containerString(serverData.remoteAddresses));
             emit q->serverAdded(serverData.id);
         }
         else

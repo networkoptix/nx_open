@@ -69,11 +69,9 @@ QnCameraHistoryPool::QnCameraHistoryPool(
     connect(resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr &resource)
         {
-            NX_VERBOSE(this, lit("%1 statusChanged signal received for resource %2, %3, %4")
-                    .arg(QString::fromLatin1(Q_FUNC_INFO))
-                    .arg(resource->getId().toString())
-                    .arg(resource->getName())
-                    .arg(nx::utils::url::hidePassword(resource->getUrl())));
+            NX_VERBOSE(this,
+                "%1 statusChanged signal received for resource %2, %3, %4", Q_FUNC_INFO,
+                resource->getId(), resource->getName(), nx::utils::url::hidePassword(resource->getUrl()));
 
             QnVirtualCameraResourcePtr cam = resource.dynamicCast<QnVirtualCameraResource>();
             if (cam)

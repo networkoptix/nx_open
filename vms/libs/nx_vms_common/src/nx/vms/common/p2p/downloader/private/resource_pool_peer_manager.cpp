@@ -126,7 +126,7 @@ QString ResourcePoolPeerManager::peerString(const nx::Uuid& peerId) const
     }
     else
     {
-        result = QStringLiteral("Unknown server %1%2").arg(proxy, peerId.toString());
+        result = NX_FMT("Unknown server %1%2", proxy, peerId);
     }
 
     return result;

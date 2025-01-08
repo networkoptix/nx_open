@@ -292,7 +292,7 @@ bool SubjectHierarchy::addOrUpdate(const nx::Uuid& subject, const QSet<nx::Uuid>
     for (const auto& id: parents)
     {
         if (id == subject || d->isRecursiveMember(id, subjectAsSet))
-            NX_WARNING(this, "Circular dependency detected for %1", subject.toString());
+            NX_WARNING(this, "Circular dependency detected for %1", subject);
     }
 
     currentParents = parents;
@@ -407,7 +407,7 @@ bool SubjectHierarchy::addOrUpdate(
     }
 
     if (d->isRecursiveMember(subject, members))
-        NX_WARNING(this, "Circular dependency detected for %1", subject.toString());
+        NX_WARNING(this, "Circular dependency detected for %1", subject);
 
     lk.unlock();
 
