@@ -1630,7 +1630,7 @@
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation>レイアウトを選択</translation>
+      <translation>レイアウト選択</translation>
     </message>
     <message>
       <source>Shared layouts</source>
