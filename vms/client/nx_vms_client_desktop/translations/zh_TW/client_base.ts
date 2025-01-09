@@ -1940,7 +1940,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>合作夥伴資訊</translation>
     </message>
     <message>
       <source>Phones</source>
@@ -7274,7 +7274,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>指標</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
@@ -7305,7 +7305,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>指標</translation>
     </message>
     <message>
       <source>Target resource does not exist</source>
@@ -12393,7 +12393,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 Version is available</source>
-      <translation type="unfinished">%1 Version is available</translation>
+      <translation>%1 版本已可用</translation>
     </message>
     <message>
       <source>Skip Version</source>

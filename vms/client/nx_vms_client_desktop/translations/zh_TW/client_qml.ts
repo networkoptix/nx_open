@@ -653,11 +653,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>清單設定</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>新增清單</translation>
     </message>
     <message>
       <source>Name</source>
@@ -665,7 +665,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>欄位名稱</translation>
     </message>
     <message>
       <source>OK</source>
@@ -1175,7 +1175,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>需要服務</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1649,11 +1649,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>沒有清單</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>您還沒有建立任何清單。清單可以讓您儲存多個值以在事件規則中使用。建立一個新清單來開始新增項目。</translation>
     </message>
     <message>
       <source>Create New...</source>
@@ -2230,7 +2230,7 @@ Press Alt + Click to follow object</source>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>根據權限可用</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>

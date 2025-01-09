@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>提供的欄位類型無效</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
