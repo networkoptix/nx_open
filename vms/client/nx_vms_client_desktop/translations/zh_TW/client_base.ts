@@ -1025,7 +1025,7 @@
     </message>
     <message>
       <source>Lookup Lists...</source>
-      <translation type="unfinished">Lookup Lists...</translation>
+      <translation>查找清單...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1936,7 +1936,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>合作夥伴資訊</translation>
     </message>
     <message>
       <source>Phones</source>
@@ -7512,7 +7512,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the system will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the system will be imported automatically.</translation>
+      <translation>只有首次新增至系統後的攝影機或伺服器的離線時間段會自動匯入。</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
@@ -7550,7 +7550,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>指標</translation>
     </message>
     <message>
       <source>Place Hotspot</source>
@@ -7585,7 +7585,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>指標</translation>
     </message>
     <message>
       <source>Select Camera...</source>
@@ -8374,7 +8374,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User input</source>
-      <translation type="unfinished">User input</translation>
+      <translation>使用者輸入</translation>
     </message>
     <message>
       <source>Edit camera settings</source>
@@ -12220,7 +12220,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 Version is available</source>
-      <translation type="unfinished">%1 Version is available</translation>
+      <translation>%1 版本已可用</translation>
     </message>
   </context>
   <context>
@@ -12574,11 +12574,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Listed</source>
-      <translation type="unfinished">Listed</translation>
+      <translation>包含</translation>
     </message>
     <message>
       <source>Not listed</source>
-      <translation type="unfinished">Not listed</translation>
+      <translation>未包含</translation>
     </message>
     <message>
       <source>Attributes</source>
