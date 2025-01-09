@@ -3185,6 +3185,40 @@ Result canModifyStorage(const CanModifyStorageData& data)
             detail::ServerApiErrors::tr("Changing storage URL is prohibited."));
     }
 
+    if (data.hasExistingStorage)
+    {
+        const auto archiveModeIt = std::find_if(
+            data.request.addParams.cbegin(), data.request.addParams.cend(),
+            [](const auto& p) { return p.name == ResourcePropertyKey::kStorageArchiveMode; });
+
+        if (archiveModeIt != data.request.addParams.cend())
+        {
+            auto mode = nx::vms::api::StorageArchiveMode::undefined;
+            auto r = nx::reflect::fromString<nx::vms::api::StorageArchiveMode>(
+                archiveModeIt->value.toStdString(), &mode);
+
+            if (!r)
+            {
+                data.logErrorFunc(nx::format(
+                    "Failed to deserialize ArchiveMode property value '%1'",  archiveModeIt->value));
+                return Result(
+                    ErrorCode::forbidden,
+                    detail::ServerApiErrors::tr("Invalid `storageArchiveMode` value."));
+            }
+
+            if (mode == nx::vms::api::StorageArchiveMode::undefined)
+            {
+                data.logErrorFunc(nx::format(
+                    "Changing ArchiveMode to undefined is prohibited for existing storage'"));
+                return Result(
+                    ErrorCode::forbidden,
+                    detail::ServerApiErrors::tr(
+                        "Changing `storageArchiveMode` to undefined is "
+                        "prohibited for existing storage."));
+            }
+        }
+    }
+
     return ErrorCode::ok;
 }
 
