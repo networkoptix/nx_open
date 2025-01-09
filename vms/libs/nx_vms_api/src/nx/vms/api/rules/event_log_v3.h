@@ -33,9 +33,8 @@ struct NX_VMS_API EventParametersV3
     nx::Uuid eventResourceId;
 
     /**%apidoc[opt]
-     * Name of the Device which has triggered the Event. It can be used
-     * in a filter in Event Rules to assign different actions to different Devices. Also, the
-     * user could see this name in the notification panel. Example: "POS terminal 5".
+     * Name of an arbitrary resource that caused the event. Useful when there is no actual
+     * Resource to fill `eventResourceId`. Used when `eventType` equals to `userDefinedEvent` only.
      */
     QString resourceName;
 
