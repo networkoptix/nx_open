@@ -178,8 +178,7 @@ void registerSiteSettingHandlers(
      **%apidoc PATCH /rest/v{4-}/site/settings
      * Modifies a bunch of Site settings by passing a JSON object with the setting keys and
      * values in the request body. The existing settings can be obtained in the same format using
-     * the "Get Site settings" function. The complete list of settings with their types is
-     * returned by the "Get Site settings manifest" function.
+     * the "Get Site settings" function.
      * %example {"siteName": "Site"}
      * %caption Modify Site settings
      * %ingroup Site
@@ -191,8 +190,7 @@ void registerSiteSettingHandlers(
      **%apidoc:any PUT /rest/v{4-}/site/settings/{name}
      * Replaces a single Site setting by passing a JSON value in the request body. The existing
      * setting values can be obtained using the "Get Site settings" function as a JSON object
-     * with setting values mapped by field names. The complete list of settings with their types is
-     * returned by the "Get Site settings manifest" function.
+     * with setting values mapped by field names.
      * %example Site
      * %caption Replace Site setting
      * %ingroup Site

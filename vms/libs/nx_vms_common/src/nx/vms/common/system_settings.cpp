@@ -309,7 +309,7 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
             nx::vms::api::EmailSettings{},
             isValid,
             this,
-            [] { return tr("SMTP settings"); });
+            [] { return tr("SMTP settings."); });
 
     connect(
         d->emailSettingsAdaptor,
@@ -325,44 +325,44 @@ SystemSettings::AdaptorList SystemSettings::initStaticticsAdaptors()
 {
     d->statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "statisticsAllowed", true, this,
-        [] { return tr("Anonymous statistics report allowed"); });
+        [] { return tr("Anonymous statistics report allowed."); });
 
     d->statisticsReportLastTimeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "statisticsReportLastTime", QString(), this,
-        [] { return tr("Anonymous statistics report last time"); });
+        [] { return tr("Anonymous statistics report last time."); });
 
     d->statisticsReportLastVersionAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "statisticsReportLastVersion", QString(), this,
-        [] { return tr("Anonymous statistics report last version"); });
+        [] { return tr("Anonymous statistics report last version."); });
 
     d->statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "statisticsReportLastNumber", 0, this,
-        [] { return tr("Anonymous statistics report last number"); });
+        [] { return tr("Anonymous statistics report last number."); });
 
     d->statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "statisticsReportTimeCycle", "30d", this,
-        [] { return tr("Anonymous statistics time cycle"); });
+        [] { return tr("Anonymous statistics time cycle."); });
 
     d->statisticsReportUpdateDelayAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "statisticsReportUpdateDelay", "3h", this,
-        [] { return tr("Anonymous statistics report delay after update"); });
+        [] { return tr("Anonymous statistics report delay after update."); });
 
     d->statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "statisticsReportServerApi", QString(), this,
-        [] { return tr("Anonymous Statistics Report Server URL"); });
+        [] { return tr("Anonymous Statistics Report Server URL."); });
 
     d->crashReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "crashReportServerApi", QString(), this,
-        [] { return tr("Anonymous Crash Report Server API URL"); });
+        [] { return tr("Anonymous Crash Report Server API URL."); });
 
     d->clientStatisticsSettingsUrlAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "clientStatisticsSettingsUrl", QString(), this,
-        [] { return tr("Anonymous statistics report Client settings"); });
+        [] { return tr("Anonymous statistics report Client settings."); });
 
     d->deviceStorageInfoUpdateIntervalSAdaptor =
         new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
             "deviceStorageInfoUpdateIntervalS", 7 * 24 * 3600 * 1s, this,
-            [] { return tr("Device storage information update interval"); });
+            [] { return tr("Device storage information update interval."); });
 
     connect(
         d->statisticsAllowedAdaptor,
@@ -394,19 +394,19 @@ SystemSettings::AdaptorList SystemSettings::initConnectionAdaptors()
     d->ec2AliveUpdateIntervalSecAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "ec2AliveUpdateIntervalSec", 60,
         [](auto v) { return v >= 1 && v <= 60 * 60; }, this,
-        [] { return tr("Site alive update interval (seconds, 1s-1h)"); });
+        [] { return tr("Site alive update interval (seconds, 1s-1h)."); });
     ec2Adaptors << d->ec2AliveUpdateIntervalSecAdaptor;
 
     d->proxyConnectTimeoutSecAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "proxyConnectTimeoutSec", 5,
         [](auto v) { return v >= 1 && v <= 60 * 60; }, this,
-        [] { return tr("Proxy connection timeout (seconds, 1s-1h)"); });
+        [] { return tr("Proxy connection timeout (seconds, 1s-1h)."); });
     ec2Adaptors << d->proxyConnectTimeoutSecAdaptor;
 
     d->proxyConnectionAccessPolicyAdaptor =
         new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::ProxyConnectionAccessPolicy>(
             Names::proxyConnectionAccessPolicy, nx::vms::api::ProxyConnectionAccessPolicy::powerUsers, this,
-            [] { return tr("Proxy connection access policy"); });
+            [] { return tr("Proxy connection access policy."); });
     ec2Adaptors << d->proxyConnectionAccessPolicyAdaptor;
 
     for (auto adaptor: ec2Adaptors)
@@ -433,12 +433,12 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
 
     d->timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "timeSynchronizationEnabled", true, this,
-        [] { return tr("Time synchronization enabled"); });
+        [] { return tr("Time synchronization enabled."); });
     timeSynchronizationAdaptors << d->timeSynchronizationEnabledAdaptor;
 
     d->primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
         Names::primaryTimeServer, nx::Uuid(), this,
-        [] { return tr("Primary time synchronization Server ID"); });
+        [] { return tr("Primary time synchronization Server ID."); });
     timeSynchronizationAdaptors << d->primaryTimeServerAdaptor;
 
     d->maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor =
@@ -446,19 +446,19 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
             "maxDifferenceBetweenSynchronizedAndInternetTime",
             duration_cast<milliseconds>(std::chrono::seconds(2)).count(),
             this,
-            [] { return tr("Max difference between local and source time (milliseconds)"); });
+            [] { return tr("Max difference between local and source time (milliseconds)."); });
     timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
 
     d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor =
         new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
             "maxDifferenceBetweenSynchronizedAndLocalTimeMs", 2s, this,
-            [] { return tr("Max difference between local and source time (milliseconds)"); });
+            [] { return tr("Max difference between local and source time (milliseconds)."); });
     timeSynchronizationAdaptors << d->maxDifferenceBetweenSynchronizedAndLocalTimeMsAdaptor;
 
     d->osTimeChangeCheckPeriodMsAdaptor =
         new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
             "osTimeChangeCheckPeriodMs", 5s, this,
-            [] { return tr("OS time change check period"); });
+            [] { return tr("OS time change check period."); });
     timeSynchronizationAdaptors << d->osTimeChangeCheckPeriodMsAdaptor;
 
     d->syncTimeExchangePeriodAdaptor =
@@ -466,7 +466,7 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
             "syncTimeExchangePeriod",
             duration_cast<milliseconds>(std::chrono::minutes(10)).count(),
             this,
-            [] { return tr("Sync time synchronization interval for network requests"); });
+            [] { return tr("Sync time synchronization interval for network requests."); });
     timeSynchronizationAdaptors << d->syncTimeExchangePeriodAdaptor;
 
     d->syncTimeEpsilonAdaptor =
@@ -474,7 +474,7 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
             "syncTimeEpsilon",
             duration_cast<milliseconds>(std::chrono::milliseconds(200)).count(),
             this,
-            [] { return tr("Sync time epsilon. New value is not applied if time delta less than epsilon"); });
+            [] { return tr("Sync time epsilon. New value is not applied if time delta less than epsilon."); });
     timeSynchronizationAdaptors << d->syncTimeEpsilonAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
@@ -493,19 +493,19 @@ SystemSettings::AdaptorList SystemSettings::initTimeSynchronizationAdaptors()
 SystemSettings::AdaptorList SystemSettings::initCloudAdaptors()
 {
     d->cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::cloudAccountName, QString(), this, [] { return tr("Cloud owner account"); });
+        Names::cloudAccountName, QString(), this, [] { return tr("Cloud owner account."); });
 
     d->organizationIdAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
-        Names::organizationId, nx::Uuid(), this, [] { return tr("Organization Id"); });
+        Names::organizationId, nx::Uuid(), this, [] { return tr("Organization Id."); });
 
     d->cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::cloudSystemID, QString(), this, [] { return tr("Cloud Site ID"); });
+        Names::cloudSystemID, QString(), this, [] { return tr("Cloud Site ID."); });
 
     d->cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::cloudAuthKey, QString(), this, [] { return tr("Cloud authorization key"); });
+        Names::cloudAuthKey, QString(), this, [] { return tr("Cloud authorization key."); });
 
     d->system2faEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the Site"); });
+        Names::system2faEnabled, false, this, [] { return tr("Enable 2FA for the Site."); });
 
     d->masterCloudSyncListAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "masterCloudSyncList", QString(), this,
@@ -562,26 +562,26 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     using namespace std::chrono;
 
     d->systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::systemName, QString(), this, [] { return tr("Site name"); });
+        Names::systemName, QString(), this, [] { return tr("Site name."); });
 
     d->localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<nx::Uuid>(
         Names::localSystemId, nx::Uuid(), this,
         [] { return tr("Local Site ID, null means the Site is not set up yet."); });
 
     d->lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::lastMergeMasterId, QString(), this, [] { return tr("Last master Site merge ID"); });
+        Names::lastMergeMasterId, QString(), this, [] { return tr("Last master Site merge ID."); });
 
     d->lastMergeSlaveIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::lastMergeSlaveId, QString(), this, [] { return tr("Last slave Site merge ID"); });
+        Names::lastMergeSlaveId, QString(), this, [] { return tr("Last slave Site merge ID."); });
 
     d->disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::disabledVendors, QString(), this, [] { return tr("Disable Device vendors"); });
+        Names::disabledVendors, QString(), this, [] { return tr("Disable Device vendors."); });
 
     d->cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "cameraSettingsOptimization", true, this, [] { return tr("Optimize Camera settings"); });
+        "cameraSettingsOptimization", true, this, [] { return tr("Optimize Camera settings."); });
 
     d->autoUpdateThumbnailsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "autoUpdateThumbnails", true, this, [] { return tr("Thumbnails auto-update"); });
+        "autoUpdateThumbnails", true, this, [] { return tr("Thumbnails auto-update."); });
 
     d->maxSceneItemsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxSceneItems", 0,
@@ -593,88 +593,88 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             return !limit.has_value() || (v > 0 && v <= *limit);
         },
         this,
-        [] { return tr("Max scene items (0 means default)"); });
+        [] { return tr("Max scene items (0 means default)."); });
 
     d->useTextEmailFormatAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "useTextEmailFormat", false, this, [] { return tr("Send plain-text emails"); });
+        "useTextEmailFormat", false, this, [] { return tr("Send plain-text emails."); });
 
     d->useWindowsEmailLineFeedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "useWindowsEmailLineFeed", false, this,
-        [] { return tr("Use Windows line feed in emails"); });
+        [] { return tr("Use Windows line feed in emails."); });
 
     d->auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "auditTrailEnabled", true, this, [] { return tr("Enable audit trail"); });
+        "auditTrailEnabled", true, this, [] { return tr("Enable audit trail."); });
 
     d->auditTrailPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "auditTrailPeriodDays", 183,
         [](auto v) { return v >= 14 && v <= 730; }, this,
-        [] { return tr("Audit trail period (days, 14-730)"); });
+        [] { return tr("Audit trail period (days, 14-730)."); });
 
     d->eventLogPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        "eventLogPeriodDays", 30, this, [] { return tr("Event log period (days)"); });
+        "eventLogPeriodDays", 30, this, [] { return tr("Event log period (days)."); });
 
     d->trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::trafficEncryptionForced, true, this,
-        [] { return tr("Enforce HTTPS (data traffic encryption)"); });
+        [] { return tr("Enforce HTTPS (data traffic encryption)."); });
 
     d->videoTrafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::videoTrafficEncryptionForced, false, this,
-        [] { return tr("Enforce RTSPS (video traffic encryption)"); });
+        [] { return tr("Enforce RTSPS (video traffic encryption)."); });
 
     d->exposeDeviceCredentialsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::exposeDeviceCredentials, true, this,
-        [] { return tr("Expose device passwords stored in VMS for administrators (for web pages)"); });
+        [] { return tr("Expose device passwords stored in VMS for administrators (for web pages)."); });
 
     d->autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "autoDiscoveryEnabled", true, this,
-        [] { return tr("Enable auto-discovery"); });
+        [] { return tr("Enable auto-discovery."); });
 
     d->autoDiscoveryResponseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "autoDiscoveryResponseEnabled", true, this,
-        [] { return tr("Enable auto-update notifications"); });
+        [] { return tr("Enable auto-update notifications."); });
 
     d->updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "updateNotificationsEnabled", true, this, [] { return tr("Enable update notifications"); });
+        "updateNotificationsEnabled", true, this, [] { return tr("Enable update notifications."); });
 
      d->upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "upnpPortMappingEnabled", true, this, [] { return tr("Enable UPNP port-mapping"); });
+        "upnpPortMappingEnabled", true, this, [] { return tr("Enable UPNP port-mapping."); });
 
     d->backupSettingsAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::BackupSettings>(
         Names::backupSettings, nx::vms::api::BackupSettings(), this,
-        [] { return tr("Backup settings"); });
+        [] { return tr("Backup settings."); });
 
     d->cloudHostAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        Names::cloudHost, QString(), this, [] { return tr("Cloud host override"); });
+        Names::cloudHost, QString(), this, [] { return tr("Cloud host override."); });
 
     d->crossdomainEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "crossdomainEnabled", false, this, [] { return tr("Enable cross-domain policy"); });
+        "crossdomainEnabled", false, this, [] { return tr("Enable cross-domain policy."); });
 
     d->arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "arecontRtspEnabled", false, this, [] { return tr("Enable RTSP for Arecont"); });
+        "arecontRtspEnabled", false, this, [] { return tr("Enable RTSP for Arecont."); });
 
     d->sequentialFlirOnvifSearcherEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "sequentialFlirOnvifSearcherEnabled", false, this,
-        [] { return tr("Enable sequential Flir ONVIF searcher"); });
+        [] { return tr("Enable sequential Flir ONVIF searcher."); });
 
     d->maxP2pQueueSizeBytesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxP2pQueueSizeBytes", 1024 * 1024 * 128,
         [](auto v) { return v >= 1024 * 1024 * 32 && v <= 1024 * 1024 * 512; }, this,
-        [] { return tr("Max P2P queue size (bytes, 32-512MB)"); });
+        [] { return tr("Max P2P queue size (bytes, 32-512MB)."); });
 
     d->maxP2pAllClientsSizeBytesAdaptor = new QnLexicalResourcePropertyAdaptor<qint64>(
         "maxP2pAllClientsSizeBytes", 1024 * 1024 * 128,
         [](auto v) { return v >= 1024 * 1024 * 32 && v <= 1024 * 1024 * 512; }, this,
-        [] { return tr("Max P2P all clients size (bytes, 32-512MB)"); });
+        [] { return tr("Max P2P all clients size (bytes, 32-512MB)."); });
 
     d->maxRecordQueueSizeBytesAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRecordQueueSizeBytes", 1024 * 1024 * 24,
         [](auto v) { return v >= 1024 * 1024 * 6 && v <= 1024 * 1024 * 96; }, this,
-        [] { return tr("Max record queue size (bytes, 6-96MB)"); });
+        [] { return tr("Max record queue size (bytes, 6-96MB)."); });
 
     d->maxRecordQueueSizeElementsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRecordQueueSizeElements", 1000,
         [](auto v) { return v >= 250 && v <= 4000; }, this,
-        [] { return tr("Max record queue size (elements, 250-4000)"); });
+        [] { return tr("Max record queue size (elements, 250-4000)."); });
 
     d->maxHttpTranscodingSessionsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::maxHttpTranscodingSessions, 2, this,
@@ -689,113 +689,113 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             "session."); });
 
     d->rtpTimeoutMsAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
-        "rtpTimeoutMs", 10s, this, [] { return tr("RTP timeout (milliseconds)"); });
+        "rtpTimeoutMs", 10s, this, [] { return tr("RTP timeout (milliseconds)."); });
 
     d->maxRtspConnectDurationSecondsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRtspConnectDurationSeconds", 0, this,
-        [] { return tr("Max RTSP connection duration (seconds)"); });
+        [] { return tr("Max RTSP connection duration (seconds)."); });
 
     d->cloudConnectUdpHolePunchingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "cloudConnectUdpHolePunchingEnabled", true, this,
-        [] { return tr("Enable cloud-connect UDP hole-punching"); });
+        [] { return tr("Enable cloud-connect UDP hole-punching."); });
 
     d->cloudConnectRelayingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "cloudConnectRelayingEnabled", true, this,
-        [] { return tr("Enable cloud-connect relays usage"); });
+        [] { return tr("Enable cloud-connect relays usage."); });
 
     d->cloudConnectRelayingOverSslForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "cloudConnectRelayingOverSslForced", false, this,
-        [] { return tr("Enforce SSL for cloud-connect relays"); });
+        [] { return tr("Enforce SSL for cloud-connect relays."); });
 
     d->enableEdgeRecordingAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "enableEdgeRecording", true, this, [] { return tr("Enable recording on EDGE"); });
+        "enableEdgeRecording", true, this, [] { return tr("Enable recording on EDGE."); });
 
     d->webSocketEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        Names::webSocketEnabled, true, this, [] { return tr("Enable WebSocket for P2P"); });
+        Names::webSocketEnabled, true, this, [] { return tr("Enable WebSocket for P2P."); });
 
     d->maxRemoteArchiveSynchronizationThreadsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxRemoteArchiveSynchronizationThreads", -1,
         [](auto v) { return v >= -1 && v <= 32; }, this,
-        [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)"); });
+        [] { return tr("Max thread count for remote archive synchronization (<=0 - auto, max 32)."); });
 
     d->customReleaseListUrlAdaptor = new QnLexicalResourcePropertyAdaptor<utils::Url>(
         "customReleaseListUrl", nx::utils::Url(), this,
-        [] { return tr("Update releases.json file URL"); });
+        [] { return tr("Update releases.json file URL."); });
 
     d->targetUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
         "targetUpdateInformation", QByteArray(), this,
-        [] { return tr("Target update information"); });
+        [] { return tr("Target update information."); });
 
     d->installedUpdateInformationAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
         "installedUpdateInformation", QByteArray(), this,
-        [] { return tr("Installed update information"); });
+        [] { return tr("Installed update information."); });
 
     d->downloaderPeersAdaptor = new QnJsonResourcePropertyAdaptor<FileToPeerList>(
-        "downloaderPeers", FileToPeerList(), this, [] { return tr("Downloader peers for files"); });
+        "downloaderPeers", FileToPeerList(), this, [] { return tr("Downloader peers for files."); });
 
     d->clientUpdateSettingsAdaptor = new QnJsonResourcePropertyAdaptor<api::ClientUpdateSettings>(
         "clientUpdateSettings", api::ClientUpdateSettings{}, this,
-        [] { return tr("Client update settings"); });
+        [] { return tr("Client update settings."); });
 
     d->maxVirtualCameraArchiveSynchronizationThreadsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxVirtualCameraArchiveSynchronizationThreads", -1, this,
-        [] { return tr("Thread count limit for camera archive synchronization"); });
+        [] { return tr("Thread count limit for camera archive synchronization."); });
 
     d->watermarkSettingsAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::WatermarkSettings>(
         "watermarkSettings", nx::vms::api::WatermarkSettings(), this,
-        [] { return tr("Watermark settings"); });
+        [] { return tr("Watermark settings."); });
 
     d->pixelationSettingsAdaptor =
         new QnJsonResourcePropertyAdaptor<nx::vms::api::PixelationSettings>(
             "pixelationSettings", nx::vms::api::PixelationSettings{}, this,
-            [] { return tr("Pixelation settings"); });
+            [] { return tr("Pixelation settings."); });
 
     d->sessionLimitSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::sessionLimitS, kDefaultSessionLimit,
         [](const std::chrono::seconds& value) { return value >= 0s; },
         this,
-        [] { return tr("Authorization Session token lifetime (seconds)"); });
+        [] { return tr("Authorization Session token lifetime (seconds)."); });
 
     d->useSessionLimitForCloudAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::useSessionLimitForCloud, false, this,
-        [] { return tr("Apply session limit for Cloud tokens"); });
+        [] { return tr("Apply session limit for Cloud tokens."); });
 
     d->sessionsLimitAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionsLimit, 10'0000, [](const int& value) { return value >= 0; }, this,
-        [] { return tr("Session token count limit on a single Server"); });
+        [] { return tr("Session token count limit on a single Server."); });
 
     d->sessionsLimitPerUserAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         Names::sessionsLimitPerUser, 5'000, [](const int& value) { return value >= 0; }, this,
-        [] { return tr("Max session token count per user on single Server"); });
+        [] { return tr("Max session token count per user on single Server."); });
 
     d->remoteSessionUpdateSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::remoteSessionUpdateS, 10s,
         [](const std::chrono::seconds& value) { return value > 0s; }, this,
-        [] { return tr("Update interval for remote session token cache (other Servers and Cloud)"); });
+        [] { return tr("Update interval for remote session token cache (other Servers and Cloud)."); });
 
     d->remoteSessionTimeoutSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::remoteSessionTimeoutS, 6h,
         [](const std::chrono::seconds& value) { return value > 0s; }, this,
-        [] { return tr("Timeout for remote session token cache (other Servers and Cloud)"); });
+        [] { return tr("Timeout for remote session token cache (other Servers and Cloud)."); });
 
     d->defaultVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        "defaultVideoCodec", "h263p", this, [] { return tr("Default video codec"); });
+        "defaultVideoCodec", "h263p", this, [] { return tr("Default video codec."); });
 
     d->defaultExportVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "defaultExportVideoCodec", "mpeg4", this,
-        [] { return tr("Default codec for export video"); });
+        [] { return tr("Default codec for export video."); });
 
     d->lowQualityScreenVideoCodecAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "lowQualityScreenVideoCodec", "mpeg2video", this,
-        [] { return tr("Low quality screen video codec"); });
+        [] { return tr("Low quality screen video codec."); });
 
     d->licenseServerAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::licenseServer, "https://licensing.vmsproxy.com", this,
-        [] { return tr("License server"); });
+        [] { return tr("License server."); });
 
     d->resourceFileUriAdaptor = new QnLexicalResourcePropertyAdaptor<nx::utils::Url>(
         Names::resourceFileUri, "https://resources.vmsproxy.com/resource_data.json", this,
-        [] { return tr("URI for resource_data.json automatic update"); });
+        [] { return tr("URI for resource_data.json automatic update."); });
 
     d->maxEventLogRecordsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "maxEventLogRecords", 100 * 1000, this,
@@ -815,90 +815,90 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     d->metadataStorageChangePolicyAdaptor =
         new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::MetadataStorageChangePolicy>(
             "metadataStorageChangePolicy", nx::vms::api::MetadataStorageChangePolicy::keep, this,
-            [] { return tr("Meta data storage change policy"); });
+            [] { return tr("Meta data storage change policy."); });
 
     d->targetPersistentUpdateStorageAdaptor =
         new QnJsonResourcePropertyAdaptor<api::PersistentUpdateStorage>(
             "targetPersistentUpdateStorage", api::PersistentUpdateStorage(), this,
-            [] { return tr("Persistent Servers for update storage"); });
+            [] { return tr("Persistent Servers for update storage."); });
 
     d->installedPersistentUpdateStorageAdaptor =
         new QnJsonResourcePropertyAdaptor<api::PersistentUpdateStorage>(
             "installedPersistentUpdateStorage", api::PersistentUpdateStorage(), this,
-            [] { return tr("Persistent Servers where updates are stored"); });
+            [] { return tr("Persistent Servers where updates are stored."); });
 
     d->specificFeaturesAdaptor = new QnJsonResourcePropertyAdaptor<std::map<QString, int>>(
         Names::specificFeatures, std::map<QString, int>{}, this,
-        [] { return tr("VMS Server version specific features"); });
+        [] { return tr("VMS Server version specific features."); });
 
     d->defaultUserLocaleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::defaultUserLocale, "", this,
-        [] { return tr("Default locale for new users"); });
+        [] { return tr("Default locale for new users."); });
 
     d->additionalLocalFsTypesAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         "additionalLocalFsTypes", "", this,
-        [] { return tr("Additional local FS storage types for recording"); });
+        [] { return tr("Additional local FS storage types for recording."); });
 
     d->keepIoPortStateIntactOnInitializationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "keepIoPortStateIntactOnInitialization", false, this,
-        [] { return tr("Keep IO port state on when Server connects to the device"); });
+        [] { return tr("Keep IO port state on when Server connects to the device."); });
 
     d->mediaBufferSizeKbAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeKb", 256,
         [](auto v) { return v >= 10 && v <= 4 * 1024; }, this,
-        [] { return tr("Media buffer size (KB, 10KB-4MB)"); });
+        [] { return tr("Media buffer size (KB, 10KB-4MB)."); });
 
     d->mediaBufferSizeForAudioOnlyDeviceKbAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "mediaBufferSizeForAudioOnlyDeviceKb", 16,
         [](auto v) { return v >= 1 && v <= 1024; }, this,
-        [] { return tr("Media buffer size for audio only devices (KB, 1KB-1MB)"); });
+        [] { return tr("Media buffer size for audio only devices (KB, 1KB-1MB)."); });
 
     d->forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "forceAnalyticsDbStoragePermissions", true,  this,
-        [] { return tr("Force analytics DB storage mount point permissions in case of failure"); });
+        [] { return tr("Force analytics DB storage mount point permissions in case of failure."); });
 
     d->checkVideoStreamPeriodMsAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
         "checkVideoStreamPeriodMs", 10s, this,
-        [] { return tr("Check video stream permissions on VMS server period (milliseconds)"); });
+        [] { return tr("Check video stream permissions on VMS server period (milliseconds)."); });
 
     d->storageEncryptionAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "storageEncryption", false, this, [] { return tr("Storage encryption enabled"); });
+        "storageEncryption", false, this, [] { return tr("Storage encryption enabled."); });
 
     d->currentStorageEncryptionKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QByteArray>(
         "currentStorageEncryptionKey", QByteArray(), this,
-        [] { return tr("Current storage encryption key"); });
+        [] { return tr("Current storage encryption key."); });
 
     d->showServersInTreeForNonAdminsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "showServersInTreeForNonAdmins", true, this,
-        [] { return tr("Show Servers in the Resource Tree for non-admins"); });
+        [] { return tr("Show Servers in the Resource Tree for non-admins."); });
 
     d->serverHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::serverHeader, "$vmsName/$vmsVersion ($company) $compatibility", this,
-        [] { return tr("HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility"); });
+        [] { return tr("HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility."); });
     connect(
         d->serverHeaderAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         [this] { d->serverHeaderCache.reset(); });
 
     d->supportedOriginsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-         Names::supportedOrigins, "*", this, [] { return tr("HTTP header: Origin"); });
+         Names::supportedOrigins, "*", this, [] { return tr("HTTP header: Origin."); });
 
     d->frameOptionsHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-         Names::frameOptionsHeader, "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options"); });
+         Names::frameOptionsHeader, "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options."); });
 
     d->useHttpsOnlyForCamerasAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras"); });
+        "useHttpsOnlyForCameras", false, this, [] { return tr("Use only HTTPS for cameras."); });
 
     d->securityForPowerUsersAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::securityForPowerUsers, true, this,
-        [] { return tr("Allow Power User editing Security Settings"); });
+        [] { return tr("Allow Power User editing Security Settings."); });
 
     connect(d->securityForPowerUsersAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &SystemSettings::securityForPowerUsersChanged, Qt::QueuedConnection);
 
     d->insecureDeprecatedApiEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiEnabled, false, this,
-        [] { return tr("Enable deprecated API functions (insecure)"); });
+        [] { return tr("Enable deprecated API functions (insecure)."); });
 
     d->insecureDeprecatedApiInUseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::insecureDeprecatedApiInUseEnabled, false, this,
@@ -912,14 +912,14 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     d->exposeServerEndpointsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::exposeServerEndpoints, true, this,
-        []() { return tr("Expose IP addresses for autodiscovery"); });
+        []() { return tr("Expose IP addresses for autodiscovery."); });
 
     d->showMouseTimelinePreviewAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview"); });
+        "showMouseTimelinePreview", true, this, [] { return tr("Show mouse timeline preview."); });
 
     d->ldapAdaptor = new QnJsonResourcePropertyAdaptor<nx::vms::api::LdapSettings>(
         Names::ldap, nx::vms::api::LdapSettings(), this,
-        [] { return tr("LDAP settings"); });
+        [] { return tr("LDAP settings."); });
 
     d->cloudPollingIntervalSAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::seconds>(
         Names::cloudPollingIntervalS, 60s,

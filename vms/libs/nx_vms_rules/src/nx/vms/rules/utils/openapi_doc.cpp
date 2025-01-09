@@ -7,7 +7,6 @@
 #include <QJsonDocument>
 
 #include <nx/utils/json.h>
-#include <nx/utils/lockable.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/api/types/event_rule_types.h>
@@ -41,28 +40,6 @@ QString formatIdPart(QString part)
     if (part.endsWith('s'))
         part.removeLast();
     return part;
-}
-
-QJsonObject readOpenApiDoc(const QString& docPath)
-{
-    QFile file(docPath);
-    if (!file.open(QFile::ReadOnly))
-        return {};
-
-    QJsonParseError jsonError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), &jsonError);
-
-    if (!NX_ASSERT(jsonError.error == QJsonParseError::NoError,
-            "Failed to parse JSON: %1",
-            jsonError.errorString()))
-    {
-        return {};
-    }
-
-    if (!NX_ASSERT(jsonDoc.isObject(), "JSON is not an object."))
-        return {};
-
-    return jsonDoc.object();
 }
 
 QJsonValue generateDefaultValue(const QMetaType& metaType)
@@ -110,13 +87,6 @@ PropertyDescriptor mapMetaTypeToJsonTypeAndExample(const QMetaType& metaType)
 } // namespace
 
 namespace nx::vms::rules::utils {
-const QString kTemplatePath = ":/vms_rules_templates/template_event_rules_openapi.json.in";
-
-VmsRulesOpenApiDocHelper* VmsRulesOpenApiDocHelper::instance()
-{
-    static VmsRulesOpenApiDocHelper sInstance;
-    return &sInstance;
-}
 
 QJsonObject createTypeDescriptor(const QString& id)
 {
@@ -232,11 +202,11 @@ QJsonObject createStreamQualityDescriptor(bool addDefaultValue)
 QJsonObject constructSchemaReference(const QString& displayName)
 {
     QJsonObject reference;
-    reference["$ref"] = "#/components/schemas/" + VmsRulesOpenApiDocHelper::schemaName(displayName);
+    reference["$ref"] = "#/components/schemas/" + OpenApiDoc::schemaName(displayName);
     return reference;
 }
 
-void collectOpenApiInfo(
+static void collectOpenApiInfo(
     const QList<ItemDescriptor>& items, QJsonObject& schemas, QJsonArray& listReference)
 {
     for (const auto& item: items)
@@ -282,11 +252,11 @@ void collectOpenApiInfo(
         if (!item.description.isEmpty())
             schema[kDescriptionProperty] = item.description;
         listReference.push_back(constructSchemaReference(item.id));
-        schemas[VmsRulesOpenApiDocHelper::schemaName(item.id)] = schema;
+        schemas[OpenApiDoc::schemaName(item.id)] = schema;
     }
 }
 
-QString VmsRulesOpenApiDocHelper::schemaName(const QString& id)
+QString OpenApiDoc::schemaName(const QString& id)
 {
     return formatIdPart(id);
 }
@@ -387,109 +357,21 @@ QJsonObject getPropertyOpenApiDescriptor(const QMetaType& metaType, bool addDefa
     return createBasicTypeDescriptor(metaType, addDefaultValue);
 }
 
-QJsonObject VmsRulesOpenApiDocHelper::generateOpenApiDoc(nx::vms::common::SystemContext* context)
+OpenApiDoc OpenApiDoc::generate(nx::vms::common::SystemContext* context)
 {
-    QFile templateOpenApi(kTemplatePath);
-    if (!NX_ASSERT(
-            templateOpenApi.open(QFile::ReadOnly), "The OpenAPI doc template file cannot be opened."))
-    {
-        return {};
-    }
-
-    QTextStream textStream(&templateOpenApi);
-    QString templateText = textStream.readAll();
+    OpenApiDoc result;
 
     // Item descriptors that are not supported by the site need to be filtered out.
     const auto filteredEvents =
         filterItems(context, defaultItemFilters(), context->vmsRulesEngine()->events().values());
-    QJsonObject schemas;
-    QJsonArray eventListReference;
-    collectOpenApiInfo(filteredEvents, schemas, eventListReference);
+    collectOpenApiInfo(filteredEvents, result.schemas, result.events);
 
     // Item descriptors that are not supported by the site need to be filtered out.
     const auto filteredActions =
         filterItems(context, defaultItemFilters(), context->vmsRulesEngine()->actions().values());
-    QJsonArray actionListReference;
-    collectOpenApiInfo(filteredActions, schemas, actionListReference);
+    collectOpenApiInfo(filteredActions, result.schemas, result.actions);
 
-    const auto jsonActionList = QJsonDocument(actionListReference).toJson();
-    const auto jsonEventList = QJsonDocument(eventListReference).toJson();
-    QString jsonSchemas = QJsonDocument(schemas).toJson();
-
-    // Remove closing brackets.
-    jsonSchemas = jsonSchemas.trimmed().removeFirst().removeLast();
-    templateText = templateText.arg(
-        jsonActionList, jsonEventList, jsonSchemas.toUtf8(), jsonActionList, jsonEventList);
-
-    return QJsonDocument::fromJson(templateText.toUtf8()).object();
-}
-
-QJsonObject getSchemasObject(const QJsonObject& openApiDocObject)
-{
-    using namespace nx::utils::json;
-    return optObject(
-        optObject(openApiDocObject, "components", "No element component in openapi doc"),
-        "schemas",
-        "No element schemas in openapi doc");
-}
-
-QJsonObject getPathsObject(const QJsonObject& openApiDocObject)
-{
-    using namespace nx::utils::json;
-    return optObject(openApiDocObject, "paths", "No element paths in openapi doc");
-}
-
-
-void mergeOpenApiDoc(QJsonObject& basicDocToMergeInto, const QJsonObject& vmsRulesDoc)
-{
-    if (!NX_ASSERT(!vmsRulesDoc.isEmpty() && !basicDocToMergeInto.isEmpty(),
-            "Incorrect documentation for merging"))
-    {
-        return;
-    }
-
-    using namespace nx::utils::json;
-    auto originalSchemas = getSchemasObject(basicDocToMergeInto);
-
-    auto vmsSchemas = getSchemasObject(vmsRulesDoc);
-    for(auto& vmsSchemaName : vmsSchemas.keys())
-        originalSchemas[vmsSchemaName] = std::move(vmsSchemas.take(vmsSchemaName));
-
-    auto originalPaths = getPathsObject(basicDocToMergeInto);
-    auto vmsRulesPaths = getPathsObject(vmsRulesDoc);
-    for(const auto& pathName : vmsRulesPaths.keys())
-        originalPaths[pathName] = std::move(vmsRulesPaths.take(pathName));
-
-    auto originalComponents = optObject(basicDocToMergeInto,"components");
-    originalComponents["schemas"] = originalSchemas;
-
-    basicDocToMergeInto["components"] = originalComponents;
-    basicDocToMergeInto["paths"] = originalPaths;
-}
-
-QJsonObject VmsRulesOpenApiDocHelper::addVmsRulesDocIfRequired(
-    const QString& basicDocFilePath, nx::vms::common::SystemContext* systemContext)
-{
-    auto openApiDoc = readOpenApiDoc(basicDocFilePath);
-    if (openApiDoc.isEmpty())
-        return {};
-
-    // Get version from basicDocFilePath.
-    static const QRegularExpression rx("[^0-9]+");
-    const auto parts = basicDocFilePath.split(rx, Qt::SkipEmptyParts);
-
-    if (parts.isEmpty() || parts.first().toInt() < kMinimumVersionRequiresMerging)
-        return openApiDoc; //< OpenAPI doc doesn't require merging.
-
-    auto lockableResource = m_cache.lock();
-    auto it = lockableResource->find(basicDocFilePath);
-    if (it != lockableResource->end())
-        return it->second;
-
-    mergeOpenApiDoc(openApiDoc, generateOpenApiDoc(systemContext));
-
-    lockableResource->emplace(basicDocFilePath, openApiDoc);
-    return openApiDoc;
+    return result;
 }
 
 void updatePropertyForField(QJsonObject& openApiObjectDescriptor,

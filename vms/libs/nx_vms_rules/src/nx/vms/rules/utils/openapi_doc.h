@@ -2,13 +2,11 @@
 
 #pragma once
 
-#include <QMetaObject>
-#include <QMetaProperty>
-#include <mutex>
-
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include <QtCore/QMetaObject>
+#include <QtCore/QMetaProperty>
 
-#include <nx/utils/lockable.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/utils/api_renamer.h>
 
@@ -26,7 +24,6 @@ static constexpr auto kMinProperty = "minimum";
 static constexpr auto kMaxProperty = "maximum";
 static constexpr auto kPropertyKey = "properties";
 static constexpr auto kDocOpenApiSchemePropertyName = "openApiSchema";
-const int kMinimumVersionRequiresMerging = 4;
 
 /**
  * Adds default, minimum, max values from Field properties, if presented.
@@ -81,13 +78,11 @@ NX_VMS_RULES_API void updatePropertyForField(QJsonObject& openApiObjectDescripto
     const QString& docPropertyName,
     const QString& value);
 
-class NX_VMS_RULES_API VmsRulesOpenApiDocHelper
+struct NX_VMS_RULES_API OpenApiDoc
 {
-public:
-    static VmsRulesOpenApiDocHelper* instance();
-
-    VmsRulesOpenApiDocHelper(const VmsRulesOpenApiDocHelper&) = delete;
-    VmsRulesOpenApiDocHelper& operator=(const VmsRulesOpenApiDocHelper&) = delete;
+    QJsonArray events;
+    QJsonArray actions;
+    QJsonObject schemas;
 
     /**
      * Changes the input string to the appropriate schema name format.
@@ -95,19 +90,8 @@ public:
      * Result example: "AnalyticsObject"
      */
     static QString schemaName(const QString& id);
-    static QJsonObject generateOpenApiDoc(nx::vms::common::SystemContext* context);
 
-    /**
-     * Adds schemas and paths for VmsRules that are missing in basicDoc.
-     * In case of duplication, the paths from generated documentation overwrites the one in basicDocFile.
-     * If basicDoc does not require VmsRules documentation, the original document will be returned.
-     */
-    QJsonObject addVmsRulesDocIfRequired(const QString& basicDocFile,
-        nx::vms::common::SystemContext* systemContext);
-
-private:
-    VmsRulesOpenApiDocHelper() = default;
-    ~VmsRulesOpenApiDocHelper() = default;
-    nx::Lockable<std::map<QString, QJsonObject>> m_cache;
+    static OpenApiDoc generate(nx::vms::common::SystemContext* context);
 };
+
 }  // namespace nx::vms::rules::utils
