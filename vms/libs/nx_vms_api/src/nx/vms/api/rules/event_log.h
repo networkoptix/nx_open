@@ -8,6 +8,7 @@
 #include <nx/utils/json/qjson.h>
 #include <nx/utils/json/qt_containers_reflect.h>
 #include <nx/vms/api/json/value_or_array.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 #include "../data/server_time_period.h"
 #include "common.h"
@@ -115,7 +116,6 @@ struct NX_VMS_API EventLogRecord
 
 #define EventLogRecord_Fields \
     (timestampMs)(eventData)(actionData)(aggregatedInfo)(ruleId)(flags)
-
 NX_REFLECTION_INSTRUMENT(EventLogRecord, EventLogRecord_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(ubjson)(sql_record), NX_VMS_API)
 
@@ -123,6 +123,14 @@ std::string NX_VMS_API toString(const EventLogRecord& record);
 
 // Helper function for log data sorting & merging.
 inline quint64 getTimestamp(const EventLogRecord& record) { return record.timestampMs.count(); }
+
+struct NX_VMS_API EventLogRecordWithLegacyTypes: EventLogRecord
+{
+    api::ActionType actionType;
+};
+#define EventLogRecordWithLegacyTypes_Fields EventLogRecord_Fields (actionType)
+NX_REFLECTION_INSTRUMENT(EventLogRecordWithLegacyTypes, EventLogRecordWithLegacyTypes_Fields)
+QN_FUSION_DECLARE_FUNCTIONS(EventLogRecordWithLegacyTypes, (json), NX_VMS_API)
 
 } // namespace nx::vms::rules
 

@@ -8,7 +8,9 @@ namespace nx::vms::api::rules {
 
 struct EventLogFilter;
 struct EventLogRecord;
+struct EventLogRecordWithLegacyTypes;
 
 using EventLogRecordList = std::vector<EventLogRecord>;
+using EventLogRecordWithLegacyTypesList = std::vector<EventLogRecordWithLegacyTypes>;
 
 } // namespace nx::vms::rules
