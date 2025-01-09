@@ -1806,7 +1806,7 @@
     </message>
     <message>
       <source>Last master Site merge ID</source>
-      <translation type="unfinished">Last master Site merge ID</translation>
+      <translation>最後的主站點合併ID</translation>
     </message>
     <message>
       <source>Last slave Site merge ID</source>
