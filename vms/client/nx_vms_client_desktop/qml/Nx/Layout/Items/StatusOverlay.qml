@@ -364,7 +364,7 @@ Item
                 case StatusOverlay.AnalogWithoutLicenseOverlay:
                 case StatusOverlay.VideowallWithoutLicenseOverlay:
                     return makeErrorOverlayData(qsTr("Not enough licenses"),
-                        "image://skin/48x48/Outline/lock.svg?primary=red")
+                        "image://skin/48x48/Outline/restrict.svg?primary=red")
 
                 case StatusOverlay.ServerOfflineOverlay:
                     return makeErrorOverlayData(qsTr("Server unavailable"))
