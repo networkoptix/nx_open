@@ -51,8 +51,7 @@ void WebSocketConnections::executeAsync(
 WebSocketConnection* WebSocketConnections::addConnection(
     std::any connectionInfo, std::unique_ptr<nx::network::websocket::WebSocket> socket)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    auto connection = std::make_unique<WebSocketConnection>(std::move(socket),
+    auto connection = WebSocketConnection::create(std::move(socket),
         [this](auto connection) { removeConnection(connection); },
         [this, connectionInfo = std::move(connectionInfo)](auto request, auto handler, auto connection)
         {
@@ -86,8 +85,10 @@ WebSocketConnection* WebSocketConnections::addConnection(
                 {api::JsonRpcError::methodNotFound, "Unsupported method"}));
         });
     auto connectionPtr = connection.get();
-    m_connections.emplace(connectionPtr, Connection{std::move(connection)});
-    lock.unlock();
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_connections.emplace(connectionPtr, Connection{std::move(connection)});
+    }
     NX_VERBOSE(this, "Add connection %1", connectionPtr);
     connectionPtr->start();
     return connectionPtr;
