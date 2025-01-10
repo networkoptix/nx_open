@@ -54,13 +54,9 @@ std::pair<bool, std::optional<Response>> isResponse(const rapidjson::Value& valu
 } // namespace
 
 WebSocketConnection::WebSocketConnection(
-    std::unique_ptr<nx::network::websocket::WebSocket> webSocket,
-    OnDone onDone)
+    std::unique_ptr<nx::network::websocket::WebSocket> webSocket, OnDone onDone)
     :
     m_onDone(std::move(onDone)),
-    m_incomingProcessor{std::make_unique<IncomingProcessor>()},
-    m_outgoingProcessor{
-        std::make_unique<OutgoingProcessor>([this](auto value) { send(std::move(value)); })},
     m_socket(std::move(webSocket))
 {
     base_type::bindToAioThread(m_socket->getAioThread());
@@ -68,34 +64,41 @@ WebSocketConnection::WebSocketConnection(
         m_address = socket->getForeignAddress();
 }
 
-void WebSocketConnection::setRequestHandler(RequestHandler requestHandler)
+void WebSocketConnection::start(
+    std::weak_ptr<WebSocketConnection> self, RequestHandler requestHandler)
 {
-    m_incomingProcessor = std::make_unique<IncomingProcessor>(
-        [this, requestHandler = std::move(requestHandler)](const auto& request, auto responseHandler)
+    m_self = std::move(self);
+    m_outgoingProcessor = std::make_unique<OutgoingProcessor>(
+        [self = m_self](auto value)
         {
-            requestHandler(
-                request,
-                [this, handler = std::move(responseHandler)](auto response) mutable
-                {
-                    dispatch([response = std::move(response), handler = std::move(handler)]() mutable
+            if (auto lock = self.lock())
+                lock->send(std::move(value));
+        });
+    if (requestHandler)
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>(
+            [requestHandler = std::move(requestHandler), thisPointer = this](
+                const auto& request, auto responseHandler)
+            {
+                requestHandler(request,
+                    [handler = std::move(responseHandler)](auto response) mutable
                     {
                         handler(std::move(response));
-                    });
-                },
-                this);
-        });
-}
-
-void WebSocketConnection::start()
-{
+                    },
+                    thisPointer);
+            });
+    }
+    else
+    {
+        m_incomingProcessor = std::make_unique<IncomingProcessor>();
+    }
     m_socket->start();
     readNextMessage();
 }
 
 WebSocketConnection::~WebSocketConnection()
 {
-    if (m_onDone)
-        m_onDone(SystemError::noError, this);
+    nx::utils::moveAndCallOptional(m_onDone, SystemError::noError, this);
 }
 
 void WebSocketConnection::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -119,13 +122,16 @@ void WebSocketConnection::send(
     Request request, ResponseHandler handler, std::string serializedRequest)
 {
     dispatch(
-        [this,
+        [self = m_self,
             request = std::move(request),
             handler = std::move(handler),
             serializedRequest = std::move(serializedRequest)]() mutable
         {
-            m_outgoingProcessor->processRequest(
-                std::move(request), std::move(handler), std::move(serializedRequest));
+            if (auto lock = self.lock())
+            {
+                lock->m_outgoingProcessor->processRequest(
+                    std::move(request), std::move(handler), std::move(serializedRequest));
+            }
         });
 }
 
@@ -133,9 +139,15 @@ void WebSocketConnection::send(
     std::vector<Request> jsonRpcRequests, BatchResponseHandler handler)
 {
     dispatch(
-        [this, jsonRpcRequests = std::move(jsonRpcRequests), handler = std::move(handler)]() mutable
+        [self = m_self,
+            jsonRpcRequests = std::move(jsonRpcRequests),
+            handler = std::move(handler)]() mutable
         {
-            m_outgoingProcessor->processBatchRequest(std::move(jsonRpcRequests), std::move(handler));
+            if (auto lock = self.lock())
+            {
+                lock->m_outgoingProcessor->processBatchRequest(
+                    std::move(jsonRpcRequests), std::move(handler));
+            }
         });
 }
 
@@ -143,20 +155,26 @@ void WebSocketConnection::readNextMessage()
 {
     auto buffer = std::make_unique<nx::Buffer>();
     auto bufferPtr = buffer.get();
-    m_socket->readSomeAsync(
-        bufferPtr,
-        [this, buffer = std::move(buffer)](auto errorCode, auto /*bytesTransferred*/)
+    m_socket->readSomeAsync(bufferPtr,
+        [self = m_self, buffer = std::move(buffer)](auto errorCode, auto /*bytesTransferred*/)
         {
             if (errorCode != SystemError::noError)
             {
-                NX_DEBUG(this, "Failed to read next message with error code %1", errorCode);
-                m_outgoingProcessor->clear(errorCode);
-                nx::utils::moveAndCallOptional(m_onDone, errorCode, this);
+                if (auto lock = self.lock())
+                {
+                    NX_DEBUG(
+                        lock.get(), "Failed to read next message with error code %1", errorCode);
+                    lock->m_outgoingProcessor->clear(errorCode);
+                    nx::utils::moveAndCallOptional(lock->m_onDone, errorCode, lock.get());
+                }
                 return;
             }
 
-            readHandler(*buffer.get());
-            readNextMessage();
+            if (auto lock = self.lock())
+            {
+                lock->readHandler(*buffer.get());
+                lock->readNextMessage();
+            }
         });
 }
 
@@ -199,13 +217,16 @@ void WebSocketConnection::processRequest(rapidjson::Document data)
 void WebSocketConnection::processQueuedRequest()
 {
     m_incomingProcessor->processRequest(std::move(m_queuedRequests.front()),
-        [this](std::string response)
+        [self = m_self](std::string response)
         {
-            if (!response.empty())
-                send(std::move(response));
-            m_queuedRequests.pop();
-            if (!m_queuedRequests.empty())
-                processQueuedRequest();
+            if (auto lock = self.lock())
+            {
+                if (!response.empty())
+                    lock->send(std::move(response));
+                lock->m_queuedRequests.pop();
+                if (!lock->m_queuedRequests.empty())
+                    lock->processQueuedRequest();
+            }
         });
 }
 
@@ -215,13 +236,16 @@ void WebSocketConnection::send(std::string data)
     auto bufferPtr = buffer.get();
     logMessage("send to", m_address, *bufferPtr);
     m_socket->sendAsync(bufferPtr,
-        [buffer = std::move(buffer), this](auto errorCode, auto /*bytesTransferred*/)
+        [self = m_self, buffer = std::move(buffer)](auto errorCode, auto /*bytesTransferred*/)
         {
-            if (errorCode != SystemError::noError)
+            if (errorCode == SystemError::noError)
+                return;
+
+            if (auto lock = self.lock())
             {
-                NX_DEBUG(this, "Failed to send message with error code %1", errorCode);
-                m_outgoingProcessor->clear(errorCode);
-                nx::utils::moveAndCallOptional(m_onDone, errorCode, this);
+                NX_DEBUG(lock.get(), "Failed to send message with error code %1", errorCode);
+                lock->m_outgoingProcessor->clear(errorCode);
+                nx::utils::moveAndCallOptional(lock->m_onDone, errorCode, lock.get());
             }
         });
 }
@@ -232,21 +256,27 @@ void WebSocketConnection::addGuard(const QString& id, nx::utils::Guard guard)
         return;
 
     dispatch(
-        [this, id, g = std::move(guard)]() mutable
+        [self = m_self, id, g = std::move(guard)]() mutable
         {
-            auto& guard = m_guards[id];
-            NX_VERBOSE(this, "%1 guard for %2", guard ? "Adding" : "Replacing", id);
-            guard = std::move(g);
+            if (auto lock = self.lock())
+            {
+                auto& guard = lock->m_guards[id];
+                NX_VERBOSE(lock.get(), "%1 guard for %2", guard ? "Adding" : "Replacing", id);
+                guard = std::move(g);
+            }
         });
 }
 
 void WebSocketConnection::removeGuard(const QString& id)
 {
     dispatch(
-        [this, id]() mutable
+        [self = m_self, id]() mutable
         {
-            NX_VERBOSE(this, "Removing guard for %1", id);
-            m_guards.erase(id);
+            if (auto lock = self.lock())
+            {
+                NX_VERBOSE(lock.get(), "Removing guard for %1", id);
+                lock->m_guards.erase(id);
+            }
         });
 }
 

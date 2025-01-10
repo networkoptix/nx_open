@@ -17,9 +17,7 @@ namespace nx::json_rpc {
 class IncomingProcessor;
 namespace detail { class OutgoingProcessor; }
 
-class NX_JSON_RPC_API WebSocketConnection:
-    public nx::network::aio::BasicPollable,
-    public std::enable_shared_from_this<WebSocketConnection>
+class NX_JSON_RPC_API WebSocketConnection: public nx::network::aio::BasicPollable
 {
 public:
     using base_type = nx::network::aio::BasicPollable;
@@ -28,13 +26,11 @@ public:
         void(const Request&, ResponseHandler, WebSocketConnection*)>;
     using OnDone = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, WebSocketConnection*)>;
 
-    WebSocketConnection(
-        std::unique_ptr<nx::network::websocket::WebSocket> webSocket, OnDone onDone);
+    WebSocketConnection(std::unique_ptr<nx::network::websocket::WebSocket> socket, OnDone onDone);
     virtual ~WebSocketConnection() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    void setRequestHandler(RequestHandler requestHandler);
-    void start();
+    void start(std::weak_ptr<WebSocketConnection> self, RequestHandler requestHandler = {});
     void send(
         Request request,
         ResponseHandler handler = {},
@@ -57,6 +53,7 @@ private:
     void send(std::string data);
 
 private:
+    std::weak_ptr<WebSocketConnection> m_self;
     OnDone m_onDone;
     nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;

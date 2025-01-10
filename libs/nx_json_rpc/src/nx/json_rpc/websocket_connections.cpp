@@ -68,8 +68,13 @@ void WebSocketConnections::executeAsync(
 void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> connection)
 {
     auto connectionPtr = connection.get();
+    std::weak_ptr<WebSocketConnection> weakConnection{connection};
     NX_VERBOSE(this, "Add connection %1", connectionPtr);
-    connection->setRequestHandler(
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_connections.emplace(connectionPtr, Connection{std::move(connection)});
+    }
+    connectionPtr->start(std::move(weakConnection),
         [this](auto request, auto handler, auto connection)
         {
             NX_MUTEX_LOCKER lock(&m_mutex);
@@ -100,14 +105,10 @@ void WebSocketConnections::addConnection(std::shared_ptr<WebSocketConnection> co
                 }
             }
 
+            lock.unlock();
             handler(Response::makeError(
                 request.responseId(), Error::methodNotFound, "Unsupported method"));
         });
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        m_connections.emplace(connectionPtr, Connection{std::move(connection)});
-    }
-    connectionPtr->start();
 }
 
 void WebSocketConnections::removeConnection(WebSocketConnection* connection)
