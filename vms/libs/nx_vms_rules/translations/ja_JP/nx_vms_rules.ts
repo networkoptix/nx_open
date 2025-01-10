@@ -632,7 +632,7 @@
     </message>
     <message>
       <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
     <message>
       <source>Speak the following</source>
