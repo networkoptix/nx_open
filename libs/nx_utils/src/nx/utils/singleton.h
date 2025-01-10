@@ -45,5 +45,9 @@ protected:
     }
 
 private:
+    #if defined(__clang__) && defined(_MSC_VER)
+    static inline NX_FORCE_EXPORT Derived* s_instance = nullptr;
+    #else
     static NX_FORCE_EXPORT Derived* s_instance;
+    #endif
 };

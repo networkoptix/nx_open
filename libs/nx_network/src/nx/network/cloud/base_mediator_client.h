@@ -23,6 +23,11 @@ public:
     {
     }
 
+    BaseMediatorClient(const BaseMediatorClient&) = delete;
+    BaseMediatorClient(BaseMediatorClient&&) = delete;
+    BaseMediatorClient& operator=(const BaseMediatorClient&) = delete;
+    BaseMediatorClient& operator=(BaseMediatorClient&&) = delete;
+
 protected:
     template<typename RequestData, typename CompletionHandlerType>
     void doRequest(

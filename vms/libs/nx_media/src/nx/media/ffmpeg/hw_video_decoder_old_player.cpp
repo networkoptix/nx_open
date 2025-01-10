@@ -44,7 +44,7 @@ AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
     }
 }
 
-class NX_MEDIA_API VideoFrameAdapter: public AbstractVideoSurface
+class VideoFrameAdapter: public AbstractVideoSurface
 {
 public:
     VideoFrameAdapter(

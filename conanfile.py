@@ -150,12 +150,13 @@ class NxOpenConan(ConanFile):
         self.build_requires("qt-host/6.9.0" "#3995869eb604dd7c10d91e6869ca2a9f")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
 
-        if self.isLinux:
+        if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/20.1.2" "#45a020e716ad31135c131b24734f0769")
+                self.build_requires("clang/20.1.2" "#bc083c5c0eedbdf254af2744d261f9c8")
                 self.build_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
-            self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
+            if self.isLinux:
+                self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
 
         if self.isWindows:
             self.build_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
@@ -209,7 +210,7 @@ class NxOpenConan(ConanFile):
         if self.isWindows or self.isLinux:
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
-                self.requires("cuda-toolkit/12.5.1" "#895935cfab790040df87c288d2873f04")
+                self.requires("cuda-toolkit/12.5.1" "#34ae878d0b2f4df2297bac67d026a307")
                 self.requires("libvpl/2023.4.0" "#22d0df9697d26ecbb784e71a2c882e05")
                 self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 

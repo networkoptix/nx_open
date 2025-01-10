@@ -4,6 +4,10 @@
 
 #include <time.h>
 
+#if defined(__clang__) && defined(_MSC_VER)
+#include <comdef.h>
+#endif
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/core/demangle.hpp>
@@ -150,6 +154,13 @@ QString toString(const std::wstring& value)
 {
     return QString::fromStdWString(value);
 }
+
+#if defined(__clang__) && defined(_MSC_VER)
+QString toString(const _bstr_t& value)
+{
+    return QString::fromWCharArray(value, value.length());
+}
+#endif
 
 QString toString(const QChar& value)
 {
