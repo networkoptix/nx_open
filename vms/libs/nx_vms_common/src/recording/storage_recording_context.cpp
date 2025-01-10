@@ -27,9 +27,9 @@ using namespace recording;
 
 namespace {
 
-QString fileExtensionFromContainer(const QString& container)
+QString fileExtensionFromContainer(const std::string& container)
 {
-    const AVOutputFormat* outputCtx = av_guess_format(container.toLatin1().data(), NULL, NULL);
+    const AVOutputFormat* outputCtx = av_guess_format(container.data(), NULL, NULL);
     if (outputCtx == 0)
     {
         throw ErrorEx(
@@ -60,7 +60,9 @@ bool convertExtraDataToMp4(
 } // namespace
 
 StorageRecordingContext::StorageRecordingContext(bool exportMode):
-    m_exportMode(exportMode)
+    m_exportMode(exportMode),
+    m_convertDataToMp4Format(!exportMode),
+    m_container("matroska")
 {
 }
 
@@ -111,7 +113,7 @@ CodecParametersPtr StorageRecordingContext::getVideoCodecParameters(
 }
 
 CodecParametersConstPtr StorageRecordingContext::getAudioCodecParameters(
-    const CodecParametersConstPtr& sourceCodecParams, const QString& /*container*/)
+    const CodecParametersConstPtr& sourceCodecParams, const std::string& /*container*/)
 {
     return sourceCodecParams;
 }
@@ -135,7 +137,7 @@ void StorageRecordingContext::allocateFfmpegObjects(
                 // Do not convert to annexB when client export mode, as we can not convert extra
                 // data without possibly transcoded frame. Server do not transcode video, so we
                 // can use this videoData as video format that will be used on write data.
-                if (!m_exportMode && m_container == "matroska")
+                if (m_convertDataToMp4Format)
                 {
                     if (!convertExtraDataToMp4(videoData.get(), codecParams))
                         throw ErrorEx(Error::Code::incompatibleCodec, "Failed to convert codec parameters");
@@ -248,7 +250,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
 {
     auto md = mediaData;
     auto videoData = dynamic_cast<const QnCompressedVideoData*>(mediaData.get());
-    if (!m_exportMode && m_container == "matroska" && videoData && nx::media::isAnnexb(videoData))
+    if (m_convertDataToMp4Format && videoData && nx::media::isAnnexb(videoData))
     {
         md = m_annexbToMp4.process(videoData);
         if (!md)
@@ -492,9 +494,10 @@ bool StorageRecordingContext::doPrepareToStart(
 
 void StorageRecordingContext::setContainer(const QString& container)
 {
-    m_container = container;
+    m_container = container.toLower().toStdString();
     if (m_container == "mkv")
         m_container = "matroska";
+    m_convertDataToMp4Format = !m_exportMode && m_container == "matroska";
 }
 
 } // namespace nx
