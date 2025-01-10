@@ -47,7 +47,7 @@ void setCurrentThreadName(std::string name)
         return;
 
     if (const auto setThreadDescription = reinterpret_cast<SetThreadDescription>(
-        GetProcAddress(handle, "SetThreadDescription")))
+        reinterpret_cast<void*>(GetProcAddress(handle, "SetThreadDescription"))))
     {
         setThreadDescription(GetCurrentThread(), qUtf16Printable(QString::fromStdString(name)));
     }

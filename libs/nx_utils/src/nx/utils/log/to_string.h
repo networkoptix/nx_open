@@ -30,6 +30,7 @@ class QByteArray;
 class QJsonValue;
 class QJsonArray;
 class QJsonObject;
+class _bstr_t;
 
 //-------------------------------------------------------------------------------------------------
 // Pointers.
@@ -165,6 +166,9 @@ NX_UTILS_API QString toString(const std::string_view& value);
 NX_UTILS_API QString toString(const std::wstring& value);
 NX_UTILS_API QString toString(const std::string_view& value);
 
+#if defined(__clang__) && defined(_MSC_VER)
+NX_UTILS_API QString toString(const _bstr_t& value);
+#endif
 NX_UTILS_API QString toString(const QChar& value);
 NX_UTILS_API QString toString(const QByteArray& value);
 NX_UTILS_API QString toString(const QUrl& value);

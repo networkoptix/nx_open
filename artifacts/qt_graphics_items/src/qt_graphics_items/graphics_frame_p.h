@@ -37,7 +37,7 @@ public:
     GraphicsFramePrivate()
         : GraphicsWidgetPrivate(),
           frect(QRect(0, 0, 0, 0)),
-          frameStyle(GraphicsFrame::NoFrame | GraphicsFrame::Plain),
+          frameStyle(static_cast<int>(GraphicsFrame::NoFrame) | static_cast<int>(GraphicsFrame::Plain)),
           lineWidth(1),
           midLineWidth(0),
           frameWidth(0),

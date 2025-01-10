@@ -398,6 +398,12 @@ if(NOT compilerMsvc)
             -Wno-range-loop-construct
             -Wno-range-loop-bind-reference
             -Wno-conditional-uninitialized
+            -Wno-error=format
+            -Wno-error=deprecated-copy
+            -Wno-error=sign-compare
+            -Wno-ignored-attributes
+            -Wno-error=unused-parameter
+            -Wno-error=unused-but-set-variable
         )
 
         # Suppress some warnings which are not to be fixed in the nearest time.
@@ -405,6 +411,7 @@ if(NOT compilerMsvc)
             -Wno-sign-compare
             -Wno-microsoft-cast
             -Wno-language-extension-token
+            -Wno-unused-command-line-argument
             -Wno-covered-switch-default #< Contradicts with MSVC warning.
         )
     else() # GCC / Native CLang
