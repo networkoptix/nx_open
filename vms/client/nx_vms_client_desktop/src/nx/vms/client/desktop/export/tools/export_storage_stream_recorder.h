@@ -74,7 +74,7 @@ private:
     virtual CodecParametersPtr getVideoCodecParameters(
         const QnConstCompressedVideoDataPtr& videoData) override;
     virtual CodecParametersConstPtr getAudioCodecParameters(
-        const CodecParametersConstPtr& sourceCodecpar, const QString& container) override;
+        const CodecParametersConstPtr& sourceCodecpar, const std::string& container) override;
 
     virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const override;
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& md) override;

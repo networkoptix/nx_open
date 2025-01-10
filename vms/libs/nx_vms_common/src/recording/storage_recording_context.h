@@ -69,7 +69,7 @@ protected:
     virtual CodecParametersPtr getVideoCodecParameters(
         const QnConstCompressedVideoDataPtr& videoData);
     virtual CodecParametersConstPtr getAudioCodecParameters(
-        const CodecParametersConstPtr& sourceCodecParams, const QString& container);
+        const CodecParametersConstPtr& sourceCodecParams, const std::string& container);
 
     virtual void initMetadataStream(StorageContext& context) = 0;
     virtual void initIoContext(StorageContext& context);
@@ -86,7 +86,8 @@ protected:
 
 private:
     const bool m_exportMode;
-    QString m_container = "matroska";
+    bool m_convertDataToMp4Format;
+    std::string m_container;
     bool m_packetWritten = false;
     std::optional<nx::recording::Error> m_lastError;
     nx::media::AnnexbToMp4 m_annexbToMp4;

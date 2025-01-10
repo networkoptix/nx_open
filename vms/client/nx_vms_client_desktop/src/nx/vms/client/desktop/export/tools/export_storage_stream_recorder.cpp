@@ -264,14 +264,14 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
 }
 
 CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
-    const CodecParametersConstPtr& sourceCodecParams, const QString& container)
+    const CodecParametersConstPtr& sourceCodecParams, const std::string& container)
 {
     AVCodecID dstAudioCodec = AV_CODEC_ID_NONE;
-    if (container.toLower() == "avi")
+    if (container == "avi")
     {
         dstAudioCodec = AV_CODEC_ID_MP3; //< Transcode audio to MP3.
     }
-    else if (container.toLower() == "mp4")
+    else if (container == "mp4")
     {
         if (sourceCodecParams->getCodecId() != AV_CODEC_ID_MP3
             && sourceCodecParams->getCodecId() != AV_CODEC_ID_AAC)
@@ -295,7 +295,7 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
     }
 
     m_audioTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(dstAudioCodec);
-    if (container.toLower() == "mp4"
+    if (container == "mp4"
         && dstAudioCodec == AV_CODEC_ID_MP3
         && sourceCodecParams->getSampleRate() < kMinMp4Mp3SampleRate)
     {
