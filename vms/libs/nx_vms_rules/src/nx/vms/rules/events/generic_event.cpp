@@ -38,11 +38,13 @@ QVariantMap GenericEvent::details(
 {
     auto result = base_type::details(context, aggregatedInfo);
 
+    // There is a separate source string field in the event;
     result.remove(utils::kSourceIdDetailName);
+    result[utils::kSourceNameDetailName] = source();
+
     utils::insertIfNotEmpty(result, utils::kExtraCaptionDetailName, extraCaption());
     utils::insertIfNotEmpty(result, utils::kExtendedCaptionDetailName, extendedCaption());
     utils::insertIfNotEmpty(result, utils::kDetailingDetailName, description());
-    utils::insertIfNotEmpty(result, utils::kSourceNameDetailName, source());
     utils::insertLevel(result, nx::vms::event::Level::common);
     utils::insertIcon(result, icon());
     utils::insertClientAction(result, ClientAction::previewCameraOnTime);

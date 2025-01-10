@@ -332,9 +332,14 @@ bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
     if (!data.record().flags.testFlag(nx::vms::api::rules::EventLogFlag::videoLinkExists))
         return false;
 
-    const auto device = eventSource(context, data).dynamicCast<QnVirtualCameraResource>();
+    for (const auto& device: context->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+        nx::vms::rules::utils::getDeviceIds(data.event(context))))
+    {
+        if (context->accessController()->hasPermissions(device, Qn::ViewContentPermission))
+            return true;
+    }
 
-    return device && context->accessController()->hasPermissions(device, Qn::ViewContentPermission);
+    return false;
 }
 
 } // namespace

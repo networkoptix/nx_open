@@ -22,6 +22,7 @@ NX_REFLECTION_ENUM_CLASS(EventLogFlag,
     /**%apidoc The notification requires user acknowledge. */
     acknowledge = 1 << 0,
 
+    /**%apidoc There is recording archive exists for the time and device of the event. */
     videoLinkExists = 1 << 1
 )
 Q_DECLARE_FLAGS(EventLogFlags, EventLogFlag)
