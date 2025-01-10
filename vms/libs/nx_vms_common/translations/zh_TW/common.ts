@@ -1640,11 +1640,11 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>用於儲存更新的常駐伺服器</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>儲存更新的常駐伺服器</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>

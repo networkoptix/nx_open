@@ -2227,7 +2227,7 @@
     </message>
     <message>
       <source>Default notification title will be used if left empty</source>
-      <translation>空の場合、デフォルトの通知タイトルが使用されます</translation>
+      <translation>このフィールドが空の場合、デフォルトの通知タイトルが使用されます</translation>
     </message>
     <message>
       <source>Body</source>
@@ -2484,7 +2484,7 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation>再生時間 :</translation>
+      <translation>再生時刻 :</translation>
     </message>
     <message>
       <source>rewind for</source>
@@ -2542,7 +2542,7 @@
     </message>
     <message>
       <source>Speak to users</source>
-      <translation>通知先ユーザー</translation>
+      <translation>対象ユーザー</translation>
     </message>
   </context>
   <context>
