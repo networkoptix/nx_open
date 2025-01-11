@@ -247,18 +247,16 @@ void MediaDownloadBackend::downloadVideo(qint64 startTimeMs,
             using ResponseData = rest::ErrorOrData<nx::vms::api::LoginSession>;
             auto tryOpenDownload = nx::utils::guarded(this,
                 [this, context = std::move(context)]
-                (bool /*success*/, int /*handle*/, ResponseData errorOrData)
+                (bool /*success*/, int /*handle*/, ResponseData session)
                 {
-                    if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
+                    if (session)
                     {
                         d->runDownloadForContext(std::move(context), session->token.c_str());
                         return;
                     }
 
-                    if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
-                        NX_DEBUG(this, "Can't get authorization ticket, error %1", error->errorId);
-                    else
-                        NX_ASSERT(false, "Shouldn't get here");
+                    NX_DEBUG(this, "Can't get authorization ticket, error %1",
+                        session.error().errorId);
 
                     showDownloadProcessError();
                 });

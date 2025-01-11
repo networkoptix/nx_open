@@ -166,21 +166,20 @@ void NotificationActionExecutor::handleAcknowledgeAction()
         [this, id = notification->id(), camera](
             rest::Handle,
             bool /*success*/,
-            rest::ErrorOrData<nx::vms::api::BookmarkV3>&& response)
+            rest::ErrorOrData<nx::vms::api::BookmarkV3>&& bookmark)
         {
-            if (const auto error = std::get_if<nx::network::rest::Result>(&response))
+            if (!bookmark)
             {
                 NX_WARNING(this, "Can't acknowledge action id: %1, code: %2, error: %3",
-                    id, error->errorId, error->errorString);
+                    id, bookmark.error().errorId, bookmark.error().errorString);
                 return;
             }
 
-            auto& bookmark = std::get<nx::vms::api::BookmarkV3>(response);
-            NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark.id);
+            NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark->id);
 
             const auto systemContext = SystemContext::fromResource(camera);
             systemContext->cameraBookmarksManager()->addExistingBookmark(
-                nx::vms::common::bookmarkFromApi(std::move(bookmark)));
+                nx::vms::common::bookmarkFromApi(std::move(*bookmark)));
         });
 
     const auto handle = systemContext->connectedServerApi()->acknowledge(

@@ -109,8 +109,7 @@ void ManualDeviceSearcher::stop()
     const auto stopCallback = nx::utils::guarded(this,
         [this](bool success, rest::Handle /*handle*/, rest::ServerConnection::ErrorOrEmpty result)
         {
-            auto error = std::get_if<nx::network::rest::Result>(&result);
-            if (!success || (error && error->errorId != nx::network::rest::ErrorId::ok))
+            if (!success || (!result && result.error().errorId != nx::network::rest::ErrorId::ok))
                 stop(); //< Try to stop one more time.
             else if (m_status.state != QnManualResourceSearchStatus::Finished)
                 abort();
@@ -204,15 +203,14 @@ void ManualDeviceSearcher::searchForDevices(
     const auto startCallback = nx::utils::guarded(this,
         [this](bool success,
             rest::Handle /*handle*/,
-            const rest::ErrorOrData<api::DeviceSearch>& errorOrData)
+            const rest::ErrorOrData<api::DeviceSearch>& result)
         {
-            auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-            if (!success || (error && error->errorId != nx::network::rest::ErrorId::ok))
+            if (!success || (!result && result.error().errorId != nx::network::rest::ErrorId::ok))
             {
                 setLastErrorText(tr("Can not start the search process"));
                 abort();
             }
-            else if (auto result = std::get_if<api::DeviceSearch>(&errorOrData))
+            else if (result)
             {
                 m_searchProcessId = result->id;
                 m_updateProgressTimer.start();
@@ -301,15 +299,13 @@ void ManualDeviceSearcher::updateStatus()
     const auto startCallback = nx::utils::guarded(this,
         [this](bool success,
             rest::Handle /*handle*/,
-            const rest::ErrorOrData<api::DeviceSearch>& errorOrData)
+            const rest::ErrorOrData<api::DeviceSearch>& result)
         {
-            auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-            if (!success || (error && error->errorId != nx::network::rest::ErrorId::ok))
+            if (!success || (!result && result.error().errorId != nx::network::rest::ErrorId::ok))
                 return;
 
             NX_ASSERT(!m_searchProcessId.isEmpty());
 
-            auto result = std::get_if<api::DeviceSearch>(&errorOrData);
             setStatus(result->status.value_or(
                 api::DeviceSearchStatus{api::DeviceSearchStatus::Init, 0, 0}));
             updateDevices(result->devices.value_or(std::vector<api::DeviceModelForSearch>{}));

@@ -196,11 +196,11 @@ void postAcceptIntercomCall(
             QString error = nx::format(
                 "The call acceptance operation for the %1 intercom has failed", intercomId);
 
-            if (const auto* restResult = std::get_if<nx::network::rest::Result>(&result))
+            if (!result)
             {
-                error += nx::format(": %1", restResult->errorId);
-                if (!restResult->errorString.isEmpty())
-                    error += nx::format(", %1", restResult->errorString);
+                error += nx::format(": %1", result.error().errorId);
+                if (!result.error().errorString.isEmpty())
+                    error += nx::format(", %1", result.error().errorString);
             }
             NX_WARNING(NX_SCOPE_TAG, error);
         },

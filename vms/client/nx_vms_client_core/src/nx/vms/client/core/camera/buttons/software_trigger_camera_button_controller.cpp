@@ -413,10 +413,10 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
     api->createEvent(nx::vms::rules::serialize(triggerEvent.get()).props,
         [this, ruleId, state](bool success, auto /*handle*/, auto result)
         {
-            if (const auto error = std::get_if<nx::network::rest::Result>(&result))
+            if (!result)
             {
                 NX_ERROR(this, "Can't activate soft trigger, rule: %1, code: %2, error: %3",
-                    ruleId, error->errorId, error->errorString);
+                    ruleId, result.error().errorId, result.error().errorString);
             }
 
             updateActiveTrigger(ruleId, state, success);

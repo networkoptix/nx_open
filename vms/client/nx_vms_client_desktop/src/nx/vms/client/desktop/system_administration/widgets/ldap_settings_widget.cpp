@@ -423,10 +423,10 @@ bool LdapSettingsWidget::requestLdapReset()
 
             globalSettings()->setLdap(settingsBackup);
 
-            if (auto error = std::get_if<nx::network::rest::Result>(&result))
+            if (!result)
             {
-                if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
-                    showError(error->errorString);
+                if (result.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                    showError(result.error().errorString);
             }
             else
             {
@@ -498,12 +498,12 @@ void LdapSettingsWidget::applyChanges()
 
     const auto settingsCallback = nx::utils::guarded(this,
         [this, settingsBackup = std::move(settingsBackup)](
-            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> errorOrData)
+            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> settings)
         {
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
 
-            if (auto settings = std::get_if<nx::vms::api::LdapSettings>(&errorOrData))
+            if (settings)
             {
                 NX_ASSERT(success);
 
@@ -520,10 +520,10 @@ void LdapSettingsWidget::applyChanges()
                 d->checkingOnlineStatus = false;
                 globalSettings()->setLdap(settingsBackup);
 
-                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                if (!settings)
                 {
-                    if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
-                        showError(error->errorString);
+                    if (settings.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                        showError(settings.error().errorString);
                 }
                 else
                 {
@@ -572,10 +572,10 @@ void LdapSettingsWidget::requestSync()
             {
                 checkOnlineAndSyncStatus();
             }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&result))
+            else if (!result)
             {
-                if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
-                    showError(error->errorString);
+                if (result.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                    showError(result.error().errorString);
             }
             else
             {
@@ -612,7 +612,7 @@ void LdapSettingsWidget::testConnection(
 
     auto callback = nx::utils::guarded(this,
         [this](
-            bool /*success*/, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+            bool /*success*/, int handle, rest::ErrorOrData<std::vector<QString>> firstDnPerFilter)
         {
             if (handle == d->currentHandle)
             {
@@ -624,15 +624,15 @@ void LdapSettingsWidget::testConnection(
                 return;
             }
 
-            if (auto firstDnPerFilter = std::get_if<std::vector<QString>>(&errorOrData))
+            if (firstDnPerFilter)
             {
                 d->testMessage = tr("Connection OK");
                 d->testState = TestState::ok;
             }
-            else if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                error && error->errorId != network::rest::ErrorId::serviceUnavailable)
+            else if (!firstDnPerFilter
+                && firstDnPerFilter.error().errorId != network::rest::ErrorId::serviceUnavailable)
             {
-                d->testMessage = error->errorString;
+                d->testMessage = firstDnPerFilter.error().errorString;
                 d->testState = TestState::error;
             }
             else
@@ -669,13 +669,13 @@ void LdapSettingsWidget::testOnline(
 
     auto callback = nx::utils::guarded(this,
         [this](
-            bool success, int handle, rest::ErrorOrData<std::vector<QString>> errorOrData)
+            bool success, int handle, rest::ErrorOrData<std::vector<QString>> data)
         {
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
 
             d->checkingOnlineStatus = false;
-            d->online = success && std::get_if<std::vector<QString>>(&errorOrData);
+            d->online = success && data;
             d->updateUserAndGroupCount();
         });
 

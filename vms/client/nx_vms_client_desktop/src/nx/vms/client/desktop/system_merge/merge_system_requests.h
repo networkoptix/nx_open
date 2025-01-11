@@ -12,14 +12,9 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/site_merge_data.h>
 
+#include <api/server_rest_connection.h>
+
 namespace nx::network::http { class Credentials; }
-
-namespace rest {
-
-template<typename Data>
-using ErrorOrData = std::variant<nx::network::rest::Result, Data>;
-
-} // namespace rest
 
 namespace nx::vms::client::desktop {
 

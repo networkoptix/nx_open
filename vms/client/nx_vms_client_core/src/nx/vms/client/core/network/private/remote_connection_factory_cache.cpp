@@ -76,12 +76,11 @@ void requestCacheInfoUpdate(
         [connection, purpose=purpose](
             bool success,
             rest::Handle /*handle*/,
-            const rest::ErrorOrData<std::vector<nx::vms::api::ServerInformationV1>>& response)
+            const rest::ErrorOrData<std::vector<nx::vms::api::ServerInformationV1>>& servers)
         {
             if (!success)
                 return;
 
-            auto servers = std::get_if<std::vector<nx::vms::api::ServerInformationV1>>(&response);
             if (!servers)
                 return;
 

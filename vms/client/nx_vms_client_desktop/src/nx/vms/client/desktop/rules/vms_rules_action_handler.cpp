@@ -63,16 +63,16 @@ struct VmsRulesActionHandler::Private
             [this](
                 bool /*success*/,
                 rest::Handle requestId,
-                const rest::ErrorOrData<api::LookupListDataList>& result)
+                rest::ErrorOrData<api::LookupListDataList> lookupLists)
             {
                 if (this->requestId != requestId)
                     return;
 
                 this->requestId = std::nullopt;
 
-                if (std::holds_alternative<network::rest::Result>(result))
+                if (!lookupLists)
                 {
-                    auto restResult = std::get<network::rest::Result>(result);
+                    auto restResult = lookupLists.error();
                     NX_WARNING(
                         this,
                         "Lookup Lists request %1 failed: %2",
@@ -82,10 +82,9 @@ struct VmsRulesActionHandler::Private
                     return;
                 }
 
-                auto lookupLists = std::get<api::LookupListDataList>(result);
-                NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists.size());
+                NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists->size());
 
-                q->lookupListManager()->initialize(std::move(lookupLists));
+                q->lookupListManager()->initialize(std::move(*lookupLists));
             });
 
         requestId = q->connectedServerApi()->getLookupLists(std::move(callback), q->thread());

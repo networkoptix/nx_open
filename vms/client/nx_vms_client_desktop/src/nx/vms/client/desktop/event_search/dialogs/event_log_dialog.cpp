@@ -612,21 +612,19 @@ void EventLogDialog::query(
         [this](
             bool success,
             rest::Handle handle,
-            rest::ErrorOrData<nx::vms::api::rules::EventLogRecordList> response)
+            rest::ErrorOrData<nx::vms::api::rules::EventLogRecordList> records)
         {
             if (m_request != handle)
                 return;
 
-            if (auto records = std::get_if<nx::vms::api::rules::EventLogRecordList>(&response))
+            if (records)
             {
                 requestFinished(std::move(*records), /*success*/ true);
             }
             else
             {
-                const auto& result = std::get<nx::network::rest::Result>(response);
-
                 NX_ERROR(this, "Can't read event log, success: %1, code: %2, error: %3",
-                    success, result.errorId, result.errorString);
+                    success, records.error().errorId, records.error().errorString);
 
                 requestFinished({}, /*success*/ false);
             }

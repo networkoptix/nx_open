@@ -698,9 +698,9 @@ bool LicenseManagerWidget::activateLicense()
                 body.key);
             if (!success)
             {
-                if (!std::holds_alternative<rest::Empty>(result))
+                if (!result)
                 {
-                    auto res = std::get<nx::network::rest::Result>(result);
+                    auto res = result.error();
                     if (res.errorId == nx::network::rest::ErrorId::serviceUnavailable)
                     {
                         NX_VERBOSE(this, "Network error occured activating license key.");

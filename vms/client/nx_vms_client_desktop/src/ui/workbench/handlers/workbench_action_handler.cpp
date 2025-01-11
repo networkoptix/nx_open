@@ -895,11 +895,11 @@ void ActionHandler::changeDefaultPasswords(
             [completionGuard, camera, errorResultsStorage]
                 (bool, rest::Handle, rest::ErrorOrEmpty reply)
             {
-                if (std::holds_alternative<rest::Empty>(reply))
+                if (reply)
                     return;
 
                 errorResultsStorage->append(
-                    PasswordChangeResult(camera, std::get<nx::network::rest::Result>(reply)));
+                    PasswordChangeResult(camera, reply.error()));
             };
 
         connectedServerApi()->changeCameraPassword(camera, auth,

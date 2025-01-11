@@ -80,7 +80,7 @@ void LdapStatusWatcher::refresh()
 
     const auto statusCallback = nx::utils::guarded(this,
         [this](
-            bool /*success*/, int handle, rest::ErrorOrData<api::LdapStatus> errorOrData)
+            bool /*success*/, int handle, rest::ErrorOrData<api::LdapStatus> status)
         {
             if (handle != m_refreshHandle)
             {
@@ -90,15 +90,16 @@ void LdapStatusWatcher::refresh()
 
             m_refreshHandle = 0;
 
-            if (const auto status = std::get_if<api::LdapStatus>(&errorOrData))
+            if (status)
             {
                 NX_DEBUG(this, "Successfully received LDAP status. State: %1", status->state);
                 NX_VERBOSE(this, "LDAP status: %1", nx::reflect::json::serialize(*status));
                 setStatus(*status);
             }
-            else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+            else
             {
-                NX_DEBUG(this, "Request error: %1 (%2).", error->errorId, error->errorString);
+                auto error = status.error();
+                NX_DEBUG(this, "Request error: %1 (%2).", error.errorId, error.errorString);
                 setStatus({});
             }
 

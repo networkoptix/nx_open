@@ -89,7 +89,7 @@ struct CloudCrossSystemContextDataLoader::Private
             [this](
                 bool success,
                 ::rest::Handle requestId,
-                ::rest::ErrorOrData<ServerInformationV1List> response)
+                ::rest::ErrorOrData<ServerInformationV1List> result)
             {
                 NX_ASSERT(currentRequest && *currentRequest == requestId);
                 currentRequest = std::nullopt;
@@ -100,13 +100,12 @@ struct CloudCrossSystemContextDataLoader::Private
                      return;
                 }
 
-                if (const auto error = std::get_if<nx::network::rest::Result>(&response))
+                if (!result)
                 {
-                    NX_WARNING(this, "Servers request failed: %1", QJson::serialized(*error));
+                    NX_WARNING(this, "Servers request failed: %1", QJson::serialized(result.error()));
                     return;
                 }
 
-                auto result = std::get_if<ServerInformationV1List>(&response);
                 NX_VERBOSE(this, "Received %1 servers", result->size());
                 servers = *result;
                 requestData();

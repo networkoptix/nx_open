@@ -223,9 +223,9 @@ struct CloudCrossSystemContext::Private
             [this](
                 bool /*success*/,
                 int /*handle*/,
-                rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
+                rest::ErrorOrData<nx::vms::api::LoginSession> session)
             {
-                if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
+                if (session)
                 {
                     tokenUpdater->onTokenUpdated(
                         qnSyncTime->currentTimePoint() + session->expiresInS);
@@ -238,12 +238,12 @@ struct CloudCrossSystemContext::Private
                     // cross-system context requires the refresh token to be reissued.
                     needsCloudAuthorization = !tokenUpdater->isActive();
                 }
-                else if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                else
                 {
-                    if (error->errorId == nx::network::rest::ErrorId::sessionTruncated)
+                    if (session.error().errorId == nx::network::rest::ErrorId::sessionTruncated)
                         needsCloudAuthorization = true;
 
-                    NX_VERBOSE(this, "Update token error: %1", error->errorId);
+                    NX_VERBOSE(this, "Update token error: %1", session.error().errorId);
                 }
             });
 

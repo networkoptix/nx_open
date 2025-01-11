@@ -468,17 +468,16 @@ struct UserSettingsDialog::Private
         common::SessionTokenHelperPtr sessionTokenHelper,
         bool success,
         int handle,
-        rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
+        rest::ErrorOrData<nx::vms::api::UserModel> data)
     {
         if (NX_ASSERT(handle == currentRequest))
             currentRequest = 0;
 
         if (!success)
         {
-            if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                error && error->errorId != nx::network::rest::ErrorId::sessionExpired)
+            if (!data && data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
             {
-                showServerError(tr("Failed to apply changes"), *error);
+                showServerError(tr("Failed to apply changes"), data.error());
             }
             isSaving = false;
             return;
@@ -490,7 +489,7 @@ struct UserSettingsDialog::Private
                 currentSession->updatePassword(*actualPassword);
         }
 
-        if (auto data = std::get_if<nx::vms::api::UserModel>(&errorOrData))
+        if (data)
         {
             if (data->type == nx::vms::api::UserType::temporaryLocal)
             {
@@ -855,7 +854,7 @@ void UserSettingsDialog::onTerminateLink()
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> data)
             {
                 if (NX_ASSERT(handle == d->currentRequest))
                     d->currentRequest = 0;
@@ -865,14 +864,14 @@ void UserSettingsDialog::onTerminateLink()
                 if (success)
                     return;
 
-                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                if (!data)
                 {
-                    if (error->errorId != nx::network::rest::ErrorId::sessionExpired)
-                        d->showServerError(tr("Failed to apply changes"), *error);
+                    if (data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                        d->showServerError(tr("Failed to apply changes"), data.error());
                     return;
                 }
 
-                if (auto data = std::get_if<nx::vms::api::UserModel>(&errorOrData))
+                if (data)
                 {
                     NX_ASSERT(data->temporaryToken);
                     d->updateUiFromTemporaryToken(*data->temporaryToken);
@@ -917,7 +916,7 @@ void UserSettingsDialog::onResetLink(
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this, callback](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
+                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> data)
             {
                 if (NX_ASSERT(handle == d->currentRequest))
                     d->currentRequest = 0;
@@ -929,15 +928,14 @@ void UserSettingsDialog::onResetLink(
 
                 if (!success)
                 {
-                    if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                        error && error->errorId != nx::network::rest::ErrorId::sessionExpired)
+                    if (!data && data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
                     {
-                        d->showServerError(tr("Failed to apply changes"), *error);
+                        d->showServerError(tr("Failed to apply changes"), data.error());
                     }
                     return;
                 }
 
-                if (auto data = std::get_if<nx::vms::api::UserModel>(&errorOrData))
+                if (data)
                 {
                     NX_ASSERT(data->temporaryToken);
 
@@ -1298,7 +1296,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
         [this, password = password.toStdString()](
             bool /*success*/,
             int handle,
-            rest::ErrorOrData<nx::vms::api::LoginSession> errorOrData)
+            rest::ErrorOrData<nx::vms::api::LoginSession> session)
         {
             if (NX_ASSERT(handle == d->currentRequest))
                 d->currentRequest = 0;
@@ -1310,7 +1308,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
                 return;
             }
 
-            if (auto session = std::get_if<nx::vms::api::LoginSession>(&errorOrData))
+            if (session)
             {
                 NX_DEBUG(this, "Received token with length: %1", session->token.length());
 
@@ -1345,9 +1343,7 @@ void UserSettingsDialog::refreshToken(const QString& password)
             }
             else
             {
-                const auto error = std::get_if<nx::network::rest::Result>(&errorOrData);
-                if (error)
-                    NX_INFO(this, "Can't receive token: %1", QJson::serialized(*error));
+                NX_INFO(this, "Can't receive token: %1", QJson::serialized(session.error()));
             }
         });
 

@@ -41,7 +41,7 @@ rest::ErrorOrData<Data> parseResultOrData(
         Data data;
         if (QJson::deserialize(response.messageBody, &data))
             return data;
-        return nx::network::rest::Result::notImplemented();
+        return nx::utils::unexpected(nx::network::rest::Result::notImplemented());
     }
 
     NX_DEBUG(
@@ -50,10 +50,10 @@ rest::ErrorOrData<Data> parseResultOrData(
         response.errorCode,
         response.statusLine.statusCode);
 
-    return nx::vms::common::api::parseRestResult(
+    return nx::utils::unexpected(nx::vms::common::api::parseRestResult(
         static_cast<nx::network::http::StatusCode::Value>(response.statusLine.statusCode),
         Qn::SerializationFormat::json,
-        response.messageBody);
+        response.messageBody));
 }
 
 void addRequestData(Request* request, nx::Buffer&& data)
@@ -201,7 +201,8 @@ public:
                         nx::network::http::StatusCode::undefined))
                 {
                     NX_DEBUG(this, "Can't connect to proxy, IO error.");
-                    callback(nx::network::rest::Result::serviceUnavailable());
+                    callback(nx::utils::unexpected(
+                        nx::network::rest::Result::serviceUnavailable()));
                     return;
                 }
 
@@ -212,7 +213,7 @@ public:
                         this, "Can't connect to proxy, unexpected HTTP status: %1", statusCode);
                     const auto result = nx::network::rest::Result{
                         nx::network::rest::Result::errorFromHttpStatus(statusCode)};
-                    callback(result);
+                    callback(nx::utils::unexpected(result));
                     return;
                 }
 

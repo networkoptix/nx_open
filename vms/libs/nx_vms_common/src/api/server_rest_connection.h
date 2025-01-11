@@ -27,6 +27,7 @@
 #include <nx/network/rest/result.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/std/expected.h>
 #include <nx/utils/system_error.h>
 #include <nx/vms/api/analytics/analytics_actions.h>
 #include <nx/vms/api/analytics/analytics_engine_settings_data.h>
@@ -97,7 +98,7 @@ struct RestResultWithData
 };
 
 template<typename Data>
-using ErrorOrData = std::variant<nx::network::rest::Result, Data>;
+using ErrorOrData = nx::utils::expected<Data, nx::network::rest::Result>;
 
 using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
 

@@ -82,7 +82,7 @@ void ImportFromDeviceDialog::Private::requestArchiveSynchronizationStatus()
         [this](
             bool success,
             int /*handle*/,
-            rest::ErrorOrData<nx::vms::api::RemoteArchiveSynchronizationStatusList> errorOrData)
+            rest::ErrorOrData<nx::vms::api::RemoteArchiveSynchronizationStatusList> data)
         {
             if (!success)
             {
@@ -95,10 +95,8 @@ void ImportFromDeviceDialog::Private::requestArchiveSynchronizationStatus()
             m_loadingTimer.setInterval(kUpdateTimeout);
             m_loadingTimer.start();
 
-            const auto data =
-                std::get<nx::vms::api::RemoteArchiveSynchronizationStatusList>(errorOrData);
-
-            importDataModel.setData(data);
+            NX_ASSERT(data);
+            importDataModel.setData(*data);
         });
 
     if (auto connection = q->systemContext()->connectedServerApi())

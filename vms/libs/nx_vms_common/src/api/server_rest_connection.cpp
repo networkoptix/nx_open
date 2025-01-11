@@ -259,12 +259,17 @@ rest::ErrorOrData<T> parseMessageBody(
 
             NX_ASSERT(false, "Data cannot be deserialized:\n %1",
                 messageBody.left(kMessageBodyLogSize));
-            return nx::network::rest::Result::notImplemented();
+            return nx::utils::unexpected(nx::network::rest::Result::notImplemented());
         }
     }
 
-    return parseMessageBody(Type<nx::network::rest::Result>{}, format, messageBody, statusLine,
-        success);
+    return nx::utils::unexpected(
+        parseMessageBody(
+            Type<nx::network::rest::Result>{},
+            format,
+            messageBody,
+            statusLine,
+            success));
 }
 
 template <typename T>
@@ -743,7 +748,7 @@ Handle ServerConnection::dumpDatabase(
             }
             nx::network::rest::Result result;
             QJson::deserialize(body, &result);
-            callback(success, requestId, result);
+            callback(success, requestId, nx::utils::unexpected(result));
         };
 
     auto timeouts = nx::network::http::AsyncClient::Timeouts::defaults();
@@ -1676,12 +1681,11 @@ std::tuple<
     std::vector<nx::vms::api::JsonRpcResponse>>
 extractJsonRpcExpired(const rest::ErrorOrData<JsonRpcResultType>& result)
 {
-    const auto rpcResponse = std::get_if<JsonRpcResultType>(&result);
-    if (!rpcResponse)
+    if (!result)
         return {};
 
     const auto responseArray = std::get_if<
-        std::vector<nx::vms::api::JsonRpcResponse>>(rpcResponse);
+        std::vector<nx::vms::api::JsonRpcResponse>>(&*result);
 
     if (!responseArray)
         return {};
@@ -1706,34 +1710,31 @@ bool mergeJsonRpcResults(
     std::vector<nx::vms::api::JsonRpcResponse>& originalResponse,
     const rest::ErrorOrData<JsonRpcResultType>& result)
 {
-    const auto rpcResponse = std::get_if<JsonRpcResultType>(&result);
-    if (!rpcResponse)
+    if (!result)
     {
         // Server could not handle the request.
-        if (const auto error = std::get_if<nx::network::rest::Result>(&result))
+        auto error = result.error();
+
+        // For all requests with expired session fill in error from single rest::Result.
+        for (auto& response: originalResponse)
         {
-            // For all requests with expired session fill in error from single rest::Result.
-            for (auto& response: originalResponse)
+            if (isSessionExpiredError(response))
             {
-                if (isSessionExpiredError(response))
-                {
-                    response = nx::json_rpc::Response::makeError(response.id,
-                        nx::json_rpc::Error::applicationError,
-                        error->errorString.toStdString(),
-                        *error);
-                }
+                response = nx::json_rpc::Response::makeError(response.id,
+                    nx::json_rpc::Error::applicationError,
+                    error.errorString.toStdString(),
+                    error);
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
-    const auto responseArray = std::get_if<std::vector<nx::vms::api::JsonRpcResponse>>(rpcResponse);
+    const auto responseArray = std::get_if<std::vector<nx::vms::api::JsonRpcResponse>>(&*result);
     if (!responseArray)
     {
         // This should not happen because original requests were valid. But handle it anyway.
 
-        if (const auto error = std::get_if<nx::vms::api::JsonRpcResponse>(rpcResponse))
+        if (const auto error = std::get_if<nx::vms::api::JsonRpcResponse>(&*result))
         {
             // For all requests with expired session fill in error from single json-rpc response.
             for (auto& response: originalResponse)
@@ -1791,10 +1792,10 @@ Handle ServerConnection::jsonRpcBatchCall(
         {
             if (success)
             {
-                if (const auto rpcResponse = std::get_if<JsonRpcResultType>(&result))
+                if (result)
                 {
                     if (const auto responseArray = std::get_if<
-                        std::vector<nx::vms::api::JsonRpcResponse>>(rpcResponse))
+                        std::vector<nx::vms::api::JsonRpcResponse>>(&*result))
                     {
                         callback(success, requestId, *responseArray);
                         return;
@@ -1804,27 +1805,21 @@ Handle ServerConnection::jsonRpcBatchCall(
                 return;
             }
 
-            if (const auto error = std::get_if<nx::network::rest::Result>(&result))
+            if (!result)
             {
                 callback(success, requestId, {nx::json_rpc::Response::makeError(
                     std::nullptr_t{},
                     nx::json_rpc::Error::applicationError,
-                    error->errorString.toStdString(),
-                    *error)});
+                    result.error().errorString.toStdString(),
+                    result.error())});
                 return;
             }
 
-            if (const auto rpcResponse = std::get_if<JsonRpcResultType>(&result))
+            if (const auto singleResponse = std::get_if<
+                nx::vms::api::JsonRpcResponse>(&*result))
             {
-                if (const auto singleResponse = std::get_if<
-                    nx::vms::api::JsonRpcResponse>(rpcResponse))
-                {
-                    callback(success, requestId, {*singleResponse});
-                }
-                return;
+                callback(success, requestId, {*singleResponse});
             }
-
-            callback(success, requestId, {});
         };
 
     auto wrapper = makeSessionAwareCallbackInternal<
@@ -2218,7 +2213,7 @@ Handle ServerConnection::ldapAuthenticateAsync(
                 {
                     nx::network::rest::Result result;
                     QJson::deserialize(body, &result);
-                    callback(requestId, std::move(result), authResult);
+                    callback(requestId, nx::utils::unexpected(std::move(result)), authResult);
                     return;
                 }
 
@@ -2828,8 +2823,7 @@ Handle ServerConnection::executeDelete(
 template<typename ResultType>
 nx::network::rest::ErrorId getError(const ResultType& result)
 {
-    auto error = std::get_if<nx::network::rest::Result>(&result);
-    return error ? error->errorId : nx::network::rest::ErrorId::ok;
+    return result.error().errorId;
 }
 
 nx::network::rest::ErrorId getError(
@@ -3036,7 +3030,7 @@ typename ServerConnectionBase::Result<ResultType>::type ServerConnection::makeSe
                                                     ctx->callback(
                                                         jsonRpcSuccess,
                                                         originalHandle,
-                                                        ctx->originalResponse);
+                                                        JsonRpcResultType(ctx->originalResponse));
                                                     return;
                                                 }
                                             }

@@ -419,11 +419,11 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
                 at_archiveRebuildReply(
                     success,
                     handle,
-                    std::get<nx::vms::api::StorageScanInfoFull>(errorOrData));
+                    *errorOrData);
             }
             else
             {
-                const auto error = std::get<nx::network::rest::Result>(errorOrData);
+                const auto error = errorOrData.error();
                 NX_ERROR(this, "Can't rebuld archive, error: %1, text: %2",
                     error.errorId, error.errorString);
 
@@ -453,10 +453,10 @@ bool QnServerStorageManager::sendArchiveRebuildRequest(
         auto stopCallback = nx::utils::guarded(this,
             [this](bool success, rest::Handle handle, rest::ErrorOrEmpty errorOrEmpty)
             {
-                if (const auto error = std::get_if<nx::network::rest::Result>(&errorOrEmpty))
+                if (!errorOrEmpty)
                 {
                     NX_ERROR(this, "Can't cancel archive rebuld, error: %1, text: %2",
-                        error->errorId, error->errorString);
+                        errorOrEmpty.error().errorId, errorOrEmpty.error().errorString);
                 }
 
                 at_archiveRebuildReply(success, handle, {});

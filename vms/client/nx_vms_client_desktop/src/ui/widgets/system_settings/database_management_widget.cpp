@@ -125,11 +125,11 @@ void QnDatabaseManagementWidget::backupDb()
         [this, fileName](
             bool success,
             rest::Handle requestId,
-            rest::ErrorOrData<QByteArray> errorOrData)
+            rest::ErrorOrData<QByteArray> data)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
             success = false;
-            if (auto data = std::get_if<QByteArray>(&errorOrData))
+            if (data)
             {
                 QFile file(fileName);
                 success = file.open(QIODevice::WriteOnly) && file.write(*data) == data->size();
@@ -141,10 +141,10 @@ void QnDatabaseManagementWidget::backupDb()
             }
             else
             {
-                if (auto error = std::get_if<nx::network::rest::Result>(&errorOrData))
+                if (!data)
                 {
                     NX_ERROR(
-                        this, "Failed to dump Server database: %1", QJson::serialized(*error));
+                        this, "Failed to dump Server database: %1", QJson::serialized(data.error()));
                 }
                 setWarningStyle(ui->labelMessage);
                 ui->labelMessage->setText(tr("Failed to back up database"));
@@ -232,7 +232,7 @@ void QnDatabaseManagementWidget::restoreDb()
             m_currentRequest = 0;
             updateState(State::restoreFinished, success);
 
-            if (std::holds_alternative<rest::Empty>(reply))
+            if (reply)
             {
                 ui->labelMessage->setText(tr(
                     "Database successfully restored. Server application will restart shortly."));
@@ -242,7 +242,7 @@ void QnDatabaseManagementWidget::restoreDb()
             NX_ERROR(this,
                 "Failed to restore Server database from file '%1'. %2",
                 fileName,
-                std::get<nx::network::rest::Result>(reply).errorString);
+                reply.error().errorString);
             setWarningStyle(ui->labelMessage);
             ui->labelMessage->setText(tr("Failed to restore database"));
         });

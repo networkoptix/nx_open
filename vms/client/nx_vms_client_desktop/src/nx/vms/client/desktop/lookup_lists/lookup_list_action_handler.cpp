@@ -145,8 +145,8 @@ struct LookupListActionHandler::Private
                     }
 
                     QString error;
-                    if (!std::holds_alternative<rest::Empty>(result))
-                        error = std::get<nx::network::rest::Result>(result).errorString;
+                    if (!result)
+                        error = result.error().errorString;
 
                     NX_WARNING(this, "Lookup List save request %1 failed - %2", requestId, error);
                     this->requestId = std::nullopt;

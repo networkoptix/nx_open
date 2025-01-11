@@ -235,16 +235,16 @@ rest::Handle VmsEventSearchListModel::Private::getEvents(
         [this, callback = std::move(callback)](
             bool success, rest::Handle handle, rest::ErrorOrData<EventLogRecordList>&& data)
         {
-            if (const auto error = std::get_if<nx::network::rest::Result>(&data))
+            if (!data)
             {
                 NX_WARNING(this, "Event log request: %1 failed: %2, %3",
-                    handle, error->errorId, error->errorString);
+                    handle, data.error().errorId, data.error().errorString);
 
                 callback(false, handle, {});
             }
             else
             {
-                callback(success, handle, std::get<EventLogRecordList>(std::move(data)));
+                callback(success, handle, std::move(*data));
             }
         });
 

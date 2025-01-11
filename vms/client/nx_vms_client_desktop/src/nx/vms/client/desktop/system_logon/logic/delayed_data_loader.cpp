@@ -46,25 +46,24 @@ struct DelayedDataLoader::Private
             [this](
                 bool /*success*/,
                 rest::Handle requestId,
-                const rest::ErrorOrData<EventLogRecordList>& result)
+                rest::ErrorOrData<EventLogRecordList> records)
             {
                 if (!requestIds.remove(requestId))
                     return;
 
-                if (auto restResult = std::get_if<network::rest::Result>(&result))
+                if (!records)
                 {
                     NX_WARNING(
                         this,
                         "Acknowledge request %1 failed, error: %2, string: %3",
-                        requestId, restResult->errorId, restResult->errorString);
+                        requestId, records.error().errorId, records.error().errorString);
                     return;
                 }
 
-                auto records = std::get<EventLogRecordList>(result);
-                NX_VERBOSE(this, "Received %1 acknowledge actions", records.size());
+                NX_VERBOSE(this, "Received %1 acknowledge actions", records->size());
 
                 appContext()->mainWindowContext()->workbenchContext()
-                    ->instance<NotificationActionExecutor>()->setAcknowledge(std::move(records));
+                    ->instance<NotificationActionExecutor>()->setAcknowledge(std::move(*records));
             });
 
         if (auto serverApi = q->connectedServerApi())
@@ -84,24 +83,23 @@ struct DelayedDataLoader::Private
             [this](
                 bool /*success*/,
                 rest::Handle requestId,
-                const rest::ErrorOrData<LookupListDataList>& result)
+                rest::ErrorOrData<LookupListDataList> lookupLists)
             {
                 if (!requestIds.remove(requestId))
                     return;
 
-                if (auto restResult = std::get_if<network::rest::Result>(&result))
+                if (!lookupLists)
                 {
                     NX_WARNING(
                         this,
                         "Lookup Lists request %1 failed, error: %2, string: %3",
-                        requestId, restResult->errorId, restResult->errorString);
+                        requestId, lookupLists.error().errorId, lookupLists.error().errorString);
                     return;
                 }
 
-                auto lookupLists = std::get<LookupListDataList>(result);
-                NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists.size());
+                NX_VERBOSE(this, "Received %1 Lookup Lists entries", lookupLists->size());
 
-                q->lookupListManager()->initialize(std::move(lookupLists));
+                q->lookupListManager()->initialize(std::move(*lookupLists));
             });
 
         if (auto serverApi = q->connectedServerApi())

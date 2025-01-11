@@ -312,7 +312,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
     auto handleReply = nx::utils::guarded(this,
         [this](bool, rest::Handle, rest::ErrorOrEmpty reply)
         {
-            if (std::holds_alternative<rest::Empty>(reply))
+            if (reply)
             {
                 NX_DEBUG(this, "Server bind succeeded");
                 qnCloudStatusWatcher->setAuthData(m_cloudAuthData,
@@ -321,7 +321,7 @@ void ConnectToCloudTool::onLocalSessionTokenReady()
                 return;
             }
 
-            const auto& error = std::get<nx::network::rest::Result>(reply);
+            const auto& error = reply.error();
             NX_DEBUG(
                 this, "Server bind failed, error: %1, string: %2", error.errorId, error.errorString);
 

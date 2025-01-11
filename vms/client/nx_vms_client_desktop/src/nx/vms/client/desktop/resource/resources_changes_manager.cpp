@@ -96,8 +96,8 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
                 ? nx::network::rest::ErrorId::ok
                 : nx::network::rest::ErrorId::internalServerError;
 
-            if (auto error = std::get_if<nx::network::rest::Result>(&result))
-                errorCode = error->errorId;
+            if (!result)
+                errorCode = result.error().errorId;
 
             if (callback)
                 callback(success, resource, errorCode);
@@ -308,10 +308,9 @@ rest::Handle ResourcesChangesManager::saveServer(
             rest::Handle requestId,
             rest::ErrorOrData<QByteArray> reply)
         {
-            if (success && std::holds_alternative<nx::network::rest::Result>(reply))
+            if (success && !reply)
             {
-                const auto& error = std::get<nx::network::rest::Result>(reply);
-                NX_ERROR(this, "Save changes failed: %1", error.errorString);
+                NX_ERROR(this, "Save changes failed: %1", reply.error().errorString);
                 success = false;
             }
 
