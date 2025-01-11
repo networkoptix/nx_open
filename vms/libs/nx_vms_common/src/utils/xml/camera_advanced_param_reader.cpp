@@ -103,7 +103,7 @@ namespace QnXmlTag {
 
     const QString conditionalShow           = lit("conditional-show");
     const QString conditionalRange          = lit("conditional-range");
-    const QString conditionalTrigger        = lit("conditional-triggger");
+    const QString conditionalTrigger        = lit("conditional-trigger");
 
     const QString dependencyId          = lit("id");
     const QString conditionId           = lit("id");
