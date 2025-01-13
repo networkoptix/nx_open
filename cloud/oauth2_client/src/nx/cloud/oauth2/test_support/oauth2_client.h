@@ -39,7 +39,7 @@ private:
     std::unordered_map<RequstPath, int, PathHash> m_requestsCounter;
 };
 
-class Oauth2ClientMock : public AbstractOauth2Client
+class Oauth2ClientMock: public AbstractOauth2Client
 {
 public:
     Oauth2ClientMock(Oauth2ClientMockManager& manager);
