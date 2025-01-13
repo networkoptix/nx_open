@@ -8,6 +8,7 @@
 
 class QLabel;
 class QPushButton;
+class QSpacerItem;
 
 namespace nx::vms::client::desktop { class BusyIndicatorGraphicsWidget; }
 
@@ -82,13 +83,12 @@ private:
     QPixmap redGlowVertical();
 
 private:
-    Controls m_visibleControls;
-    int m_visibleExtrasControlsCount = 0;
-    bool m_initialized;
-    bool m_iconVisible;
-    bool m_useErrorStyle;
-    ErrorStyle m_errorStyle;
-    bool m_showGlow;
+    Controls m_visibleControls = Control::kNoControl;
+    bool m_initialized = false;
+    bool m_captionVisible = false;
+    bool m_useErrorStyle = false;
+    ErrorStyle m_errorStyle = ErrorStyle::red;
+    bool m_showGlow = false;
 
     QnViewportBoundWidget* const m_preloaderHolder;
     QnViewportBoundWidget* const m_centralHolder;
@@ -106,9 +106,11 @@ private:
     // Central area
     QLabel* const m_centralAreaImage;
     QLabel* const m_caption;
+    QPushButton* const m_button;
+    QSpacerItem* const m_postIconSpacer;
+    QSpacerItem* const m_postCaptionSpacer;
 
     // Extras
-    QPushButton* const m_button;
     QPushButton* const m_customButton;
 
     QString m_tooltip;
