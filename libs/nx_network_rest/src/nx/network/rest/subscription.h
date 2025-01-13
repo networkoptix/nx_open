@@ -8,9 +8,9 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/thread/mutex.h>
 
 #include "handler.h"
 
@@ -26,15 +26,30 @@ public:
         nx::utils::MoveOnlyFunc<void(const QString& id, NotifyType, const Data& data)>;
 
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
-    virtual ~SubscriptionHandler() = default;
+    virtual ~SubscriptionHandler()
+    {
+        std::unordered_map<std::shared_ptr<SubscriptionCallback>, QString> subscriptions;
+        std::unordered_map<QString, std::set<std::shared_ptr<SubscriptionCallback>>> subscribedIds;
+        nx::utils::Guard guard;
+        auto lock(m_asyncOperationGuard->lock());
+        guard = std::move(m_guard);
+        subscriptions = std::move(m_subscriptions);
+        subscribedIds = std::move(m_subscribedIds);
+    }
 
     nx::utils::Guard addSubscription(const QString& id, const Request&, SubscriptionCallback callback)
     {
         auto subscription = std::make_shared<SubscriptionCallback>(std::move(callback));
         NX_VERBOSE(this, "Add subscription %1 for %2", subscription.get(), id);
 
-        nx::utils::Guard guard{[this, subscription]() { removeSubscription(subscription); }};
-        NX_MUTEX_LOCKER lock(&m_mutex);
+        nx::utils::Guard guard{
+            [this, subscription, sharedGuard = m_asyncOperationGuard.sharedGuard()]()
+            {
+                nx::utils::Guard guard;
+                if (auto lock = sharedGuard->lock())
+                    guard = removeSubscription(subscription);
+            }};
+        auto lock(m_asyncOperationGuard->lock());
         if (m_subscribedIds.empty())
             m_guard = m_addMonitor();
         m_subscribedIds[id].emplace(subscription);
@@ -47,7 +62,7 @@ public:
         std::set<std::shared_ptr<SubscriptionCallback>> holder1;
         std::set<std::shared_ptr<SubscriptionCallback>> holder2;
         {
-            NX_MUTEX_LOCKER lock(&m_mutex);
+            auto lock(m_asyncOperationGuard->lock());
             if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
                 holder1 = it->second;
             if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
@@ -66,29 +81,26 @@ public:
     }
 
 private:
-    void removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription)
+    nx::utils::Guard removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription)
     {
         NX_VERBOSE(this, "Remove subscription %1", subscription.get());
-        nx::utils::Guard guard;
+        if (auto s = m_subscriptions.find(subscription); s != m_subscriptions.end())
         {
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            if (auto s = m_subscriptions.find(subscription); s != m_subscriptions.end())
+            if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
             {
-                if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
-                {
-                    it->second.erase(subscription);
-                    if (it->second.empty())
-                        m_subscribedIds.erase(it);
-                }
-                m_subscriptions.erase(s);
+                it->second.erase(subscription);
+                if (it->second.empty())
+                    m_subscribedIds.erase(it);
             }
-            if (m_subscribedIds.empty())
-                guard = std::move(m_guard);
+            m_subscriptions.erase(s);
         }
+        if (m_subscribedIds.empty())
+            return std::move(m_guard);
+        return {};
     }
 
 private:
-    nx::Mutex m_mutex;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Guard m_guard;
     std::unordered_map<std::shared_ptr<SubscriptionCallback>, QString> m_subscriptions;
     std::unordered_map<QString, std::set<std::shared_ptr<SubscriptionCallback>>> m_subscribedIds;
