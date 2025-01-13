@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <functional>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
@@ -13,6 +14,8 @@ namespace utils {
 
 class NX_UTILS_API TimerHolder final
 {
+    using TimerManagerGetter = std::function<nx::utils::TimerManager*()>;
+
     struct TimerContext
     {
         TimerId timerId = 0;
@@ -23,7 +26,7 @@ public:
     using TimerOwnerId = QString;
 
 public:
-    TimerHolder(nx::utils::TimerManager* timerManager);
+    TimerHolder(TimerManagerGetter timerManagerGetter);
     ~TimerHolder();
 
     // Cancels previous timer for specified object and sets up a new one.
@@ -49,7 +52,7 @@ private:
     mutable nx::Mutex m_mutex;
     std::map<TimerOwnerId, std::shared_ptr<TimerContext>> m_timers;
     std::atomic<bool> m_terminated{false};
-    nx::utils::TimerManager* m_timerManager = nullptr;
+    TimerManagerGetter m_timerManagerGetter;
 };
 
 } // namespace utils

@@ -2,11 +2,13 @@
 
 #include "timer_holder.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx {
 namespace utils {
 
-TimerHolder::TimerHolder(nx::utils::TimerManager* timerManager):
-    m_timerManager(timerManager)
+TimerHolder::TimerHolder(TimerManagerGetter timerManagerGetter):
+    m_timerManagerGetter(std::move(timerManagerGetter))
 {
 }
 
@@ -29,6 +31,10 @@ void TimerHolder::addTimer(
         timerContext = timerContextUnsafe(timerOwnerId);
     }
 
+    auto* timerManager = m_timerManagerGetter();
+    if (!NX_ASSERT(timerManager))
+        return;
+
     const auto setTimer =
         [&]()
         {
@@ -36,9 +42,9 @@ void TimerHolder::addTimer(
                 return;
 
             if (timerContext->timerId)
-                m_timerManager->deleteTimer(timerContext->timerId);
+                timerManager->deleteTimer(timerContext->timerId);
 
-            timerContext->timerId = m_timerManager->addTimer(
+            timerContext->timerId = timerManager->addTimer(
                 [timerContext, callback](TimerId timerId)
                 {
                     NX_MUTEX_LOCKER lock(&timerContext->lock);
@@ -50,7 +56,7 @@ void TimerHolder::addTimer(
                 delay);
         };
 
-    if (m_timerManager == QThread::currentThread())
+    if (timerManager == QThread::currentThread())
         return setTimer();
 
     NX_MUTEX_LOCKER lock(&timerContext->lock);
@@ -59,6 +65,10 @@ void TimerHolder::addTimer(
 
 void TimerHolder::cancelTimerSync(const TimerOwnerId& timerOwnerId)
 {
+    auto* timerManager = m_timerManagerGetter();
+    if (!timerManager)
+        return;
+
     std::shared_ptr<TimerContext> timerContext;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -69,7 +79,7 @@ void TimerHolder::cancelTimerSync(const TimerOwnerId& timerOwnerId)
     if (!timerContext->timerId)
         return;
 
-    m_timerManager->deleteTimer(timerContext->timerId);
+    timerManager->deleteTimer(timerContext->timerId);
     timerContext->timerId = 0;
 }
 
