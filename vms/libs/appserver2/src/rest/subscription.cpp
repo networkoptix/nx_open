@@ -6,14 +6,31 @@
 
 namespace ec2 {
 
+SubscriptionHandler::~SubscriptionHandler()
+{
+    std::unordered_map<std::shared_ptr<SubscriptionCallback>, QString> subscriptions;
+    std::unordered_map<QString, std::set<std::shared_ptr<SubscriptionCallback>>> subscribedIds;
+    nx::utils::Guard guard;
+    auto lock(m_asyncOperationGuard->lock());
+    guard = std::move(m_guard);
+    subscriptions = std::move(m_subscriptions);
+    subscribedIds = std::move(m_subscribedIds);
+}
+
 nx::utils::Guard SubscriptionHandler::addSubscription(
     const QString& id, SubscriptionCallback callback)
 {
     auto subscription = std::make_shared<SubscriptionCallback>(std::move(callback));
     NX_VERBOSE(this, "Add subscription %1 for %2", subscription.get(), id);
 
-    nx::utils::Guard guard{[this, subscription]() { removeSubscription(subscription); }};
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    nx::utils::Guard guard{
+        [this, subscription, sharedGuard = m_asyncOperationGuard.sharedGuard()]()
+        {
+            nx::utils::Guard guard;
+            if (auto lock = sharedGuard->lock())
+                guard = removeSubscription(subscription);
+        }};
+    auto lock(m_asyncOperationGuard->lock());
     if (m_subscribedIds.empty())
         m_guard = m_addMonitor();
     m_subscribedIds[id].emplace(subscription);
@@ -26,7 +43,7 @@ void SubscriptionHandler::notify(const QString& id, NotifyType notifyType, QJson
     std::set<std::shared_ptr<SubscriptionCallback>> holder1;
     std::set<std::shared_ptr<SubscriptionCallback>> holder2;
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
+        auto lock(m_asyncOperationGuard->lock());
         if (auto it = m_subscribedIds.find(id); it != m_subscribedIds.end())
             holder1 = it->second;
         if (auto it = m_subscribedIds.find(QString("*")); it != m_subscribedIds.end())
@@ -38,26 +55,23 @@ void SubscriptionHandler::notify(const QString& id, NotifyType notifyType, QJson
         (*callback)(id, notifyType, payload);
 }
 
-void SubscriptionHandler::removeSubscription(
+nx::utils::Guard SubscriptionHandler::removeSubscription(
     const std::shared_ptr<SubscriptionCallback>& subscription)
 {
     NX_VERBOSE(this, "Remove subscription %1", subscription.get());
-    nx::utils::Guard guard;
+    if (auto s = m_subscriptions.find(subscription); s != m_subscriptions.end())
     {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        if (auto s = m_subscriptions.find(subscription); s != m_subscriptions.end())
+        if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
         {
-            if (auto it = m_subscribedIds.find(s->second); it != m_subscribedIds.end())
-            {
-                it->second.erase(subscription);
-                if (it->second.empty())
-                    m_subscribedIds.erase(it);
-            }
-            m_subscriptions.erase(s);
+            it->second.erase(subscription);
+            if (it->second.empty())
+                m_subscribedIds.erase(it);
         }
-        if (m_subscribedIds.empty())
-            guard = std::move(m_guard);
+        m_subscriptions.erase(s);
     }
+    if (m_subscribedIds.empty())
+        return std::move(m_guard);
+    return {};
 }
 
 } // namespace ec2

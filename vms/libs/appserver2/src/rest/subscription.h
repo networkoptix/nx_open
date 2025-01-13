@@ -9,9 +9,9 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/thread/mutex.h>
 
 namespace ec2 {
 
@@ -29,7 +29,7 @@ class SubscriptionHandler
 public:
     using AddMonitor = nx::utils::MoveOnlyFunc<nx::utils::Guard()>;
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
-    virtual ~SubscriptionHandler() = default;
+    virtual ~SubscriptionHandler();
     nx::utils::Guard addSubscription(const QString& id, SubscriptionCallback callback);
     void notify(const QString& id, NotifyType notifyType, QJsonValue payload = {});
 
@@ -40,10 +40,10 @@ public:
     }
 
 private:
-    void removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription);
+    nx::utils::Guard removeSubscription(const std::shared_ptr<SubscriptionCallback>& subscription);
 
 private:
-    nx::Mutex m_mutex;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Guard m_guard;
     std::unordered_map<std::shared_ptr<SubscriptionCallback>, QString> m_subscriptions;
     std::unordered_map<QString, std::set<std::shared_ptr<SubscriptionCallback>>> m_subscribedIds;
