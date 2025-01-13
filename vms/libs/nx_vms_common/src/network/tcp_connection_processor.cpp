@@ -10,8 +10,8 @@
 #endif
 
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/metrics/metrics_storage.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
@@ -366,17 +366,15 @@ std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorRespons
             QJson::serialized(nx::network::rest::Result{
                 nx::network::rest::Result::errorFromHttpStatus(errorCode), details}));
     }
-    else
-    {
-        static const nx::String kAuthEnumPrefix = "Auth_";
-        return std::pair<nx::String, nx::String>(
-            header::ContentType::kHtml.toString(),
-            NX_FMT(R"http(<HTML><HEAD><TITLE>%1</TITLE></HEAD><BODY><H1>%2 %3 -- %4</H1></BODY>)http",
-                errorCode, static_cast<int>(errorCode), errorCode,
-                details.startsWith(kAuthEnumPrefix)
-                    ? details.mid(kAuthEnumPrefix.size())
-                    : nx::String(details)));
-    }
+
+    static const nx::String kAuthEnumPrefix = "Auth_";
+    return std::pair<nx::String, nx::String>(
+        header::ContentType::kHtml.toString(),
+        NX_FMT(R"http(<HTML><HEAD><TITLE>%1</TITLE></HEAD><BODY><H1>%2 %3 -- %4</H1></BODY>)http",
+            errorCode, static_cast<int>(errorCode), errorCode,
+            details.startsWith(kAuthEnumPrefix)
+                ? details.mid(kAuthEnumPrefix.size())
+                : nx::String(details)));
 }
 
 void QnTCPConnectionProcessor::logRequestOrResponse(

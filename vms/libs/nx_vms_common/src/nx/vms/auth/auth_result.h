@@ -13,6 +13,7 @@ namespace nx::vms::common {
  */
 NX_REFLECTION_ENUM(AuthResult,
     Auth_OK, /**< OK. */
+    Auth_MissingCredentials, /**< No credentials provided when required. */
     Auth_WrongLogin, /**< Invalid login. */
     Auth_WrongInternalLogin, /**< Invalid login used for internal auth scheme. */
     Auth_WrongDigest, /**< Invalid or empty digest. */
