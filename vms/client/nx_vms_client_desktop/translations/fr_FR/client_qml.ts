@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Langue de notification</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Mises à jour du client hors ligne</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Les mises à jour hors ligne sont activées et les fichiers sont stockés sur les serveurs.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>L'activation de cette option permettra de télécharger des fichiers supplémentaires sur les serveurs qui peuvent être utilisés pour mettre à jour les clients connectés même sans accès Internet.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Ceci supprimera tous les fichiers de mise à jour sur les serveurs.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Poursuivre quand même?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Sélectionner / Désélectionner tout</translation>
     </message>
   </context>
   <context>
@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Paramètres des tuiles</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Paramètres du tableau</translation>
     </message>
   </context>
   <context>
@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Vérifiez les paramètres d'administration du site pour configurer ce plugin.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Ce plugin n'a aucun paramètre au niveau du site.</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Les intégrations permettent une utilisation transparente des analyses vidéo sur divers appareils à partir du VMS.
+Sélectionnez une intégration pour commencer à configurer ses paramètres.</translation>
     </message>
   </context>
   <context>
@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Mauvais code d'appairage</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -406,7 +406,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Partagé par lien</translation>
     </message>
   </context>
   <context>
@@ -697,25 +697,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Sélectionnez le type</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>La suppression des attributs supprimera toutes les données associées</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>La suppression de la liste effacera toutes les données qu'elle contient.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Supprimer la liste ?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Cette liste est associée à %n Règle d'événement. Êtes-vous sûr de vouloir la supprimer ?</numerusform>
+        <numerusform>Cette liste est associée à %n Règles d'événement. Êtes-vous sûr de vouloir la supprimer ?</numerusform>
       </translation>
     </message>
   </context>
@@ -741,15 +741,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Exporter la liste</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Exportation</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Ouvrir le dossier de fichiers...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -825,7 +825,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Les filtres aident à contrôler l'accès au site et la synchronisation en spécifiant quels utilisateurs et/ou groupes du DN de base sont autorisés.</translation>
     </message>
   </context>
   <context>
@@ -922,7 +922,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Certaines valeurs n'ont pas pu être mises en correspondance automatiquement. Veuillez les mapper manuellement.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -944,11 +944,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Au niveau du site, les membres du groupe ont les autorisations suivantes :</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Au niveau du site, l'utilisateur dispose des autorisations suivantes :</translation>
     </message>
   </context>
   <context>
@@ -1072,7 +1072,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Il existe un autre groupe portant le même nom. Il est recommandé d'attribuer des noms uniques aux groupes.</translation>
     </message>
   </context>
   <context>
@@ -1224,7 +1224,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Gérer les intégrations</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1239,7 +1239,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Ce plugin n'a aucun paramètre au niveau du site.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1331,7 +1331,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Connectez-vous au site pour configurer la manière d'ouvrir les mises en page</translation>
     </message>
   </context>
   <context>
@@ -1401,19 +1401,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Connectez votre site à un serveur LDAP pour une gestion plus facile des utilisateurs</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>L'importation continue depuis le serveur LDAP est désactivée pour ce site. Les mises à jour des groupes et des appartenances des utilisateurs et des groupes se feront uniquement par synchronisation manuelle.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Aucun utilisateur ou groupe ne correspond aux paramètres de synchronisation et n'est ajouté à la base de données du site. Assurez-vous que les paramètres et les filtres du serveur LDAP sont correctement configurés.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Veuillez utiliser des précautions pour modifier les paramètres LDAP. Une configuration incorrecte pourrait perturber la disponibilité du site pour un grand nombre d'utilisateurs simultanément.</translation>
     </message>
   </context>
   <context>
@@ -1472,11 +1472,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Liste d'importation</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Options d'importation</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1488,11 +1488,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Séparateur:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Les données contiennent un en-tête</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1508,31 +1508,31 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importation</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Impossible d'ouvrir le fichier</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Veuillez vous assurer que le fichier existe et que vous avez accès au fichier sélectionné</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Correction des entrées importées</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Impossible d'importer le fichier sélectionné</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Le fichier semble être vide.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Veuillez vous assurer que le fichier sélectionné existe et que vous y avez accès.</translation>
     </message>
   </context>
   <context>
@@ -1559,7 +1559,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 sélectionné :</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1575,11 +1575,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Impossible d'enregistrer le fichier</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Veuillez vous assurer que vous avez accès au dossier sélectionné et que vous disposez de suffisamment d'espace disque</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1587,7 +1587,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Exporter la sélection</translation>
     </message>
   </context>
   <context>
@@ -1702,9 +1702,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>avec %n attribut</numerusform>
+        <numerusform>avec %n attributs</numerusform>
       </translation>
     </message>
     <message>

@@ -107,23 +107,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Pour la durée de l'événement</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>À durée déterminée</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>L'événement se produit</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>L'événement commence</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>L'événement s'arrête</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -194,7 +194,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>Annulé</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1162,23 +1162,23 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Se connecter au site</translation>
     </message>
     <message>
       <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
+      <translation>Onglet Mise en page</translation>
     </message>
     <message>
       <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
+      <translation>Nouvel onglet de mise en page</translation>
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>Onglet Écran d'accueil</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
+      <translation>Nouvel onglet d'écran d'accueil</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1186,15 +1186,15 @@
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Mise à jour du site...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Gestion des listes...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Ouvrir les intégrations...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1203,7 +1203,7 @@
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Ouvrir dans</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1218,7 +1218,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Fenêtre dédiée</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1226,11 +1226,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>API JavaScript...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Fusionner avec le site actuellement connecté...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1501,11 +1501,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Si votre site n'a pas accès à Internet, veuillez envoyer la clé de licence et l'HWID fournis à %1 pour recevoir le fichier d'activation.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Si votre site n'a pas accès à Internet, veuillez envoyer la clé de licence et l'HWID fournis à votre équipe d'assistance régionale/de licence pour recevoir le fichier d'activation :</translation>
     </message>
   </context>
   <context>
@@ -1635,7 +1635,7 @@ Clé de licence : %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Se connecter au site</translation>
     </message>
   </context>
   <context>
@@ -1750,7 +1750,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>Entrez ici une courte description du site.</translation>
     </message>
   </context>
   <context>
@@ -2103,7 +2103,7 @@ Clé de licence : %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Site arrêté. Pour se connecter à un mur vidéo, le site doit être en état actif. %1</translation>
     </message>
   </context>
   <context>
@@ -2201,37 +2201,37 @@ Clé de licence : %2</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Cet appareil est retiré du site</numerusform>
+        <numerusform>Ces appareils sont retirés du site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Cet caméra est retirée du site</numerusform>
+        <numerusform>Ces caméras sont retirées du site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
-        <numerusform>These servers are removed from Site</numerusform>
+      <translation>
+        <numerusform>Ce serveur est retiré du site</numerusform>
+        <numerusform>Ces serveurs sont retirés du site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
-        <numerusform>These users are removed from Site</numerusform>
+      <translation>
+        <numerusform>Cet utilisateur est retiré du site</numerusform>
+        <numerusform>Ces utilisateurs sont retirés du site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
-        <numerusform>These resources are removed from Site</numerusform>
+      <translation>
+        <numerusform>Cet ressource est retirée du site</numerusform>
+        <numerusform>Ces ressources sont retirées du site</numerusform>
       </translation>
     </message>
   </context>
@@ -2418,33 +2418,33 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Nom du site modifié</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Fusion du site</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Connexion au serveur proxy</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>Le site a été mis à jour vers la version %1</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Durée : %3, Cible : %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Heure de début : %1, Cible : %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>IP de l'utilisateur</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2456,11 +2456,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>IP de l'appareil</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>IP de la caméra</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2990,58 +2990,58 @@ Clé de licence : %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Déconnecter le site de %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Connecter le site à %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Il n'y a actuellement aucune connexion entre votre site et %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Entrez le mot de passe de votre compte pour déconnecter le site de %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Impossible de déconnecter le site de %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Site déconnecté de %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Déconnecter le site de %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>L'enregistrement s'arrêtera et tous les abonnements aux services seront supprimés</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Tous les utilisateurs %1 seront supprimés du site</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation type="unfinished">You will be logged out of the site. The site will be accessible only via local network</translation>
+      <translation>Vous serez déconnecté du site. Le site ne sera accessible que via le réseau local</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation type="unfinished">The site will be accessible only via local network</translation>
+      <translation>Le site sera accessible uniquement via le réseau local</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>Les données existantes (paramètres du site et archives) seront préservées</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -3236,11 +3236,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>Le site n'est pas compatible avec l'authentification à deux facteurs</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>Impossible de se connecter au site &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3353,11 +3353,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>La configuration du site sera restaurée à partir de la sauvegarde, l'application serveur sera redémarrée.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Entrez le mot de passe de votre compte pour restaurer le site à partir de la sauvegarde</translation>
     </message>
   </context>
   <context>
@@ -3566,7 +3566,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>Les filtres de notifications sont déplacés vers le panneau de droite</translation>
     </message>
   </context>
   <context>
@@ -3625,7 +3625,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Intégrations ouvertes</translation>
     </message>
   </context>
   <context>
@@ -3919,7 +3919,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>Les paramètres sont en lecture seule. Veuillez contacter l'administrateur de votre site. Toutes les modifications seront perdues après la fermeture du programme.</translation>
     </message>
   </context>
   <context>
@@ -4090,7 +4090,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>&quot;La caméra virtuelle&quot; est un stockage virtuel pour les fichiers vidéo, qui peuvent être téléchargés sur n'importe quel serveur de votre site et accessibles par n'importe quel utilisateur.</translation>
     </message>
   </context>
   <context>
@@ -4426,7 +4426,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Déplacer vers une fenêtre dédiée</translation>
     </message>
   </context>
   <context>
@@ -4757,7 +4757,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>L'authentification non sécurisée (digest) doit être désactivée pour votre compte avant que l'accès à distance soit disponible.</translation>
     </message>
   </context>
   <context>
@@ -4841,7 +4841,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</source>
-      <translation type="unfinished">This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.</translation>
+      <translation>Impossible d'accéder à cette caméra. Effectuez les diagnostics de la caméra dans le client de bureau pour obtenir des informations supplémentaires.</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4849,11 +4849,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation type="unfinished">This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</translation>
+      <translation>Cet appareil photo nécessite que des informations d'identification autorisées soient définies dans les paramètres de l'appareil dans le portail Cloud ou le client de bureau.</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>NON PRIS EN CHARGE</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4861,11 +4861,11 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>SITE ARRÊTÉ</translation>
     </message>
     <message>
       <source>STREAM LIMITATION</source>
-      <translation type="unfinished">STREAM LIMITATION</translation>
+      <translation>LIMITATION DU STREAM</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4873,7 +4873,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>AUDIO ONLY</source>
-      <translation type="unfinished">AUDIO ONLY</translation>
+      <translation>AUDIO SEULEMENT</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -5054,7 +5054,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Choisissez une politique de lecture-écriture pour définir comment interagir avec les répertoires de stockage.</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -5066,28 +5066,28 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Isolé</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>Les serveurs de site ont des politiques de lecture/écriture différentes pour le stockage</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL : %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>Exclusif - le serveur lit tous les dossiers mais écrit uniquement dans son propre dossier. Il supprime les anciennes données de tous les dossiers.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Partagé - le serveur lit tous les dossiers mais écrit uniquement dans son propre dossier. Il supprime les anciennes données uniquement de son propre dossier.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Isolé - le serveur lit et écrit exclusivement dans son propre dossier. Il supprime les anciennes données uniquement de son propre dossier.</translation>
     </message>
   </context>
   <context>
@@ -5190,7 +5190,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Isolé</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -5206,23 +5206,23 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>amovible</translation>
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Taille inconnue</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>Le stockage a des politiques de lecture/écriture différentes sur différents serveurs du site</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Cliquez sur l'icône pour voir la liste des serveurs</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Politique de lecture-écriture</translation>
     </message>
   </context>
   <context>
@@ -5335,7 +5335,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>Impossible d'enregistrer les paramètres du site</translation>
     </message>
   </context>
   <context>
@@ -5458,27 +5458,27 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>Le site ne dispose pas d'accès Internet pour la synchronisation horaire</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>La partition système est utilisée pour les données d'analyse</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Site suspendu</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Site arrêté</translation>
     </message>
     <message>
       <source>Reject intercom call</source>
-      <translation type="unfinished">Reject intercom call</translation>
+      <translation>Rejeter l'appel interphone</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>L'adresse e-mail n'est pas définie pour votre compte</translation>
     </message>
     <message>
       <source>Calling...</source>
@@ -5486,31 +5486,31 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Appel manqué</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Le stockage n'est pas configuré sur %n serveur</numerusform>
+        <numerusform>Le stockage n'est pas configuré sur %n serveurs</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Le stockage de sauvegarde n'est pas configuré sur %n serveur</numerusform>
+        <numerusform>Le stockage de sauvegarde n'est pas configuré sur %n serveurs</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>Le programme d'enregistrement n'est pas valide</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>Le programme d'enregistrement n'est pas valide sur %n caméra</numerusform>
+        <numerusform>Le programme d'enregistrement n'est pas valide sur %n caméras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5523,11 +5523,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Découvrez %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>La synchronisation des archives à distance a échoué</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
@@ -5538,30 +5538,30 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>Le stockage système est utilisé pour les données d'analyse sur %n serveur</numerusform>
+        <numerusform>Le stockage système est utilisé pour les données d'analyse sur %n serveurs</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>Connectez-vous à votre site depuis n'importe où !</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Aucun serveur en ligne sur le site ne dispose d'accès Internet pour la synchronisation horaire.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>Vous ne pouvez pas recevoir les notifications du site par e-mail.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>Ils ne peuvent pas recevoir les notifications du site par e-mail.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Certaines caméras sont configurées pour enregistrer dans un mode qu'elles ne prennent pas en charge.</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
@@ -5572,34 +5572,34 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>Le site cessera bientôt de fonctionner</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>Le site a cessé de fonctionner</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>Le site cessera de fonctionner aujourd'hui</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>Le site cessera de fonctionner demain</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>Le site cessera de fonctionner dans %n jour</numerusform>
+        <numerusform>Le site cessera de fonctionner dans %n jours</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>Les langues de notification et d'interface diffèrent</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>La langue des notifications diffère de la langue de l'interface</translation>
     </message>
   </context>
   <context>
@@ -5622,19 +5622,19 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>Lorsque cette option est activée, de nouvelles caméras et de nouveaux serveurs sont continuellement découverts et des demandes de découverte sont envoyées aux caméras pour les mises à jour de statut.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Inclut des informations sur le site, telles que les modèles de caméras et les versions de micrologiciel, le nombre de serveurs, etc.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Autoriser l'optimisation des paramètres de l'appareil</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Autoriser l'optimisation des paramètres des caméras</translation>
     </message>
   </context>
   <context>
@@ -5750,7 +5750,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Auto-refresh every %1</source>
-      <translation type="unfinished">Auto-refresh every %1</translation>
+      <translation>Actualisation automatique toutes les %1</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5977,11 +5977,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Site arrêté</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Pour ajouter un mur vidéo, le site doit être actif. %1</translation>
     </message>
   </context>
   <context>
@@ -6241,11 +6241,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Unable to move device</source>
-      <translation type="unfinished">Unable to move device</translation>
+      <translation>Impossible de déplacer l'appareil</translation>
     </message>
     <message>
       <source>Maximum number of devices for this server is reached</source>
-      <translation type="unfinished">Maximum number of devices for this server is reached</translation>
+      <translation>Le nombre maximal d'appareils pour ce serveur est atteint</translation>
     </message>
   </context>
   <context>
@@ -6426,15 +6426,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Developer Mode Info</source>
-      <translation type="unfinished">Developer Mode Info</translation>
+      <translation>Infos sur le mode développeur</translation>
     </message>
     <message>
       <source>Is listed</source>
-      <translation type="unfinished">Is listed</translation>
+      <translation>Est listé</translation>
     </message>
     <message>
       <source>Is not listed</source>
-      <translation type="unfinished">Is not listed</translation>
+      <translation>N'est pas listé</translation>
     </message>
     <message>
       <source>In</source>
@@ -6446,61 +6446,61 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>%n removed devices</source>
-      <translation type="unfinished">%n removed devices</translation>
+      <translation>%n appareils supprimés</translation>
     </message>
     <message>
       <source>%n removed cameras</source>
-      <translation type="unfinished">%n removed cameras</translation>
+      <translation>%n caméras supprimées</translation>
     </message>
     <message>
       <source>%n removed servers</source>
-      <translation type="unfinished">%n removed servers</translation>
+      <translation>%n serveurs supprimés</translation>
     </message>
     <message>
       <source>%n removed layouts</source>
-      <translation type="unfinished">%n removed layouts</translation>
+      <translation>%n mises en page supprimées</translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n sujet supplémentaire</numerusform>
+        <numerusform>%n sujets supplémentaires</numerusform>
       </translation>
     </message>
     <message>
       <source>%n devices more</source>
-      <translation type="unfinished">%n devices more</translation>
+      <translation>%n appareils en plus</translation>
     </message>
     <message>
       <source>%n cameras more</source>
-      <translation type="unfinished">%n cameras more</translation>
+      <translation>%n caméras plus</translation>
     </message>
     <message>
       <source>%n servers more</source>
-      <translation type="unfinished">%n servers more</translation>
+      <translation>%n serveurs supplémentaires</translation>
     </message>
     <message>
       <source>%n layouts more</source>
-      <translation type="unfinished">%n layouts more</translation>
+      <translation>%n mises en page supplémentaires</translation>
     </message>
   </context>
   <context>
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Nombre de serveurs par site</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
-      <translation type="unfinished">Number of devices per server</translation>
+      <translation>Nombre d'appareils par serveur</translation>
     </message>
     <message>
       <source>Number of items on layout</source>
-      <translation type="unfinished">Number of items on layout</translation>
+      <translation>Nombre d'éléments sur la mise en page</translation>
     </message>
     <message>
       <source>Number of days of archive</source>
-      <translation type="unfinished">Number of days of archive</translation>
+      <translation>Nombre de jours d'archivage</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -6512,7 +6512,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>Fonctionnalités inter-sites</translation>
     </message>
   </context>
   <context>
@@ -6520,17 +6520,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>Inclure également</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>Commencer</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>Avant l'événement</translation>
     </message>
     <message>
       <source>End</source>
@@ -6540,7 +6540,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>Après l'événement</translation>
     </message>
   </context>
   <context>
@@ -6718,9 +6718,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>Supprimer %n régle ?</numerusform>
+        <numerusform>Supprimer %n régles ?</numerusform>
       </translation>
     </message>
   </context>
@@ -6818,7 +6818,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
-      <translation type="unfinished">Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</translation>
+      <translation>Permet aux utilisateurs d'accéder à un flux audio à partir d'un appareil. Utilisé en combinaison avec Lecture en direct et/ou Relecture.</translation>
     </message>
   </context>
   <context>
@@ -6850,11 +6850,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Ajouter à la liste</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Créer une nouvelle liste...</translation>
     </message>
   </context>
   <context>
@@ -7166,15 +7166,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Site arrêté</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>Pour effectuer une sauvegarde sur un stockage cloud, le site doit être dans un état actif. %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>Site suspendu. Pour modifier la configuration de sauvegarde, le site doit être en état actif. %1</translation>
     </message>
   </context>
   <context>
@@ -7249,7 +7249,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Appel manqué</translation>
     </message>
   </context>
   <context>
@@ -7358,11 +7358,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on performance</translation>
+      <translation>Ne modifiez pas ces paramètres à moins d'être absolument sûr de leur impact potentiel sur les performances</translation>
     </message>
     <message>
       <source>Only camera or server offline periods after the first addition to the site will be imported automatically.</source>
-      <translation type="unfinished">Only camera or server offline periods after the first addition to the site will be imported automatically.</translation>
+      <translation>Seules les périodes hors ligne de la caméra ou du serveur après le premier ajout au site seront importées automatiquement.</translation>
     </message>
   </context>
   <context>
@@ -7381,7 +7381,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Open Layout in new Tab</source>
-      <translation type="unfinished">Open Layout in new Tab</translation>
+      <translation>Ouvrir la mise en page dans un nouvel onglet</translation>
     </message>
   </context>
   <context>
@@ -7408,7 +7408,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Select Target...</source>
-      <translation type="unfinished">Select Target...</translation>
+      <translation>Sélectionner la cible...</translation>
     </message>
   </context>
   <context>
@@ -7427,11 +7427,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>La ressource cible n'existe pas</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Sélectionnez la caméra ou la disposition...</translation>
     </message>
     <message>
       <source>Target</source>
@@ -7442,7 +7442,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::CameraHotspotsSettingsWidget</name>
     <message>
       <source>Select Hotspot Target</source>
-      <translation type="unfinished">Select Hotspot Target</translation>
+      <translation>Sélectionner la cible du Hotspot</translation>
     </message>
   </context>
   <context>
