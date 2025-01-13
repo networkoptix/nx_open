@@ -161,13 +161,15 @@ void VmsRulesActionHandler::openEventLogDialog()
         const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
         d->eventLogDialog->setDateRange(period.startTimeMs, period.endTimeMs());
     }
-    else
-    {
-        d->eventLogDialog->resetDateRange();
-    }
-    d->eventLogDialog->setEventType(parameters.argument(Qn::EventTypeRole, QString()));
-    d->eventLogDialog->setActionType(parameters.argument(Qn::ActionTypeRole, QString()));
-    d->eventLogDialog->setEventDevices(eventDeviceIds);
+
+    if (parameters.hasArgument(Qn::EventTypeRole))
+        d->eventLogDialog->setEventType(parameters.argument<QString>(Qn::EventTypeRole));
+
+    if (parameters.hasArgument(Qn::ActionTypeRole))
+        d->eventLogDialog->setActionType(parameters.argument<QString>(Qn::ActionTypeRole));
+
+    if (!eventDeviceIds.empty())
+        d->eventLogDialog->setEventDevices(eventDeviceIds);
 
     d->eventLogDialog->enableUpdateData();
 }
