@@ -26,6 +26,8 @@ QString AuthResultTranslations::toErrorMessage(AuthResult value)
         case Auth_OK:
             NX_ASSERT(false, "This value is not an error");
             break;
+        case Auth_MissingCredentials:
+            return tr("No credentials provided when required by endpoint.");
 
         case Auth_WrongLogin:
         case Auth_WrongInternalLogin:
