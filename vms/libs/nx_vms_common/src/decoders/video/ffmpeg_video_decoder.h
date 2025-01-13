@@ -91,4 +91,5 @@ private:
     QnAbstractMediaData::MediaFlags m_lastFlags {};
     int m_lastChannelNumber = 0;
     const DecoderConfig m_config;
+    bool m_opened = false;
 };
