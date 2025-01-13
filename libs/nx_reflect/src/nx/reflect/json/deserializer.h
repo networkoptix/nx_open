@@ -406,6 +406,9 @@ DeserializationResult deserializeValue(const DeserializationContext& ctx, T* dat
 template<typename T>
 DeserializationResult deserializeValue(const DeserializationContext& ctx, std::optional<T>* data)
 {
+    if (data->has_value())
+        return deserializeValue(ctx, &data->value());
+
     T val;
     auto result = deserializeValue(ctx, &val);
     if (result)
@@ -451,7 +454,6 @@ private:
         const WrappedField& field,
         std::optional<T>*)
     {
-        std::optional<T> data;
         DeserializationResult deserializationResult(true);
         auto valueIter = ctx.value.FindMember(field.name());
         if (valueIter != ctx.value.MemberEnd())
@@ -462,7 +464,17 @@ private:
                 return deserializationResult;
             }
 
-            data.emplace(createDefault<T>());
+            std::optional<T> data;
+            if constexpr (HasGet<WrappedField>::value)
+            {
+                data = field.get(*m_data);
+                if (!data)
+                    data.emplace(createDefault<T>());
+            }
+            else
+            {
+                data.emplace(createDefault<T>());
+            }
             auto& dataRef = *data;
             auto curDeserializationResult = deserializeValue(
                 DeserializationContext{valueIter->value, ctx.flags}, &dataRef);
@@ -473,6 +485,7 @@ private:
                     m_deserializationResult.addField(
                         field, std::move(curDeserializationResult.fields));
                 }
+                field.set(m_data, std::move(data));
             }
             else
             {
@@ -483,10 +496,8 @@ private:
         }
         else
         {
-            data = std::nullopt;
+            field.set(m_data, std::nullopt);
         }
-
-        field.set(m_data, std::move(data));
         return deserializationResult;
     }
 
@@ -506,7 +517,7 @@ private:
             return {};
         }
 
-        T data = createDefault<T>();
+        T data = defaultField<T>(field);
         auto deserializationResult =
             deserializeValue(DeserializationContext{valueIter->value, ctx.flags}, &data);
 
@@ -534,6 +545,26 @@ private:
         }
 
         return deserializationResult;
+    }
+
+private:
+    template<typename F, typename = void>
+    struct HasGet { static constexpr bool value = false; };
+
+    template<typename F>
+    struct HasGet<F, detail::void_t<decltype(&F::get)>> { static constexpr bool value = true; };
+
+    template<typename T, typename WrappedField>
+    T defaultField(const WrappedField& field)
+    {
+        if constexpr (HasGet<WrappedField>::value)
+        {
+            return field.get(*m_data);
+        }
+        else
+        {
+            return createDefault<T>();
+        }
     }
 
 private:

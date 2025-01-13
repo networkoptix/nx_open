@@ -8,6 +8,7 @@
 #include <nx/utils/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/device_model.h>
+#include <nx/vms/api/json/value_or_array.h>
 
 namespace nx::network::rest::json::test {
 
@@ -297,6 +298,32 @@ TEST(Json, ReflectStripDefault)
     ASSERT_EQ(nx::reflect::json_detail::getStringRepresentation(
             nx::json::serialized(list, /*stripDefault*/ true)),
         "[{\"parameters\":{\"parameter1\":{\"key\":\"value\"},\"parameter2\":{\"key\":\"value\"}}}]");
+}
+
+struct ValueOrArrayModel
+{
+    std::optional<nx::vms::api::json::ValueOrArray<QString>> value;
+};
+NX_REFLECTION_INSTRUMENT(ValueOrArrayModel, (value))
+
+TEST(Json, ReflectValueOrArray)
+{
+    const nx::vms::api::json::ValueOrArray<QString> kExpected{{"value1", "value2"}};
+    ValueOrArrayModel model;
+
+    Params::fromList({{"value", "value2"}, {"value", "value1"}}).deserializeOrThrow(&model);
+    ASSERT_EQ(model.value, kExpected);
+    model.value.reset();
+
+    nx::reflect::json::deserialize("{\"value\":[\"value1\", \"value2\"]}", &model);
+    ASSERT_EQ(model.value, kExpected);
+    model.value.reset();
+
+    Params{}.deserializeOrThrow(&model);
+    ASSERT_FALSE(model.value);
+
+    nx::reflect::json::deserialize("{}", &model);
+    ASSERT_FALSE(model.value);
 }
 
 TEST(Json, KeepDefaultWithVariant)
