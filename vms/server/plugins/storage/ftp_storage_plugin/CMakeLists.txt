@@ -3,5 +3,4 @@
 nx_add_server_plugin(ftp_storage_plugin NO_MOC NO_GTEST OPTIONAL
     PRIVATE_LIBS
         nx_sdk ftplibpp
-    ADD_TO_DISTRIBUTION_IF FALSE
 )
