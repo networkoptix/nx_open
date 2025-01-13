@@ -61,7 +61,7 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     if (m_metrics)
         m_metrics->decoders()++;
     setMultiThreadDecoding(m_mtDecodingPolicy == MultiThreadDecodePolicy::enabled);
-    openDecoder(data);
+    m_opened = openDecoder(data);
 }
 
 QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
@@ -179,7 +179,8 @@ bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     }
     avcodec_free_context(&m_context);
     m_spsFound = false;
-    return openDecoder(data);
+    m_opened = openDecoder(data);
+    return m_opened;
 }
 
 void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height)
@@ -253,6 +254,8 @@ bool QnFfmpegVideoDecoder::decode(
         }
         m_codecId = data->compressionType;
     }
+    if (!m_opened && !isImage)
+        return false;
 
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     int got_picture = 0;
