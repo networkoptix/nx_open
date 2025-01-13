@@ -21,7 +21,7 @@
 namespace {
 
 static const int STORE_QUEUE_SIZE = 50;
-static const int kPrebufferHardLimit = 1000;
+static const int kPrebufferHardLimit = 2000; //< Near 1 minute of video buffer for 30fps.
 
 } // namespace
 
@@ -181,22 +181,28 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     m_prebuffer.push(md);
     const bool alwaysSave = md->flags & QnAbstractMediaData::MediaFlags_AlwaysSave;
     const bool timeDiscontinue = isPrimaryStream(md) && md->timestamp < m_lastPrimaryTime;
-    const bool hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
+    bool hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
     const qint64 kNoPtsValue = (qint64) AV_NOPTS_VALUE;
-    if (m_prebufferingUsec == 0 || alwaysSave || timeDiscontinue || hardLimitReached)
+
+    if (timeDiscontinue)
+        NX_VERBOSE(this, "Time discontinue. Resource: %1", m_resource);
+    if (hardLimitReached)
+        NX_VERBOSE(this, "Pre-buffer hard limit reached. Resource: %1", m_resource);
+
+    if (m_prebufferingUsec == 0 || alwaysSave || timeDiscontinue)
     {
-        if (timeDiscontinue)
-            NX_VERBOSE(this, "Time discontinue. Resource: %1", m_resource);
-        if (hardLimitReached)
-            NX_VERBOSE(this, "Pre-buffer hard limit reached. Resource: %1", m_resource);
         flushPrebuffer();
     }
-    else if (isPrimaryStream(md))
+    else if (isPrimaryStream(md) || hardLimitReached)
     {
-        m_lastPrimaryTime = md->timestamp;
-        if (m_nextIFrameTime == kNoPtsValue && isPrimaryKeyFrame(md))
-            m_nextIFrameTime = md->timestamp;
-        while (m_nextIFrameTime != kNoPtsValue && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
+        if (isPrimaryStream(md))
+        {
+            m_lastPrimaryTime = md->timestamp;
+            if (m_nextIFrameTime == kNoPtsValue && isPrimaryKeyFrame(md))
+                m_nextIFrameTime = md->timestamp;
+        }
+        while ((m_nextIFrameTime != kNoPtsValue && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
+            || hardLimitReached)
         {
             while (!m_prebuffer.isEmpty() && (!isPrimaryStream(m_prebuffer.front())
                 || m_prebuffer.front()->timestamp < m_nextIFrameTime))
@@ -209,6 +215,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
                     markNeedKeyData();
             }
             m_nextIFrameTime = findNextIFrame(m_nextIFrameTime);
+            hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
         }
     }
 
