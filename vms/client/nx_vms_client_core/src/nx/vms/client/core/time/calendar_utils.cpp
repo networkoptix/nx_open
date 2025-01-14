@@ -9,12 +9,19 @@ namespace nx::vms::client::core::calendar_utils {
 QDate firstWeekStartDate(const QLocale& locale, int year, int month)
 {
     auto date = QDate(year, month, 1);
-    const int dayOfWeek = date.dayOfWeek();
-    if (locale.firstDayOfWeek() == Qt::Monday)
-        date = date.addDays(1 - dayOfWeek);
-    else if (dayOfWeek < Qt::Sunday)
-        date = date.addDays(-dayOfWeek);
-    return date;
+    const auto dayOfWeek = date.dayOfWeek();
+    const auto firstDayOfWeek = locale.firstDayOfWeek();
+
+    if (dayOfWeek == firstDayOfWeek)
+        return date;
+
+    int offset{};
+    if (firstDayOfWeek < dayOfWeek)
+        offset = firstDayOfWeek - dayOfWeek;
+    else
+        offset = firstDayOfWeek - dayOfWeek - 7;
+
+    return date.addDays(offset);
 }
 
 NX_VMS_CLIENT_CORE_API QBitArray buildArchivePresence(

@@ -109,13 +109,19 @@ TEST_P(CalendarModelStartDayValueTestFixture, StartDayOffsetTest)
     ASSERT_EQ(dayNumber, params.expected.displayValue);
 }
 
+static const QLocale kSaturdayMonthStartLocale = QLocale(QLocale::Arabic, QLocale::Egypt);
 static const QLocale kSundayMonthStartLocale = QLocale(QLocale::English, QLocale::UnitedStates);
 static const QLocale kMondayMonthStartLocale = QLocale(QLocale::Russian, QLocale::RussianFederation);
 
 // 1 September 2019 is Sunday. Testing values checks if visual model has proper offset of the first
-// month's day (accroding to the specified locale).
+// month's day (according to the specified locale).
 static const std::vector<StartDayOffsetTestParams> kStartDayTestData =
 {
+    {
+        When{kSaturdayMonthStartLocale, kTestYear, kTestMonth},
+        Expect{1, kExpectedFirstDayOfMonth}
+    },
+
     {
         When{kSundayMonthStartLocale, kTestYear, kTestMonth},
         Expect{0, kExpectedFirstDayOfMonth}
