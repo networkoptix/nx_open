@@ -9829,7 +9829,7 @@ Wydajność witryny jest obniżona.</translation>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Pliki tekstowe</translation>
     </message>
     <message>
       <source>All</source>
@@ -9852,7 +9852,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>Wszystkie inne pliki tekstowe</translation>
     </message>
   </context>
   <context>
