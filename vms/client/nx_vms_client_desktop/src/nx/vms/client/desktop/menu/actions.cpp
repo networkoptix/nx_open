@@ -533,7 +533,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget | GlobalHotkey)
         .text(ContextMenu::tr("Save Current Layout As..."))
         .shortcut("Ctrl+Shift+S")
-        .shortcut(QKeySequence("Ctrl+Alt+S"), Builder::Windows, false)
         .condition(
             condition::isLoggedIn()
             && condition::applyToCurrentLayout(condition::canSaveLayoutAs())
