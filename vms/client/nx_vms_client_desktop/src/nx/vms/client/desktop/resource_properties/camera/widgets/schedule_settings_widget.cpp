@@ -245,7 +245,7 @@ void ScheduleSettingsWidget::setupUi()
         "and does not affect resolution. Low, Medium, High and Best are preset bitrate values."));
 
     ui->bitrateSpinBox->setDecimals(common::CameraBitrateCalculator::kBitrateKbpsPrecisionDecimals);
-    ui->bitrateSpinBox->setSuffix(QString(" ") + tr("Mbit/s"));
+    ui->bitrateSpinBox->setSuffix(QString(" ") + tr("Mbps", "Megabits per seconds"));
 
     ui->bitrateSlider->setProperty(
         style::Properties::kSliderFeatures,

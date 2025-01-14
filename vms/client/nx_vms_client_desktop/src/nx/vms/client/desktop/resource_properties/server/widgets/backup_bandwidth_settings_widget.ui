@@ -145,7 +145,7 @@
            <item>
             <widget class="QLabel" name="fixedLimitSuffixLabel">
              <property name="text">
-              <string>Mbit/s</string>
+              <string>Mbps</string>
              </property>
             </widget>
            </item>
@@ -330,7 +330,7 @@
               <item>
                <widget class="QLabel" name="scheduledLimitSuffixLabel">
                 <property name="text">
-                 <string>Mbit/s</string>
+                 <string>Mbps</string>
                 </property>
                </widget>
               </item>
