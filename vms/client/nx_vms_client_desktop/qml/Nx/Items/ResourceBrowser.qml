@@ -127,17 +127,12 @@ Item
             ? "image://skin/64x64/Outline/openfolder.svg?primary=dark10"
             : "image://skin/64x64/Outline/notfound.svg?primary=dark10"
 
-        title: parent.localFilesAbsent ? qsTr("No local files") : qsTr("Nothing found")
+        title: qsTr("No local files")
 
         description:
         {
-            if (parent.localFilesAbsent)
-            {
-                return qsTr("Drag video files or images to the client window, or add local media"
+            return qsTr("Drag video files or images to the client window, or add local media"
                     + " folder through the Local Settings dialog")
-            }
-
-            return qsTr("Try searching for something else")
         }
     }
 }
