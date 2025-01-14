@@ -374,15 +374,22 @@ struct UserSettingsDialog::Private
             QDialogButtonBox::Ok,
             parentWidget);
 
-        QPushButton* copyButton = new ClipboardButton(
-            tr("Copy Access Link"),
-            ClipboardButton::tr("Copied", "to Clipboard"));
-
-        QObject::connect(copyButton, &QPushButton::pressed,
-            [token, this]
+        auto makeCopyButton =
+            [this, token]()
             {
-                QGuiApplication::clipboard()->setText(linkFromToken(token));
-            });
+                QPushButton* copyButton = new ClipboardButton(
+                    tr("Copy Access Link"),
+                    ClipboardButton::tr("Copied", "to Clipboard"));
+
+                QObject::connect(copyButton, &QPushButton::pressed,
+                    nx::utils::guarded(q,
+                        [token, this]
+                        {
+                            QGuiApplication::clipboard()->setText(linkFromToken(token));
+                        }));
+
+                return copyButton;
+            };
 
         if (!q->systemSettings()->cloudSystemId().isEmpty())
         {
@@ -392,14 +399,15 @@ struct UserSettingsDialog::Private
                 obtainLinkButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
 
             const auto replaceCustomWidget = nx::utils::guarded(&messageBox,
-                [this, &obtainLinkButton, &copyButton, &messageBox]
+                [this, obtainLinkButton, makeCopyButton, &messageBox]
                 {
                     if (!linkReady)
                         return;
 
                     messageBox.addCustomWidget(
-                        copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+                        makeCopyButton(), QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
                     messageBox.removeCustomWidget(obtainLinkButton);
+                    // The button is still owned by the message box, but it is not needed anymore.
                     delete obtainLinkButton;
                 });
 
@@ -434,7 +442,7 @@ struct UserSettingsDialog::Private
         else
         {
             messageBox.addCustomWidget(
-                copyButton, QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
+                makeCopyButton(), QnMessageBox::Layout::Content, 0, Qt::AlignLeft);
         }
 
         messageBox.setWindowTitle(title);
