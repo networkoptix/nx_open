@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+  <g class="16x16/Solid/api_error">
+    <path fill="#A5B7C0" fill-rule="evenodd" d="M2.08 4.979a.273.273 0 0 1 0-.387L4.592 2.08a.273.273 0 0 1 .387 0l2.512 2.512a.273.273 0 0 1 0 .387L4.98 7.491a.273.273 0 0 1-.387 0L2.08 4.98ZM8.93 2a.5.5 0 0 0-.5.5v2.857a1 1 0 0 1 1.246.136l1.409 1.409 1.409-1.41a1 1 0 0 1 1.414 0l.093.094V2.5a.5.5 0 0 0-.5-.5H8.929Zm-1.36 8.414-1.078 1.079a1 1 0 0 0 0 1.414l.939.94a.499.499 0 0 1-.36.153H2.5a.5.5 0 0 1-.5-.5V8.928a.5.5 0 0 1 .5-.5h3.812a1 1 0 0 0 .18.247l1.08 1.078v.661Z" class="Primary" clip-rule="evenodd"/>
+    <g class="Secondary">
+      <path fill="#EF5350" fill-rule="evenodd" d="m8.968 6.2 6 6-1.768 1.768-6-6L8.968 6.2Z" clip-rule="evenodd"/>
+      <path fill="#EF5350" fill-rule="evenodd" d="m13.2 6.2-6 6 1.768 1.768 6-6L13.2 6.2Z" clip-rule="evenodd"/>
+    </g>
+  </g>
+</svg>

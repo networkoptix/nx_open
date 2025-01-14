@@ -1,14 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
   <g class="20x20/Solid/api_error" clip-path="url(#a)">
     <path fill="#A5B7C0" fill-rule="evenodd" d="M2.108 6.01a.368.368 0 0 1 0-.52L5.49 2.108a.368.368 0 0 1 .52 0L9.392 5.49a.368.368 0 0 1 0 .52L6.01 9.392a.368.368 0 0 1-.52 0L2.108 6.01ZM17.998 2h-7.5v7.5h2.655l.208-.208a1 1 0 0 1 1.414 0l.208.208h2.402l.208-.208a.995.995 0 0 1 .405-.246V2Zm-5.845 8.5-.56.56a1 1 0 0 0 0 1.414l1.409 1.409-1.409 1.409a1 1 0 0 0 0 1.414L12.887 18h-2.389v-7.5h1.655ZM2 10.5h7.5V18H2v-7.5Z" class="Primary" clip-rule="evenodd"/>
-    <g class="Secondary">
-      <path fill="#EF5350" fill-rule="evenodd" d="m14.068 10.099 6 6-1.768 1.768-6-6 1.768-1.768Z" clip-rule="evenodd"/>
-      <path fill="#EF5350" fill-rule="evenodd" d="m18.3 10.099-6 6 1.768 1.768 6-6-1.768-1.768Z" clip-rule="evenodd"/>
-    </g>
+    <path class="Secondary" fill="#EF5350" fill-rule="evenodd" d="m14.068 10.099 6 6-1.768 1.768-6-6 1.768-1.768Z" clip-rule="evenodd"/>
+    <path class="Secondary" fill="#EF5350" fill-rule="evenodd" d="m18.3 10.099-6 6 1.768 1.768 6-6-1.768-1.768Z" clip-rule="evenodd"/>
   </g>
   <defs>
     <clipPath id="a" class="a">
-      <path fill="#fff" d="M0 0h20v20H0z"/>
+      <path fill="#ffffff" d="M0 0h20v20H0z"/>
     </clipPath>
   </defs>
 </svg>

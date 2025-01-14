@@ -7,7 +7,6 @@
 #include <QtGui/QPalette>
 
 #include <client/client_globals.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -21,21 +20,17 @@
 
 namespace {
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAnalyticsIconSubstitutions = {
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAnalyticsIconSubstitutions = {
     {QIcon::Normal, {.primary = "light10"}},
 };
 
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAnalyticsHoveredIconSubstitutions = {
-    {QIcon::Normal, {.primary = "light14"}},
-};
-
-static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDeleteThemeSubstitutions = {
+const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kDeleteThemeSubstitutions = {
     {QIcon::Normal, {.primary = "light16"}},
     {QIcon::Active, {.primary = "light17"}},
     {QIcon::Selected, {.primary = "light15"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kDefaultAnalyticsIcon, "20x20/Outline/default.svg", kAnalyticsIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kDefaultStorageAnalyticsIcon, "20x20/Outline/default.svg", kAnalyticsIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kDeleteIcon, "20x20/Outline/delete.svg", kDeleteThemeSubstitutions)
 
 int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
@@ -415,7 +410,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
                 if (storage.id == m_metadataStorageId)
                 {
-                    return qnSkin->icon(kDefaultAnalyticsIcon)
+                    return qnSkin->icon(kDefaultStorageAnalyticsIcon)
                         .pixmap(QSize(20, 20));
                 }
 
@@ -425,7 +420,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
 
                 if (couldStoreAnalytics(storage))
                 {
-                    return qnSkin->icon(kDefaultAnalyticsIcon)
+                    return qnSkin->icon(kDefaultStorageAnalyticsIcon)
                         .pixmap(QSize(20, 20));
                 }
             }
