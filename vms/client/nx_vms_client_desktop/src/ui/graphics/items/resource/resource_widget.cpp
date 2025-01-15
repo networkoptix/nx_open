@@ -19,7 +19,6 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/range_adapters.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -362,15 +361,6 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
     if (sIconCache.contains(name))
         return sIconCache[name];
 
-    using namespace nx::vms::client::core;
-    static const QMap<QIcon::Mode, QColor> colors = {
-        {QIcon::Normal, core::colorTheme()->color("@light4")},
-        {QIcon::Active, core::colorTheme()->color("@light1")},
-        {QnIcon::Pressed, core::colorTheme()->color("@light7")},
-        {QIcon::Disabled, core::colorTheme()->color("@light4", /*alpha*/ 77)}};
-
-    static const QColor checkedBgColor = core::colorTheme()->color("brand");
-
     QPixmapDropShadowFilter filter;
     filter.setBlurRadius(2.5);
     filter.setOffset(QPointF(0, 0));
@@ -402,12 +392,21 @@ QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
     QIcon icon;
     const QPixmap pixmap = qnSkin->pixmap(name);
 
-    for (const auto [mode, color]: nx::utils::constKeyValueRange(colors))
+    static const QMap<QIcon::Mode, QColor> kColors = {
+        {QIcon::Normal, core::colorTheme()->color("light4")},
+        {QIcon::Active, core::colorTheme()->color("light1")},
+        {QnIcon::Pressed, core::colorTheme()->color("light7")},
+        {QIcon::Disabled, core::colorTheme()->color("light4", /*alpha*/ 77)}};
+    for (const auto& [mode, color]: kColors.asKeyValueRange())
     {
-        const auto colorized = Skin::colorize(pixmap, color);
+        const auto colorized = nx::vms::client::core::Skin::colorize(pixmap, color);
         icon.addPixmap(preparePixmap(colorized, {}), mode, QIcon::Off);
-        icon.addPixmap(preparePixmap(colorized, checkedBgColor), mode, QIcon::On);
     }
+
+    static const auto brandContrastColor = core::colorTheme()->color("brand_contrast");
+    const auto colorized = nx::vms::client::core::Skin::colorize(pixmap, brandContrastColor);
+    static const auto checkedBgColor = core::colorTheme()->color("brand");
+    icon.addPixmap(preparePixmap(colorized, checkedBgColor), QIcon::Normal, QIcon::On);
 
     sIconCache.insert(name, icon);
     return icon;
