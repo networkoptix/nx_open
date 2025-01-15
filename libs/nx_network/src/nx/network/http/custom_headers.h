@@ -33,7 +33,6 @@ static constexpr char PEER_GUID_HEADER_NAME[] = "X-Nx-Peer-Guid";
 static constexpr char API_RESULT_CODE_HEADER_NAME[] = "X-Nx-Result-Code";
 static constexpr char RTT_MS_HEADER_NAME[] = "X-Nx-rtt-ms";
 
-static constexpr char EC2_SYSTEM_ID_HEADER_NAME[] = "X-Nx-Ec-SYSTEM-Id";
 static constexpr char EC2_CONNECTION_STATE_HEADER_NAME[] = "X-Nx-EC-CONNECTION-STATE";
 static constexpr char EC2_CONNECTION_DIRECTION_HEADER_NAME[] = "X-Nx-Connection-Direction";
 static constexpr char EC2_CONNECTION_GUID_HEADER_NAME[] = "X-Nx-Connection-Guid";

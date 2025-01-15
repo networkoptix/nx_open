@@ -577,12 +577,6 @@ void QnTransactionTransportBase::doOutgoingConnect(
             remotePeerUrl.userName().toStdString(), remotePeerUrl.password().toStdString()));
     }
 
-    if (m_localPeer.isServer())
-    {
-        m_httpClient->addAdditionalHeader(
-            Qn::EC2_SYSTEM_ID_HEADER_NAME,
-            m_localSystemId.toStdString());
-    }
     if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
     {
         m_httpClient->addAdditionalHeader(
