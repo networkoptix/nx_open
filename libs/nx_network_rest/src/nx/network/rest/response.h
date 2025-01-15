@@ -13,7 +13,7 @@ struct NX_NETWORK_REST_API Response
     std::optional<Content> content;
     bool isUndefinedContentLength = false;
     nx::network::http::HttpHeaders httpHeaders;
-    std::variant<rapidjson::Document, QJsonValue> contentBodyJson;
+    std::variant<std::nullptr_t, rapidjson::Document, QJsonValue> contentBodyJson;
 
     Response(
         nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
