@@ -122,10 +122,8 @@ Device::AxisLimits DeviceHid::parseAxisLimits(
     result.mid = descriptor.mid.toInt(/*ok*/ nullptr, kAutoDetectBase);
 
     result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
-
-    const int minBounce = (result.max - result.min) / 100.0 * kMinBounceInPercentages;
-    if (minBounce > result.bounce)
-        result.bounce = minBounce;
+    if (kMinBounceInPercentages > result.bounce)
+        result.bounce = kMinBounceInPercentages;
 
     if (result.mid == 0)
         result.mid = (result.min + result.max) / 2;

@@ -39,10 +39,13 @@ public:
 protected:
     struct AxisLimits
     {
-        int min = 0;
-        int max = 0;
-        int mid = 0;
-        int bounce = 0;
+        int min = 0; // Possible values: -N, 0, etc.
+        int max = 0; // Possible values: N, etc.
+        int mid = 0; // Neutural joystick position. Some value in between min and max.
+        int bounce = 0; // Minimum significant zero point deviation in percent of the full range.
+
+        // The factor by which the raw axis position value should be multiplied to get
+        // the real value. Possible values: 1, 0.N.
         double sensitivity = 0;
     };
 
@@ -123,6 +126,8 @@ protected:
     bool axisIsInitialized(AxisIndexes index) const;
     void setAxisInitialized(AxisIndexes index, bool isInitialized);
     void setInitializedButtonsNumber(int number);
+
+    int bounceAbsoluteValue(const AxisLimits& limits);
 
 protected:
     Manager* m_manager;
