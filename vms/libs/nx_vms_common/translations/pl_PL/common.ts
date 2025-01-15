@@ -60,7 +60,7 @@
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>Wydarzenia w witrynie</translation>
     </message>
   </context>
   <context>
@@ -1145,7 +1145,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Żadna z wybranych ról użytkownika nie zawiera użytkowników</translation>
     </message>
   </context>
   <context>
@@ -1457,11 +1457,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>Adres e-mail nie został ustawiony dla wszystkich wybranych użytkowników.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>Adres e-mail nie jest ustawiony dla niektórych wybranych użytkowników.</translation>
     </message>
   </context>
   <context>
@@ -1999,27 +1999,27 @@
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h)</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h)</translation>
+      <translation>Interwał aktualizacji aktywności witryny (sekundy, 1s-1h)</translation>
     </message>
     <message>
       <source>Proxy connection access policy</source>
-      <translation type="unfinished">Proxy connection access policy</translation>
+      <translation>Polityka dostępu do połączenia proxy</translation>
     </message>
     <message>
       <source>Cloud Site ID</source>
-      <translation type="unfinished">Cloud Site ID</translation>
+      <translation>ID witryny w chmurze</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site</source>
-      <translation type="unfinished">Enable 2FA for the Site</translation>
+      <translation>Włącz 2FA dla witryny</translation>
     </message>
     <message>
       <source>Site name</source>
-      <translation type="unfinished">Site name</translation>
+      <translation>Nazwa witryny</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>Lokalne ID witryny, null oznacza, że witryna nie jest jeszcze skonfigurowana.</translation>
     </message>
     <message>
       <source>Last master Site merge ID</source>
@@ -2035,11 +2035,11 @@
     </message>
     <message>
       <source>Apply session limit for Cloud tokens</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens</translation>
+      <translation>Zastosuj limit sesji dla tokenów chmury</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Włącz lub wyłącz tworzenie nowych wniosków o rejestrację integracji</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL</source>
@@ -2797,11 +2797,11 @@
     </message>
     <message>
       <source>Call Request</source>
-      <translation type="unfinished">Call Request</translation>
+      <translation>Prośba o połączenie</translation>
     </message>
     <message>
       <source>Call Request Missed</source>
-      <translation type="unfinished">Call Request Missed</translation>
+      <translation>Prośba o połączenie nieodebrana</translation>
     </message>
   </context>
 </TS>

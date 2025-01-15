@@ -9837,7 +9837,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>Eksport listy</translation>
     </message>
   </context>
   <context>
@@ -9848,7 +9848,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Pliki tekstowe</translation>
     </message>
     <message>
       <source>All other text files</source>
@@ -10096,8 +10096,8 @@ Możesz to wymusić, ale może to znacznie zwiększyć obciążenie procesora.</
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>Wykrywanie ruchu jest obecnie wyłączone dla tej kamery, ponieważ strumień wideo przekracza rozdzielczość %1 * %2.
+Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrostu obciążenia procesora.</translation>
     </message>
   </context>
   <context>
@@ -10373,24 +10373,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>Wersje systemu operacyjnego niektórych komponentów nie są już obsługiwane. Usuń je z witryny lub zaktualizuj ich system operacyjny do obsługiwanej wersji.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>Niezgodna instancja %1. Aby zaktualizować, najpierw rozłącz witrynę z %1.</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>Nie zaleca się instalowania aktualizacji na koniec tygodnia</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>Witryna zaktualizowana do</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>Trwa aktualizacja witryny</translation>
     </message>
   </context>
   <context>
@@ -10404,7 +10404,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>Możliwe formaty:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -10517,11 +10517,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>Domyślnej grupy LDAP nie można usunąć, dopóki witryna jest połączona z serwerem LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>Zarządzanie użytkownikami organizacji jest dostępne tylko na poziomie organizacji, a nie na poziomie witryny</translation>
     </message>
   </context>
   <context>
@@ -10532,7 +10532,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>Nie można potwierdzić zdarzenia na niedostępnej kamerze.</translation>
     </message>
   </context>
   <context>
@@ -10570,15 +10570,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>Bieżąca witryna</translation>
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>Dowolne powiadomienie</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>Powiadomienia o zdarzeniach</translation>
     </message>
     <message>
       <source>System Notifications</source>
@@ -10586,16 +10586,16 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Wybierz typy...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Dowolne powiadomienie</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
       <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
+        <numerusform>%n typów powiadomień</numerusform>
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
@@ -10606,7 +10606,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Wybierz typy powiadomień</translation>
     </message>
   </context>
   <context>
@@ -10871,7 +10871,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>Witryna nie jest połączona z %1. Powiadomienia mobilne działają tylko wtedy, gdy witryna jest połączona z %1.</translation>
     </message>
   </context>
   <context>
@@ -10970,11 +10970,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Automatyczne odświeżanie integracji</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Automatyczne odświeżanie strony internetowej</translation>
     </message>
   </context>
   <context>
@@ -11507,12 +11507,12 @@ Nadal możesz zmienić jakość i FPS bezpośrednio w kamerze.</translation>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Hasło szyfrowania będzie wymagane do przywrócenia archiwum.
+Uwaga: Tego hasła nie można zresetować. Jeśli je zgubisz, archiwum będzie nie do odzyskania.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Szyfruje dane archiwalne, aby uniemożliwić ich przeglądanie poza witryną. Nie będziesz musiał wprowadzać hasła szyfrującego, aby przeglądać archiwum wideo w tej witrynie.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
@@ -12064,7 +12064,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Ta akcja nie jest obsługiwana w przypadku powiadomień z innych witryn</translation>
     </message>
   </context>
   <context>
@@ -14217,7 +14217,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>Automatyczne aktualizacje klienta</translation>
     </message>
   </context>
   <context>
