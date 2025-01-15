@@ -168,11 +168,6 @@ void Rule::setSystem(bool system)
     m_system = system;
 }
 
-QString Rule::getUniqueId() const
-{
-    return QString(QLatin1String("Rule_%1_")).arg(m_id.toString());
-}
-
 bool Rule::isScheduleMatchTime(const QDateTime& datetime) const
 {
     if (m_binSchedule.isEmpty())

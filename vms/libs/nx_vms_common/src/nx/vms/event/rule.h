@@ -23,8 +23,6 @@ public:
 
     static const QByteArray kGuidPostfix;
 
-    QString getUniqueId() const;
-
     nx::Uuid id() const;
     void setId(const nx::Uuid& value);
 
