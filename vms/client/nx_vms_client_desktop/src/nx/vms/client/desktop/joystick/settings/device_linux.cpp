@@ -154,11 +154,10 @@ Device::AxisLimits DeviceLinux::parseAxisLimits(
     result.min = JoystickEvent::MIN_AXES_VALUE;
     result.max = JoystickEvent::MAX_AXES_VALUE;
     result.mid = (result.min + result.max) / 2;
-    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
 
-    const int minBounce = (result.max - result.min) / 100.0 * kMinBounceInPercentages;
-    if (minBounce > result.bounce)
-        result.bounce = minBounce;
+    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    if (kMinBounceInPercentages > result.bounce)
+        result.bounce = kMinBounceInPercentages;
 
     result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
     return result;
