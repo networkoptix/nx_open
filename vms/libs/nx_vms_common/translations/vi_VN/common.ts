@@ -81,6 +81,10 @@
       <source>Wrong password</source>
       <translation>Sai mật khẩu</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkSort</name>
@@ -1354,7 +1358,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>Hết thời gian kết nối proxy (giây, 1s-1h)</translation>
+      <translation>Thời gian chờ kết nối proxy (giây, 1 giây-1 giờ)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>

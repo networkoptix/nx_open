@@ -81,6 +81,10 @@
       <source>Wrong password</source>
       <translation>패스워드가 틀립니다.</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkSort</name>

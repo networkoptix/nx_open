@@ -81,6 +81,10 @@
       <source>Wrong password</source>
       <translation>Błędne hasło</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkSort</name>
@@ -1767,7 +1771,7 @@
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>Funkcje specyficzne dla wersji serwera VMS</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
