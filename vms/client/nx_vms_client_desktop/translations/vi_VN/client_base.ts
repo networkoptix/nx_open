@@ -3515,11 +3515,11 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Open Event video</source>
-      <translation type="unfinished">Open Event video</translation>
+      <translation>Mở video sự kiện</translation>
     </message>
     <message>
       <source>Open Event camera</source>
-      <translation type="unfinished">Open Event camera</translation>
+      <translation>Mở camera sự kiện</translation>
     </message>
   </context>
   <context>

@@ -81,6 +81,10 @@
       <source>Wrong password</source>
       <translation>كلمة مرور خاطئة</translation>
     </message>
+    <message>
+      <source>No credentials provided when required by endpoint.</source>
+      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkSort</name>
