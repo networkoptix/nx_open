@@ -704,7 +704,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::storageTooSlow:
         {
             QString storageUrl = reasonParamsEncoded;
-            result = tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
+            result = tr("Not enough HDD/SSD/Network speed for recording to %1.").arg(storageUrl);
             break;
         }
         case EventReason::storageFull:
