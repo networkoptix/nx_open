@@ -86,7 +86,9 @@ struct QnEmailSmtpServerPreset
 struct NX_VMS_COMMON_API QnEmailSettings: nx::vms::api::EmailSettings
 {
     QnEmailSettings() = default;
-    QnEmailSettings(const nx::vms::api::EmailSettings& settings);
+    QnEmailSettings(
+        const nx::vms::api::EmailSettings& settings,
+        const nx::Uuid& organizationId);
 
     /**
      * @return True if <tt>email</tt> field contains valid email address and <tt>server</tt> field

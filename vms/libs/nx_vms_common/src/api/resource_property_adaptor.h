@@ -250,16 +250,21 @@ public:
         return base_type::value();
     }
 
-    virtual QJsonValue jsonValue(QnJsonContext* context = nullptr) const override
+    static QJsonValue jsonValue(QnJsonContext* context, const T& value)
     {
         QJsonValue result;
 
         if (context)
-            QJson::serialize(context, value(), &result);
+            QJson::serialize(context, value, &result);
         else
-            QJson::serialize(value(), &result);
+            QJson::serialize(value, &result);
 
         return result;
+    }
+
+    virtual QJsonValue jsonValue(QnJsonContext* context = nullptr) const override
+    {
+        return jsonValue(context, value());
     }
 
     virtual void setValue(const QVariant& value) override

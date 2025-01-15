@@ -99,7 +99,9 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
 
     .updateNotificationsEnabled = true,
 
-    .emailSettings = EmailSettings{},
+    .emailSettings = EmailSettings{
+        .useCloudServiceToSendEmail = false
+    },
 
     .timeSynchronizationEnabled = true,
     .primaryTimeServer = nx::Uuid{},

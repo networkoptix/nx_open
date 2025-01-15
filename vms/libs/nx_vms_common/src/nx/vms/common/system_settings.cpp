@@ -70,6 +70,36 @@ std::string makeServerHeaderValue(QString value)
 
 namespace nx::vms::common {
 
+class EmailSettingsAdaptor: public QnJsonResourcePropertyAdaptor<nx::vms::api::EmailSettings>
+{
+    using base_type = QnJsonResourcePropertyAdaptor<nx::vms::api::EmailSettings>;
+    std::function<nx::Uuid()> m_getOrganizationId;
+
+public:
+    EmailSettingsAdaptor() = default;
+
+    EmailSettingsAdaptor(const QString& key,
+        std::function<nx::Uuid()> getOrganizationId,
+        std::function<bool(const nx::vms::api::EmailSettings&)> isValueValid,
+        QObject* parent,
+        std::function<QString()> label)
+        :
+        base_type(key, nx::vms::api::EmailSettings(), isValueValid, parent, label),
+        m_getOrganizationId(getOrganizationId)
+    {
+    }
+
+    QnEmailSettings value() const
+    {
+        return QnEmailSettings(base_type::value(), m_getOrganizationId());
+    }
+
+    virtual QJsonValue jsonValue(QnJsonContext* context = nullptr) const override
+    {
+        return base_type::jsonValue(context, (nx::vms::api::EmailSettings) value());
+    }
+};
+
 struct SystemSettings::Private
 {
     QnResourcePropertyAdaptor<bool>* cameraSettingsOptimizationAdaptor = nullptr;
@@ -116,7 +146,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<std::chrono::seconds>* deviceStorageInfoUpdateIntervalSAdaptor = nullptr;
 
     // set of email settings adaptors
-    QnResourcePropertyAdaptor<nx::vms::api::EmailSettings>* emailSettingsAdaptor = nullptr;
+    EmailSettingsAdaptor* emailSettingsAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<nx::vms::api::LdapSettings>* ldapAdaptor = nullptr;
 
@@ -299,14 +329,14 @@ SystemSettings::AdaptorList SystemSettings::initEmailAdaptors()
     const auto isValid =
         [](const nx::vms::api::EmailSettings& s)
         {
-            return !s.useCloudServiceToSendEmail
+        return !s.useCloudServiceToSendEmail.value_or(false)
                 || s.supportAddress == nx::branding::supportAddress();
         };
 
     d->emailSettingsAdaptor =
-        new QnJsonResourcePropertyAdaptor<nx::vms::api::EmailSettings>(
-            "emailSettings",
-            nx::vms::api::EmailSettings{},
+        new EmailSettingsAdaptor(
+        "emailSettings",
+            [this]() { return organizationId(); },
             isValid,
             this,
             [] { return tr("SMTP settings."); });
@@ -1531,7 +1561,7 @@ QnEmailSettings SystemSettings::emailSettings() const
 
 void SystemSettings::setEmailSettings(const QnEmailSettings& emailSettings)
 {
-    d->emailSettingsAdaptor->setValue(static_cast<nx::vms::api::EmailSettings>(emailSettings));
+    d->emailSettingsAdaptor->setValue(emailSettings);
 }
 
 void SystemSettings::synchronizeNow()

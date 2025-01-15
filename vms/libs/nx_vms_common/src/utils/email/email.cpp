@@ -55,8 +55,15 @@ QnEmailSmtpServerPreset::QnEmailSmtpServerPreset(
     port(port)
 {}
 
-QnEmailSettings::QnEmailSettings(const nx::vms::api::EmailSettings& settings):
-    nx::vms::api::EmailSettings(settings){}
+QnEmailSettings::QnEmailSettings(
+    const nx::vms::api::EmailSettings& settings,
+    const nx::Uuid& organizationId)
+    :
+    nx::vms::api::EmailSettings(settings)
+{
+    if (!useCloudServiceToSendEmail.has_value())
+        useCloudServiceToSendEmail = !organizationId.isNull();
+}
 
 int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType)
 {

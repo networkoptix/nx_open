@@ -314,6 +314,7 @@ void OutgoingMailSettingsWidget::Private::setupDialogControls()
             ui->serviceTypeDropdown->setMenu(effectiveServiceTypeDropdownMenu());
             if (getUseCloudServiceFromDialog())
                 updateCloudServiceStatus();
+            updateConfigurationStatus();
         });
 
     q->connect(q, &OutgoingMailSettingsWidget::hasChangesChanged,
@@ -753,7 +754,8 @@ OutgoingMailSettingsWidget::~OutgoingMailSettingsWidget()
 void OutgoingMailSettingsWidget::loadDataToUi()
 {
     d->loadEmailSettingsToDialog();
-    d->setUseCloudServiceToDialog(systemSettings()->emailSettings().useCloudServiceToSendEmail);
+    d->setUseCloudServiceToDialog(systemSettings()->emailSettings()
+        .useCloudServiceToSendEmail.value_or(false));
     d->updateConfigurationStatus();
 }
 

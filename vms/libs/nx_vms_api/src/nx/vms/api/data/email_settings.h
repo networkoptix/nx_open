@@ -53,8 +53,8 @@ struct NX_VMS_API EmailSettings
     /**%apidoc EHLO SMTP command argument. */
     std::optional<QString> smtpEhloName;
 
-    /**%apidoc[opt] Use a cloud service to send email. */
-    bool useCloudServiceToSendEmail = false;
+    /**%apidoc Use a cloud service to send email. */
+    std::optional<bool> useCloudServiceToSendEmail;
 
     bool operator==(const EmailSettings& other) const = default;
     QByteArray toString() const;
