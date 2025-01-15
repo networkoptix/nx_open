@@ -1354,7 +1354,7 @@
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h)</source>
-      <translation>Hết thời gian kết nối proxy (giây, 1s-1h)</translation>
+      <translation>Thời gian chờ kết nối proxy (giây, 1 giây-1 giờ)</translation>
     </message>
     <message>
       <source>Time synchronization enabled</source>
