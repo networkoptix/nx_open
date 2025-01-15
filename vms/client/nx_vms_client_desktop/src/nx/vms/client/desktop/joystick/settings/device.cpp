@@ -88,12 +88,12 @@ void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
 
 double Device::mapAxisState(int rawValue, const AxisLimits& limits)
 {
-    if (rawValue < limits.mid - limits.bounce)
+    if (rawValue < limits.mid - bounceAbsoluteValue(limits))
     {
         // "Negative" part of the axis.
         return -1. * limits.sensitivity * (limits.mid - rawValue) / (limits.mid - limits.min);
     }
-    else if (rawValue > limits.mid + limits.bounce)
+    else if (rawValue > limits.mid + bounceAbsoluteValue(limits))
     {
         // "Positive" part of the axis.
         return 1. * limits.sensitivity * (rawValue - limits.mid) / (limits.max - limits.mid);
@@ -200,6 +200,12 @@ void Device::setInitializedButtonsNumber(int number)
 
     m_initializedButtonsNumber = number;
     emit initializedButtonsNumberChanged();
+}
+
+int Device::bounceAbsoluteValue(const Device::AxisLimits& limits)
+{
+    const auto fullRange = limits.max - limits.min;
+    return limits.bounce * 0.01 * fullRange / 2;
 }
 
 } // namespace nx::vms::client::desktop::joystick
