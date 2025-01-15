@@ -103,6 +103,7 @@ public:
 
     const QScopedPointer<nx::utils::PendingOperation> emitDataChanged;
     bool liveReceptionActive = false;
+    bool noArchive = false; //< Whether an archive fetch yielded no results with current filters.
 
     using MetadataReceiverList = std::vector<std::unique_ptr<LiveAnalyticsReceiver>>;
     MetadataReceiverList metadataReceivers;
@@ -610,8 +611,12 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
 void AnalyticsSearchListModel::Private::processMetadata()
 {
     // Don't start receiving live data until first archive fetch is finished.
-    if (data.empty() && (q->fetchInProgress() || q->canFetchData(FetchDirection::older)))
+    if (data.empty()
+        && !noArchive
+        && (q->fetchInProgress() || q->canFetchData(FetchDirection::older)))
+    {
         return;
+    }
 
     // Special handling if live mode is paused (analytics tab is hidden).
     if (q->livePaused() && !data.empty())
@@ -1486,7 +1491,9 @@ bool AnalyticsSearchListModel::requestFetch(
             }
 
             emit fetchCommitStarted(request);
+
             const auto ranges = d->applyFetchedData(std::move(data), request);
+            d->noArchive = d->data.empty();
 
             completionHandler(FetchResult::complete,
                 ranges,
@@ -1508,6 +1515,7 @@ void AnalyticsSearchListModel::clearData()
     d->currentHttpRequestId = {};
     d->data.clear();
     d->gapBeforeNewTracks = false;
+    d->noArchive = false;
 }
 
 void AnalyticsSearchListModel::setLiveTimestampGetter(LiveTimestampGetter value)
