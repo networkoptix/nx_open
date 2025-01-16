@@ -32,6 +32,8 @@ public:
     void setStorageType(const QString& type);
     QString getStorageType() const;
 
+    bool isCloudStorage() const;
+
     void setMaxStoreTime(int timeInSeconds);
     int getMaxStoreTime() const;
 
