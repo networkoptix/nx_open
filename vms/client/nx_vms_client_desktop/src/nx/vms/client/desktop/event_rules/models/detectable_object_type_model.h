@@ -17,7 +17,7 @@ namespace nx::vms::client::desktop {
 /**
  * An item model providing a tree of analytics detectable object types available in the system.
  */
-class DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel>
+class NX_VMS_CLIENT_DESKTOP_API DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
     Q_PROPERTY(nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel*

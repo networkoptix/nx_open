@@ -129,7 +129,6 @@ public:
         m_testModel.reset(new AnalyticsDialogTableModel());
         m_testModel->setSourceModel(m_sourceModel.get());
         m_testModel->setAttributeManager(m_attributeManager.get());
-
         m_modelTester.reset(new QAbstractItemModelTester(m_testModel.get(),
             QAbstractItemModelTester::FailureReportingMode::Fatal));
 

@@ -135,9 +135,11 @@ signals:
     void selectedDevicesChanged();
     void selectedAttributeValuesChanged();
 
+protected:
+    void setObjectTypes(const std::vector<ObjectType*>& objectTypes);
+
 private:
     ObjectType* objectTypeById(const QString& id) const;
-    void setObjectTypes(const std::vector<ObjectType*>& objectTypes);
     void setEngines(const std::vector<nx::analytics::taxonomy::AbstractEngine*>& engines);
     void rebuild();
     void update(

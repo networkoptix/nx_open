@@ -19,12 +19,6 @@ using namespace nx::vms::client::core::analytics::taxonomy;
 class DetectableObjectTypeModel::Private
 {
 public:
-    struct TypeData
-    {
-        ObjectType* parent = nullptr;
-        int indexInParent = -1;
-    };
-
     Private(DetectableObjectTypeModel* q, core::analytics::taxonomy::AnalyticsFilterModel* filterModel):
         q(q),
         filterModel(filterModel)
@@ -47,7 +41,7 @@ public:
         for (int i = 0; i < types.size(); ++i)
         {
             ObjectType* type = types[i];
-            data.insert(type, TypeData{.indexInParent = i});
+            data.insert(type, i);
             updateData(type->derivedObjectTypes());
         }
     }
@@ -66,7 +60,7 @@ public:
 public:
     DetectableObjectTypeModel* const q;
     AnalyticsFilterModel* const filterModel;
-    QMap<ObjectType*, TypeData> data;
+    QMap<ObjectType*, int> data;
 };
 
 DetectableObjectTypeModel::DetectableObjectTypeModel(
@@ -104,7 +98,7 @@ QModelIndex DetectableObjectTypeModel::parent(const QModelIndex& index) const
         return {};
 
     return parent
-        ? createIndex(d->data[parent].indexInParent, 0, parent)
+        ? createIndex(d->data[parent], 0, parent)
         : QModelIndex();
 }
 

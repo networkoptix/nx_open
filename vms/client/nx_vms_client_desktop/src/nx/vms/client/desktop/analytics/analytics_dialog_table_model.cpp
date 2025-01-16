@@ -133,14 +133,14 @@ QVariant AnalyticsDialogTableModel::data(const QModelIndex& index, int role) con
 
 int AnalyticsDialogTableModel::rowCount(const QModelIndex& parent) const
 {
-    return NX_ASSERT(!parent.isValid()) && sourceModel()
+    return !parent.isValid() && sourceModel()
         ? sourceModel()->rowCount()
         : 0;
 }
 
 int AnalyticsDialogTableModel::columnCount(const QModelIndex& parent) const
 {
-    return NX_ASSERT(!parent.isValid())
+    return !parent.isValid() && sourceModel()
         ? m_columnNames.count()
         : 0;
 }
