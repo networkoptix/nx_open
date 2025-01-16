@@ -234,6 +234,9 @@ void checkSystemSettings(
             SystemSettings defaultSettings;
             static_cast<SaveableSystemSettings&>(defaultSettings) = kDefaultSaveableSystemSettings;
             static_cast<SettingsBase&>(defaultSettings) = kDefaultSettingsBase;
+            defaultSettings.cloudSystemID = QString{};
+            defaultSettings.localSystemId = nx::Uuid{};
+            defaultSettings.system2faEnabled = false;
             QJson::serialize(&context, defaultSettings, &qjson);
             reflect = nx::reflect::json::serialize(defaultSettings);
             break;

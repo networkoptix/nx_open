@@ -364,7 +364,16 @@ struct NX_VMS_API SaveableSystemSettings: SaveableSettingsBase, UserSessionSetti
     {
         SaveableSiteSettings result;
         static_cast<SaveableSettingsBase&>(result) = *this;
-        result.userSessionSettings = *this;
+        #define VALUE(R, RESULT, ITEM) \
+            if (ITEM) \
+            { \
+                if (!RESULT.userSessionSettings) \
+                    RESULT.userSessionSettings = UserSessionSettings{.ITEM = ITEM}; \
+                else \
+                    RESULT.userSessionSettings->ITEM = ITEM; \
+            }
+        BOOST_PP_SEQ_FOR_EACH(VALUE, result, UserSessionSettings_Fields)
+        #undef VALUE
         result.siteName = systemName;
         return result;
     }
@@ -386,9 +395,9 @@ NX_REFLECTION_TAG_TYPE(SaveableSystemSettings, jsonSerializeInt64AsString)
 
 struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
 {
-    QString cloudSystemID;
-    nx::Uuid localSystemId;
-    bool system2faEnabled = false;
+    std::optional<QString> cloudSystemID;
+    std::optional<nx::Uuid> localSystemId;
+    std::optional<bool> system2faEnabled;
 
     SystemSettings() = default;
     bool operator==(const SystemSettings&) const = default;
@@ -396,9 +405,9 @@ struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
     SystemSettings(SiteSettings settings):
         SaveableSystemSettings(std::move(settings)),
         SettingsBase(std::move(settings)),
-        cloudSystemID(std::move(settings.cloudId).value_or(QString{})),
-        localSystemId(std::move(settings.localId).value_or(nx::Uuid{})),
-        system2faEnabled(settings.enabled2fa.value_or(false))
+        cloudSystemID(std::move(settings.cloudId)),
+        localSystemId(std::move(settings.localId)),
+        system2faEnabled(settings.enabled2fa)
     {
     }
 
@@ -413,9 +422,8 @@ struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
         return result;
     }
 };
-#define NonBaseUnsaveableSystemSettings_Fields (cloudSystemID)(localSystemId)(system2faEnabled)
-#define UnsaveableSystemSettings_Fields SettingsBase_Fields NonBaseUnsaveableSystemSettings_Fields
-#define SystemSettings_Fields SaveableSystemSettings_Fields UnsaveableSystemSettings_Fields
+#define SystemSettings_Fields SaveableSystemSettings_Fields SettingsBase_Fields \
+    (cloudSystemID)(localSystemId)(system2faEnabled)
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)
