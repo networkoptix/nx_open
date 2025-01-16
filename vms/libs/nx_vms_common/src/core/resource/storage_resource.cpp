@@ -49,6 +49,12 @@ QString QnStorageResource::getStorageType() const
     return m_storageType;
 }
 
+bool QnStorageResource::isCloudStorage() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_storageType == "cloud";
+}
+
 void QnStorageResource::setMaxStoreTime(int timeInSeconds)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
