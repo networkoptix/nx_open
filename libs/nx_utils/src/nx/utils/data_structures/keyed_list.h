@@ -94,6 +94,9 @@ public:
 
         for (const auto& key: keys)
         {
+            if (m_keyToNumber.contains(key))
+                continue;
+
             m_items.push_back({key, number});
             m_keyToNumber.insert(key, number);
             ++number;
