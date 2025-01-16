@@ -7,6 +7,7 @@
 #include <QtCore/QTimer>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/storage_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -56,6 +57,7 @@ struct ServicesUsageModel::Private
     QString serviceTypeDisplay(const nx::Uuid& serviceId) const;
     int totalServiceQuantity(const nx::Uuid& serviceId) const;
     int usedServiceQuantity(const nx::Uuid& serviceId) const;
+    bool hasCloudBackupStorage() const;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -149,6 +151,17 @@ int ServicesUsageModel::Private::totalServiceQuantity(const nx::Uuid& serviceId)
     return saasData.services.at(serviceId).quantity;
 }
 
+bool ServicesUsageModel::Private::hasCloudBackupStorage() const
+{
+    const auto systemContext = serviceManager->systemContext();
+    const auto storages  = systemContext->resourcePool()->storages();
+    return std::any_of(storages.begin(), storages.end(),
+        [](const auto& storage)
+        {
+            return storage->isBackup() && storage->isCloudStorage();
+        });
+}
+
 int ServicesUsageModel::Private::usedServiceQuantity(const nx::Uuid& serviceId) const
 {
     if (!NX_ASSERT(servicesInfo.contains(serviceId)))
@@ -171,6 +184,8 @@ int ServicesUsageModel::Private::usedServiceQuantity(const nx::Uuid& serviceId) 
     }
     else if (service.type == nx::vms::api::SaasService::kCloudRecordingType)
     {
+        if (!hasCloudBackupStorage())
+            return 0;
         CloudStorageServiceUsageHelper usageHelper(systemContext);
         const auto allInfoByService = usageHelper.allInfoByService();
         return allInfoByService.contains(serviceId)
