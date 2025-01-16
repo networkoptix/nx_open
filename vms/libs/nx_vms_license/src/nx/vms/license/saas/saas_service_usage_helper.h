@@ -12,19 +12,19 @@
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
-namespace nx::vms::common::saas {
+namespace nx::vms::license::saas {
 
 /*
  * This class is intended to calculate service usage for SaaS services
  * that VMS reads from Channel Partner Server.
  */
-class NX_VMS_COMMON_API CloudServiceUsageHelper:
+class CloudServiceUsageHelper:
     public QObject,
-    public /*mixin*/ SystemContextAware
+    public /*mixin*/ nx::vms::common::SystemContextAware
 {
 public:
     CloudServiceUsageHelper(
-        SystemContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
 protected:
@@ -35,11 +35,11 @@ protected:
  /*
   *  Helper class to calculate integration licenses usages.
   */
-class NX_VMS_COMMON_API IntegrationServiceUsageHelper: public CloudServiceUsageHelper
+class IntegrationServiceUsageHelper: public CloudServiceUsageHelper
 {
 public:
     IntegrationServiceUsageHelper(
-        SystemContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
     /*
@@ -90,13 +90,13 @@ private:
 /*
  *  Helper class to calculate integration licenses usages.
  */
-class NX_VMS_COMMON_API CloudStorageServiceUsageHelper: public CloudServiceUsageHelper
+class CloudStorageServiceUsageHelper: public CloudServiceUsageHelper
 {
     Q_OBJECT
 
 public:
     CloudStorageServiceUsageHelper(
-        SystemContext* context,
+        nx::vms::common::SystemContext* context,
         std::optional<std::chrono::milliseconds> cacheAutoUpdateInterval = std::nullopt,
         QObject* parent = nullptr);
 
@@ -174,10 +174,10 @@ private:
 /*
  *  Helper class to calculate integration licenses usages.
  */
-class NX_VMS_COMMON_API LiveViewUsageHelper: public CloudServiceUsageHelper
+class LiveViewUsageHelper: public CloudServiceUsageHelper
 {
 public:
-    LiveViewUsageHelper(SystemContext* context, QObject* parent = nullptr);
+    LiveViewUsageHelper(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
 
     /*
      * @return Information how many Live View service is available and used.
@@ -188,11 +188,11 @@ public:
 /*
   *  Helper class to calculate local recording usages.
   */
-class NX_VMS_COMMON_API LocalRecordingUsageHelper: public CloudServiceUsageHelper
+class LocalRecordingUsageHelper: public CloudServiceUsageHelper
 {
 public:
     LocalRecordingUsageHelper(
-        SystemContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
     /*
@@ -206,4 +206,4 @@ public:
 
 };
 
-} // nx::vms::common::saas
+} // nx::vms::license::saas

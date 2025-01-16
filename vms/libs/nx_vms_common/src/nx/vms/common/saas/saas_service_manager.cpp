@@ -24,8 +24,6 @@
 #include <nx/utils/qt_direct_connect.h>
 #include <utils/common/synctime.h>
 
-#include "saas_service_usage_helper.h"
-
 static const QString kAdditionTierLimitsPropertyKey("additionTierLimits");
 static const QString kSaasDataPropertyKey("saasData");
 static const QString kSaasServicesPropertyKey("saasServices");
@@ -34,7 +32,6 @@ using namespace nx::vms::api;
 
 namespace {
 
-constexpr std::chrono::seconds kUpdateLiveOveruseTimeout(5);
 constexpr std::array<SaasTierLimitName, 5> checkedTiers =
 {
     SaasTierLimitName::maxServers,
@@ -83,18 +80,7 @@ namespace nx::vms::common::saas {
 ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     QObject(parent),
     SystemContextAware(context),
-    m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); }),
-    m_liveOveruse(
-        [this]()
-        {
-            {
-                NX_MUTEX_LOCKER mutexLocker(&m_mutex);
-                if (m_data.state != SaasState::active)
-                    return std::set<nx::Uuid>();
-            }
-            auto info = LiveViewUsageHelper(systemContext()).info();
-            return std::move(info.exceedDevices);
-        }, kUpdateLiveOveruseTimeout)
+    m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); })
 {
     connect(
         resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
@@ -574,21 +560,6 @@ bool ServiceManager::isTierGracePeriodExpired() const
 {
     const qint64 expiredMs = tierGracePeriodExpirationTime().count();
     return expiredMs > 0 && qnSyncTime->currentMSecsSinceEpoch() > expiredMs;
-}
-
-bool ServiceManager::isLiveServiceOveruse(const nx::Uuid& id) const
-{
-    return m_liveOveruse.updated().contains(id);
-}
-
-bool ServiceManager::hasLiveServiceOveruse() const
-{
-    return !m_liveOveruse.updated().empty();
-}
-
-bool ServiceManager::isLiveServiceOveruseCached(const nx::Uuid& id) const
-{
-    return m_liveOveruse.get().contains(id);
 }
 
 std::optional<int> ServiceManager::tierGracePeriodDaysLeft() const

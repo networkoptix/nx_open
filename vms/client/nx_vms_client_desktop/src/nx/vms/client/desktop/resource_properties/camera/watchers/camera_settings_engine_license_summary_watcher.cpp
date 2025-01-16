@@ -5,7 +5,7 @@
 #include <nx/vms/client/desktop/common/utils/engine_license_summary_provider.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 

@@ -26,7 +26,7 @@
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_tree_entity_builder.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/dialogs/common/message_box.h>
@@ -60,7 +60,7 @@ QModelIndexList filterSelectedIndexes(const QModelIndexList& selectedIndexes)
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::api;
-using namespace nx::vms::common::saas;
+using namespace nx::vms::license::saas;
 
 BackupSettingsViewWidget::BackupSettingsViewWidget(
     ServerSettingsDialogStore* store, QWidget* parent):

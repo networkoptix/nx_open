@@ -31,12 +31,12 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/ec2/ec_connection_notification_manager.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_fwd.h>
@@ -1788,7 +1788,7 @@ struct ModifyResourceParamAccess
         const nx::vms::api::ResourceParamWithRefData& param)
     {
         auto newEngines = QJson::deserialized<QSet<nx::Uuid>>(param.value.toUtf8());
-        nx::vms::common::saas::IntegrationServiceUsageHelper helper(systemContext);
+        nx::vms::license::saas::IntegrationServiceUsageHelper helper(systemContext);
         helper.proposeChange(param.resourceId, newEngines);
         if (helper.isOverflow())
         {
@@ -2111,7 +2111,7 @@ private:
 
             NX_DEBUG(this, "%1: Saas service is active");
 
-            nx::vms::common::saas::CloudStorageServiceUsageHelper helper(systemContext);
+            nx::vms::license::saas::CloudStorageServiceUsageHelper helper(systemContext);
             helper.proposeChange(
                 /*devicesToAdd*/ {param.cameraId}, /*devicesToRemove*/ std::set<nx::Uuid>());
             if (helper.isOverflow())

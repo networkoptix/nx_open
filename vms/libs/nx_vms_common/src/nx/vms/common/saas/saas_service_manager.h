@@ -131,21 +131,6 @@ public:
 
 
     /**
-     * @return true if live service overused
-     */
-    bool hasLiveServiceOveruse() const;
-
-    /**
-     * @return true if live service overused for provided camera
-     */
-    bool isLiveServiceOveruse(const nx::Uuid& cameraId) const;
-
-    /**
-     * @return true if live service overused. The value is cached and updated every 5 seconds.
-     */
-    bool isLiveServiceOveruseCached(const nx::Uuid& cameraId) const;
-
-    /**
      * @return true if any of tiers has overuse
      */
     bool hasTierOveruse() const;
@@ -260,7 +245,6 @@ private:
     std::vector<nx::utils::SharedGuardPtr> m_qtSignalGuards;
 
     nx::utils::CachedValue<std::chrono::milliseconds> m_tierGracePeriodExpirationTime;
-    nx::utils::CachedValueWithTimeout<std::set<nx::Uuid>> m_liveOveruse;
 };
 
 } // nx::vms::common::saas

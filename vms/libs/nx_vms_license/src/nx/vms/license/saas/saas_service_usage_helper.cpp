@@ -12,8 +12,10 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
+#include <nx/vms/license/usage_helper.h>
 
 using namespace nx::vms::api;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -31,7 +33,7 @@ int getMegapixels(const auto& camera)
 
 } // namespace
 
-namespace nx::vms::common::saas {
+namespace nx::vms::license::saas {
 
 // --------------------------- CloudServiceUsageHelper -------------------
 
@@ -578,23 +580,37 @@ LicenseSummaryDataEx LiveViewUsageHelper::info() const
 {
     LicenseSummaryDataEx result;
 
-    // Add local recording services as well.
-    for (const auto& [serviceId, parameters]:systemContext()->saasServiceManager()->localRecording())
-        result.available += parameters.totalChannelNumber;
-
-    LocalRecordingUsageHelper localRecording(systemContext());
-
     const auto cameras = getAllCameras();
-    for (const auto& camera: cameras)
+
+    if (systemContext()->saasServiceManager()->saasState() == api::SaasState::active)
     {
-        if (camera->isScheduleEnabled())
-            --result.available;
+        // Add local recording services as well.
+        for (const auto& [serviceId, parameters]:
+            systemContext()->saasServiceManager()->localRecording())
+        {
+            result.available += parameters.totalChannelNumber;
+        }
+        for (const auto& camera: cameras)
+        {
+            if (camera->isScheduleEnabled())
+                --result.available;
+        }
     }
+    else
+    {
+        // Add old licenses
+        nx::vms::license::CamLicenseUsageHelper helper(systemContext());
+        for (Qn::LicenseType licenseType: helper.licenseTypes())
+        {
+            result.available +=
+                helper.totalLicenses(licenseType) - helper.usedLicenses(licenseType);
+        }
+    }
+
     result.available = std::max(0, result.available);
 
     for (const auto& [serviceId, parameters]: systemContext()->saasServiceManager()->liveView())
         result.available += parameters.totalChannelNumber;
-
 
     for (const auto& camera: cameras)
     {
@@ -609,4 +625,4 @@ LicenseSummaryDataEx LiveViewUsageHelper::info() const
     return result;
 }
 
-} // nx::vms::common::saas
+} // nx::vms::license::saas

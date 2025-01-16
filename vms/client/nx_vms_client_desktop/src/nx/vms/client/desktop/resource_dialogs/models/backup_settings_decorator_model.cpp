@@ -24,7 +24,7 @@
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/system_settings.h>
 
 namespace {
@@ -133,7 +133,7 @@ struct BackupSettingsDecoratorModel::Private
     std::optional<nx::vms::api::BackupSettings> changedGlobalBackupSettings;
 
     bool isCloudBackupStorage = false;
-    std::unique_ptr<nx::vms::common::saas::CloudStorageServiceUsageHelper> cloudStorageUsageHelper;
+    std::unique_ptr<nx::vms::license::saas::CloudStorageServiceUsageHelper> cloudStorageUsageHelper;
 
     QSet<rest::Handle> requests;
 
@@ -816,7 +816,7 @@ void BackupSettingsDecoratorModel::loadState(const ServerSettingsDialogState& st
     d->isCloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
 
     d->cloudStorageUsageHelper.reset(d->isCloudBackupStorage
-        ? new nx::vms::common::saas::CloudStorageServiceUsageHelper(
+        ? new nx::vms::license::saas::CloudStorageServiceUsageHelper(
             systemContext(), kCloudStorageInfoUpdateInterval)
         : nullptr);
 

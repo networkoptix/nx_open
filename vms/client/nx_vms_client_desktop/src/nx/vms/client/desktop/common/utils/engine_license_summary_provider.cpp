@@ -10,7 +10,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/time/formatter.h>
 
 namespace nx::vms::client::desktop {
@@ -29,7 +29,7 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(nx::Uuid engineId) const
         if (!engine->plugin()->manifest().isLicenseRequired)
             return {};
 
-        auto summary = common::saas::IntegrationServiceUsageHelper{systemContext()}
+        auto summary = license::saas::IntegrationServiceUsageHelper{systemContext()}
             .info(engine->plugin()->manifest().id)
             .toVariantMap();
 
@@ -58,7 +58,7 @@ QVariant EngineLicenseSummaryProvider::licenseSummary(
         if (!engine->plugin()->manifest().isLicenseRequired)
             return {};
 
-        auto usageHelper = common::saas::IntegrationServiceUsageHelper{systemContext()};
+        auto usageHelper = license::saas::IntegrationServiceUsageHelper{systemContext()};
         if (NX_ASSERT(camera))
         {
             usageHelper.proposeChange(
@@ -86,7 +86,7 @@ QSet<nx::Uuid> EngineLicenseSummaryProvider::overusedEngines(
     QnResource* camera,
     const QSet<nx::Uuid>& proposedEngines) const
 {
-    auto usageHelper = common::saas::IntegrationServiceUsageHelper{systemContext()};
+    auto usageHelper = license::saas::IntegrationServiceUsageHelper{systemContext()};
     if (NX_ASSERT(camera))
         usageHelper.proposeChange(camera->getId(), proposedEngines);
 

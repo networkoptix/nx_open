@@ -15,7 +15,7 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_service_type_display_helper.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/time/formatter.h>
 
 namespace {
@@ -28,6 +28,7 @@ static constexpr auto kCameraSignalsAccumulationTimerInterval = 250ms;
 namespace nx::vms::client::desktop::saas {
 
 using namespace nx::vms::common::saas;
+using namespace nx::vms::license::saas;
 
 //-------------------------------------------------------------------------------------------------
 // ServicesUsageModel::Private declaration.

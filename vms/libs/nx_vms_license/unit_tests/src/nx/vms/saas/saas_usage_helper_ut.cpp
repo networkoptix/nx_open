@@ -10,11 +10,12 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_service_usage_helper.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
+#include <nx/vms/license/list_helper.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 
-namespace nx::vms::common::saas::test {
+namespace nx::vms::license::saas::test {
 
 struct TestPluginData
 {
@@ -649,6 +650,19 @@ TEST_F(SaasServiceUsageHelperTest, liveServiceUsage)
     ASSERT_EQ(15, liveDetails.available); // < 5 unused localRecording + 10 LiveView.
     ASSERT_EQ(25, liveDetails.inUse);
     ASSERT_EQ(10, liveDetails.exceedDevices.size());
+
+    // Switch system from saas to oldLicenseMode
+    manager->loadSaasData("");
+    liveDetails = m_liveHelper->info();
+    ASSERT_EQ(25, liveDetails.exceedDevices.size()); //< Thre is no recording licenses now.
+
+    nx::vms::license::setFakeLicenseCount(10, Qn::LicenseType::LC_Professional);
+    liveDetails = m_liveHelper->info();
+    ASSERT_EQ(20, liveDetails.exceedDevices.size()); //< 5 unused old Licenses applied
+
+    // Rollback state
+    nx::vms::license::setFakeLicenseCount(0, Qn::LicenseType::LC_Professional);
+    manager->loadSaasData(kSaasDataJson);
 }
 
-} // nx::vms::common::saas::test
+} // nx::vms::license::saas::test
