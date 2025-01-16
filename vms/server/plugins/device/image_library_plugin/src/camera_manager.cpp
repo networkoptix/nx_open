@@ -7,6 +7,7 @@
 #include "archive_reader.h"
 #include "media_encoder.h"
 #include "time_periods.h"
+#include "utils.h"
 
 static const int FRAME_DURATION_USEC = 1*1000*1000;
 
@@ -21,7 +22,7 @@ CameraManager::CameraManager(const nxcip::CameraInfo& info)
         nxcip::BaseCameraManager::hardwareMotionCapability |
         nxcip::BaseCameraManager::fixedQualityCapability ),
     m_dirContentsManager(
-        info.url,
+        fileUrlToPath(info.url),
         FRAME_DURATION_USEC)
 {
     m_pluginRef->addRef();

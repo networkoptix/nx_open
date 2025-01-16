@@ -12,6 +12,9 @@
 #include "camera_manager.h"
 #include "dir_iterator.h"
 #include "plugin.h"
+#include "utils.h"
+
+#include <nx/kit/debug.h>
 
 DiscoveryManager::DiscoveryManager()
 :
@@ -72,70 +75,57 @@ int DiscoveryManager::findCameras2(nxcip::CameraInfo2* /*cameras*/, const char* 
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
+int DiscoveryManager::checkHostAddress(
+    nxcip::CameraInfo* cameraInfo,
+    const char* address,
+    const char* /*login*/,
+    const char* /*password*/ )
 {
-    static constexpr char kFilePrefix[] = "file://";
-    const char* path = address;
-    if( strncmp( address, kFilePrefix, sizeof(kFilePrefix) - 1 ) == 0 )
-    if (strncmp(address, kFilePrefix, sizeof(kFilePrefix) - 1) == 0)
-    {
-        path += sizeof(kFilePrefix) - 1; //< Skip the prefix.
-        if (path[0] == '/') //< Skip the third slash, if any.
-            ++path;
-    }
+    using nx::kit::utils::toString;
 
-    const size_t pathLen = strlen( path );
-    if( pathLen == 0 || pathLen > FILENAME_MAX )
+    const std::string path = fileUrlToPath(address);
+
+    if (path.empty())
+    {
+        NX_PRINT << "The file path in the URL is empty.";
         return 0;
+    }
+    if (path.size() > FILENAME_MAX)
+    {
+        NX_PRINT << "The file path in the URL is longer than " << FILENAME_MAX << " characters.";
+        return 0;
+    }
 
     struct stat fStat;
-    memset( &fStat, 0, sizeof(fStat) );
-
-    if( path[pathLen-1] == '/' || path[pathLen-1] == '\\' )
+    memset(&fStat, 0, sizeof(fStat));
+    if (const int e = stat(path.c_str(), &fStat); e != 0)
     {
-        //removing trailing separator
-        char tmpNameBuf[FILENAME_MAX+1];
-        strcpy( tmpNameBuf, path );
-        for( char* pos = tmpNameBuf+pathLen-1;
-            pos >= tmpNameBuf && (*pos == '/' || *pos == '\\');
-            --pos )
-        {
-            *pos = '\0';
-        }
-        if( stat( tmpNameBuf, &fStat ) != 0 )
-            return 0;
-    }
-    else
-    {
-        if( stat( path, &fStat ) != 0 )
-            return 0;
-    }
-
-    if( !(fStat.st_mode & S_IFDIR) )
+        NX_PRINT << "stat(" << toString(path) << ") failed with code " << e << ".";
         return 0;
-
-    //path is a path to local directory
-
-    //checking, whether the path dir contains jpg images
-    DirIterator dirIterator( path );
-
-    //m_dirIterator.setRecursive( true );
-    dirIterator.setEntryTypeFilter( FsEntryType::etRegularFile );
-    dirIterator.setWildCardMask( "*.jp*g" );    //jpg or jpeg
-
-    //reading directory
-    bool isImageLibrary = false;
-    while( dirIterator.next() )
-    {
-        isImageLibrary = true;
-        break;
     }
-    if( !isImageLibrary )
-        return 0;
 
-    strcpy( cameras[0].url, path );
-    strcpy( cameras[0].uid, path );
-    strcpy( cameras[0].modelName, path );
+    if (!(fStat.st_mode & S_IFDIR))
+    {
+        NX_PRINT << "The URL path is not a directory.";
+        return 0;
+    }
+
+    // Checking whether the directory contains jpg images.
+    DirIterator dirIterator(path);
+    //m_dirIterator.setRecursive(true);
+    dirIterator.setEntryTypeFilter(FsEntryType::etRegularFile);
+    dirIterator.setWildCardMask("*.jp*g"); //< jpg or jpeg
+    if (!dirIterator.next())
+    {
+        NX_PRINT << "The directory " << toString(path) << " contains no .jpg or .jpeg files.";
+        return 0;
+    }
+
+    strcpy(cameraInfo->url, address); //< Use the full URL in this field.
+    strcpy(cameraInfo->uid, path.c_str());
+    strcpy(cameraInfo->modelName, path.c_str());
+
+    logCameraInfo(*cameraInfo, std::string("DiscoveryManager::") + __func__ + "()");
 
     return 1;
 }
