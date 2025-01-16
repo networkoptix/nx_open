@@ -599,6 +599,11 @@ namespace nxcip
             dontAutoOpenCamera                  = 0x200000,   //!< Server should not open video from camera at its will.
             noAnalytics                         = 0x400000,   //!< Analytics Engine mustn't bind to the Device.
             noVideo                             = 0x800000,   //!< Audio only device
+
+            /** Primary purpose of a device is IO module but not a camera.That flag affects UI/UX.
+             * If this flag is enabled, \a CameraRelayIOManager MUST be implemented.
+             */
+            ioDeviceCapability                  = 0x1000000
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
