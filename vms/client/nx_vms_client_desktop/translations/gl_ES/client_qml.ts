@@ -1889,7 +1889,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Intenta buscar outra cousa</translation>
     </message>
   </context>
   <context>
@@ -1945,7 +1945,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>SIN ACCESO</translation>
     </message>
   </context>
   <context>
