@@ -11,21 +11,21 @@ namespace nx::cloud::oauth2::client::test {
 class Oauth2ClientMockManager
 {
 public:
-    using RequstPath = std::pair<std::string /* Path */, std::string_view /* Method */>;
+    using RequestPath = std::pair<std::string /* Path */, std::string_view /* Method */>;
     using Response =
         std::pair<db::api::ResultCode /* result */, std::string /* serialized response*/>;
 
 public:
-    void setResponse(const RequstPath& requestPath, const Response& response);
-    void setRequest(const RequstPath& requestPath, const std::string& request);
-    int getNumCalls(const RequstPath& requestPath);
+    void setResponse(const RequestPath& requestPath, const Response& response);
+    void setRequest(const RequestPath& requestPath, const std::string& request = "*");
+    int getNumCalls(const RequestPath& requestPath);
 
 private:
     friend class Oauth2ClientMock;
 
     struct PathHash
     {
-        std::size_t operator()(const RequstPath& key) const
+        std::size_t operator()(const RequestPath& key) const
         {
             std::size_t h1 = std::hash<std::string>{}(key.first);
             std::size_t h2 = std::hash<std::string_view>{}(key.second);
@@ -34,9 +34,9 @@ private:
     };
 
 private:
-    std::unordered_map<RequstPath, Response, PathHash> m_responses;
-    std::unordered_map<RequstPath, std::string, PathHash> m_requests;
-    std::unordered_map<RequstPath, int, PathHash> m_requestsCounter;
+    std::unordered_map<RequestPath, Response, PathHash> m_responses;
+    std::unordered_map<RequestPath, std::string, PathHash> m_requests;
+    std::unordered_map<RequestPath, int, PathHash> m_requestsCounter;
 };
 
 class Oauth2ClientMock: public AbstractOauth2Client
@@ -51,6 +51,11 @@ public:
 
     void issueAuthorizationCode(
         const db::api::IssueTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
+            completionHandler) override;
+
+    void issuePasswordResetCode(
+        const db::api::IssuePasswordResetCodeRequest& request,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
             completionHandler) override;
 
@@ -100,14 +105,14 @@ public:
 
 private:
     template <class Request, class Response, class CompletionHandler>
-    void processRequst(
-        const Oauth2ClientMockManager::RequstPath& requestPath,
+    void processRequest(
+        const Oauth2ClientMockManager::RequestPath& requestPath,
         const Request& request,
         CompletionHandler handler);
 
     template<class Response, class CompletionHandler>
-    void processRequst(
-        const Oauth2ClientMockManager::RequstPath& requestPath,
+    void processRequest(
+        const Oauth2ClientMockManager::RequestPath& requestPath,
         CompletionHandler handler);
 
 private:
@@ -115,8 +120,8 @@ private:
 };
 
 template<class Request, class Response, class CompletionHandler>
-void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequst(
-    const Oauth2ClientMockManager::RequstPath& requestPath,
+void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequest(
+    const Oauth2ClientMockManager::RequestPath& requestPath,
     const Request& request,
     CompletionHandler handler)
 {
@@ -126,14 +131,22 @@ void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequst(
     else
         requestStr = nx::reflect::json::serialize(request);
 
-    NX_ASSERT(m_manager.m_requests.count(requestPath));
-    NX_ASSERT(m_manager.m_requests[requestPath] == requestStr);
-    processRequst<Response>(requestPath, std::move(handler));
+    if (!m_manager.m_requests.contains(requestPath))
+        NX_ASSERT(false, "Unexpected request path: %1", requestPath);
+
+    const std::string& registeredRequestStr = m_manager.m_requests[requestPath];
+    if (registeredRequestStr != "*" && registeredRequestStr != requestStr)
+    {
+        NX_ASSERT(false, "Unexpected request for path %1: %2. Should be: %3",
+            requestPath, requestStr, m_manager.m_requests[requestPath]);
+    }
+
+    processRequest<Response>(requestPath, std::move(handler));
 }
 
 template<class Response, class CompletionHandler>
-void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequst(
-    const Oauth2ClientMockManager::RequstPath& requestPath, CompletionHandler handler)
+void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequest(
+    const Oauth2ClientMockManager::RequestPath& requestPath, CompletionHandler handler)
 {
     m_manager.m_requestsCounter[requestPath]++;
     if constexpr (!std::is_same_v<Response, void>)

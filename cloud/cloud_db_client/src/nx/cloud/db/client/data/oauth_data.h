@@ -6,6 +6,10 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/url_query.h>
 
+#include "account_data.h"
+
 namespace nx::cloud::db::api {
+
+NX_REFLECTION_INSTRUMENT(IssuePasswordResetCodeRequest, (account)(codeExpirationTimeout))
 
 } // namespace nx::cloud::db::api

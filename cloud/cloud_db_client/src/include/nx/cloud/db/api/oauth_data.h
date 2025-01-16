@@ -10,6 +10,7 @@
 #include <nx/network/jose/jwt.h>
 #include <nx/reflect/instrument.h>
 
+#include "account_data.h"
 #include "two_factor_auth_data.h"
 
 namespace nx::cloud::db::api {
@@ -69,6 +70,15 @@ struct IssueTokenRequest
 
 NX_REFLECTION_INSTRUMENT(IssueTokenRequest, (grant_type)(response_type)(client_id)(scope) \
     (password)(username)(refresh_token)(code)(refresh_token_lifetime)(access_token))
+
+struct IssuePasswordResetCodeRequest
+{
+    /**%apidoc User account data.*/
+    AccountData account;
+
+    /**%apidoc Number of seconds the code will expire in.*/
+    std::optional<std::chrono::seconds> codeExpirationTimeout;
+};
 
 NX_REFLECTION_ENUM_CLASS(TokenType,
     bearer

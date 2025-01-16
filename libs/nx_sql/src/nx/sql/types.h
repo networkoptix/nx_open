@@ -32,6 +32,7 @@ NX_REFLECTION_ENUM_CLASS(DBResultCode,
     retryLater,
     uniqueConstraintViolation,
     connectionError,
+    externalServiceError,
     logicError,
     endOfData
 );

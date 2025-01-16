@@ -186,6 +186,7 @@ bool QueryExecutionThread::isDbErrorRecoverable(DBResultCode code)
 
         case DBResultCode::ioError:
         case DBResultCode::connectionError:
+        case DBResultCode::externalServiceError:
             return false;
 
         default:

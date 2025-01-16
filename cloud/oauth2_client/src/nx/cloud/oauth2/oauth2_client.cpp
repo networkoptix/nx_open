@@ -9,12 +9,15 @@
 
 namespace nx::cloud::oauth2::client {
 
+static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(10);
+
 Oauth2Client::Oauth2Client(
     const nx::utils::Url& url,
     const nx::network::http::Credentials& credentials):
     base_type(url, nx::network::ssl::kDefaultCertificateCheck)
 {
     setHttpCredentials(credentials);
+    setRequestTimeout(kDefaultRequestTimeout);
 }
 
 void Oauth2Client::issueToken(
@@ -36,6 +39,18 @@ void Oauth2Client::issueAuthorizationCode(
     base_type::template makeAsyncCall<db::api::IssueCodeResponse>(
         nx::network::http::Method::post,
         api::kOauthTokenPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
+}
+
+void Oauth2Client::issuePasswordResetCode(
+    const db::api::IssuePasswordResetCodeRequest& request,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)> handler)
+{
+    base_type::template makeAsyncCall<db::api::IssueCodeResponse>(
+        nx::network::http::Method::post,
+        api::kOauthPasswordResetCodePath,
         {}, // query
         std::move(request),
         std::move(handler));

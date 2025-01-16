@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <nx/cloud/db/api/oauth_data.h>
 #include <nx/cloud/db/api/result_code.h>
 #include <nx/cloud/db/client/async_http_requests_executor.h>
+#include <nx/cloud/db/client/data/oauth_data.h>
 #include <nx/network/http/generic_api_client.h>
 #include <nx/utils/basic_factory.h>
 
@@ -34,6 +34,11 @@ public:
 
     virtual void issueAuthorizationCode(
         const db::api::IssueTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
+            completionHandler) = 0;
+
+    virtual void issuePasswordResetCode(
+        const db::api::IssuePasswordResetCodeRequest& request,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
             completionHandler) = 0;
 
@@ -104,6 +109,11 @@ public:
 
     void issueAuthorizationCode(
         const db::api::IssueTokenRequest& request,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
+            completionHandler) override;
+
+    virtual void issuePasswordResetCode(
+        const db::api::IssuePasswordResetCodeRequest& request,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
             completionHandler) override;
 
