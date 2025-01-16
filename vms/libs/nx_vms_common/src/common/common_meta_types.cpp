@@ -83,7 +83,6 @@
 #include <recording/stream_recorder_data.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
-#include <utils/common/optional.h>
 #include <utils/math/space_mapper.h>
 
 using namespace nx::vms::common;
@@ -233,7 +232,6 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<QnRecordingStatsReply>();
 
-    qRegisterMetaType<QnOptionalBool>();
     qRegisterMetaType<QnIOPortData>();
     qRegisterMetaType<QnIOPortDataList>();
     qRegisterMetaType<QList<QMap<QString, QString>>>();
