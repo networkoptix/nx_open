@@ -182,22 +182,6 @@ This JSON object describes an Object type. It has the following fields:
     NOTE: The icons from the above mentioned icon collection that refer to various brands are not
     available for the VMS Taxonomy.
 
-- `"color"`: String
-
-    Optional. Defines the color of a bounding box used to show such Objects on the video. Can be
-    one of the following fixed values:
-    - `"Magenta"`
-    - `"Blue"`
-    - `"Green"`
-    - `"Yellow"`
-    - `"Cyan"`
-    - `"Purple"`
-    - `"Orange"`
-    - `"Red"`
-    - `"White"`
-
-    NOTE: This concept of color has no relation to the one used as an Attribute type.
-
 - `"base"`: String
 
     Optional name of an Object Type to inherit the Attributes from.
