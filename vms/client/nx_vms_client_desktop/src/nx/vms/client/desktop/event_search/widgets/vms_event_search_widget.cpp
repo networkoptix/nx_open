@@ -328,7 +328,7 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
     auto analyticsMenu = m_analyticsEventsSubmenuAction->menu();
 
     const QString currentSelection = m_eventModel->selectedSubType();
-    bool currentSelectionStillAvailable = false;
+    bool currentSelectionStillAvailable = currentSelection.isEmpty();
 
     auto addItemRecursive = nx::utils::y_combinator(
         [this, currentSelection, &currentSelectionStillAvailable]
@@ -377,10 +377,7 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
         if (!root->children.empty())
         {
             addMenuAction(
-                analyticsMenu,
-                rules::Strings::anyAnalyticsEvent(),
-                kAnalyticsEventType,
-                {});
+                analyticsMenu, rules::Strings::anyAnalyticsEvent(), kAnalyticsEventType);
 
             analyticsMenu->addSeparator();
             addItemRecursive(analyticsMenu, root);
