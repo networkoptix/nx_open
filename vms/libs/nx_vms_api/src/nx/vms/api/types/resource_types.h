@@ -266,7 +266,7 @@ enum ServerFlag
     SF_deprecated_TimeCtrl = 0x010,
 
     /**%apidoc[unused]
-     * System name is default, so it will be displayed as "Unassigned System' in NxTool.
+     * System name is not configured yet. Current value is auto-generated string.
      */
     SF_deprecated_AutoSystemName = 0x020,
 

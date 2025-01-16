@@ -23,7 +23,7 @@ struct NX_VMS_COMMON_API ConfigureSystemData: public PasswordData
     std::vector<nx::vms::api::UserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;
     bool rewriteLocalSettings = false;
-    QString systemName; //added for compatibility with NxTool
+    QString systemName;
     QString currentPassword; // required for password change only
     nx::Uuid mergeId;
     std::set<nx::Uuid> remoteRemovedObjects;
