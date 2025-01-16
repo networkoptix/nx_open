@@ -238,7 +238,12 @@ Dialog
                                             objectList.position)
 
                                         let y = objectList.position.y + objectList.contentY
-                                        y -= y % (objectList.itemHeight + objectList.spacing)
+                                        const shift = objectList.itemHeight / 2 + objectList.spacing
+                                        y -= (y + shift)
+                                            % (objectList.itemHeight + objectList.spacing)
+                                            - shift
+                                        if (y > objectList.mapFromItem(objectList.dragItem, 0, 0).y)
+                                            y -= objectList.itemHeight + objectList.spacing
                                         const hoveredItem = objectList.itemAt(
                                             objectList.position.x, y)
                                         objectList.hoveredItemIndex =
@@ -252,15 +257,20 @@ Dialog
                                 function drop()
                                 {
                                     autoScroller.velocity = 0
-                                    if (!drag.active
-                                        || objectList.hoveredItemIndex < 0
-                                        || !DragAndDrop.drop(
+                                    if (drag.active && objectList.hoveredItemIndex >= 0)
+                                    {
+                                        const index =
+                                            objectList.model.index(objectList.hoveredItemIndex, 0)
+                                        objectList.hoveredItemIndex = -1
+                                        if (DragAndDrop.drop(
                                             DragAndDrop.createMimeData([dragIndexWatcher.index]),
                                             Qt.MoveAction,
-                                            objectList.model.index(objectList.hoveredItemIndex, 0)))
-                                    {
-                                        cancelDrag()
+                                            index))
+                                        {
+                                            return
+                                        }
                                     }
+                                    cancelDrag()
                                 }
 
                                 function cancelDrag()
@@ -290,17 +300,17 @@ Dialog
             {
                 id: dropMarker
 
-                readonly property bool allowed: objectList.dragItem
+                readonly property bool relevant: objectList.dragItem
                     && objectList.hoveredItemIndex >= 0
                     && objectList.hoveredItemIndex !== dragIndexWatcher.index.row
-                visible: allowed
+                visible: relevant
                 width: objectList.width - objectList.itemMargin * 2
                 height: 2
                 color: ColorTheme.colors.brand_core
                 x: objectList.itemMargin
                 y:
                 {
-                    if (!allowed)
+                    if (!relevant)
                         return -1
 
                     const hoveredItem = objectList.itemAtIndex(objectList.hoveredItemIndex)
@@ -321,6 +331,7 @@ Dialog
                 width: objectList.width - objectList.itemMargin * 2
                 x: objectList.itemMargin
                 z: 10
+                opacity: 0.8
                 height: objectList.itemHeight
                 color: ColorTheme.colors.dark8
                 visible: !!objectList.dragItem
