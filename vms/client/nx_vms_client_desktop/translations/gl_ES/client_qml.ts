@@ -963,7 +963,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Intenta buscar outra cousa</translation>
     </message>
   </context>
   <context>

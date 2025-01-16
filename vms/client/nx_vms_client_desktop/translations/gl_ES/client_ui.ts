@@ -291,7 +291,7 @@
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Programado</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
