@@ -354,17 +354,9 @@ void AbstractSearchListModel::setInterestTimePeriod(const OptionalTimePeriod& va
         return;
 
     d->interestTimePeriod = value;
+    clear();
 
-    if (!d->interestTimePeriod
-        || !d->interestTimePeriod->isValid()
-        || !d->interestTimePeriod->isInfinite())
-    {
-        clear();
-    }
-
-    cancelFetch();
-
-    if (!d->interestTimePeriod || d->interestTimePeriod->isInfinite())
+    if (d->interestTimePeriod && !d->interestTimePeriod->isInfinite())
         setLive(false);
 
     emit dataNeeded();
