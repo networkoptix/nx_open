@@ -346,7 +346,7 @@
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Utwórz zakładkę</translation>
     </message>
     <message>
       <source>Add Tags</source>

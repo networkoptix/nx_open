@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Idioma de notificación</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Actualizacións de clientes sen conexión</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>As actualizacións sen conexión están habilitadas e os ficheiros almacénanse en servidores.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Ao activar esta opción activarase a descarga de ficheiros adicionais aos servidores que se poden usar para actualizar os clientes conectados, mesmo sen acceso a Internet.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Isto eliminará todos os ficheiros de actualización dos servidores.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Proceder de todos os xeitos?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Seleccionar / Deseleccionar todo</translation>
     </message>
   </context>
   <context>
@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Configuración de mosaicos</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Configuración da táboa</translation>
     </message>
   </context>
   <context>
@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Comprobe a configuración da administración do sitio para configurar este complemento.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Este complemento non ten ningunha configuración a nivel de sitio.</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>As integracións permiten a utilización sen problemas da análise de vídeo en varios dispositivos do VMS.
+Seleccione unha integración para comezar a configurar os seus parámetros.</translation>
     </message>
   </context>
   <context>
@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Código de emparellamento incorrecto</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -406,7 +406,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Compartido por ligazón</translation>
     </message>
   </context>
   <context>
@@ -697,25 +697,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Seleccionar tipo</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Ao eliminar atributos, eliminaranse todos os datos asociados</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Ao eliminar a lista, borraranse todos os datos que contén.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Eliminar a lista?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Esta lista está asociada con %n Regras de eventos. Seguro de que queres eliminala?</numerusform>
+        <numerusform>Esta lista está asociada con %n Regras de eventos. Seguro de que queres eliminala?</numerusform>
       </translation>
     </message>
   </context>
@@ -741,15 +741,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Exportar Listas</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Exportando</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Abrir o cartafol de ficheiros...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -825,7 +825,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Os filtros axudan a controlar o acceso ao sitio e a sincronización especificando que usuarios e/ou grupos do DN base están permitidos.</translation>
     </message>
   </context>
   <context>
@@ -922,7 +922,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Algúns valores non se puideron facer coincidir automaticamente. Por favor, asígnaos manualmente.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -2238,7 +2238,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Intenta buscar outra cousa</translation>
     </message>
   </context>
   <context>
@@ -2294,7 +2294,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>SIN ACCESO</translation>
     </message>
   </context>
   <context>

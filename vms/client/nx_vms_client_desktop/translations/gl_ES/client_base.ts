@@ -4433,7 +4433,7 @@ Clave de licenza: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Introducir URL</translation>
     </message>
     <message>
       <source>URL</source>
@@ -4826,7 +4826,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Configuración</translation>
     </message>
   </context>
   <context>
@@ -4881,7 +4881,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>SIN ACCESO</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
@@ -4893,7 +4893,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>SIN EMISIÓN EN VIVO</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -7404,7 +7404,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>SIN ACCESO</translation>
     </message>
     <message>
       <source>Select Target...</source>
@@ -8169,7 +8169,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Success</source>
@@ -11583,7 +11583,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Ir a Live/en vivo</translation>
     </message>
   </context>
   <context>
