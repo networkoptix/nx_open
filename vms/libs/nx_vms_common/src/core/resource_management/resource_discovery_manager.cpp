@@ -32,23 +32,6 @@
 
 using namespace nx::vms::common;
 
-// ------------------------------------ QnManualCameraInfo -----------------------------
-
-QnManualCameraInfo::QnManualCameraInfo(
-    const nx::utils::Url& url,
-    const QAuthenticator& auth,
-    const QString& resType,
-    const QString& physicalId,
-    nx::network::rest::audit::Record auditRecord)
-    :
-    url(url),
-    resType(qnResTypePool->getResourceTypeByName(resType)),
-    auth(auth),
-    physicalId(physicalId),
-    auditRecord(std::move(auditRecord))
-{
-}
-
 QnResourceDiscoveryManagerTimeoutDelegate::QnResourceDiscoveryManagerTimeoutDelegate( QnResourceDiscoveryManager* discoveryManager)
 :
     m_discoveryManager(discoveryManager)
@@ -69,8 +52,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager(
     nx::vms::common::SystemContextAware(systemContext),
     m_ready(false),
     m_state(InitialSearch),
-    m_discoveryUpdateIdx(0),
-    m_manualCameraListChanged(false)
+    m_discoveryUpdateIdx(0)
 {
     m_threadPool.setMaxThreadCount(resourceManagementIni().maxResourceDiscoveryThreadCount);
 }
@@ -530,81 +512,6 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     return !resources.isEmpty();
 }
 
-QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(
-    const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
-{
-    NX_MUTEX_LOCKER lock(&m_searchersListMutex);
-    return manualCameraInfoUnsafe(camera, auditRecord);
-}
-
-QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfoUnsafe(
-    const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const
-{
-    const auto resourceTypeId = camera->getTypeId();
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    NX_ASSERT(resourceType, lit("Resource type %1 was not found").arg(resourceTypeId.toString()));
-
-    const auto model = resourceType
-        ? resourceType->getName()
-        : camera->getModel();
-    QnManualCameraInfo info(
-        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getPhysicalId(), auditRecord);
-
-    for (const auto& searcher: m_searchersList)
-    {
-        if (searcher->isResourceTypeSupported(resourceTypeId))
-            info.searcher = searcher;
-    }
-
-    return info;
-}
-
-QSet<QString> QnResourceDiscoveryManager::registerManualCameras(
-    const std::vector<QnManualCameraInfo>& cameras)
-{
-    NX_MUTEX_LOCKER lock(&m_searchersListMutex);
-    QSet<QString> registeredUniqueIds;
-    for (const auto& camera: cameras)
-    {
-        // This is important to use reverse order of searchers as ONVIF resource type fits both
-        // ONVIF and FLEX searchers, while ONVIF is always last one.
-        for (auto searcherIterator = m_searchersList.rbegin();
-            searcherIterator != m_searchersList.rend();
-            ++searcherIterator)
-        {
-            auto searcher = *searcherIterator;
-            if (!camera.resType || !searcher->isResourceTypeSupported(camera.resType->getId()))
-                continue;
-
-            NX_DEBUG(this, nx::format("Manual camera %1 is registered for %2 on %3")
-                .args(camera.physicalId, typeid(*searcher), camera.url));
-
-            QnManualCameraInfo updatedManualCameraInfo = camera;
-            if (m_manualCameraByUniqueId.contains(camera.physicalId))
-                updatedManualCameraInfo.isUpdated = true;
-
-            const auto iterator = m_manualCameraByUniqueId.insert(
-                updatedManualCameraInfo.physicalId,
-                updatedManualCameraInfo);
-
-            iterator.value().searcher = searcher;
-            registeredUniqueIds << camera.physicalId;
-            m_manualCameraListChanged = true;
-            break;
-        }
-    }
-    return registeredUniqueIds;
-}
-
-bool QnResourceDiscoveryManager::isManuallyAdded(const QnVirtualCameraResourcePtr& camera) const
-{
-    if (!camera->isManuallyAdded())
-        return false;
-
-    NX_MUTEX_LOCKER lock(&m_searchersListMutex);
-    return m_manualCameraByUniqueId.contains(camera->getPhysicalId());
-}
-
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const
 {
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
@@ -682,12 +589,6 @@ void QnResourceDiscoveryManager::updateSearchersUsage()
     bool usePartialEnable = isRedundancyUsing();
     for(QnAbstractResourceSearcher *searcher: m_searchersList)
         updateSearcherUsageUnsafe(searcher, usePartialEnable);
-}
-
-void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources)
-{
-    processDiscoveredResources(resources, SearchType::Partial);
-    m_resourceProcessor->processResources(resources);
 }
 
 QnResourceList QnResourceDiscoveryManager::remapPhysicalIdIfNeed(const QnResourceList& resources)

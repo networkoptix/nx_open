@@ -27,25 +27,6 @@
 
 class QnAbstractResourceSearcher;
 
-struct NX_VMS_COMMON_API QnManualCameraInfo
-{
-    QnManualCameraInfo(nx::network::rest::audit::Record auditRecord): auditRecord(std::move(auditRecord)) {}
-    QnManualCameraInfo(
-        const nx::utils::Url& url,
-        const QAuthenticator& auth,
-        const QString& resType,
-        const QString& physicalId,
-        nx::network::rest::audit::Record auditRecord);
-
-    nx::utils::Url url;
-    QnResourceTypePtr resType;
-    QAuthenticator auth;
-    QnAbstractResourceSearcher* searcher = nullptr;
-    QString physicalId;
-    bool isUpdated = false;
-    nx::network::rest::audit::Record auditRecord;
-};
-
 class QnAbstractResourceSearcher;
 
 class QnResourceDiscoveryManager;
@@ -107,12 +88,6 @@ public:
 
     void setReady(bool ready);
 
-    /** Returns number of cameras that were successfully added. */
-    QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
-    bool isManuallyAdded(const QnVirtualCameraResourcePtr& camera) const;
-    QnManualCameraInfo manualCameraInfo(
-        const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
-
     ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
@@ -122,7 +97,6 @@ public:
 
     void setLastDiscoveredResources(const QnResourceList& resources);
     QnResourceList lastDiscoveredResources() const;
-    void addResourcesImmediatly(QnResourceList& resources);
 
     QThreadPool* threadPool();
     DiscoveryMode discoveryMode() const;
@@ -131,8 +105,6 @@ public slots:
 
 protected:
     virtual void run() override;
-    QnManualCameraInfo manualCameraInfoUnsafe(
-        const QnVirtualCameraResourcePtr& camera, const nx::network::rest::audit::Record& auditRecord) const;
 
 signals:
     void localSearchDone();
@@ -185,7 +157,6 @@ protected:
     mutable nx::Mutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QMap<QString, QnManualCameraInfo> m_manualCameraByUniqueId;
 
     bool m_server;
     std::atomic<bool> m_ready;
@@ -198,14 +169,10 @@ protected:
     // Ignore resources for 1 discovery loop.
     QSet<QString> m_resourcesToIgnore;
 
-    QHash<nx::Uuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
-    QHash<nx::Uuid, QnManualResourceSearchEntryList> m_searchProcessResults; // TODO: #virtualCamera unused!!!
-
     mutable nx::Mutex m_resListMutex;
     std::array<QnResourceList, 6> m_lastDiscoveredResources;
     int m_discoveryUpdateIdx;
 
 protected:
     unsigned int m_runNumber;
-    bool m_manualCameraListChanged;
 };
