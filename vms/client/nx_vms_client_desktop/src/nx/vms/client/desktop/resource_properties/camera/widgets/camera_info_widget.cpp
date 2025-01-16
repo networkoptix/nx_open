@@ -52,6 +52,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
     ui->eventLogButton->setIcon(qnSkin->icon(kEventLogIcon));
     ui->cameraRulesButton->setIcon(qnSkin->icon(kEventRulesIcon));
 
+    ui->restreamingLinkTitleHint->addHintLine(
+        tr("Use this link to add the camera to another site"));
+
     autoResizePagesToContents(ui->stackedWidget,
         {QSizePolicy::Preferred, QSizePolicy::Fixed},
         true);
@@ -79,6 +82,9 @@ CameraInfoWidget::CameraInfoWidget(QWidget* parent):
 
     connect(ui->cameraIdCopyButton, &ClipboardButton::clicked, this,
         [this]() { ClipboardButton::setClipboardText(ui->cameraIdLabel->text()); });
+
+    connect(ui->restreamingLinkCopyButton, &ClipboardButton::clicked, this,
+        [this]() { ClipboardButton::setClipboardText(m_restreamingUrl); });
 
     connect(ui->pingButton, &QPushButton::clicked, this,
         [this]() { emit actionRequested(menu::PingAction); });
@@ -175,6 +181,9 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->secondaryStreamLabel->setText(secondaryStreamUrl);
     ui->secondaryStreamCopyButton->setHidden(secondaryStreamUrl.isEmpty());
 
+    m_restreamingUrl = state.singleCameraProperties.restreamingUrl;
+    ui->restreamingLinkCopyButton->setHidden(m_restreamingUrl.isEmpty());
+
     // Hide certain fields for RTSP/HTTP links.
     const bool isNetworkLink = state.isSingleCamera()
         && state.singleCameraProperties.networkLink;
@@ -209,6 +218,9 @@ void CameraInfoWidget::loadState(const CameraSettingsDialogState& state)
     ui->verticalSpacer2->setHidden(isNetworkLink);
     ui->showOnLayoutButton->setHidden(!state.singleCameraProperties.permissions.
         testAnyFlags(Qn::ViewLivePermission | Qn::ViewFootagePermission));
+    ui->verticalSpacer3->setHidden(!state.saasInitialized);
+    ui->restreamingLinkTitleWidget->setHidden(!state.saasInitialized);
+    ui->restreamingLinkControlWidget->setHidden(!state.saasInitialized);
 }
 
 void CameraInfoWidget::alignLabels()
@@ -223,7 +235,8 @@ void CameraInfoWidget::alignLabels()
         ui->macAddressTitleLabel,
         ui->cameraIdTitleLabel,
         ui->primaryStreamTitleLabel,
-        ui->secondaryStreamTitleLabel});
+        ui->secondaryStreamTitleLabel,
+        ui->restreamingLinkTitleWidget});
 }
 
 void CameraInfoWidget::updatePalette()

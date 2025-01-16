@@ -881,6 +881,7 @@ public:
     int backupMegapixels(nx::vms::api::CameraBackupQuality quality) const;
 
     QnLiveStreamParams streamConfiguration(nx::vms::api::StreamIndex stream) const;
+    nx::utils::Url vmsCloudUrl() const;
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);

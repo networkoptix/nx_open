@@ -836,6 +836,7 @@ State loadSingleCameraProperties(
         singleCamera->streamInfo(StreamIndex::primary).getResolution();
     singleProperties.secondaryStreamResolution =
         singleCamera->streamInfo(StreamIndex::secondary).getResolution();
+    singleProperties.restreamingUrl = singleCamera->vmsCloudUrl().toString();
 
     singleProperties.supportedAnalyicsObjectTypes = singleCamera->supportedObjectTypes(
         /*filterByEngines*/ false);

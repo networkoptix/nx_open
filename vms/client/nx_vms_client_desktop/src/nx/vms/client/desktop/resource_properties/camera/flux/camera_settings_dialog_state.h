@@ -71,6 +71,8 @@ struct SingleCameraProperties
     QSize primaryStreamResolution;
     QSize secondaryStreamResolution;
 
+    QString restreamingUrl;
+
     std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
 
     /** Camera's supported object types, not filtered by engines. */

@@ -37,6 +37,7 @@ private:
 
 private:
     const QScopedPointer<Ui::CameraInfoWidget> ui;
+    QString m_restreamingUrl;
     nx::utils::ScopedConnections m_storeConnections;
 };
 

@@ -3286,3 +3286,24 @@ int QnVirtualCameraResource::backupMegapixels(nx::vms::api::CameraBackupQuality 
 
     return result;
 }
+
+nx::utils::Url QnVirtualCameraResource::vmsCloudUrl() const
+{
+    nx::utils::Url result;
+
+    if (!systemContext())
+        return result;
+
+    QString systemId = systemContext()->globalSettings()->cloudSystemId();
+    if (systemId.isEmpty())
+        return result;
+
+    result.setScheme("rtsp");
+    result.setHost(nx::format("%1.relay.vmsproxy.com", systemId));
+
+    result.setPath("/" + getId().toSimpleString());
+    result.setPort(443);
+    result.setQuery(QUrlQuery("stream=primary"));
+
+    return result;
+}

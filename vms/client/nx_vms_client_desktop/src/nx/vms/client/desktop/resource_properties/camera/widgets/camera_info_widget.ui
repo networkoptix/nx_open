@@ -106,7 +106,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" alignment="Qt::AlignTop">
+       <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignTop">
         <widget class="nx::vms::client::desktop::OptionalLabel" name="vendorLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -118,11 +118,11 @@
           <string notr="true">&lt;Vendor&gt;</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" alignment="Qt::AlignTop">
+       <item row="1" column="1" alignment="Qt::AlignmentFlag::AlignTop">
         <widget class="nx::vms::client::desktop::OptionalLabel" name="modelLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -134,11 +134,11 @@
           <string notr="true">&lt;E96&gt;</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
-       <item row="1" column="2" alignment="Qt::AlignTop">
+       <item row="1" column="2" alignment="Qt::AlignmentFlag::AlignTop">
         <widget class="QLabel" name="ipAddressLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -150,11 +150,11 @@
           <string notr="true">&lt;192.168.1.1&gt;</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
-       <item row="1" column="3" alignment="Qt::AlignTop">
+       <item row="1" column="3" alignment="Qt::AlignmentFlag::AlignTop">
         <widget class="QLabel" name="logicalIdLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -166,7 +166,7 @@
           <string notr="true">&lt;1&gt;</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -192,163 +192,147 @@
        <property name="verticalSpacing">
         <number>0</number>
        </property>
-       <item row="10" column="1">
-        <widget class="QWidget" name="primaryStreamControlWidget" native="true">
+       <item row="8" column="0">
+        <widget class="QWidget" name="verticalSpacer2" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>8</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>8</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLabel" name="logicalIdDetailLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>250</width>
-           <height>0</height>
+           <width>0</width>
+           <height>20</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="primaryStreamLayout">
-          <property name="spacing">
-           <number>12</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="nx::vms::client::desktop::OptionalLabel" name="primaryStreamLabel">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string notr="true">&lt;rtsp://192.168.1.1:554/vendor-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignTop">
-           <widget class="nx::vms::client::desktop::ClipboardButton" name="primaryStreamCopyButton">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>19</height>
-             </size>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="primaryStreamSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <property name="text">
+          <string notr="true">&lt;1&gt;</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QWidget" name="pingControlsWidget" native="true">
-         <layout class="QHBoxLayout" name="ipAddressDetailLayout">
-          <property name="spacing">
-           <number>8</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="ipAddressDetailLabel">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string notr="true">&lt;192.168.1.1&gt;</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item alignment="Qt::AlignTop">
-           <widget class="QPushButton" name="pingButton">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>19</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Ping</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>1</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+       <item row="0" column="0">
+        <widget class="QLabel" name="vendorDetailTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Vendor</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="modelDetailTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Model</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="primaryStreamTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Primary Stream</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="nx::vms::client::desktop::OptionalLabel" name="vendorDetailLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string notr="true">&lt;Vendor&gt;</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="nx::vms::client::desktop::OptionalLabel" name="modelDetailLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string notr="true">&lt;E96&gt;</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="nx::vms::client::desktop::OptionalLabel" name="webPageLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string notr="true">&lt;http://192.168.1.1/&gt;</string>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item row="11" column="1">
@@ -399,11 +383,11 @@
              <string notr="true">&lt;rtsp://192.168.1.1:554/vendor-media/media.amp?streamprofile=hdwitnessSecondary&gt;</string>
             </property>
             <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+             <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
-          <item alignment="Qt::AlignTop">
+          <item alignment="Qt::AlignmentFlag::AlignTop">
            <widget class="nx::vms::client::desktop::ClipboardButton" name="secondaryStreamCopyButton">
             <property name="maximumSize">
              <size>
@@ -425,7 +409,7 @@
           <item>
            <spacer name="secondaryStreamSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -438,129 +422,85 @@
          </layout>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QWidget" name="verticalSpacer2" native="true">
+       <item row="10" column="1">
+        <widget class="QWidget" name="primaryStreamControlWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>8</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>8</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="nx::vms::client::desktop::OptionalLabel" name="vendorDetailLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>20</height>
+           <width>250</width>
+           <height>0</height>
           </size>
          </property>
-         <property name="text">
-          <string notr="true">&lt;Vendor&gt;</string>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="firmwareTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Firmware</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="modelDetailTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Model</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" alignment="Qt::AlignVCenter">
-        <widget class="QLabel" name="ipAddressDetailTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>IP Address</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="cameraIdTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Camera ID</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="nx::vms::client::desktop::OptionalLabel" name="modelDetailLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string notr="true">&lt;E96&gt;</string>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="webPageTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Web Page</string>
-         </property>
+         <layout class="QHBoxLayout" name="primaryStreamLayout">
+          <property name="spacing">
+           <number>12</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="nx::vms::client::desktop::OptionalLabel" name="primaryStreamLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true">&lt;rtsp://192.168.1.1:554/vendor-media/media.amp?streamprofile=hdwitnessPrimary&gt;</string>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignmentFlag::AlignTop">
+           <widget class="nx::vms::client::desktop::ClipboardButton" name="primaryStreamCopyButton">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>19</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="primaryStreamSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
        <item row="2" column="1">
@@ -581,7 +521,201 @@
           <string notr="true">&lt;FFF-500-V1.23.45-AC&gt;</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="firmwareTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Firmware</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="secondaryStreamTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Secondary Stream</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="logicalIdDetailTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Logical ID</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="QWidget" name="verticalSpacer3" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>8</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>8</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="webPageTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Web Page</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QWidget" name="pingControlsWidget" native="true">
+         <layout class="QHBoxLayout" name="ipAddressDetailLayout">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="ipAddressDetailLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string notr="true">&lt;192.168.1.1&gt;</string>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignmentFlag::AlignTop">
+           <widget class="QPushButton" name="pingButton">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>19</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Ping</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>1</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QWidget" name="verticalSpacer1" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>8</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>8</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="cameraIdTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Camera ID</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" alignment="Qt::AlignmentFlag::AlignVCenter">
+        <widget class="QLabel" name="ipAddressDetailTitleLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>IP Address</string>
          </property>
         </widget>
        </item>
@@ -627,7 +761,7 @@
              <string notr="true">&lt;cf5bac1d-6b93-e517-41ab-6f13bbc7a2af&gt;</string>
             </property>
             <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+             <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
             </property>
            </widget>
           </item>
@@ -647,7 +781,7 @@
           <item>
            <spacer name="primaryStreamSpacer_2">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -658,32 +792,6 @@
            </spacer>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="primaryStreamTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Primary Stream</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="secondaryStreamTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Secondary Stream</string>
-         </property>
         </widget>
        </item>
        <item row="6" column="1">
@@ -704,7 +812,7 @@
           <string notr="true">&lt;FF-FF-FF-0C-76-E9&gt;</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -721,96 +829,103 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="logicalIdDetailTitleLabel">
+       <item row="13" column="1">
+        <widget class="QWidget" name="restreamingLinkControlWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Logical ID</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="QLabel" name="logicalIdDetailLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>20</height>
+           <width>250</width>
+           <height>0</height>
           </size>
          </property>
-         <property name="text">
-          <string notr="true">&lt;1&gt;</string>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-         </property>
+         <layout class="QHBoxLayout" name="secondaryStreamLayout_2">
+          <property name="spacing">
+           <number>12</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item alignment="Qt::AlignmentFlag::AlignTop">
+           <widget class="nx::vms::client::desktop::ClipboardButton" name="restreamingLinkCopyButton">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>19</height>
+             </size>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="restreamingLinkSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>1</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="nx::vms::client::desktop::OptionalLabel" name="webPageLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string notr="true">&lt;http://192.168.1.1/&gt;</string>
-         </property>
-         <property name="openExternalLinks">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="vendorDetailTitleLabel">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Vendor</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QWidget" name="verticalSpacer1" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>8</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>8</height>
-          </size>
-         </property>
+       <item row="13" column="0">
+        <widget class="QWidget" name="restreamingLinkTitleWidget" native="true">
+         <layout class="QHBoxLayout" name="restreamingLinkTitleLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="restreamingLinkTitleLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Restreaming Link</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="nx::vms::client::desktop::HintButton" name="restreamingLinkTitleHint" native="true"/>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -847,7 +962,7 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item alignment="Qt::AlignLeft">
+         <item alignment="Qt::AlignmentFlag::AlignLeft">
           <widget class="QPushButton" name="toggleInfoButton">
            <property name="text">
             <string notr="true">&lt;More info&gt;</string>
@@ -957,6 +1072,11 @@
    <class>nx::vms::client::desktop::OptionalLabel</class>
    <extends>QLabel</extends>
    <header location="global">nx/vms/client/desktop/common/widgets/optional_label.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::HintButton</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
