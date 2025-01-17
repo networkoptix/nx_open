@@ -33,7 +33,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 vms::rules::utils::kRecordBeforeFieldName,
                 tr("Pre-recording"),
                 {},
-                {.initialValue = 1s, .maximumValue = 600s, .minimumValue = 0s},
+                {.initialValue = 1s, .maximumValue = 60s, .minimumValue = 0s},
                 {utils::kDurationFieldName}),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,

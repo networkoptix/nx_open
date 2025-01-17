@@ -56,7 +56,7 @@
         <string>s</string>
        </property>
        <property name="maximum">
-        <number>600</number>
+        <number>60</number>
        </property>
        <property name="value">
         <number>10</number>
