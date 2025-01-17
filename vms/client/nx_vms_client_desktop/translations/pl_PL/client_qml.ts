@@ -556,7 +556,7 @@
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Aby umożliwić użytkownikom LDAP logowanie się do %1, konieczne jest nawiązanie połączenia między %1 a korporacyjnym serwerem LDAP.</translation>
     </message>
   </context>
   <context>
@@ -840,7 +840,7 @@
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the system level, group members have permissions to:</source>
-      <translation type="unfinished">At the system level, group members have permissions to:</translation>
+      <translation>Na poziomie systemu członkowie grupy mają uprawnienia do:</translation>
     </message>
     <message>
       <source>At the system level, the user has permissions to:</source>
@@ -1129,7 +1129,7 @@
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Wykorzystanie</translation>
     </message>
   </context>
   <context>
@@ -1267,11 +1267,11 @@
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt system availability for a large number of users simultaneously.</translation>
+      <translation>Proszę zachować ostrożność podczas zmiany ustawień LDAP. Nieprawidłowa konfiguracja może zakłócić dostępność witryny dla dużej liczby użytkowników jednocześnie.</translation>
     </message>
     <message>
       <source>Connect your System to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your System to an LDAP server for easier user management</translation>
+      <translation>Połącz swój system z serwerem LDAP, aby ułatwić zarządzanie użytkownikami</translation>
     </message>
     <message>
       <source>Not configured yet</source>
@@ -1283,7 +1283,7 @@
     </message>
     <message>
       <source>Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous sync with LDAP server is disabled for this system. Updates to groups and users and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Ciągła synchronizacja z serwerem LDAP jest wyłączona dla tego systemu. Aktualizacje grup i użytkowników oraz członkostwa w grupach będą wykonywane wyłącznie poprzez ręczną synchronizację.</translation>
     </message>
     <message>
       <source>Search Bases</source>
@@ -1552,7 +1552,7 @@
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Brak niestandardowych grup</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1568,7 +1568,7 @@
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Użyj przycisków z lewej strony, aby dodać do grupy</translation>
     </message>
     <message>
       <source>Member of</source>
@@ -1583,7 +1583,7 @@
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Wbudowane</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1622,31 +1622,31 @@
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Brak uprawnień niestandardowych</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Nie znaleziono zasobów</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Automatycznie dodaj zależne uprawnienia</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Użyj %1 lub %2, aby wybrać wiele zasobów, lub %3, aby wyczyścić wybór</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Tabela zasobów umożliwia przegląd uprawnień użytkowników lub grup i pozwala przypisać uprawnienia do określonych zasobów.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Jeśli wybierzesz uprawnienie zależne od innego uprawnienia, oba uprawnienia będą przyznawane automatycznie.</translation>
     </message>
   </context>
   <context>
@@ -1758,7 +1758,7 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Wciśnij klawisze strzałek, aby się poruszać. Użyj klawiszy plus i minus, aby powiększyć.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
@@ -1766,7 +1766,7 @@ aby aktywować PTZ</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Możesz ponownie włączyć ten przewodnik, przechodząc do Ustawień lokalnych &gt; Zaawansowane &gt; Zresetuj wszystkie ostrzeżenia</translation>
     </message>
     <message>
       <source>Introducing
@@ -1791,31 +1791,31 @@ na temat tego, co się zmieniło.</translation>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Aby użyć śledzenia blokady celu,
+naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>dzisiaj</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 godzina</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 godziny</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 dni</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 dni</translation>
     </message>
   </context>
   <context>
@@ -1856,32 +1856,32 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Posiada uprawnienia %1</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Dodaj %1 i zależne uprawnienia</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Dodaj uprawnienia %1</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Usuń %1 i zależne uprawnienia</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Usuń uprawnienia %1</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Dziedziczy również z</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
@@ -1890,11 +1890,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Już odziedziczone z</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Zostanie odziedziczone z</translation>
     </message>
   </context>
   <context>
@@ -1932,7 +1932,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Strony internetowe i integracje</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2051,19 +2051,19 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>System został zawieszony. Aby włączyć/wyłączyć korzystanie z integracji dla bieżącego urządzenia, system musi być w stanie aktywnym. Skontaktuj się ze swoim partnerem kanałowym, aby uzyskać szczegółowe informacje</translation>
     </message>
     <message>
       <source>System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been suspended. To enable/disable the integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>System został zawieszony. Aby włączyć/wyłączyć korzystanie z integracji dla niektórych urządzeń, system musi być w stanie aktywnym. Skontaktuj się ze swoim partnerem kanałowym, aby uzyskać szczegółowe informacje</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>System został wyłączony. Aby włączyć tę integrację dla bieżącego urządzenia, system musi być w stanie aktywnym. Skontaktuj się z partnerem kanału po szczegóły</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</translation>
+      <translation>System został wyłączony. Aby aktywować tę integrację dla niektórych urządzeń, system musi być w stanie aktywnym. Skontaktuj się z partnerem kanału po szczegóły</translation>
     </message>
   </context>
   <context>
@@ -2268,7 +2268,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Min. 3 znaki</translation>
     </message>
   </context>
   <context>
@@ -2286,11 +2286,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Zawsze</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Po zalogowaniu</translation>
     </message>
   </context>
   <context>
@@ -2298,19 +2298,19 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Ważne od %1 do %2 (wg czasu serwera)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Ważne od %1 do %2 (wg czasu serwera) lub przez %3 po zalogowaniu</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Link ważny do</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
@@ -2588,15 +2588,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Ustaw hasło, aby włączyć niezabezpieczone uwierzytelnianie</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Zezwalaj na niezabezpieczone uwierzytelnianie (digest)</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Tego użytkownika nie znaleziono w bazie danych LDAP i nie może się on zalogować.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2604,15 +2604,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Dostęp wygasa</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Link dostępowy</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Kopiuj link</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -2624,7 +2624,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Brak prawidłowego linku dla tego użytkownika</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -2633,7 +2633,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Uzyskiwanie linku...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>

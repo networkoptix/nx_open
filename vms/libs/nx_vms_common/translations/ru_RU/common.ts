@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Недопустимое содержимое JSON.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Неподдерживаемый тип содержимого.</translation>
     </message>
   </context>
   <context>
