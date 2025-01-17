@@ -81,11 +81,11 @@
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>
-      <translation type="unfinished">Can&apos;t download video</translation>
+      <translation>Nie można pobrać wideo</translation>
     </message>
     <message>
       <source>Please check a network connection.</source>
-      <translation type="unfinished">Please check a network connection.</translation>
+      <translation>Sprawdź połączenie sieciowe.</translation>
     </message>
   </context>
   <context>
@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Please check your internet connection</source>
-      <translation type="unfinished">Please check your internet connection</translation>
+      <translation>Sprawdź swoje połączenie internetowe</translation>
     </message>
   </context>
 </TS>
