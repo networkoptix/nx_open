@@ -1569,7 +1569,7 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Current password</source>
@@ -2423,7 +2423,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>ログイン</translation>
+      <translation>ログイン名</translation>
     </message>
     <message>
       <source>Full Name</source>

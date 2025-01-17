@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>Ingen legitimasjon oppgitt når endepunktet krever det.</translation>
     </message>
   </context>
   <context>

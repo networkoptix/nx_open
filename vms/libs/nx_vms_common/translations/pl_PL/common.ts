@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>Nie podano danych uwierzytelniających, mimo że są wymagane przez punkt końcowy.</translation>
     </message>
   </context>
   <context>
@@ -1891,7 +1891,7 @@
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+      <translation>Włącz przestarzałe funkcje API (niebezpieczne)</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
@@ -1900,11 +1900,11 @@
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Włącz przestarzałe funkcje API aktualnie używane przez oprogramowanie %1 (niebezpieczne)</translation>
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>ID organizacji</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
