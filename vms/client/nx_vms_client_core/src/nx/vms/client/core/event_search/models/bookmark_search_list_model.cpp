@@ -187,6 +187,9 @@ bool BookmarkSearchListModel::Private::requestFetch(
         .orderBy = QnBookmarkSortOrder(BookmarkSortField::startTime, sortOrder),
         .cameras = idsFromCameras(q->cameraSet().cameras())};
 
+    if (filter.text.indexOf(' ') > 0 && !filter.text.startsWith("\""))
+        filter.text = "\"" + filter.text + "\"";
+
     if (const auto& interestTimePeriod = q->interestTimePeriod())
     {
         filter.startTimeMs = interestTimePeriod->startTime();
