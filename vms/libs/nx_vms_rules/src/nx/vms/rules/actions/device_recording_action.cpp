@@ -52,7 +52,7 @@ const ItemDescriptor& DeviceRecordingAction::manifest()
                 "the recording duration before the event's start time.",
                 TimeFieldProperties{
                     .value = 1s,
-                    .maximumValue = 600s,
+                    .maximumValue = 60s,
                     .minimumValue = 0s}.toVariantMap()),
             utils::makeTimeFieldDescriptor<TimeField>(
                 vms::rules::utils::kRecordAfterFieldName,
