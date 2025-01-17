@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>エンドポイントで認証情報が要求されましたが、提供されませんでした。</translation>
     </message>
   </context>
   <context>
