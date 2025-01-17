@@ -100,7 +100,6 @@ Control
 
                 delayMs: CoreSettings.iniConfigValue("intervalPreviewDelayMs")
                 loopDelayMs: CoreSettings.iniConfigValue("intervalPreviewLoopDelayMs")
-                durationMs: CoreSettings.iniConfigValue("intervalPreviewDurationMs")
                 speedFactor: CoreSettings.iniConfigValue("intervalPreviewSpeedFactor")
 
                 anchors.fill: parent

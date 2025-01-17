@@ -22,7 +22,7 @@ Item
     property bool snippedPreview: false
 
     property real timestampMs: -1
-    property real durationMs: CoreSettings.iniConfigValue("intervalPreviewDurationMs")
+    property real durationMs: 0
     property real startTimeMs: timestampMs - durationMs / 2
 
     property real speedFactor: 1.0

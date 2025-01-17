@@ -60,7 +60,7 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Dev] Path to json file with basic colors that are used to generate the Color theme.\n"
         "If empty, the precompiled basic colors will be used.\n");
 
-	NX_INI_FLAG(false, delayLiveAnalyticsData,
+    NX_INI_FLAG(false, delayLiveAnalyticsData,
         "[Support] Prohibits showing live analytics before the corresponding frame appears on\n"
         "the camera if the camera is playing live");
 
@@ -80,9 +80,8 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     NX_INI_INT(500, intervalPreviewLoopDelayMs,
         "[Design] The delay time in milliseconds before interval video playback is restarted.");
 
-    NX_INI_INT(8000, intervalPreviewDurationMs,
-        "[Design] The duration of interval video playback in milliseconds.\n"
-        "Half of it is before exact preview timestamp and another half is after.");
+    NX_INI_INT(4000, previewPaddingTimeMs,
+        "[Design] Extra milliseconds before and after object preview.");
 
     NX_INI_INT(4, intervalPreviewSpeedFactor,
         "[Design] Interval preview video playback speed multiplier.");

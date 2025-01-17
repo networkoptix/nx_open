@@ -64,6 +64,7 @@ Rectangle
         {
             intervalPreview.resource = selectedItem.previewResource
             intervalPreview.timestampMs = selectedItem.previewTimestampMs
+            intervalPreview.durationMs = selectedItem.previewDurationMs
             intervalPreview.aspectRatio = selectedItem.previewAspectRatio
         }
     }

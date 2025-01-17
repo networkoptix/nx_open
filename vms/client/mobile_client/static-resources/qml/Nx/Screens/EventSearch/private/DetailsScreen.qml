@@ -545,22 +545,18 @@ Page
                 return;
 
             preview.resource = resource
-            preview.startTimeMs = accessor.getData(currentEventIndex, "timestampMs")
-            preview.durationMs = d.getPreviewDurationMs(currentEventIndex)
+
+            const paddingTimeMs = eventDetailsScreen.isAnalyticsDetails
+                ? CoreSettings.iniConfigValue("previewPaddingTimeMs")
+                : 0
+            preview.startTimeMs =
+                accessor.getData(currentEventIndex, "timestampMs") - paddingTimeMs
+            preview.durationMs =
+                accessor.getData(currentEventIndex, "durationMs") + paddingTimeMs * 2
             preview.setPosition(preview.startTimeMs)
             slider.value = preview.startTimeMs
 
             preview.play(preview.startTimeMs) //< Loads the stream anyway.
-        }
-
-        function getPreviewDurationMs(index)
-        {
-            // Duration for objects can't be less than the specified value in ini configuration.
-            const kMinimalDurationMs = CoreSettings.iniConfigValue("intervalPreviewDurationMs")
-            const durationMs = accessor.getData(index, "durationMs")
-            return eventDetailsScreen.isAnalyticsDetails
-                ? Math.max(durationMs, kMinimalDurationMs)
-                : durationMs
         }
 
         function updateStatusBarVisibility()
