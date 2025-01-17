@@ -165,6 +165,7 @@ struct SystemSettings::Private
 
     // misc adaptors
     QnResourcePropertyAdaptor<int>* maxEventLogRecordsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* maxBookmarksAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<QString>* systemNameAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* arecontRtspEnabledAdaptor = nullptr;
@@ -643,6 +644,9 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     d->eventLogPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "eventLogPeriodDays", 30, this, [] { return tr("Event log period (days)."); });
 
+    d->maxBookmarksAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        "maxBookmarks", 0, this, [] { return tr("Maximum number of bookmarks. Value less than or equal to 0 is infinite."); });
+
     d->trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         Names::trafficEncryptionForced, true, this,
         [] { return tr("Enforce HTTPS (data traffic encryption)."); });
@@ -1024,6 +1028,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         Qt::QueuedConnection);
 
     connect(
+        d->maxBookmarksAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::maxBookmarksChanged,
+        Qt::QueuedConnection);
+
+    connect(
         d->cameraSettingsOptimizationAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
         this,
@@ -1353,6 +1364,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->resourceFileUriAdaptor
         << d->maxHttpTranscodingSessionsAdaptor
         << d->maxEventLogRecordsAdaptor
+        << d->maxBookmarksAdaptor
         << d->forceLiveCacheForPrimaryStreamAdaptor
         << d->metadataStorageChangePolicyAdaptor
         << d->maxRtpRetryCountAdaptor
@@ -1470,6 +1482,16 @@ std::chrono::days SystemSettings::auditTrailPeriodDays() const
 std::chrono::days SystemSettings::eventLogPeriodDays() const
 {
     return std::chrono::days(d->eventLogPeriodDaysAdaptor->value());
+}
+
+int SystemSettings::maxBookmarks() const
+{
+    return d->maxBookmarksAdaptor->value();
+}
+
+void SystemSettings::setMaxBookmarks(int value)
+{
+    return d->maxBookmarksAdaptor->setValue(value);
 }
 
 bool SystemSettings::isTrafficEncryptionForced() const
@@ -1601,7 +1623,7 @@ bool SystemSettings::synchronizeNowSync()
     return resourcePropertyDictionary()->saveParams(d->admin->getId());
 }
 
-bool SystemSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
+bool SystemSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& /*mediaServer*/)
 {
     bool changed = false;
     for (const auto adapter: d->allAdaptors)

@@ -147,6 +147,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .licenseServer = QString{"https://licensing.vmsproxy.com"},
     .lowQualityScreenVideoCodec = QString{"mpeg2video"},
     .masterCloudSyncList = QString{},
+    .maxBookmarks = 0,
     .maxDifferenceBetweenSynchronizedAndInternetTime = 2'000,
     .maxDifferenceBetweenSynchronizedAndLocalTimeMs = 2s,
     .maxEventLogRecords = 100'000,

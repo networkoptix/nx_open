@@ -202,6 +202,9 @@ public:
     std::chrono::days auditTrailPeriodDays() const;
     std::chrono::days eventLogPeriodDays() const;
 
+    int maxBookmarks() const;
+    void setMaxBookmarks(int value);
+
     bool isTrafficEncryptionForced() const;
     void setTrafficEncryptionForced(bool value);
 
@@ -558,6 +561,7 @@ signals:
     void auditTrailEnableChanged();
     void auditTrailPeriodDaysChanged();
     void eventLogPeriodDaysChanged();
+    void maxBookmarksChanged();
     void cameraSettingsOptimizationChanged();
     void useHttpsOnlyForCamerasChanged();
     void autoUpdateThumbnailsChanged();

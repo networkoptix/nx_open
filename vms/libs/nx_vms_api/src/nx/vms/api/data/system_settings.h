@@ -88,6 +88,7 @@ struct SaveableSettingsBase
     std::optional<QString> licenseServer;
     std::optional<QString> lowQualityScreenVideoCodec;
     std::optional<QString> masterCloudSyncList;
+    std::optional<int> maxBookmarks;
     std::optional<int> maxDifferenceBetweenSynchronizedAndInternetTime; //< TODO: Make std::chrono.
     std::optional<std::chrono::milliseconds> maxDifferenceBetweenSynchronizedAndLocalTimeMs;
     std::optional<int> maxEventLogRecords;
@@ -169,6 +170,7 @@ struct SaveableSettingsBase
     (licenseServer) \
     (lowQualityScreenVideoCodec) \
     (masterCloudSyncList) \
+    (maxBookmarks) \
     (maxDifferenceBetweenSynchronizedAndInternetTime) \
     (maxDifferenceBetweenSynchronizedAndLocalTimeMs) \
     (maxEventLogRecords) \
