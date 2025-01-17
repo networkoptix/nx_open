@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Configuración</translation>
     </message>
     <message>
       <source>Quit</source>
