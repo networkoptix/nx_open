@@ -150,7 +150,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .maxDifferenceBetweenSynchronizedAndInternetTime = 2'000,
     .maxDifferenceBetweenSynchronizedAndLocalTimeMs = 2s,
     .maxEventLogRecords = 100'000,
-    .maxHttpTranscodingSessions = 2,
+    .maxHttpTranscodingSessions = 8,
     .maxP2pAllClientsSizeBytes = 1024 * 1024 * 128,
     .maxP2pQueueSizeBytes = 1024 * 1024 * 128,
     .maxRecordQueueSizeBytes = 1024 * 1024 * 24,

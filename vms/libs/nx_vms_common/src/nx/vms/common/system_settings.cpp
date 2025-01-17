@@ -707,7 +707,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [] { return tr("Max record queue size (elements, 250-4000)."); });
 
     d->maxHttpTranscodingSessionsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
-        Names::maxHttpTranscodingSessions, 2, this,
+        Names::maxHttpTranscodingSessions, 8, this,
         [] { return tr(
             "Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 "
             "connections at once, then closes the first one. "
