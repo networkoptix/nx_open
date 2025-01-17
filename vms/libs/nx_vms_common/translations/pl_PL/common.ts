@@ -1681,7 +1681,7 @@
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>Funkcje specyficzne dla wersji serwera VMS</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>

@@ -519,7 +519,7 @@
     </message>
     <message>
       <source>Additional recipients</source>
-      <translation type="unfinished">Additional recipients</translation>
+      <translation>Dodatkowi odbiorcy</translation>
     </message>
     <message>
       <source>Email Message</source>
