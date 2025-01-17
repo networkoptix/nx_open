@@ -1770,7 +1770,7 @@
     </message>
     <message>
       <source>VMS Server version specific features</source>
-      <translation type="unfinished">VMS Server version specific features</translation>
+      <translation>Funkcje specyficzne dla wersji serwera VMS</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
@@ -1882,7 +1882,7 @@
     </message>
     <message>
       <source>Organization Id</source>
-      <translation type="unfinished">Organization Id</translation>
+      <translation>ID organizacji</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1906,16 +1906,16 @@
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure)</translation>
+      <translation>Włącz przestarzałe funkcje API (niebezpieczne)</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>Włącz przestarzałe funkcje API aktualnie używane przez oprogramowanie %1 (niebezpieczne)</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>Odstęp czasu między żądaniami HTTP wysyłanymi do chmury w celu synchronizacji danych.</translation>
     </message>
   </context>
   <context>
