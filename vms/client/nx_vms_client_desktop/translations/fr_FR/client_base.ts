@@ -8110,12 +8110,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Connecter le site à %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Connecter le site à %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
@@ -9010,7 +9010,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Les sites seront fusionnés sous peu</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
@@ -9657,15 +9657,15 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Les serveurs de l’autre site apparaîtront dans l’arborescence des ressources une fois la synchronisation de la base de données terminée.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Les sites seront fusionnés sous peu</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>Impossible de fusionner les sites</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9720,16 +9720,16 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>Le site n'a pas été trouvé.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>Le site découvert %1 a une version incompatible %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>Le site sélectionné possède une ancienne version du logiciel qui est incompatible avec le site actuel. Mettez à jour le site sélectionné vers la dernière version pour le fusionner avec la version actuelle.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -9741,43 +9741,43 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>Vous êtes sur le point de fusionner des sites avec des licences NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Une seule licence NVR est autorisée par site, la deuxième licence sera donc désactivée.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>Impossible de configurer le site distant %1.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>Le site %1 ne peut être fusionné qu'avec des non-%1. Le nom du site et le mot de passe sont prélevés sur le site %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>Les deux sites sont connectés à %1. La fusion n'est pas autorisée.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>Les sites %1 ont des propriétaires différents. La fusion n'est pas autorisée.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Impossible de fusionner les sites car ils possèdent au moins un serveur avec le même identifiant. Veuillez supprimer ce serveur et réessayer.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>Le nom du site n'est pas encore configuré.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>Le nombre maximum de serveurs pour le site est atteint.</translation>
     </message>
   </context>
   <context>
@@ -9807,8 +9807,8 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>La détection de mouvement est actuellement désactivée pour cette caméra car le flux vidéo dépasse la résolution %1 * %2 .
+Vous pouvez forcer la détection de mouvement, mais cela peut entraîner une augmentation substantielle de la charge du processeur.</translation>
     </message>
   </context>
   <context>
@@ -10082,24 +10082,24 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>Les versions OS de certains composants ne sont plus supportées. Veuillez les retirer du Site ou mettre à jour leur système d'exploitation vers une version prise en charge.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>Instance %1 incompatible. Pour mettre à jour, déconnectez d'abord le site de %1 .</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>Il n'est pas recommandé d'appliquer les mises à jour en fin de semaine</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>Site mis à jour vers</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>Mise à jour du site en cours</translation>
     </message>
   </context>
   <context>
@@ -10113,7 +10113,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>Formats possibles :</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -10220,11 +10220,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>Le groupe LDAP par défaut ne peut pas être supprimé tant que le site est connecté au serveur LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>La gestion des utilisateurs pour les utilisateurs de l'organisation est disponible uniquement au niveau de l'organisation, et non au niveau du site</translation>
     </message>
   </context>
   <context>
@@ -10235,7 +10235,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>Impossible de reconnaître l'événement sur une caméra inaccessible.</translation>
     </message>
   </context>
   <context>
@@ -10271,15 +10271,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>Site actuel</translation>
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>Toute notification</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>Notifications d'événements</translation>
     </message>
     <message>
       <source>System Notifications</source>
@@ -10287,17 +10287,17 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Choisir les types...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Toute notification</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n type de notification</numerusform>
+        <numerusform>%n types de notifications</numerusform>
       </translation>
     </message>
   </context>
@@ -10305,7 +10305,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Sélectionner les types de notifications</translation>
     </message>
   </context>
   <context>
@@ -10566,7 +10566,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>Le site n'est pas connecté à %1. Les notifications mobiles ne fonctionnent que lorsque le site est connecté à %1.</translation>
     </message>
   </context>
   <context>
@@ -10665,11 +10665,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Actualisation automatique de l'intégration</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Actualisation automatique de la page Web</translation>
     </message>
   </context>
   <context>
@@ -11075,8 +11075,8 @@ Vous pouvez toujours changer la qualité et le FPS directement sur la caméra.</
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Les paramètres de qualité et de FPS sont désactivés en raison de l'option &quot;Autoriser l'optimisation des paramètres de la caméra&quot; dans la fenêtre &quot;Administration du site&quot; .
+Vous pouvez toujours modifier la qualité et le FPS directement sur la caméra.</translation>
     </message>
   </context>
   <context>
@@ -11178,17 +11178,17 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Une configuration supplémentaire peut être requise sur la machine serveur.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Le mot de passe de chiffrement sera nécessaire pour restaurer l'archive.
+Attention : ce mot de passe ne peut pas être réinitialisé. Si vous le perdez, l'archive sera irrécupérable.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Chiffre les données d'archives pour empêcher leur consultation en dehors du site. Vous ne serez pas obligé de saisir le mot de passe de chiffrement pour consulter les archives vidéo sur ce site.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
@@ -11887,7 +11887,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Il existe plusieurs groupes portant ce nom. Pour maintenir une structure claire et organisée, nous vous suggérons de fournir des noms uniques pour chaque groupe.</translation>
     </message>
   </context>
   <context>
@@ -11946,7 +11946,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Erreur du site</translation>
     </message>
   </context>
   <context>
@@ -11998,7 +11998,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Il existe un autre utilisateur avec ce login. Pour éviter tout problème, il est nécessaire que tous les utilisateurs disposent d'un login unique.</translation>
     </message>
   </context>
   <context>
@@ -12144,7 +12144,7 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Cela supprimera instantanément l'accès au site pour cet utilisateur</translation>
     </message>
   </context>
   <context>
@@ -12463,7 +12463,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>Indisponible en mode fenêtre dédiée</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>

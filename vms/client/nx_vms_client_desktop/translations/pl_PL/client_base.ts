@@ -5183,7 +5183,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Udostępnione</translation>
     </message>
     <message>
       <source>Isolated</source>
@@ -5319,7 +5319,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Udostępnione</translation>
     </message>
     <message>
       <source>Undefined</source>

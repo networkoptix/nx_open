@@ -1239,7 +1239,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Este complemento non ten ningunha configuración a nivel de sitio.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -2844,7 +2844,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Idioma de notificación</translation>
     </message>
   </context>
   <context>
@@ -2984,7 +2984,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Idioma de notificación</translation>
     </message>
     <message>
       <source>Interface Language</source>
