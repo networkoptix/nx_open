@@ -1919,7 +1919,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Dostępne według uprawnień</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2313,15 +2313,15 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Link pozostanie dostępny do określonej daty (w oparciu o czas serwera)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Cofnij dostęp po zalogowaniu</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Dostęp może zostać cofnięty wcześniej, jeżeli okres ważności łącza dobiegnie końca</translation>
     </message>
     <message>
       <source>In</source>
@@ -2485,7 +2485,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Zezwalaj na niezabezpieczone uwierzytelnianie (digest)</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
@@ -2679,7 +2679,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplikat</translation>
     </message>
     <message>
       <source>Delete</source>

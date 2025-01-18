@@ -11813,7 +11813,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Link dostępowy</translation>
     </message>
     <message>
       <source>Invalid Link</source>
@@ -12475,7 +12475,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Uzyskiwanie linku...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
@@ -12881,7 +12881,7 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Strony internetowe i integracje</translation>
     </message>
   </context>
   <context>
