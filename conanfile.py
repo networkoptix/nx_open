@@ -61,7 +61,6 @@ class NxOpenConan(ConanFile):
         "useClang": (True, False),
         "customization": "ANY",
         "installRuntimeDependencies": (True, False),
-        "onlyUnrevisionedPackages": (True, False),
     }
     default_options = {
         "targetDevice": None,
@@ -70,7 +69,6 @@ class NxOpenConan(ConanFile):
         "installRuntimeDependencies": True,
         "quick_start_guide:format": "pdf",
         "mobile_user_manual:format": "pdf",
-        "onlyUnrevisionedPackages": False,
     }
 
     ffmpeg_version_and_revision = "7.0.1#b9bb17f3bf3fcf3b1562a0ee030dcdd5"
@@ -140,11 +138,6 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        # Put any unrevisioned requirements here if necessary.
-
-        if self.options.onlyUnrevisionedPackages:
-            return
-
         self.build_requires("apidoctool/3.0" "#d64fbd2e42475cc531b5011fb70c2791")
         self.build_requires("qt-host/6.8.1" "#85e70e412be85fa75148b0c341cd78fb")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
@@ -172,9 +165,6 @@ class NxOpenConan(ConanFile):
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
     def requirements(self):
-        if self.options.onlyUnrevisionedPackages:
-            return
-
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#29029859608219dca154603c384f5442")

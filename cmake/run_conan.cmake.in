@@ -11,18 +11,6 @@ set(CONAN_EXECUTABLE "@CONAN_EXECUTABLE@")
 set(CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@")
 set(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
 
-# Possible values for conanUpdateMode:
-# - default: Conan is started once, doing full update, if possible. The script will check if the
-#     Conan remote is available and will not request the update if not. This is the default mode
-#     for manual script invokation.
-# - force: Like "default", but the update is requested unconditionally. Must be used in CI builds.
-#     A situation when the Conan remote is not available is not normal for CI.
-# - avoid: Conan may update packages if a new recipe revision was requested in conanfile.py. Use it
-#     if your internet connection is really slow and you want to reduce configuration time.
-# - min: Conan updates only requirements which do not specify a revision. Should be used by default
-#     in developer builds.
-set(conanUpdateMode "default" CACHE INTERNAL "") #< CACHE makes it possible to use `-D`.
-
 set(installSystemRequirements "OFF" CACHE INTERNAL "")
 
 set(conanNxRemote "@conanNxRemote@")
@@ -45,39 +33,13 @@ else()
     set(ENV{CONAN_SYSREQUIRES_MODE} "verify")
 endif()
 
-set(supported_update_modes default avoid min force)
-if(NOT conanUpdateMode IN_LIST supported_update_modes)
-    string(JOIN ", " supported_update_modes_string ${supported_update_modes})
-    message(FATAL_ERROR
-        "Unrecognized conanUpdateMode=${conanUpdateMode}. "
-        "Supported modes: ${supported_update_modes_string}.")
-endif()
-
-if("--update" IN_LIST conanFlags)
-    set(mode force)
-endif()
-
 function(run_conan)
-    cmake_parse_arguments(
-        CONAN "NO_UPDATE;NO_FAIL_ON_ERROR" "INSTALL_FOLDER;ERROR_MESSAGE" "" ${ARGV})
-
-    if(NOT CONAN_INSTALL_FOLDER)
-        set(CONAN_INSTALL_FOLDER ${CMAKE_BINARY_DIR})
-    endif()
-
-    if(CONAN_NO_UPDATE)
-        set(update_flag)
-    else()
-        set(update_flag --update)
-    endif()
-
     execute_process(
         COMMAND
             ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}
             ${conanFlags}
-            --install-folder ${CONAN_INSTALL_FOLDER}
-            ${update_flag}
-            ${CONAN_UNPARSED_ARGUMENTS}
+            --install-folder ${CMAKE_BINARY_DIR}
+            ${ARGV}
         COMMAND_ECHO STDERR
         RESULT_VARIABLE result
     )
@@ -85,64 +47,22 @@ function(run_conan)
     if(result EQUAL 0)
         set(CONAN_FAILED FALSE PARENT_SCOPE)
     else()
-        set(message_level FATAL_ERROR)
-        if(CONAN_NO_FAIL_ON_ERROR)
-            set(message_level WARNING)
-        endif()
-        if(NOT CONAN_ERROR_MESSAGE)
-            set(CONAN_ERROR_MESSAGE "Conan failed to install dependencies.")
-        endif()
-
-        message(${message_level} ${CONAN_ERROR_MESSAGE})
-
         set(CONAN_FAILED TRUE PARENT_SCOPE)
     endif()
 endfunction()
 
-function(check_remote)
-    file(
-        DOWNLOAD ${conanNxRemote}
-        STATUS status
-        TIMEOUT 3 #< Seconds.
-    )
-    list(GET status 0 status_code)
-    if(status_code STREQUAL "0")
-        set(REMOTE_ACCESSIBLE TRUE PARENT_SCOPE)
-    else()
-        message(WARNING "Conan remote URL ${conanNxRemote} is not accessible.")
-        set(REMOTE_ACCESSIBLE FALSE PARENT_SCOPE)
-    endif()
-endfunction()
+run_conan()
 
-if(conanUpdateMode STREQUAL force)
-    run_conan()
-else()
-    if(NOT conanUpdateMode STREQUAL avoid)
-        check_remote()
-        if(NOT REMOTE_ACCESSIBLE)
-            set(conanUpdateMode avoid)
-        endif()
-    endif()
+# TODO: Remove the second attempt with `--update` flag when the project is switched to Conan 2.
+# Conan 2 can hold multiple revisions in the local cache, thus it does not need this workaround to
+# replace downloaded recipe revisions.
+if(CONAN_FAILED)
+    message(WARNING "Conan failed to install dependencies. Retrying with `--update`.")
+    run_conan(--update)
+endif()
 
-    if(conanUpdateMode STREQUAL avoid)
-        run_conan(NO_UPDATE)
-    elseif(conanUpdateMode STREQUAL min)
-        run_conan(
-            --no-imports
-            -o onlyUnrevisionedPackages=True
-            INSTALL_FOLDER ${CMAKE_BINARY_DIR}/conan_tmp_install
-            ERROR_MESSAGE "Conan failed to update the unrevisioned packages."
-        )
-        file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/conan_tmp_install)
-
-        run_conan(NO_UPDATE NO_FAIL_ON_ERROR
-            ERROR_MESSAGE "Conan failed to install dependencies. Retrying with `--update`.")
-        if(CONAN_FAILED)
-            run_conan()
-        endif()
-    else() # Default mode.
-        run_conan()
-    endif()
+if(CONAN_FAILED)
+    message(FATAL_ERROR "Conan failed to install dependencies.")
 endif()
 
 file(COPY "${CMAKE_BINARY_DIR}/conan.lock" DESTINATION "${conanLockExportDir}/")

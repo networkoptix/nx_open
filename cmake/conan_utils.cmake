@@ -9,13 +9,6 @@ set(conanLockFile "" CACHE STRING "Install Conan packages using specified lock f
 set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
 set(customConanHome "" CACHE STRING "Custom Conan home directory.")
 
-set(default_conan_update_mode "force")
-if(developerBuild)
-    set(default_conan_update_mode "min")
-endif()
-set(conanUpdateMode ${default_conan_update_mode} CACHE STRING
-    "One of: default, force, min, avoid. See run_conan.cmake.in for details.")
-
 string(CONCAT installSystemRequirementsDoc
     "Allow installation of system requirements by Conan. "
     "This option does only work in an interactive shell.")
@@ -133,7 +126,6 @@ function(nx_run_conan)
         nx_execute_process_or_fail(
             COMMAND ${CMAKE_COMMAND}
                 -DinstallSystemRequirements=${installSystemRequirements}
-                -DconanUpdateMode=${conanUpdateMode}
                 -P ${run_conan_script}
             ERROR_MESSAGE "Conan execution failed."
         )
