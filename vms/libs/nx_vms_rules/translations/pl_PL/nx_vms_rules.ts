@@ -137,11 +137,11 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Występuje W</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Rozpocznij kiedy</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -185,11 +185,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>I Podpis</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>I Opis</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>I Obiekt</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -350,7 +350,7 @@
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Dodaj tagi</translation>
     </message>
   </context>
   <context>
@@ -361,7 +361,7 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Ograniczanie akcji</translation>
     </message>
   </context>
   <context>
@@ -376,11 +376,11 @@
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Sygnał na wejściu urządzenia</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Z ID</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
@@ -460,7 +460,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Wyjście urządzenia</translation>
     </message>
   </context>
   <context>
@@ -475,7 +475,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Nagrywanie kamery</translation>
     </message>
     <message>
       <source>On</source>
@@ -737,7 +737,7 @@
     </message>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Pokaż powiadomienie na pulpicie</translation>
     </message>
   </context>
   <context>
@@ -842,15 +842,15 @@
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Wykonaj ustawienie PTZ</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>Preset PTZ</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Wykonaj dla użytkowników</translation>
     </message>
   </context>
   <context>
@@ -865,11 +865,11 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Wyślij powiadomienie mobilne</translation>
     </message>
     <message>
       <source>Add Source Device name to Body</source>
-      <translation type="unfinished">Add Source Device name to Body</translation>
+      <translation>Dodaj nazwę urządzenia źródłowego do treści</translation>
     </message>
   </context>
   <context>
@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Powtórz dźwięk</translation>
     </message>
   </context>
   <context>
@@ -906,7 +906,7 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message>
       <source>License migration issue</source>
-      <translation type="unfinished">License migration issue</translation>
+      <translation>Problem z migracją licencji</translation>
     </message>
     <message>
       <source>Recording services disabled</source>
@@ -1047,7 +1047,7 @@
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Wymuś otwarcie układu alarmu</translation>
     </message>
   </context>
   <context>

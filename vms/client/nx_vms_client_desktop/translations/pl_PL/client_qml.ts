@@ -2842,7 +2842,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Zezwalaj na niezabezpieczone uwierzytelnianie (digest)</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
@@ -3044,7 +3044,7 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Duplikat</translation>
     </message>
     <message>
       <source>Delete</source>
