@@ -518,7 +518,7 @@ void UploadWorker::handleUpload()
 
     const auto callback = nx::utils::guarded(this,
         [this, chunk](
-            bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+            bool success, rest::Handle handle, const rest::EmptyResponseType&)
         {
             {
                 NX_MUTEX_LOCKER lock(&d->mutex);

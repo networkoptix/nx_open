@@ -77,6 +77,8 @@ class SystemContext;
 
 namespace rest {
 
+struct EmptyResponseType {};
+
 template <typename T>
 struct RestResultWithData
 {
@@ -179,7 +181,6 @@ public:
 
     void setUserId(const nx::Uuid& userId);
 
-    struct EmptyResponseType {};
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
 
     /**
@@ -1096,7 +1097,7 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerConnection::DebugFlags);
 
-using Empty = ServerConnection::EmptyResponseType;
+using Empty = EmptyResponseType;
 using ErrorOrEmpty = ServerConnection::ErrorOrEmpty;
 
 } // namespace rest

@@ -58,7 +58,7 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(
                 return;
 
             const auto callback = nx::utils::guarded(this,
-                [this](bool, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
+                [this](bool, rest::Handle, const rest::EmptyResponseType&)
                 {
                     accept();
                 });

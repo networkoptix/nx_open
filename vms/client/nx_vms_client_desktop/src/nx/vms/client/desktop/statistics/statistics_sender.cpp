@@ -56,7 +56,7 @@ struct StatisticsSender::Private
             [statisticsData](
                 bool success,
                 rest::Handle /*handle*/,
-                rest::ServerConnection::EmptyResponseType /*response */)
+                rest::EmptyResponseType /*response */)
             {
                 if (!success)
                     return;

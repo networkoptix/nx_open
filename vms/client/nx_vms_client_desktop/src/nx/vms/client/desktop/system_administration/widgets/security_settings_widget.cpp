@@ -543,7 +543,7 @@ void SecuritySettingsWidget::applyChanges()
         [this](
             bool success,
             rest::Handle requestId,
-            const rest::ServerConnection::EmptyResponseType& /*response*/)
+            const rest::EmptyResponseType& /*response*/)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
             m_currentRequest = 0;

@@ -404,7 +404,7 @@ void VirtualCameraWorker::handleUploadProgress(const UploadState& state)
         d->state.consumeProgress = 0;
 
         const auto callback = nx::utils::guarded(this,
-            [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+            [this](bool success, rest::Handle handle, const rest::EmptyResponseType&)
             {
                 d->requests.releaseHandle(handle);
                 handleConsumeStarted(success);
