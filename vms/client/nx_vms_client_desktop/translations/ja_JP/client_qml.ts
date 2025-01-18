@@ -2573,7 +2573,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation>終了</translation>
+      <translation>失効</translation>
     </message>
     <message>
       <source>New Link...</source>
