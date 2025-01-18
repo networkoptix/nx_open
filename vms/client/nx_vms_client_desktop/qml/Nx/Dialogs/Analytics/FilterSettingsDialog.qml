@@ -238,18 +238,17 @@ Dialog
                                             objectList.position)
 
                                         let y = objectList.position.y + objectList.contentY
-                                        const shift = objectList.itemHeight / 2 + objectList.spacing
-                                        y -= (y + shift)
-                                            % (objectList.itemHeight + objectList.spacing)
-                                            - shift
-                                        if (y > objectList.mapFromItem(objectList.dragItem, 0, 0).y)
-                                            y -= objectList.itemHeight + objectList.spacing
-                                        const hoveredItem = objectList.itemAt(
-                                            objectList.position.x, y)
+                                        const step = objectList.itemHeight + objectList.spacing
+                                        const shift = step / 2
+                                        let index = Math.floor((y - shift) / step)
+                                        if (index < dragIndexWatcher.index.row)
+                                            ++index
+                                        index = Math.max(0, Math.min(index, objectList.count - 1));
+                                        const hoveredItem = objectList.itemAtIndex(index)
                                         objectList.hoveredItemIndex =
                                             hoveredItem
                                             && hoveredItem.itemFlags & Qt.ItemIsDropEnabled
-                                                ? hoveredItem.modelIndex.row
+                                                ? index
                                                 : -1
                                     }
                                 }
