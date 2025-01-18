@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <variant>
-
 #include <QtCore/QThread>
 
 #include <analytics/db/analytics_db_types.h>
@@ -66,7 +64,7 @@
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_diagnostics.h>
 
-#include "server_rest_connection_fwd.h"
+#include "rest_types.h"
 
 namespace nx::vms::common {
 
@@ -77,36 +75,7 @@ class SystemContext;
 
 namespace rest {
 
-struct EmptyResponseType {};
-
-template <typename T>
-struct RestResultWithData
-{
-    RestResultWithData() {}
-    RestResultWithData(const nx::network::rest::Result& restResult, T data):
-        error(restResult.errorId),
-        errorString(restResult.errorString),
-        data(std::move(data))
-    {
-    }
-
-    RestResultWithData(const RestResultWithData&) = delete;
-    RestResultWithData(RestResultWithData&&) = default;
-    RestResultWithData& operator=(const RestResultWithData&) = delete;
-    RestResultWithData& operator=(RestResultWithData&&) = default;
-
-    nx::network::rest::ErrorId error = nx::network::rest::ErrorId::ok;
-    QString errorString;
-    T data;
-};
-
-template<typename Data>
-using ErrorOrData = nx::utils::expected<Data, nx::network::rest::Result>;
-
 using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
-
-template<typename ResultType>
-using Callback = nx::utils::MoveOnlyFunc<void (bool success, Handle requestId, ResultType result)>;
 
 /**
  * Class for HTTP requests to mediaServer.
@@ -172,9 +141,6 @@ public:
      * Default callback type for GET requests without result data.
      */
     using GetCallback = Callback<nx::network::rest::JsonResult>;
-
-    using DataCallback = nx::utils::MoveOnlyFunc<void(bool success, Handle requestId,
-        QByteArray result, const nx::network::http::HttpHeaders& headers)>;
 
     using ContextPtr = nx::network::http::ClientPool::ContextPtr;
 
@@ -929,33 +895,10 @@ public:
     static void setDebugFlag(DebugFlag flag, bool on);
 
 private:
-    template<typename ResultType>
-    Callback<ResultType> makeSessionAwareCallback(
-        nx::vms::common::SessionTokenHelperPtr helper,
-        nx::network::http::ClientPool::Request request,
-        Callback<ResultType> callback,
-        std::optional<nx::network::http::AsyncClient::Timeouts> timeouts = {});
-
-    template<typename ResultType, typename... CallbackParameters, typename... Args>
-    Callback<ResultType> makeSessionAwareCallbackInternal(
-        nx::vms::common::SessionTokenHelperPtr helper,
-        nx::network::http::ClientPool::Request request,
-        Callback<ResultType> callback,
-        std::optional<nx::network::http::AsyncClient::Timeouts> timeouts,
-        Args&&... args);
-
-    template <typename ResultType>
-    Handle executeRequest(
+    ContextPtr prepareContext(
         const nx::network::http::ClientPool::Request& request,
-        Callback<ResultType> callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<Timeouts> timeouts = {});
-
-    Handle executeRequest(
-        const nx::network::http::ClientPool::Request& request,
-        DataCallback callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<Timeouts> timeouts = {});
+        nx::utils::MoveOnlyFunc<void (ContextPtr)> callback,
+        std::optional<Timeouts> timeouts = std::nullopt);
 
     QUrl prepareUrl(const QString& path, const nx::network::rest::Params& params) const;
 
@@ -981,13 +924,6 @@ private:
         const QUrl& url,
         const nx::String& messageBody = {});
 
-    /** Passes request to ClientPool. */
-    Handle sendRequest(
-        const nx::network::http::ClientPool::Request& request,
-        nx::utils::MoveOnlyFunc<void (ContextPtr)> callback = {},
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<Timeouts> timeouts = {});
-
     /** Passes Context to ClientPool. */
     Handle sendRequest(const nx::network::http::ClientPool::ContextPtr& context);
 
@@ -998,10 +934,10 @@ private:
     /**
      * Generic requests, for the types, that should not be exposed to common library.
      */
-    template<typename CallbackType> Handle executeGet(
+    template<typename ResultType> Handle executeGet(
         const QString& path,
         const nx::network::rest::Params& params,
-        CallbackType callback,
+        Callback<ResultType> callback,
         QThread* targetThread,
         std::optional<nx::Uuid> proxyToServer = {},
         std::optional<Timeouts> timeouts = std::nullopt);
