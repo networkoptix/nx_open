@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Rodzaj</translation>
     </message>
     <message>
       <source>And Caption</source>
@@ -408,11 +408,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>I Podpis</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>I Opis</translation>
     </message>
   </context>
   <context>
@@ -496,11 +496,11 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Rozpocznij kiedy</translation>
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Występuje w</translation>
     </message>
   </context>
   <context>
@@ -669,7 +669,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Występuje w</translation>
     </message>
     <message>
       <source>For Plugin</source>
@@ -677,11 +677,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>I Podpis</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>I Opis</translation>
     </message>
     <message>
       <source>And Level Is</source>
@@ -713,7 +713,7 @@
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Rozpocznij kiedy</translation>
     </message>
   </context>
   <context>
@@ -979,7 +979,7 @@
     </message>
     <message>
       <source>Occurs at</source>
-      <translation type="unfinished">Occurs at</translation>
+      <translation>Występuje w</translation>
     </message>
     <message>
       <source>By</source>
