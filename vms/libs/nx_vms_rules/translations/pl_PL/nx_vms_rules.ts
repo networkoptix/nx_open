@@ -181,7 +181,7 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Rodzaj</translation>
     </message>
     <message>
       <source>And Caption</source>
