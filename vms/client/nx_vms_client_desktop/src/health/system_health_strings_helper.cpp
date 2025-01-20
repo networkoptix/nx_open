@@ -302,7 +302,7 @@ QString QnSystemHealthStringsHelper::resourceText(
 
     QStringList formattedResources;
     for (int i = 0; i < list.size() && i < maxResourcesLines; ++i)
-        formattedResources.append(nx::utils::elideString(list[i], maxWidth, "(...)"));
+        formattedResources.append(nx::utils::elideString(list[i], maxWidth, "..."));
 
     if (list.size() > maxResourcesLines)
     {
