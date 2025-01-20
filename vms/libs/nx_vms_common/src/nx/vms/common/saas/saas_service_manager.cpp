@@ -49,7 +49,8 @@ namespace nx::vms::common::saas {
 
 ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     QObject(parent),
-    SystemContextAware(context)
+    SystemContextAware(context),
+    m_mutex(nx::Mutex::Recursive)
 {
     using namespace nx::vms::api;
 
