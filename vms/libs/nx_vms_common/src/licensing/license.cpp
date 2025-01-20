@@ -701,7 +701,7 @@ QnLicensePtr QnLicensePool::findLicense(const QString& key) const
     return nullptr;
 }
 
-void QnLicensePool::addLicense_i(const QnLicensePtr& license)
+void QnLicensePool::addLicenseUnsafe(const QnLicensePtr& license)
 {
     if (!license)
         return;
@@ -711,30 +711,34 @@ void QnLicensePool::addLicense_i(const QnLicensePtr& license)
 
 void QnLicensePool::addLicense(const QnLicensePtr& license)
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
-    addLicense_i(license);
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        addLicenseUnsafe(license);
+    }
     emit licensesChanged();
 }
 
 void QnLicensePool::removeLicense(const QnLicensePtr& license)
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    m_licenseDict.remove(license->key());
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        m_licenseDict.remove(license->key());
+    }
     emit licensesChanged();
 }
 
-void QnLicensePool::addLicenses_i(const QnLicenseList& licenses)
+void QnLicensePool::addLicensesUnsafe(const QnLicenseList& licenses)
 {
     for(const QnLicensePtr& license: licenses)
-        addLicense_i(license);
+        addLicenseUnsafe(license);
 }
 
 void QnLicensePool::addLicenses(const QnLicenseList& licenses)
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
-    addLicenses_i(licenses);
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        addLicensesUnsafe(licenses);
+    }
     emit licensesChanged();
 }
 
@@ -742,19 +746,20 @@ void QnLicensePool::replaceLicenses(const api::LicenseDataList& licenses)
 {
     QnLicenseList qnLicences;
     ec2::fromApiToResourceList(licenses, qnLicences);
-
-    NX_MUTEX_LOCKER locker(&m_mutex);
-
-    m_licenseDict.clear();
-    addLicenses_i(qnLicences);
-
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        m_licenseDict.clear();
+        addLicensesUnsafe(qnLicences);
+    }
     emit licensesChanged();
 }
 
 void QnLicensePool::reset()
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
-    m_licenseDict = QnLicenseDict();
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        m_licenseDict = QnLicenseDict();
+    }
     emit licensesChanged();
 }
 
