@@ -466,17 +466,6 @@ Item
                         }
                     }
 
-                    CenteredField
-                    {
-                        visible: allowInsecureCheckBox.checked
-                            && allowInsecureCheckBox.visible
-
-                        InsecureWarning
-                        {
-                            width: parent.width
-                        }
-                    }
-
                     Item
                     {
                         height: 64 - contentColumn.spacing * 2
@@ -907,6 +896,16 @@ Item
                 text: qsTr("When continuous sync with LDAP server is disabled, user membership in " +
                     "groups does not synchronize automatically. To update this information, " +
                     "initiate a manual sync.")
+            }
+
+            InsecureBanner
+            {
+                Layout.fillWidth: true
+
+                login: control.login
+                watchToReopen: control.userId
+                visible: allowInsecureCheckBox.checked
+                    && allowInsecureCheckBox.visible
             }
         }
     }

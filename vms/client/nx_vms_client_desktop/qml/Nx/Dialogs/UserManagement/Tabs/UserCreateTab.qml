@@ -92,6 +92,7 @@ Item
     {
         id: scroll
         anchors.fill: parent
+        anchors.bottom: insecureBanner.top
 
         contentItem: Column
         {
@@ -346,17 +347,6 @@ Item
 
             CenteredField
             {
-                visible: allowInsecureCheckBox.checked
-                    && allowInsecureCheckBox.visible
-
-                InsecureWarning
-                {
-                    width: parent.width
-                }
-            }
-
-            CenteredField
-            {
                 visible: control.userType == UserSettingsGlobal.CloudUser
 
                 Text
@@ -401,5 +391,17 @@ Item
                 }
             }
         }
+    }
+
+    InsecureBanner
+    {
+        id: insecureBanner
+        anchors.left: control.left
+        anchors.right: control.right
+        anchors.bottom: control.bottom
+
+        login: control.login
+        visible: allowInsecureCheckBox.checked
+            && allowInsecureCheckBox.visible
     }
 }
