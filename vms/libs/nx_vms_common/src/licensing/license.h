@@ -227,8 +227,8 @@ signals:
     void licensesChanged();
 
 private:
-    void addLicense_i(const QnLicensePtr& license);
-    void addLicenses_i(const QnLicenseList& licenses);
+    void addLicenseUnsafe(const QnLicensePtr& license);
+    void addLicensesUnsafe(const QnLicenseList& licenses);
 
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
