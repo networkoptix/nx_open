@@ -5,23 +5,23 @@
 #include <optional>
 
 #include <api/runtime_info_manager.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 #include <licensing/license.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/qt_direct_connect.h>
 #include <nx/vms/api/data/ldap.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
-#include <nx/utils/qt_direct_connect.h>
 #include <utils/common/synctime.h>
 
 static const QString kAdditionTierLimitsPropertyKey("additionTierLimits");
@@ -80,6 +80,7 @@ namespace nx::vms::common::saas {
 ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     QObject(parent),
     SystemContextAware(context),
+    m_mutex(nx::Mutex::Recursive),
     m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); })
 {
     connect(
