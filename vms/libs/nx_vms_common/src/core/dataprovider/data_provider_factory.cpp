@@ -37,7 +37,7 @@ QnAbstractStreamDataProvider* QnDataProviderFactory::createDataProvider(
 {
     for (const auto& gen: d->data)
     {
-        if (resource->inherits(gen.className))
+        if (resource->(gen.className))
             return gen.generator(resource, role);
     }
     NX_ASSERT(false, "Data provider is not registered.");

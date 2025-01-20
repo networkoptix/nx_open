@@ -352,7 +352,6 @@ public:
     void setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value);
 
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
-    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
     // Returns user-defined camera name (if not empty), default name otherwise
     QString getUserDefinedName() const;
