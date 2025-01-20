@@ -399,7 +399,7 @@ QString Strings::getName(
     if (tryNames)
     {
         if (users.size() == 1 && groups.empty())
-            return users.front()->getName();
+            return users.front()->displayName();
 
         if (users.empty() && groups.size() <= 2)
         {

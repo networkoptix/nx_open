@@ -125,6 +125,9 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
 
         if (const auto storage = m_resource.dynamicCast<QnStorageResource>())
             m_name = storage->getUrl();
+
+        if (const auto user = m_resource.dynamicCast<QnUserResource>())
+            m_name = user->displayName();
     }
 
     if (detailLevel == Qn::RI_NameOnly)

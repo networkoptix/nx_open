@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/branding.h>
 #include <nx/utils/math/math.h>
@@ -40,31 +41,37 @@ const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");
 const QByteArray QnAuditLogModel::kSourceServerParamName("srcSrv");
 
-namespace
+namespace {
+
+QString firstResourceName(const QnLegacyAuditRecord *d1)
 {
-    QString firstResourceName(const QnLegacyAuditRecord *d1)
-    {
-        auto resourcePool = qnClientCoreModule->resourcePool();
+    auto resourcePool = qnClientCoreModule->resourcePool();
 
-        if (d1->resources.empty())
-            return QString();
-        if (QnResourcePtr res = resourcePool->getResourceById(d1->resources[0]))
-            return res->getName();
-        else
-            return QString();
-    }
+    if (d1->resources.empty())
+        return QString();
+    if (QnResourcePtr res = resourcePool->getResourceById(d1->resources[0]))
+        return res->getName();
+    else
+        return QString();
+}
 
-    QString firstResourceIp(const QnLegacyAuditRecord *d1)
-    {
-        auto resourcePool = qnClientCoreModule->resourcePool();
+QString firstResourceIp(const QnLegacyAuditRecord *d1)
+{
+    auto resourcePool = qnClientCoreModule->resourcePool();
 
-        if (d1->resources.empty())
-            return QString();
-        if (QnVirtualCameraResourcePtr res = resourcePool->getResourceById<QnVirtualCameraResource>(d1->resources[0]))
-            return res->getHostAddress();
-        else
-            return QString();
-    }
+    if (d1->resources.empty())
+        return QString();
+    if (QnVirtualCameraResourcePtr res = resourcePool->getResourceById<QnVirtualCameraResource>(d1->resources[0]))
+        return res->getHostAddress();
+    else
+        return QString();
+}
+
+QString displayName(const QString& name)
+{
+    const auto user = qnClientCoreModule->resourcePool()->userByName(name).first;
+    return user ? user->displayName() : name;
+}
 
 QString sourceServerName(const QnResourcePool* resourcePool, const QnLegacyAuditRecord *rec)
 {
@@ -677,7 +684,7 @@ QString QnAuditLogModel::textData(const Column& column, const QnLegacyAuditRecor
                 return QString();
 
         case UserNameColumn:
-            return data->authSession.userName;
+            return displayName(data->authSession.userName);
 
         case UserHostColumn:
             return data->authSession.userHost;

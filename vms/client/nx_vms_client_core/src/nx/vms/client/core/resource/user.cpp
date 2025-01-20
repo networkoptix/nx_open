@@ -115,4 +115,16 @@ UserSettings UserResource::settings() const
     return result;
 }
 
+bool UserResource::shouldMaskUser() const
+{
+    if (!base_type::shouldMaskUser())
+        return false;
+
+    auto systemContext = SystemContext::fromResource(toSharedPointer());
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    return systemContext->user().get() != this;
+}
+
 } // namespace nx::vms::client::core

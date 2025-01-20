@@ -63,6 +63,8 @@ namespace email {
  */
 NX_VMS_COMMON_API bool isValidAddress(const QString& address);
 
+NX_VMS_COMMON_API QString maskEmail(const QString& address);
+
 } // namespace email
 } // namespace nx
 

@@ -28,6 +28,7 @@
 #include <nx/vms/event/events/abstract_event.h>
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
+#include <utils/email/email.h>
 
 const nx::Uuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 const QString QnUserResource::kIntegrationRequestDataProperty("integrationRequestData");
@@ -894,4 +895,21 @@ nx::vms::api::UserSettings QnUserResource::settings() const
     nx::reflect::json::deserialize<UserSettings>(value.toStdString(), &result);
 
     return result;
+}
+
+QString QnUserResource::displayEmail() const
+{
+    return shouldMaskUser() ? nx::email::maskEmail(getEmail()) : getEmail();
+}
+
+QString QnUserResource::displayName() const
+{
+    // Names and emails should be masked only for users with "hidden" attribute. Since their email
+    // and name are identical, it is sufficient to return a masked email.
+    return shouldMaskUser() ? displayEmail() : getName();
+}
+
+bool QnUserResource::shouldMaskUser() const
+{
+    return attributes().testFlag(nx::vms::api::UserAttribute::hidden);
 }

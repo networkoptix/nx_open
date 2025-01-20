@@ -28,8 +28,7 @@ QString getVisibleBookmarkCreatorName(
         || systemContext->resourceAccessManager()->hasPowerUserPermissions(currentUser)
         || currentUser->getId() == bookmark.creatorId)
     {
-        return common::QnBookmarkFacade::creatorName(
-            bookmark, systemContext->resourcePool(), currentUser);
+        return common::QnBookmarkFacade::creatorName(bookmark, systemContext->resourcePool());
     }
 
     return {}; //< Only power users can see name of other users.

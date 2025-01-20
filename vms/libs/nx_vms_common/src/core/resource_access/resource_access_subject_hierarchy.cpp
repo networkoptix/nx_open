@@ -153,22 +153,12 @@ QnResourceAccessSubject ResourceAccessSubjectHierarchy::subjectById(const nx::Uu
 }
 
 QnUserResourceList ResourceAccessSubjectHierarchy::usersInGroups(
-    const QSet<nx::Uuid>& groupIds, bool withHidden) const
+    const QSet<nx::Uuid>& groupIds) const
 {
     if (!NX_ASSERT(d->resourcePool))
         return {};
 
-    const auto users =
-        d->resourcePool->getResourcesByIds<QnUserResource>(recursiveMembers(groupIds));
-
-    if (withHidden)
-        return users;
-
-    return users.filtered(
-        [](const QnUserResourcePtr& user)
-        {
-            return !user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
-        });
+    return d->resourcePool->getResourcesByIds<QnUserResource>(recursiveMembers(groupIds));
 }
 
 } // namespace nx::core::access

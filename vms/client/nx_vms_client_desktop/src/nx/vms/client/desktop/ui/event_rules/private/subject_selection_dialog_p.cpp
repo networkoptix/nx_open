@@ -33,11 +33,6 @@ int countEnabledUsers(const auto& subjects)
         });
 }
 
-bool isUserVisible(const QnUserResourcePtr& user)
-{
-    return !user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
-}
-
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions colorSubs = {
     {QnIcon::Normal, {.primary = "light10", .secondary="light4"}},
     {QnIcon::Selected, {.primary = "light4", .secondary="light1"}}};
@@ -127,8 +122,7 @@ QValidator::State RoleListModel::validateRole(const nx::Uuid& roleId) const
     if (m_roleValidator)
         return m_roleValidator(roleId);
 
-    const auto users = systemContext()->accessSubjectHierarchy()->usersInGroups(
-	    {roleId}, /*withHidden*/ false);
+    const auto users = systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
 
     std::vector<QnResourceAccessSubject> subjects{users.cbegin(), users.cend()};
 
@@ -179,8 +173,7 @@ QValidator::State RoleListModel::validateUsers(
 QSet<nx::Uuid> RoleListModel::checkedUsers() const
 {
     QSet<nx::Uuid> checkedUsers;
-    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(
-	    checkedRoles(), /*withHidden*/ false))
+    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(checkedRoles()))
     {
         checkedUsers.insert(user->getId());
     }
@@ -220,15 +213,14 @@ UserListModel::UserListModel(
         this, &UserListModel::updateIndicators);
 
     m_usersModel->setHasCheckboxes(true);
-    m_usersModel->setResources(
-        resourcePool()->getResources<QnUserResource>(&isUserVisible));
+    m_usersModel->setResources(resourcePool()->getResources<QnUserResource>());
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (auto user = resource.dynamicCast<QnUserResource>())
             {
-                if (isUserVisible(user) && !m_usersModel->resources().contains(user))
+                if (!m_usersModel->resources().contains(user))
                     m_usersModel->addResource(user);
             }
         });
@@ -285,7 +277,7 @@ bool UserListModel::systemHasCustomUsers() const
     const auto customUsers = resourcePool()->getResources<QnUserResource>(
         [](const QnUserResourcePtr& user)
         {
-            return isUserVisible(user) && user->allGroupIds().empty();
+            return user->allGroupIds().empty();
         });
 
     return !customUsers.empty();
@@ -447,8 +439,7 @@ void GroupListDelegate::getDisplayInfo(const QModelIndex& index,
     const auto roleId = index.data(core::UuidRole).value<nx::Uuid>();
 
     const int usersInRole = countEnabledUsers(
-        systemContext()->accessSubjectHierarchy()->usersInGroups(
-		    {roleId}, /*withHidden*/ false));
+        systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}));
 
     baseName = userGroupManager()->find(roleId).value_or(api::UserGroupData{}).name;
     extInfo = QString("%1 %2").arg(nx::UnicodeChars::kEnDash, tr("%n Users", "", usersInRole));

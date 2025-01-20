@@ -26,8 +26,7 @@ QnUserResourceList buildUserList(
     QSet<nx::Uuid> groupIds;
     nx::vms::common::getUsersAndGroups(context, subjects, users, groupIds);
 
-    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(
-        groupIds, /*withHidden*/ false))
+    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
     {
         if (std::find_if(users.begin(), users.end(),
             [user](const QnUserResourcePtr& existing)
@@ -139,7 +138,7 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
     if (users.empty() && !groupIds.empty())
     {
         const auto usersInGroups = systemContext()->accessSubjectHierarchy()->usersInGroups(
-            groupIds, /*withHidden*/ false);
+            groupIds);
 
         if (usersInGroups.empty())
             return QValidator::Intermediate;
@@ -209,7 +208,7 @@ QString QnSubjectValidationPolicy::calculateAlert(
     if (users.empty() && !groupIds.empty())
     {
         const auto usersInGroups = systemContext()->accessSubjectHierarchy()->usersInGroups(
-            groupIds, /*withHidden*/ false);
+            groupIds);
 
         if (usersInGroups.empty())
             return nx::vms::common::html::document(tr("None of selected user roles contain users"));
@@ -376,7 +375,7 @@ QString QnRequiredAccessRightPolicy::calculateAlert(bool allUsers,
         alert = tr(
             "%1 user does not have %2 permission for some of selected cameras",
             "%1 is the name of the selected user, %2 is the permission name")
-                .arg(html::bold(user->getName()))
+                .arg(html::bold(user->displayName()))
                 .arg(permissionName);
     }
 
@@ -406,8 +405,7 @@ QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const nx::Uuid& r
                 return QValidator::Acceptable;
 
             const auto groupUsers =
-                systemContext()->accessSubjectHierarchy()->usersInGroups(
-                    {roleId}, /*withHidden*/ false);
+                systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
 
             if (std::any_of(groupUsers.cbegin(), groupUsers.cend(),
                 [this](const auto& user) { return user->isEnabled() && userValidity(user); }))
@@ -471,10 +469,8 @@ void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout
 
 QValidator::State QnCloudUsersValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
-    const auto& users = systemContext()->accessSubjectHierarchy()->usersInGroups(
-        {roleId}, /*withHidden*/ false);
+    const auto& users = systemContext()->accessSubjectHierarchy()->usersInGroups({roleId});
 
-    bool hasCloud = false;
     bool hasNonCloud = false;
 
     for (const auto& user: users)
@@ -482,7 +478,6 @@ QValidator::State QnCloudUsersValidationPolicy::roleValidity(const nx::Uuid& rol
         if (!user->isEnabled())
             continue;
 
-        hasCloud |= user->isCloud();
         hasNonCloud |= !user->isCloud();
     }
 
@@ -536,8 +531,7 @@ QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const nx::Uuid& 
 {
     bool hasValid{false};
     bool hasInvalid{false};
-    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups(
-        {roleId}, /*withHidden*/ false))
+    for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}))
     {
         if (userValidity(user))
         {

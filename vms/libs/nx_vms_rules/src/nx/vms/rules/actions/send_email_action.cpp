@@ -56,8 +56,7 @@ const ItemDescriptor& SendEmailAction::manifest()
 }
 
 QSet<QString> SendEmailAction::emailAddresses(
-    common::SystemContext* context,
-    bool activeOnly) const
+    common::SystemContext* context, bool activeOnly, bool displayOnly) const
 {
     QSet<QString> recipients;
 
@@ -74,7 +73,7 @@ QSet<QString> SendEmailAction::emailAddresses(
     };
 
     for (const auto& user: utils::users(users(), context, activeOnly))
-        insertRecipientIfValid(user->getEmail());
+        insertRecipientIfValid(displayOnly ? user->displayEmail() : user->getEmail());
 
     for (const auto& additionalRecipient: emails().split(';', Qt::SkipEmptyParts))
         insertRecipientIfValid(additionalRecipient);
@@ -85,7 +84,8 @@ QSet<QString> SendEmailAction::emailAddresses(
 QVariantMap SendEmailAction::details(common::SystemContext* context) const
 {
     auto result = BasicAction::details(context);
-    result.insert(utils::kDestinationDetailName, emailAddresses(context, false).values().join(' '));
+    result.insert(utils::kDestinationDetailName,
+        emailAddresses(context, /*activeOnly*/ false, /*displayOnly*/ true).values().join(' '));
 
     return result;
 }

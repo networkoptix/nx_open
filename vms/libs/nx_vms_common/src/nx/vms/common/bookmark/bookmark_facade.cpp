@@ -12,7 +12,7 @@
 namespace nx::vms::common {
 
 QString BookmarkFacadeStrings::creatorName(const std::optional<nx::Uuid>& creatorUserId,
-    QnResourcePool* pool, const QnUserResourcePtr& currentUser)
+    QnResourcePool* pool)
 {
     if (!creatorUserId || creatorUserId->isNull())
         return {};
@@ -23,10 +23,7 @@ QString BookmarkFacadeStrings::creatorName(const std::optional<nx::Uuid>& creato
     const auto userResource =
         pool->getResourceById<QnUserResource>(*creatorUserId);
 
-    // Hidden users are shown only to themselves.
-    return userResource == currentUser || !nx::vms::common::isUserHidden(userResource)
-        ? userResource->getName()
-        : QString{};
+    return userResource ? userResource->displayName() : QString{};
 }
 
 QString BookmarkFacadeStrings::cameraName(const nx::Uuid& deviceId, QnResourcePool* pool)

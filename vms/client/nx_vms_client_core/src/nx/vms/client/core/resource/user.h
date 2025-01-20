@@ -32,6 +32,8 @@ public:
     void setSettings(const nx::vms::api::UserSettings& settings);
     nx::vms::api::UserSettings settings() const;
 
+    virtual bool shouldMaskUser() const override;
+
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 

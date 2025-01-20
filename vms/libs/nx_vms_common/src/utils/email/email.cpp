@@ -37,6 +37,14 @@ bool nx::email::isValidAddress(const QString& address)
     return QnEmailAddress(address).isValid();
 }
 
+QString nx::email::maskEmail(const QString& address)
+{
+    QnEmailAddress email(address);
+    return email.isValid() && !email.user().isEmpty()
+        ? QString("%1***%2@%3").arg(email.user().front(), email.user().back(), email.domain())
+        : address;
+}
+
 static QnSmtpPresets smtpServerPresetPresets;
 static bool smtpInitialized = false;
 

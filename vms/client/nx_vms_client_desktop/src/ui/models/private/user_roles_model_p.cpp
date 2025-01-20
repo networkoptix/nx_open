@@ -23,11 +23,6 @@ bool lessRoleByName(const UserGroupData& r1, const UserGroupData& r2)
     return nx::utils::naturalStringCompare(r1.name, r2.name, Qt::CaseInsensitive) < 0;
 };
 
-bool isRoleHidden(const UserGroupData& role)
-{
-    return role.attributes.testFlag(nx::vms::api::UserAttribute::hidden);
-}
-
 } // namespace
 
 QnUserRolesModel::Private::Private(
@@ -46,7 +41,6 @@ QnUserRolesModel::Private::Private(
     if (flags.testFlag(QnUserRolesModel::UserRoleFlag))
     {
         m_userRoles = systemContext()->userGroupManager()->groups();
-        nx::utils::erase_if(m_userRoles, &isRoleHidden);
 
         std::sort(m_userRoles.begin(), m_userRoles.end(), lessRoleByName);
 
@@ -69,9 +63,6 @@ void QnUserRolesModel::Private::setUserRoles(UserGroupDataList value)
 
 bool QnUserRolesModel::Private::updateUserRole(const UserGroupData& userRole)
 {
-    if (isRoleHidden(userRole))
-        return false;
-
     auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
         [&userRole](const UserGroupData& role)
         {

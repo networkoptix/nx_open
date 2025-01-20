@@ -15,8 +15,7 @@ struct NX_VMS_COMMON_API BookmarkFacadeStrings
     Q_DECLARE_TR_FUNCTIONS(BookmarkFacadeStrings)
 
 protected:
-    static QString creatorName(const std::optional<nx::Uuid>& creatorId, QnResourcePool* pool,
-        const QnUserResourcePtr& currentUser = {});
+    static QString creatorName(const std::optional<nx::Uuid>& creatorId, QnResourcePool* pool);
     static QString cameraName(const nx::Uuid& deviceId, QnResourcePool* pool);
     static QString siteEvent();
 };
@@ -95,10 +94,9 @@ struct NX_VMS_COMMON_API BookmarkFacade<QnCameraBookmark>:
         return std::set<QString>(bookmark.tags.begin(), bookmark.tags.end());
     }
 
-    static QString creatorName(const Type& bookmark, QnResourcePool* pool,
-        const QnUserResourcePtr& currentUser = {})
+    static QString creatorName(const Type& bookmark, QnResourcePool* pool)
     {
-        return BookmarkFacadeStrings::creatorName(bookmark.creatorId, pool, currentUser);
+        return BookmarkFacadeStrings::creatorName(bookmark.creatorId, pool);
     }
 
     static QString cameraName(const Type& bookmark, QnResourcePool* pool)

@@ -38,7 +38,7 @@ public:
     /**
      * List of users belonging to a given set of groups or any of their child groups, recursively.
      */
-    QnUserResourceList usersInGroups(const QSet<nx::Uuid>& groupIds, bool withHidden) const;
+    QnUserResourceList usersInGroups(const QSet<nx::Uuid>& groupIds) const;
 
 private:
     class Private;

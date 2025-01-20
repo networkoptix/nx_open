@@ -192,6 +192,10 @@ public:
 
     nx::vms::api::UserSettings settings() const;
 
+    QString displayEmail() const;
+    QString displayName() const;
+    virtual bool shouldMaskUser() const;
+
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userGroupsChanged(const QnUserResourcePtr& user);
