@@ -210,12 +210,11 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     const auto recordingFolder = screenRecordingSettings()->recordingFolder.exists()
         ? screenRecordingSettings()->recordingFolder()
         : QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-    QString filePath = recordingFolder
-        + "/"
-        + nx::utils::replaceNonFileNameCharacters(
+    QString filePath = QDir(recordingFolder).absoluteFilePath(
+        nx::utils::replaceNonFileNameCharacters(
             nx::format("video_recording_%1.avi",
                 nx::vms::time::toString(dt, nx::vms::time::Format::filename_date)),
-            '_');
+            '_'));
 
     const auto res = resourcePool()->getResourceById<core::DesktopResource>(
         core::DesktopResource::getDesktopResourceUuid());
