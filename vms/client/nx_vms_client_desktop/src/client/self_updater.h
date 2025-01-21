@@ -67,6 +67,7 @@ private:
     bool updateApplauncherDesktopIcon();
 
     void updateMinilauncherIconsOnWindows(bool hasAdminRights);
+    bool updateMinilauncherIconsOnWindowsInDir(const QDir& dir);
 
 private:
     nx::utils::SoftwareVersion m_clientVersion;
