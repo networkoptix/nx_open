@@ -141,7 +141,7 @@ QColor QnNotificationLevel::notificationColor(Value level)
     switch (level)
     {
         case Value::NoNotification:        return Qt::transparent;
-        case Value::OtherNotification:     return Qt::white;
+        case Value::OtherNotification:     return colorTheme()->color("light1");
         case Value::CommonNotification:    return colorTheme()->color("green");
         case Value::ImportantNotification: return colorTheme()->color("yellow");
         case Value::CriticalNotification:  return colorTheme()->color("red");
@@ -160,7 +160,7 @@ QColor QnNotificationLevel::notificationTextColor(Value level)
         case Value::ImportantNotification: return colorTheme()->color("yellow");
         case Value::CriticalNotification:  return colorTheme()->color("red");
         case Value::SuccessNotification:   return colorTheme()->color("green");
-        case Value::OtherNotification:     return Qt::white;
+        case Value::OtherNotification:     return colorTheme()->color("light1");
         case Value::CommonNotification:
         default:
             return colorTheme()->color("light4");
