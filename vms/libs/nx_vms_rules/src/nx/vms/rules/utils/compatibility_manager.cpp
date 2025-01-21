@@ -220,8 +220,7 @@ void CompatibilityManager::onDurationChanged()
     fixDurationValue();
     fixStateValue();
 
-    // When action has non zero duration, pre and post recording (except bookmark action
-    // pre-recording) fields must have zero value.
+    // When action has non zero duration post recording field must have zero value.
     const auto fixTimeField =
         [actionBuilder, durationField](const QString& fieldName)
         {
@@ -235,9 +234,6 @@ void CompatibilityManager::onDurationChanged()
                 timeField->setValue(std::chrono::microseconds::zero());
             }
         };
-
-    if (vms::rules::utils::type<vms::rules::BookmarkAction>() != actionBuilder->actionType())
-        fixTimeField(vms::rules::utils::kRecordBeforeFieldName);
 
     fixTimeField(vms::rules::utils::kRecordAfterFieldName);
 
