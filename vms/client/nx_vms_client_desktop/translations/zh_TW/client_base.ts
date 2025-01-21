@@ -1552,7 +1552,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>請聯繫 %1以取得有效授權。</translation>
+      <translation>請聯繫 %1以取得有效授權序號。</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1801,7 +1801,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
-      <translation>只允許拉丁字母、 數字和符號.</translation>
+      <translation>只允許拉丁字母、 數字和符號</translation>
     </message>
   </context>
   <context>
@@ -3899,7 +3899,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>欲取得離線授權檔，請提供授權碼和硬體ID到 %1，</translation>
+      <translation>欲取得離線授權檔，請提供授權碼和硬體ID至 %1，</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
@@ -3908,7 +3908,7 @@ License Key: %2</source>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援(%1), 以取得離線授權.</translation>
+      <translation>請將授權碼及硬體 ID提供給您的所在地區/授權支援(%1), 以取得離線授權檔案。</translation>
     </message>
     <message>
       <source>Text Files</source>
@@ -12559,7 +12559,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>如果該欄位為空白, 事件將維持在觸發狀態</translation>
+      <translation>如果該欄位為空白, 將總是觸發事件</translation>
     </message>
   </context>
   <context>
@@ -12853,7 +12853,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發</translation>
+      <translation>只有當標題欄位中的文字與輸入的任何關鍵字相符時, 事件才會觸發。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
