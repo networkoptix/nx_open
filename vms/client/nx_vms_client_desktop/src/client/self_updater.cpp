@@ -137,6 +137,15 @@ bool isDeveloperBuildOnWindows()
     return !QFileInfo::exists(QDir(binaryPath).absoluteFilePath(qtLibFile));
 }
 
+QString getCompleteBaseName(const QString& fileName)
+{
+    auto lastDotIndex = fileName.lastIndexOf(".");
+    if (lastDotIndex == -1)
+        return fileName;
+
+    return fileName.first(lastDotIndex);
+}
+
 } // namespace
 
 
@@ -870,61 +879,10 @@ void SelfUpdater::updateMinilauncherIconsOnWindows(bool hasAdminRights)
 
     NX_VERBOSE(this, "Desktop path: %1", desktopPath);
 
-    const QStringList shortcutSourcePrefixes =
-        QnClientInstallationsManager::clientInstallRoots();
-    const QString shortcutSourceSuffix = nx::branding::minilauncherBinaryName();
+    const bool desktopShortcutUpdated = updateMinilauncherIconsOnWindowsInDir(desktopPath);
+    const bool startMenuShortcutUpdated = updateMinilauncherIconsOnWindowsInDir(startMenuPath);
 
-    bool updated = false;
-
-    const QFileInfoList desktopShortcuts = QDir(desktopPath).entryInfoList({"*.lnk"}, QDir::Files);
-    const QFileInfoList startMenuShortcuts =
-        QDir(startMenuPath).entryInfoList({"*.lnk"}, QDir::Files);
-
-    for (const auto& entry: desktopShortcuts + startMenuShortcuts)
-    {
-        NX_VERBOSE(this, "Shortcut found: %1. Acquiring shortcut parameters.",
-            entry.absoluteFilePath());
-
-        // Acquire shortcut data.
-        auto info = qnPlatform->shortcuts()->getShortcutInfo(
-            entry.absolutePath(),
-            entry.completeBaseName());
-
-        // Check if the shortcut points to some minilauncher binary.
-        const bool shortcutToLauncher = std::any_of(shortcutSourcePrefixes.begin(),
-            shortcutSourcePrefixes.end(),
-            [filePath = info.sourceFile](auto& prefix)
-            {
-                return filePath.startsWith(prefix, Qt::CaseInsensitive);
-            })
-            && info.sourceFile.endsWith(shortcutSourceSuffix, Qt::CaseInsensitive);
-
-        // Additional check. We don't want to change VideoWall icons or user-chosen icons.
-        if (shortcutToLauncher
-            && (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
-                || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive)))
-        {
-            NX_INFO(this, "Updating icon for shortcut at %1", entry.absoluteFilePath());
-            NX_INFO(this, "Previous icon location: %1", info.iconPath);
-
-            // Overwrite the shortcut.
-            // This call clears shortcut icon, so the target binary icon will be used.
-            bool success = qnPlatform->shortcuts()->createShortcut(
-                info.sourceFile,
-                entry.absolutePath(),
-                entry.completeBaseName(),
-                info.arguments);
-            NX_INFO(this, "Success: %1", success);
-
-            updated = true;
-        }
-        else
-        {
-            NX_VERBOSE(this, "Shortcut should not be updated");
-        }
-    }
-
-    if (updated)
+    if (desktopShortcutUpdated || startMenuShortcutUpdated)
     {
         // Explorer caches program icons, so it doesn't need to parse binaries repeatedly.
         // Unfortunatelly, it doesn't make an icon obsolete when the original file is updated.
@@ -940,6 +898,63 @@ void SelfUpdater::updateMinilauncherIconsOnWindows(bool hasAdminRights)
     }
 
     NX_VERBOSE(this, "Shortcut update finished");
+}
+
+bool SelfUpdater::updateMinilauncherIconsOnWindowsInDir(const QDir& dir)
+{
+    const auto shortcutSourcePrefixes = QnClientInstallationsManager::clientInstallRoots();
+    const auto shortcutSourceSuffix = nx::branding::minilauncherBinaryName();
+
+    bool updated{false};
+    const auto absolutePath = dir.absolutePath();
+    // `QDir::entryInfoList` is not used here because it might take a significant amount of time if
+    // there are links to network drives or shared folders within the given directory.
+    for (const auto& entry: dir.entryList({"*.lnk"}, QDir::Files))
+    {
+        const auto absoluteFilePath = dir.absoluteFilePath(entry);
+        NX_VERBOSE(this, "Shortcut found: %1. Acquiring shortcut parameters", absoluteFilePath);
+
+        const auto completeBaseName = getCompleteBaseName(entry);
+        // Acquire shortcut data.
+        auto info = qnPlatform->shortcuts()->getShortcutInfo(absolutePath, completeBaseName);
+
+        NX_VERBOSE(this, "Shortcut parameters received");
+
+        // Check if the shortcut points to some minilauncher binary.
+        const bool shortcutToLauncher = std::any_of(shortcutSourcePrefixes.begin(),
+            shortcutSourcePrefixes.end(),
+            [filePath = info.sourceFile](auto& prefix)
+            {
+                return filePath.startsWith(prefix, Qt::CaseInsensitive);
+            })
+            && info.sourceFile.endsWith(shortcutSourceSuffix, Qt::CaseInsensitive);
+
+        // Additional check. We don't want to change VideoWall icons or user-chosen icons.
+        if (shortcutToLauncher
+            && (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
+                || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive)))
+        {
+            NX_INFO(this, "Updating icon for shortcut at %1", absoluteFilePath);
+            NX_INFO(this, "Previous icon location: %1", info.iconPath);
+
+            // Overwrite the shortcut.
+            // This call clears shortcut icon, so the target binary icon will be used.
+            bool success = qnPlatform->shortcuts()->createShortcut(
+                info.sourceFile,
+                absolutePath,
+                completeBaseName,
+                info.arguments);
+            NX_INFO(this, "Success: %1", success);
+
+            updated = true;
+        }
+        else
+        {
+            NX_VERBOSE(this, "Shortcut should not be updated");
+        }
+    }
+
+    return updated;
 }
 
 } // namespace nx::vms::client::desktop
