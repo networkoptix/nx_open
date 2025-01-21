@@ -64,11 +64,6 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* /*video
     return true;
 }
 
-bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* /*metadataPackets*/)
-{
-    return true;
-}
-
 void DeviceAgent::doSetSettings(
     nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
     const nx::sdk::IStringMap* /*settings*/)

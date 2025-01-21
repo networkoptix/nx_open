@@ -25,9 +25,6 @@ protected:
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
 
-    virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
-
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
         const nx::sdk::IStringMap* settings) override;

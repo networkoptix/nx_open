@@ -42,10 +42,7 @@ class IObjectTrackBestShotPacket1:
     public Interface<IObjectTrackBestShotPacket1, IObjectTrackBestShotPacket0>
 {
 public:
-    static auto interfaceId()
-    {
-        return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket1");
-    }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket1"); }
 
     /**
      * @return HTTP or HTTPS URL of the image that should be used as the Track Best Shot. Only
@@ -92,10 +89,7 @@ class IObjectTrackBestShotPacket:
     public Interface<IObjectTrackBestShotPacket, IObjectTrackBestShotPacket1>
 {
 public:
-    static auto interfaceId()
-    {
-        return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket2");
-    }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket2"); }
 
     virtual Flags flags() const = 0;
 };

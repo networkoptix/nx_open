@@ -162,8 +162,8 @@ void ConsumingDeviceAgent::processMetadataPacket(
     }
     if (!metadataPacket)
     {
-        NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet" << packetIndexName(packetIndex)
-            << " found; discarded.";
+        NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet"
+            << packetIndexName(packetIndex) << " found; discarded.";
         return;
     }
 
@@ -186,25 +186,9 @@ void ConsumingDeviceAgent::doSetSettings(
         *outResult = settingsReceived();
 }
 
-void ConsumingDeviceAgent::getIntegrationSideSettings(
-    Result<const ISettingsResponse*>* /*outResult*/) const
-{
-}
-
 void ConsumingDeviceAgent::finalize()
 {
     NX_OUTPUT << __func__ << "()";
-}
-
-void ConsumingDeviceAgent::doGetSettingsOnActiveSettingChange(
-    Result<const IActiveSettingChangedResponse*>* /*outResult*/,
-    const IActiveSettingChangedAction* /*activeSettingChangedAction*/)
-{
-}
-
-void ConsumingDeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/)
-{
 }
 
 //-------------------------------------------------------------------------------------------------

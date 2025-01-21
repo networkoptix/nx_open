@@ -39,7 +39,7 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
 private:
-    nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
+    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> cookSomeEvents();
     int64_t usSinceEpoch() const;
     void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
     void stopFetchingMetadata();

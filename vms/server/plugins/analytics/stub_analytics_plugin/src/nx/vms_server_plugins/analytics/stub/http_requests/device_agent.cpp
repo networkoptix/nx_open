@@ -23,7 +23,8 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
-class RequestCompletionHandler: public nx::sdk::RefCountable<nx::sdk::IUtilityProvider4::IHttpRequestCompletionHandler>
+class RequestCompletionHandler:
+    public nx::sdk::RefCountable<nx::sdk::IUtilityProvider::IHttpRequestCompletionHandler>
 {
 public:
     using Result = nx::sdk::Result<nx::sdk::IString*>;
@@ -96,7 +97,7 @@ std::string DeviceAgent::manifestString() const
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
 {
     m_lastFrameTimestampUs = videoPacket->timestampUs();
-    if (m_lastFrameTimestampUs < m_lastEventTimestampUs + m_requestContext.periodSeconds*1E6)
+    if (m_lastFrameTimestampUs < m_lastEventTimestampUs + m_requestContext.periodSeconds * 1E6)
         return true;
 
     auto handler =  nx::sdk::makePtr<RequestCompletionHandler>();

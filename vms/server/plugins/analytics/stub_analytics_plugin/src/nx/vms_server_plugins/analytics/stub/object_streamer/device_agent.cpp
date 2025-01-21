@@ -54,11 +54,14 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     if (m_lastFrameTimestampUs >= 0)
     {
         // Generate metadata for the previous frame.
-        const int previousFrameNumber = (m_frameNumber == 0) ? m_maxFrameNumber : (m_frameNumber - 1);
+        const int previousFrameNumber =
+            (m_frameNumber == 0) ? m_maxFrameNumber : (m_frameNumber - 1);
         const int64_t previousFrameTimestampUs = m_lastFrameTimestampUs;
-        const int64_t previousFrameDurationUs = std::max(videoPacket->timestampUs() - previousFrameTimestampUs, (int64_t) 0);
+        const int64_t previousFrameDurationUs =
+            std::max(videoPacket->timestampUs() - previousFrameTimestampUs, (int64_t) 0);
 
-        for (auto& metadataPacket: generateMetadata(previousFrameNumber, previousFrameTimestampUs, previousFrameDurationUs))
+        for (auto& metadataPacket: generateMetadata(
+            previousFrameNumber, previousFrameTimestampUs, previousFrameDurationUs))
         {
             pushMetadataPacket(metadataPacket.releasePtr());
         }

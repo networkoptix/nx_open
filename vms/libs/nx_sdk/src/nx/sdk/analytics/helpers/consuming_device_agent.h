@@ -57,6 +57,7 @@ protected:
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
      * thread for long.
+     *
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame);
@@ -128,8 +129,10 @@ protected:
     virtual void finalize() override;
 
     virtual void doGetSettingsOnActiveSettingChange(
-        Result<const IActiveSettingChangedResponse*>* outResult,
-        const IActiveSettingChangedAction* activeSettingChangedAction) override;
+        Result<const IActiveSettingChangedResponse*>* /*outResult*/,
+        const IActiveSettingChangedAction* /*activeSettingChangedAction*/) override
+    {
+    }
 
 public:
     virtual ~ConsumingDeviceAgent() override;
@@ -142,12 +145,21 @@ public:
 
 protected:
     virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
+
     virtual void doSetSettings(
         Result<const ISettingsResponse*>* outResult, const IStringMap* settings) override;
-    virtual void getIntegrationSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+
+    virtual void getIntegrationSideSettings(
+        Result<const ISettingsResponse*>* /*outResult*/) const override
+    {
+    }
+
     virtual void getManifest(Result<const IString*>* outResult) const override;
+
     virtual void doSetNeededMetadataTypes(
-        Result<void>* outResult, const IMetadataTypes* neededMetadataTypes) override;
+        Result<void>* /*outResult*/, const IMetadataTypes* /*neededMetadataTypes*/) override
+    {
+    }
 
 private:
     void logMetadataPacketIfNeeded(

@@ -90,7 +90,8 @@ private:
 
     IRefCountable* doQueryInterface(const IRefCountable::InterfaceId* id)
     {
-        for (const auto& ownId: IRefCountable::alternativeInterfaceIds(DerivedInterface::interfaceId()))
+        for (const auto& ownId:
+            IRefCountable::alternativeInterfaceIds(DerivedInterface::interfaceId()))
         {
             if (*ownId == *id)
             {

@@ -13,7 +13,10 @@ namespace nx::sdk::analytics {
 class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 {
 public:
-    ObjectTrackBestShotPacket(Uuid trackId = Uuid(), int64_t timestampUs = -1, Rect boundingBox = Rect());
+    ObjectTrackBestShotPacket(
+        Uuid trackId = Uuid(),
+        int64_t timestampUs = -1,
+        Rect boundingBox = Rect());
 
     virtual int64_t timestampUs() const override;
     virtual void getTrackId(Uuid* outValue) const override;

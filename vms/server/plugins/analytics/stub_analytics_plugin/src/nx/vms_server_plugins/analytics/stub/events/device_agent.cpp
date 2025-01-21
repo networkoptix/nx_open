@@ -264,7 +264,7 @@ void DeviceAgent::eventThreadLoop()
     while (!m_terminated)
     {
         if (m_deviceAgentSettings.generateEvents && m_needToGenerateEvents)
-            pushMetadataPacket(cookSomeEvents());
+            pushMetadataPacket(cookSomeEvents().get());
 
         // Sleep until the next event needs to be generated, or the thread is ordered
         // to terminate (hence condition variable instead of sleep()). Return value
@@ -298,10 +298,10 @@ void DeviceAgent::stopEventThread()
 //-------------------------------------------------------------------------------------------------
 // private
 
-IMetadataPacket* DeviceAgent::cookSomeEvents()
+Ptr<IMetadataPacket> DeviceAgent::cookSomeEvents()
 {
     const auto descriptor = kEventsToFire[m_eventContext.currentEventTypeIndex];
-    auto eventMetadataPacket = new EventMetadataPacket();
+    auto eventMetadataPacket = makePtr<EventMetadataPacket>();
     eventMetadataPacket->setTimestampUs(usSinceEpoch());
     eventMetadataPacket->setDurationUs(0);
 
