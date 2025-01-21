@@ -53,7 +53,7 @@ ValidationResult TargetUserFieldValidator::validity(
             }
 
             auto cameraField = rule->eventFilters().front()->fieldByName<SourceCameraField>(
-                    utils::kCameraIdFieldName);
+                    utils::kDeviceIdFieldName);
             if (acknowledgeField->value() == true && cameraField && !cameraField->acceptAll())
             {
                 QnRequiredAccessRightPolicy policy{

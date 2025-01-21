@@ -9,23 +9,23 @@
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API PluginDiagnosticEvent: public AnalyticsEngineEvent
+class NX_VMS_RULES_API IntegrationDiagnosticEvent: public AnalyticsEngineEvent
 {
     Q_OBJECT
-    Q_CLASSINFO("type", "pluginDiagnostic")
+    Q_CLASSINFO("type", "integrationDiagnostic")
 
     FIELD(nx::vms::api::EventLevel, level, setLevel)
 
 public:
     static const ItemDescriptor& manifest();
 
-    PluginDiagnosticEvent() = default;
+    IntegrationDiagnosticEvent() = default;
 
-    PluginDiagnosticEvent(
+    IntegrationDiagnosticEvent(
         std::chrono::microseconds timestamp,
         const QString &caption,
         const QString &description,
-        nx::Uuid cameraId,
+        nx::Uuid deviceId,
         nx::Uuid engineId,
         nx::vms::api::EventLevel level);
 

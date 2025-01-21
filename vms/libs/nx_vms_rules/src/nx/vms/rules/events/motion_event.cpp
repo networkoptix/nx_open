@@ -14,13 +14,13 @@ namespace nx::vms::rules {
 
 MotionEvent::MotionEvent(std::chrono::microseconds timestamp, State state, nx::Uuid deviceId):
     base_type(timestamp, state),
-    m_cameraId(deviceId)
+    m_deviceId(deviceId)
 {
 }
 
 QString MotionEvent::resourceKey() const
 {
-    return m_cameraId.toSimpleString();
+    return deviceId().toSimpleString();
 }
 
 QVariantMap MotionEvent::details(
@@ -38,7 +38,7 @@ QVariantMap MotionEvent::details(
 
 QString MotionEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
     return tr("Motion on %1").arg(resourceName);
 }
 
@@ -53,7 +53,7 @@ const ItemDescriptor& MotionEvent::manifest()
         .fields = {
             utils::makeStateFieldDescriptor(Strings::beginWhen()),
             makeFieldDescriptor<SourceCameraField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
@@ -63,7 +63,7 @@ const ItemDescriptor& MotionEvent::manifest()
                 }.toVariantMap()),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
         .emailTemplateName = "camera_motion.mustache"
     };
     return kDescriptor;

@@ -26,7 +26,7 @@ public:
     AnalyticsObjectEvent(
         State state,
         std::chrono::microseconds timestamp,
-        nx::Uuid cameraId,
+        nx::Uuid deviceId,
         nx::Uuid engineId,
         const QString& objectTypeId,
         nx::Uuid objectTrackId,

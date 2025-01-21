@@ -22,14 +22,14 @@ SoftTriggerEvent::SoftTriggerEvent(
     std::chrono::microseconds timestamp,
     State state,
     nx::Uuid triggerId,
-    nx::Uuid cameraId,
+    nx::Uuid deviceId,
     nx::Uuid userId,
     const QString& name,
     const QString& icon)
     :
     BasicEvent(timestamp, state),
     m_triggerId(triggerId),
-    m_cameraId(cameraId),
+    m_deviceId(deviceId),
     m_userId(userId),
     m_triggerName(name),
     m_triggerIcon(icon)
@@ -44,7 +44,7 @@ QString SoftTriggerEvent::aggregationSubKey() const
 
 QString SoftTriggerEvent::resourceKey() const
 {
-    return m_cameraId.toSimpleString();
+    return deviceId().toSimpleString();
 }
 
 QString SoftTriggerEvent::aggregationKey() const
@@ -85,7 +85,7 @@ QString SoftTriggerEvent::caption() const
 QStringList SoftTriggerEvent::detailing(common::SystemContext* context) const
 {
     QStringList result;
-    result << tr("Source: %1").arg(Strings::resource(context, m_cameraId, Qn::RI_WithUrl));
+    result << tr("Source: %1").arg(Strings::resource(context, deviceId(), Qn::RI_WithUrl));
     result << tr("User: %1").arg(Strings::resource(context, m_userId));
     return result;
 }
@@ -109,7 +109,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
         .fields = {
             makeFieldDescriptor<UniqueIdField>("triggerId", TranslatableString("Invisible")),
             makeFieldDescriptor<SourceCameraField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
@@ -131,7 +131,7 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
                 "Icon, displayed within a circular overlay."),
         },
         .resources = {
-            {utils::kCameraIdFieldName,
+            {utils::kDeviceIdFieldName,
                 {ResourceType::device, Qn::ViewContentPermission, Qn::SoftTriggerPermission}},
             {utils::kUserIdFieldName, {ResourceType::user, {}, Qn::WritePermission}}},
         .createPermissions = nx::vms::api::GlobalPermission::none,

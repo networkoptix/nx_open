@@ -76,7 +76,7 @@ protected:
         using vms::rules::SourceCameraField;
 
         auto sourceCameraField =
-            this->template getEventField<SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
+            this->template getEventField<SourceCameraField>(vms::rules::utils::kDeviceIdFieldName);
 
         if (!NX_ASSERT(sourceCameraField))
             return {};
@@ -175,7 +175,7 @@ public:
         m_comboBox->setModel(sortModel);
 
         const auto sourceCameraField =
-            getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
+            getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kDeviceIdFieldName);
         if (NX_ASSERT(sourceCameraField))
         {
             connect(

@@ -21,18 +21,18 @@ DeviceDisconnectedEvent::DeviceDisconnectedEvent(
     nx::Uuid deviceId)
     :
     base_type(timestamp),
-    m_cameraId(deviceId)
+    m_deviceId(deviceId)
 {
 }
 
 QString DeviceDisconnectedEvent::aggregationSubKey() const
 {
-    return utils::makeKey(BasicEvent::aggregationSubKey(), m_cameraId.toSimpleString());
+    return utils::makeKey(BasicEvent::aggregationSubKey(), deviceId().toSimpleString());
 }
 
 QString DeviceDisconnectedEvent::resourceKey() const
 {
-    return m_cameraId.toSimpleString();
+    return deviceId().toSimpleString();
 }
 
 QVariantMap DeviceDisconnectedEvent::details(
@@ -53,7 +53,7 @@ QVariantMap DeviceDisconnectedEvent::details(
 QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 {
     const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-        m_cameraId);
+        m_deviceId);
 
     return QnDeviceDependentStrings::getNameFromSet(
         context->resourcePool(),
@@ -67,7 +67,7 @@ QString DeviceDisconnectedEvent::caption(common::SystemContext* context) const
 QString DeviceDisconnectedEvent::extendedCaption(common::SystemContext* context) const
 {
     const auto camera = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-        m_cameraId);
+        m_deviceId);
     const auto resourceName = Strings::resource(camera, Qn::RI_WithUrl);
 
     return tr("%1 was disconnected", "Device name will be substituted").arg(resourceName);
@@ -112,7 +112,7 @@ ItemDescriptor DeviceDisconnectedEvent::manifest(common::SystemContext* context)
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 TranslatableString(getSourceName),
                 /*description*/ {},
                 ResourceFilterFieldProperties{
@@ -121,7 +121,7 @@ ItemDescriptor DeviceDisconnectedEvent::manifest(common::SystemContext* context)
                 }.toVariantMap()),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
         .emailTemplateName = "timestamp_only.mustache"
     };
     return kDescriptor;

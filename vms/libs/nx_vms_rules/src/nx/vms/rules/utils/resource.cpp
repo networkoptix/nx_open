@@ -95,7 +95,7 @@ UuidList deviceIds(const T& entity)
 {
     UuidList result;
 
-    for (const auto name: {kCameraIdFieldName, kDeviceIdsFieldName})
+    for (const auto name: {kDeviceIdFieldName, kDeviceIdsFieldName})
         result.append(fieldResourceIds(entity, name));
 
     return result;

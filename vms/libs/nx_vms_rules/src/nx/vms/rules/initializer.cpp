@@ -53,11 +53,11 @@ void Initializer::registerEvents() const
     registerEvent<DeviceIpConflictEvent>(context);
     registerEvent<FanErrorEvent>();
     registerEvent<GenericEvent>();
+    registerEvent<IntegrationDiagnosticEvent>();
     registerEvent<LdapSyncIssueEvent>();
     registerEvent<LicenseIssueEvent>();
     registerEvent<MotionEvent>();
     registerEvent<NetworkIssueEvent>();
-    registerEvent<PluginDiagnosticEvent>();
     registerEvent<PoeOverBudgetEvent>();
     registerEvent<SaasIssueEvent>();
     registerEvent<ServerCertificateErrorEvent>();

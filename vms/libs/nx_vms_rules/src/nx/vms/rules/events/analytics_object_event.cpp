@@ -20,14 +20,14 @@ namespace nx::vms::rules {
 AnalyticsObjectEvent::AnalyticsObjectEvent(
     State state,
     std::chrono::microseconds timestamp,
-    nx::Uuid cameraId,
+    nx::Uuid deviceId,
     nx::Uuid engineId,
     const QString& objectTypeId,
     nx::Uuid objectTrackId,
     const nx::common::metadata::Attributes& attributes)
     :
     AnalyticsEngineEvent(
-        timestamp, /*caption*/ QString(), /*description*/ QString(), cameraId, engineId),
+        timestamp, /*caption*/ QString(), /*description*/ QString(), deviceId, engineId),
     m_objectTypeId(objectTypeId),
     m_objectTrackId(objectTrackId),
     m_attributes(attributes)
@@ -47,7 +47,7 @@ QString AnalyticsObjectEvent::resourceKey() const
 
 QString AnalyticsObjectEvent::aggregationKey() const
 {
-    return cameraId().toSimpleString();
+    return deviceId().toSimpleString();
 }
 
 QString AnalyticsObjectEvent::cacheKey() const
@@ -59,7 +59,7 @@ nx::analytics::taxonomy::AbstractObjectType* AnalyticsObjectEvent::objectTypeByI
     common::SystemContext* context) const
 {
     const auto camera =
-        context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId());
+        context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId());
 
     return camera && camera->systemContext()
         ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(m_objectTypeId)
@@ -96,7 +96,7 @@ QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* cont
 
 QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
     const auto objectCaption = analyticsObjectCaption(context);
 
     return tr("%1 at %2", " is detected")
@@ -118,7 +118,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
         .fields = {
             utils::makeStateFieldDescriptor(Strings::state()),
             makeFieldDescriptor<SourceCameraField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
@@ -135,7 +135,7 @@ const ItemDescriptor& AnalyticsObjectEvent::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("And Object"))),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
         .emailTemplateName = "analytics_object.mustache"
     };

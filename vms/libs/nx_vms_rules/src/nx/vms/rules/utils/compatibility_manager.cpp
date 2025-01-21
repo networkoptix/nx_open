@@ -183,7 +183,7 @@ void CompatibilityManager::fixUseSourceValue()
         vms::rules::utils::kDeviceIdsFieldName);
     const auto targetSingleDeviceField =
         actionBuilder->fieldByName<vms::rules::TargetDeviceField>(
-            vms::rules::utils::kCameraIdFieldName);
+            vms::rules::utils::kDeviceIdFieldName);
 
     if (!targetDeviceField && !targetSingleDeviceField)
         return;

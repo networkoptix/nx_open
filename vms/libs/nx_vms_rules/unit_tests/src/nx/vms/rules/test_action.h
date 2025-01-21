@@ -81,7 +81,7 @@ class TestActionWithInterval: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "testWithInterval")
 
     Q_PROPERTY(std::chrono::microseconds interval MEMBER m_interval)
-    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(nx::Uuid deviceId MEMBER m_deviceId)
 
 public:
     static ItemDescriptor manifest()
@@ -97,7 +97,7 @@ public:
     }
 
 public:
-    nx::Uuid m_cameraId;
+    nx::Uuid m_deviceId;
     std::chrono::microseconds m_interval;
 };
 
@@ -107,7 +107,7 @@ class TestActionWithTargetUsers: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "testWithTargetUsers")
 
     Q_PROPERTY(nx::vms::rules::UuidSelection users MEMBER m_users)
-    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(nx::Uuid deviceId MEMBER m_deviceId)
     Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 
 public:
@@ -128,7 +128,7 @@ public:
 
 public:
     nx::vms::rules::UuidSelection m_users;
-    nx::Uuid m_cameraId;
+    nx::Uuid m_deviceId;
     UuidList m_deviceIds;
 };
 
@@ -156,7 +156,7 @@ public:
                     {{"useSource", true}})
             },
             .resources = {
-                {utils::kCameraIdFieldName, {ResourceType::device, Qn::WritePermission}},
+                {utils::kDeviceIdFieldName, {ResourceType::device, Qn::WritePermission}},
                 {utils::kDeviceIdsFieldName, {ResourceType::device, Qn::WritePermission}}},
             .readPermissions = GlobalPermission::generateEvents,
         };

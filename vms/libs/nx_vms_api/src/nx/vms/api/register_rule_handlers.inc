@@ -155,7 +155,7 @@ void registerRuleHandlers(
      *     %value stopped A "prolonged" action associated with this Generic Event in VMS Rules
      *         will stop. Transition to the <code>stopped</code> state requires the state to be
      *         <code>started</code>.
-     * %param[opt]:string cameraId Used for soft trigger.
+     * %param[opt]:string deviceId Used for soft trigger.
      * %param[opt]:string triggerId Used for soft trigger.
      * %param[opt]:string triggerName Used for soft trigger.
      * %param[opt]:string triggerIcon Used for soft trigger.

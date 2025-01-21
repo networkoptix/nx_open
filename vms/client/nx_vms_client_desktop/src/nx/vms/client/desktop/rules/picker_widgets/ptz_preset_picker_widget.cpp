@@ -30,7 +30,7 @@ void PtzPresetPicker::updateUi()
     DropdownTextPickerWidgetBase<vms::rules::PtzPresetField>::updateUi();
 
     const auto cameraField =
-        getActionField<vms::rules::TargetDeviceField>(vms::rules::utils::kCameraIdFieldName);
+        getActionField<vms::rules::TargetDeviceField>(vms::rules::utils::kDeviceIdFieldName);
 
     if (!NX_ASSERT(cameraField))
         return;

@@ -116,11 +116,11 @@ TEST_F(EventCacheTest, cachedEventReprocessedIfNotReported)
     engine->updateRule(serialize(rule.get()));
 
     auto event = TestEventInstantPtr::create(std::chrono::microseconds::zero(), State::instant);
-    event->m_cameraId = cameraB;
+    event->m_deviceId = cameraB;
     event->setCacheKey("a");
 
     EXPECT_EQ(engine->processEvent(event), 0);
-    event->m_cameraId = cameraA;
+    event->m_deviceId = cameraA;
 
     // Event stops reprocessing if reported recently.
     EXPECT_EQ(engine->processEvent(event), 1);

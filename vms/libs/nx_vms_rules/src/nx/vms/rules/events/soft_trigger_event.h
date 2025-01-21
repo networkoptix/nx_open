@@ -14,7 +14,7 @@ class NX_VMS_RULES_API SoftTriggerEvent: public BasicEvent
     Q_CLASSINFO("type", "softTrigger")
 
     FIELD(nx::Uuid, triggerId, setTriggerId)
-    FIELD(nx::Uuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, deviceId, setDeviceId)
     FIELD(nx::Uuid, userId, setUserId)
     FIELD(QString, triggerName, setTriggerName)
     FIELD(QString, triggerIcon, setTriggerIcon)
@@ -25,7 +25,7 @@ public:
         std::chrono::microseconds timestamp,
         State state,
         nx::Uuid triggerId,
-        nx::Uuid cameraId,
+        nx::Uuid deviceId,
         nx::Uuid userId,
         const QString& name,
         const QString& icon);

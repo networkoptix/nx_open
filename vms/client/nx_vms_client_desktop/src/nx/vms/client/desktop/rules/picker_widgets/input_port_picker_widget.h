@@ -32,7 +32,7 @@ private:
         DropdownTextPickerWidgetBase<vms::rules::InputPortField>::updateUi();
 
         auto sourceCameraField =
-            getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
+            getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kDeviceIdFieldName);
 
         if (!NX_ASSERT(sourceCameraField))
             return;

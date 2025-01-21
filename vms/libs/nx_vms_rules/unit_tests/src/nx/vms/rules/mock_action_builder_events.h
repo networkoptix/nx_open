@@ -49,8 +49,8 @@ private:
 
         if (auto targetedAction = action.dynamicCast<TestActionWithTargetUsers>())
         {
-            if (!targetedAction->m_cameraId.isNull())
-                targetedCameraId(targetedAction->m_cameraId);
+            if (!targetedAction->m_deviceId.isNull())
+                targetedCameraId(targetedAction->m_deviceId);
 
             if (!targetedAction->m_deviceIds.empty())
                 targetedDeviceIds(targetedAction->m_deviceIds);
@@ -83,7 +83,7 @@ private:
             return;
 
         if (action->m_deviceIds.isEmpty())
-            singleDeviceAction(action->m_users.ids, action->m_cameraId);
+            singleDeviceAction(action->m_users.ids, action->m_deviceId);
         else
             multiDeviceAction(action->m_users.ids, nx::utils::toQSet(action->m_deviceIds));
     }

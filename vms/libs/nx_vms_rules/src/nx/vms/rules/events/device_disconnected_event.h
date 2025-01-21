@@ -13,7 +13,7 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
     Q_CLASSINFO("type", "deviceDisconnected")
     using base_type = BasicEvent;
 
-    FIELD(nx::Uuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, deviceId, setDeviceId)
 
 public:
     DeviceDisconnectedEvent() = default;

@@ -37,12 +37,12 @@ ValidationResult SourceUserFieldValidator::validity(
         if (sourceUserFieldProperties.validationPolicy == kUserInputValidationPolicy)
         {
             auto cameraField =
-                rule->eventFilters().front()->fieldByName<SourceCameraField>(utils::kCameraIdFieldName);
+                rule->eventFilters().front()->fieldByName<SourceCameraField>(utils::kDeviceIdFieldName);
             if (!NX_ASSERT(cameraField))
             {
                 return {
                     QValidator::State::Invalid,
-                    Strings::fieldValueMustBeProvided(utils::kCameraIdFieldName)};
+                    Strings::fieldValueMustBeProvided(utils::kDeviceIdFieldName)};
             }
 
             const auto cameraIds = cameraField->ids();

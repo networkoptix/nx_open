@@ -107,7 +107,7 @@ public:
     {
         auto event = TestEventPtr::create();
         event->m_text = "test";
-        event->m_cameraId = nx::Uuid::createUuid();
+        event->m_deviceId = nx::Uuid::createUuid();
         event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
         event->m_intField = 42;
         event->level = nx::vms::event::Level::success;
@@ -167,7 +167,7 @@ TEST_F(EventParameterTest, fields)
 
     EXPECT_EQ(event->m_text, evaluate(event, "event.fields.text"));
     EXPECT_EQ(QString::number(event->m_intField), evaluate(event, "event.fields.intField"));
-    EXPECT_EQ(event->m_cameraId.toSimpleString(), evaluate(event, "event.fields.cameraId"));
+    EXPECT_EQ(event->m_deviceId.toSimpleString(), evaluate(event, "event.fields.deviceId"));
 
     QStringList strings;
     for (auto id: event->m_deviceIds)
@@ -192,7 +192,7 @@ TEST_F(EventParameterTest, details)
 
     EXPECT_EQ(details.value("url").toString(), evaluate(event, "event.details.url"));
     EXPECT_EQ(details.value("number").toString(), evaluate(event, "event.details.number"));
-    EXPECT_EQ(event->m_cameraId.toSimpleString(), evaluate(event, "event.details.sourceId"));
+    EXPECT_EQ(event->m_deviceId.toSimpleString(), evaluate(event, "event.details.sourceId"));
 
     EXPECT_EQ(
         details.value("detailing").value<QStringList>().join(", "),

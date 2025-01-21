@@ -27,7 +27,7 @@ public:
         State state,
         const QString &caption,
         const QString &description,
-        nx::Uuid cameraId,
+        nx::Uuid deviceId,
         nx::Uuid engineId,
         const QString& eventTypeId,
         const nx::common::metadata::Attributes& attributes,

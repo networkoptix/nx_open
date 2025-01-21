@@ -12,8 +12,6 @@ IdRenamer::IdRenamer()
 {
     for (QString name: {"device", "server", "user"})
         renameToPlural(name);
-
-    renameToPlural("camera", "devices");
 }
 
 void IdRenamer::renameToPlural(const QString& source, QString target)

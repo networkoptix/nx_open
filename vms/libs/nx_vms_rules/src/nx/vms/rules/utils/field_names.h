@@ -6,11 +6,11 @@ namespace nx::vms::rules::utils {
 
 constexpr auto kAcknowledgeFieldName = "acknowledge";
 constexpr auto kAttributesFieldName = "attributes";
-constexpr auto kCameraIdFieldName = "cameraId";
 constexpr auto kCaptionFieldName = "caption";
 constexpr auto kContentFieldName = "content";
 constexpr auto kDescriptionFieldName = "description";
 constexpr auto kDetailingFieldName = "detailing";
+constexpr auto kDeviceIdFieldName = "deviceId";
 constexpr auto kDeviceIdsFieldName = "deviceIds";
 constexpr auto kDurationFieldName = "duration";
 constexpr auto kEmailsFieldName = "emails";

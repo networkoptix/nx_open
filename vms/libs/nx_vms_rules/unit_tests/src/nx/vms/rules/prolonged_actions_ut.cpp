@@ -79,11 +79,11 @@ protected:
         givenRule({.ids = {resourceA, resourceB}}, {.ids = {resourceC}});
     }
 
-    void whenTestEventFired(State state, nx::Uuid cameraId = resourceA)
+    void whenTestEventFired(State state, nx::Uuid deviceId = resourceA)
     {
         auto event = TestEventProlongedPtr::create();
         event->setState(state);
-        event->m_cameraId = cameraId;
+        event->m_deviceId = deviceId;
 
         connector.process(event);
     }

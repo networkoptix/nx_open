@@ -355,7 +355,7 @@ TEST_F(EngineTest, cloneEvent)
         std::chrono::microseconds(123456),
         State::instant);
 
-    original->m_cameraId = nx::Uuid::createUuid();
+    original->m_deviceId = nx::Uuid::createUuid();
     original->m_text = "Test text";
     original->m_intField = 42;
     original->m_floatField = 3.14f;

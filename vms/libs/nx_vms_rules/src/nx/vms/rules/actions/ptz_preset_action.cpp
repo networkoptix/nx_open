@@ -22,7 +22,7 @@ const ItemDescriptor& PtzPresetAction::manifest()
         .targetServers = TargetServers::resourceOwner,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 Strings::at(),
                 {},
                 TargetSingleDeviceFieldProperties{
@@ -45,7 +45,7 @@ const ItemDescriptor& PtzPresetAction::manifest()
         },
         .resources = {
             {
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 {ResourceType::device, {Qn::ViewContentPermission}, {}, FieldFlag::target}
             },
             {utils::kUsersFieldName, {ResourceType::user}},

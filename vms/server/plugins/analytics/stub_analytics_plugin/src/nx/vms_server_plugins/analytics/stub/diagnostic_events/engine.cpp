@@ -68,7 +68,7 @@ R"json(
             {
                 "type": "CheckBox",
                 "name": ")json" + kGenerateIntegrationDiagnosticEventsFromDeviceAgentSetting + R"json(",
-                "caption": "Generate Plugin Diagnostic Events from the DeviceAgent",
+                "caption": "Generate Integration Diagnostic Events from the DeviceAgent",
                 "defaultValue": false
             }
         ]

@@ -954,7 +954,7 @@ QString NotificationListModel::Private::iconPath(const vms::event::AbstractActio
             return eventIconPath(nx::vms::rules::Icon::license);
 
         case EventType::pluginDiagnosticEvent:
-            return eventIconPath(nx::vms::rules::Icon::pluginDiagnostic);
+            return eventIconPath(nx::vms::rules::Icon::integrationDiagnostic);
 
         default:
             return {};

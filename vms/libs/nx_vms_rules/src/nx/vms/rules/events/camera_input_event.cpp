@@ -17,23 +17,23 @@ namespace nx::vms::rules {
 CameraInputEvent::CameraInputEvent(
     std::chrono::microseconds timestamp,
     State state,
-    nx::Uuid cameraId,
+    nx::Uuid deviceId,
     const QString& inputPortId)
     :
     base_type(timestamp, state),
     m_inputPortId(inputPortId),
-    m_cameraId(cameraId)
+    m_deviceId(deviceId)
 {
 }
 
 QString CameraInputEvent::resourceKey() const
 {
-    return utils::makeKey(m_cameraId.toSimpleString(), m_inputPortId);
+    return utils::makeKey(deviceId().toSimpleString(), m_inputPortId);
 }
 
 QString CameraInputEvent::aggregationKey() const
 {
-    return m_cameraId.toSimpleString();
+    return deviceId().toSimpleString();
 }
 
 QString CameraInputEvent::aggregationSubKey() const
@@ -63,7 +63,7 @@ QString CameraInputEvent::detailing() const
 
 QString CameraInputEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
     return tr("Input on %1").arg(resourceName);
 }
 
@@ -89,7 +89,7 @@ ItemDescriptor CameraInputEvent::manifest(common::SystemContext* context)
         .fields = {
             utils::makeStateFieldDescriptor(Strings::state()),
             makeFieldDescriptor<SourceCameraField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
@@ -102,7 +102,7 @@ ItemDescriptor CameraInputEvent::manifest(common::SystemContext* context)
                 NX_DYNAMIC_TRANSLATABLE(tr("With ID"))),
         },
         .resources = {
-            {utils::kCameraIdFieldName,
+            {utils::kDeviceIdFieldName,
                 {ResourceType::device, {Qn::ViewContentPermission, Qn::ViewLivePermission}}}
         },
         .emailTemplateName = "camera_input.mustache"

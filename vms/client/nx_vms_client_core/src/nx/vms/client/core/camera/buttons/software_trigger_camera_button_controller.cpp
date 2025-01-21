@@ -113,7 +113,7 @@ bool isSuitableRule(
         return false;
 
     const auto cameraField = filter->fieldByName<nx::vms::rules::SourceCameraField>(
-        nx::vms::rules::utils::kCameraIdFieldName);
+        nx::vms::rules::utils::kDeviceIdFieldName);
     const auto userField = filter->fieldByName<nx::vms::rules::SourceUserField>("userId");
     if (!NX_ASSERT(cameraField && userField))
         return false;

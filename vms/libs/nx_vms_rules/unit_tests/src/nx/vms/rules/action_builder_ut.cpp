@@ -164,10 +164,10 @@ public:
         builder->addField(utils::kDurationFieldName, std::move(durationField));
     }
 
-    TestEventInstantPtr makeInstantEvent(nx::Uuid cameraId = {}) const
+    TestEventInstantPtr makeInstantEvent(nx::Uuid deviceId = {}) const
     {
         auto event = TestEventInstantPtr::create(syncTime.currentTimePoint());
-        event->m_cameraId = cameraId;
+        event->m_deviceId = deviceId;
         return event;
     }
 
@@ -181,10 +181,10 @@ public:
         return makeInstantEvent();
     }
 
-    TestEventPtr makeEventWithPermissions(nx::Uuid cameraId = {}) const
+    TestEventPtr makeEventWithPermissions(nx::Uuid deviceId = {}) const
     {
         auto event = TestEventPtr::create(syncTime.currentTimePoint());
-        event->m_cameraId = cameraId;
+        event->m_deviceId = deviceId;
         return event;
     }
 

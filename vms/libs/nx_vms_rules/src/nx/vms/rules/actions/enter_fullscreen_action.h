@@ -12,7 +12,7 @@ class NX_VMS_RULES_API EnterFullscreenAction: public nx::vms::rules::BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "enterFullscreen")
 
-    FIELD(nx::Uuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, deviceId, setDeviceId)
     FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(UuidList, layoutIds, setLayoutIds)
     FIELD(std::chrono::microseconds, playbackTime, setPlaybackTime)

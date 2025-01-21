@@ -75,7 +75,7 @@ struct Facade
 
 bool hasPreview(const EventPtr& event)
 {
-    return event->property(rules::utils::kCameraIdFieldName).isValid()
+    return event->property(rules::utils::kDeviceIdFieldName).isValid()
         || event->property(rules::utils::kDeviceIdsFieldName).isValid();
 }
 

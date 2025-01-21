@@ -98,7 +98,7 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
             return;
 
         const auto camera = resourcePool()->getResourceById(
-            enterFullscreenAction->cameraId()).dynamicCast<QnVirtualCameraResource>();
+            enterFullscreenAction->deviceId()).dynamicCast<QnVirtualCameraResource>();
         if (!camera)
             return;
 
@@ -151,7 +151,7 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
         if (!NX_ASSERT(ptzAction))
             return;
 
-        auto resource = resourcePool()->getResourceById(ptzAction->cameraId());
+        auto resource = resourcePool()->getResourceById(ptzAction->deviceId());
         if (!resource)
             return;
 

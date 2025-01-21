@@ -67,7 +67,7 @@ QSet<State> getPossibleFilterStates(EventDurationType eventDurationType)
 
 bool hasSourceCamera(const vms::rules::ItemDescriptor& eventDescriptor)
 {
-    return eventDescriptor.resources.contains(utils::kCameraIdFieldName)
+    return eventDescriptor.resources.contains(utils::kDeviceIdFieldName)
         || eventDescriptor.resources.contains(utils::kDeviceIdsFieldName);
 }
 
@@ -100,8 +100,8 @@ nx::Uuid sourceId(const BasicEvent* event)
             return event->property(propName).value<nx::Uuid>();
         };
 
-    if (const auto cameraId = getId(utils::kCameraIdFieldName); !cameraId.isNull())
-        return cameraId;
+    if (const auto deviceId = getId(utils::kDeviceIdFieldName); !deviceId.isNull())
+        return deviceId;
 
     if (const auto serverId = getId(utils::kServerIdFieldName); !serverId.isNull())
         return serverId;

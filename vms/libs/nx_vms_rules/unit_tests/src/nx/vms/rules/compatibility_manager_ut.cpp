@@ -74,7 +74,7 @@ public:
 
     void withSelectedDevicesForEvent(const UuidSet& devices)
     {
-        if (auto field = eventField<SourceCameraField>(utils::kCameraIdFieldName); NX_ASSERT(field))
+        if (auto field = eventField<SourceCameraField>(utils::kDeviceIdFieldName); NX_ASSERT(field))
             field->setIds(devices);
     }
 
@@ -86,7 +86,7 @@ public:
 
     void selectedEventDevicesAre(const UuidSet& devices)
     {
-        if (auto field = eventField<SourceCameraField>(utils::kCameraIdFieldName); NX_ASSERT(field))
+        if (auto field = eventField<SourceCameraField>(utils::kDeviceIdFieldName); NX_ASSERT(field))
             EXPECT_EQ(field->ids(), devices);
     }
 

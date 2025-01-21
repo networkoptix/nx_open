@@ -11,23 +11,23 @@ AnalyticsEngineEvent::AnalyticsEngineEvent(
     std::chrono::microseconds timestamp,
     const QString& caption,
     const QString& description,
-    nx::Uuid cameraId,
+    nx::Uuid deviceId,
     nx::Uuid engineId)
     :
     DescribedEvent(timestamp, caption, description),
-    m_cameraId(cameraId),
+    m_deviceId(deviceId),
     m_engineId(engineId)
 {
 }
 
-nx::Uuid AnalyticsEngineEvent::cameraId() const
+nx::Uuid AnalyticsEngineEvent::deviceId() const
 {
-    return m_cameraId;
+    return m_deviceId;
 }
 
-void AnalyticsEngineEvent::setCameraId(nx::Uuid cameraId)
+void AnalyticsEngineEvent::setDeviceId(nx::Uuid deviceId)
 {
-    m_cameraId = cameraId;
+    m_deviceId = deviceId;
 }
 
 nx::Uuid AnalyticsEngineEvent::engineId() const
@@ -42,7 +42,7 @@ void AnalyticsEngineEvent::setEngineId(nx::Uuid engineId)
 
 QString AnalyticsEngineEvent::resourceKey() const
 {
-    return m_cameraId.toSimpleString();
+    return deviceId().toSimpleString();
 }
 
 QVariantMap AnalyticsEngineEvent::details(

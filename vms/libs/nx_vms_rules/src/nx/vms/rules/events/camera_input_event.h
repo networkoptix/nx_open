@@ -14,13 +14,13 @@ class NX_VMS_RULES_API CameraInputEvent: public BasicEvent
     Q_CLASSINFO("type", "cameraInput")
 
     FIELD(QString, inputPortId, setInputPortId)
-    FIELD(nx::Uuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, deviceId, setDeviceId)
 
 public:
     CameraInputEvent(
         std::chrono::microseconds timestamp,
         State state,
-        nx::Uuid cameraId,
+        nx::Uuid deviceId,
         const QString& inputPortId);
 
     CameraInputEvent() = default;

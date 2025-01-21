@@ -15,7 +15,7 @@ inline const QMap<EventType, QString> eventTypesMap = {
     {EventType::userDefinedEvent, QStringLiteral("generic")},
     {EventType::cameraInputEvent, QStringLiteral("cameraInput")},
     {EventType::cameraMotionEvent, QStringLiteral("motion")},
-    {EventType::pluginDiagnosticEvent, QStringLiteral("pluginDiagnostic")},
+    {EventType::pluginDiagnosticEvent, QStringLiteral("integrationDiagnostic")},
     {EventType::softwareTriggerEvent, QStringLiteral("softTrigger")},
     {EventType::cameraDisconnectEvent, QStringLiteral("deviceDisconnected")},
     {EventType::cameraIpConflictEvent, QStringLiteral("deviceIpConflict")},

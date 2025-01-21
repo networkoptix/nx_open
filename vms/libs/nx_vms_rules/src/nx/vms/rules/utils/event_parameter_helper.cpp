@@ -53,7 +53,7 @@ const QString kEventTimeExample = "2021-01-13T09:11:23+00:00";
 const QString kEventTimestampExample = "1644422205";
 const QString kCustomTextExample = "Some custom text";
 const QString kDeviceFilterText = "Events that include the <code>deviceIds</code> or "
-                                  "<code>cameraId</code> field in their manifest.<br/>"
+                                  "<code>deviceId</code> field in their manifest.<br/>"
                                   "For example: Camera Disconnected Event, Network Issue.";
 
 const SubstitutionDoc kDefaultDeviceIdDoc = {

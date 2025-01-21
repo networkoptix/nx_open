@@ -95,7 +95,7 @@ public:
         const auto& meta = T::staticMetaObject;
 
         static const auto resProps = QSet<QString>{
-            utils::kCameraIdFieldName,
+            utils::kDeviceIdFieldName,
             utils::kDeviceIdsFieldName,
             utils::kEngineIdFieldName,
             utils::kLayoutIdFieldName,
@@ -329,18 +329,18 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventRegistration<DeviceIpConflictEvent>(systemContext());
     testEventRegistration<FanErrorEvent>();
     testEventRegistration<GenericEvent>();
+    testEventRegistration<IntegrationDiagnosticEvent>();
     testEventRegistration<LicenseIssueEvent>();
     testEventRegistration<MotionEvent>();
     testEventRegistration<NetworkIssueEvent>();
-    testEventRegistration<PluginDiagnosticEvent>();
     testEventRegistration<PoeOverBudgetEvent>();
+    testEventRegistration<SaasIssueEvent>();
     testEventRegistration<ServerCertificateErrorEvent>();
     testEventRegistration<ServerConflictEvent>();
     testEventRegistration<ServerFailureEvent>();
     testEventRegistration<ServerStartedEvent>();
     testEventRegistration<SoftTriggerEvent>();
     testEventRegistration<StorageIssueEvent>();
-    testEventRegistration<SaasIssueEvent>();
 }
 
 TEST_F(BuiltinTypesTest, BuiltinActions)

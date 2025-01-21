@@ -81,7 +81,7 @@ public:
         {"text", "hello"},
         {"boolField", true},
         {"floatField", 123.123},
-        {"cameraId", nx::Uuid::createUuid().toSimpleString()},
+        {rules::utils::kDeviceIdFieldName, nx::Uuid::createUuid().toSimpleString()},
     };
 
     const FieldDescriptor kDummyDescriptor;
@@ -351,7 +351,7 @@ TEST_F(ActionFieldTest, EventDotSource)
 
     field.setText("{event.source}");
 
-    EXPECT_EQ(event->m_cameraId.toSimpleString(), field.build(eventAggregator).toString());
+    EXPECT_EQ(event->m_deviceId.toSimpleString(), field.build(eventAggregator).toString());
 }
 
 TEST_F(ActionFieldTest, EventTooltip)
@@ -438,7 +438,7 @@ TEST_F(ActionFieldTest, TargetUsersField)
 TEST_F(ActionFieldTest, TargetSingleDeviceTest)
 {
     const auto event = QSharedPointer<TestEvent>::create();
-    event->m_cameraId = nx::Uuid::createUuid();
+    event->m_deviceId = nx::Uuid::createUuid();
     event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
     const auto aggEvent = AggregatedEventPtr::create(event);
 

@@ -20,7 +20,7 @@ class TestEventInstant: public nx::vms::rules::BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "testInstant")
 
-    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(nx::Uuid deviceId MEMBER m_deviceId)
 public:
     static ItemDescriptor manifest()
     {
@@ -30,7 +30,7 @@ public:
             .flags = {ItemFlag::instant},
             .fields = {
                 makeFieldDescriptor<SourceCameraField>(
-                    utils::kCameraIdFieldName,
+                    utils::kDeviceIdFieldName,
                     nx::TranslatableString("Camera id"),
                     {},
                     {{"acceptAll", true}}),
@@ -42,7 +42,7 @@ public:
 
     virtual QString resourceKey() const override
     {
-        return m_cameraId.toSimpleString();
+        return m_deviceId.toSimpleString();
     }
 
     virtual QString cacheKey() const override
@@ -55,7 +55,7 @@ public:
         m_cacheKey = cacheKey;
     }
 
-    nx::Uuid m_cameraId;
+    nx::Uuid m_deviceId;
     QString m_cacheKey;
 };
 
@@ -67,7 +67,7 @@ class TestEvent: public nx::vms::rules::BasicEvent
     Q_CLASSINFO("type", "testPermissions")
 
     Q_PROPERTY(nx::Uuid serverId MEMBER m_serverId)
-    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(nx::Uuid deviceId MEMBER m_deviceId)
     Q_PROPERTY(UuidList deviceIds MEMBER m_deviceIds)
 
     Q_PROPERTY(int intField MEMBER m_intField)
@@ -88,8 +88,8 @@ public:
             .displayName = TranslatableString("Test event with permissions"),
             .flags = {ItemFlag::instant, ItemFlag::prolonged},
             .resources = {
-                {"cameraId", {ResourceType::device, Qn::ViewContentPermission}},
-                {"deviceIds", {ResourceType::device, Qn::ViewContentPermission}}},
+                {rules::utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+                {rules::utils::kDeviceIdsFieldName, {ResourceType::device, Qn::ViewContentPermission}}},
             .readPermissions = nx::vms::api::GlobalPermission::viewLogs,
         };
     }
@@ -98,12 +98,12 @@ public:
 
     virtual QString aggregationSubKey() const override
     {
-        return utils::makeKey(BasicEvent::aggregationSubKey(), m_cameraId.toSimpleString());
+        return utils::makeKey(BasicEvent::aggregationSubKey(), m_deviceId.toSimpleString());
     }
 
     virtual QString resourceKey() const override
     {
-        return m_cameraId.toSimpleString();
+        return m_deviceId.toSimpleString();
     }
 
     virtual QVariantMap details(common::SystemContext* context,
@@ -124,7 +124,7 @@ public:
     }
 
     nx::Uuid m_serverId;
-    nx::Uuid m_cameraId;
+    nx::Uuid m_deviceId;
     UuidList m_deviceIds;
 
     int m_intField{};
@@ -143,7 +143,7 @@ class TestEventProlonged : public nx::vms::rules::BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "testProlonged")
 
-    Q_PROPERTY(nx::Uuid cameraId MEMBER m_cameraId)
+    Q_PROPERTY(nx::Uuid deviceId MEMBER m_deviceId)
 
 public:
     using BasicEvent::BasicEvent;
@@ -158,7 +158,7 @@ public:
                 makeFieldDescriptor<StateField>(
                     utils::kStateFieldName, nx::TranslatableString("State field")),
                 makeFieldDescriptor<SourceCameraField>(
-                    utils::kCameraIdFieldName,
+                    utils::kDeviceIdFieldName,
                     nx::TranslatableString("Camera id"),
                     {},
                     ResourceFilterFieldProperties{
@@ -170,10 +170,10 @@ public:
 
     QString resourceKey() const override
     {
-        return m_cameraId.toSimpleString();
+        return m_deviceId.toSimpleString();
     }
 
-    nx::Uuid m_cameraId;
+    nx::Uuid m_deviceId;
 };
 
 using TestEventInstantPtr = QSharedPointer<TestEventInstant>;

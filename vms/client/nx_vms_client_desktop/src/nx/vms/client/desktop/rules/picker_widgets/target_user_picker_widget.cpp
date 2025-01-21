@@ -95,7 +95,7 @@ void TargetUserPicker::onSelectButtonClicked()
         else if (validationPolicy == vms::rules::kBookmarkManagementValidationPolicy)
         {
             auto cameraField =
-                getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kCameraIdFieldName);
+                getEventField<vms::rules::SourceCameraField>(vms::rules::utils::kDeviceIdFieldName);
 
             if (cameraField && !cameraField->acceptAll())
             {

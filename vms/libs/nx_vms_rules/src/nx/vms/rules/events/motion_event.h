@@ -13,7 +13,7 @@ class NX_VMS_RULES_API MotionEvent: public BasicEvent
     using base_type = BasicEvent;
     Q_CLASSINFO("type", "motion")
 
-    FIELD(nx::Uuid, cameraId, setCameraId)
+    FIELD(nx::Uuid, deviceId, setDeviceId)
 
 public:
     MotionEvent() = default;

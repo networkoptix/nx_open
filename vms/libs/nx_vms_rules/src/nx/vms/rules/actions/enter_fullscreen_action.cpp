@@ -22,7 +22,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
         .executionTargets = ExecutionTarget::clients,
         .fields = {
             makeFieldDescriptor<TargetDeviceField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Camera")),
                 {},
                 TargetSingleDeviceFieldProperties{
@@ -42,7 +42,7 @@ const ItemDescriptor& EnterFullscreenAction::manifest()
             utils::makePlaybackFieldDescriptor(Strings::rewind()),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kLayoutIdsFieldName, {ResourceType::layout, Qn::ReadPermission}},
             {utils::kUsersFieldName, {ResourceType::user}},
         },

@@ -24,7 +24,7 @@ static const QMap<Icon, QString> kIconPaths = {
     {Icon::storage, "20x20/Outline/storage.svg"},
     {Icon::server, "20x20/Outline/server.svg"},
     {Icon::inputSignal, "20x20/Outline/input_signal.svg"},
-    {Icon::pluginDiagnostic, "20x20/Outline/plugin.svg"},
+    {Icon::integrationDiagnostic, "20x20/Outline/plugin.svg"},
     {Icon::fanError, "20x20/Outline/fan.svg"},
      // TODO: VMS-47520: check how this event is called and create if required.
     {Icon::cloudOffline, "20x20/Outline/cloud_offline.svg"},

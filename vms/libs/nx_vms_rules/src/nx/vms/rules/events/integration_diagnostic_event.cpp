@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "plugin_diagnostic_event.h"
+#include "integration_diagnostic_event.h"
 
 #include <nx/vms/rules/event_filter_fields/analytics_engine_field.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_level_field.h>
@@ -15,6 +15,9 @@
 namespace nx::vms::rules {
 
 namespace {
+
+const auto kCaption =
+    NX_DYNAMIC_TRANSLATABLE(IntegrationDiagnosticEvent::tr("Integration Diagnostic Event"));
 
 nx::vms::event::Level calculateLevel(nx::vms::api::EventLevel eventLevel)
 {
@@ -36,20 +39,20 @@ nx::vms::event::Level calculateLevel(nx::vms::api::EventLevel eventLevel)
 
 } // namespace
 
-PluginDiagnosticEvent::PluginDiagnosticEvent(
+IntegrationDiagnosticEvent::IntegrationDiagnosticEvent(
     std::chrono::microseconds timestamp,
     const QString& caption,
     const QString& description,
-    nx::Uuid cameraId,
+    nx::Uuid deviceId,
     nx::Uuid engineId,
     nx::vms::api::EventLevel level)
     :
-    AnalyticsEngineEvent(timestamp, caption, description, cameraId, engineId),
+    AnalyticsEngineEvent(timestamp, caption, description, deviceId, engineId),
     m_level(level)
 {
 }
 
-QVariantMap PluginDiagnosticEvent::details(
+QVariantMap IntegrationDiagnosticEvent::details(
     common::SystemContext* context, const nx::vms::api::rules::PropertyMap& aggregatedInfo) const
 {
     auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
@@ -59,32 +62,32 @@ QVariantMap PluginDiagnosticEvent::details(
 
     result.insert(utils::kExtendedCaptionDetailName, extendedCaption(context));
     utils::insertLevel(result, calculateLevel(level()));
-    utils::insertIcon(result, nx::vms::rules::Icon::pluginDiagnostic);
+    utils::insertIcon(result, nx::vms::rules::Icon::integrationDiagnostic);
 
     return result;
 }
 
-QString PluginDiagnosticEvent::eventCaption() const
+QString IntegrationDiagnosticEvent::eventCaption() const
 {
-    return caption().isEmpty() ? tr("Plugin Diagnostic Event") : caption();
+    return caption().isEmpty() ? kCaption : caption();
 }
 
-QString PluginDiagnosticEvent::extendedCaption(common::SystemContext* context) const
+QString IntegrationDiagnosticEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
     return nx::format("%1 - %2", resourceName, eventCaption());
 }
 
-const ItemDescriptor& PluginDiagnosticEvent::manifest()
+const ItemDescriptor& IntegrationDiagnosticEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
-        .id = utils::type<PluginDiagnosticEvent>(),
-        .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Plugin Diagnostic Event")),
+        .id = utils::type<IntegrationDiagnosticEvent>(),
+        .displayName = kCaption,
         .description = "Triggered when an event is received from "
             "a plugin device connected to the site.",
         .fields = {
             makeFieldDescriptor<SourceCameraField>(
-                utils::kCameraIdFieldName,
+                utils::kDeviceIdFieldName,
                 Strings::occursAt(),
                 {},
                 ResourceFilterFieldProperties{
@@ -104,9 +107,9 @@ const ItemDescriptor& PluginDiagnosticEvent::manifest()
                 NX_DYNAMIC_TRANSLATABLE(tr("And Level Is"))),
         },
         .resources = {
-            {utils::kCameraIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
+            {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},
             {utils::kEngineIdFieldName, {ResourceType::analyticsEngine}}},
-        .emailTemplateName = "plugin_diagnostic.mustache"
+        .emailTemplateName = "integration_diagnostic.mustache"
     };
 
     return kDescriptor;

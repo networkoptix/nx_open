@@ -38,7 +38,7 @@ bool hasTargetCamera(const vms::rules::ItemDescriptor& actionDescriptor)
         [](const vms::rules::FieldDescriptor& fieldDescriptor)
         {
             return fieldDescriptor.fieldName == vms::rules::utils::kDeviceIdsFieldName
-                || fieldDescriptor.fieldName == vms::rules::utils::kCameraIdFieldName;
+                || fieldDescriptor.fieldName == vms::rules::utils::kDeviceIdFieldName;
         });
 }
 

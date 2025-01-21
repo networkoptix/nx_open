@@ -17,12 +17,12 @@ namespace nx::vms::rules {
 
 NetworkIssueEvent::NetworkIssueEvent(
     std::chrono::microseconds timestamp,
-    nx::Uuid cameraId,
+    nx::Uuid deviceId,
     nx::vms::api::EventReason reason,
     const NetworkIssueInfo& info)
     :
     BasicEvent(timestamp),
-    m_cameraId(cameraId),
+    m_deviceId(deviceId),
     m_reason(reason),
     m_info(info)
 {
@@ -30,14 +30,14 @@ NetworkIssueEvent::NetworkIssueEvent(
 
 QString NetworkIssueEvent::resourceKey() const
 {
-    return m_cameraId.toSimpleString();
+    return m_deviceId.toSimpleString();
 }
 
 QString NetworkIssueEvent::aggregationSubKey() const
 {
     return utils::makeKey(
         BasicEvent::aggregationSubKey(),
-        cameraId().toSimpleString(),
+        deviceId().toSimpleString(),
         QString::number(static_cast<int>(reason())));
 }
 
@@ -57,7 +57,7 @@ QVariantMap NetworkIssueEvent::details(
 
 QString NetworkIssueEvent::extendedCaption(common::SystemContext* context) const
 {
-    const auto resourceName = Strings::resource(context, cameraId(), Qn::RI_WithUrl);
+    const auto resourceName = Strings::resource(context, deviceId(), Qn::RI_WithUrl);
     return tr("Network Issue at %1").arg(resourceName);
 }
 
@@ -82,7 +82,7 @@ QString NetworkIssueEvent::reasonText(common::SystemContext* context) const
         case EventReason::networkConnectionClosed:
         {
             const auto device = context->resourcePool()
-                ->getResourceById<QnVirtualCameraResource>(cameraId());
+                ->getResourceById<QnVirtualCameraResource>(deviceId());
             const auto deviceType = device
                 ? QnDeviceDependentStrings::calculateDeviceType(context->resourcePool(), {device})
                 : QnCameraDeviceType::Mixed;
@@ -148,7 +148,7 @@ const ItemDescriptor& NetworkIssueEvent::manifest()
             "and packet loss is detected.",
         .flags = {ItemFlag::instant, ItemFlag::aggregationByTypeSupported},
         .resources = {
-            {utils::kCameraIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}},
+            {utils::kDeviceIdFieldName, { ResourceType::device, Qn::ViewContentPermission}}},
         .emailTemplateName = "timestamp_and_details.mustache"
     };
     return kDescriptor;
