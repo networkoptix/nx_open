@@ -392,6 +392,8 @@ void GlobalToolTipAttached::Private::initEventFilter()
 void GlobalToolTipAttached::Private::handleToolTipAboutToShow()
 {
     auto toolTip = instance();
+    if (!toolTip)
+        return;
 
     if (toolTip.invokerItem() != item)
         return;
