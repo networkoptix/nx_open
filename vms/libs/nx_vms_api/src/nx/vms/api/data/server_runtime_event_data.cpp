@@ -12,28 +12,4 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx_vms_api_ServerRuntimeEventData_Fields,
     (optional, true))
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    DeviceAgentSettingsMaybeChangedData,
-    (json),
-    nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields,
-    (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    DeviceFootageChangedData,
-    (json),
-    nx_vms_api_DeviceFootageChangedData_Fields,
-    (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AnalyticsStorageParametersChangedData,
-    (json),
-    nx_vms_api_AnalyticsStorageParametersChangedData_Fields,
-    (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    DeviceAdvancedSettingsManifestChangedData,
-    (json),
-    nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields,
-    (optional, true))
-
 } // namespace nx::vms::api

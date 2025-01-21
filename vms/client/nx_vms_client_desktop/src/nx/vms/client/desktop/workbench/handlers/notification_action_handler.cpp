@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/json.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -172,6 +173,12 @@ NotificationActionHandler::NotificationActionHandler(
             const auto resource = system()->resourcePool()->getResourceById(id);
             setSystemHealthEventVisible(MessageType::replacedDeviceDiscovered, resource, false);
         });
+
+    const auto eventConnector = systemContext->serverRuntimeEventConnector();
+    connect(eventConnector,
+        &nx::vms::client::core::ServerRuntimeEventConnector::serviceDisabled,
+        this,
+        &NotificationActionHandler::at_serviceDisabled);
 
     connect(this, &NotificationActionHandler::notificationAdded,
         this,
@@ -375,6 +382,32 @@ void NotificationActionHandler::at_context_userChanged()
 {
     if (!system()->user())
         clear();
+}
+
+void NotificationActionHandler::at_serviceDisabled(
+    nx::vms::api::EventReason reason,
+    const std::set<nx::Uuid>& deviceIds)
+{
+    using namespace nx::vms::api;
+    MessageType messageType;
+    switch (reason)
+    {
+        case EventReason::notEnoughLocalRecordingServices:
+            messageType = MessageType::recordingServiceDisabled;
+            break;
+        case EventReason::notEnoughCloudRecordingServices:
+            messageType = MessageType::cloudServiceDisabled;
+            break;
+        case EventReason::notEnoughIntegrationServices:
+            messageType = MessageType::integrationServiceDisabled;
+            break;
+        default:
+            NX_ASSERT(false, "Unexpected event reason %1", reason);
+            return;
+    }
+
+    auto resources = system()->resourcePool()->getResourcesByIds(deviceIds);
+    setSystemHealthEventVisibleInternal(messageType, QVariant::fromValue(resources), true);
 }
 
 void NotificationActionHandler::at_businessActionReceived(

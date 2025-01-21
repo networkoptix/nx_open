@@ -1045,8 +1045,12 @@ QString StringsHelper::servicesDisabledReason(const EventParameters& params)
     NX_ASSERT(params.eventType == EventType::saasIssueEvent);
 
     const auto channelCount = SaasIssueEvent::decodeLicenseKeys(params).size();
+    return servicesDisabledReason(params.reasonCode, channelCount);
+}
 
-    switch (params.reasonCode)
+QString StringsHelper::servicesDisabledReason(EventReason reasonCode, int channelCount)
+{
+    switch (reasonCode)
     {
         case EventReason::notEnoughLocalRecordingServices:
             return tr("Recording on %n channels was stopped due to service overuse.",

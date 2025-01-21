@@ -108,6 +108,7 @@ public:
     static QString ldapSyncIssueText(const EventParameters& params);
 
     static QString servicesDisabledReason(const EventParameters& params);
+    static QString servicesDisabledReason(EventReason reasonCode, int channelCount);
     static QString licenseMigrationReason(EventReason reasonCode);
 
     static QStringList licenseMigrationDetails(

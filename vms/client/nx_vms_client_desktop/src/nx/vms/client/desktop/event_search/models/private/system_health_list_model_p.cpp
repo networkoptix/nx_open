@@ -41,6 +41,7 @@
 #include <nx/vms/common/system_health/system_health_data_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
@@ -54,6 +55,13 @@
 namespace {
 
 using namespace nx::vms::common::system_health;
+
+bool isServiceDisabledMessage(MessageType message)
+{
+    return message == MessageType::recordingServiceDisabled
+        || message == MessageType::cloudServiceDisabled
+        || message == MessageType::integrationServiceDisabled;
+}
 
 std::optional<QString> overusedSaasServiceType(MessageType messageType)
 {
@@ -88,16 +96,21 @@ namespace nx::vms::client::desktop {
 
 SystemHealthListModel::Private::Item::Item(
     MessageType message,
-    const QnResourcePtr& resource)
+    const QnResourceList& resources)
     :
     message(message),
-    resource(resource)
+    resources(resources)
 {
+}
+
+QnResourcePtr SystemHealthListModel::Private::Item::getResource() const
+{
+    return !resources.empty() ? resources[0] : QnResourcePtr();
 }
 
 bool SystemHealthListModel::Private::Item::operator==(const Item& other) const
 {
-    return message == other.message && resource == other.resource;
+    return message == other.message && resources == other.resources;
 }
 
 bool SystemHealthListModel::Private::Item::operator!=(const Item& other) const
@@ -109,7 +122,7 @@ bool SystemHealthListModel::Private::Item::operator<(const Item& other) const
 {
     return message != other.message
         ? message < other.message
-        : resource < other.resource;
+        : resources < other.resources;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -211,7 +224,12 @@ common::system_health::MessageType SystemHealthListModel::Private::message(int i
 
 QnResourcePtr SystemHealthListModel::Private::resource(int index) const
 {
-    return m_items[index].resource;
+    return m_items[index].getResource();
+}
+
+ QnResourceList SystemHealthListModel::Private::resources(int index) const
+{
+    return m_items[index].resources;
 }
 
 QString SystemHealthListModel::Private::description(int index) const
@@ -222,7 +240,6 @@ QString SystemHealthListModel::Private::description(int index) const
 QString SystemHealthListModel::Private::title(int index) const
 {
     const auto& item = m_items[index];
-    const QString resourceName = item.resource ? item.resource->getName() : "";
 
     switch (item.message)
     {
@@ -288,7 +305,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
     {
         using namespace nx::vms::common;
 
-        const auto camera = item.resource.dynamicCast<QnVirtualCameraResource>();
+        const auto camera = item.getResource().dynamicCast<QnVirtualCameraResource>();
         if (!NX_ASSERT(camera, "Invalid notification parameter"))
             return {};
 
@@ -357,6 +374,35 @@ QString SystemHealthListModel::Private::toolTip(int index) const
     {
         return (tr("The Site exceeds its Organization's limits and may become "
             "non-functional soon. Please adjust your usage to avoid service disruption."));
+    }
+
+    if (isServiceDisabledMessage(item.message))
+    {
+        using namespace nx::vms::event;
+        EventReason eventReason;
+        switch (item.message)
+        {
+            case MessageType::recordingServiceDisabled:
+                eventReason = EventReason::notEnoughLocalRecordingServices;
+                break;
+            case MessageType::cloudServiceDisabled:
+                eventReason = EventReason::notEnoughCloudRecordingServices;
+                break;
+            case MessageType::integrationServiceDisabled:
+                eventReason = EventReason::notEnoughIntegrationServices;
+                break;
+            default:
+                NX_ASSERT(false, "Unexpected message type %1", item.message);
+                return QString();
+        }
+
+        QStringList tooltipLines;
+        tooltipLines << StringsHelper::servicesDisabledReason(eventReason, item.resources.size());
+        tooltipLines << QString();
+        const auto resourceInfoLevel = appContext()->localSettings()->resourceInfoLevel();
+        for (const auto& resource: item.resources)
+            tooltipLines << QnResourceDisplayInfo(resource).toString(resourceInfoLevel);
+        return tooltipLines.join("<br>");
     }
 
     return QnSystemHealthStringsHelper::messageTooltip(
@@ -435,7 +481,7 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
         {
             const auto action = CommandActionPtr(new CommandAction(tr("Undo Replace")));
             connect(action.data(), &CommandAction::triggered, this,
-                [this, resource = item.resource]
+                [this, resource = item.getResource()]
                 {
                     const auto parameters = menu::Parameters(resource);
                     menu()->triggerIfPossible(menu::UndoReplaceCameraAction, parameters);
@@ -576,7 +622,7 @@ menu::Parameters SystemHealthListModel::Private::parameters(int index) const
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveRebuildCanceled:
         {
-            return menu::Parameters(m_items[index].resource)
+            return menu::Parameters(m_items[index].getResource())
                 .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
         }
 
@@ -659,9 +705,11 @@ void SystemHealthListModel::Private::doAddItem(
         }
     }
 
-    QnResourcePtr resource;
+    QnResourceList resources;
     if (params.canConvert<QnResourcePtr>())
-        resource = params.value<QnResourcePtr>();
+        resources << params.value<QnResourcePtr>();
+    else if (params.canConvert<QnResourceList>())
+        resources = params.value<QnResourceList>();
 
     vms::event::AbstractActionPtr action;
     if (params.canConvert<vms::event::AbstractActionPtr>())
@@ -672,12 +720,12 @@ void SystemHealthListModel::Private::doAddItem(
             const auto sourceResources = event::sourceResources(
                 action->getRuntimeParams(),
                 system()->resourcePool());
-            if (sourceResources && !sourceResources->isEmpty())
-                resource = sourceResources->first();
+            if (sourceResources)
+                resources = *sourceResources;
         }
     }
 
-    Item item(message, resource);
+    Item item(message, resources);
     item.serverData = action;
 
     auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
@@ -725,7 +773,7 @@ void SystemHealthListModel::Private::removeItemForResource(
 {
     NX_VERBOSE(this, "Removing a system health message %1", toString(message));
 
-    const Item item(message, resource);
+    const Item item(message, QnResourceList() << resource);
     const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
     if (position != m_items.cend() && *position == item)
         q->removeRows(std::distance(m_items.cbegin(), position), 1);

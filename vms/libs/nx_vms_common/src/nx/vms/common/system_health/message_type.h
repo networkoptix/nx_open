@@ -89,6 +89,13 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
      */
     saasTierIssue = 38,
 
+    /**
+     * Show a warning that service was disabled automatically due to SaaS issue
+     */
+    recordingServiceDisabled = 39,
+    cloudServiceDisabled = 40,
+    integrationServiceDisabled = 41,
+
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.
 

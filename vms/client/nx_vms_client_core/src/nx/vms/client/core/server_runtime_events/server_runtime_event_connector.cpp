@@ -37,7 +37,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::deviceAgentSettingsMaybeChanged:
         {
             DeviceAgentSettingsMaybeChangedData result;
-            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
                 return;
 
             emit deviceAgentSettingsMaybeChanged(
@@ -49,7 +49,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::deviceFootageChanged:
         {
             DeviceFootageChangedData result;
-            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
                 return;
 
             emit deviceFootageChanged(result.deviceIds);
@@ -59,7 +59,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::analyticsStorageParametersChanged:
         {
             AnalyticsStorageParametersChangedData result;
-            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
                 return;
 
             emit analyticsStorageParametersChanged(result.serverId);
@@ -69,10 +69,20 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::deviceAdvancedSettingsManifestChanged:
         {
             DeviceAdvancedSettingsManifestChangedData result;
-            if (!NX_ASSERT(QJson::deserialize(eventData.eventData, &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
                 return;
 
             emit deviceAdvancedSettingsManifestChanged(result.deviceIds);
+
+            return;
+        }
+        case ServerRuntimeEventType::serviceDisabled:
+        {
+            ServiceDisabledData result;
+            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
+                return;
+
+            emit serviceDisabled(result.reason, result.deviceIds);
 
             return;
         }

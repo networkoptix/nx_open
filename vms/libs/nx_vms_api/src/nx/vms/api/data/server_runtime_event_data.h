@@ -11,6 +11,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 namespace nx::vms::api {
 
@@ -22,6 +23,9 @@ enum class ServerRuntimeEventType
     deviceFootageChanged = 2,
     analyticsStorageParametersChanged = 3,
     deviceAdvancedSettingsManifestChanged = 4,
+
+    /** Saas service was automatically disabled due to licenses issue */
+    serviceDisabled = 5,
 };
 
 template<typename Visitor>
@@ -64,7 +68,6 @@ struct NX_VMS_API DeviceAgentSettingsMaybeChangedData
 
 #define nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields (deviceId)(engineId)(settingsData)
 
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsMaybeChangedData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceAgentSettingsMaybeChangedData,
     nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields)
 
@@ -74,7 +77,6 @@ struct NX_VMS_API DeviceFootageChangedData
 };
 
 #define nx_vms_api_DeviceFootageChangedData_Fields (deviceIds)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceFootageChangedData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceFootageChangedData,
     nx_vms_api_DeviceFootageChangedData_Fields)
 
@@ -84,7 +86,6 @@ struct NX_VMS_API AnalyticsStorageParametersChangedData
 };
 
 #define nx_vms_api_AnalyticsStorageParametersChangedData_Fields (serverId)
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsStorageParametersChangedData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(AnalyticsStorageParametersChangedData,
     nx_vms_api_AnalyticsStorageParametersChangedData_Fields)
 
@@ -93,8 +94,16 @@ struct NX_VMS_API DeviceAdvancedSettingsManifestChangedData
     std::set<nx::Uuid> deviceIds;
 };
 #define nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields (deviceIds)
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAdvancedSettingsManifestChangedData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceAdvancedSettingsManifestChangedData,
     nx_vms_api_DeviceAdvancedSettingsManifestChangedData_Fields)
+
+struct NX_VMS_API ServiceDisabledData
+{
+    EventReason reason{EventReason::none};
+    std::set<nx::Uuid> deviceIds;
+};
+#define nx_vms_api_ServiceDisabledData_Fields (reason)(deviceIds)
+NX_REFLECTION_INSTRUMENT(ServiceDisabledData,
+    nx_vms_api_ServiceDisabledData_Fields)
 
 } // namespace nx::vms::api

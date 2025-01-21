@@ -34,6 +34,7 @@ public:
     int count() const;
 
     MessageType message(int index) const;
+    QnResourceList resources(int index) const;
     QnResourcePtr resource(int index) const;
 
     QString title(int index) const;
@@ -73,7 +74,8 @@ private:
     struct Item
     {
         Item() = default;
-        Item(MessageType message, const QnResourcePtr& resource);
+        Item(MessageType message, const QnResourceList& resources);
+        QnResourcePtr getResource() const;
 
         operator MessageType() const { return message; } //< Implicit by design.
         bool operator==(const Item& other) const;
@@ -81,7 +83,7 @@ private:
         bool operator<(const Item& other) const;
 
         MessageType message = MessageType::count;
-        QnResourcePtr resource;
+        QnResourceList resources;
         vms::event::AbstractActionPtr serverData;
     };
 

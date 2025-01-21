@@ -103,6 +103,12 @@ QString QnSystemHealthStringsHelper::messageShortTitle(
                 return tr("Site will stop functioning tomorrow");
             return tr("Site will stop functioning in %n days", "", *daysLeft);
         }
+        case MessageType::recordingServiceDisabled:
+            return tr("Recording disabled");
+        case MessageType::cloudServiceDisabled:
+            return tr("Cloud storage backup disabled");
+        case MessageType::integrationServiceDisabled:
+            return tr("Paid integration services disabled");
         case MessageType::showIntercomInformer:
             return tr("Intercom call");
         case MessageType::showMissedCallInformer:

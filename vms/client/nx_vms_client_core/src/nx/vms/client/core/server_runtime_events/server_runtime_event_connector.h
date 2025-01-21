@@ -23,6 +23,7 @@ signals:
     void deviceFootageChanged(const std::vector<nx::Uuid>& deviceIds);
     void analyticsStorageParametersChanged(nx::Uuid serverId);
     void deviceAdvancedSettingsManifestChanged(const std::set<nx::Uuid>& deviceIds);
+    void serviceDisabled(nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
 
 private:
     void at_serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);

@@ -20,6 +20,8 @@ static const std::set<MessageType> kMessagesSpecificForSaas{
     MessageType::saasInSuspendedState,
     MessageType::saasInShutdownState,
     MessageType::saasTierIssue,
+    MessageType::cloudServiceDisabled,
+    MessageType::integrationServiceDisabled,
 };
 
 } // namespace
@@ -62,6 +64,9 @@ bool isMessageLocked(MessageType message)
         case MessageType::saasInSuspendedState:
         case MessageType::saasInShutdownState:
         case MessageType::saasTierIssue:
+        case MessageType::recordingServiceDisabled:
+        case MessageType::cloudServiceDisabled:
+        case MessageType::integrationServiceDisabled:
         case MessageType::showIntercomInformer:
         case MessageType::showMissedCallInformer:
         case MessageType::notificationLanguageDiffers:

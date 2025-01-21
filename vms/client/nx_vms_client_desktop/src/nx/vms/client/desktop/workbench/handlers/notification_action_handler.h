@@ -42,6 +42,8 @@ private:
 
     void at_context_userChanged();
     void at_businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
+    void at_serviceDisabled(
+        nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
 
     void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
 

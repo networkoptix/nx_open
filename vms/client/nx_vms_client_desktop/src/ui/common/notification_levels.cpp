@@ -124,6 +124,9 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
         case MessageType::storagesNotConfigured:
         case MessageType::remoteArchiveSyncError:
         case MessageType::showMissedCallInformer:
+        case MessageType::recordingServiceDisabled:
+        case MessageType::cloudServiceDisabled:
+        case MessageType::integrationServiceDisabled:
             return QnNotificationLevel::Value::CriticalNotification;
 
         default:
