@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/webpage/default_webpage_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_settings.h>
@@ -176,7 +177,15 @@ struct Workbench::Private
      */
     bool inClearProcess = false;
 
+    DefaultWebpageManager defaultWebpageHandler;
+
     std::shared_ptr<StateDelegate> stateDelegate;
+
+    Private(Workbench* q):
+        q(q),
+        defaultWebpageHandler(q->workbenchContext())
+    {
+    }
 
     int layoutIndex(const LayoutResourcePtr& resource) const
     {
@@ -239,7 +248,7 @@ struct Workbench::Private
 Workbench::Workbench(WindowContext* windowContext, QObject* parent):
     QObject(parent),
     WindowContextAware(windowContext),
-    d(new Private{.q=this})
+    d(new Private(this))
 {
     setCurrentLayout(d->dummyLayout.get());
 
@@ -816,6 +825,9 @@ void Workbench::update(const WorkbenchState& state)
         if (!restoreCurrentLayout(resourcePool, state.currentLayoutId))
             restoreCurrentLayout(appContext()->cloudLayoutsPool(), state.currentLayoutId);
     }
+
+    if (ini().openDefaultWebPageOnConnect)
+        d->defaultWebpageHandler.tryOpenDefaultWebPage();
 
     // Empty workbench is not supported correctly.
     // Create a new layout in the case there are no opened layouts in the workbench state.

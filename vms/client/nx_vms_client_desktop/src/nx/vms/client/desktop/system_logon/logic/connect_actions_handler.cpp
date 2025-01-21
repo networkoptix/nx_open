@@ -483,7 +483,10 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
 
             if (mainWindow()->welcomeScreen())
                 mainWindow()->setWelcomeScreenVisible(!checked);
-            if (workbench()->layouts().empty())
+
+            // If we are connecting to the site, layout will be created in Workbench::update().
+            const auto isLoggedIn = this->windowContext()->system()->user();
+            if (!isLoggedIn && workbench()->layouts().empty())
                 menu()->trigger(menu::OpenNewTabAction);
         });
 

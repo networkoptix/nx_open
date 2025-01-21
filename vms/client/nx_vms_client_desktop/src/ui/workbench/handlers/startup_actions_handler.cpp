@@ -46,7 +46,6 @@
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
-#include <nx/vms/client/desktop/webpage/default_webpage_handler.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -115,7 +114,6 @@ struct StartupActionsHandler::Private
 
     std::unique_ptr<LogonData> delayedLogonParameters;
     std::unique_ptr<QTimer> delayedLogonTimer;
-    std::unique_ptr<DefaultWebpageHandler> defaultWebpageHandler;
     nx::utils::ScopedConnection sessionConnection;
 
     void onCloudSystemsChanged(const QnCloudSystemList& systems)
@@ -199,14 +197,6 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
         [this](const QnCloudSystemList &systems) { d->onCloudSystemsChanged(systems); },
         Qt::QueuedConnection);
 
-    if (ini().openDefaultWebPageOnConnect)
-    {
-        // Ensure default webpage handler is initialized after this class to make sure saved
-        // session (if any) will be restored before the default web page is opened (see
-        // handleConnected() method below).
-        d->defaultWebpageHandler = std::make_unique<DefaultWebpageHandler>(context());
-    }
-
     // Connect to the established session.
     if (!qnRuntime->isVideoWallMode())
     {
@@ -244,21 +234,6 @@ void StartupActionsHandler::handleConnected()
 {
     if (!NX_ASSERT(context()->user()))
         return;
-
-    // Sometimes we get here when 'New Layout' has already been added. But all user's layouts must
-    // be created AFTER this method. Otherwise the user will see uncreated layouts in layout
-    // selection menu. As temporary workaround we can just remove that layouts.
-    // TODO: #dklychkov Do not create new empty layout before this method end.
-    // See: LayoutsHandler::at_openNewTabAction_triggered()
-    if (!qnRuntime->isAcsMode())
-    {
-        for (const QnLayoutResourcePtr& layout: resourcePool()->getResourcesByParentId(
-            context()->user()->getId()).filtered<QnLayoutResource>())
-        {
-            if (layout->hasFlags(Qn::local) && !layout->isFile())
-                resourcePool()->removeResource(layout);
-        }
-    }
 
     // We should not change state when using "Open in New Window". Otherwise workbench will be
     // cleared here even if no state is saved.
