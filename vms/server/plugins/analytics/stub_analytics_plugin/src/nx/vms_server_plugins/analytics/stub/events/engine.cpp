@@ -64,6 +64,10 @@ std::string Engine::manifestString() const
                 "id": ")json" + kSuspiciousNoiseEventType + R"json(",
                 "name": "Suspicious noise",
                 "groupId": ")json" + kSoundRelatedEventGroup + R"json("
+            },
+            {
+                "id": ")json" + kEventWithImageEventType + R"json(",
+                "name": "Event with image"
             }
         ],
         "groups":

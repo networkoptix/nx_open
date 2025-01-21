@@ -190,7 +190,8 @@ R"json(
         { "eventTypeId": ")json" + kAdditionalEventType2 + R"json(" })json"
             )
             : ""
-        ) + R"json(
+        ) + R"json(,
+        { "eventTypeId": ")json" + kEventWithImageEventType + R"json(" }
     ],
     "typeLibrary": {
         "eventTypes": [
@@ -264,7 +265,7 @@ void DeviceAgent::eventThreadLoop()
     while (!m_terminated)
     {
         if (m_deviceAgentSettings.generateEvents && m_needToGenerateEvents)
-            pushMetadataPacket(cookSomeEvents().get());
+            pushMetadataPacket(cookSomeEvents().releasePtr());
 
         // Sleep until the next event needs to be generated, or the thread is ordered
         // to terminate (hence condition variable instead of sleep()). Return value
@@ -320,7 +321,40 @@ Ptr<IMetadataPacket> DeviceAgent::cookSomeEvents()
         (m_eventContext.currentEventTypeIndex + 1) % ((int) kEventsToFire.size());
 
     eventMetadataPacket->addItem(eventMetadata.get());
+
+    // Generate EventWithImage together with the first Event in the list.
+    if (m_eventContext.currentEventTypeIndex == 0)
+        eventMetadataPacket->addItem(createEventWithImage().get());
+
     return eventMetadataPacket;
+}
+
+Ptr<IEventMetadata> DeviceAgent::createEventWithImage()
+{
+    auto eventMetadata = makePtr<EventMetadata>();
+    eventMetadata->setTypeId(kEventWithImageEventType);
+    eventMetadata->setCaption("Event with image (caption)");
+    eventMetadata->setDescription("Event with image (description)");
+
+    const float w = 0.1F;
+    const float h = 0.1F;
+    const float x = m_eventContext.imageX;
+    const float y = m_eventContext.imageY;
+    // Intentionally allow the bounding box to spread out of the frame when close to the
+    // bottom-right corner, in order to test such possibility.
+    m_eventContext.imageX += 0.1F;
+    if (m_eventContext.imageX >= 1.0F)
+        m_eventContext.imageX = 0;
+    m_eventContext.imageY += 0.1F;
+    if (m_eventContext.imageY >= 1.0F)
+        m_eventContext.imageY = 0;
+
+    eventMetadata->setBoundingBox(Rect(x, y, w, h));
+
+    NX_PRINT << "Generating EventWithImage with bounding box {" << x << ", " << y << ", "
+        << w << " x " << h << "}";
+
+    return eventMetadata;
 }
 
 int64_t DeviceAgent::usSinceEpoch() const

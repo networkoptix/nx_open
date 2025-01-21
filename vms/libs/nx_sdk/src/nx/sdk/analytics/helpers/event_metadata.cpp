@@ -51,6 +51,11 @@ const char* EventMetadata::key() const
     return m_key.c_str();
 }
 
+void EventMetadata::getBoundingBox(Rect* outValue) const
+{
+    *outValue = m_boundingBox;
+}
+
 void EventMetadata::setTypeId(std::string typeId)
 {
     m_typeId = std::move(typeId);
@@ -79,6 +84,11 @@ void EventMetadata::setIsActive(bool isActive)
 void EventMetadata::setKey(std::string key)
 {
     m_key = std::move(key);
+}
+
+void EventMetadata::setBoundingBox(const Rect& boundingBox)
+{
+    m_boundingBox = boundingBox;
 }
 
 void EventMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QRectF>
+
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/prolonged_event.h>
 #include <nx/utils/uuid.h>
@@ -25,7 +27,8 @@ public:
         nx::common::metadata::Attributes attributes,
         nx::Uuid objectTrackId,
         QString key,
-        qint64 timeStampUsec);
+        qint64 timeStampUsec,
+        QRectF boundingBox);
 
     nx::Uuid engineId() const;
     const QString& eventTypeId() const;
@@ -46,6 +49,7 @@ public:
 
     const nx::Uuid objectTrackId() const;
     const QString& key() const;
+    const QRectF& boundingBox() const;
 
 private:
     const nx::Uuid m_engineId;
@@ -55,6 +59,7 @@ private:
     const nx::common::metadata::Attributes m_attributes;
     const nx::Uuid m_objectTrackId;
     const QString m_key;
+    const QRectF m_boundingBox;
 };
 
 } // namespace event

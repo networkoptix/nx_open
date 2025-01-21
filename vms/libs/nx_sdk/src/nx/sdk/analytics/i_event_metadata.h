@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/interface.h>
 
 #include "i_metadata.h"
@@ -44,7 +45,7 @@ public:
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 };
 
-class IEventMetadata: public Interface<IEventMetadata, IEventMetadata1>
+class IEventMetadata2: public Interface<IEventMetadata2, IEventMetadata1>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadata2"); }
@@ -60,6 +61,21 @@ public:
      */
     virtual const char* key() const = 0;
 };
-using IEventMetadata2 = IEventMetadata;
+
+class IEventMetadata: public Interface<IEventMetadata, IEventMetadata2>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadata3"); }
+
+    /** Called by boundingBox() */
+    protected: virtual void getBoundingBox(Rect* outValue) const = 0;
+    /**
+     * @return Bounding box of the video frame fragment associated with the event (the video frame
+     *     timestamp is assumed to be equal to the Event timestamp), or an invalid rectangle (e.g.
+     *     a default-constructed one) if no image is associated with the Event.
+     */
+    public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
+};
+using IEventMetadata3 = IEventMetadata;
 
 } // namespace nx::sdk::analytics

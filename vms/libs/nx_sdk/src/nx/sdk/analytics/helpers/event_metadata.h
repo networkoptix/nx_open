@@ -22,6 +22,7 @@ public:
     virtual const char* description() const override;
     virtual bool isActive() const override;
     virtual const char* key() const override;
+    virtual void getBoundingBox(Rect* outValue) const override;
 
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
@@ -32,6 +33,7 @@ public:
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
     void setTrackId(Uuid trackId);
     void setKey(std::string key);
+    void setBoundingBox(const Rect& boundingBox);
 
 protected:
     virtual const IAttribute* getAttribute(int index) const override;
@@ -46,6 +48,7 @@ private:
     std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
     Uuid m_trackId;
     std::string m_key;
+    Rect m_boundingBox;
 };
 
 } // namespace nx::sdk::analytics

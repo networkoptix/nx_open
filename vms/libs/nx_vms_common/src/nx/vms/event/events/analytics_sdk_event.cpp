@@ -32,7 +32,8 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     nx::common::metadata::Attributes attributes,
     nx::Uuid objectTrackId,
     QString key,
-    qint64 timeStampUsec)
+    qint64 timeStampUsec,
+    QRectF boundingBox)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
     m_engineId(engineId),
@@ -41,7 +42,8 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     m_description(std::move(description)),
     m_attributes(std::move(attributes)),
     m_objectTrackId(objectTrackId),
-    m_key(key)
+    m_key(key),
+    m_boundingBox(boundingBox)
 {
 }
 
@@ -140,6 +142,11 @@ const nx::Uuid AnalyticsSdkEvent::objectTrackId() const
 const QString& AnalyticsSdkEvent::key() const
 {
     return m_key;
+}
+
+const QRectF& AnalyticsSdkEvent::boundingBox() const
+{
+    return m_boundingBox;
 }
 
 } // namespace event

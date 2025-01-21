@@ -9,6 +9,7 @@
 #include <thread>
 #include <vector>
 
+#include <nx/sdk/analytics/i_event_metadata.h>
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 
 #include "engine.h"
@@ -40,6 +41,7 @@ protected:
 
 private:
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> cookSomeEvents();
+    nx::sdk::Ptr<nx::sdk::analytics::IEventMetadata> createEventWithImage();
     int64_t usSinceEpoch() const;
     void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
     void stopFetchingMetadata();
@@ -69,6 +71,8 @@ private:
     struct EventContext
     {
         int currentEventTypeIndex = 0;
+        float imageX = 0;
+        float imageY = 0;
     };
 
     EventContext m_eventContext;
@@ -83,6 +87,7 @@ const std::string kSuspiciousNoiseEventType = "nx.stub.suspiciousNoise";
 const std::string kSoundRelatedEventGroup = "nx.stub.soundRelated";
 const std::string kAdditionalEventType = "nx.stub.additionalEvent1";
 const std::string kAdditionalEventType2 = "nx.stub.additionalEvent2";
+const std::string kEventWithImageEventType = "nx.stub.eventWithImage";
 
 } // namespace events
 } // namespace stub
