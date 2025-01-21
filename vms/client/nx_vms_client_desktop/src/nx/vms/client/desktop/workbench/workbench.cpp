@@ -32,6 +32,7 @@
 #include <nx/vms/client/desktop/system_tab_bar/system_tab_bar_model.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/webpage/default_webpage_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -171,7 +172,14 @@ struct Workbench::Private
      */
     bool inClearProcess = false;
 
+    DefaultWebpageManager defaultWebpageHandler;
+
     std::shared_ptr<StateDelegate> stateDelegate;
+
+    Private(Workbench* q):
+        defaultWebpageHandler(q->context())
+    {
+    }
 
     int layoutIndex(const LayoutResourcePtr& resource) const
     {
@@ -236,7 +244,7 @@ struct Workbench::Private
 Workbench::Workbench(QObject* parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    d(new Private())
+    d(new Private(this))
 {
     setCurrentLayout(d->dummyLayout.get());
 
@@ -848,6 +856,9 @@ void Workbench::update(const WorkbenchState& state)
         if (!restoreCurrentLayout(resourcePool(), state.currentLayoutId))
             restoreCurrentLayout(appContext()->cloudLayoutsPool(), state.currentLayoutId);
     }
+
+    if (ini().openDefaultWebPageOnConnect)
+        d->defaultWebpageHandler.tryOpenDefaultWebPage();
 
     // Empty workbench is not supported correctly.
     // Create a new layout in the case there are no opened layouts in the workbench state.
