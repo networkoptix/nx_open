@@ -903,12 +903,19 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
         if (getString(paramObject, "name") != "_orderBy")
             continue;
 
-        const auto items = getArray(getObject(getObject(paramObject, "schema"), "items"), "enum");
+        const auto schemaObject = getObject(paramObject, "schema");
+        const bool isArray = schemaObject.value("type") == "array";
+        if (!isArray && orderByValues.size() > 1)
+            throw Exception::invalidParameter("_orderBy", nx::toString(orderByValues));
+        const auto expectedEnumValues = isArray
+            ? getArray(getObject(schemaObject, "items"), "enum")
+            : getArray(schemaObject, "enum");
         for (const auto& value: orderByValues)
         {
-            if (std::find_if(items.begin(), items.end(),
+            if (std::find_if(expectedEnumValues.begin(),
+                    expectedEnumValues.end(),
                     [value](auto item) { return asString(item) == value; })
-                == items.end())
+                == expectedEnumValues.end())
             {
                 throw Exception::invalidParameter("_orderBy", nx::toString(value));
             }

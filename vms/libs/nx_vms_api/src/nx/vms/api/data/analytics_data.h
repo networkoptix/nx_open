@@ -339,6 +339,8 @@ struct ObjectTrackTitle
      * `GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage.{format}`.
      */
     bool isImageAvailable = false;
+
+    bool operator<(const ObjectTrackTitle& other) const noexcept { return text < other.text; }
 };
 #define ObjectTrackTitle_Fields (text)(imageInfo)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackTitle, (json));
