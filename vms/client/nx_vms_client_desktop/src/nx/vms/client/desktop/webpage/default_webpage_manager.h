@@ -9,10 +9,12 @@
 
 namespace nx::vms::client::desktop {
 
-class DefaultWebpageHandler: public QObject, public QnWorkbenchContextAware
+class DefaultWebpageManager: public QObject, public QnWorkbenchContextAware
 {
 public:
-    DefaultWebpageHandler(QnWorkbenchContext* context, QObject* parent = nullptr);
+    DefaultWebpageManager(QnWorkbenchContext* context, QObject* parent = nullptr);
+
+    void tryOpenDefaultWebPage();
 
 private:
     void openDefaultWebPage(const QnWebPageResourcePtr& webpage);
