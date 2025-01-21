@@ -54,7 +54,9 @@ const ItemDescriptor& HttpAction::manifest()
             utils::makeIntervalFieldDescriptor(
                 Strings::intervalOfAction(),
                 {},
-                TimeFieldProperties{.maximumValue = std::chrono::days(24855)}.toVariantMap())
+                TimeFieldProperties{
+                    .value = std::chrono::minutes(1),
+                    .maximumValue = std::chrono::days(24855)}.toVariantMap())
         }
     };
     return kDescriptor;
