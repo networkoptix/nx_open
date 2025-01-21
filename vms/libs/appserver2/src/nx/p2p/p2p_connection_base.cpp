@@ -79,6 +79,9 @@ ConnectionBase::ConnectionBase(
     m_connectionLockGuard(std::move(connectionLockGuard)),
     m_isClient(true)
 {
+    if (remotePeerType == vms::api::PeerType::cloudServer)
+        setFilter(std::make_unique<CloudTransactionFilter>());
+
     m_remotePeer.id = remoteId;
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
     m_httpClient->setSendTimeout(keepAliveTimeout);

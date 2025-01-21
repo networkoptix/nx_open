@@ -45,6 +45,9 @@ void LocalConnectionFactory::registerTransactionBusHandlers(
      * %ingroup Utilities
      * %param[opt]:option noInitialData If specified, then the initial database is not sent to a
      *     Client on the connection start.
+     * %param[opt]:string filter Filter transactions by their types. It is possible to specify
+     *     several types via `|` delimiter.
+     *     %example setResourceStatus|saveUser
      * %return A ready-to-use HTTP connection, read-only as of now.
      */
     httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>("HTTP",

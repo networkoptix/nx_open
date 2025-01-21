@@ -27,6 +27,11 @@ namespace ec2 {
         virtual bool isIncoming() const = 0;
         virtual std::multimap<QString, QString> httpQueryParams() const = 0;
 
+        void setFilter(std::unique_ptr<nx::p2p::TransactionFilter> transactionFilter)
+        {
+            m_filter = std::move(transactionFilter);
+        }
+
         template<typename Transaction>
         // requires std::is_base_of<QnAbstractTransaction, Transaction>
         nx::p2p::FilterResult shouldTransactionBeSentToPeer(const Transaction& transaction)
@@ -55,15 +60,14 @@ namespace ec2 {
                 return nx::p2p::FilterResult::allow;
             }
 
-            // TODO: #akolesnikov Replace the condition with "is filter present?"
-            if (remotePeer().peerType == api::PeerType::cloudServer)
-                return m_cloudTransactionFilter.match(transaction);
+            if (m_filter)
+                return m_filter->match(transaction);
 
             return nx::p2p::FilterResult::allow;
         }
 
     private:
-        nx::p2p::CloudTransactionFilter m_cloudTransactionFilter;
+        std::unique_ptr<nx::p2p::TransactionFilter> m_filter;
 
     private:
         static bool skipTransactionForMobileClient(ApiCommand::Value command);

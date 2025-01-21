@@ -144,4 +144,15 @@ CloudTransactionFilter::CloudTransactionFilter()
     NX_CRITICAL(parse(kCloudFilterJson));
 }
 
+// ---------------------------- TransactionCommandFilter ------------------------------------
+
+TransactionCommandFilter::TransactionCommandFilter(const std::set<ec2::ApiCommand::Value>& commands)
+{
+    m_filter.defaultAction = "deny";
+    Rule rule;
+    for (const auto& command: commands)
+        rule.ids.push_back(command);
+    m_filter.allow.push_back(rule);
+}
+
 } // namespace nx::p2p

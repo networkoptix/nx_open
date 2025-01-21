@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <set>
+
+#include <QtCore/QStringList>
+
 #include <type_traits>
 
 #include <nx/utils/log/log.h>
@@ -71,7 +75,7 @@ public:
             ? FilterResult::allow : FilterResult::deny;
     }
 
-private:
+protected:
     enum class MatchResult
     {
         matched,
@@ -166,6 +170,15 @@ class CloudTransactionFilter:
 {
 public:
     CloudTransactionFilter();
+};
+
+/*
+ * Filter transactions by list of transaction types
+ */
+class TransactionCommandFilter: public TransactionFilter
+{
+public:
+    TransactionCommandFilter(const std::set<ec2::ApiCommand::Value>& commands);
 };
 
 } // namespace nx::p2p
