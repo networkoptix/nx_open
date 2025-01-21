@@ -245,7 +245,10 @@ public:
 
 protected:
     virtual Qn::LicenseType calculateLicenseType() const override { return m_cameraType; }
-    virtual QnAbstractStreamDataProvider *createLiveDataProvider() override { return nullptr; }
+    virtual QnAbstractStreamDataProvider *createDataProvider(Qn::ConnectionRole /*role*/) override
+    {
+        return nullptr;
+    }
 
 private:
     void debugLogStreams()

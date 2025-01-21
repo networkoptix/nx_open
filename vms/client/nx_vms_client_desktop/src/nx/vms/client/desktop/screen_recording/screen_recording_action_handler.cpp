@@ -11,8 +11,6 @@
 #include <QtWidgets/QGraphicsView>
 
 #include <client/client_runtime_settings.h>
-#include <client_core/client_core_module.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
@@ -210,8 +208,7 @@ void ScreenRecordingActionHandler::startRecordingInternal()
         return;
     }
 
-    m_dataProvider.reset(dynamic_cast<DesktopDataProviderWrapper*>(
-        qnClientCoreModule->dataProviderFactory()->createDataProvider(res)));
+    m_dataProvider.reset(dynamic_cast<DesktopDataProviderWrapper*>(res->createDataProvider()));
     m_recorder.reset(new ExportStorageStreamRecorder(res, m_dataProvider.get()));
     m_dataProvider->addDataProcessor(m_recorder.data());
 

@@ -3,7 +3,6 @@
 #include "client_video_camera.h"
 
 #include <client_core/client_core_module.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <core/resource/camera_resource.h>
@@ -144,8 +143,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(
     NX_MUTEX_LOCKER lock( &m_exportMutex );
     if (!m_exportRecorder)
     {
-        auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
-            m_resource);
+        auto tmpReader = m_resource->createDataProvider(Qn::CR_Default);
         QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
         if (!archiveReader)
         {

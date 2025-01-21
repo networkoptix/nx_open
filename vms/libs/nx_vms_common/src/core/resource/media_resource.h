@@ -24,6 +24,9 @@ public:
     QnMediaResource();
     virtual ~QnMediaResource();
 
+    virtual QnAbstractStreamDataProvider* createDataProvider(
+        Qn::ConnectionRole role = Qn::CR_Default) = 0;
+
     // size - is size of one channel; we assume all channels have the same size
     virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const;
 

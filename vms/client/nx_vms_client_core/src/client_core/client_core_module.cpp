@@ -6,7 +6,6 @@
 #include <QtQml/QQmlEngine>
 
 #include <api/common_message_processor.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
@@ -15,7 +14,6 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/session_token_terminator.h>
-#include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/skin_image_provider.h>
 #include <nx/vms/client/core/system_context.h>
@@ -28,7 +26,6 @@ static QnClientCoreModule* s_instance = nullptr;
 struct QnClientCoreModule::Private
 {
     std::unique_ptr<NetworkModule> networkModule;
-    std::unique_ptr<QnDataProviderFactory> resourceDataProviderFactory;
     std::unique_ptr<SessionTokenTerminator> sessionTokenTerminator;
 };
 
@@ -48,9 +45,6 @@ QnClientCoreModule::QnClientCoreModule(
         s_instance = this;
 
     systemContext->storeToQmlContext(appContext()->qmlEngine()->rootContext());
-
-    d->resourceDataProviderFactory.reset(new QnDataProviderFactory());
-    d->resourceDataProviderFactory->registerResourceType<DesktopAudioOnlyResource>();
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 
     const auto qmlEngine = appContext()->qmlEngine();
@@ -95,11 +89,6 @@ void QnClientCoreModule::initializeNetworking(
 NetworkModule* QnClientCoreModule::networkModule() const
 {
     return d->networkModule.get();
-}
-
-QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const
-{
-    return d->resourceDataProviderFactory.get();
 }
 
 SessionTokenTerminator* QnClientCoreModule::sessionTokenTerminator() const

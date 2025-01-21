@@ -685,8 +685,6 @@ public:
     nx::vms::api::BackupContentTypes getBackupContentType() const;
     void setBackupContentType(nx::vms::api::BackupContentTypes contentTypes);
 
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
-
     /**
      * @return backup policy of the device. Besides the values corresponding to On and Off state,
      *     it may be equal to the <tt>nx::vms::api::BackupPolicy::byDefault</tt> value, which means

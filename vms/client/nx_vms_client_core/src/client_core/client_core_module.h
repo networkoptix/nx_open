@@ -13,7 +13,6 @@
 
 class QQmlEngine;
 
-class QnDataProviderFactory;
 class QnPtzControllerPool;
 class QnResourcePool;
 
@@ -44,8 +43,6 @@ public:
         Qn::SerializationFormat serializationFormat);
 
     nx::vms::client::core::NetworkModule* networkModule() const;
-
-    QnDataProviderFactory* dataProviderFactory() const;
     nx::vms::client::core::SessionTokenTerminator* sessionTokenTerminator() const;
 
 private:

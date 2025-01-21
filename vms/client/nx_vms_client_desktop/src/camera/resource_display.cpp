@@ -6,8 +6,6 @@
 
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
-#include <client_core/client_core_module.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_media_layout.h>
@@ -29,7 +27,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
-    m_dataProvider = qnClientCoreModule->dataProviderFactory()->createDataProvider(resource);
+    m_dataProvider = m_mediaResource->createDataProvider();
     if (m_dataProvider)
     {
         m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider.data());

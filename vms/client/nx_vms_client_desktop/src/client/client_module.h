@@ -59,7 +59,6 @@ public:
 
 private:
     static void initSurfaceFormat();
-    void registerResourceDataProviders();
 
 private:
     struct Private;

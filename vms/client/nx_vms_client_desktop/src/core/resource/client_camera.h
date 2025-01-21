@@ -28,9 +28,7 @@ public:
         const QnVirtualCameraResourcePtr& camera,
         const QAuthenticator& authenticator);
 
-    static QnAbstractStreamDataProvider* createDataProvider(
-        const QnResourcePtr& resource,
-        Qn::ConnectionRole role);
+    QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 
     /**
      * Debug log representation. Used by toString(const T*).
@@ -50,8 +48,7 @@ signals:
 
 protected slots:
     virtual void resetCachedValues() override;
-protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+
 private:
     Qn::ResourceFlags calculateFlags() const;
 private:

@@ -16,7 +16,6 @@
 #include <api/network_proxy_factory.h>
 #include <client/client_runtime_settings.h>
 #include <client_core/client_core_module.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera.h>
 #include <core/resource_management/resource_discovery_manager.h>
@@ -108,7 +107,6 @@ QnClientModule::QnClientModule(
     d->analyticsMetadataProviderFactory.reset(new core::analytics::AnalyticsMetadataProviderFactory());
     d->analyticsMetadataProviderFactory->registerMetadataProviders();
 
-    registerResourceDataProviders();
     integrations::initialize(this);
 
     d->licenseHealthWatcher.reset(new LicenseHealthWatcher(
@@ -233,16 +231,6 @@ nx::vms::license::VideoWallLicenseUsageHelper* QnClientModule::videoWallLicenseU
 core::AnalyticsSettingsManager* QnClientModule::analyticsSettingsManager() const
 {
     return d->analyticsSettingsManager.get();
-}
-
-void QnClientModule::registerResourceDataProviders()
-{
-    auto factory = qnClientCoreModule->dataProviderFactory();
-    factory->registerResourceType<QnAviResource>();
-    factory->registerResourceType<QnClientCameraResource>();
-    #if defined(Q_OS_WIN)
-        factory->registerResourceType<WindowsDesktopResource>();
-    #endif
 }
 
 } // namespace nx::vms::client::desktop

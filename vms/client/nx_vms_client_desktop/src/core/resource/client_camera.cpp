@@ -72,21 +72,6 @@ void QnClientCameraResource::setAuthToCameraGroup(
     }
 }
 
-QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
-    const QnResourcePtr& resource,
-    Qn::ConnectionRole role)
-{
-    const auto camera = resource.dynamicCast<QnClientCameraResource>();
-    NX_ASSERT(camera && role == Qn::CR_Default);
-    if (!camera)
-        return nullptr;
-
-     QnAbstractStreamDataProvider* result = camera->createLiveDataProvider();
-     if (result)
-         result->setRole(role);
-     return result;
-}
-
 QString QnClientCameraResource::idForToStringFromPtr() const
 {
     return QnResource::idForToStringFromPtr();
@@ -117,8 +102,9 @@ AudioLayoutConstPtr QnClientCameraResource::getAudioLayout(
     return QnMediaResource::getAudioLayout();
 }
 
-QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
+QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(Qn::ConnectionRole role)
 {
+    NX_ASSERT(role == Qn::CR_Default);
     const auto camera = toSharedPointer(this);
     auto context = dynamic_cast<nx::vms::client::core::SystemContext*>(systemContext());
     if (!NX_ASSERT(context))
@@ -155,6 +141,6 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
                     delegate->updateCredentials(connection->credentials());
             });
     }
-
+    result->setRole(role);
     return result;
 }

@@ -19,5 +19,5 @@ public:
         const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 
 protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role) override;
 };

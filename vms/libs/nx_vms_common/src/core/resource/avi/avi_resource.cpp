@@ -81,20 +81,13 @@ QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
     return aviDelegate;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
-    const QnResourcePtr& resource,
-    Qn::ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviResource::createDataProvider(Qn::ConnectionRole /*role*/)
 {
-    const auto aviResource = resource.dynamicCast<QnAviResource>();
-    NX_ASSERT(aviResource);
-    if (!aviResource)
-        return nullptr;
+    if (FileTypeSupport::isImageFileExt(getUrl()))
+        return new QnSingleShotFileStreamreader(toSharedPointer());
 
-    if (FileTypeSupport::isImageFileExt(resource->getUrl()))
-        return new QnSingleShotFileStreamreader(resource);
-
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(aviResource);
-    result->setArchiveDelegate(aviResource->createArchiveDelegate());
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
+    result->setArchiveDelegate(createArchiveDelegate());
     return result;
 }
 

@@ -33,6 +33,11 @@ public:
             return videoLayout;
         return QnMediaResource::getVideoLayout(dataProvider);
     }
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole /*role*/) override
+    {
+        return nullptr;
+    }
+
 
     QnResourceVideoLayoutPtr videoLayout;
 };

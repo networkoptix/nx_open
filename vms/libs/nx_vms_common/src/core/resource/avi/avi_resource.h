@@ -27,10 +27,7 @@ public:
     QnAviResource(const QString& file);
     ~QnAviResource();
 
-    static QnAbstractStreamDataProvider* createDataProvider(
-        const QnResourcePtr& resource,
-        Qn::ConnectionRole role);
-
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role) override;
     virtual QString toString() const;
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;

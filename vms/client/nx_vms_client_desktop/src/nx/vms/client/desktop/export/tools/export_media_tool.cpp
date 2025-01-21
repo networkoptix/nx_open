@@ -4,8 +4,6 @@
 
 #include <QtCore/QFileInfo>
 
-#include <client_core/client_core_module.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
 #include <core/resource/camera_resource.h>
@@ -177,8 +175,7 @@ private:
             return true;
         }
 
-        const auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
-                mediaResource);
+        const auto tmpReader = mediaResource->createDataProvider();
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(tmpReader);
         if (!archiveReader)

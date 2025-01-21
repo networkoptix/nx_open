@@ -20,9 +20,7 @@ public:
 
     bool hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
-    static QnAbstractStreamDataProvider* createDataProvider(
-        const QnResourcePtr& resource,
-        Qn::ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role) override;
 };
 
 } // namespace nx::vms::client::core

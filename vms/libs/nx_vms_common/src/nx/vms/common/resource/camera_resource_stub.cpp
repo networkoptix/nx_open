@@ -55,7 +55,7 @@ CameraResourceStub::~CameraResourceStub()
 {
 }
 
-QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
+QnAbstractStreamDataProvider* CameraResourceStub::createDataProvider(Qn::ConnectionRole /*role*/)
 {
     NX_ASSERT(false);
     return nullptr;

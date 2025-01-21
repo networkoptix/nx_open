@@ -5,7 +5,6 @@
 #include <QtCore/QElapsedTimer>
 
 #include <client_core/client_core_module.h>
-#include <core/dataprovider/data_provider_factory.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/tcp_connection_priv.h>
@@ -162,8 +161,7 @@ void DesktopCameraConnectionProcessor::processRequest()
         NX_DEBUG(this, "Start streaming data to the VMS server");
         if (!d->dataProvider)
         {
-            d->dataProvider = qnClientCoreModule->dataProviderFactory()->createDataProvider(
-                d->desktop);
+            d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
             d->dataConsumer = new DesktopCameraConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();

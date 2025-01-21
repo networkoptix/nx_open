@@ -23,15 +23,11 @@ public:
     virtual bool isRendererSlow() const override;
     virtual AudioLayoutConstPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
-    static QnAbstractStreamDataProvider* createDataProvider(
-        const QnResourcePtr& resource,
-        Qn::ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role) override;
 
     bool hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
 private:
-    QnAbstractStreamDataProvider* createDataProviderInternal();
-
     void createSharedDataProvider();
 
     friend class DesktopDataProviderWrapper;

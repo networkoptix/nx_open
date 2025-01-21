@@ -55,7 +55,7 @@ public:
         nx::vms::common::AnalyticsEngineResourceList engines);
 
 protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+    virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role) override;
     virtual Qn::LicenseType calculateLicenseType() const override;
 
 private:

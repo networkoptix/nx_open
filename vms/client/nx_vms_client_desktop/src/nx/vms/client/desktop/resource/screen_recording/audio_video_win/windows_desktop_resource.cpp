@@ -126,7 +126,8 @@ bool WindowsDesktopResource::hasVideo(const QnAbstractStreamDataProvider* /*data
     return true;
 }
 
-QnAbstractStreamDataProvider* WindowsDesktopResource::createDataProviderInternal()
+QnAbstractStreamDataProvider* WindowsDesktopResource::createDataProvider(
+    Qn::ConnectionRole /*role*/)
 {
     NX_MUTEX_LOCKER lock(&m_dpMutex);
 
@@ -192,17 +193,6 @@ AudioLayoutConstPtr WindowsDesktopResource::getAudioLayout(
     if (m_desktopDataProvider && m_desktopDataProvider->getAudioLayout())
         return m_desktopDataProvider->getAudioLayout();
     return emptyAudioLayout;
-}
-
-QnAbstractStreamDataProvider* WindowsDesktopResource::createDataProvider(
-    const QnResourcePtr& resource, Qn::ConnectionRole /*role*/)
-{
-    const auto desktopResource = resource.dynamicCast<WindowsDesktopResource>();
-    NX_ASSERT(desktopResource);
-    if (!desktopResource)
-        return nullptr;
-
-    return desktopResource->createDataProviderInternal();
 }
 
 } // namespace nx::vms::client::desktop
