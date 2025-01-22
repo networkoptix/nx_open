@@ -942,7 +942,7 @@ Window
                 return {
                     "trackId": getData("trackId"),
                     "previewResource": getData("previewResource"),
-                    "previewTimestampMs": getData("previewTimestampMs") - paddingTimeMs || 0,
+                    "previewTimestampMs": getData("timestampMs") - paddingTimeMs || 0,
                     "previewDurationMs": getData("durationMs") + paddingTimeMs * 2 || 0,
                     "previewAspectRatio": getData("previewAspectRatio") || 1.0,
                     "timestamp": getData("timestamp") || "",

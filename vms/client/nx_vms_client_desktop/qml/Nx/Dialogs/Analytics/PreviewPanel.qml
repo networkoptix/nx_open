@@ -60,7 +60,7 @@ Rectangle
         intervalPreview.resource = null
         intervalPreview.timestampMs = 0
 
-        if (selectedItem)
+        if (selectedItem?.previewResource)
         {
             intervalPreview.resource = selectedItem.previewResource
             intervalPreview.timestampMs = selectedItem.previewTimestampMs
