@@ -1765,7 +1765,7 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Maksymalna liczba wątków dla zdalnej synchronizacji archiwum (&lt;=0 - auto, max 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
