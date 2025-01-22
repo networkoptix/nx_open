@@ -1039,10 +1039,14 @@
     </message>
   </context>
   <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-      <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-      <translation>계정 보안은 중요합니다. 그럴 만한 충분한 이유가 없다면 이 설정을 활성화하지 마세요.</translation>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+    </message>
+    <message>
+      <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
     </message>
   </context>
   <context>
