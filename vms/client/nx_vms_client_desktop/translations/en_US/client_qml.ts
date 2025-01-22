@@ -1042,10 +1042,14 @@
     </message>
 </context>
 <context>
-    <name>InsecureWarning</name>
+    <name>InsecureBanner</name>
     <message>
-        <source>Account security is important. Do not enable this setting unless you have good reasons to do so.</source>
-        <translation></translation>
+        <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
