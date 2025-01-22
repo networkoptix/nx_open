@@ -13,6 +13,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_streamer.h>
@@ -68,7 +69,22 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
 
     if (active)
     {
-        streamer = std::make_shared<TwoWayAudioStreamer>();
+        auto desktop = q->resourcePool()->getResourceById<DesktopResource>(
+            DesktopResource::getDesktopResourceUuid());
+
+        if (!desktop)
+        {
+            NX_WARNING(this, "Desktop resource not found");
+            return false;
+        }
+        std::unique_ptr<QnAbstractStreamDataProvider> provider(
+            desktop->createDataProvider(Qn::CR_Default));
+        if (!provider)
+        {
+            NX_WARNING(this, "Failed to create desktop data provider");
+            return false;
+        }
+        streamer = std::make_shared<TwoWayAudioStreamer>(std::move(provider));
         const bool result = streamer->start(q->connection()->credentials(), targetResource);
         setStarted(result);
         if (callback)

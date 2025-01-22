@@ -20,6 +20,7 @@ class TwoWayAudioStreamer:
     public std::enable_shared_from_this<TwoWayAudioStreamer>
 {
 public:
+    TwoWayAudioStreamer(std::unique_ptr<QnAbstractStreamDataProvider> provider);
     virtual ~TwoWayAudioStreamer();
     bool start(
         const nx::network::http::Credentials& credentials,
@@ -48,7 +49,7 @@ private:
     nx::Lockable<std::deque<std::unique_ptr<nx::utils::ByteArray>>> m_bufferQueue;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
     nx::network::aio::AsyncChannelPtr m_streamChannel;
-    std::unique_ptr<DesktopAudioOnlyDataProvider> m_provider;
+    std::unique_ptr<QnAbstractStreamDataProvider> m_provider;
     std::atomic<bool> m_stop = false;
     std::atomic<bool> m_sendInProcess = false;
 };

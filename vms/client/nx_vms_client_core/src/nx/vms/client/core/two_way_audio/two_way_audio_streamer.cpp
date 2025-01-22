@@ -16,6 +16,11 @@ static constexpr int kMaxBufferLength = 100;
 
 namespace nx::vms::client::core {
 
+TwoWayAudioStreamer::TwoWayAudioStreamer(std::unique_ptr<QnAbstractStreamDataProvider> provider):
+    m_provider(std::move(provider))
+{
+}
+
 bool TwoWayAudioStreamer::start(
     const nx::network::http::Credentials& credentials, const QnVirtualCameraResourcePtr& camera)
 {
@@ -140,8 +145,6 @@ void TwoWayAudioStreamer::onUpgradeHttpClient()
 
 void TwoWayAudioStreamer::startProvider()
 {
-    QnResourcePtr resource(new QnResource());
-    m_provider = std::make_unique<DesktopAudioOnlyDataProvider>(resource);
     m_provider->subscribe(this);
     m_provider->startIfNotRunning();
 }
