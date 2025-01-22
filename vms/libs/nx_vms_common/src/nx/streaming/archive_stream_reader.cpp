@@ -561,16 +561,6 @@ begin_label:
     if (jumpTime != qint64(AV_NOPTS_VALUE) && reverseMode == prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
         m_outOfPlaybackMask = false;
-        /*
-        if (m_newDataMarker) {
-            QString s;
-            QTextStream str(&s);
-            str << "setMarker=" << m_newDataMarker
-                << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
-            str.flush();
-            NX_INFO(this, s);
-        }
-        */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
         m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
         if (!exactJumpToSpecifiedFrame && channelCount > 1)
@@ -1412,7 +1402,8 @@ void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contex
 
 void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
 {
-    if (m_navDelegate) {
+    if (m_navDelegate)
+    {
         m_navDelegate->setSpeed(value, currentTimeHint);
         return;
     }
@@ -1425,7 +1416,7 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
     for (int i = 0; i < dataProcessors->size(); ++i)
     {
         QnAbstractDataConsumer* dp = dynamic_cast<QnAbstractDataConsumer*>(dataProcessors->at(i));
-        if( !dp )
+        if (!dp)
             continue;
         dp->setSpeed(value);
     }

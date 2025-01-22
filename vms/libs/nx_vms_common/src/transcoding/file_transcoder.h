@@ -55,7 +55,7 @@ public:
     /*!
         Tagging MUST be done after \a setContainer and before \a startAsync
     */
-    bool addTag( const QString& name, const QString& value );
+    bool addTag(const QString& name, const QString& value);
     //!Set ffmpeg video codec and params
     /*!
         \param codec codec to transcode to. Ignored if \a transcodeMethod == \a TM_NoTranscode
@@ -67,7 +67,7 @@ public:
     */
     bool setVideoCodec(
         AVCodecID codec,
-        QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode,
+        QnFfmpegTranscoder::TranscodeMethod transcodeMethod = QnFfmpegTranscoder::TM_FfmpegTranscode,
         Qn::StreamQuality quality = Qn::StreamQuality::highest,
         const QSize& resolution = QSize(),
         int bitrate = -1,
@@ -80,7 +80,7 @@ public:
     */
     bool setAudioCodec(
         AVCodecID codec,
-        QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode );
+        QnFfmpegTranscoder::TranscodeMethod transcodeMethod = QnFfmpegTranscoder::TM_FfmpegTranscode );
     //!Set source data duration (in millis) to read. By default, whole source data is read
     void setTranscodeDurationLimit( unsigned int lengthToReadMS );
     //!Returns zero on success else - error code (TODO: define error codes)

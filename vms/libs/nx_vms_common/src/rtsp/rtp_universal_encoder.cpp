@@ -308,11 +308,11 @@ bool QnUniversalRtpEncoder::open(
     m_sourceCodec = media->compressionType;
     m_codec = m_transcodingEnabled ? dstCodec : media->compressionType;
     m_payloadType = getPayloadType(m_codec, m_isVideo);
-    QnTranscoder::TranscodeMethod method = m_transcodingEnabled
-        ? QnTranscoder::TM_FfmpegTranscode
-        : QnTranscoder::TM_DirectStreamCopy;
+    QnFfmpegTranscoder::TranscodeMethod method = m_transcodingEnabled
+        ? QnFfmpegTranscoder::TM_FfmpegTranscode
+        : QnFfmpegTranscoder::TM_DirectStreamCopy;
 
-    if (m_transcoder.setContainer("rtp") != 0 || !isCodecSupported(dstCodec))
+    if (!m_transcoder.setContainer("rtp") || !isCodecSupported(dstCodec))
         return false;
 
     if (m_config.absoluteRtcpTimestamps)
@@ -323,10 +323,10 @@ bool QnUniversalRtpEncoder::open(
 
     m_transcoder.setPacketizedMode(true);
     m_transcoder.setUseRealTimeOptimization(m_config.useRealTimeOptimization);
-    int status = -1;
+    bool status = false;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {
-        if (method == QnTranscoder::TM_FfmpegTranscode)
+        if (method == QnFfmpegTranscoder::TM_FfmpegTranscode)
         {
             QSize sourceSize = getVideoSize(media);
             if (sourceSize.isEmpty())
@@ -347,7 +347,7 @@ bool QnUniversalRtpEncoder::open(
             QnConstCompressedVideoDataPtr(),
             std::dynamic_pointer_cast<const QnCompressedAudioData>(media));
     }
-    if (status != 0)
+    if (!status)
         return false;
 
     buildSdp(mediaHigh, mediaLow, m_transcodingEnabled, requiredQuality);

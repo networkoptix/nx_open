@@ -14,9 +14,9 @@
 
 namespace {
 
-const QLatin1String folder("notifications");
-const QLatin1String targetContainter("mp3");
-const QLatin1String titleTag("Title");  // TODO: #sivanov Replace with database field.
+constexpr char* folder ="notifications";
+constexpr char* targetContainter = "mp3";
+constexpr char* titleTag = "Title";  // TODO: #sivanov Replace with database field.
 
 }
 

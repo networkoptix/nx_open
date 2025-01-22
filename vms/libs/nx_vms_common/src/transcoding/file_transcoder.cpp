@@ -41,30 +41,30 @@ bool FileTranscoder::setDestFile( const QString& filePath )
 
 bool FileTranscoder::setContainer( const QString& containerName )
 {
-    return m_transcoder.setContainer( containerName ) == QnTranscoder::OperationResult::Success;
+    return m_transcoder.setContainer(containerName);
 }
 
 bool FileTranscoder::addTag( const QString& name, const QString& value )
 {
-    return m_transcoder.addTag( name, value );
+    return m_transcoder.addTag(name.toUtf8().constData(), value.toUtf8().constData());
 }
 
 bool FileTranscoder::setVideoCodec(
     AVCodecID codec,
-    QnTranscoder::TranscodeMethod transcodeMethod,
+    QnFfmpegTranscoder::TranscodeMethod transcodeMethod,
     Qn::StreamQuality quality,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params )
 {
-    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params ) == QnTranscoder::OperationResult::Success;
+    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params );
 }
 
 bool FileTranscoder::setAudioCodec(
     AVCodecID codec,
-    QnTranscoder::TranscodeMethod transcodeMethod )
+    QnFfmpegTranscoder::TranscodeMethod transcodeMethod )
 {
-    return m_transcoder.setAudioCodec( codec, transcodeMethod ) == QnTranscoder::OperationResult::Success;
+    return m_transcoder.setAudioCodec( codec, transcodeMethod );
 }
 
 void FileTranscoder::setTranscodeDurationLimit( unsigned int lengthToReadMS )
@@ -109,9 +109,9 @@ bool FileTranscoder::setTagValue(
     if( !transcoder->setSourceFile( srcFilePath ) ||
         !transcoder->setDestFile( tempFilePath ) ||
         !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||
-        !transcoder->setAudioCodec( formatCtx->audio_codec_id, QnTranscoder::TM_DirectStreamCopy ) ||
-        !transcoder->setVideoCodec( formatCtx->video_codec_id, QnTranscoder::TM_DirectStreamCopy ) ||
-        !transcoder->addTag( name, value ) )
+        !transcoder->setAudioCodec( formatCtx->audio_codec_id, QnFfmpegTranscoder::TM_DirectStreamCopy ) ||
+        !transcoder->setVideoCodec( formatCtx->video_codec_id, QnFfmpegTranscoder::TM_DirectStreamCopy ) ||
+        !transcoder->addTag(name.toUtf8().constData(), value.toUtf8().constData()))
     {
         avformat_close_input(&formatCtx);
         return false;

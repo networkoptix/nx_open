@@ -14,8 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 
-namespace nx {
-namespace transcoding {
+namespace nx::transcoding {
 
 namespace {
 
@@ -169,5 +168,147 @@ QSize findMaxSavedResolution(const QnConstCompressedVideoDataPtr& video)
     return result;
 }
 
-} // namespace transcoding
-} // namespace nx
+} // namespace nx::transcoding
+
+int suggestBitrate(
+    AVCodecID /*codec*/,
+    QSize resolution,
+    Qn::StreamQuality quality,
+    const char* codecName)
+{
+    // I assume for a Qn::StreamQuality::highest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::StreamQuality::lowest quality 30 fps for 1080 we need 1 mbps
+
+    if (resolution.width() == 0)
+        resolution.setWidth(resolution.height() * 4 / 3);
+
+    int hiEnd;
+    switch (quality)
+    {
+        case Qn::StreamQuality::lowest:
+            hiEnd = 1024;
+            break;
+        case Qn::StreamQuality::low:
+            hiEnd = 1024 + 512;
+            break;
+        case Qn::StreamQuality::normal:
+            hiEnd = 1024 * 2;
+            break;
+        case Qn::StreamQuality::high:
+            hiEnd = 1024 * 3;
+            break;
+        case Qn::StreamQuality::rapidReview:
+            hiEnd = 1024 * 10;
+            break;
+        case Qn::StreamQuality::highest:
+        default:
+            hiEnd = 1024 * 5;
+            break;
+    }
+
+    float resolutionFactor = resolution.width()*resolution.height() / 1920.0 / 1080;
+    resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240 for Mq quality
+
+    float codecFactor = 1;
+    if (codecName)
+    {
+        // Increase bitrate due to bad quality of libopenh264 coding.
+        if (strcmp(codecName, "mpeg4") == 0)
+            codecFactor = 1.2;
+        else if (strcmp(codecName, "libopenh264") == 0)
+            codecFactor = 4;
+    }
+
+    int result = hiEnd * resolutionFactor * codecFactor;
+    return qMax(128, result) * 1024;
+}
+
+QnCodecParams::Value suggestMediaStreamParams(
+    AVCodecID codec,
+    Qn::StreamQuality quality)
+{
+    QnCodecParams::Value params;
+
+    switch (codec)
+    {
+        case AV_CODEC_ID_MJPEG:
+        {
+            int qVal = 1;
+            switch( quality )
+            {
+                case Qn::StreamQuality::lowest:
+                    qVal = 8;
+                    break;
+                case Qn::StreamQuality::low:
+                    qVal = 4;
+                    break;
+                case Qn::StreamQuality::normal:
+                    qVal = 3;
+                    break;
+                case Qn::StreamQuality::high:
+                    qVal = 2;
+                    break;
+                case Qn::StreamQuality::highest:
+                case Qn::StreamQuality::rapidReview:
+                    qVal = 1;
+                    break;
+                default:
+                    break;
+            }
+
+            params.insert( QnCodecParams::qmin, qVal );
+            params.insert( QnCodecParams::qmax, 20);
+        }
+        break;
+        case AV_CODEC_ID_VP8:
+        {
+            int cpuUsed = 0;
+            int staticThreshold = 0;
+
+            switch (quality)
+            {
+                case Qn::StreamQuality::lowest:
+                    cpuUsed = 5;
+                    break;
+                case Qn::StreamQuality::low:
+                    cpuUsed = 4;
+                    break;
+                case Qn::StreamQuality::normal:
+                    cpuUsed = 3;
+                    break;
+                case Qn::StreamQuality::high:
+                    cpuUsed = 1;
+                    break;
+                case Qn::StreamQuality::highest:
+                case Qn::StreamQuality::rapidReview:
+                    cpuUsed = 0;
+                    break;
+                default:
+                    break;
+            }
+
+            if (quality <= Qn::StreamQuality::normal)
+            {
+                // [0..3] Bigger numbers mean less possibilities for encoder.
+                params.insert("profile", 1);
+                staticThreshold = 1000;
+            }
+
+            // Options are taken from https://www.webmproject.org/docs/encoder-parameters/
+
+            params.insert("good", QString());
+            params.insert("cpu-used", cpuUsed);
+            params.insert("kf-min-dist", 0);
+            params.insert("kf-max-dist", 360);
+            params.insert("token-parts", 2);
+            params.insert("static-thresh", staticThreshold);
+            params.insert("min-q", 0);
+            params.insert("max-q", 63);
+            break;
+        }
+        default:
+            break;
+    }
+
+    return params;
+}

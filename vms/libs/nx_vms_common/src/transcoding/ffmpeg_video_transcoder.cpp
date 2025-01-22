@@ -193,7 +193,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
     {
-        m_bitrate = QnTranscoder::suggestBitrate(
+        m_bitrate = suggestBitrate(
             m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality, avCodec->name);
     }
     m_encoderCtx->bit_rate = m_bitrate;

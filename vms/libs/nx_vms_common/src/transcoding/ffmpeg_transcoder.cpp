@@ -14,9 +14,10 @@ extern "C" {
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_io_context.h>
-
-#include "ffmpeg_audio_transcoder.h"
-#include "ffmpeg_video_transcoder.h"
+#include <transcoding/filters/abstract_image_filter.h>
+#include <transcoding/filters/filter_helper.h>
+#include <transcoding/ffmpeg_audio_transcoder.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
 
 static const int IO_BLOCK_SIZE = 1024*16;
 
@@ -69,6 +70,250 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     return 0;
 }
 
+bool QnFfmpegTranscoder::setVideoCodec(
+    AVCodecID codec,
+    TranscodeMethod method,
+    Qn::StreamQuality quality,
+    const QSize& resolution,
+    int bitrate,
+    QnCodecParams::Value params)
+{
+    if (params.isEmpty())
+        params = suggestMediaStreamParams(codec, quality);
+
+    m_videoCodec = codec;
+    switch (method)
+    {
+        case TM_DirectStreamCopy:
+            m_vTranscoder.reset();
+            break;
+        case TM_FfmpegTranscode:
+        {
+            m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
+                m_config.decoderConfig,
+                m_metrics,
+                codec);
+
+            m_vTranscoder->setOutputResolutionLimit(resolution);
+            m_vTranscoder->setBitrate(bitrate);
+            m_vTranscoder->setParams(params);
+            m_vTranscoder->setQuality(quality);
+            m_vTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
+            auto filterChain = QnImageFilterHelper::createFilterChain(m_transcodingSettings);
+            m_vTranscoder->setFilterChain(filterChain);
+
+            if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG)
+            {
+                // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
+                bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
+                if (isAtom || resolution.height() >= 1080)
+                    m_vTranscoder->setUseMultiThreadEncode(true);
+            }
+            break;
+        }
+        default:
+            NX_ERROR(this, "Unknown transcoding method.");
+            return false;
+    }
+    return true;
+}
+
+void QnFfmpegTranscoder::setUseRealTimeOptimization(bool value)
+{
+    m_useRealTimeOptimization = value;
+    if (m_vTranscoder)
+        m_vTranscoder->setUseRealTimeOptimization(value);
+}
+
+bool QnFfmpegTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
+{
+    m_audioCodec = codec;
+    switch (method)
+    {
+        case TM_DirectStreamCopy:
+            m_aTranscoder.reset();
+            break;
+        case TM_FfmpegTranscode:
+            m_aTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(codec);
+            break;
+        default:
+            m_lastErrMessage = "Unknown transcode method";
+            return false;
+    }
+    return true;
+}
+
+int QnFfmpegTranscoder::openAndTranscodeDelayedData()
+{
+    const auto& video = m_delayedVideoQueue.isEmpty() ?
+        QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first();
+    const auto& audio = m_delayedAudioQueue.isEmpty() ?
+        QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first();
+
+    if (m_beforeOpenCallback)
+        m_beforeOpenCallback(this, video, audio);
+
+    if (!open(video, audio))
+    {
+        NX_WARNING(this, "Failed to open transcoder");
+        return -1;
+    }
+
+    int errCode = 0;
+    while (!m_delayedVideoQueue.isEmpty())
+    {
+        errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue());
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode video packet, error code: %1", errCode);
+            return errCode;
+        }
+    }
+    while (!m_delayedAudioQueue.isEmpty())
+    {
+        errCode = transcodePacketInternal(m_delayedAudioQueue.dequeue());
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode audio packet, error code: %1", errCode);
+            return errCode;
+        }
+    }
+    return 0;
+}
+
+int QnFfmpegTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, nx::utils::ByteArray* const result)
+{
+    m_internalBuffer.clear();
+    m_outputPacketSize.clear();
+    if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        finalize(result);
+
+        if (++m_eofCounter >= 3)
+            return -8; // EOF reached
+        else
+            return 0;
+    }
+    else if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
+        return 0; // transcode only audio and video, skip packet
+
+    m_eofCounter = 0;
+
+    int errCode = true;
+    bool doTranscoding = true;
+    static const size_t kMaxDelayedQueueSize = 60;
+
+    if (result)
+        result->clear();
+
+    if (!m_initialized)
+    {
+        if (media->dataType == QnAbstractMediaData::VIDEO)
+            m_delayedVideoQueue << std::dynamic_pointer_cast<const QnCompressedVideoData> (media);
+        else
+            m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
+        doTranscoding = false;
+        if ((m_videoCodec != AV_CODEC_ID_NONE || m_beforeOpenCallback) && m_delayedVideoQueue.isEmpty()
+            && m_delayedAudioQueue.size() < (int)kMaxDelayedQueueSize)
+        {
+            return 0; // not ready to init
+        }
+        if (m_audioCodec != AV_CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
+            && m_delayedVideoQueue.size() < (int)kMaxDelayedQueueSize)
+        {
+            return 0; // not ready to initQnFfmpegTranscoder
+        }
+        // Ready to initialize transcoder.
+        errCode = openAndTranscodeDelayedData();
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode delayed data, error code: %1", errCode);
+            return errCode;
+        }
+    }
+
+    if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||
+        (media->dataType == QnAbstractMediaData::VIDEO && !m_initializedVideo))
+    {
+        return 0;
+    }
+
+    if (doTranscoding)
+    {
+        errCode = transcodePacketInternal(media);
+        if (errCode != 0)
+            return errCode;
+    }
+
+    if (result)
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
+
+    return 0;
+}
+
+int QnFfmpegTranscoder::finalize(nx::utils::ByteArray* const result)
+{
+    m_internalBuffer.clear();
+    if (!m_initialized)
+    {
+        int errCode = openAndTranscodeDelayedData();
+        if (errCode != 0)
+        {
+            NX_WARNING(this, "Failed to transcode delayed data on finalize, error code: %1",
+                errCode);
+            return errCode;
+        }
+    }
+
+    if (!m_initialized)
+        return true;
+
+    finalizeInternal(result);
+    if (result)
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
+    m_initialized = false;
+    return true;
+}
+
+void QnFfmpegTranscoder::flush(nx::utils::ByteArray* const result)
+{
+    if (result)
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
+}
+
+QString QnFfmpegTranscoder::getLastErrorMessage() const
+{
+    return m_lastErrMessage;
+}
+
+int QnFfmpegTranscoder::writeBuffer(const char* data, int size)
+{
+    m_internalBuffer.write(data,size);
+    if (m_packetizedMode)
+        m_outputPacketSize << size;
+    return size;
+}
+
+void QnFfmpegTranscoder::setPacketizedMode(bool value)
+{
+    m_packetizedMode = value;
+}
+
+const QVector<int>& QnFfmpegTranscoder::getPacketsSize()
+{
+    return m_outputPacketSize;
+}
+
+void QnFfmpegTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& settings)
+{
+    m_transcodingSettings = settings;
+}
+
+void QnFfmpegTranscoder::setBeforeOpenCallback(BeforeOpenCallback callback)
+{
+    m_beforeOpenCallback = std::move(callback);
+}
+
 AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 {
     quint8* ioBuffer;
@@ -89,11 +334,12 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metric::Storage* metrics)
-:
-    QnTranscoder(config.decoderConfig, metrics),
-    m_config(config)
+QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metric::Storage* metrics):
+    m_config(config),
+    m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024, AV_INPUT_BUFFER_PADDING_SIZE),
+    m_metrics(metrics)
 {
+    QThread::currentThread()->setPriority(QThread::LowPriority);
     NX_DEBUG(this, "Created new ffmpeg transcoder. Total transcoder count %1",
         QnFfmpegTranscoder_count.fetchAndAddOrdered(1) + 1);
 }
@@ -124,26 +370,26 @@ void QnFfmpegTranscoder::setSourceResolution(const QSize& resolution)
     m_sourceResolution = resolution;
 }
 
-int QnFfmpegTranscoder::setContainer(const QString& container)
+bool QnFfmpegTranscoder::setContainer(const QString& container)
 {
     m_container = container;
     const AVOutputFormat* outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
         NX_WARNING(this, "Container %1 was not found in FFMPEG library.", container);
-        return -1;
+        return false;
     }
 
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, "");
     if (err != 0)
     {
         NX_WARNING(this, "Could not create output context for format %1.", container);
-        return -2;
+        return false;
     }
     if (container == QLatin1String("rtp"))
         m_formatCtx->packet_size = m_rtpMtu;
 
-    return 0;
+    return true;
 }
 
 void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& value)
@@ -166,7 +412,7 @@ AVPixelFormat QnFfmpegTranscoder::getPixelFormatJpeg(const QnConstCompressedVide
         return info.pixelFormat;
 }
 
-int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
+bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
     if (!m_formatCtx)
         setContainer(m_container);
@@ -177,7 +423,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (videoStream == 0)
         {
             NX_ERROR(this, "Could not allocate output stream for recording.");
-            return -1;
+            return false;
         }
 
         videoStream->id = 0;
@@ -191,7 +437,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             if (!m_vTranscoder->open(video))
             {
                 NX_WARNING(this, "Can't open video transcoder for RTSP streaming");
-                return -1;
+                return false;
             }
 
             if (m_vTranscoder->getCodecContext())
@@ -225,7 +471,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                     NX_WARNING(this,
                         "Could not perform direct stream copy because frame size is undefined.");
                     closeFfmpegContext();
-                    return -3;
+                    return false;
                 }
             }
 
@@ -305,7 +551,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (audioStream == 0)
         {
             NX_ERROR(this, "Could not allocate output stream for recording.");
-            return -1;
+            return false;
         }
 
         audioStream->id = 0;
@@ -314,7 +560,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         {
             NX_WARNING(this, "Could not find codec %1.", m_audioCodec);
             closeFfmpegContext();
-            return -2;
+            return false;
         }
         m_audioCodecParameters = audioStream->codecpar;
         m_audioCodecParameters->codec_type = AVMEDIA_TYPE_AUDIO;
@@ -334,7 +580,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         }
     }
     if (m_formatCtx->nb_streams == 0)
-        return -4;
+        return false;
 
     m_formatCtx->pb = createFfmpegIOContext();
 
@@ -343,7 +589,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     {
         closeFfmpegContext();
         NX_ERROR(this, "Video or audio codec is incompatible with container %1.", m_container);
-        return -3;
+        return false;
     }
 
     if (video)
@@ -357,12 +603,12 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_aTranscoder.reset();
 
     m_initialized = true;
-    return 0;
+    return true;
 }
 
-bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
+bool QnFfmpegTranscoder::addTag(const char* name, const char* value)
 {
-    return av_dict_set( &m_formatCtx->metadata, name.toUtf8().constData(), value.toUtf8().constData(), 0 ) >= 0;
+    return av_dict_set(&m_formatCtx->metadata, name, value, 0) >= 0;
 }
 
 int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket)
@@ -461,7 +707,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(
     else if (m_videoCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
         return 0;
 
-    QnCodecTranscoder* transcoder;
+    QnCodecTranscoder* transcoder = nullptr;
     if (dynamic_cast<const QnCompressedVideoData*>(media.get()))
         transcoder = m_vTranscoder.get();
     else
@@ -516,11 +762,12 @@ int QnFfmpegTranscoder::finalizeInternal(nx::utils::ByteArray* const /*result*/)
     for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
     {
         //finalizing codec transcoder
-        QnCodecTranscoder* transcoder;
+        QnCodecTranscoder* transcoder = nullptr;
         if (streamIndex == 0)
             transcoder = m_vTranscoder.get();
         else if (streamIndex == 1)
             transcoder = m_aTranscoder.get();
+
         if (!transcoder)
             continue;
 

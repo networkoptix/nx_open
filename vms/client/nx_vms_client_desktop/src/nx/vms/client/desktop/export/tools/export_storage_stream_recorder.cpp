@@ -237,7 +237,7 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
         if (m_transcoderFixedFrameRate)
             m_videoTranscoder->setFixedFrameRate(m_transcoderFixedFrameRate);
         m_videoTranscoder->setParams(
-            QnTranscoder::suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality));
+            suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality));
 
         m_videoTranscoder->setFilterChain(*m_transcodeFilters);
         m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
