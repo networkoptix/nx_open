@@ -271,7 +271,6 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
                 avcodec_parameters_from_context(
                     codecpar, m_mediaTranscoder.videoTranscoder()->getCodecContext());
             }
-            codecpar->bit_rate = m_mediaTranscoder.videoTranscoder()->getBitrate();
         }
         else
         {
@@ -344,14 +343,12 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
 
         if (m_mediaTranscoder.audioTranscoder())
         {
-            if (m_mediaTranscoder.audioTranscoder()->getCodecContext())
+            if (m_mediaTranscoder.audioTranscoder()->getCodecParameters())
             {
-                avcodec_parameters_from_context(
+                avcodec_parameters_copy(
                     codecpar,
-                    m_mediaTranscoder.audioTranscoder()->getCodecContext());
+                    m_mediaTranscoder.audioTranscoder()->getCodecParameters());
             }
-
-            codecpar->bit_rate = m_mediaTranscoder.audioTranscoder()->getBitrate();
         }
         else
         {

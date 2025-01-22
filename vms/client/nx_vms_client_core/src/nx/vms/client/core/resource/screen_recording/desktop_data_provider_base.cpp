@@ -3,16 +3,12 @@
 #include "desktop_data_provider_base.h"
 
 #include <nx/media/sse_helper.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
 
 DesktopDataProviderBase::DesktopDataProviderBase(const QnResourcePtr& ptr):
     QnAbstractMediaStreamDataProvider(ptr)
-{
-
-}
-
-DesktopDataProviderBase::~DesktopDataProviderBase()
 {
 
 }
@@ -99,6 +95,54 @@ AVSampleFormat DesktopDataProviderBase::fromQtAudioFormat(const QAudioFormat& fo
     }
 
     return AV_SAMPLE_FMT_NONE;
+}
+
+AudioLayoutConstPtr DesktopDataProviderBase::getAudioLayout()
+{
+    if (!m_audioLayout)
+        m_audioLayout.reset(new AudioLayout(m_audioEncoder.codecParameters()));
+
+    return m_audioLayout;
+}
+
+int DesktopDataProviderBase::getAudioFrameSize()
+{
+    return m_audioEncoder.codecParameters()->getFrameSize();
+}
+
+bool DesktopDataProviderBase::initAudioDecoder(int sampleRate, AVSampleFormat format, int channels)
+{
+    AVChannelLayout layout;
+    av_channel_layout_default(&layout, channels);
+    return m_audioEncoder.open(AV_CODEC_ID_MP3, sampleRate, format, layout, /*bitrate*/0);
+}
+
+bool DesktopDataProviderBase::encodeAndPutAudioData(uint8_t* buffer, int size)
+{
+     if (!m_audioEncoder.sendFrame(buffer, size))
+        return false;
+
+    QnWritableCompressedAudioDataPtr packet;
+    while (!needToStop())
+    {
+        if (!m_audioEncoder.receivePacket(packet))
+            return false;
+
+        if (!packet)
+            break;
+
+        if (m_utcTimstampOffsetUs == 0)
+            m_utcTimstampOffsetUs = qnSyncTime->currentUSecsSinceEpoch();
+
+        packet->timestamp += m_utcTimstampOffsetUs;
+        packet->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        packet->dataProvider = this;
+        packet->channelNumber = 1;
+        if (dataCanBeAccepted())
+            putData(packet);
+    }
+
+    return true;
 }
 
 } // namespace nx::vms::client::core

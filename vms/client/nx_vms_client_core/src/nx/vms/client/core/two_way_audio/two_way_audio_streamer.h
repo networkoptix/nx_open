@@ -26,10 +26,11 @@ public:
         const nx::network::http::Credentials& credentials,
         const QnVirtualCameraResourcePtr& camera);
 
-private: // QnAbstractMediaDataReceptor impl.
+public: // QnAbstractMediaDataReceptor impl.
     virtual bool canAcceptData() const override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
     virtual void clearUnprocessedData() override;
+    virtual bool needConfigureProvider() const { return false; } //< for DesktopDataProvider this means - No Video
 
 private:
     void onUpgradeHttpClient();

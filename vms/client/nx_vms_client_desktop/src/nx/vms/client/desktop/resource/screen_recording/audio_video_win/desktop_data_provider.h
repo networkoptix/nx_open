@@ -37,8 +37,6 @@ public:
 
     virtual bool isInitialized() const override;
 
-    virtual AudioLayoutConstPtr getAudioLayout() override;
-
     bool readyToStop() const;
 
     qint64 currentTime() const;

@@ -11,7 +11,7 @@
 #include <nx/utils/byte_array.h>
 #include <transcoding/abstract_codec_transcoder.h>
 #include <transcoding/ffmpeg_audio_resampler.h>
-
+#include <transcoding/audio_encoder.h>
 
 //< Minimal supported sample rate in mp4(with mp3), see ffmpeg(7.0.1) movenc.c:7579
 constexpr int kMinMp4Mp3SampleRate = 16000;
@@ -72,11 +72,6 @@ public:
      */
     bool isOpened() const;
 
-    /**
-     * \return encoder context.
-     */
-    AVCodecContext* getCodecContext();
-
     AVCodecParameters* getCodecParameters();
 
     /**
@@ -87,37 +82,13 @@ public:
     bool sendPacket(const QnConstAbstractMediaDataPtr& media);
     bool receivePacket(QnAbstractMediaDataPtr* const result);
 
-    //!Get output bitrate bitrate (bps)
-    int getBitrate() const { return m_bitrate; }
-
-private:
-    void tuneContextsWithMedia(
-        AVCodecContext* inCtx,
-        AVCodecContext* outCtx,
-        const QnConstAbstractMediaDataPtr& media);
-
-    std::size_t getSampleMultiplyCoefficient(const AVCodecContext* ctx);
-    std::size_t getPlanesCount(const AVCodecContext* ctx);
-    bool initResampler();
-
-    QnAbstractMediaDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
-
 private:
     const Config m_config;
-    AVCodecContext* m_encoderCtx = nullptr;
     AVCodecContext* m_decoderCtx = nullptr;
-    std::unique_ptr<FfmpegAudioResampler> m_resampler;
+    nx::media::ffmpeg::AudioEncoder m_encoder;
 
-    /**
-     * Wrapper for m_encoderContext.
-     * Used to create our own media packets from AVPacket ffmpeg structure.
-     */
-    CodecParametersConstPtr m_codecParamaters;
-
-    int m_dstSampleRate = 0;
     bool m_isOpened = false;
     int m_channelNumber = 0;
-    int m_bitrate = -1;
 };
 
 using QnFfmpegAudioTranscoderPtr = std::unique_ptr<QnFfmpegAudioTranscoder>;

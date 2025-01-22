@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/media/codec_parameters.h>
-#include <nx/media/ffmpeg/audio_encoder.h>
 
 #include "../desktop_data_provider_base.h"
 
@@ -22,7 +21,6 @@ public:
     virtual ~DesktopAudioOnlyDataProvider();
 
     virtual bool isInitialized() const override;
-    virtual AudioLayoutConstPtr getAudioLayout() override;
     virtual void beforeDestroyDataProvider(QnAbstractMediaDataReceptor* dataProviderWrapper) override;
     virtual bool readyToStop() const override;
     virtual void pleaseStop() override;
@@ -53,9 +51,7 @@ private:
     bool m_initialized = false;
     bool m_stopping = false;
     int m_frameSize = 0;
-    int64_t m_utcTimstampOffsetUs = 0;
     QByteArray m_internalBuffer;
-    nx::media::ffmpeg::AudioEncoder m_audioEncoder;
     std::vector<AudioSourceInfoPtr> m_audioSourcesInfo;
     SpeexPreprocessState* m_speexPreprocessState;
 };

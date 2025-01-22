@@ -374,8 +374,6 @@ struct DesktopDataProvider::Private
     bool isVideoInitialized = false;
 
     QPointer<nx::vms::client::core::VoiceSpectrumAnalyzer> soundAnalyzer;
-    AVPacket* outPacket = av_packet_alloc();
-    nx::media::ffmpeg::AudioEncoder audioEncoder;
     int frameSize = 0;
     std::unique_ptr<QElapsedTimer> timer;
     std::unique_ptr<AudioDeviceChangeNotifier> audioDeviceChangeNotifier =
@@ -580,19 +578,13 @@ bool DesktopDataProvider::initAudioCapturing()
         int sampleRate = format.sampleRate();
         int channels = d->audioInfo.size() > 1 ? /*stereo*/ 2 : format.channelCount();
 
-        AVChannelLayout layout;
-        av_channel_layout_default(&layout, channels);
-        if (!d->audioEncoder.initialize(AV_CODEC_ID_MP2,
-            sampleRate,
-            fromQtAudioFormat(format),
-            layout,
-            /*bitrate*/ 64000 * channels))
+        if (!initAudioDecoder(sampleRate, fromQtAudioFormat(format), channels))
         {
             m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;
         }
 
-        d->frameSize = d->audioEncoder.codecParams()->getFrameSize();
+        d->frameSize = getAudioFrameSize();
         d->audioFrameDuration = d->frameSize / (double) sampleRate * 1000; // keep in ms
 
         d->soundAnalyzer = appContext()->voiceSpectrumAnalyzer();
@@ -737,36 +729,8 @@ void DesktopDataProvider::putAudioData()
         }
         d->soundAnalyzer->processData(buffer1, d->frameSize);
 
-        if (!d->audioEncoder.sendFrame((uint8_t*)buffer1, d->frameSize))
+        if (!encodeAndPutAudioData((uint8_t*)buffer1, d->frameSize))
             return;
-
-        QnWritableCompressedAudioDataPtr packet;
-        while (!needToStop())
-        {
-            if (!d->audioEncoder.receivePacket(packet))
-                return;
-
-            if (!packet)
-                break;
-
-            if (d->initTime == AV_NOPTS_VALUE)
-                d->initTime = qnSyncTime->currentUSecsSinceEpoch();
-
-            packet->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            packet->dataProvider = this;
-            packet->channelNumber = 1;
-
-            AVRational timeBaseNative;
-            timeBaseNative.num = 1;
-            timeBaseNative.den = 1000000;
-
-            AVRational timeBaseMs;
-            timeBaseMs.num = 1;
-            timeBaseMs.den = 1000;
-
-            packet->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + d->initTime;
-            putData(packet);
-        }
     }
 }
 
@@ -902,14 +866,6 @@ void DesktopDataProvider::closeStream()
     foreach(EncodedAudioInfo* audioChannel, d->audioInfo)
         delete audioChannel;
     d->audioInfo.clear();
-}
-
-AudioLayoutConstPtr DesktopDataProvider::getAudioLayout()
-{
-    if (d->audioEncoder.codecParams() && !m_audioLayout)
-        m_audioLayout.reset(new AudioLayout(d->audioEncoder.codecParams()));
-
-    return m_audioLayout;
 }
 
 qint64 DesktopDataProvider::currentTime() const

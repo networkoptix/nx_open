@@ -63,8 +63,6 @@ public:
 
     //!Returns picture size (in pixels) of output video stream
     QSize getOutputResolution() const;
-    //!Get output bitrate bitrate (bps)
-    int getBitrate() const { return m_bitrate; }
 
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);

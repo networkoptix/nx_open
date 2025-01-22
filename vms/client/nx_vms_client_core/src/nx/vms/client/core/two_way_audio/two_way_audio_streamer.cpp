@@ -200,7 +200,7 @@ void TwoWayAudioStreamer::putData(const QnAbstractDataPacketPtr& data)
     auto audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (!audioData)
     {
-        NX_WARNING(this, "Invalid audio packet");
+        NX_VERBOSE(this, "Skip non-audio packet");
         return;
     }
 

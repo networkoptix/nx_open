@@ -13,7 +13,6 @@ extern "C" {
 
 #include <speex/speex_preprocess.h>
 
-#include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <nx/audio/audio.h>
 #include <nx/build_info.h>
 #include <nx/media/codec_parameters.h>
@@ -22,13 +21,11 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/audio_recording_settings.h>
-#include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
 
 namespace {
 
-const auto kSingleChannelBitrate = 64000;
 const auto kStereoChannelCount = 2;
 const auto kDefaultSampleRate = 44100;
 const auto kDefaultChannelCount = 1;
@@ -116,18 +113,10 @@ void DesktopAudioOnlyDataProvider::run()
     int sampleRate = format.sampleRate();
     int channels = m_audioSourcesInfo.size() > 1 ? kStereoChannelCount : format.channelCount();
 
-    AVChannelLayout layout;
-    av_channel_layout_default(&layout, channels);
-    if (!m_audioEncoder.initialize(AV_CODEC_ID_MP3,
-        sampleRate,
-        fromQtAudioFormat(format),
-        layout,
-        kSingleChannelBitrate * channels))
-    {
+    if (!initAudioDecoder(sampleRate, fromQtAudioFormat(format), channels))
         return;
-    }
 
-    m_frameSize = m_audioEncoder.codecParams()->getFrameSize();
+    m_frameSize = getAudioFrameSize();
     initSpeex(m_frameSize, sampleRate);
     resizeBuffers(m_frameSize);
 
@@ -176,7 +165,7 @@ QAudioFormat DesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
 
     if (!deviceInfo.isFormatSupported(result))
     {
-        qDebug() << "Default format is not supported, trying to use nearest";
+        NX_DEBUG(NX_SCOPE_TAG, "Default format is not supported, trying to use nearest");
 
         if (!deviceInfo.supportedSampleFormats().contains(result.sampleFormat()))
         {
@@ -185,7 +174,6 @@ QAudioFormat DesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
                 *errorString = tr("Sample format of input device %1 is not supported.")
                     .arg(deviceInfo.description());
             }
-
             return {};
         }
 
@@ -271,29 +259,8 @@ void DesktopAudioOnlyDataProvider::processData()
         auto firstBuffer = m_audioSourcesInfo.at(0)->frameBuffer;
 
         m_soundAnalyzer->processData((qint16*)firstBuffer, m_frameSize);
-
-        if (!m_audioEncoder.sendFrame((uint8_t*)firstBuffer, m_frameSize))
+        if (!encodeAndPutAudioData((uint8_t*)firstBuffer, m_frameSize))
             return;
-
-        QnWritableCompressedAudioDataPtr packet;
-        while (!needToStop())
-        {
-            if (!m_audioEncoder.receivePacket(packet))
-                return;
-
-            if (!packet)
-                break;
-
-            if (m_utcTimstampOffsetUs == 0)
-                m_utcTimstampOffsetUs = qnSyncTime->currentUSecsSinceEpoch();
-
-            packet->timestamp += m_utcTimstampOffsetUs;
-            packet->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            packet->dataProvider = this;
-            packet->channelNumber = 1;
-            if (dataCanBeAccepted())
-                putData(packet);
-        }
     }
 }
 
@@ -363,14 +330,6 @@ void DesktopAudioOnlyDataProvider::preprocessAudioBuffers(
 bool DesktopAudioOnlyDataProvider::isInitialized() const
 {
     return m_initialized;
-}
-
-AudioLayoutConstPtr DesktopAudioOnlyDataProvider::getAudioLayout()
-{
-    if (!m_audioLayout)
-        m_audioLayout.reset(new AudioLayout(m_audioEncoder.codecParams()));
-
-    return m_audioLayout;
 }
 
 void DesktopAudioOnlyDataProvider::beforeDestroyDataProvider(

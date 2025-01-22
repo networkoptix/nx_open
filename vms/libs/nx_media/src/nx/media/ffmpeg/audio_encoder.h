@@ -4,6 +4,7 @@
 
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/codec_parameters.h>
+#include <transcoding/ffmpeg_audio_resampler.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -11,31 +12,42 @@ extern "C" {
 
 namespace nx::media::ffmpeg {
 
-class NX_MEDIA_API AudioEncoder
+class NX_VMS_COMMON_API AudioEncoder
 {
 public:
     AudioEncoder();
     ~AudioEncoder();
 
-    bool initialize(
+    bool open(
         AVCodecID codec,
         int sampleRate,
         AVSampleFormat format,
         AVChannelLayout layout,
-        int bitrate);
+        int bitrate,
+        int dstFrameSize = 0);
     bool sendFrame(uint8_t* data, int size);
+    bool sendFrame(AVFrame* inputFrame);
     bool receivePacket(QnWritableCompressedAudioDataPtr& result);
-    CodecParametersPtr codecParams();
+    CodecParametersPtr codecParameters();
+
+    /**
+     * \brief Sets destination sample rate.
+     * \param value Desired destination sample rate.
+     */
+    void setSampleRate(int value);
 
 private:
+    QnWritableCompressedAudioDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
     void close();
 
 private:
+    int m_dstSampleRate = 0;
+    int m_bitrate = -1;
     int64_t m_ptsUs = 0;
     AVFrame* m_inputFrame = nullptr;
-    AVPacket* m_outputPacket = nullptr;
     AVCodecContext* m_encoderContext = nullptr;
     CodecParametersPtr m_codecParams;
+    std::unique_ptr<FfmpegAudioResampler> m_resampler;
 };
 
 } // namespace nx::media::ffmpeg

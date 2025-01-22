@@ -304,7 +304,7 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
     if (!m_audioTranscoder->open(sourceCodecParams))
         return nullptr;
 
-    return std::make_shared<CodecParameters>(m_audioTranscoder->getCodecContext());
+    return std::make_shared<CodecParameters>(m_audioTranscoder->getCodecParameters());
 }
 
 void ExportStorageStreamRecorder::setTranscoderFixedFrameRate(int value)
