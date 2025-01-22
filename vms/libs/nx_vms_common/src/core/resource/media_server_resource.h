@@ -120,6 +120,12 @@ public:
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
+    nx::network::http::Credentials credentials() const
+    {
+        return nx::network::http::PasswordCredentials{
+            getId().toSimpleStdString(), getAuthKey().toStdString()};
+    }
+
     /**
      * @return Data structure containing the backup bitrate limit in bytes per second for each hour
      *     for each day of week. Absence of a value for the given day-of-week/hour pair means that

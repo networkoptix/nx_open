@@ -63,7 +63,9 @@ AuthResult GenericUserDataProvider::authorize(
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
         {
             const QString ha1Data = nx::format("%1:%2:%3",
-                server->getId(), nx::network::AppInfo::realm(), server->getAuthKey());
+                server->getId().toSimpleString(),
+                nx::network::AppInfo::realm(),
+                server->getAuthKey());
             ha1 = QCryptographicHash::hash(ha1Data.toUtf8(), QCryptographicHash::Md5).toHex();
         }
 

@@ -3410,9 +3410,7 @@ nx::network::http::Credentials getRequestCredentials(
         return connection->credentials();
 
     NX_ASSERT(PeerData::isServer(localPeerType), "Unexpected peer type");
-    return nx::network::http::Credentials(
-        targetServer->getId().toStdString(),
-        nx::network::http::PasswordAuthToken(targetServer->getAuthKey().toStdString()));
+    return targetServer->credentials();
 }
 
 bool setupAuth(

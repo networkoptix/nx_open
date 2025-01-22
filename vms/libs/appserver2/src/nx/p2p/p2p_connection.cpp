@@ -111,8 +111,7 @@ bool Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient)
         if (authKey.isEmpty())
             return false;
 
-        httpClient->setCredentials(
-            PasswordCredentials(server->getId().toStdString(), authKey.toStdString()));
+        httpClient->setCredentials(server->credentials());
         return true;
     }
 
