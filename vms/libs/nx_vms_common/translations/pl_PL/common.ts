@@ -1850,7 +1850,7 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32)</translation>
+      <translation>Maksymalna liczba wątków dla zdalnej synchronizacji archiwum (&lt;=0 - auto, max 32)</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization</source>
@@ -1902,7 +1902,7 @@
     </message>
     <message>
       <source>Allow Power User editing Security Settings</source>
-      <translation type="unfinished">Allow Power User editing Security Settings</translation>
+      <translation>Zezwalaj użytkownikowi zaawansowanemu na edycję ustawień zabezpieczeń</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure)</source>
