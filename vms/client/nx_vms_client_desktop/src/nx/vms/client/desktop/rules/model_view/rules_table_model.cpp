@@ -53,7 +53,6 @@ namespace nx::vms::client::desktop::rules {
 namespace {
 
 constexpr auto kAttentionIconPath = "20x20/Solid/attention.svg?primary=yellow";
-constexpr auto kInvalidRuleIconPath = "20x20/Solid/alert2.svg?primary=yellow";
 
 constexpr auto kEnabledForegroundColor = "light10";
 constexpr auto kDisabledForegroundColor = "dark16";
@@ -422,7 +421,7 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
     if (role == Qt::DecorationRole)
     {
         if (!isRuleValid(rule))
-            return kInvalidRuleIconPath;
+            return kAttentionIconPath;
     }
 
     return {};
