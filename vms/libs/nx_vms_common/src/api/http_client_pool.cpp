@@ -241,32 +241,36 @@ struct HttpConnection
  */
 struct AsyncClientStopper
 {
-    AsyncClientStopper(std::unique_ptr<AsyncClient>&& clientToStop, bool stopAsync = false):
+    AsyncClientStopper(std::unique_ptr<AsyncClient>&& clientToStop):
         client(std::move(clientToStop))
     {
-        if (stopAsync && NX_ASSERT(client))
+        if (NX_ASSERT(client))
         {
             promise = std::make_shared<std::promise<void>>();
-            client->pleaseStop([this]() { promise->set_value(); });
+            client->pleaseStop(
+                [this]()
+                {
+                    promise->set_value();
+                    stopped = true;
+                });
         }
     }
 
-    bool isStoppingAsync() const
-    {
-        return promise != nullptr;
-    }
-
-    void stop()
+    ~AsyncClientStopper()
     {
         if (promise)
             promise->get_future().wait();
-        else
-            client->pleaseStopSync();
+    }
+
+    bool isStopped() const
+    {
+        return stopped || !promise;
     }
 
 private:
     std::unique_ptr<AsyncClient> client;
     std::shared_ptr<std::promise<void>> promise;
+    std::atomic_bool stopped = false;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -316,34 +320,39 @@ struct ClientPool::Private
         }
     }
 
-    void deleteStoppedClients(bool includeAsyncStoppingClients = false)
+    void deleteStoppedClients()
     {
         std::vector<std::unique_ptr<AsyncClientStopper>> stoppedClients;
 
         {
             NX_MUTEX_LOCKER lock(&mutex);
-            if (includeAsyncStoppingClients)
-            {
-                stoppedClients.swap(stoppingClients);
-            }
-            else
-            {
-                for (auto it = stoppingClients.begin(); it != stoppingClients.end(); /*no inc*/)
-                {
-                    if ((*it)->isStoppingAsync())
-                    {
-                        ++it;
-                        continue;
-                    }
 
+            for (auto it = stoppingClients.begin(); it != stoppingClients.end(); /*no inc*/)
+            {
+                if ((*it)->isStopped())
+                {
+                    // Postpone the client deletion.
                     stoppedClients.push_back(std::move(*it));
                     it = stoppingClients.erase(it);
+                }
+                else
+                {
+                    ++it;
                 }
             }
         }
 
-        for (const std::unique_ptr<AsyncClientStopper>& client: stoppedClients)
-            client->stop();
+        stoppedClients.clear();
+    }
+
+    void stopClientsSync()
+    {
+        std::vector<std::unique_ptr<AsyncClientStopper>> stoppedClients;
+
+        {
+            NX_MUTEX_LOCKER lock(&mutex);
+            stoppedClients.swap(stoppingClients);
+        }
 
         stoppedClients.clear();
     }
@@ -502,7 +511,7 @@ struct ClientPool::Private
                 if (connection->client)
                 {
                     stoppingClients.push_back(std::make_unique<AsyncClientStopper>(
-                        std::move(connection->client), /*stopAsync*/ !sync));
+                        std::move(connection->client)));
                 }
             }
 
@@ -514,7 +523,7 @@ struct ClientPool::Private
         }
 
         if (sync)
-            deleteStoppedClients(/*includeAsyncStoppingClients*/ true);
+            stopClientsSync();
 
         if (invokeCallbacks)
         {
