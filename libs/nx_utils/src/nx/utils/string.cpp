@@ -10,6 +10,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
+#include <QtCore/private/qtools_p.h>
 
 #include <nx/kit/utils.h>
 #include <nx/utils/datetime.h>
@@ -198,7 +199,8 @@ void ExtractTokenView(
     QStringView string,
     int& pos,
     bool& isNumber,
-    bool enableFloat)
+    bool enableFloat,
+    bool& isSpecial)
 {
     buffer = {};
     if (string.isNull() || pos >= string.length())
@@ -207,6 +209,7 @@ void ExtractTokenView(
     int startPos = pos;
 
     isNumber = false;
+    isSpecial = false;
     QChar curr = string[pos];
     // TODO:: Fix it
     // If you don't want to handle sign of the number, this isNumberStart is not needed indeed
@@ -260,10 +263,19 @@ void ExtractTokenView(
         }
     }
 
-    if (!isNumber)
+    if (QtMiscUtils::isAsciiLetterOrNumber(curr.toLatin1()))
     {
-        while (!isNumberStart(curr) && pos < string.length())
+        isSpecial = true;
+        INCBUFVIEW();
+    }
+
+    if (!isNumber && !isSpecial)
+    {
+        while (!isNumberStart(curr) && !QtMiscUtils::isAsciiLetterOrNumber(curr.toLatin1())
+            && pos < string.length())
+        {
             INCBUFVIEW();
+        }
     }
 
     const qsizetype count = std::min((qsizetype) pos, string.size()) - startPos;
@@ -287,6 +299,8 @@ int naturalStringCompare(
     // all status values are created on the stack outside the loop to make as fast as possible
     bool lhsNumber = false;
     bool rhsNumber = false;
+    bool lhsSpecial = false;
+    bool rhsSpecial = false;
 
     double lhsValue = 0.0;
     double rhsValue = 0.0;
@@ -295,8 +309,8 @@ int naturalStringCompare(
 
     while (retVal == 0 && ii < lhs.length() && jj < rhs.length())
     {
-        ExtractTokenView(lhsBufferQStr, lhs, ii, lhsNumber, enableFloat);
-        ExtractTokenView(rhsBufferQStr, rhs, jj, rhsNumber, enableFloat);
+        ExtractTokenView(lhsBufferQStr, lhs, ii, lhsNumber, enableFloat, lhsSpecial);
+        ExtractTokenView(rhsBufferQStr, rhs, jj, rhsNumber, enableFloat, rhsSpecial);
 
         if (!lhsNumber && !rhsNumber)
         {
