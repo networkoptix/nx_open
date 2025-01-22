@@ -12,6 +12,7 @@ compiler.cppstd=20
 [options]
 zlib/*:shared=False
 openssl/*:shared=False
+lsquic/*:shared=False
 qt/*:shared=False
 qt/*:qtwebengine=False
 ffmpeg:shared=False

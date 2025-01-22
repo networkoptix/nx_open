@@ -23,7 +23,7 @@ nx_configure_directory(
 
 nx_generate_package_json(${CMAKE_CURRENT_BINARY_DIR}/package.json
     COMPONENT client
-    VARIANTS "{ \"minimumVersion\": \"10.16\" }")
+    VARIANTS "{ \"minimumVersion\": \"12.0\" }")
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/package.json)
 
 set(app_icon ${customization_dir}/icons/macosx/logo.icns)
