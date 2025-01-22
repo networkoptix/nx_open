@@ -56,6 +56,16 @@ void ClaimSet::setSecuritySequence(int val)
     set("pwdSeq", val);
 }
 
+std::optional<std::string> ClaimSet::subjectTyp() const
+{
+    return get<std::string>("subjTyp");
+}
+
+void ClaimSet::setSubjectTyp(const std::string& val)
+{
+    set("subjTyp", val);
+}
+
 std::optional<std::string> ClaimSet::region() const
 {
     return get<std::string>("region");

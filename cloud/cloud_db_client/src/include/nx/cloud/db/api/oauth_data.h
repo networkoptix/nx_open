@@ -20,6 +20,7 @@ NX_REFLECTION_ENUM_CLASS(GrantType,
     password,
     refresh_token,
     authorization_code,
+    system_credentials,
     sso_tokens
 );
 
@@ -264,6 +265,9 @@ public:
     std::optional<int> securitySequence() const;
     void setSecuritySequence(int val);
 
+    // Oauth subject type. MUST be one of user, system
+    std::optional<std::string> subjectTyp() const;
+    void setSubjectTyp(const std::string& val);
 
     // For internal purpose only. The AWS region the user account belongs to.
     std::optional<std::string> region() const;
