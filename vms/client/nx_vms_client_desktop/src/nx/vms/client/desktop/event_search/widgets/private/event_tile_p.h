@@ -87,7 +87,7 @@ public:
     QString getFormattedSystemNameIfNeeded(const QString& systemId);
 
     QString getElidedStringByRowsNumberAndWidth(
-        const QFont& font, const QString& text, int textWidth, int rowLimit);
+        QLabel* containerLabel, const QString& text, int rowLimit);
 };
 
 } // namespace nx::vms::client::desktop

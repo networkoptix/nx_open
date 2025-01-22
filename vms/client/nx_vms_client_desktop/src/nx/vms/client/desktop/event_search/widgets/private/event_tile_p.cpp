@@ -60,9 +60,8 @@ void EventTile::Private::setDescription(const QString& value)
     descriptionLabelDescriptor.formatter =
         [&]()
         {
-            return getElidedStringByRowsNumberAndWidth(q->ui->descriptionLabel->font(),
+            return getElidedStringByRowsNumberAndWidth(q->ui->descriptionLabel,
                 descriptionLabelDescriptor.fullContent.toString(),
-                q->ui->descriptionLabel->width(),
                 kTileDescriptionLineLimit);
         };
     updateLabelForCurrentWidth(q->ui->descriptionLabel, descriptionLabelDescriptor);
@@ -85,9 +84,8 @@ void EventTile::Private::setTitle(const QString& value)
     titleLabelDescriptor.formatter =
         [&]()
         {
-            return getElidedStringByRowsNumberAndWidth(q->ui->nameLabel->font(),
-                titleLabelDescriptor.fullContent.toString(),
-                q->ui->nameLabel->width(),
+            return getElidedStringByRowsNumberAndWidth(q->ui->nameLabel,
+            titleLabelDescriptor.fullContent.toString(),
                 kTileTitleLineLimit);
         };
     updateLabelForCurrentWidth(q->ui->nameLabel, titleLabelDescriptor);
@@ -228,8 +226,9 @@ QString EventTile::Private::getElidedResourceText(const QStringList& list)
     const auto maxWidth = q->ui->resourceListLabel->width();
     if (list.size() == 1)
     {
-        return getElidedStringByRowsNumberAndWidth(
-            q->ui->resourceListLabel->font(), list.front(), maxWidth, kMaximumResourceLineLimit);
+        return getElidedStringByRowsNumberAndWidth(q->ui->resourceListLabel,
+            list.front(),
+            kMaximumResourceLineLimit);
     }
 
     // If there are multiple sources,
@@ -244,8 +243,9 @@ QString EventTile::Private::getElidedResourceText(const QStringList& list)
     QString additionalText = tr(" + %n", "", list.size() - 1);
     if (getWidthOfText(list.front() + additionalText, q->ui->resourceListLabel) > maxWidth)
     {
-        return getElidedStringByRowsNumberAndWidth(
-            q->ui->resourceListLabel->font(), list.front(), maxWidth, kMaximumResourceLineLimit);
+        return getElidedStringByRowsNumberAndWidth(q->ui->resourceListLabel,
+            list.front(),
+            kMaximumResourceLineLimit);
     }
 
     // If there are multiple sources, and all of them CAN NOT fit into one line,
@@ -397,12 +397,16 @@ QString EventTile::Private::getFormattedSystemNameIfNeeded(const QString& system
 }
 
 QString EventTile::Private::getElidedStringByRowsNumberAndWidth(
-    const QFont& font, const QString& text, int textWidth, int rowLimit)
+    QLabel* containerLabel, const QString& text, int rowLimit)
 {
+    if (!containerLabel)
+        return {};
+
     QTextDocument doc;
-    doc.setDefaultFont(font);
+    doc.setDefaultFont(containerLabel->font());
+    doc.setDocumentMargin(containerLabel->margin());
     doc.setHtml(common::html::toHtml(text));
-    doc.setTextWidth(textWidth);
+    doc.setTextWidth(containerLabel->width());
     core::text_utils::elideDocumentLines(&doc, rowLimit, true, "...");
     // Must return html, since many strings in labels are created with html formatting.
     return doc.toHtml();
