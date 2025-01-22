@@ -150,7 +150,7 @@ public:
     bool registerActionField(const QString& type, const ActionFieldRecord& record);
 
     /** To be used with fixTransactionInputFromApi / amendOutputDataIfNeeded function pair. */
-    const QSet<QString>& encryptedActionBuilderProperties(const QString& type) const;
+    const QSet<QString>& encryptedActionFieldProperties(const QString& type) const;
 
     /**
      * Builds action builder based on the registered action descriptor. Builder fields are filled

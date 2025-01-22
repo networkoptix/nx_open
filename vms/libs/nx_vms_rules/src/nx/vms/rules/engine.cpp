@@ -446,7 +446,7 @@ bool Engine::registerActionField(const QString& type, const ActionFieldRecord& r
     return true;
 }
 
-const QSet<QString>& Engine::encryptedActionBuilderProperties(const QString& type) const
+const QSet<QString>& Engine::encryptedActionFieldProperties(const QString& type) const
 {
     static const QSet<QString> kEmpty;
 
