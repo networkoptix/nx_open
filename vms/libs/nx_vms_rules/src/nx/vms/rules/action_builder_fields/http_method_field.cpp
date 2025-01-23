@@ -10,11 +10,14 @@ namespace nx::vms::rules {
 
 const QSet<QString>& HttpMethodField::allowedValues()
 {
-    static const QSet kAllowedValues = {QString(network::http::Method::get.data()),
+    static const QSet kAllowedValues = {
+        QString(network::http::Method::get.data()),
         QString(network::http::Method::post.data()),
         QString(network::http::Method::put.data()),
         QString(network::http::Method::patch.data()),
-        QString(network::http::Method::delete_.data())};
+        QString(network::http::Method::delete_.data()),
+        QString{} //< An empty value means that the method will be calculated automatically.
+    };
 
     return kAllowedValues;
 }
@@ -26,7 +29,7 @@ QJsonObject HttpMethodField::openApiDescriptor(const QVariantMap&)
     for (const auto& value: allowedValues())
         enums.append(value);
     descriptor[utils::kEnumProperty] = enums;
-    descriptor[utils::kExampleProperty] = *allowedValues().begin();
+    descriptor[utils::kExampleProperty] = QString(network::http::Method::post.data());
     return descriptor;
 }
 
