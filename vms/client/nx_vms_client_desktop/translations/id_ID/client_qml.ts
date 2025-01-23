@@ -1042,11 +1042,11 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Otentikasi digest sudah tidak digunakan lagi dan akan dinonaktifkan pada rilis berikutnya, dan hanya boleh digunakan bila Otentikasi Bearer default tidak dapat digunakan.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Otentikasi digest sudah tidak berlaku lagi dan akan dinonaktifkan pada rilis berikutnya, dan hanya boleh digunakan jika Otentikasi Bearer default tidak dapat digunakan. Login pengguna hanya boleh terdiri dari huruf kecil.</translation>
     </message>
   </context>
   <context>

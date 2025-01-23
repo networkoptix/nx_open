@@ -801,7 +801,7 @@
     </message>
     <message>
       <source>Cloud storage services disabled</source>
-      <translation type="unfinished">Cloud storage services disabled</translation>
+      <translation>Usługi przechowywania w chmurze wyłączone</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>

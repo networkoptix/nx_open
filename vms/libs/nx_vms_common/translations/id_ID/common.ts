@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>Tidak ada kredensial yang diberikan saat diminta oleh endpoint.</translation>
     </message>
   </context>
   <context>
