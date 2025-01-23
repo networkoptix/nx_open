@@ -22,7 +22,7 @@ public:
     void setFlags(Flags flags);
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
-    void addItem(const IEventMetadata* event);
+    void addItem(Ptr<const IEventMetadata> event);
     void clear();
 
 protected:

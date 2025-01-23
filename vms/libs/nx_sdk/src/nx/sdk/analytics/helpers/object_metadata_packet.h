@@ -21,7 +21,7 @@ public:
     void setFlags(Flags flags);
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
-    void addItem(const IObjectMetadata* object);
+    void addItem(Ptr<const IObjectMetadata> object);
     void clear();
 
 protected:

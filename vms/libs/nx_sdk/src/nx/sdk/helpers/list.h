@@ -20,12 +20,12 @@ public:
         return (int) m_items.size();
     }
 
-    void addItem(IItem* item)
+    void addItem(Ptr<IItem> item)
     {
         if (!NX_KIT_ASSERT(item))
             return;
 
-        m_items.push_back(nx::sdk::shareToPtr(item));
+        m_items.push_back(item);
     }
 
     void clear()
@@ -42,11 +42,11 @@ protected:
         if (!NX_KIT_ASSERT(m_items[index]))
             return nullptr;
 
-        return nx::sdk::shareToPtr(m_items[index]).releasePtr();
+        return shareToPtr(m_items[index]).releasePtr();
     }
 
 private:
-    std::vector<nx::sdk::Ptr<IItem>> m_items;
+    std::vector<Ptr<IItem>> m_items;
 };
 
 } // namespace nx::sdk

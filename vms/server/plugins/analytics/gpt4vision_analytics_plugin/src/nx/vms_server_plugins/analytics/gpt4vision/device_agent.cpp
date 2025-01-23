@@ -288,7 +288,7 @@ void DeviceAgent::handleOpenAiResponse(const open_ai::Response& response)
         // and other automatic processing.
         eventMetadata->setCaption("GPT4");
         eventMetadata->setDescription(response.choices[0].message.content);
-        eventMetadataPacket->addItem(eventMetadata.get());
+        eventMetadataPacket->addItem(eventMetadata);
         pushMetadataPacket(eventMetadataPacket.releasePtr());
     }
     else if (!response.error.message.empty())

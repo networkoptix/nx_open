@@ -49,11 +49,11 @@ void ObjectMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void ObjectMetadataPacket::addItem(const IObjectMetadata* objectMetadata)
+void ObjectMetadataPacket::addItem(Ptr<const IObjectMetadata> objectMetadata)
 {
     if (!NX_KIT_ASSERT(objectMetadata))
         return;
-    m_objects.push_back(shareToPtr(objectMetadata));
+    m_objects.push_back(objectMetadata);
 }
 
 void ObjectMetadataPacket::clear()

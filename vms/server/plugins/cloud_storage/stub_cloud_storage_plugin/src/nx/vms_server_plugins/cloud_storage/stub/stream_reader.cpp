@@ -33,10 +33,7 @@ StreamReader::StreamReader(
     m_codecInfos = nx::sdk::makePtr<nx::sdk::List<nx::sdk::cloud_storage::ICodecInfo>>();
     m_opaqueMetadata = m_file->opaqueMetadata();
     for (const auto& codecInfo: m_file->codecInfo())
-    {
-        m_codecInfos->addItem(
-            nx::sdk::makePtr<nx::sdk::cloud_storage::CodecInfo>(codecInfo).get());
-    }
+        m_codecInfos->addItem(nx::sdk::makePtr<nx::sdk::cloud_storage::CodecInfo>(codecInfo));
 }
 
 void StreamReader::getOpaqueMetadata(nx::sdk::Result<const nx::sdk::IString*>* outResult) const

@@ -320,11 +320,11 @@ Ptr<IMetadataPacket> DeviceAgent::cookSomeEvents()
     m_eventContext.currentEventTypeIndex =
         (m_eventContext.currentEventTypeIndex + 1) % ((int) kEventsToFire.size());
 
-    eventMetadataPacket->addItem(eventMetadata.get());
+    eventMetadataPacket->addItem(eventMetadata);
 
     // Generate EventWithImage together with the first Event in the list.
     if (m_eventContext.currentEventTypeIndex == 0)
-        eventMetadataPacket->addItem(createEventWithImage().get());
+        eventMetadataPacket->addItem(createEventWithImage());
 
     return eventMetadataPacket;
 }

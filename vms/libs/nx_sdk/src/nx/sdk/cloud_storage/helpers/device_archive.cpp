@@ -50,8 +50,8 @@ DeviceArchive::DeviceArchive(
 {
     for (const auto& indexToIndexData: m_data)
     {
-        m_indexArchiveList.addItem(
-            new IndexArchive(indexToIndexData.first, indexToIndexData.second));
+        m_indexArchiveList.addItem(makePtr<IndexArchive>(
+            indexToIndexData.first, indexToIndexData.second));
     }
 }
 

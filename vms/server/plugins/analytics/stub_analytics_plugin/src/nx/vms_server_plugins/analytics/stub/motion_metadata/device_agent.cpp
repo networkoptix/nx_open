@@ -216,7 +216,7 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
                 objectMetadata->setTrackId(
                     m_objectTrackIdForObjectCells[objectColumn * objectRowCount + objectRow]);
                 objectMetadata->setConfidence(1.0F);
-                objectMetadataPacket->addItem(objectMetadata.get());
+                objectMetadataPacket->addItem(objectMetadata);
             }
         }
 

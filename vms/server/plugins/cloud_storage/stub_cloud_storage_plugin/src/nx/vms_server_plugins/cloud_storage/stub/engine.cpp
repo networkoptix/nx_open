@@ -129,7 +129,7 @@ void Engine::startAsyncTasks()
                 {
                     const auto deviceId = deviceIdToDeviceData.first;
                     auto deviceAgent = findDeviceAgentById(deviceId, m_deviceAgents);
-                    result.addItem(new nx::sdk::cloud_storage::DeviceArchive(
+                    result.addItem(nx::sdk::makePtr<nx::sdk::cloud_storage::DeviceArchive>(
                         deviceAgent, deviceIdToDeviceData.second));
                 }
 

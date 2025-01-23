@@ -100,7 +100,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTime
         objects[i]->setBoundingBox(generateBoundingBox(m_frameIndex, i, (int) objects.size()));
         objects[i]->setTrackId(trackIdByTrackIndex(i));
 
-        metadataPacket->addItem(objects[i].get());
+        metadataPacket->addItem(objects[i]);
     }
 
     return metadataPacket;

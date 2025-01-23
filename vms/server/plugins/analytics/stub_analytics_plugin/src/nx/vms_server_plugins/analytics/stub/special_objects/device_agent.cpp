@@ -273,12 +273,12 @@ void DeviceAgent::addBlinkingObjectIfNeeded(
         dedicatedMetadataPacket->setTimestampUs(metadataTimestampUs);
         dedicatedMetadataPacket->setDurationUs(0);
 
-        dedicatedMetadataPacket->addItem(blinkingObjectMetadata.get());
+        dedicatedMetadataPacket->addItem(blinkingObjectMetadata);
         metadataPackets->push_back(dedicatedMetadataPacket.releasePtr());
     }
     else
     {
-        objectMetadataPacket->addItem(blinkingObjectMetadata.get());
+        objectMetadataPacket->addItem(blinkingObjectMetadata);
     }
 }
 
@@ -304,7 +304,7 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
             Attribute::Type::string, "nx.sys.color", fixedObjectColor));
     }
 
-    objectMetadataPacket->addItem(objectMetadata.get());
+    objectMetadataPacket->addItem(objectMetadata);
 }
 
 void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
@@ -334,7 +334,7 @@ void DeviceAgent::addCounterIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPac
         "counterValue",
         std::to_string(m_counterObjectAttributeValue++)));
 
-    objectMetadataPacket->addItem(objectMetadata.get());
+    objectMetadataPacket->addItem(objectMetadata);
 }
 
 void DeviceAgent::addPointIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
@@ -370,7 +370,7 @@ void DeviceAgent::addPointIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacke
         "nx.sys.showAsPoint",
         "true"));
 
-    objectMetadataPacket->addItem(objectMetadata.get());
+    objectMetadataPacket->addItem(objectMetadata);
 }
 
 void DeviceAgent::addEmptyNameObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadataPacket)
@@ -400,7 +400,7 @@ void DeviceAgent::addEmptyNameObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMet
     const float realHeight = 0.1F;
 
     objectMetadata->setBoundingBox(Rect(realXOffset, realYOffset, realWidth, realHeight));
-    objectMetadataPacket->addItem(objectMetadata.get());
+    objectMetadataPacket->addItem(objectMetadata);
 }
 
 std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()

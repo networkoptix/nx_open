@@ -49,11 +49,11 @@ void EventMetadataPacket::setDurationUs(int64_t durationUs)
     m_durationUs = durationUs;
 }
 
-void EventMetadataPacket::addItem(const IEventMetadata* eventMetadata)
+void EventMetadataPacket::addItem(Ptr<const IEventMetadata> eventMetadata)
 {
     if (!NX_KIT_ASSERT(eventMetadata))
         return;
-    m_events.push_back(shareToPtr(eventMetadata));
+    m_events.push_back(eventMetadata);
 }
 
 void EventMetadataPacket::clear()

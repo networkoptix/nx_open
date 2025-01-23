@@ -82,7 +82,7 @@ Ptr<IObjectMetadataPacket> DeviceAgent::generateObject(int64_t timestampUs)
 
     auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
     objectMetadataPacket->setTimestampUs(timestampUs);
-    objectMetadataPacket->addItem(objectMetadata.get());
+    objectMetadataPacket->addItem(objectMetadata);
 
     return objectMetadataPacket;
 }

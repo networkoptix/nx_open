@@ -186,7 +186,7 @@ std::vector<Ptr<IMetadataPacket>> DeviceAgent::generateMetadata(
             for (const auto& item: object.attributes)
                 objectMetadata->addAttribute(makePtr<Attribute>(item.first, item.second));
 
-            objectMetadataPacket->addItem(objectMetadata.get());
+            objectMetadataPacket->addItem(objectMetadata);
         }
     }
 

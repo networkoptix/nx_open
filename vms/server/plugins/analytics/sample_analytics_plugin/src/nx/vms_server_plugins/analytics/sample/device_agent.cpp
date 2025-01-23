@@ -124,7 +124,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
     eventMetadata->setCaption("New sample plugin track started");
     eventMetadata->setDescription("New track #" + std::to_string(m_trackIndex) + " started");
 
-    eventMetadataPacket->addItem(eventMetadata.get());
+    eventMetadataPacket->addItem(eventMetadata);
 
     // Generate index and track id for the next track.
     ++m_trackIndex;
@@ -158,7 +158,7 @@ Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket()
     const float y = d * frameIndexInsideTrack;
     objectMetadata->setBoundingBox(Rect(x, y, width, height));
 
-    objectMetadataPacket->addItem(objectMetadata.get());
+    objectMetadataPacket->addItem(objectMetadata);
 
     return objectMetadataPacket;
 }

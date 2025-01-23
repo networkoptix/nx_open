@@ -110,7 +110,7 @@ void DeviceAgent::generateTitleObject()
         objectMetadata->setTrackId(trackContext.trackId);
         objectMetadata->setBoundingBox(trackContext.boundingBox);
 
-        objectMetadataPacket->addItem(objectMetadata.get());
+        objectMetadataPacket->addItem(objectMetadata);
     }
 
     pushMetadataPacket(objectMetadataPacket.releasePtr());
@@ -137,7 +137,7 @@ void DeviceAgent::generateBestShotObject()
         objectMetadata->setTrackId(trackContext.trackId);
         objectMetadata->setBoundingBox(trackContext.boundingBox);
 
-        objectMetadataPacket->addItem(objectMetadata.get());
+        objectMetadataPacket->addItem(objectMetadata);
     }
 
     pushMetadataPacket(objectMetadataPacket.releasePtr());

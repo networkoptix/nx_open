@@ -118,7 +118,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     eventMetadata->setIsActive(true);
     eventMetadata->setConfidence(1.0);
     handler->fillMetadata(eventMetadata);
-    eventMetadataPacket->addItem(eventMetadata.get());
+    eventMetadataPacket->addItem(eventMetadata);
     pushMetadataPacket(eventMetadataPacket.releasePtr());
     return true;
 }
