@@ -22,7 +22,8 @@ protected:
     virtual std::string manifestString() const override;
 
     virtual bool pushCustomMetadataPacket(
-        const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICustomMetadataPacket> customMetadataPacket
+    ) override;
 
 private:
     Engine* const m_engine;

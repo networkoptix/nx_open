@@ -30,7 +30,7 @@ protected:
     virtual std::string manifestString() const override;
 
     virtual bool pushUncompressedVideoFrame(
-        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> videoFrame) override;
 
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
@@ -38,7 +38,7 @@ private:
     const std::string kEventType = "nx.gpt4vision.response";
 
     open_ai::QueryPayload::Message::Content::ImageUrl encodeImage(
-        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame,
+        nx::sdk::Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> videoFrame,
         std::string format = "jpg") const;
 
     void sendVideoFrameToOpenAi(const open_ai::QueryPayload& payload);

@@ -109,7 +109,7 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
-void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
+void DeviceAgent::processVideoFrame(Ptr<const IDataPacket> videoFrame, const char* func)
 {
     if (m_deviceAgentSettings.additionalFrameProcessingDelayMs.load()
         > std::chrono::milliseconds::zero())
@@ -123,7 +123,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     ++m_frameCounter;
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoFrame)
 {
     NX_OUTPUT << "Received compressed video frame, resolution: "
         << videoFrame->width() << "x" << videoFrame->height();
@@ -221,7 +221,7 @@ void DeviceAgent::processFrameMotion(Ptr<IList<IMetadataPacket>> metadataPacketL
         }
 
         motionObjectMetadataCount += objectMetadataPacket->count();
-        pushMetadataPacket(objectMetadataPacket.releasePtr());
+        pushMetadataPacket(objectMetadataPacket);
     }
 
     NX_OUTPUT << "Generated " << motionObjectMetadataCount << " motion Objects for the frame.";

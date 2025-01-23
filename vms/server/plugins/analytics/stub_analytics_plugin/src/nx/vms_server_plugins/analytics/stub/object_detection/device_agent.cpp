@@ -108,7 +108,7 @@ std::string DeviceAgent::manifestString() const
     return kDeviceAgentManifest;
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoFrame)
 {
     ++m_frameIndex;
     if ((m_frameIndex % kTrackLength) == 0)
@@ -117,7 +117,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     Ptr<IMetadataPacket> objectMetadataPacket = generateObjectMetadataPacket(
         videoFrame->timestampUs() + m_timestampShiftMs * 1000);
 
-    pushMetadataPacket(objectMetadataPacket.releasePtr());
+    pushMetadataPacket(objectMetadataPacket);
 
     return true;
 }

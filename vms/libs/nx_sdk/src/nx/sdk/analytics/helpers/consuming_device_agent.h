@@ -60,19 +60,26 @@ protected:
      *
      * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
-    virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame);
+    virtual bool pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> /*videoFrame*/)
+    {
+        return true;
+    }
 
     /**
      * Override to accept next uncompressed video frame for processing.
      * @param videoFrame Contains a pointer to the uncompressed video frame raw bytes.
      */
-    virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame);
+    virtual bool pushUncompressedVideoFrame(Ptr<const IUncompressedVideoFrame> /*videoFrame*/)
+    {
+        return true;
+    }
 
     /**
      * Override to accept next custom metadata for processing.
      * @param customMetadataPacket Contains a pointer to the custom metadata packet.
      */
-    virtual bool pushCustomMetadataPacket(const ICustomMetadataPacket* /*customMetadataPacket*/)
+    virtual bool pushCustomMetadataPacket(
+        Ptr<const ICustomMetadataPacket> /*customMetadataPacket*/)
     {
         return true;
     }
@@ -83,13 +90,16 @@ protected:
      * the moment (not necessarily referring to that frame). As an alternative, send metadata to
      * Server by calling pushMetadataPacket() instead of implementing this method.
      */
-    virtual bool pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets);
+    virtual bool pullMetadataPackets(std::vector<Ptr<IMetadataPacket>>* /*metadataPackets*/)
+    {
+        return true;
+    }
 
     /**
-     * Send a newly constructed metadata packet to Server. Can be called at any time, from any
+     * Sends a newly constructed metadata packet to Server. Can be called at any time, from any
      * thread. As an alternative, send metadata to Server by implementing pullMetadataPackets().
      */
-    void pushMetadataPacket(IMetadataPacket* metadataPacket);
+    void pushMetadataPacket(Ptr<IMetadataPacket> metadataPacket);
 
     /**
      * Sends an IntegrationDiagnosticEvent to the Server. Can be called from any thread, but if
@@ -163,10 +173,11 @@ protected:
 
 private:
     void logMetadataPacketIfNeeded(
-        const IMetadataPacket* metadataPacket,
+        Ptr<const IMetadataPacket> metadataPacket,
         int packetIndex) const;
-    void processMetadataPackets(const std::vector<IMetadataPacket*>& metadataPackets);
-    void processMetadataPacket(IMetadataPacket* metadataPacket, int packetIndex /*= -1*/);
+
+    void processMetadataPackets(const std::vector<Ptr<IMetadataPacket>>& metadataPackets);
+    void processMetadataPacket(Ptr<IMetadataPacket> metadataPacket, int packetIndex = -1);
 
 private:
     mutable std::mutex m_mutex;

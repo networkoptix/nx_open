@@ -94,7 +94,7 @@ std::string DeviceAgent::manifestString() const
 )json";
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoPacket)
 {
     m_lastFrameTimestampUs = videoPacket->timestampUs();
     if (m_lastFrameTimestampUs < m_lastEventTimestampUs + m_requestContext.periodSeconds * 1E6)
@@ -119,7 +119,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
     eventMetadata->setConfidence(1.0);
     handler->fillMetadata(eventMetadata);
     eventMetadataPacket->addItem(eventMetadata);
-    pushMetadataPacket(eventMetadataPacket.releasePtr());
+    pushMetadataPacket(eventMetadataPacket);
     return true;
 }
 

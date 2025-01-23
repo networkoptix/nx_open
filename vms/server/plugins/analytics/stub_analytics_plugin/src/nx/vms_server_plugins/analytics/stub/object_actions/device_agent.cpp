@@ -47,13 +47,13 @@ R"json(
 )json";
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoPacket)
 {
     NX_OUTPUT << "Pushing compressed video packet, timestamp "
         << videoPacket->timestampUs() << " us; ";
 
     Ptr<IObjectMetadataPacket> objectMetadataPacket = generateObject(videoPacket->timestampUs());
-    pushMetadataPacket(objectMetadataPacket.releasePtr());
+    pushMetadataPacket(objectMetadataPacket);
     return true;
 }
 

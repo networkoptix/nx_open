@@ -48,24 +48,6 @@ ConsumingDeviceAgent::~ConsumingDeviceAgent()
     NX_PRINT << "Destroyed " << this;
 }
 
-bool ConsumingDeviceAgent::pushCompressedVideoFrame(
-    const ICompressedVideoPacket* /*videoFrame*/)
-{
-    return true;
-}
-
-bool ConsumingDeviceAgent::pushUncompressedVideoFrame(
-    const IUncompressedVideoFrame* /*videoFrame*/)
-{
-    return true;
-}
-
-bool ConsumingDeviceAgent::pullMetadataPackets(
-    std::vector<IMetadataPacket*>* /*metadataPackets*/)
-{
-    return true;
-}
-
 //-------------------------------------------------------------------------------------------------
 // Implementation of interface methods.
 
@@ -100,17 +82,17 @@ void ConsumingDeviceAgent::doPushDataPacket(
 
     if (const auto compressedFrame = dataPacket->queryInterface<ICompressedVideoPacket>())
     {
-        if (!pushCompressedVideoFrame(compressedFrame.get()))
+        if (!pushCompressedVideoFrame(compressedFrame))
             return logError(ErrorCode::otherError, "pushCompressedVideoFrame() failed.");
     }
     else if (const auto uncompressedFrame = dataPacket->queryInterface<IUncompressedVideoFrame>())
     {
-        if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
+        if (!pushUncompressedVideoFrame(uncompressedFrame))
             return logError(ErrorCode::otherError, "pushUncompressedVideoFrame() failed.");
     }
     else if (const auto customMetadataPacket = dataPacket->queryInterface<ICustomMetadataPacket>())
     {
-        if (!pushCustomMetadataPacket(customMetadataPacket.get()))
+        if (!pushCustomMetadataPacket(customMetadataPacket))
             return logError(ErrorCode::otherError, "pushCustomMetadataPacket() failed.");
     }
     else
@@ -121,7 +103,7 @@ void ConsumingDeviceAgent::doPushDataPacket(
     if (!m_handler)
         return logError(ErrorCode::internalError, "setHandler() was not called.");
 
-    std::vector<IMetadataPacket*> metadataPackets;
+    std::vector<Ptr<IMetadataPacket>> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
         return logError(ErrorCode::otherError, "pullMetadataPackets() failed.");
 
@@ -131,7 +113,7 @@ void ConsumingDeviceAgent::doPushDataPacket(
 }
 
 void ConsumingDeviceAgent::processMetadataPackets(
-    const std::vector<IMetadataPacket*>& metadataPackets)
+    const std::vector<Ptr<IMetadataPacket>>& metadataPackets)
 {
     if (!metadataPackets.empty())
     {
@@ -142,7 +124,7 @@ void ConsumingDeviceAgent::processMetadataPackets(
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         for (int i = 0; i < (int) metadataPackets.size(); ++i)
-            processMetadataPacket(Ptr(metadataPackets.at(i)).get(), i);
+            processMetadataPacket(metadataPackets.at(i), i);
     }
 }
 
@@ -152,7 +134,7 @@ static std::string packetIndexName(int packetIndex)
 }
 
 void ConsumingDeviceAgent::processMetadataPacket(
-    IMetadataPacket* metadataPacket, int packetIndex = -1)
+    Ptr<IMetadataPacket> metadataPacket, int packetIndex /*= -1*/)
 {
     if (!m_handler)
     {
@@ -169,7 +151,7 @@ void ConsumingDeviceAgent::processMetadataPacket(
 
     logMetadataPacketIfNeeded(metadataPacket, packetIndex);
     NX_KIT_ASSERT(metadataPacket->timestampUs() >= 0);
-    m_handler->handleMetadata(metadataPacket);
+    m_handler->handleMetadata(metadataPacket.get());
 }
 
 void ConsumingDeviceAgent::getManifest(Result<const IString*>* outResult) const
@@ -195,11 +177,10 @@ void ConsumingDeviceAgent::finalize()
 // Tools for the derived class.
 
 void ConsumingDeviceAgent::pushMetadataPacket(
-    IMetadataPacket* metadataPacket)
+    Ptr<IMetadataPacket> metadataPacket)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     processMetadataPacket(metadataPacket);
-    metadataPacket->releaseRef();
 }
 
 void ConsumingDeviceAgent::pushIntegrationDiagnosticEvent(
@@ -247,7 +228,7 @@ void ConsumingDeviceAgent::pushManifest(const std::string& manifest)
 }
 
 void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
-    const IMetadataPacket* metadataPacket,
+    Ptr<const IMetadataPacket> metadataPacket,
     int packetIndex) const
 {
     if (!NX_DEBUG_ENABLE_OUTPUT || !NX_KIT_ASSERT(metadataPacket))

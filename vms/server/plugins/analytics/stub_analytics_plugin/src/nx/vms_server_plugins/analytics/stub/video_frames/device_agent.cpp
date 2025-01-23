@@ -99,7 +99,7 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
-void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
+void DeviceAgent::processVideoFrame(Ptr<const IDataPacket> videoFrame, const char* func)
 {
     if (m_deviceAgentSettings.additionalFrameProcessingDelayMs.load()
         > std::chrono::milliseconds::zero())
@@ -113,7 +113,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     if (m_deviceAgentSettings.leakFrames)
     {
         NX_PRINT << "Intentionally creating a memory leak with IDataPacket @"
-            << nx::kit::utils::toString(videoFrame);
+            << nx::kit::utils::toString(videoFrame.get());
         videoFrame->addRef();
     }
 
@@ -129,7 +129,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     ++m_frameCounter;
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoFrame)
 {
     if (m_engine->needUncompressedVideoFrames())
     {
@@ -144,7 +144,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     return true;
 }
 
-bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
+bool DeviceAgent::pushUncompressedVideoFrame(Ptr<const IUncompressedVideoFrame> videoFrame)
 {
     if (!m_engine->needUncompressedVideoFrames())
     {
@@ -162,7 +162,7 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
 //-------------------------------------------------------------------------------------------------
 // private
 
-bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
+bool DeviceAgent::checkVideoFrame(Ptr<const IUncompressedVideoFrame> frame) const
 {
     if (frame->pixelFormat() != m_engine->pixelFormat())
     {
@@ -211,7 +211,7 @@ bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 }
 
 bool DeviceAgent::checkVideoFramePlane(
-    const IUncompressedVideoFrame* frame,
+    Ptr<const IUncompressedVideoFrame> frame,
     const PixelFormatDescriptor* pixelFormatDescriptor,
     int plane) const
 {
@@ -257,7 +257,7 @@ bool DeviceAgent::checkVideoFramePlane(
 }
 
 void DeviceAgent::dumpSomeFrameBytes(
-    const nx::sdk::analytics::IUncompressedVideoFrame* frame, int plane) const
+    Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> frame, int plane) const
 {
     // Hex-dump some bytes from raw pixel data.
 

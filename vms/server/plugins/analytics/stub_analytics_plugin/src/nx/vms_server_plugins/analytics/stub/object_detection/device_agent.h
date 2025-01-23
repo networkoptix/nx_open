@@ -31,7 +31,7 @@ protected:
     virtual std::string manifestString() const override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICompressedVideoPacket> videoFrame) override;
 
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 

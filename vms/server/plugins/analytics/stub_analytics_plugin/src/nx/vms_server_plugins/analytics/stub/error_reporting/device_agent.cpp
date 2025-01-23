@@ -54,7 +54,7 @@ R"json(
 })json";
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* /*videoFrame*/)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> /*videoFrame*/)
 {
     ++m_frameCount;
 

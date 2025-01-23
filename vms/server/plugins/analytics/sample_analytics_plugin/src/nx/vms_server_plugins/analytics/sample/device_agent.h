@@ -22,10 +22,10 @@ protected:
     virtual std::string manifestString() const override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICompressedVideoPacket> videoFrame) override;
 
     virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>>* metadataPackets) override;
 
 private:
     nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();

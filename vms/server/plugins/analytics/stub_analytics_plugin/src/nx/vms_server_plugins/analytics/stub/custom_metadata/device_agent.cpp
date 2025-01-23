@@ -42,7 +42,7 @@ std::string DeviceAgent::manifestString() const
 }
 
 bool DeviceAgent::pushCustomMetadataPacket(
-    const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket)
+    Ptr<const nx::sdk::analytics::ICustomMetadataPacket> customMetadataPacket)
 {
     if (!ini().needMetadata)
     {

@@ -23,7 +23,7 @@ public:
 
 protected:
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICompressedVideoPacket> videoFrame) override;
 
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,

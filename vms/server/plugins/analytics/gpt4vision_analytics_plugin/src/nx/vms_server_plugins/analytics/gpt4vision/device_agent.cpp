@@ -94,7 +94,7 @@ std::string DeviceAgent::manifestString() const
 /**
  * Called when the Server sends a new uncompressed frame from a camera.
  */
-bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
+bool DeviceAgent::pushUncompressedVideoFrame(Ptr<const IUncompressedVideoFrame> videoFrame)
 {
     if (m_engine->apiKey().empty())
         return true;
@@ -124,7 +124,7 @@ bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* vide
 }
 
 open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
-    const IUncompressedVideoFrame* videoFrame,
+    Ptr<const IUncompressedVideoFrame> videoFrame,
     std::string format) const
 {
     // TODO: #sivanov Support other frame pixel formats.
@@ -289,7 +289,7 @@ void DeviceAgent::handleOpenAiResponse(const open_ai::Response& response)
         eventMetadata->setCaption("GPT4");
         eventMetadata->setDescription(response.choices[0].message.content);
         eventMetadataPacket->addItem(eventMetadata);
-        pushMetadataPacket(eventMetadataPacket.releasePtr());
+        pushMetadataPacket(eventMetadataPacket);
     }
     else if (!response.error.message.empty())
     {

@@ -42,20 +42,20 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICompressedVideoPacket> videoFrame) override;
 
     virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>>* metadataPackets) override;
 
 private:
-    std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
+    std::vector<nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>> cookSomeObjects();
 
     nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadata> cookBlinkingObjectIfNeeded(
         int64_t metadataTimestampUs);
 
     void addBlinkingObjectIfNeeded(
         int64_t metadataTimestampUs,
-        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets,
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>>* metadataPackets,
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
     void addFixedObjectIfNeeded(
@@ -70,10 +70,12 @@ private:
     void addEmptyNameObjectIfNeeded(
         nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> objectMetadataPacket);
 
-    void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
+    void processVideoFrame(
+        nx::sdk::Ptr<const nx::sdk::analytics::IDataPacket> videoFrame,
+        const char* func);
 
     void processCustomMetadataPacket(
-        const nx::sdk::analytics::ICustomMetadataPacket* customMetadataPacket,
+        nx::sdk::Ptr<const nx::sdk::analytics::ICustomMetadataPacket> customMetadataPacket,
         const char* func);
 
     void cleanUpTimestampQueue();

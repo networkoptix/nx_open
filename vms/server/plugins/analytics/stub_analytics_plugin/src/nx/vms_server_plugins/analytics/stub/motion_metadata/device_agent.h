@@ -33,10 +33,12 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICompressedVideoPacket> videoFrame) override;
 
 private:
-    void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
+    void processVideoFrame(
+        nx::sdk::Ptr<const nx::sdk::analytics::IDataPacket> videoFrame,
+        const char* func);
 
     void processFrameMotion(
         nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>> metadataPacketList);

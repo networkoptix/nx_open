@@ -169,7 +169,7 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
-void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
+void DeviceAgent::processVideoFrame(Ptr<const IDataPacket> videoFrame, const char* func)
 {
     if (m_deviceAgentSettings.additionalFrameProcessingDelayMs.load()
         > std::chrono::milliseconds::zero())
@@ -188,7 +188,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
         m_frameTimestampUsQueue.push_back(frameTimestamp);
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoFrame)
 {
     NX_OUTPUT << "Received compressed video frame, resolution: "
         << videoFrame->width() << "x" << videoFrame->height();
@@ -197,7 +197,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     return true;
 }
 
-bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
+bool DeviceAgent::pullMetadataPackets(std::vector<Ptr<IMetadataPacket>>* metadataPackets)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
@@ -257,7 +257,7 @@ Ptr<IObjectMetadata> DeviceAgent::cookBlinkingObjectIfNeeded(int64_t metadataTim
  */
 void DeviceAgent::addBlinkingObjectIfNeeded(
     int64_t metadataTimestampUs,
-    std::vector<IMetadataPacket*>* metadataPackets,
+    std::vector<Ptr<IMetadataPacket>>* metadataPackets,
     Ptr<ObjectMetadataPacket> objectMetadataPacket)
 {
     const auto blinkingObjectMetadata = cookBlinkingObjectIfNeeded(metadataTimestampUs);
@@ -274,7 +274,7 @@ void DeviceAgent::addBlinkingObjectIfNeeded(
         dedicatedMetadataPacket->setDurationUs(0);
 
         dedicatedMetadataPacket->addItem(blinkingObjectMetadata);
-        metadataPackets->push_back(dedicatedMetadataPacket.releasePtr());
+        metadataPackets->push_back(dedicatedMetadataPacket);
     }
     else
     {
@@ -403,11 +403,11 @@ void DeviceAgent::addEmptyNameObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMet
     objectMetadataPacket->addItem(objectMetadata);
 }
 
-std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
+std::vector<Ptr<IMetadataPacket>> DeviceAgent::cookSomeObjects()
 {
     std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
 
-    std::vector<IMetadataPacket*> result;
+    std::vector<Ptr<IMetadataPacket>> result;
 
     if (m_lastVideoFrameTimestampUs == 0)
         return result;
@@ -437,7 +437,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
         return result;
 
-    result.push_back(objectMetadataPacket.releasePtr());
+    result.push_back(objectMetadataPacket);
     return result;
 }
 

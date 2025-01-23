@@ -71,7 +71,7 @@ std::string DeviceAgent::manifestString() const
 /**
  * Called when the Server sends a new compressed frame from a camera.
  */
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoFrame)
 {
     ++m_frameIndex;
     m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
@@ -81,7 +81,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
     {
         auto eventMetadataPacket = generateEventMetadataPacket();
         // Send generated metadata packet to the Server.
-        pushMetadataPacket(eventMetadataPacket.releasePtr());
+        pushMetadataPacket(eventMetadataPacket);
     }
 
     return true; //< There were no errors while processing the video frame.
@@ -97,9 +97,9 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
  * pushMetadataPacket() when you generate one metadata packet and do not want to store it in the
  * class field, and use pullMetadataPackets otherwise.
  */
-bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
+bool DeviceAgent::pullMetadataPackets(std::vector<Ptr<IMetadataPacket>>* metadataPackets)
 {
-    metadataPackets->push_back(generateObjectMetadataPacket().releasePtr());
+    metadataPackets->push_back(generateObjectMetadataPacket());
 
     return true; //< There were no errors while filling metadataPackets.
 }

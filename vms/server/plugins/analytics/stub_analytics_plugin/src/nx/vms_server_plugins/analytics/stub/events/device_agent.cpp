@@ -265,7 +265,7 @@ void DeviceAgent::eventThreadLoop()
     while (!m_terminated)
     {
         if (m_deviceAgentSettings.generateEvents && m_needToGenerateEvents)
-            pushMetadataPacket(cookSomeEvents().releasePtr());
+            pushMetadataPacket(cookSomeEvents());
 
         // Sleep until the next event needs to be generated, or the thread is ordered
         // to terminate (hence condition variable instead of sleep()). Return value

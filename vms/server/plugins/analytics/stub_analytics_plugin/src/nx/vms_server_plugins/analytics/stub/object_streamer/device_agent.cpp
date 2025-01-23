@@ -48,7 +48,7 @@ std::string DeviceAgent::manifestString() const
     return "{}";
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoPacket)
 {
     // If we received at least one frame previously.
     if (m_lastFrameTimestampUs >= 0)
@@ -63,7 +63,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPa
         for (auto& metadataPacket: generateMetadata(
             previousFrameNumber, previousFrameTimestampUs, previousFrameDurationUs))
         {
-            pushMetadataPacket(metadataPacket.releasePtr());
+            pushMetadataPacket(metadataPacket);
         }
 
         // On wraparound, remove per-stream-cycle track ids.

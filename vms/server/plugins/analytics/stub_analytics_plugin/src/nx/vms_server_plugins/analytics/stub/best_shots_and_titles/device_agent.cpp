@@ -113,7 +113,7 @@ void DeviceAgent::generateTitleObject()
         objectMetadataPacket->addItem(objectMetadata);
     }
 
-    pushMetadataPacket(objectMetadataPacket.releasePtr());
+    pushMetadataPacket(objectMetadataPacket);
 }
 
 void DeviceAgent::generateBestShotObject()
@@ -140,7 +140,7 @@ void DeviceAgent::generateBestShotObject()
         objectMetadataPacket->addItem(objectMetadata);
     }
 
-    pushMetadataPacket(objectMetadataPacket.releasePtr());
+    pushMetadataPacket(objectMetadataPacket);
 }
 
 void DeviceAgent::maybeGenerateBestShotAndTitle()
@@ -151,7 +151,7 @@ void DeviceAgent::maybeGenerateBestShotAndTitle()
 
         std::vector<Ptr<IObjectTrackBestShotPacket>> bestShotPackets = generateBestShots();
         for (Ptr<IObjectTrackBestShotPacket>& bestShotPacket: bestShotPackets)
-            pushMetadataPacket(bestShotPacket.releasePtr());
+            pushMetadataPacket(bestShotPacket);
     }
 
     if (m_generateTitle)
@@ -160,11 +160,11 @@ void DeviceAgent::maybeGenerateBestShotAndTitle()
 
         std::vector<Ptr<IObjectTrackTitlePacket>> titlePackets = generateTitles();
         for (Ptr<IObjectTrackTitlePacket>& titlePacket: titlePackets)
-            pushMetadataPacket(titlePacket.releasePtr());
+            pushMetadataPacket(titlePacket);
     }
 }
 
-bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoPacket)
+bool DeviceAgent::pushCompressedVideoFrame(Ptr<const ICompressedVideoPacket> videoPacket)
 {
     m_lastFrameTimestampUs = videoPacket->timestampUs();
     maybeGenerateBestShotAndTitle();

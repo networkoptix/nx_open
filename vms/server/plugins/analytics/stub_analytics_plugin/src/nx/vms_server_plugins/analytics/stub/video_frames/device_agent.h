@@ -39,23 +39,25 @@ protected:
     virtual nx::sdk::Result<const nx::sdk::ISettingsResponse*> settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
-        const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::ICompressedVideoPacket> videoFrame) override;
 
     virtual bool pushUncompressedVideoFrame(
-        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
+        nx::sdk::Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> videoFrame) override;
 
 private:
-    void processVideoFrame(const nx::sdk::analytics::IDataPacket* videoFrame, const char* func);
+    void processVideoFrame(
+        nx::sdk::Ptr<const nx::sdk::analytics::IDataPacket> videoFrame, const char* func);
 
-    bool checkVideoFrame(const nx::sdk::analytics::IUncompressedVideoFrame* frame) const;
+    bool checkVideoFrame(
+        nx::sdk::Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> frame) const;
 
     bool checkVideoFramePlane(
-        const nx::sdk::analytics::IUncompressedVideoFrame* frame,
+        nx::sdk::Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> frame,
         const nx::sdk::analytics::PixelFormatDescriptor* pixelFormatDescriptor,
         int plane) const;
 
     void dumpSomeFrameBytes(
-        const nx::sdk::analytics::IUncompressedVideoFrame* frame,
+        nx::sdk::Ptr<const nx::sdk::analytics::IUncompressedVideoFrame> frame,
         int plane) const;
 
 private:
