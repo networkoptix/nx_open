@@ -548,7 +548,7 @@
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation>Bearer認証タイプを選択した場合、トークンのフィールドに入力する必要があります。</translation>
+      <translation>Bearer 認証タイプを選択した場合、トークンのフィールドに入力する必要があります。</translation>
     </message>
   </context>
   <context>
