@@ -304,7 +304,7 @@ public:
         return deserializeValue(serializedValue, &value) && isValueValid(value.value<T>());
     }
 
-    virtual bool isJsonValueValid(const QJsonValue& value) const
+    virtual bool isJsonValueValid(const QJsonValue& value) const override
     {
         T typedValue;
         return QJson::deserialize<T>(value, &typedValue) && isValueValid(typedValue);

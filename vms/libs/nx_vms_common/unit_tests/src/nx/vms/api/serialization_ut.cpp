@@ -5,6 +5,7 @@
 #include <api/model/api_ioport_data.h>
 #include <api/model/configure_system_data.h>
 #include <api/resource_property_adaptor.h>
+#include <core/resource/resource.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/system_setting_description.h>
@@ -253,6 +254,41 @@ void checkSystemSettings(
     ASSERT_EQ(expected.toStdString(), qjsonFromReflect.toStdString());
 }
 
+struct TestProperty
+{
+    std::string name;
+    std::optional<std::string> password;
+    int timeout = 60;
+
+    bool operator==(const TestProperty& other) const = default;
+
+    friend void PrintTo(const TestProperty& val, ::std::ostream* os)
+    {
+        *os << QJson::serialized(val).toStdString();
+    }
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestProperty, (json), (name)(password)(timeout))
+
+struct TestResource: QnResource
+{
+    TestResource()
+    {
+        setForceUsingLocalProperties(true);
+    }
+
+    void setTestProperty(TestProperty value)
+    {
+        setTestProperty(QString::fromUtf8(QJson::serialized(value)));
+    }
+
+    void setTestProperty(QString data)
+    {
+        setProperty("testProperty", data);
+        emitPropertyChanged("testProperty", "", data);
+    }
+};
+
 } // namespace
 
 TEST(SystemSettings, serialization)
@@ -263,6 +299,35 @@ TEST(SystemSettings, serialization)
     const auto adaptors = systemSettings.allSettings();
     checkSystemSettings(adaptors, notReadOnly);
     checkSystemSettings(adaptors, notWriteOnly);
+}
+
+TEST(SystemSettings, settingsWithOptionalUpdate)
+{
+    QnSharedResourcePointer<TestResource> resource(new TestResource());
+    QnJsonResourcePropertyAdaptor<TestProperty> adapter("testProperty", TestProperty{});
+    adapter.setResource(resource);
+    EXPECT_EQ(adapter.value(), TestProperty{});
+    const std::vector<TestProperty> testValues = {
+        {.name = "name1", .password = std::nullopt},
+        {.name = "name2", .password = "password2"},
+        {.name = "", .password = std::nullopt},
+        {.name = "name3", .password = std::nullopt, .timeout = 10},
+    };
+    NX_INFO(this, "Update adapter from property");
+    for (const auto& testValue: testValues)
+    {
+        resource->setTestProperty(testValue);
+        EXPECT_EQ(adapter.value(), testValue);
+    }
+
+    NX_INFO(this, "Update adapter directly");
+    for (const auto& testValue: testValues)
+    {
+        adapter.setValue(testValue);
+        EXPECT_EQ(adapter.value(), testValue);
+    }
+    resource->setTestProperty(QString());
+    EXPECT_EQ(adapter.value(), TestProperty{});
 }
 
 } // namespace nx::vms::api::test
