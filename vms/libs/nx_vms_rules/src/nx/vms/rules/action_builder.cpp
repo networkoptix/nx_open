@@ -643,17 +643,11 @@ ActionPtr ActionBuilder::buildAction(
         }
         else
         {
-            if (action->property(propertyName).isValid())
+            // Set property value only if it exists.
+            if (action->property(propertyName).isValid()
+                && aggregatedEvent->property(propertyName).isValid())
             {
-                // Set property value if it exists as event's property.
-                if (aggregatedEvent->property(propertyName).isValid())
-                    action->setProperty(propertyName, aggregatedEvent->property(propertyName));
-                else if (const auto details = aggregatedEvent->details(engine()->systemContext());
-                    details.contains(propertyName))
-                {
-                    // Set property value if it exists in events details.
-                    action->setProperty(propertyName, details.value(propertyName));
-                }
+                action->setProperty(propertyName, aggregatedEvent->property(propertyName));
             }
         }
     }

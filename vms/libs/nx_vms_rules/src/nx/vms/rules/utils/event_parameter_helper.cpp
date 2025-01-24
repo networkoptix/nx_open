@@ -340,6 +340,9 @@ void EventParameterHelper::Private::initFormatFunctions()
     registerFormatFunction("event.extendedDescription",
         {.formatFunction = &extendedEventDescription, .visible = false});
 
+    registerFormatFunction("event.details",
+        {.formatFunction = &eventDetails, .visible = false});
+
     registerFormatFunction(
         "event.name", {.formatFunction = &eventName, .documentation = kDefaultEventNameDoc});
 

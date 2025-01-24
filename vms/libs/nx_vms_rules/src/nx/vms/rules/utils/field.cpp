@@ -150,7 +150,7 @@ FieldDescriptor makeNotificationTextWithFieldsDescriptor(const QString& fieldNam
     }
     else if (fieldName == kDescriptionFieldName)
     {
-        defaultText = defaultText.isEmpty() ? QString("{event.description}") : defaultText;
+        defaultText = defaultText.isEmpty() ? QString("{event.details}") : defaultText;
         displayName = displayName.empty() ? NX_DYNAMIC_TRANSLATABLE(BasicAction::tr("Description"))
                                           : displayName;
         description = QString("Description, displayed on the event tile.");

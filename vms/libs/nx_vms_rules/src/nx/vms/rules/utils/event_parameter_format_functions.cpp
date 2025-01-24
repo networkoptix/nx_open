@@ -127,6 +127,12 @@ QString eventDescription(SubstitutionContext* substitution, common::SystemContex
     return result;
 }
 
+QString eventDetails(SubstitutionContext* substitution, common::SystemContext* context)
+{
+    return Strings::eventDetails(substitution->event->details(context))
+        .join(common::html::kLineBreak);
+}
+
 // Keep in sync with StringHelper::eventDescription().
 QString extendedEventDescription(
     SubstitutionContext* substitution, common::SystemContext* context)

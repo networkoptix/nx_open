@@ -38,6 +38,8 @@ QString eventDescription(
 // Keep in sync with StringHelper::eventDescription().
 QString extendedEventDescription(
     SubstitutionContext* substitution, common::SystemContext* context);
+QString eventDetails(
+    SubstitutionContext* substitution, common::SystemContext* context);
 
 QString eventTime(SubstitutionContext* substitution, common::SystemContext* context);
 QString eventTimeStart(SubstitutionContext* substitution, common::SystemContext* context);
