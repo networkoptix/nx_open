@@ -24,8 +24,15 @@ public:
         const LayoutItemData& oldItem);
 
 public:
+    struct ResourceData
+    {
+        QHash<QnLayoutResourcePtr /*layout*/, QSet<nx::Uuid> /*itemIds*/> itemsOnLayouts;
+        QSet<QnLayoutResourcePtr> layouts; //< For convenience and cleaner interface.
+    };
+
     QSet<QnLayoutResourcePtr> watchedLayouts;
-    QHash<nx::Uuid, QnCounterHash<QnLayoutResourcePtr>> itemLayouts;
+    QHash<nx::Uuid /*resourceId*/, ResourceData> resourceData;
+    QHash<QnLayoutResourcePtr, QSet<nx::Uuid>> layoutResources;
     mutable nx::Mutex mutex;
 };
 
@@ -73,19 +80,46 @@ bool LayoutItemWatcher::addWatchedLayout(const QnLayoutResourcePtr& layout)
 
 bool LayoutItemWatcher::removeWatchedLayout(const QnLayoutResourcePtr& layout)
 {
+    QSet<nx::Uuid> removedFromLayoutIds;
+    QSet<nx::Uuid> removedFromTheWatcherIds;
+
+    layout->disconnect(d.get());
+
     {
         NX_MUTEX_LOCKER lk(&d->mutex);
 
         if (!d->watchedLayouts.remove(layout))
             return false;
-    }
 
-    layout->disconnect(d.get());
+        // If `removeWatchedLayout` is called from layout's `update()`, current layout items
+        // may be already updated, so we must use stored `layoutResources[layout]` data to
+        // determine what resources are being removed.
+        removedFromLayoutIds = d->layoutResources.take(layout);
+
+        for (const auto& resourceId: removedFromLayoutIds)
+        {
+            auto& data = d->resourceData[resourceId];
+            data.itemsOnLayouts.remove(layout);
+            data.layouts.remove(layout);
+
+            if (data.layouts.empty())
+            {
+                NX_ASSERT(data.itemsOnLayouts.empty());
+                removedFromTheWatcherIds.insert(resourceId);
+                d->resourceData.remove(resourceId);
+            }
+        }
+    }
 
     NX_VERBOSE(this, "Removed watched layout: %1", layout);
 
-    for (auto item: layout->getItems())
-        d->handleItemRemoved(layout, item);
+    for (const auto resourceId: removedFromLayoutIds)
+    {
+        emit removedFromLayout(resourceId, layout);
+
+        if (removedFromTheWatcherIds.contains(resourceId))
+            emit resourceRemoved(resourceId);
+    }
 
     return true;
 }
@@ -105,14 +139,13 @@ bool LayoutItemWatcher::isWatched(const QnLayoutResourcePtr& layout) const
 bool LayoutItemWatcher::hasResource(const nx::Uuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
-    return d->itemLayouts.contains(resourceId);
+    return d->resourceData.contains(resourceId);
 }
 
-QnCounterHash<QnLayoutResourcePtr> LayoutItemWatcher::resourceLayouts(
-    const nx::Uuid& resourceId) const
+QSet<QnLayoutResourcePtr> LayoutItemWatcher::resourceLayouts(const nx::Uuid& resourceId) const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
-    return d->itemLayouts.value(resourceId);
+    return d->resourceData.value(resourceId).layouts;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -131,8 +164,22 @@ void LayoutItemWatcher::Private::handleItemAdded(
     bool addedToFirstLayout = false;
     {
         NX_MUTEX_LOCKER lk(&mutex);
-        addedToFirstLayout = !itemLayouts.contains(resourceId);
-        addedToLayout = itemLayouts[resourceId].insert(layout);
+        auto& data = resourceData[resourceId];
+        auto& items = data.itemsOnLayouts[layout];
+
+        // If `addWatchedLayout()` was called inside `QnResource::update()` and this
+        // `QnLayoutResource::itemAdded()` was called later from the same update,
+        // the item is already added to the watcher and should be skipped here.
+        if (items.contains(item.uuid))
+            return;
+
+        addedToFirstLayout = data.layouts.empty();
+        addedToLayout = items.empty();
+        data.layouts.insert(layout);
+        items.insert(item.uuid);
+
+        if (addedToLayout)
+            layoutResources[layout].insert(resourceId);
     }
 
     if (addedToLayout)
@@ -155,13 +202,30 @@ void LayoutItemWatcher::Private::handleItemRemoved(
     bool removedFromLastLayout = false;
     {
         NX_MUTEX_LOCKER lk(&mutex);
-        if (!NX_ASSERT(itemLayouts.contains(resourceId)))
+
+        // If `addWatchedLayout()` was called inside `QnResource::update()` and this
+        // `QnLayoutResource::itemRemoved()` was called later from the same update,
+        // the item is already not in the watcher and should be skipped here.
+        if (!resourceData.value(resourceId).itemsOnLayouts.value(layout).contains(item.uuid))
             return;
-        auto& layouts = itemLayouts[resourceId];
-        removedFromLayout = layouts.remove(layout);
-        removedFromLastLayout = layouts.empty();
-        if (removedFromLastLayout)
-            itemLayouts.remove(resourceId);
+
+        auto& data = resourceData[resourceId];
+        auto& items = data.itemsOnLayouts[layout];
+
+        items.remove(item.uuid);
+        if (removedFromLayout = items.empty())
+        {
+            data.itemsOnLayouts.remove(layout);
+            data.layouts.remove(layout);
+
+            layoutResources[layout].remove(resourceId);
+
+            if (removedFromLastLayout = data.layouts.empty())
+            {
+                NX_ASSERT(data.itemsOnLayouts.empty());
+                resourceData.remove(resourceId);
+            }
+        }
     }
 
     if (removedFromLayout)
@@ -174,7 +238,7 @@ void LayoutItemWatcher::Private::handleItemRemoved(
 void LayoutItemWatcher::Private::handleItemChanged(
     const QnLayoutResourcePtr& layout, const LayoutItemData& item, const LayoutItemData& oldItem)
 {
-    if (item.resource.id == oldItem.resource.id)
+    if (item.resource.id == oldItem.resource.id && NX_ASSERT(item.uuid == oldItem.uuid))
         return;
 
     handleItemRemoved(layout, oldItem);

@@ -2,12 +2,12 @@
 
 #pragma once
 
+#include <QtCore/QSet>
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/counter_hash.h>
 
 namespace nx::vms::common {
 
@@ -44,7 +44,7 @@ public:
     bool isWatched(const QnLayoutResourcePtr& layout) const;
 
     bool hasResource(const nx::Uuid& resourceId) const;
-    QnCounterHash<QnLayoutResourcePtr> resourceLayouts(const nx::Uuid& resourceId) const;
+    QSet<QnLayoutResourcePtr> resourceLayouts(const nx::Uuid& resourceId) const;
 
 signals:
     void addedToLayout(const nx::Uuid& resourceId, const QnLayoutResourcePtr& layout);
