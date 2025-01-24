@@ -1042,11 +1042,11 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Digest 認証は非推奨であり、次のリリースでは無効になります。デフォルトの Bearer 認証を使用できない場合にのみ使用してください。</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Digest 認証は非推奨であり、次のリリースでは無効になります。デフォルトの Bearer 認証を使用できない場合にのみ使用してください。ユーザーのログイン名は小文字のみで構成する必要があります。</translation>
     </message>
   </context>
   <context>

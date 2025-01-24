@@ -83,7 +83,7 @@
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>Không cung cấp thông tin xác thực khi điểm cuối yêu cầu.</translation>
     </message>
   </context>
   <context>
