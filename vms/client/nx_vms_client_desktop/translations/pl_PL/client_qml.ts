@@ -1063,11 +1063,11 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Uwierzytelnianie digest jest przestarzałe i zostanie wyłączone w następnej wersji. Należy go używać wyłącznie wtedy, gdy nie można użyć domyślnego uwierzytelniania Bearer.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Uwierzytelnianie digest jest przestarzałe i zostanie wyłączone w następnej wersji, i powinno być używane tylko wtedy, gdy nie można użyć domyślnego uwierzytelniania Bearer. Loginy użytkowników muszą składać się wyłącznie z małych liter.</translation>
     </message>
   </context>
   <context>
