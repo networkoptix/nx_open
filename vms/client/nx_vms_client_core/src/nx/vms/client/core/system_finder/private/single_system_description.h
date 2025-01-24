@@ -60,6 +60,8 @@ public:
 
     virtual QString idForToStringFromPtr() const override;
 
+    virtual bool isPending() const override;
+
     static QString extractSystemName(const QString& systemName);
 
 public:
@@ -76,6 +78,8 @@ public:
     void setServerHost(const nx::Uuid& serverId, const nx::utils::Url& host);
 
     void setName(const QString& value);
+
+    void setPending(bool value);
 
 protected:
     SingleSystemDescription(
@@ -101,6 +105,7 @@ private:
     QMultiMap<int, nx::Uuid> m_prioritized;
     QHash<nx::Uuid, nx::utils::Url> m_hosts;
     QSet<nx::Uuid> m_reachableServers;
+    bool m_isPending = false;
 };
 
 } // namespace nx::vms::client::core

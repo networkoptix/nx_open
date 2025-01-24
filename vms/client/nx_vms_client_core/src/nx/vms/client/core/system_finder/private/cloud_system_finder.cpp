@@ -285,7 +285,7 @@ struct CloudSystemFinder::Private
                 systemDescription->addServer(initialServer);
                 systemDescription->setServerHost(initialServer.id, systemUrl(system.cloudId));
             }
-
+            systemDescription->setPending(system.isPending);
             updatedSystems.insert(system.cloudId, systemDescription);
         }
 

@@ -227,6 +227,12 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     if (leftIsConnectable != rightIsConnectable)
         return leftIsConnectable;
 
+    const bool leftIsPending = sourceLeft.data(QnSystemsModel::IsPending).toBool();
+    const bool rightIsPending = sourceRight.data(QnSystemsModel::IsPending).toBool();
+
+    if (leftIsPending != rightIsPending)
+        return leftIsPending;
+
     const bool leftIsCloud = sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
     const bool rightIsCloud = sourceRight.data(QnSystemsModel::IsCloudSystemRoleId).toBool();
 

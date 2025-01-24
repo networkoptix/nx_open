@@ -86,6 +86,7 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
         system.version = QString::fromStdString(systemData.version);
         system.organizationId = QString::fromStdString(
             nx::cloud::db::api::getAttrValueOr(systemData.attributes, "organizationId", ""));
+        system.isPending = systemData.status == SystemStatus::notActivated;
         result.append(system);
     }
 

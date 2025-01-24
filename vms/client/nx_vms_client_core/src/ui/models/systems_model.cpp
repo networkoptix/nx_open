@@ -46,7 +46,8 @@ namespace
         {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"},
         {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"},
         {QnSystemsModel::IsSaasSuspended, "isSaasSuspended"},
-        {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"}
+        {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"},
+        {QnSystemsModel::IsPending, "isPending"}
     };
 }
 
@@ -276,6 +277,9 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case IsSaasShutDown:
             return system->saasState() == nx::vms::api::SaasState::shutdown
                 || system->saasState() == nx::vms::api::SaasState::autoShutdown;
+
+        case IsPending:
+            return system->isPending();
 
         default:
             return QVariant();

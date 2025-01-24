@@ -425,4 +425,14 @@ qint64 SingleSystemDescription::getServerLastUpdatedMs(const nx::Uuid& serverId)
     return m_serverTimestamps.value(serverId).elapsed();
 }
 
+void SingleSystemDescription::setPending(bool value)
+{
+    m_isPending = value;
+}
+
+bool SingleSystemDescription::isPending() const
+{
+    return m_isPending;
+}
+
 } // namespace nx::vms::client::core

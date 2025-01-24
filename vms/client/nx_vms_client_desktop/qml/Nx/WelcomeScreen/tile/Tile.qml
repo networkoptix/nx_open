@@ -36,6 +36,7 @@ Button
     readonly property bool is2FaEnabledForSystem: model.is2FaEnabledForSystem
     readonly property bool systemRequires2FaEnabledForUser:
         model.isCloudSystem && model.is2FaEnabledForSystem  && !context.is2FaEnabledForUser
+    readonly property bool isPending: model.isPending
 
     readonly property bool saasSuspended: model.isSaasSuspended
     readonly property bool saasShutDown: model.isSaasShutDown

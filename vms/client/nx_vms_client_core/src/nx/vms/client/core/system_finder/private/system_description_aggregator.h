@@ -88,6 +88,8 @@ public:
 
     virtual QString idForToStringFromPtr() const override;
 
+    virtual bool isPending() const override;
+
 private:
     void emitSystemChanged();
 

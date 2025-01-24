@@ -206,11 +206,22 @@ Item
         {
             id: anchorTag
 
-            color: ColorTheme.colors.pink_core
+            color: ColorTheme.colors.green_attention
+
+            text: qsTr("New")
+
+            visible: tile.isFactorySystem && tile.online
+        }
+
+        Nx.Tag
+        {
+            id: newTag
+
+            color: ColorTheme.colors.dark12
 
             text: qsTr("Pending")
 
-            visible: tile.isFactorySystem && tile.online
+            visible: tile.isPending
         }
 
         ColoredImage

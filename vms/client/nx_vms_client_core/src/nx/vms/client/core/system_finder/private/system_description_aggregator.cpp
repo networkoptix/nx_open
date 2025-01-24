@@ -328,6 +328,18 @@ bool SystemDescriptionAggregator::isOnline() const
         });
 }
 
+bool SystemDescriptionAggregator::isPending() const
+{
+    if (isEmptyAggregator())
+        return false;
+
+    return std::any_of(m_systems.begin(), m_systems.end(),
+        [](const SystemDescriptionPtr& system)
+        {
+            return system->isPending();
+        });
+}
+
 bool SystemDescriptionAggregator::isReachable() const
 {
     if (isEmptyAggregator())

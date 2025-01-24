@@ -109,6 +109,12 @@ public:
 
     virtual QString idForToStringFromPtr() const = 0;
 
+    /**
+     * @return true if system is in pending state.
+     * That means there is no VMS server that connected to that system yet.
+     */
+    virtual bool isPending() const = 0;
+
 signals:
     void serverAdded(const Uuid& serverId);
     void serverChanged(const Uuid& serverId, QnServerFields flags);

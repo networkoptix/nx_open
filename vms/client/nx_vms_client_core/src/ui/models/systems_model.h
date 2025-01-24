@@ -45,6 +45,8 @@ public:
         IsSaasSuspended,
         IsSaasShutDown,
 
+        IsPending,
+
         RolesCount
     };
 

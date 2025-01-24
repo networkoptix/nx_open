@@ -23,6 +23,8 @@ struct NX_VMS_COMMON_API QnCloudSystem
 
     QString organizationId;
 
+    bool isPending = false;
+
     bool operator==(const QnCloudSystem &other) const;
 
     bool visuallyEqual(const QnCloudSystem& other) const;
@@ -30,6 +32,6 @@ struct NX_VMS_COMMON_API QnCloudSystem
 
 NX_REFLECTION_INSTRUMENT(QnCloudSystem,
     (cloudId)(localId)(name)(ownerAccountEmail)(ownerFullName)(weight)(lastLoginTimeUtcMs)
-    (authKey)(online)(system2faEnabled)(version)(organizationId))
+    (authKey)(online)(system2faEnabled)(version)(organizationId)(isPending))
 
 typedef QList<QnCloudSystem> QnCloudSystemList;
