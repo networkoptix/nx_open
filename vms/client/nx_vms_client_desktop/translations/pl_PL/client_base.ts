@@ -5327,7 +5327,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>usuwany</translation>
     </message>
     <message>
       <source>Unknown size</source>

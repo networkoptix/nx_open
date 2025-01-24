@@ -6339,7 +6339,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In</source>
-      <translation>上限</translation>
+      <translation>検索対象リスト</translation>
     </message>
     <message>
       <source>%n removed subjects</source>
