@@ -1042,11 +1042,11 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Xác thực Digest đã lỗi thời và sẽ bị vô hiệu hóa trong bản phát hành tiếp theo và chỉ nên sử dụng khi không thể sử dụng Xác thực người mang mặc định.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Xác thực Digest đã lỗi thời và sẽ bị vô hiệu hóa trong bản phát hành tiếp theo và chỉ nên sử dụng khi không thể sử dụng Xác thực Bearer mặc định. Thông tin đăng nhập của người dùng chỉ được bao gồm các chữ cái thường.</translation>
     </message>
   </context>
   <context>
