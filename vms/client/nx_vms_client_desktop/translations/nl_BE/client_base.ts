@@ -4426,7 +4426,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Verplaatsen naar een speciaal venster</translation>
     </message>
   </context>
   <context>
