@@ -1751,7 +1751,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update</source>
-      <translation type="unfinished">URI for resource_data.json automatic update</translation>
+      <translation>URL dla automatycznej aktualizacji resource_data.json</translation>
     </message>
     <message>
       <source>Meta data storage change policy</source>
