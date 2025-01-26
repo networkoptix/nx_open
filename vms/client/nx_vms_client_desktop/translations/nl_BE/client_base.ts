@@ -1516,7 +1516,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Actief</translation>
     </message>
     <message>
       <source>Not configured</source>
