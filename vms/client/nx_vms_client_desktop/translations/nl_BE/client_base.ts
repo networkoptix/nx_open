@@ -1658,7 +1658,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Actief</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -6810,7 +6810,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Instellingen bewerken.</translation>
     </message>
     <message>
       <source>Play Audio</source>
@@ -10908,15 +10908,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Actief</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Opgeschort</translation>
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Uitschakelen</translation>
     </message>
   </context>
   <context>
@@ -12593,7 +12593,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Titel</translation>
     </message>
     <message>
       <source>Camera</source>
