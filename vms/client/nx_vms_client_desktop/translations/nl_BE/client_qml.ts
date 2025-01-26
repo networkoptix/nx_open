@@ -468,11 +468,11 @@
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Opgeschort</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Uitschakelen</translation>
     </message>
   </context>
   <context>
@@ -1239,7 +1239,7 @@
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Geavanceerde instellingen</translation>
     </message>
     <message>
       <source>Disconnect</source>
