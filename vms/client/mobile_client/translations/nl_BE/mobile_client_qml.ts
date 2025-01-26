@@ -410,7 +410,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Locaties</translation>
     </message>
     <message>
       <source>All Sites</source>
