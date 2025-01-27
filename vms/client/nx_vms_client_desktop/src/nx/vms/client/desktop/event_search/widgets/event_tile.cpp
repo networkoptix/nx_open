@@ -72,6 +72,8 @@ static constexpr auto kDefaultReloadMode = AsyncImageWidget::ReloadMode::showPre
 constexpr auto kDotRadius = 8;
 constexpr auto kDotSpacing = 4;
 
+constexpr auto kCheckDragIsFinishedInterval = std::chrono::milliseconds(50);
+
 } // namespace
 
 EventTile::EventTile(QWidget* parent):
@@ -230,6 +232,23 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->installEventFilter(this);
     ui->resourceListLabel->installEventFilter(this);
     ui->descriptionLabel->installEventFilter(this);
+
+    d->checkDragIsFinished.setInterval(kCheckDragIsFinishedInterval);
+    d->checkDragIsFinished.setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    d->checkDragIsFinished.setCallback(
+        [this]
+        {
+            if (qGuiApp->mouseButtons().testFlag(Qt::LeftButton))
+            {
+                d->checkDragIsFinished.requestOperation();
+                return;
+            }
+
+            // Drag is finished, update widget's state.
+            setAttribute(Qt::WA_UnderMouse, rect().contains(mapFromGlobal(QCursor::pos())));
+            d->handleStateChanged(
+                underMouse() ? Private::State::hoverOn : Private::State::hoverOff);
+        });
 }
 
 EventTile::~EventTile()
@@ -571,6 +590,11 @@ bool EventTile::event(QEvent* event)
             d->clickButton = mouseEvent->button();
             d->clickModifiers = mouseEvent->modifiers();
             d->clickPoint = mouseEvent->pos();
+
+            // For some reason, sometimes the given attribute is not updated, which can lead to an
+            // incorrect tile visual state. To fix this, force the update.
+            setAttribute(Qt::WA_UnderMouse);
+
             d->handleStateChanged(Private::State::pressed);
             return true;
         }
@@ -599,7 +623,17 @@ bool EventTile::event(QEvent* event)
             if ((d->clickButton == Qt::NoButton) || closeToStart(hoverEvent->pos()))
                 break;
             if (d->clickButton == Qt::LeftButton)
+            {
                 emit dragStarted(d->clickPoint, size());
+
+                // When a drag operation is completed outside of the tile, the MouseButtonRelease
+                // event is not triggered for the tile due to QDrag::exec is used in the
+                // `dragStarted` signal handler (https://bugreports.qt.io/browse/QTBUG-104028). This
+                // can cause the tile to remain in a pressed state even after the mouse button has
+                // been released. To fix this, we can start a timer to monitor when the drag has
+                // finished, and then forcefully update the widget's state when the drag ends.
+                d->checkDragIsFinished.requestOperation();
+            }
             d->clickButton = Qt::NoButton;
             break;
         }

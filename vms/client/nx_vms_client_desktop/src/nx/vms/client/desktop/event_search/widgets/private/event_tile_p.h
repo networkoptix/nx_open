@@ -8,6 +8,7 @@
 #include <QtCore/QCache>
 #include <QtCore/QTimer>
 
+#include <nx/utils/pending_operation.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <ui/widgets/common/elided_label.h>
 
@@ -57,6 +58,7 @@ public:
     LabelDescriptor resourceLabelDescriptor;
     QString iconPath;
     bool previewEnabled = false;
+    utils::PendingOperation checkDragIsFinished;
 
     Private(EventTile* q);
 
