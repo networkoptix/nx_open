@@ -21,8 +21,7 @@ namespace nx::vms::common {
 class NX_VMS_COMMON_API AbstractCertificateVerifier: public QObject
 {
 public:
-    AbstractCertificateVerifier(const std::string& trustedCertificateFilterRegex,
-        QObject* parent = nullptr);
+    AbstractCertificateVerifier(QObject* parent = nullptr);
     virtual ~AbstractCertificateVerifier();
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(

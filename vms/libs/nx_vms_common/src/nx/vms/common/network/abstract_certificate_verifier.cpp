@@ -6,20 +6,38 @@
 #include <QtCore/QFile>
 #include <QtNetwork/QSslConfiguration>
 
+#include <nx/kit/ini_config.h>
 #include <nx/network/ssl/certificate.h>
 
 namespace nx::vms::common {
 
+namespace {
+
+struct SecurityIni: nx::kit::IniConfig
+{
+    SecurityIni(): IniConfig("nx_security.ini") { reload(); }
+
+    NX_INI_STRING("", untrustedCertificatesRegex,
+        "ECMAScript regex to ignore built-in TLS certificates by their filenames.");
+
+    NX_INI_FLAG(1, ignoreNonSelfSignedCertificates,
+        "Ignore non-self signed (e.g. cross-signed) built-in TLS certificates.");
+};
+
+SecurityIni& securityIni()
+{
+    static SecurityIni ini;
+    return ini;
+}
+
+} // namespace
+
 static std::once_flag trustedCertificatesLoaded;
 
-AbstractCertificateVerifier::AbstractCertificateVerifier(
-    const std::string& trustedCertificateFilterRegex,
-    QObject* parent)
-    :
-    QObject(parent)
+AbstractCertificateVerifier::AbstractCertificateVerifier(QObject* parent): QObject(parent)
 {
     std::call_once(trustedCertificatesLoaded,
-        [this, trustedCertificateFilterRegex]()
+        [this]()
         {
             constexpr auto kCaLogLevel = nx::log::Level::verbose;
             if (nx::log::isToBeLogged(kCaLogLevel))
@@ -32,16 +50,17 @@ AbstractCertificateVerifier::AbstractCertificateVerifier(
                 for (const auto& c: QSslConfiguration::defaultConfiguration().systemCaCertificates())
                     NX_UTILS_LOG(kCaLogLevel, this, c);
             }
-            const std::regex regex(trustedCertificateFilterRegex);
+            const std::string regexStr(securityIni().untrustedCertificatesRegex);
+            const std::regex regex(regexStr);
             const QDir folder(":/trusted_certificates");
             for (const auto& fileInfo: folder.entryInfoList({"*.pem"}, QDir::Files))
             {
                 const QString fileName = fileInfo.fileName();
-                if (!std::regex_match(fileInfo.baseName().toStdString(), regex))
+                if (std::regex_match(fileInfo.baseName().toStdString(), regex))
                 {
                     NX_INFO(this,
-                        "Ignore trusted certificate %1 which does not match the filter %2",
-                        fileName, trustedCertificateFilterRegex);
+                        "Ignore built-in certificate %1 which matchs the filter %2",
+                        fileName, regexStr);
                     continue;
                 }
 
@@ -66,14 +85,14 @@ void AbstractCertificateVerifier::loadTrustedCertificate(
     if (chain.size() != 1)
     {
         NX_WARNING(this,
-            "Ignore trusted certificate %1 with more that one certificate", name);
+            "Ignore built-in certificate file %1 with more that one certificate", name);
         return;
     }
 
     const auto& cert = chain[0];
-    if (cert.issuer() != cert.subject())
+    if (securityIni().ignoreNonSelfSignedCertificates && cert.issuer() != cert.subject())
     {
-        NX_WARNING(this, "Ignore not self-signed trusted certificate %1", name);
+        NX_WARNING(this, "Ignore not self-signed built-in certificate %1", name);
         return;
     }
 
@@ -85,7 +104,7 @@ void AbstractCertificateVerifier::loadTrustedCertificate(
     }
     else
     {
-        NX_WARNING(this, "Ignore expired trusted certificate %1", name);
+        NX_WARNING(this, "Ignore expired built-in certificate %1", name);
     }
 }
 
