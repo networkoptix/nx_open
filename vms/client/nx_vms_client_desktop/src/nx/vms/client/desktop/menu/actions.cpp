@@ -75,7 +75,11 @@ static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kButtonsI
     {QnIcon::Normal, {.primary = "light4"}},
 };
 
-NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kButtonsIconTheme)
+static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kAccentedButtonsIconTheme = {
+    {QnIcon::Normal, {.primary = "brand_contrast"}},
+};
+
+NX_DECLARE_COLORIZED_ICON(kPlayIcon, "20x20/Outline/play.svg", kAccentedButtonsIconTheme)
 NX_DECLARE_COLORIZED_ICON(kAddIcon, "16x16/Outline/plussmall.svg", kButtonsIconTheme);
 NX_DECLARE_COLORIZED_ICON(kArrowDownIcon,
     "16x16/Outline/arrow_down.svg", kButtonsIconTheme)
