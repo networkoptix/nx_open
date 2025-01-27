@@ -1346,7 +1346,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Livevisning</translation>
     </message>
   </context>
   <context>
@@ -1907,7 +1907,7 @@
     </message>
     <message>
       <source>Default locale for new users</source>
-      <translation type="unfinished">Default locale for new users</translation>
+      <translation>Standardspråk för nya användare</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds)</source>

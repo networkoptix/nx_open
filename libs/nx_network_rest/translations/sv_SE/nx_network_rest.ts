@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>Användaren är inaktiverad. Kontakta din systemadministratör.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Denna auktoriseringsmetod är förbjuden. Kontakta din systemadministratör.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -64,7 +64,7 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Internt serverfel (%1). Kontakta din systemadministratör.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>

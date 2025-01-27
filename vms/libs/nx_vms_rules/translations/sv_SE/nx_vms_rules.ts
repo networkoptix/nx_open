@@ -726,11 +726,11 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Listan är inte vald</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Lista med angivet Id &apos;%1&apos; finns inte</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
@@ -881,7 +881,7 @@
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>Det givna filtret är inte kompatibelt med den givna byggaren</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>%1 certifikatfel</translation>
     </message>
   </context>
   <context>
@@ -978,7 +978,7 @@
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 Konflikt</translation>
     </message>
   </context>
   <context>
@@ -997,7 +997,7 @@
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 Misslyckande</translation>
     </message>
   </context>
   <context>
@@ -1008,7 +1008,7 @@
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Startad</translation>
     </message>
   </context>
   <context>
@@ -1054,14 +1054,14 @@
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>Användare: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>Ljud är inte valt</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>`%1` tillstånd är inte giltigt för `%2` händelsen och `%3` åtgärd med angivna parametrar</translation>
     </message>
   </context>
   <context>
@@ -1141,33 +1141,33 @@
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Det gick inte att hämta händelsebeskrivningen</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>Händelsen har ingen källkamera</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Välj minst en layout</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Listan är inte vald</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Lista med angivet Id &apos;%1&apos; finns inte</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>Lista med det angivna id &apos;%1&apos; är inte en generisk lista</translation>
     </message>
   </context>
   <context>
@@ -1182,14 +1182,14 @@
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>Visa för</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>Webbadressen får inte vara tom</translation>
     </message>
     <message>
       <source>Url must be valid</source>
