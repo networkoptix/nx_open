@@ -76,8 +76,8 @@ struct NX_VMS_API PushDeviceAgentManifestData
     /**%apidoc Engine id */
     nx::Uuid id;
 
-    /**%apidoc Device Agent id */
-    nx::Uuid deviceId;
+    /**%apidoc Device Agent flexible id */
+    QString deviceId;
 
     /**%apidoc Device Agent manifest */
     DeviceAgentManifest deviceAgentManifest;
@@ -130,8 +130,8 @@ struct NX_VMS_API DeviceAgentIntegrationDiagnosticEvent
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent id */
-    nx::Uuid deviceId;
+    /**%apidoc Device Agent flexible id */
+    QString deviceId;
     /**%apidoc Level */
     IntegrationDiagnosticEventLevel level;
     /**%apidoc Caption */
@@ -203,8 +203,8 @@ struct NX_VMS_API ApiObjectMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent id */
-    nx::Uuid deviceId;
+    /**%apidoc Device Agent flexible id */
+    QString deviceId;
     /**%apidoc[opt] Flags */
     Flags flags = Flags::none;
     /**%apidoc[opt] Timestamp */
@@ -229,8 +229,8 @@ struct NX_VMS_API ApiBestShotMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent id */
-    nx::Uuid deviceId;
+    /**%apidoc Device Agent flexible id */
+    QString deviceId;
     /**%apidoc[opt] Track id */
     Uuid trackId;
     /**%apidoc[opt] Flags */
@@ -264,8 +264,8 @@ struct NX_VMS_API ApiObjectTitleMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent id */
-    nx::Uuid deviceId;
+    /**%apidoc Device Agent flexible id */
+    QString deviceId;
     /**%apidoc[opt] Track id */
     Uuid trackId;
     /**%apidoc[opt] Flags */
@@ -325,8 +325,8 @@ struct NX_VMS_API ApiEventMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent id */
-    nx::Uuid deviceId;
+    /**%apidoc Device Agent flexible id */
+    QString deviceId;
     /**%apidoc[opt] Flags */
     Flags flags = Flags::none;
     /**%apidoc[opt] Timestamp */

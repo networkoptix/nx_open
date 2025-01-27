@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QString>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
@@ -11,10 +13,10 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API DeviceAgentId
 {
     /**%apidoc[opt]:string
-     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * Flexible id of the Device (can be obtained from "id", "physicalId" or "logicalId" field via
      * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      */
-    nx::Uuid id;
+    QString id;
     nx::Uuid engineId;
 
     const DeviceAgentId& getId() const { return *this; }
