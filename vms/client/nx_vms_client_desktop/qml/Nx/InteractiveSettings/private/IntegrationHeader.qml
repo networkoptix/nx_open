@@ -163,7 +163,7 @@ RowLayout
 
         text: qsTr("Refresh")
         icon.source: "image://skin/20x20/Outline/reload.svg"
-        visible: header.refreshable && !header.refreshing
+        opacity: header.refreshable && !header.refreshing ? 1.0 : 0.0
 
         onClicked:
             header.refreshButtonClicked()
