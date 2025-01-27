@@ -279,11 +279,14 @@ void AnalyticsSettingsStore::removeIntegration(const nx::Uuid& integrationId)
         return;
 
     // Delete requests are handled in the same way as apply requests.
-    m_pendingApplyRequests << connectedServerApi()->deleteEmptyResult(
+    m_pendingApplyRequests << connectedServerApi()->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::delete_,
         nx::format("/rest/v4/analytics/integrations/%1", integrationId.toSimpleString()),
         nx::network::rest::Params(),
+        /*body*/ {},
         nx::utils::guarded(this,
-            [this](bool, rest::Handle requestId, const rest::ServerConnection::EmptyResponseType&)
+            [this](bool, rest::Handle requestId, const rest::ServerConnection::ErrorOrEmpty&)
             {
                 m_pendingApplyRequests.removeOne(requestId);
             }),

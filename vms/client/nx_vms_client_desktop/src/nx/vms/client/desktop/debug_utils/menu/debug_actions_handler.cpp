@@ -226,8 +226,14 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
     const auto tokenHelper = system()->restApiHelper()->getSessionTokenHelper();
     const auto paramValue = value ? "true" : "false";
 
-    api->putRest(
-        tokenHelper, request, network::rest::Params{}, paramValue, handler, thread());
+    api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        tokenHelper,
+        nx::network::http::Method::put,
+        request,
+        network::rest::Params{},
+        paramValue,
+        handler,
+        thread());
 }
 
 void DebugActionsHandler::at_debugIncrementCounterAction_triggered()

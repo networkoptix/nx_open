@@ -304,16 +304,18 @@ int QnCameraBookmarksManagerPrivate::sendPostRequest(
         [this](
             bool success,
             rest::Handle handle,
-            const rest::ServerConnection::EmptyResponseType& /*response*/)
+            const rest::ServerConnection::ErrorOrEmpty& /*response*/)
         {
             handleBookmarkOperation(success, handle);
         });
 
-    return serverApi->postEmptyResult(
+    return serverApi->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::post,
         path,
         request.toParams(),
         /*body*/ {},
-        callback,
+        std::move(callback),
         thread(),
         serverId);
 }
@@ -335,7 +337,9 @@ rest::Handle QnCameraBookmarksManagerPrivate::sendPatchRequest(
             handleBookmarkOperation(success, handle);
         });
 
-    return serverApi->patchRest(systemContext()->getSessionTokenHelper(),
+    return serverApi->sendRequest<rest::ErrorOrData<QByteArray>>(
+        systemContext()->getSessionTokenHelper(),
+        nx::network::http::Method::patch,
         path,
         nx::network::rest::Params{},
         nx::reflect::json::serialize(bookmark),

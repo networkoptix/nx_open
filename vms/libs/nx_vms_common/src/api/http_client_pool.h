@@ -124,7 +124,7 @@ public:
         int handle = 0;
 
         /** Callback to be called when response is received. */
-        std::function<void (QSharedPointer<Context> context)> completionFunc;
+        nx::utils::MoveOnlyFunc<void (QSharedPointer<Context> context)> completionFunc;
 
         QThread* targetThread() const;
 

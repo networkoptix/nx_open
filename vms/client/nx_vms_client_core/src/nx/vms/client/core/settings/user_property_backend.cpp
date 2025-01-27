@@ -129,8 +129,9 @@ bool UserPropertyBackend::sync()
     const api::ResourceWithParameters resourceWithParams{
         .parameters{{m_propertyName, m_originalValues}}};
 
-    connectedServerApi()->patchRest(
+    connectedServerApi()->sendRequest<rest::ErrorOrData<QByteArray>>(
         m_tokenHelperGetter(),
+        nx::network::http::Method::patch,
         "/rest/v4/users/" + user->getId().toSimpleString(),
         {},
         nx::reflect::json::serialize(resourceWithParams),

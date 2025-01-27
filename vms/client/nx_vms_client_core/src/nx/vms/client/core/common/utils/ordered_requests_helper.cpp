@@ -5,37 +5,46 @@
 #include <QtCore/QQueue>
 
 #include <api/server_rest_connection.h>
-
 #include <nx/utils/guarded_callback.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::core {
 
+namespace {
+
+static rest::Handle kNoConnection = -2;
+
+} // namespace
+
 struct OrderedRequestsHelper::Private
 {
-    using Request = std::function<rest::Handle ()>;
-    using Requests = QQueue<Request>;
+    using Request = nx::utils::MoveOnlyFunc<rest::Handle()>;
+    using Requests = std::deque<Request>;
 
-    void addRequest(const Request& request);
+    void addRequest(Request&& request);
     void tryExecuteNextRequest();
 
     rest::Handle currentHandle = -1;
     Requests requests;
 };
 
-void OrderedRequestsHelper::Private::addRequest(const Request& request)
+void OrderedRequestsHelper::Private::addRequest(Request&& request)
 {
     if (!request)
         return;
 
-    requests.enqueue(request);
+    requests.push_back(std::move(request));
     tryExecuteNextRequest();
 }
 
 void OrderedRequestsHelper::Private::tryExecuteNextRequest()
 {
-    while (currentHandle == -1 && !requests.isEmpty())
-        currentHandle = requests.dequeue()();
+    while (currentHandle == -1 && !requests.empty())
+    {
+        auto callback = std::move(requests.front());
+        requests.pop_front();
+        currentHandle = callback();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -60,36 +69,48 @@ bool OrderedRequestsHelper::postJsonResult(
     if (!connection)
         return false;
 
-    const auto internalCallback = nx::utils::guarded(this,
-        [this, callback](
+    auto internalCallback = nx::utils::guarded(this,
+        [this, callback = std::move(callback)](
             bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
         {
-            if (handle != d->currentHandle)
+            if (handle != d->currentHandle && handle != kNoConnection)
             {
                 NX_ASSERT(false, "Wrong requests order");
                 return;
             }
 
             if (callback)
-                callback(success, handle, result);
+                callback(success, handle == kNoConnection ? -1 : handle, result);
 
             d->currentHandle = -1;
-            d->tryExecuteNextRequest();
+
+            if (handle != kNoConnection)
+                d->tryExecuteNextRequest();
         });
 
-    const auto request =
-        [connection, action, params, callback, internalCallback, thread]() -> rest::Handle
+    auto request =
+        [connection, action, params, internalCallback = std::move(internalCallback),
+            thread]() mutable -> rest::Handle
         {
             if (connection)
-                return connection->postJsonResult(action, params, {}, internalCallback, thread);
+            {
+                return connection->postJsonResult(
+                    action, params, {}, std::move(internalCallback), thread);
+            }
 
             executeInThread(thread,
-                [callback]() { callback(/*success*/ false, /*handle*/ -1, /*result*/ {}); });
+                [callback = std::move(internalCallback)]()
+                {
+                    callback(
+                        /*success*/ false,
+                        kNoConnection,
+                        /*result*/ nx::network::rest::JsonResult{});
+                });
 
             return -1;
         };
 
-    d->addRequest(request);
+    d->addRequest(std::move(request));
     return true;
 }
 
@@ -103,36 +124,48 @@ bool OrderedRequestsHelper::getJsonResult(
     if (!connection)
         return false;
 
-    const auto internalCallback = nx::utils::guarded(this,
-        [this, callback](
+    auto internalCallback = nx::utils::guarded(this,
+        [this, callback = std::move(callback)](
             bool success, rest::Handle handle, const nx::network::rest::JsonResult& result)
         {
-            if (handle != d->currentHandle)
+            if (handle != d->currentHandle && handle != kNoConnection)
             {
                 NX_ASSERT(false, "Wrong requests order");
                 return;
             }
 
             if (callback)
-                callback(success, handle, result);
+                callback(success, handle == kNoConnection ? -1 : handle, result);
 
             d->currentHandle = -1;
-            d->tryExecuteNextRequest();
+
+            if (handle != kNoConnection)
+                d->tryExecuteNextRequest();
         });
 
-    const auto request =
-        [connection, action, params, callback, internalCallback, thread]() -> rest::Handle
+    auto request =
+        [connection, action, params, internalCallback = std::move(internalCallback),
+            thread]() mutable -> rest::Handle
         {
             if (connection)
-                return connection->getJsonResult(action, params, internalCallback, thread);
+            {
+                return connection->getJsonResult(
+                    action, params, std::move(internalCallback), thread);
+            }
 
             executeInThread(thread,
-                [callback]() { callback(/*success*/ false, /*handle*/ -1, /*result*/ {}); });
+                [callback = std::move(internalCallback)]()
+                {
+                    callback(
+                        /*success*/ false,
+                        kNoConnection,
+                        /*result*/ nx::network::rest::JsonResult{});
+                });
 
             return -1;
         };
 
-    d->addRequest(request);
+    d->addRequest(std::move(request));
     return true;
 }
 

@@ -25,7 +25,7 @@ rest::Handle AnalyticsSettingsMockApiInterface::getSettings(
     const AnalyticsEngineResourcePtr& engine,
     core::AnalyticsSettingsCallback callback)
 {
-    return makeRequest(RequestInfo::Type::get, device, engine, callback).handle;
+    return makeRequest(RequestInfo::Type::get, device, engine, std::move(callback));
 }
 
 rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
@@ -35,7 +35,7 @@ rest::Handle AnalyticsSettingsMockApiInterface::applySettings(
     const QJsonObject& /*settingsModel*/,
     core::AnalyticsSettingsCallback callback)
 {
-    return makeRequest(RequestInfo::Type::apply, device, engine, callback).handle;
+    return makeRequest(RequestInfo::Type::apply, device, engine, std::move(callback));
 }
 
 rest::Handle AnalyticsSettingsMockApiInterface::activeSettingsChanged(
@@ -47,7 +47,7 @@ rest::Handle AnalyticsSettingsMockApiInterface::activeSettingsChanged(
     const QJsonObject& paramValues,
     core::AnalyticsActiveSettingsCallback callback)
 {
-    return makeRequest(RequestInfo::Type::get, device, engine, callback).handle;
+    return makeRequest(RequestInfo::Type::get, device, engine, std::move(callback));
 }
 
 bool AnalyticsSettingsMockApiInterface::requestWasSent(const core::DeviceAgentId& agentId) const
@@ -69,7 +69,7 @@ void AnalyticsSettingsMockApiInterface::sendReply(
     m_requests.erase(request);
 }
 
-AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface::makeRequest(
+rest::Handle AnalyticsSettingsMockApiInterface::makeRequest(
     RequestInfo::Type type,
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,
@@ -78,15 +78,16 @@ AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface
     m_lastHandle++;
 
     m_requests.push_back({
-        type,
-        m_lastHandle,
-        { device->getId(), engine->getId() },
-        callback }
-    );
-    return m_requests.back();
+        .type = type,
+        .handle = m_lastHandle,
+        .agentId = {device->getId(), engine->getId()},
+        .callback = std::move(callback)
+    });
+
+    return m_requests.back().handle;
 }
 
-AnalyticsSettingsMockApiInterface::RequestInfo AnalyticsSettingsMockApiInterface::makeRequest(
+rest::Handle AnalyticsSettingsMockApiInterface::makeRequest(
     RequestInfo::Type type,
     const QnVirtualCameraResourcePtr& device,
     const AnalyticsEngineResourcePtr& engine,

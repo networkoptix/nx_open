@@ -732,8 +732,9 @@ bool LicenseManagerWidget::activateLicense()
     if (auto api = connectedServerApi(); NX_ASSERT(api, "Connection must be established"))
     {
         NX_VERBOSE(this, "Activating license using VMS Server. License key: %1", body.key);
-        m_currentRequest = api->putRest(
+        m_currentRequest = api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
             sessionTokenHelper,
+            nx::network::http::Method::put,
             QString("/rest/v2/licenses/%1").arg(body.key),
             nx::network::rest::Params{},
             QByteArray::fromStdString(nx::reflect::json::serialize(body)),

@@ -169,7 +169,7 @@ struct LookupListActionHandler::Private
         auto callback = nx::utils::guarded(q,
             [this](bool success,
                 rest::Handle requestId,
-                const rest::ServerConnection::EmptyResponseType& /*response*/)
+                const rest::ServerConnection::ErrorOrEmpty& /*response*/)
             {
                 if (this->requestId != requestId)
                     return;
@@ -199,10 +199,13 @@ struct LookupListActionHandler::Private
                 }
             });
 
-        requestId = q->connectedServerApi()->deleteEmptyResult(
+        requestId = q->connectedServerApi()->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+            /*helper*/ nullptr,
+            nx::network::http::Method::delete_,
             nx::format("/rest/v4/lookupLists/%1").arg(listId),
-            {},
-            callback,
+            /*params*/ {},
+            /*body*/ {},
+            std::move(callback),
             q->thread());
 
         NX_VERBOSE(this, "Send remove list %1 request (%2)", listId, *requestId);

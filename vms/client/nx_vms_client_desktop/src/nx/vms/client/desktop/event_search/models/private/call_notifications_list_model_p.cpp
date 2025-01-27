@@ -68,8 +68,9 @@ void postRejectIntercomCall(
     if (!NX_ASSERT(serverApi))
         return;
 
-    serverApi->postRest(
+    serverApi->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
         system->getSessionTokenHelper(),
+        nx::network::http::Method::post,
         nx::format("/rest/v4/devices/%1/intercom/rejectCall", intercomId.toSimpleString()),
         nx::network::rest::Params(),
         /*body*/ QByteArray(),

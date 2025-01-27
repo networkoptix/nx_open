@@ -69,7 +69,7 @@ struct StatisticsSender::Private
         q->systemContext()->connectedServerApi()->sendStatisticsUsingServer(
             server->getId(),
             statisticsData->payload,
-            callback,
+            std::move(callback),
             q->thread());
     }
 };

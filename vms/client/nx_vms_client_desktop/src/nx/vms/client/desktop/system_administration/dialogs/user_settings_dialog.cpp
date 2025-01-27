@@ -1278,7 +1278,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this, state, actualPassword, sessionTokenHelper](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
+                bool success, rest::Handle handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
             {
                 d->onUserSaveRequestCompleted(
                     state,
@@ -1287,7 +1287,8 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                     success,
                     handle,
                     errorOrData);
-            }), thread());
+            }),
+            thread());
 }
 
 void UserSettingsDialog::refreshToken(const QString& password)

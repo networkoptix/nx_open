@@ -46,7 +46,7 @@ public:
             return api->getDeviceAnalyticsSettings(
                 device,
                 engine,
-                nx::utils::guarded(m_owner, callback),
+                nx::utils::guarded(m_owner, std::move(callback)),
                 m_owner->thread());
         }
 
@@ -70,7 +70,7 @@ public:
                 engine,
                 settingsValues,
                 settingsModel,
-                nx::utils::guarded(m_owner, callback),
+                nx::utils::guarded(m_owner, std::move(callback)),
                 m_owner->thread());
         }
 
@@ -98,7 +98,7 @@ public:
                 settingsModel,
                 settingsValues,
                 paramValues,
-                nx::utils::guarded(m_owner, callback),
+                nx::utils::guarded(m_owner, std::move(callback)),
                 m_owner->thread());
         }
 

@@ -56,13 +56,13 @@ public:
         bool success = true);
 
 private:
-    RequestInfo makeRequest(
+    rest::Handle makeRequest(
         RequestInfo::Type type,
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         core::AnalyticsSettingsCallback callback);
 
-    RequestInfo makeRequest(
+    rest::Handle makeRequest(
         RequestInfo::Type type,
         const QnVirtualCameraResourcePtr& device,
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,

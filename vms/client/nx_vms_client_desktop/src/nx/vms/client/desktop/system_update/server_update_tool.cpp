@@ -878,7 +878,7 @@ bool ServerUpdateTool::requestStopAction()
         [this](
             bool success,
             rest::Handle /*requestId*/,
-            const rest::ServerConnection::EmptyResponseType& /*response*/)
+            const rest::ServerConnection::ErrorOrEmpty& /*response*/)
         {
             NX_VERBOSE(this, "requestStopAction() - success=%1", success);
 
@@ -898,10 +898,13 @@ bool ServerUpdateTool::requestStopAction()
             emit cancelUpdateComplete(success, toString(error));
         };
 
-    connection->postEmptyResult("/ec2/cancelUpdate",
+    connection->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::post,
+        "/ec2/cancelUpdate",
         network::rest::Params{},
-        QByteArray{},
-        nx::utils::guarded(this, handleResponse),
+        /*body*/ {},
+        nx::utils::guarded(this, std::move(handleResponse)),
         thread());
 
     for (const auto& file: m_activeDownloads)
@@ -1058,10 +1061,11 @@ bool ServerUpdateTool::requestStartUpdate(
             emit startUpdateComplete(success, toString(error));
         };
 
-    connection->postJsonResult("/ec2/startUpdate",
+    connection->postJsonResult(
+        "/ec2/startUpdate",
         network::rest::Params{},
         QJson::serialized(info),
-        nx::utils::guarded(this, handleResponse));
+        nx::utils::guarded(this, std::move(handleResponse)));
 
     m_remoteUpdateManifest = info;
 

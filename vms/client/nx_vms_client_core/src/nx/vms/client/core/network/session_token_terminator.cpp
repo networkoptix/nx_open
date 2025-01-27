@@ -7,9 +7,9 @@
 #include <QtCore/QTimer>
 
 #include <api/server_rest_connection.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "remote_connection.h"
 
@@ -86,7 +86,7 @@ void SessionTokenTerminator::terminateToken(RemoteConnectionPtr connection)
         [this](
             bool success,
             rest::Handle handle,
-            rest::ServerConnection::EmptyResponseType /*requestResult*/)
+            rest::ServerConnection::ErrorOrEmpty /*requestResult*/)
         {
             if (!success)
                 NX_WARNING(this, "Can not terminate authentication token");
@@ -101,10 +101,14 @@ void SessionTokenTerminator::terminateToken(RemoteConnectionPtr connection)
         });
 
     NX_DEBUG(this, "Terminate authentication token");
-    auto handle = connection->serverApi()->deleteEmptyResult(
+
+    auto handle = connection->serverApi()->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::delete_,
         QString("/rest/v1/login/sessions/") + credentials.authToken.value,
         nx::network::rest::Params(),
-        callback,
+        /*body*/ {},
+        std::move(callback),
         this->thread()); //< Response handler will be called in UI thread.
 
     if (handle != rest::Handle())

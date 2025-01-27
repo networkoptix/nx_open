@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/vms/api/data/json_rpc.h>
 #include <nx/vms/event/event_fwd.h>
 
@@ -23,7 +24,7 @@ namespace rest {
 #endif
 
 template<typename ResultType>
-using Callback = std::function<void(bool success, Handle requestId, ResultType result)>;
+using Callback = nx::utils::MoveOnlyFunc<void(bool success, Handle requestId, ResultType result)>;
 
 class ServerConnection;
 using ServerConnectionPtr = std::shared_ptr<ServerConnection>;

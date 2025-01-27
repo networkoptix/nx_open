@@ -108,14 +108,14 @@ struct ServerConnectionBase
     template<typename ResultType>
     struct Result
     {
-        using type = std::function<void (bool success, Handle requestId, ResultType result)>;
+        using type = nx::utils::MoveOnlyFunc<void (bool success, Handle requestId, ResultType result)>;
     };
 };
 
 template<>
 struct ServerConnectionBase::Result<QByteArray>
 {
-    using type = std::function<void(bool success, Handle requestId, QByteArray result,
+    using type = nx::utils::MoveOnlyFunc<void(bool success, Handle requestId, QByteArray result,
         const nx::network::http::HttpHeaders& headers)>;
 };
 
@@ -724,7 +724,7 @@ public:
         Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
         QThread* targetThread = nullptr);
 
-    using LdapAuthenticateCallback = std::function<void(
+    using LdapAuthenticateCallback = nx::utils::MoveOnlyFunc<void(
         Handle requestId,
         ErrorOrData<nx::vms::api::UserModelV3> userOrError,
         nx::network::rest::AuthResult authResult)>;
@@ -886,56 +886,16 @@ public:
         std::optional<Timeouts> timeouts = {},
         std::optional<nx::Uuid> proxyToServer = {});
 
-    /** Sends POST request with a response to be an Ubjson. */
-    Handle postUbJsonResult(
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const QByteArray& body,
-        UbJsonResultCallback&& callback,
-        QThread* targetThread = nullptr);
-
-    /** Sends POST request with a response to be an EmptyResult. */
-    Handle postEmptyResult(
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const QByteArray& body,
-        PostCallback&& callback,
-        QThread* targetThread = nullptr,
-        std::optional<nx::Uuid> proxyToServer = {},
-        std::optional<Qn::SerializationFormat> contentType = Qn::SerializationFormat::ubjson);
-
-    /** Sends PUT request with a response to be an EmptyResult. */
-    Handle putEmptyResult(
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const QByteArray& body,
-        PostCallback&& callback,
-        QThread* targetThread = nullptr,
-        std::optional<nx::Uuid> proxyToServer = {});
-
-    Handle putRest(
+    template <typename ResultType>
+    Handle sendRequest(
         nx::vms::common::SessionTokenHelperPtr helper,
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const QByteArray& body,
-        Result<ErrorOrEmpty>::type callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
-
-    Handle patchRest(
-        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::Method method,
         const QString& action,
         const nx::network::rest::Params& params,
         const nx::String& body,
-        Result<ErrorOrData<QByteArray>>::type callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
-
-    Handle postRest(
-        nx::vms::common::SessionTokenHelperPtr helper,
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const QByteArray& body,
-        Result<ErrorOrEmpty>::type callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
+        Callback<ResultType>&& callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        std::optional<nx::Uuid> proxyToServer = {});
 
     Handle getUbJsonResult(
         const QString& action,
@@ -956,19 +916,6 @@ public:
         const nx::network::rest::Params& params,
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
-
-    Handle deleteEmptyResult(
-        const QString& action,
-        const nx::network::rest::Params& params,
-        PostCallback&& callback,
-        QThread* target = nullptr);
-
-    Handle deleteRest(
-        nx::vms::common::SessionTokenHelperPtr helper,
-        const QString& action,
-        const nx::network::rest::Params& params,
-        Result<ErrorOrEmpty>::type callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
      * Cancel running request by known requestId. If request is canceled, callback isn't called.
@@ -1022,26 +969,13 @@ private:
     Handle executeRequest(
         const nx::network::http::ClientPool::Request& request,
         Callback<ResultType> callback,
-        QThread* targetThread,
-        std::optional<Timeouts> timeouts = {});
-
-    template <typename ResultType>
-    Handle executeRequest(
-        const nx::network::http::ClientPool::Request& request,
-        Callback<ResultType> callback,
         nx::utils::AsyncHandlerExecutor executor = {},
         std::optional<Timeouts> timeouts = {});
 
     Handle executeRequest(
         const nx::network::http::ClientPool::Request& request,
         Result<QByteArray>::type callback,
-        QThread* targetThread,
-        std::optional<Timeouts> timeouts = {});
-
-    Handle executeRequest(
-        const nx::network::http::ClientPool::Request& request,
-        Callback<EmptyResponseType> callback,
-        QThread* targetThread,
+        nx::utils::AsyncHandlerExecutor executor = {},
         std::optional<Timeouts> timeouts = {});
 
     QUrl prepareUrl(const QString& path, const nx::network::rest::Params& params) const;
@@ -1071,13 +1005,7 @@ private:
     /** Passes request to ClientPool. */
     Handle sendRequest(
         const nx::network::http::ClientPool::Request& request,
-        std::function<void (ContextPtr)> callback = {},
-        QThread* thread = nullptr,
-        std::optional<Timeouts> timeouts = {});
-
-    Handle sendRequest(
-        const nx::network::http::ClientPool::Request& request,
-        std::function<void (ContextPtr)> callback = {},
+        nx::utils::MoveOnlyFunc<void (ContextPtr)> callback = {},
         nx::utils::AsyncHandlerExecutor executor = {},
         std::optional<Timeouts> timeouts = {});
 

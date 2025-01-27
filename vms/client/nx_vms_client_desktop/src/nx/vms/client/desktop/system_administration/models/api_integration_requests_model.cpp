@@ -92,11 +92,14 @@ void ApiIntegrationRequestsModel::reject(const QString& id)
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;
 
-    connectedServerApi()->deleteEmptyResult(
+    connectedServerApi()->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        /*helper*/ nullptr,
+        nx::network::http::Method::delete_,
         nx::format("/rest/v4/analytics/integrations/*/requests/%1", id),
         nx::network::rest::Params(),
+        /*body*/ {},
         nx::utils::guarded(this,
-            [this](bool, rest::Handle, const rest::ServerConnection::EmptyResponseType&)
+            [this](bool, rest::Handle, const rest::ServerConnection::ErrorOrEmpty&)
             {
                 refresh();
             }),
@@ -108,8 +111,9 @@ void ApiIntegrationRequestsModel::approve(const QString& id)
     if (!connection()) //< It may be null if the client just disconnected from the server.
         return;
 
-    connectedServerApi()->postRest(
+    connectedServerApi()->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
         systemContext()->restApiHelper()->getSessionTokenHelper(),
+        nx::network::http::Method::post,
         nx::format("/rest/v4/analytics/integrations/*/requests/%1/approve", id),
         nx::network::rest::Params(),
         /*body*/ QByteArray(),

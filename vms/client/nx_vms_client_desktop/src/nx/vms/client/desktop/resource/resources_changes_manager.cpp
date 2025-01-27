@@ -141,7 +141,14 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
         ? helper
         : systemContext->restApiHelper()->getSessionTokenHelper();
 
-    api->deleteRest(tokenHelper, action, network::rest::Params{}, handler, this);
+    api->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
+        tokenHelper,
+        nx::network::http::Method::delete_,
+        action,
+        /*params*/ {},
+        /*body*/ {},
+        std::move(handler),
+        this);
 }
 
 void ResourcesChangesManager::saveCamera(const QnVirtualCameraResourcePtr& camera,
@@ -337,11 +344,13 @@ rest::Handle ResourcesChangesManager::saveServer(
     for (auto [key, value]: nx::utils::keyValueRange(modifiedProperties))
         body.parameters[key] = QJsonValue(value);
 
-    return api->patchRest(systemContext->restApiHelper()->getSessionTokenHelper(),
+    return api->sendRequest<rest::ErrorOrData<QByteArray>>(
+        systemContext->restApiHelper()->getSessionTokenHelper(),
+        nx::network::http::Method::patch,
         QString("/rest/v3/servers/%1").arg(server->getId().toSimpleString()),
         network::rest::Params{},
         QByteArray::fromStdString(nx::reflect::json::serialize(body)),
-        internalCallback,
+        std::move(internalCallback),
         this);
 }
 
