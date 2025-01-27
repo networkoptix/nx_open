@@ -334,26 +334,26 @@ void ServerConnection::setUserId(const nx::Uuid& id)
 Handle ServerConnection::cameraHistoryAsync(
     const QnChunksRequestData& request,
     Callback<nx::vms::api::CameraHistoryDataList> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/ec2/cameraHistory", request.toParams(), std::move(callback), targetThread);
+    return executeGet("/ec2/cameraHistory", request.toParams(), std::move(callback), executor);
 }
 
 Handle ServerConnection::backupPositionAsyncV1(const nx::Uuid& serverId,
     const nx::Uuid& deviceId,
     Callback<nx::vms::api::BackupPositionExV1> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto requestStr =
         NX_FMT("/rest/v1/servers/%1/backupPositions/%2").args(serverId, deviceId);
-    return executeGet(requestStr, nx::network::rest::Params(), std::move(callback), targetThread);
+    return executeGet(requestStr, nx::network::rest::Params(), std::move(callback), executor);
 }
 
 Handle ServerConnection::setBackupPositionAsyncV1(const nx::Uuid& serverId,
     const nx::Uuid& deviceId,
     const nx::vms::api::BackupPositionV1& backupPosition,
     Callback<nx::vms::api::BackupPositionV1> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto requestStr =
         NX_FMT("/rest/v1/servers/%1/backupPositions/%2").args(serverId, deviceId);
@@ -363,13 +363,13 @@ Handle ServerConnection::setBackupPositionAsyncV1(const nx::Uuid& serverId,
         "application/json",
         QJson::serialized(backupPosition),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::setBackupPositionsAsyncV1(const nx::Uuid& serverId,
     const nx::vms::api::BackupPositionV1& backupPosition,
     Callback<nx::vms::api::BackupPositionV1> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto requestStr = NX_FMT("/rest/v1/servers/%1/backupPositions", serverId);
     return executePut(
@@ -378,21 +378,21 @@ Handle ServerConnection::setBackupPositionsAsyncV1(const nx::Uuid& serverId,
         "application/json",
         QJson::serialized(backupPosition),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getServerLocalTime(
     const nx::Uuid& serverId,
     Callback<nx::network::rest::JsonResult> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params{{"local", QnLexical::serialized(true)}};
-    return executeGet("/api/gettime", params, std::move(callback), targetThread, serverId);
+    return executeGet("/api/gettime", params, std::move(callback), executor, serverId);
 }
 
 rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRequest& request,
     DataCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     if (debugFlags().testFlag(DebugFlag::disableThumbnailRequests))
         return {};
@@ -407,14 +407,14 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
             prepareUrl("/ec2/cameraThumbnail", data.toParams())),
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::sendStatisticsUsingServer(
     const nx::Uuid& proxyServerId,
     const QnSendStatisticsRequestData& statisticsData,
     PostCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     static const QString kPath = "/ec2/statistics/send";
 
@@ -433,35 +433,35 @@ Handle ServerConnection::sendStatisticsUsingServer(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getModuleInformation(
     Callback<ResultWithData<nx::vms::api::ModuleInformation>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
-    return executeGet("/api/moduleInformation", params, std::move(callback), targetThread);
+    return executeGet("/api/moduleInformation", params, std::move(callback), executor);
 }
 
 Handle ServerConnection::getModuleInformationAll(
     Callback<ResultWithData<QList<nx::vms::api::ModuleInformation>>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
     params.insert("allModules", lit("true"));
-    return executeGet("/api/moduleInformation", params, std::move(callback), targetThread);
+    return executeGet("/api/moduleInformation", params, std::move(callback), executor);
 }
 
 Handle ServerConnection::getServersInfo(
     bool onlyFreshInfo,
     Callback<ErrorOrData<nx::vms::api::ServerInformationV1List>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/rest/v1/servers/*/info",
         {{"onlyFreshInfo", QnLexical::serialized(onlyFreshInfo)}},
-        std::move(callback), targetThread);
+        std::move(callback), executor);
 }
 
 Handle ServerConnection::bindSystemToCloud(
@@ -471,7 +471,7 @@ Handle ServerConnection::bindSystemToCloud(
     const QString& organizationId,
     const std::string& ownerSessionToken,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::CloudSystemAuth data;
     data.systemId = cloudSystemId;
@@ -492,14 +492,14 @@ Handle ServerConnection::bindSystemToCloud(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::unbindSystemFromCloud(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QString& password,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::LocalSiteAuth data;
     data.password = password;
@@ -516,13 +516,13 @@ Handle ServerConnection::unbindSystemFromCloud(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::dumpDatabase(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<QByteArray>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
@@ -555,7 +555,7 @@ Handle ServerConnection::dumpDatabase(
         request,
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(internalCallback)),
-        targetThread,
+        executor,
         timeouts);
 }
 
@@ -563,7 +563,7 @@ Handle ServerConnection::restoreDatabase(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const QByteArray& data,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::post,
@@ -582,7 +582,7 @@ Handle ServerConnection::restoreDatabase(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread,
+        executor,
         timeouts);
 }
 
@@ -591,7 +591,7 @@ Handle ServerConnection::putServerLogSettings(
     const nx::Uuid& serverId,
     const nx::vms::api::ServerLogSettings& settings,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::put,
@@ -608,7 +608,7 @@ Handle ServerConnection::putServerLogSettings(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::patchSystemSettings(
@@ -642,7 +642,7 @@ Handle ServerConnection::addFileDownload(
     const QUrl& url,
     const QString& peerPolicy,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         QString("/api/downloads/%1").arg(fileName),
@@ -652,7 +652,7 @@ Handle ServerConnection::addFileDownload(
             {"url", url.toString()},
             {"peerPolicy", peerPolicy}},
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::addCamera(
@@ -660,7 +660,7 @@ Handle ServerConnection::addCamera(
     const nx::vms::api::DeviceModelForSearch& device,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::DeviceModelForSearch>>&& callback,
-    QThread* thread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(QString("/rest/v4/devices"), {}),
@@ -676,7 +676,7 @@ Handle ServerConnection::addCamera(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        thread);
+        executor);
 }
 
 Handle ServerConnection::patchCamera(
@@ -684,7 +684,7 @@ Handle ServerConnection::patchCamera(
     const nx::vms::api::DeviceModelGeneral& device,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::DeviceModelForSearch>>&& callback,
-    QThread* thread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(nx::network::http::Method::patch,
         prepareUrl(NX_FMT("/rest/v4/devices/%1", device.id), {}),
@@ -700,7 +700,7 @@ Handle ServerConnection::patchCamera(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        thread);
+        executor);
 }
 
 Handle ServerConnection::searchCamera(
@@ -708,7 +708,7 @@ Handle ServerConnection::searchCamera(
     const nx::vms::api::DeviceSearch& deviceSearchData,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::DeviceSearch>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(QString("/rest/v3/devices/*/searches/"), {}),
@@ -724,7 +724,7 @@ Handle ServerConnection::searchCamera(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::searchCameraStatus(
@@ -732,7 +732,7 @@ Handle ServerConnection::searchCameraStatus(
     const QString& searchId,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::DeviceSearch>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(nx::network::http::Method::get,
         prepareUrl(NX_FMT("/rest/v3/devices/*/searches/%1", searchId), {}));
@@ -746,7 +746,7 @@ Handle ServerConnection::searchCameraStatus(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::searchCameraStop(
@@ -754,7 +754,7 @@ Handle ServerConnection::searchCameraStop(
     const QString& searchId,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(nx::network::http::Method::delete_,
         prepareUrl(NX_FMT("/rest/v3/devices/*/searches/%1", searchId), {}));
@@ -768,36 +768,36 @@ Handle ServerConnection::searchCameraStop(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::executeAnalyticsAction(
     const nx::vms::api::AnalyticsAction& action,
     Callback<nx::network::rest::JsonResult> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/executeAnalyticsAction",
         QJson::serialized(action),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getRemoteArchiveSynchronizationStatus(
     Callback<ErrorOrData<nx::vms::api::RemoteArchiveSynchronizationStatusList>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/rest/v3/servers/this/remoteArchive/*/sync",
         nx::network::rest::Params(),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getOverlappedIds(
     const QString& nvrGroupId,
     Callback<nx::vms::api::OverlappedIdResponse> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/api/overlappedIds",
@@ -811,14 +811,14 @@ Handle ServerConnection::getOverlappedIds(
                     requestId,
                     result.deserialized<nx::vms::api::OverlappedIdResponse>());
             }),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::setOverlappedId(
     const QString& nvrGroupId,
     int overlappedId,
     Callback<nx::vms::api::OverlappedIdResponse> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::SetOverlappedIdRequest request;
     request.groupId = nvrGroupId;
@@ -838,20 +838,20 @@ Handle ServerConnection::setOverlappedId(
                     requestId,
                     result.deserialized<nx::vms::api::OverlappedIdResponse>());
             }),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::executeEventAction(
     const nx::vms::api::EventActionData& action,
     Callback<nx::network::rest::Result> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         "/api/executeEventAction",
         QJson::serialized(action),
         std::move(callback),
-        targetThread,
+        executor,
         proxyToServer);
 }
 
@@ -864,7 +864,7 @@ Handle ServerConnection::addFileUpload(
     qint64 ttl,
     bool recreateIfExists,
     AddUploadCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params
     {
@@ -880,7 +880,7 @@ Handle ServerConnection::addFileUpload(
         path,
         params,
         std::move(callback),
-        targetThread,
+        executor,
         serverId);
 }
 
@@ -889,13 +889,13 @@ Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,
     PostCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeDelete(
         lit("/api/downloads/%1").arg(fileName),
         nx::network::rest::Params{{lit("deleteData"), QnLexical::serialized(deleteData)}},
         std::move(callback),
-        targetThread,
+        executor,
         serverId);
 }
 
@@ -903,13 +903,13 @@ Handle ServerConnection::fileChunkChecksums(
     const nx::Uuid& serverId,
     const QString& fileName,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         lit("/api/downloads/%1/checksums").arg(fileName),
         nx::network::rest::Params(),
         std::move(callback),
-        targetThread,
+        executor,
         serverId);
 }
 
@@ -918,7 +918,7 @@ Handle ServerConnection::downloadFileChunk(
     const QString& fileName,
     int chunkIndex,
     DataCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
@@ -933,7 +933,7 @@ Handle ServerConnection::downloadFileChunk(
         request,
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::downloadFileChunkFromInternet(
@@ -944,7 +944,7 @@ Handle ServerConnection::downloadFileChunkFromInternet(
     int chunkSize,
     qint64 fileSize,
     DataCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::get,
@@ -964,7 +964,7 @@ Handle ServerConnection::downloadFileChunkFromInternet(
         request,
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::uploadFileChunk(
@@ -973,7 +973,7 @@ Handle ServerConnection::uploadFileChunk(
     int index,
     const QByteArray& data,
     PostCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePut(
         lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(index),
@@ -981,53 +981,53 @@ Handle ServerConnection::uploadFileChunk(
         "application/octet-stream",
         data,
         std::move(callback),
-        targetThread,
+        executor,
         serverId);
 }
 
 Handle ServerConnection::downloadsStatus(
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         lit("/api/downloads/status"),
         nx::network::rest::Params(),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::fileDownloadStatus(
     const nx::Uuid& serverId,
     const QString& fileName,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         QString("/api/downloads/%1/status").arg(fileName),
         nx::network::rest::Params(),
         std::move(callback),
-        targetThread,
+        executor,
         serverId);
 }
 
 Handle ServerConnection::getTimeOfServersAsync(
     Callback<MultiServerTimeData> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/ec2/getTimeOfServers", nx::network::rest::Params(), std::move(callback), targetThread);
+    return executeGet("/ec2/getTimeOfServers", nx::network::rest::Params(), std::move(callback), executor);
 }
 
 Handle ServerConnection::addVirtualCamera(
     const nx::Uuid& serverId,
     const QString& name,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/virtualCamera/add",
         nx::network::rest::Params{{ "name", name }},
         std::move(callback),
-        targetThread,
+        executor,
         serverId);
 }
 
@@ -1035,7 +1035,7 @@ Handle ServerConnection::prepareVirtualCameraUploads(
     const QnVirtualCameraResourcePtr& camera,
     const QnVirtualCameraPrepareData& data,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/virtualCamera/prepare",
@@ -1043,7 +1043,7 @@ Handle ServerConnection::prepareVirtualCameraUploads(
         nx::network::http::header::ContentType::kJson.toString(),
         QJson::serialized(data),
         std::move(callback),
-        targetThread,
+        executor,
         /*timeouts*/ {},
         camera->getParentId());
 }
@@ -1051,13 +1051,13 @@ Handle ServerConnection::prepareVirtualCameraUploads(
 Handle ServerConnection::virtualCameraStatus(
     const QnVirtualCameraResourcePtr& camera,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/api/virtualCamera/status",
         nx::network::rest::Params{ { lit("cameraId"), camera->getId().toSimpleString() } },
         std::move(callback),
-        targetThread,
+        executor,
         camera->getParentId());
 }
 
@@ -1066,7 +1066,7 @@ Handle ServerConnection::lockVirtualCamera(
     const QnUserResourcePtr& user,
     qint64 ttl,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/virtualCamera/lock",
@@ -1075,7 +1075,7 @@ Handle ServerConnection::lockVirtualCamera(
             { "userId", user->getId().toSimpleString() },
             { "ttl", QString::number(ttl) } },
         std::move(callback),
-        targetThread,
+        executor,
         camera->getParentId());
 }
 
@@ -1085,7 +1085,7 @@ Handle ServerConnection::extendVirtualCameraLock(
     const nx::Uuid& token,
     qint64 ttl,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/virtualCamera/extend",
@@ -1095,7 +1095,7 @@ Handle ServerConnection::extendVirtualCameraLock(
             { "userId", user->getId().toSimpleString() },
             { "ttl", QString::number(ttl) } },
         std::move(callback),
-        targetThread,
+        executor,
         camera->getParentId());
 }
 
@@ -1103,7 +1103,7 @@ Handle ServerConnection::releaseVirtualCameraLock(
     const QnVirtualCameraResourcePtr& camera,
     const nx::Uuid& token,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/virtualCamera/release",
@@ -1111,7 +1111,7 @@ Handle ServerConnection::releaseVirtualCameraLock(
             { "cameraId", camera->getId().toSimpleString() },
             { "token", token.toSimpleString() } },
         std::move(callback),
-        targetThread,
+        executor,
         camera->getParentId());
 }
 
@@ -1121,7 +1121,7 @@ Handle ServerConnection::consumeVirtualCameraFile(
     const QString& uploadId,
     qint64 startTimeMs,
     PostCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/api/virtualCamera/consume",
@@ -1131,23 +1131,23 @@ Handle ServerConnection::consumeVirtualCameraFile(
             { "uploadId", uploadId },
             { "startTime", QString::number(startTimeMs) } },
         std::move(callback),
-        targetThread,
+        executor,
         camera->getParentId());
 }
 
 Handle ServerConnection::getStatistics(
     const nx::Uuid& serverId,
     ServerConnection::GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/api/statistics", {}, std::move(callback), targetThread, serverId);
+    return executeGet("/api/statistics", {}, std::move(callback), executor, serverId);
 }
 
 Handle ServerConnection::getAuditLogRecords(
     std::chrono::milliseconds from,
     std::chrono::milliseconds to,
     UbJsonResultCallback callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     return getUbJsonResult(
@@ -1157,14 +1157,14 @@ Handle ServerConnection::getAuditLogRecords(
             {"to", QString::number(to.count())},
         },
         std::move(callback),
-        targetThread,
+        executor,
         proxyToServer);
 }
 
 Handle ServerConnection::eventLog(
     const nx::vms::api::rules::EventLogFilter& filter,
     Callback<ErrorOrData<nx::vms::api::rules::EventLogRecordList>> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<Timeouts> timeouts)
 {
     QJsonValue value;
@@ -1174,7 +1174,7 @@ Handle ServerConnection::eventLog(
         "rest/v4/events/log",
         nx::network::rest::Params::fromJson(value.toObject()),
         std::move(callback),
-        targetThread,
+        executor,
         /*proxyToServer*/{},
         timeouts);
 }
@@ -1182,26 +1182,26 @@ Handle ServerConnection::eventLog(
 Handle ServerConnection::createSoftTrigger(
     const nx::vms::api::rules::SoftTriggerData& data,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "rest/v4/events/triggers",
         nx::reflect::json::serialize(data),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getEventsToAcknowledge(
     Callback<ErrorOrData<nx::vms::api::rules::EventLogRecordList>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("rest/v4/events/acknowledges", {}, std::move(callback), targetThread);
+    return executeGet("rest/v4/events/acknowledges", {}, std::move(callback), executor);
 }
 
 Handle ServerConnection::acknowledge(
     const nx::vms::api::rules::AcknowledgeBookmark& bookmark,
     Callback<ErrorOrData<nx::vms::api::BookmarkV3>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     if (!NX_ASSERT(!bookmark.actionServerId.isNull()))
         return {};
@@ -1210,13 +1210,13 @@ Handle ServerConnection::acknowledge(
         "rest/v4/events/acknowledges",
         nx::reflect::json::serialize(bookmark),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getCameraCredentials(
     const nx::Uuid& deviceId,
     Callback<QAuthenticator> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto request = prepareRequest(
         nx::network::http::Method::get,
@@ -1255,14 +1255,14 @@ Handle ServerConnection::getCameraCredentials(
                     requestId,
                     credentials);
             }),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::changeCameraPassword(
     const QnVirtualCameraResourcePtr& camera,
     const QAuthenticator& auth,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     if (!camera || camera->getParentId().isNull())
         return Handle();
@@ -1275,14 +1275,14 @@ Handle ServerConnection::changeCameraPassword(
         nx::format("/rest/v1/devices/%1/changePassword", camera->getId()),
         nx::reflect::json::serialize(request),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 int ServerConnection::checkCameraList(
     const nx::Uuid& serverId,
     const QnVirtualCameraResourceList& cameras,
     Callback<QnCameraListReply> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     QnCameraListReply camList;
     for (const auto& c: cameras)
@@ -1292,7 +1292,7 @@ int ServerConnection::checkCameraList(
         "/api/checkDiscovery",
         QJson::serialized(camList),
         extractJsonResult<QnCameraListReply>(std::move(callback)),
-        targetThread,
+        executor,
         serverId);
 
 }
@@ -1301,7 +1301,7 @@ Handle ServerConnection::lookupObjectTracks(
     const nx::analytics::db::Filter& request,
     bool isLocal,
     Callback<nx::analytics::db::LookupResult> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     nx::network::rest::Params queryParams;
@@ -1312,7 +1312,7 @@ Handle ServerConnection::lookupObjectTracks(
         "/ec2/analyticsLookupObjectTracks",
         queryParams,
         std::move(callback),
-        targetThread,
+        executor,
         proxyToServer);
 }
 
@@ -1321,7 +1321,7 @@ Handle ServerConnection::lookupObjectTracks(
 Handle ServerConnection::getEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     Callback<nx::vms::api::analytics::EngineSettingsResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/ec2/analyticsEngineSettings",
@@ -1329,14 +1329,14 @@ Handle ServerConnection::getEngineAnalyticsSettings(
             {"analyticsEngineId", engine->getId().toSimpleString()}
         },
         extractJsonResult<nx::vms::api::analytics::EngineSettingsResponse>(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::setEngineAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
     Callback<nx::vms::api::analytics::EngineSettingsResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::analytics::EngineSettingsRequest request;
     request.settingsValues = settings;
@@ -1346,7 +1346,7 @@ Handle ServerConnection::setEngineAnalyticsSettings(
         "/ec2/analyticsEngineSettings",
         QJson::serialized(request),
         extractJsonResult<EngineSettingsResponse>(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::engineAnalyticsActiveSettingsChanged(
@@ -1356,7 +1356,7 @@ Handle ServerConnection::engineAnalyticsActiveSettingsChanged(
     const QJsonObject& settingsValues,
     const QJsonObject& paramValues,
     Callback<nx::vms::api::analytics::EngineActiveSettingChangedResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::analytics::EngineActiveSettingChangedRequest request;
     request.analyticsEngineId = engine->getId();
@@ -1370,14 +1370,14 @@ Handle ServerConnection::engineAnalyticsActiveSettingsChanged(
         "/ec2/notifyAnalyticsEngineActiveSettingChanged",
         QJson::serialized(request),
         extractJsonResult<EngineActiveSettingChangedResponse>(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     Callback<nx::vms::api::analytics::DeviceAgentSettingsResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     using namespace nx::vms::api::analytics;
     return executeGet(
@@ -1387,7 +1387,7 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
             {"analyticsEngineId", engine->getId().toSimpleString()},
         },
         extractJsonResult<DeviceAgentSettingsResponse>(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::setDeviceAnalyticsSettings(
@@ -1396,7 +1396,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const QJsonObject& settingsValues,
     const QJsonObject& settingsModel,
     Callback<nx::vms::api::analytics::DeviceAgentSettingsResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::analytics::DeviceAgentSettingsRequest request;
     request.settingsValues = settingsValues;
@@ -1408,7 +1408,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
         "/ec2/deviceAnalyticsSettings",
         QJson::serialized(request),
         extractJsonResult<nx::vms::api::analytics::DeviceAgentSettingsResponse>(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
@@ -1419,7 +1419,7 @@ Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
     const QJsonObject& settingsValues,
     const QJsonObject& paramValues,
     Callback<nx::vms::api::analytics::DeviceAgentActiveSettingChangedResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::analytics::DeviceAgentActiveSettingChangedRequest request;
     request.analyticsEngineId = engine->getId();
@@ -1434,40 +1434,40 @@ Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
         QJson::serialized(request),
         extractJsonResult<nx::vms::api::analytics::DeviceAgentActiveSettingChangedResponse>(
             std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::startArchiveRebuild(const nx::Uuid& serverId,
     const QString pool,
     Callback<ErrorOrData<nx::vms::api::StorageScanInfoFull>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto endpoint =
         NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2", serverId, pool);
-    return executePost(endpoint, nx::network::rest::Params(), std::move(callback), targetThread);
+    return executePost(endpoint, nx::network::rest::Params(), std::move(callback), executor);
 }
 
 Handle ServerConnection::getArchiveRebuildProgress(const nx::Uuid& serverId,
     const QString pool,
     Callback<ErrorOrData<nx::vms::api::StorageScanInfoFull>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto endpoint =
         NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2", serverId, pool);
     return executeGet(endpoint,
         nx::network::rest::Params{{"_keepDefault", QnLexical::serialized(true)}},
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::stopArchiveRebuild(const nx::Uuid& serverId,
     const QString pool,
     Callback<ErrorOrEmpty>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     const auto endpoint =
         NX_FMT("/rest/v2/servers/%1/rebuildArchive/%2", serverId, pool);
-    return executeDelete(endpoint, nx::network::rest::Params(), std::move(callback), targetThread);
+    return executeDelete(endpoint, nx::network::rest::Params(), std::move(callback), executor);
 }
 
 Handle ServerConnection::postJsonResult(
@@ -1475,7 +1475,7 @@ Handle ServerConnection::postJsonResult(
     const nx::network::rest::Params& params,
     const QByteArray& body,
     JsonResultCallback&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<Timeouts> timeouts,
     std::optional<nx::Uuid> proxyToServer)
 {
@@ -1486,7 +1486,7 @@ Handle ServerConnection::postJsonResult(
         contentType,
         body,
         std::move(callback),
-        targetThread,
+        executor,
         timeouts,
         proxyToServer);
 }
@@ -1677,7 +1677,7 @@ Handle ServerConnection::jsonRpcBatchCall(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     const std::vector<nx::vms::api::JsonRpcRequest>& requests,
     JsonRpcBatchResultCallback&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<Timeouts> timeouts)
 {
     auto request = prepareRequest(
@@ -1731,7 +1731,7 @@ Handle ServerConnection::jsonRpcBatchCall(
             auto context = static_cast<JsonRpcResultContext*>(resultContext.get());
             callback(context->isSuccess(), handle, std::move(*context).getResult());
         },
-        targetThread,
+        executor,
         timeouts);
 }
 
@@ -1739,38 +1739,38 @@ Handle ServerConnection::getUbJsonResult(
     const QString& path,
     nx::network::rest::Params params,
     UbJsonResultCallback&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     if (!params.contains("format"))
         params.insert("format", "ubjson");
-    return executeGet(path, params, std::move(callback), targetThread, proxyToServer);
+    return executeGet(path, params, std::move(callback), executor, proxyToServer);
 }
 
 Handle ServerConnection::getJsonResult(
     const QString& path,
     nx::network::rest::Params params,
     JsonResultCallback&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     if (!params.contains("format"))
         params.insert("format", "json");
-    return executeGet(path, params, std::move(callback), targetThread, proxyToServer);
+    return executeGet(path, params, std::move(callback), executor, proxyToServer);
 }
 
 Handle ServerConnection::getRawResult(
     const QString& path,
     const nx::network::rest::Params& params,
     DataCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return d->executeRequest(
         /*helper*/ nullptr,
         prepareRequest(nx::network::http::Method::get, prepareUrl(path, params)),
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 template <typename ResultType>
@@ -1828,35 +1828,35 @@ Handle NX_VMS_COMMON_API ServerConnection::sendRequest(
 Handle ServerConnection::getPluginInformation(
     const nx::Uuid& serverId,
     GetCallback callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/api/pluginInfo", {}, std::move(callback), targetThread, serverId);
+    return executeGet("/api/pluginInfo", {}, std::move(callback), executor, serverId);
 }
 
 Handle ServerConnection::testEmailSettings(
     const nx::vms::api::EmailSettings& settings,
     Callback<ResultWithData<QnTestEmailSettingsReply>>&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         "/api/testEmailSettings",
         QJson::serialized(settings),
         std::move(callback),
-        targetThread,
+        executor,
         proxyToServer);
 }
 
 Handle ServerConnection::testEmailSettings(
     Callback<ResultWithData<QnTestEmailSettingsReply>>&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         "/api/testEmailSettings",
         /*messageBody*/ QByteArray(),
         std::move(callback),
-        targetThread,
+        executor,
         proxyToServer);
 }
 
@@ -1864,17 +1864,17 @@ Handle ServerConnection::getStorageStatus(
     const nx::Uuid& serverId,
     const QString& path,
     Callback<ResultWithData<StorageStatusReply>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
     params.insert("path", path);
-    return executeGet("/api/storageStatus", params, std::move(callback), targetThread, serverId);
+    return executeGet("/api/storageStatus", params, std::move(callback), executor, serverId);
 }
 
 Handle ServerConnection::checkStoragePath(
     const QString& path,
     Callback<ErrorOrData<nx::vms::api::StorageSpaceDataWithDbInfoV3>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
     // Method prepareUrl calls params.toUrlQuery() which uses QUrlQuery::setQueryItems()
@@ -1886,7 +1886,7 @@ Handle ServerConnection::checkStoragePath(
         "/rest/v4/servers/this/storages/*/check",
         params,
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::setStorageEncryptionPassword(
@@ -1894,7 +1894,7 @@ Handle ServerConnection::setStorageEncryptionPassword(
     bool makeCurrent,
     const QByteArray& salt,
     PostCallback&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::vms::api::StorageEncryptionData data;
     data.password = password;
@@ -1905,13 +1905,13 @@ Handle ServerConnection::setStorageEncryptionPassword(
         "/rest/v1/system/storageEncryption",
         QJson::serialized(data),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getSystemIdFromServer(
     const nx::Uuid& serverId,
     Callback<QString>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto internalCallback =
         [callback=std::move(callback)](
@@ -1932,7 +1932,7 @@ Handle ServerConnection::getSystemIdFromServer(
         request,
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(internalCallback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::doCameraDiagnosticsStep(
@@ -1940,20 +1940,20 @@ Handle ServerConnection::doCameraDiagnosticsStep(
     const nx::Uuid& cameraId,
     CameraDiagnostics::Step::Value previousStep,
     Callback<ResultWithData<QnCameraDiagnosticsReply>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
     params.insert("cameraId", cameraId);
     params.insert("type", CameraDiagnostics::Step::toString(previousStep));
 
-    return executeGet("/api/doCameraDiagnosticsStep", params, std::move(callback), targetThread, serverId);
+    return executeGet("/api/doCameraDiagnosticsStep", params, std::move(callback), executor, serverId);
 }
 
 Handle ServerConnection::ldapAuthenticateAsync(
     const nx::vms::api::Credentials& credentials,
     bool localOnly,
     LdapAuthenticateCallback&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
     if (localOnly)
@@ -1992,26 +1992,26 @@ Handle ServerConnection::ldapAuthenticateAsync(
             QJson::deserialize(body, &user);
             callback(requestId, std::move(user), authResult);
         }),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::testLdapSettingsAsync(
     const nx::vms::api::LdapSettings& settings,
     Callback<ErrorOrData<std::vector<QString>>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/rest/v3/ldap/test",
         nx::reflect::json::serialize(settings),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::setLdapSettingsAsync(
     const nx::vms::api::LdapSettings& settings,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::LdapSettings>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::put,
@@ -2028,14 +2028,14 @@ Handle ServerConnection::setLdapSettingsAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::modifyLdapSettingsAsync(
     const nx::vms::api::LdapSettings& settings,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::LdapSettings>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::patch,
@@ -2052,39 +2052,39 @@ Handle ServerConnection::modifyLdapSettingsAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::loginInfoAsync(
     const QString& login,
     bool localOnly,
     Callback<ErrorOrData<nx::vms::api::LoginUser>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     nx::network::rest::Params params;
     if (localOnly)
         params.insert("_local", true);
-    return executeGet("/rest/v3/login/users/" + login, params, std::move(callback), targetThread);
+    return executeGet("/rest/v3/login/users/" + login, params, std::move(callback), executor);
 }
 
 Handle ServerConnection::getLdapSettingsAsync(
     Callback<ErrorOrData<nx::vms::api::LdapSettings>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/rest/v3/ldap/settings", {}, std::move(callback), targetThread);
+    return executeGet("/rest/v3/ldap/settings", {}, std::move(callback), executor);
 }
 
 Handle ServerConnection::getLdapStatusAsync(
     Callback<ErrorOrData<nx::vms::api::LdapStatus>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/rest/v3/ldap/sync", {}, std::move(callback), targetThread);
+    return executeGet("/rest/v3/ldap/sync", {}, std::move(callback), executor);
 }
 
 Handle ServerConnection::syncLdapAsync(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrEmpty>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::post,
@@ -2100,13 +2100,13 @@ Handle ServerConnection::syncLdapAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::resetLdapAsync(
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrEmpty>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
@@ -2122,7 +2122,7 @@ Handle ServerConnection::resetLdapAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::saveUserAsync(
@@ -2130,7 +2130,7 @@ Handle ServerConnection::saveUserAsync(
     const nx::vms::api::UserModelV3& userData,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::UserModelV3>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         newUser ? nx::network::http::Method::put : nx::network::http::Method::patch,
@@ -2147,14 +2147,14 @@ Handle ServerConnection::saveUserAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
  Handle ServerConnection::patchUserSettings(
     nx::Uuid id,
     const nx::vms::api::UserSettings& settings,
     Callback<ErrorOrData<nx::vms::api::UserModelV3>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     QJsonValue serializedSettings;
     QJson::serialize(settings, &serializedSettings);
@@ -2174,14 +2174,14 @@ Handle ServerConnection::saveUserAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::removeUserAsync(
     const nx::Uuid& userId,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrEmpty>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
@@ -2196,7 +2196,7 @@ Handle ServerConnection::removeUserAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::saveGroupAsync(
@@ -2204,7 +2204,7 @@ Handle ServerConnection::saveGroupAsync(
     const nx::vms::api::UserGroupModel& groupData,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrData<nx::vms::api::UserGroupModel>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         newGroup ? nx::network::http::Method::put : nx::network::http::Method::patch,
@@ -2221,14 +2221,14 @@ Handle ServerConnection::saveGroupAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::removeGroupAsync(
     const nx::Uuid& groupId,
     nx::vms::common::SessionTokenHelperPtr tokenHelper,
     Callback<ErrorOrEmpty>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::delete_,
@@ -2243,13 +2243,13 @@ Handle ServerConnection::removeGroupAsync(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::createTicket(
     const nx::Uuid& targetServerId,
     Callback<ErrorOrData<nx::vms::api::LoginSession>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::post,
@@ -2266,42 +2266,42 @@ Handle ServerConnection::createTicket(
         request,
         std::make_unique<Context>(),
         Context::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getCurrentSession(
     Callback<ErrorOrData<nx::vms::api::LoginSession>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/rest/v4/login/sessions/current",
         {},
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::loginAsync(
     const nx::vms::api::LoginSessionRequest& data,
     Callback<ErrorOrData<nx::vms::api::LoginSession>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/rest/v1/login/sessions",
         nx::reflect::json::serialize(data),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::loginAsync(
     const nx::vms::api::TemporaryLoginSessionRequest& data,
     Callback<ErrorOrData<nx::vms::api::LoginSession>> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePost(
         "/rest/v3/login/temporaryToken",
         nx::reflect::json::serialize(data),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::replaceDevice(
@@ -2309,7 +2309,7 @@ Handle ServerConnection::replaceDevice(
     const QString& replacementDevicePhysicalId,
     bool returnReportOnly,
     Callback<nx::vms::api::DeviceReplacementResponse>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     if (!NX_ASSERT(
         !deviceToBeReplacedId.isNull() && !replacementDevicePhysicalId.isEmpty(),
@@ -2345,26 +2345,26 @@ Handle ServerConnection::replaceDevice(
         request,
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(internal_callback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::undoReplaceDevice(
     const nx::Uuid& deviceId,
     PostCallback&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeDelete(
         nx::format("/rest/v2/devices/%1/replace", deviceId),
         nx::network::rest::Params(),
         std::move(callback),
-        targetThread,
+        executor,
         {});
 }
 
 Handle ServerConnection::recordedTimePeriods(
     const QnChunksRequestData& requestData,
     Callback<MultiServerPeriodDataList>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     QnChunksRequestData fixedFormatRequest(requestData);
     fixedFormatRequest.format = Qn::SerializationFormat::compressedPeriods;
@@ -2394,12 +2394,12 @@ Handle ServerConnection::recordedTimePeriods(
         request,
         std::make_unique<RawResultContext>(),
         RawResultContext::wrapCallback(std::move(internalCallback)),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::getExtendedPluginInformation(
     Callback<nx::vms::api::ExtendedPluginInfoByServer>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executeGet(
         "/ec2/pluginInfo",
@@ -2421,26 +2421,26 @@ Handle ServerConnection::getExtendedPluginInformation(
                     requestId,
                     std::move(pluginInfo));
             }),
-        targetThread);
+        executor);
 }
 
 Handle ServerConnection::debug(
-    const QString& action, const QString& value, PostCallback callback, QThread* targetThread)
+    const QString& action, const QString& value, PostCallback callback, nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/api/debug", {{action, value}}, std::move(callback), targetThread);
+    return executeGet("/api/debug", {{action, value}}, std::move(callback), executor);
 }
 
 Handle ServerConnection::getLookupLists(
     Callback<ErrorOrData<nx::vms::api::LookupListDataList>>&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
-    return executeGet("/rest/v3/lookupLists", {}, std::move(callback), targetThread);
+    return executeGet("/rest/v3/lookupLists", {}, std::move(callback), executor);
 }
 
 Handle ServerConnection::saveLookupList(
     const nx::vms::api::LookupListData& lookupList,
     Callback<ErrorOrEmpty> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return executePut(
         nx::format("/rest/v4/lookupLists/%1").arg(lookupList.id),
@@ -2448,7 +2448,7 @@ Handle ServerConnection::saveLookupList(
         Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
         QByteArray::fromStdString(nx::reflect::json::serialize(lookupList)),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 // --------------------------- private implementation -------------------------------------
@@ -2466,7 +2466,7 @@ Handle ServerConnection::executeGet(
     const QString& path,
     const nx::network::rest::Params& params,
     Callback<ResultType> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer,
     std::optional<Timeouts> timeouts)
 {
@@ -2479,7 +2479,7 @@ Handle ServerConnection::executeGet(
         request,
         std::make_unique<ResultContext<ResultType>>(),
         ResultContext<ResultType>::wrapCallback(std::move(callback)),
-        targetThread,
+        executor,
         timeouts);
 }
 
@@ -2488,14 +2488,14 @@ Handle ServerConnection::executePost(
     const QString& path,
     const nx::network::rest::Params& params,
     Callback<ResultType> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
         path,
         QJson::serialized(params.toJson()),
         std::move(callback),
-        targetThread,
+        executor,
         proxyToServer);
 }
 
@@ -2504,7 +2504,7 @@ Handle ServerConnection::executePost(
     const QString& path,
     const nx::String& messageBody,
     Callback<ResultType>&& callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     return executePost(
@@ -2513,7 +2513,7 @@ Handle ServerConnection::executePost(
         nx::network::http::header::ContentType::kJson.toString(),
         messageBody,
         std::move(callback),
-        targetThread,
+        executor,
         /*timeouts*/ {},
         proxyToServer);
 }
@@ -2525,7 +2525,7 @@ Handle ServerConnection::executePost(
     const nx::String& contentType,
     const nx::String& messageBody,
     Callback<ResultType> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<Timeouts> timeouts,
     std::optional<nx::Uuid> proxyToServer)
 {
@@ -2540,7 +2540,7 @@ Handle ServerConnection::executePost(
         request,
         std::make_unique<ResultContext<ResultType>>(),
         ResultContext<ResultType>::wrapCallback(std::move(callback)),
-        targetThread,
+        executor,
         timeouts);
 }
 
@@ -2551,7 +2551,7 @@ Handle ServerConnection::executePut(
     const nx::String& contentType,
     const nx::String& messageBody,
     Callback<ResultType> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     auto request = prepareRequest(
@@ -2564,7 +2564,7 @@ Handle ServerConnection::executePut(
         request,
         std::make_unique<ResultContext<ResultType>>(),
         ResultContext<ResultType>::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 template <typename ResultType>
@@ -2574,12 +2574,12 @@ Handle ServerConnection::executePatch(
     const nx::String& contentType,
     const nx::String& messageBody,
     Callback<ResultType> callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     auto request = prepareRequest(
         nx::network::http::Method::patch, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
-        ? d->executeRequest(request, std::move(callback), targetThread)
+        ? d->executeRequest(request, std::move(callback), executor)
         : Handle();
 
     NX_VERBOSE(d->logTag, "<%1> %2", handle, request.url);
@@ -2591,7 +2591,7 @@ Handle ServerConnection::executeDelete(
     const QString& path,
     const nx::network::rest::Params& params,
     Callback<ResultType> callback,
-    QThread* targetThread,
+    nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
     auto request = prepareRequest(nx::network::http::Method::delete_, prepareUrl(path, params));
@@ -2603,7 +2603,7 @@ Handle ServerConnection::executeDelete(
         request,
         std::make_unique<ResultContext<ResultType>>(),
         ResultContext<ResultType>::wrapCallback(std::move(callback)),
-        targetThread);
+        executor);
 }
 
 // Coroutine style request.

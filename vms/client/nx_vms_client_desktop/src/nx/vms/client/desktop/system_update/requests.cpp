@@ -13,25 +13,25 @@ rest::Handle requestUpdateInformation(
     const rest::ServerConnectionPtr& connection,
     const common::update::UpdateInfoParams& params,
     rest::JsonResultCallback&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return connection->getJsonResult(
         "/ec2/updateInformation",
         params.toRestParams(),
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 rest::Handle requestUpdateStatus(
     const rest::ServerConnectionPtr& connection,
     rest::JsonResultCallback&& callback,
-    QThread* targetThread)
+    nx::utils::AsyncHandlerExecutor executor)
 {
     return connection->getJsonResult(
         "/ec2/updateStatus",
         network::rest::Params{},
         std::move(callback),
-        targetThread);
+        executor);
 }
 
 // When we receive update infrmation via a 5.0 (or older) Server, it will not recognize the

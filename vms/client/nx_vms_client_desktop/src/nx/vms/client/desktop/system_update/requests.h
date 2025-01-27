@@ -3,6 +3,7 @@
 #pragma once
 
 #include <api/server_rest_connection_fwd.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/vms/common/update/update_check_params.h>
 #include <nx/vms/common/update/update_information.h>
 
@@ -14,12 +15,12 @@ rest::Handle requestUpdateInformation(
     const rest::ServerConnectionPtr& connection,
     const common::update::UpdateInfoParams& params,
     rest::JsonResultCallback&& callback,
-    QThread* targetThread = nullptr);
+    nx::utils::AsyncHandlerExecutor executor = {});
 
 rest::Handle requestUpdateStatus(
     const rest::ServerConnectionPtr& connection,
     rest::JsonResultCallback&& callback,
-    QThread* targetThread = nullptr);
+    nx::utils::AsyncHandlerExecutor executor = {});
 
 /** Get update info directly from the Internet or via the given proxy connection. */
 UpdateContents getUpdateContents(
