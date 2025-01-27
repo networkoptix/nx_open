@@ -5,6 +5,7 @@ import QtQuick.Layouts
 
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 
 Item
 {
@@ -36,7 +37,9 @@ Item
     property font nameFont: control.font
     property font valueFont: control.font
 
-    property real labelFraction: 0.4 //< Default: 40% to label, 60% to value.
+    // Default: 30% to label, 70% to value. This isn't strict proportion and uses only if there
+    // is not enough space for labels or values.
+    property real labelFraction: 0.3
 
     property bool interactive: false
     property Menu contextMenu
@@ -57,6 +60,11 @@ Item
     function forceLayout()
     {
         grid.forceLayout()
+    }
+
+    function update()
+    {
+        grid.updateColumnWidths()
     }
 
     Rectangle
@@ -180,11 +188,11 @@ Item
                     property var colors: modelData[control.colorsRole] ?? []
                     property int lastVisibleIndex: 0
                     readonly property bool shrinked:
-                        lastVisibleIndex < values.length - 1 || rowRepeater.shrinked
+                        lastVisibleIndex < values.length - 1 || valueRowRepeater.shrinked
 
                     Repeater
                     {
-                        id: rowRepeater
+                        id: valueRowRepeater
 
                         objectName: "valueRowRepeater"
                         model: cellValues.values
@@ -226,10 +234,10 @@ Item
                                 text: modelData +
                                     (index < cellValues.lastVisibleIndex && !cellValues.colors[index]
                                         ? ","
-                                        : "")
+                                        : " ")
                                 lineHeight: control.tableLineHeight
                                 wrapMode: Text.Wrap
-                                elide: Text.ElideRight
+                                elide: index === 0 ? Text.ElideRight : Text.ElideNone
                                 maximumLineCount: control.maximumLineCount
                             }
                         }
@@ -239,37 +247,14 @@ Item
                     {
                         id: appendix
 
+                        objectName: "appendix"
                         readonly property bool relevant:
-                            cellValues.lastVisibleIndex < rowRepeater.count - 1
+                            cellValues.lastVisibleIndex < valueRowRepeater.count - 1
                         width: relevant ? undefined : 0
                         visible: relevant
-                        text: `+ ${rowRepeater.count - cellValues.lastVisibleIndex - 1}`
+                        text: `+ ${valueRowRepeater.count - cellValues.lastVisibleIndex - 1}`
                         color: ColorTheme.darker(control.valueColor, 10)
                         font: control.valueFont
-                    }
-
-                    onWidthChanged:
-                    {
-                        if (!rowRepeater.count)
-                            return
-
-                        var lastIndex = rowRepeater.count - 1
-                        var sumWidth = 0
-                        for (var i = 0; i < rowRepeater.count; ++i)
-                        {
-                            const item = rowRepeater.itemAt(i)
-                            if (sumWidth > 0)
-                                sumWidth += spacing
-                            sumWidth += item.implicitWidth
-                            if (sumWidth > width)
-                            {
-                                lastIndex = i - 1
-                                break
-                            }
-                        }
-
-                        // At least one elided value we should show.
-                        lastVisibleIndex = Math.max(0, lastIndex)
                     }
                 }
             }
@@ -282,44 +267,7 @@ Item
 
             const labels = children.filter(child => child.objectName === "cellLabel")
             const values = children.filter(child => child.objectName === "cellValues")
-
-            const calculateImplicitWidth = (items) =>
-                items.reduce((prevMax, item) => Math.max(prevMax, item.implicitWidth), 0)
-
-            const implicitLabelWidth = calculateImplicitWidth(labels)
-            const implicitValuesWidth = calculateImplicitWidth(values)
-
-            const availableWidth =
-                grid.width - grid.columnSpacing - grid.leftPadding - grid.rightPadding
-            const preferredLabelWidth = availableWidth * control.labelFraction
-            const preferredValuesWidth = availableWidth - preferredLabelWidth
-
-            let labelWidth = 0
-            const availableLabelWidth = availableWidth - implicitValuesWidth
-
-            // If value is shorter than its preferred space...
-            if (implicitValuesWidth < preferredValuesWidth)
-            {
-                // Label may occupy not less than its preferred space
-                // and no more than its available space.
-                labelWidth = Math.max(preferredLabelWidth,
-                    Math.min(implicitLabelWidth, availableLabelWidth))
-            }
-            else // If value is longer than its preferred space...
-            {
-                // Label may occupy not less than its available space
-                // and no more than its preferred space.
-                labelWidth = Math.max(availableLabelWidth,
-                    Math.min(implicitLabelWidth, preferredLabelWidth))
-            }
-
-            const valuesWidth = availableWidth - labelWidth
-
-            for (const label of labels)
-                label.width = labelWidth
-
-            for (const value of values)
-                value.width = valuesWidth
+            NameValueTableCalculator.calculateWidths(grid, labels, values)
         }
     }
 

@@ -32,6 +32,7 @@
 #include "../dialogs/custom_settings_test_dialog.h"
 #include "../dialogs/interactive_settings_test_dialog.h"
 #include "../dialogs/joystick_investigation_wizard/joystick_investigation_wizard_dialog.h"
+#include "../dialogs/name_value_table_test_dialog.h"
 #include "../dialogs/palette_dialog.h"
 #include "../dialogs/qml_test_dialog.h"
 #include "../dialogs/resource_pool_dialog.h"
@@ -131,6 +132,7 @@ DebugActionsHandler::DebugActionsHandler(WindowContext* windowContext, QObject *
     ResourcePoolDialog::registerAction();
     WebEngineDialog::registerAction();
     SortingTestDialog::registerAction();
+    NameValueTableTestDialog::registerAction();
 
 #ifdef Q_OS_MAC
     if (ini().virtualJoystick)

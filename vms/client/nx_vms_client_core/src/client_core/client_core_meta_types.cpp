@@ -20,9 +20,10 @@
 #include <nx/utils/url.h>
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/camera/buttons/abstract_camera_button_controller.h>
@@ -53,10 +54,10 @@
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/qml/items/multiline_text_item.h>
+#include <nx/vms/client/core/qml/name_value_table_calculator.h>
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
 #include <nx/vms/client/core/qml/qml_test_helper.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/resource/access_helper.h>
 #include <nx/vms/client/core/resource/media_dewarping_params.h>
 #include <nx/vms/client/core/resource/media_resource_helper.h>
@@ -197,6 +198,7 @@ void initializeMetaTypes()
     ColorTheme::registerQmlType();
     TranslationListModel::registerQmlType();
     MultilineTextItem::registerQmlType();
+    NameValueTableCalculator::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 
