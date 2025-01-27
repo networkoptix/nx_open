@@ -38,7 +38,7 @@ RowLayout
         visible: header.checkable
         hovered: mouseArea.containsMouse && !mouseArea.containsPress
         checkState: header.checked ? Qt.Checked : Qt.Unchecked
-        Layout.alignment: Qt.AlignBaseline
+        Layout.alignment: Qt.AlignVCenter
 
         MouseArea
         {
@@ -86,7 +86,7 @@ RowLayout
         font.pixelSize: 16
         font.weight: Font.Medium
         elide: Text.ElideRight
-        Layout.alignment: Qt.AlignBaseline
+        Layout.alignment: Qt.AlignVCenter
     }
 
     ColoredImage
@@ -135,7 +135,7 @@ RowLayout
         font.pixelSize: 14
         elide: Text.ElideRight
         visible: !!text
-        Layout.alignment: Qt.AlignBaseline
+        Layout.alignment: Qt.AlignVCenter
     }
 
     Text
@@ -209,7 +209,7 @@ RowLayout
         text: qsTr("Remove")
         icon.source: "image://skin/20x20/Outline/delete.svg"
 
-        Layout.alignment: Qt.AlignBaseline
+        Layout.alignment: Qt.AlignVCenter
         onClicked:
         {
             header.removeClicked()
