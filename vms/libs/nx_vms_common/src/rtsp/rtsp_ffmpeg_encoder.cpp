@@ -17,7 +17,7 @@ static const uint32_t kNxBasicSsrc = 20'000;
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric::Storage* metrics)
     :
-    m_config(config),
+    m_decoderConfig(config),
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
@@ -31,8 +31,11 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(const DecoderConfig& config, nx::metric
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec)
 {
-    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(m_config, m_metrics, dstCodec));
-    m_videoTranscoder->setOutputResolutionLimit(dstVideoSize);
+    QnFfmpegVideoTranscoder::Config config;
+    config.decoderConfig = m_decoderConfig;
+    config.targetCodecId = dstCodec;
+    config.outputResolutionLimit = dstVideoSize;
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(config, m_metrics));
 }
 
 void QnRtspFfmpegEncoder::setMtu(int mtu)

@@ -11,18 +11,40 @@
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <nx/core/transcoding/filters/filter_chain.h>
 #include <nx/media/ffmpeg/frame_info.h>
-
-#include "transcoder.h"
+#include <nx/media/video_data_packet.h>
+#include <transcoding/abstract_codec_transcoder.h>
+#include <transcoding/transcoding_utils.h>
 
 namespace nx::metric { struct Storage; }
 
 NX_VMS_COMMON_API AVCodecID findVideoEncoder(const QString& codecName);
 
-class NX_VMS_COMMON_API QnFfmpegVideoTranscoder: public QnVideoTranscoder
+class NX_VMS_COMMON_API QnFfmpegVideoTranscoder: public AbstractCodecTranscoder
 {
-    Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(const DecoderConfig& config, nx::metric::Storage* metrics, AVCodecID codecId);
+    struct Config
+    {
+        DecoderConfig decoderConfig;
+        AVCodecID targetCodecId;
+        bool useMultiThreadEncode = false;
+        // Do not rewrite a "strange" timestamps, e.g. in case with seek.
+        bool keepOriginalTimestamps = true;
+        bool useRealTimeOptimization = false;
+        QSize outputResolutionLimit;
+        // Force to use this source resolution, instead of max stream resolution from resource.
+        QSize sourceResolution;
+        // Set output stream bitrate (bps).
+        int bitrate = -1;
+        int fixedFrameRate = 0;
+        // Set codec-specific params for output stream.
+        QnCodecParams::Value params;
+        Qn::StreamQuality quality;
+        // It used to skip some video frames inside GOP when transcoding is used.
+        int64_t startTimeUs = 0;
+    };
+
+public:
+    QnFfmpegVideoTranscoder(const Config& config, nx::metric::Storage* metrics);
     ~QnFfmpegVideoTranscoder();
 
     QnFfmpegVideoTranscoder(const QnFfmpegVideoTranscoder&) = delete;
@@ -32,25 +54,14 @@ public:
     void setFilterChain(const nx::core::transcoding::FilterChain& filters);
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
-    virtual bool open(const QnConstCompressedVideoDataPtr& video) override;
+    virtual bool open(const QnConstCompressedVideoDataPtr& video);
     void close();
     AVCodecContext* getCodecContext();
 
-    /* Allow multithread transcoding */
-    void setUseMultiThreadEncode(bool value);
-    void setUseMultiThreadDecode(bool value);
-    void setUseRealTimeOptimization(bool value);
-    void setFixedFrameRate(int value);
     //!Returns picture size (in pixels) of output video stream
     QSize getOutputResolution() const;
-    // It used to skip some video frames inside GOP when transcoding is used
-    void setPreciseStartPosition(int64_t startTimeUs);
-
-    void setOutputResolutionLimit(const QSize& resolution);
-    // Force to use this source resolution, instead of max stream resolution from resource streams
-    void setSourceResolution(const QSize& resolution);
-    // Do not rewrite a "strange" timestamps, e.g. in case with seek.
-    void setKeepOriginalTimestamps(bool value);
+    //!Get output bitrate bitrate (bps)
+    int getBitrate() const { return m_bitrate; }
 
 private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
@@ -59,37 +70,27 @@ private:
         const QnConstCompressedVideoDataPtr& video);
 
 private:
-    DecoderConfig m_config;
-
-    // It used to skip some video frames inside GOP when transcoding is used
-    int64_t m_startTimeUs = 0;
-
+    const Config m_config;
     uint32_t m_lastFlushedDecoder = 0;
     std::map<uint32_t, std::unique_ptr<QnFfmpegVideoDecoder>> m_videoDecoders;
     nx::core::transcoding::FilterChain m_filters;
     QSize m_outputResolutionLimit;
     QSize m_targetResolution;
     QSize m_sourceResolution;
+    int m_bitrate = -1;
 
     AVCodecContext* m_encoderCtx;
-
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
-
     bool m_useMultiThreadEncode;
-
     QElapsedTimer m_encodeTimer;
     qint64 m_lastEncodedTime;
     qint64 m_averageCodingTimePerFrame;
     qint64 m_averageVideoTimePerFrame;
     qint64 m_droppedFrames;
-
-    bool m_useRealTimeOptimization;
-    bool m_keepOriginalTimestamps = false;
     CodecParametersConstPtr m_ctxPtr;
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
-    int m_fixedFrameRate = 0;
     std::optional<int64_t> m_lastEncodedPts;
 };
 

@@ -2,16 +2,20 @@
 
 #pragma once
 
+#include <QtCore/QQueue>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+#include <decoders/video/ffmpeg_video_decoder.h>
 #include <export/signer.h>
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/media/audio_data_packet.h>
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/cryptographic_hash.h>
-
-#include "decoders/video/ffmpeg_video_decoder.h"
-#include "transcoder.h"
+#include <nx/utils/move_only_func.h>
+#include <transcoding/transcoding_utils.h>
 
 class QnLicensePool;
 class QnFfmpegVideoTranscoder;
@@ -121,7 +125,7 @@ public:
     //!Flushes codec buffer and finalizes stream. No \a QnFfmpegTranscoder::transcodePacket is allowed after this call
     /*
     * @return Returns OperationResult::Success if no error or error code otherwise
-    */ 
+    */
     int finalize(nx::utils::ByteArray* const result);
     //!Flushes codec buffer. Use after \a open() call to flush muxed header.
     void flush(nx::utils::ByteArray* const result);

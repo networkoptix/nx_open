@@ -14,9 +14,9 @@
 
 namespace {
 
-constexpr char* folder ="notifications";
-constexpr char* targetContainter = "mp3";
-constexpr char* titleTag = "Title";  // TODO: #sivanov Replace with database field.
+constexpr char folder[] ="notifications";
+constexpr char targetContainter[] = "mp3";
+constexpr char titleTag[] = "Title";  // TODO: #sivanov Replace with database field.
 
 }
 

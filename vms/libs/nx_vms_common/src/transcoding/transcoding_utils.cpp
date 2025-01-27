@@ -23,6 +23,25 @@ constexpr int kHeightAlign = 4;
 
 } // namespace
 
+QRect roundRect(const QRect& srcRect)
+{
+    int left = qPower2Floor((unsigned) srcRect.left(), CL_MEDIA_ALIGNMENT);
+    int top = qPower2Floor((unsigned) srcRect.top(), 2);
+
+    int width = qPower2Ceil((unsigned) srcRect.width(), 16);
+    int height = qPower2Ceil((unsigned) srcRect.height(), 2);
+
+    return QRect(left, top, width, height);
+}
+
+QSize roundSize(const QSize& size)
+{
+    int width = qPower2Ceil((unsigned) size.width(), 16);
+    int height = qPower2Ceil((unsigned) size.height(), 4);
+
+    return QSize(width, height);
+}
+
 AVCodecID findEncoderCodecId(const QString& codecName)
 {
     QString codecLower = codecName.toLower();

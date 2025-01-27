@@ -67,13 +67,11 @@ int getDefaultBitrate(AVCodecContext* context)
 
 } // namespace
 
-QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(AVCodecID codecId):
-    QnAudioTranscoder(codecId),
+QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(const Config& config):
+    m_config(config),
     m_encoderCtx(nullptr),
     m_decoderCtx(nullptr),
-    m_dstSampleRate(0),
-    m_isOpened(false),
-    m_dstFrameSize(0)
+    m_isOpened(false)
 {
 }
 
@@ -81,7 +79,6 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 {
     avcodec_free_context(&m_encoderCtx);
     avcodec_free_context(&m_decoderCtx);
-
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -98,10 +95,10 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
 {
     NX_ASSERT(context);
 
-    const AVCodec* avCodec = avcodec_find_encoder(m_codecId);
+    const AVCodec* avCodec = avcodec_find_encoder(m_config.targetCodecId);
     if (!avCodec)
     {
-        NX_WARNING(this, "Could not find encoder for codec %1.", m_codecId);
+        NX_WARNING(this, "Could not find encoder for codec %1.", m_config.targetCodecId);
         return false;
     }
 
@@ -117,7 +114,8 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
 
     m_encoderCtx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-    m_encoderCtx->bit_rate = m_bitrate > 0 ? m_bitrate : getDefaultBitrate(m_encoderCtx);
+    m_bitrate = m_config.bitrate > 0 ? m_config.bitrate : getDefaultBitrate(m_encoderCtx);
+    m_encoderCtx->bit_rate = m_bitrate;
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
@@ -288,12 +286,6 @@ void QnFfmpegAudioTranscoder::setSampleRate(int value)
 {
     m_dstSampleRate = value;
 }
-
-void QnFfmpegAudioTranscoder::setFrameSize(int value)
-{
-    m_dstFrameSize = value;
-}
-
 void QnFfmpegAudioTranscoder::tuneContextsWithMedia(
     AVCodecContext* inCtx,
     AVCodecContext* outCtx,
@@ -306,7 +298,7 @@ void QnFfmpegAudioTranscoder::tuneContextsWithMedia(
         inCtx->ch_layout = media->context->getAvCodecParameters()->ch_layout;
 
     if (outCtx->frame_size == 0)
-        outCtx->frame_size = (m_dstFrameSize > 0 ? m_dstFrameSize : inCtx->frame_size);
+        outCtx->frame_size = (m_config.dstFrameSize > 0 ? m_config.dstFrameSize : inCtx->frame_size);
 }
 
 QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(const AVPacket &packet)
@@ -315,7 +307,7 @@ QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(cons
         m_context = CodecParametersConstPtr(new CodecParameters(m_encoderCtx));
 
     auto resultAudioData = new QnWritableCompressedAudioData(packet.size, m_context);
-    resultAudioData->compressionType = m_codecId;
+    resultAudioData->compressionType = m_config.targetCodecId;
 
     resultAudioData->timestamp = packet.pts;
     resultAudioData->m_data.write((const char*)packet.data, packet.size);

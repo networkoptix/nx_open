@@ -224,23 +224,21 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
                 m_resource->systemContext()->globalSettings()->defaultExportVideoCodec());
         }
 
-        m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
-            DecoderConfig(),
-            appContext()->currentSystemContext()->metrics().get(),
-            m_dstVideoCodec);
-
-        m_videoTranscoder->setPreciseStartPosition(m_preciseStartTimeUs);
-        m_videoTranscoder->setUseMultiThreadEncode(true);
-        m_videoTranscoder->setUseMultiThreadDecode(true);
-        m_videoTranscoder->setQuality(m_transcodeQuality);
-
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = m_dstVideoCodec;
+        config.useMultiThreadEncode = true;
+        config.quality = m_transcodeQuality;
+        config.startTimeUs = m_preciseStartTimeUs;
+        config.decoderConfig.mtDecodePolicy = MultiThreadDecodePolicy::enabled;
         if (m_transcoderFixedFrameRate)
-            m_videoTranscoder->setFixedFrameRate(m_transcoderFixedFrameRate);
-        m_videoTranscoder->setParams(
-            suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality));
+            config.fixedFrameRate = m_transcoderFixedFrameRate;
+        config.params = suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality);
+        config.quality = Qn::StreamQuality::highest;
 
+        m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
+            config,
+            appContext()->currentSystemContext()->metrics().get());
         m_videoTranscoder->setFilterChain(*m_transcodeFilters);
-        m_videoTranscoder->setQuality(Qn::StreamQuality::highest);
         if (!m_videoTranscoder->open(videoData))
         {
             NX_WARNING(this, "Failed to open video transcoder");
@@ -292,7 +290,9 @@ CodecParametersConstPtr ExportStorageStreamRecorder::getAudioCodecParameters(
         return sourceCodecParams;
     }
 
-    m_audioTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(dstAudioCodec);
+    QnFfmpegAudioTranscoder::Config config;
+    config.targetCodecId = dstAudioCodec;
+    m_audioTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(config);
     if (container == "mp4"
         && dstAudioCodec == AV_CODEC_ID_MP3
         && sourceCodecParams->getSampleRate() < kMinMp4Mp3SampleRate)

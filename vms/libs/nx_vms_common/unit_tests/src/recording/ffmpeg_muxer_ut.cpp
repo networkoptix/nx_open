@@ -138,7 +138,9 @@ TEST(FfmpegAudioDecoder, decodingG726)
     // Transcoder.
     {
         QnAbstractMediaDataPtr result;
-        QnFfmpegAudioTranscoder transcoder(AV_CODEC_ID_MP2);
+        QnFfmpegAudioTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_MP2;
+        QnFfmpegAudioTranscoder transcoder(config);
         ASSERT_TRUE(transcoder.open(audioData));
 #if 0 // TODO: Fix G726 transcoding.
         for (int i = 0; i < 10; ++i)

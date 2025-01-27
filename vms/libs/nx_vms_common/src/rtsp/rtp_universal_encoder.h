@@ -8,8 +8,7 @@
 
 #include "rtsp/abstract_rtsp_encoder.h"
 #include "srtp_encryptor.h"
-#include "transcoding/ffmpeg_transcoder.h"
-#include "transcoding/transcoder.h"
+#include <transcoding/ffmpeg_transcoder.h>
 
 class QnCommonModule;
 

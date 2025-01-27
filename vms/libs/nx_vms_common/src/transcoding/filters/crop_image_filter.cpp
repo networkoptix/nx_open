@@ -3,8 +3,7 @@
 #include "crop_image_filter.h"
 
 #include <nx/media/ffmpeg/frame_info.h>
-
-#include "../transcoder.h"
+#include <transcoding/transcoding_utils.h>
 
 extern "C" {
 #ifdef WIN32
@@ -53,7 +52,7 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(
         m_size = frame->size();
         QRect rect(cwiseMul(m_rectF, frame->size()).toRect());
         if (m_alignSize)
-            rect = QnCodecTranscoder::roundRect(rect);
+            rect = nx::transcoding::roundRect(rect);
         const auto frameRect = QRect(0, 0, frame->width, frame->height);
         m_rect = rect.intersected(frameRect);
         if (m_rect.isEmpty())
@@ -87,6 +86,6 @@ QSize QnCropImageFilter::updatedResolution(const QSize& srcSize)
         return srcSize;
 
     if (m_alignSize)
-        rect = QnCodecTranscoder::roundRect(rect);
+        rect = nx::transcoding::roundRect(rect);
     return rect.size();
 }

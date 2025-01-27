@@ -6,7 +6,7 @@ extern "C" {
 #include <libavutil/opt.h>
 }
 
-#include <QtCore/QDebug>
+#include <QtCore/QThread>
 
 #include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/ffmpeg/av_packet.h>
@@ -89,26 +89,27 @@ bool QnFfmpegTranscoder::setVideoCodec(
             break;
         case TM_FfmpegTranscode:
         {
-            m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
-                m_config.decoderConfig,
-                m_metrics,
-                codec);
-
-            m_vTranscoder->setOutputResolutionLimit(resolution);
-            m_vTranscoder->setBitrate(bitrate);
-            m_vTranscoder->setParams(params);
-            m_vTranscoder->setQuality(quality);
-            m_vTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
-            auto filterChain = QnImageFilterHelper::createFilterChain(m_transcodingSettings);
-            m_vTranscoder->setFilterChain(filterChain);
-
+            QnFfmpegVideoTranscoder::Config config;
+            config.keepOriginalTimestamps = m_config.keepOriginalTimestamps;
+            config.sourceResolution = m_sourceResolution;
+            config.outputResolutionLimit = resolution;
+            config.bitrate = bitrate;
+            config.params = params;
+            config.quality = quality;
+            config.useRealTimeOptimization = m_useRealTimeOptimization;
+            config.decoderConfig = m_config.decoderConfig;
+            config.targetCodecId = codec;
             if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG)
             {
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
-                    m_vTranscoder->setUseMultiThreadEncode(true);
+                    config.useMultiThreadEncode = true;
             }
+
+            m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(config, m_metrics);
+            auto filterChain = QnImageFilterHelper::createFilterChain(m_transcodingSettings);
+            m_vTranscoder->setFilterChain(filterChain);
             break;
         }
         default:
@@ -121,8 +122,6 @@ bool QnFfmpegTranscoder::setVideoCodec(
 void QnFfmpegTranscoder::setUseRealTimeOptimization(bool value)
 {
     m_useRealTimeOptimization = value;
-    if (m_vTranscoder)
-        m_vTranscoder->setUseRealTimeOptimization(value);
 }
 
 bool QnFfmpegTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
@@ -134,8 +133,12 @@ bool QnFfmpegTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
             m_aTranscoder.reset();
             break;
         case TM_FfmpegTranscode:
-            m_aTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(codec);
+        {
+            QnFfmpegAudioTranscoder::Config config;
+            config.targetCodecId = codec;
+            m_aTranscoder = std::make_unique<QnFfmpegAudioTranscoder>(config);
             break;
+        }
         default:
             m_lastErrMessage = "Unknown transcode method";
             return false;
@@ -266,13 +269,13 @@ int QnFfmpegTranscoder::finalize(nx::utils::ByteArray* const result)
     }
 
     if (!m_initialized)
-        return true;
+        return 0;
 
     finalizeInternal(result);
     if (result)
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
     m_initialized = false;
-    return true;
+    return 0;
 }
 
 void QnFfmpegTranscoder::flush(nx::utils::ByteArray* const result)
@@ -432,8 +435,6 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
         m_videoCodecParameters->codec_id = m_videoCodec;
         if (m_vTranscoder)
         {
-            m_vTranscoder->setKeepOriginalTimestamps(m_config.keepOriginalTimestamps);
-            m_vTranscoder->setSourceResolution(m_sourceResolution);
             if (!m_vTranscoder->open(video))
             {
                 NX_WARNING(this, "Can't open video transcoder for RTSP streaming");
@@ -532,7 +533,6 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
                         {
                             m_aTranscoder->setSampleRate(kMinMp4Mp3SampleRate);
                         }
-
                         break;
                     }
                 }
@@ -707,7 +707,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(
     else if (m_videoCodec == AV_CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
         return 0;
 
-    QnCodecTranscoder* transcoder = nullptr;
+    AbstractCodecTranscoder* transcoder = nullptr;
     if (dynamic_cast<const QnCompressedVideoData*>(media.get()))
         transcoder = m_vTranscoder.get();
     else
@@ -762,7 +762,7 @@ int QnFfmpegTranscoder::finalizeInternal(nx::utils::ByteArray* const /*result*/)
     for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
     {
         //finalizing codec transcoder
-        QnCodecTranscoder* transcoder = nullptr;
+        AbstractCodecTranscoder* transcoder = nullptr;
         if (streamIndex == 0)
             transcoder = m_vTranscoder.get();
         else if (streamIndex == 1)

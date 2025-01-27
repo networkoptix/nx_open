@@ -29,6 +29,8 @@ enum class Error
     noDecoder,
     failedToWriteHeader
 };
+QRect roundRect(const QRect& srcRect);
+QSize roundSize(const QSize& size);
 
 NX_VMS_COMMON_API AVCodecID findEncoderCodecId(const QString& codecName);
 

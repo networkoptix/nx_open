@@ -14,7 +14,7 @@
 #include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/filters/scale_image_filter.h>
 #include <transcoding/filters/tiled_image_filter.h>
-#include <transcoding/transcoder.h>
+#include <transcoding/transcoding_utils.h>
 
 namespace {
 
@@ -185,7 +185,7 @@ void FilterChain::prepareVideoArFilter(const QSize& srcFrameResolution)
         if (newSize != srcFrameResolution)
         {
             push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
-                QnCodecTranscoder::roundSize(newSize))));
+                nx::transcoding::roundSize(newSize))));
         }
     }
 }
@@ -206,7 +206,7 @@ void FilterChain::prepareImageArFilter(const QSize& fullImageResolution)
         if (newSize != fullImageResolution)
         {
             push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
-                QnCodecTranscoder::roundSize(newSize))));
+                nx::transcoding::roundSize(newSize))));
         }
     }
 }
@@ -303,7 +303,7 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
     for (auto prevResizeRatio = 1.0; prevResizeRatio > 0.07; )
     {
         // We can't be sure the way input image scale affects output, so adding a loop...
-        const QSize resultResolution = QnCodecTranscoder::roundSize(apply(srcFrameResolution));
+        const QSize resultResolution = nx::transcoding::roundSize(apply(srcFrameResolution));
         if (resultResolution.width() <= resolutionLimit.width() &&
             resultResolution.height() <= resolutionLimit.height())
         {
@@ -341,7 +341,7 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
         // Due to size ceiled, some more iteration can be needed.
         // TODO refactor this -> use floor instead ceil or select new one by subtracting of alignment
         // value?
-        const auto resizeToSize = QnCodecTranscoder::roundSize(
+        const auto resizeToSize = nx::transcoding::roundSize(
             QSize(srcFrameResolution.width() * resizeRatio,
                 srcFrameResolution.height() * resizeRatio));
 

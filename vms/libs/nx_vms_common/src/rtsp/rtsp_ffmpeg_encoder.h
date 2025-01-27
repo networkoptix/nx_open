@@ -32,7 +32,7 @@ public:
     void setServerVersion(const nx::utils::SoftwareVersion& serverVersion);
 
 private:
-    DecoderConfig m_config;
+    DecoderConfig m_decoderConfig;
     bool m_gotLivePacket;
     CodecParametersConstPtr m_contextSent;
     QMap<AVCodecID, CodecParametersConstPtr> m_generatedContexts;

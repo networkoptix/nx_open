@@ -6,11 +6,12 @@
 
 #include <stdint.h>
 
+#include <nx/media/audio_data_packet.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/utils/byte_array.h>
+#include <transcoding/abstract_codec_transcoder.h>
+#include <transcoding/ffmpeg_audio_resampler.h>
 
-#include "ffmpeg_audio_resampler.h"
-#include "transcoder.h"
 
 //< Minimal supported sample rate in mp4(with mp3), see ffmpeg(7.0.1) movenc.c:7579
 constexpr int kMinMp4Mp3SampleRate = 16000;
@@ -19,13 +20,22 @@ constexpr int kMinMp4Mp3SampleRate = 16000;
  * Transcodes audio packets from one format to another.
  * Can be used to change codec and/or sample rate.
  */
-class NX_VMS_COMMON_API QnFfmpegAudioTranscoder: public QnAudioTranscoder
+class NX_VMS_COMMON_API QnFfmpegAudioTranscoder: public AbstractCodecTranscoder
 {
+public:
+    struct Config
+    {
+        AVCodecID targetCodecId;
+        int bitrate = -1;
+        // Sets destination frame size.
+        int dstFrameSize;
+    };
+
 public:
     /**
      * \param codecId Id of destination codec.
      */
-    QnFfmpegAudioTranscoder(AVCodecID codecId);
+    QnFfmpegAudioTranscoder(const Config& config);
     ~QnFfmpegAudioTranscoder();
 
     /**
@@ -46,7 +56,7 @@ public:
      * that packet.
      * \return true on success, false in case of error
      */
-    virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
+    bool open(const QnConstCompressedAudioDataPtr& audio);
 
     /**
      * \brief Sets up decoder context and opens it.
@@ -70,15 +80,11 @@ public:
      * \param value Desired destination sample rate.
      */
     void setSampleRate(int value);
-
-    /**
-     * \Brief Sets destination frame size.
-     * \param value Desired destination frame size.
-     */
-    void setFrameSize(int value);
-
     bool sendPacket(const QnConstAbstractMediaDataPtr& media);
     bool receivePacket(QnAbstractMediaDataPtr* const result);
+
+    //!Get output bitrate bitrate (bps)
+    int getBitrate() const { return m_bitrate; }
 
 private:
     void tuneContextsWithMedia(
@@ -93,6 +99,7 @@ private:
     QnAbstractMediaDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
 
 private:
+    const Config& m_config;
     AVCodecContext* m_encoderCtx;
     AVCodecContext* m_decoderCtx;
     FfmpegAudioResampler m_resampler;
@@ -105,10 +112,9 @@ private:
     CodecParametersConstPtr m_context;
 
     int m_dstSampleRate;
-
     bool m_isOpened;
     int m_channelNumber = 0;
-    int m_dstFrameSize;
+    int m_bitrate;
 };
 
 using QnFfmpegAudioTranscoderPtr = std::unique_ptr<QnFfmpegAudioTranscoder>;

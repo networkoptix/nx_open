@@ -45,7 +45,9 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Round target resolution if there is no filters
         QSize sourceResolution = QSize(720, 570);
         auto provider = getProvider(sourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H264;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(720, 572));
     }
@@ -54,7 +56,9 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Use max resolution from resource.
         QSize maxResourceResolution = QSize(1920, 1080);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), maxResourceResolution);
     }
@@ -62,7 +66,9 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Stream 4k as is.
         QSize maxResourceResolution = QSize(4096, 2160);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H264;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), maxResourceResolution);
     }
@@ -70,7 +76,9 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Stream 4k downscaled due to codec restrictions.
         QSize maxResourceResolution = QSize(4096, 2160);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(2048, 1080));
     }
@@ -78,8 +86,10 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Force source resolution.
         QSize maxResourceResolution = QSize(4096, 2160);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
-        transcoder.setSourceResolution(QSize(640, 480));
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        config.sourceResolution = QSize(640, 480);
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }
@@ -87,8 +97,10 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Use target resolution.
         QSize maxResourceResolution = QSize(1920, 1080);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
-        transcoder.setOutputResolutionLimit(QSize(0, 720));
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        config.outputResolutionLimit = QSize(0, 720);
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(1280, 720));
     }
@@ -96,8 +108,10 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Use target resolution and codec resctriction.
         QSize maxResourceResolution = QSize(3820, 2160);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
-        transcoder.setOutputResolutionLimit(QSize(0, 1200));
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
+        config.outputResolutionLimit = QSize(0, 1200);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(2048, 1152));
     }
@@ -105,7 +119,9 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Rotation
         QSize maxResourceResolution = QSize(4096, 2160);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H264;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         nx::core::transcoding::Settings settings;
         settings.rotation = 90;
         nx::core::transcoding::FilterChain filters(settings, {}, nullptr);
@@ -117,7 +133,9 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Use rotation and codec resctriction after rotation.
         QSize maxResourceResolution = QSize(3820, 2160);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         nx::core::transcoding::Settings settings;
         settings.rotation = 90;
         nx::core::transcoding::FilterChain filters(settings, {}, nullptr);
@@ -129,8 +147,10 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Resolution rounding down.
         QSize maxResourceResolution = QSize(1280, 960);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
-        transcoder.setOutputResolutionLimit(QSize(641, 480));
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        config.outputResolutionLimit = QSize(641, 480);
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }
@@ -138,8 +158,10 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Resolution rounding up and down.
         QSize maxResourceResolution = QSize(1280, 960);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H263P);
-        transcoder.setOutputResolutionLimit(QSize(639, 481));
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H263P;
+        config.outputResolutionLimit = QSize(639, 481);
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }
@@ -147,8 +169,10 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
         // Target should not upscale
         QSize maxResourceResolution = QSize(640, 480);
         auto provider = getProvider(maxResourceResolution);
-        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
-        transcoder.setOutputResolutionLimit(QSize(1280, 960));
+        QnFfmpegVideoTranscoder::Config config;
+        config.targetCodecId = AV_CODEC_ID_H264;
+        config.outputResolutionLimit = QSize(1280, 960);
+        QnFfmpegVideoTranscoder transcoder(config, nullptr);
         ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
         ASSERT_EQ(transcoder.getOutputResolution(), QSize(640, 480));
     }
@@ -157,12 +181,13 @@ TEST(FfmpegVideoTranscoder, ResolutionTest)
 std::unique_ptr<QnFfmpegVideoTranscoder> createTranscoder(
     const QnConstCompressedVideoDataPtr& videoData)
 {
-    auto transcoder = std::make_unique<QnFfmpegVideoTranscoder>(
-        DecoderConfig(), nullptr, AV_CODEC_ID_H264);
-    transcoder->setUseMultiThreadEncode(true);
-    transcoder->setUseMultiThreadDecode(true);
+    QnFfmpegVideoTranscoder::Config config;
+    config.targetCodecId = AV_CODEC_ID_H264;
+    config.useMultiThreadEncode = true;
+    config.decoderConfig.mtDecodePolicy = MultiThreadDecodePolicy::enabled;
+    config.quality = Qn::StreamQuality::highest;
+    auto transcoder = std::make_unique<QnFfmpegVideoTranscoder>(config, nullptr);
 
-    transcoder->setQuality(Qn::StreamQuality::highest);
     if (!transcoder->open(videoData))
         return nullptr;
 
