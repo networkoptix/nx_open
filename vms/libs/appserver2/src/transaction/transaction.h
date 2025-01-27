@@ -979,7 +979,7 @@ APPLY(811, saveVmsRule, nx::vms::api::rules::Rule, \
     true, /*< isPersistent */ \
     false, /*< isSystem */ \
     false, /*< isRemoveOperation */ \
-    CreateHashByIdHelper(), \
+    CreateHashForVmsRuleHelper(), \
     VmsRulesNotificationManagerHelper(), \
     PowerUserAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \
@@ -991,7 +991,7 @@ APPLY(812, removeVmsRule, nx::vms::api::IdData, \
     true, /*< isPersistent */ \
     false, /*< isSystem */ \
     true, /*< isRemoveOperation */ \
-    CreateHashByIdHelper(), \
+    CreateHashForVmsRuleHelper(), \
     VmsRulesNotificationManagerHelper(), \
     PowerUserAccess(), /*< save permission checker */ \
     AllowForAllAccess(), /*< read permission checker */ \

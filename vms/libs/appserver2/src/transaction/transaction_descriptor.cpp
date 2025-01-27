@@ -563,6 +563,15 @@ struct CreateHashForResourceParamWithRefDataHelper
     }
 };
 
+// Separate hash is needed due to id duplication in old and new tables.
+struct CreateHashForVmsRuleHelper
+{
+    nx::Uuid operator()(const nx::vms::api::IdData& data) const
+    {
+        return QnAbstractTransaction::makeHash("vms_rule", data.id.toRfc4122());
+    }
+};
+
 void apiIdDataTriggerNotificationHelper(
     const QnTransaction<nx::vms::api::IdData>& tran,
     const NotificationParams& notificationParams)
