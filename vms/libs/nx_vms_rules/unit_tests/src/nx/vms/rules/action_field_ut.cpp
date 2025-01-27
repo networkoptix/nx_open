@@ -122,10 +122,10 @@ public:
                 return new TextLookupField(systemContext(), descriptor);
             });
         engine->registerEventField(
-            fieldMetatype<TextLookupField>(),
+            fieldMetatype<AnalyticsAttributesField>(),
             [this](const FieldDescriptor* descriptor)
             {
-                return new TextLookupField(systemContext(), descriptor);
+                return new AnalyticsAttributesField(descriptor);
             });
         engine->registerEvent(AnalyticsEvent::manifest(), [] { return new AnalyticsEvent(); });
 

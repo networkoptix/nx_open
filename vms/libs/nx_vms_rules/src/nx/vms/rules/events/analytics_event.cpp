@@ -7,6 +7,7 @@
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/vms/common/system_context.h>
 
+#include "../event_filter_fields/analytics_attributes_field.h"
 #include "../event_filter_fields/analytics_event_type_field.h"
 #include "../event_filter_fields/source_camera_field.h"
 #include "../event_filter_fields/text_lookup_field.h"
@@ -132,8 +133,10 @@ const ItemDescriptor& AnalyticsEvent::manifest()
                 Strings::andDescription(),
                 "An optional attribute used to differentiate objects within "
                 "the same class for event filtering."),
-            // TODO: #amalov Consider adding following fields in 6.1+.
-            // makeFieldDescriptor<AnalyticsObjectAttributesField>("attributes", tr("Attributes")),
+            makeFieldDescriptor<AnalyticsAttributesField>(
+                utils::kAttributesFieldName,
+                NX_DYNAMIC_TRANSLATABLE(tr("And attributes")),
+                "An optional text for matching event attributes."),
         },
         .resources = {
             {utils::kDeviceIdFieldName, {ResourceType::device, Qn::ViewContentPermission}},

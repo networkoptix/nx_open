@@ -104,7 +104,7 @@ void Initializer::registerFields() const
         {
             return new AnalyticsEventTypeField(this->m_context, descriptor);
         });
-    registerEventField<AnalyticsObjectAttributesField>();
+    registerEventField<AnalyticsAttributesField>();
     m_engine->registerEventField(
         fieldMetatype<AnalyticsObjectTypeField>(),
         [this](const FieldDescriptor* descriptor)

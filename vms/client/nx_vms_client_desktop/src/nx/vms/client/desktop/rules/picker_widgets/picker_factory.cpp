@@ -200,7 +200,7 @@ PickerWidget* createEventFieldWidget(
     if (fieldId == fieldMetatype<vms::rules::AnalyticsEngineField>())
         return createPickerImpl<AnalyticsEnginePicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<vms::rules::AnalyticsObjectAttributesField>())
+    if (fieldId == fieldMetatype<vms::rules::AnalyticsAttributesField>())
         return createPickerImpl<AnalyticsObjectAttributesPicker>(field, context, parent);
 
     if (fieldId == fieldMetatype<vms::rules::AnalyticsObjectTypeField>())

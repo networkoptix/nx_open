@@ -6,16 +6,16 @@
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API AnalyticsObjectAttributesField:
-    public SimpleTypeEventField<QString, AnalyticsObjectAttributesField>
+class NX_VMS_RULES_API AnalyticsAttributesField:
+    public SimpleTypeEventField<QString, AnalyticsAttributesField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "analyticsObjectAttributes")
+    Q_CLASSINFO("metatype", "analyticsAttributes")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 
 public:
-    using SimpleTypeEventField<QString, AnalyticsObjectAttributesField>::SimpleTypeEventField;
+    using SimpleTypeEventField<QString, AnalyticsAttributesField>::SimpleTypeEventField;
 
     virtual bool match(const QVariant& eventValue) const override;
 

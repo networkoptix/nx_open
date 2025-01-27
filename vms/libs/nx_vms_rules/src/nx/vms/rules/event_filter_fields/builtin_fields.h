@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "analytics_attributes_field.h"
 #include "analytics_engine_field.h"
 #include "analytics_event_level_field.h"
 #include "analytics_event_type_field.h"
-#include "analytics_object_attributes_field.h"
 #include "analytics_object_type_field.h"
 #include "customizable_flag_field.h"
 #include "customizable_icon_field.h"
