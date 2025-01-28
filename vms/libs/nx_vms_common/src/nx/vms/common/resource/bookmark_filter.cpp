@@ -10,8 +10,10 @@ BookmarkTextFilter::BookmarkTextFilter(const QString& text)
 {
     for (const QString& word: text.split(QRegularExpression("[\\s]"), Qt::SkipEmptyParts))
     {
-        m_words.emplace_back(word, QRegularExpression(QString("\\b%1").arg(word),
-            QRegularExpression::CaseInsensitiveOption));
+        constexpr auto regexFlags = QRegularExpression::CaseInsensitiveOption
+            | QRegularExpression::UseUnicodePropertiesOption;
+
+        m_words.emplace_back(word, QRegularExpression(QString("\\b%1").arg(word), regexFlags));
     }
 };
 
