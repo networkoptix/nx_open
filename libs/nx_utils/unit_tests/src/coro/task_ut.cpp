@@ -7,6 +7,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/coro/when_all.h>
 
@@ -782,6 +783,79 @@ TEST_F(TaskTest, ResumeInSuspension)
         "scope end test",
         // Awaiter is destroyed yet it's await_suspend() continues execution.
         "awaiter after resume finished"
+    };
+    ASSERT_EQ(kFull, m_messages);
+}
+
+TEST_F(TaskTest, AwaitExecutor)
+{
+    static auto threadName =
+        []()
+        {
+            return QThread::currentThread()->objectName().toStdString();
+        };
+
+    QThread thread1;
+    thread1.setObjectName("thread1");
+    thread1.start();
+
+    QThread thread2;
+    thread2.setObjectName("thread2");
+    thread2.start();
+
+    QPointer<QObject> object = new QObject();
+    object->moveToThread(&thread1);
+
+    QMetaObject::invokeMethod(
+        object,
+        [&]() -> FireAndForget
+        {
+            nx::utils::ScopeGuard guard =
+                [&]()
+                {
+                    m_messages.push_back("destroy on " + threadName());
+                    thread1.quit();
+                    thread2.quit();
+                };
+
+            // Copy captures into coroutine stack because 'test' captures are destroyed on suspend.
+            auto t2 = &thread2;
+            auto object1 = object;
+            auto& messages = m_messages;
+
+            messages.push_back("inside " + threadName());
+
+            co_await nx::utils::AsyncHandlerExecutor();
+            messages.push_back("still in " + threadName());
+
+            co_await nx::utils::AsyncHandlerExecutor(t2);
+            messages.push_back("switched to " + threadName());
+
+            co_await nx::utils::AsyncHandlerExecutor(t2);
+            messages.push_back("remain on " + threadName());
+
+            auto executor = nx::utils::AsyncHandlerExecutor(object1);
+
+            co_await executor;
+            messages.push_back("switched to " + threadName());
+
+            delete object1;
+            co_await executor; //< Cancels the coroutine.
+
+            messages.push_back("unreachable");
+        },
+        Qt::QueuedConnection);
+
+    thread1.wait();
+    thread2.wait();
+
+    static const Messages kFull{
+        "inside thread1",
+        "still in thread1",
+        "switched to thread2",
+        "remain on thread2",
+        "switched to thread1",
+        "destroy on thread1",
     };
     ASSERT_EQ(kFull, m_messages);
 }

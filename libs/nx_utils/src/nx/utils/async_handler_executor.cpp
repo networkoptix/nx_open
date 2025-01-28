@@ -2,6 +2,10 @@
 
 #include "async_handler_executor.h"
 
+#include <nx/utils/coro/task.h>
+#include <nx/utils/coro/task_utils.h>
+#include <nx/utils/scope_guard.h>
+
 #include "async_handler_executor_detail.h"
 
 namespace nx::utils {
@@ -36,7 +40,8 @@ public:
             [](auto arg)
             {
                 (*arg.handler)();
-            });
+            },
+            Qt::QueuedConnection); //< Avoid resuming in await_suspend when on the same thread.
     }
 };
 
@@ -50,7 +55,8 @@ public:
             [](auto arg)
             {
                 (*arg.handler)();
-            });
+            },
+            Qt::QueuedConnection); //< Avoid resuming in await_suspend when on the same thread.
 
         moveToThread(thread);
     }
@@ -76,6 +82,39 @@ AsyncHandlerExecutor::AsyncHandlerExecutor(QThread* thread):
 void AsyncHandlerExecutor::submitImpl(MoveOnlyFunc<void()>&& handler) const
 {
     m_impl->submit(std::move(handler));
+}
+
+bool AsyncHandlerExecutor::Awaiter::await_ready() const noexcept
+{
+    return dynamic_cast<ImmediateImpl*>(m_impl.get());
+}
+
+void AsyncHandlerExecutor::Awaiter::await_suspend(std::coroutine_handle<> h)
+{
+    auto guard = nx::utils::makeScopeGuard(
+        [h, this]() mutable
+        {
+            m_impl.reset();
+            h.resume();
+        });
+
+    m_impl->submit(
+        [h = std::move(h), guard = std::move(guard)]() mutable
+        {
+            if (nx::coro::isCancelRequested(h))
+            {
+                guard.fire();
+                return;
+            }
+            guard.disarm();
+            h.resume();
+        });
+}
+
+void AsyncHandlerExecutor::Awaiter::await_resume() const
+{
+    if (!m_impl)
+        throw nx::coro::TaskCancelException();
 }
 
 } // namespace nx::utils

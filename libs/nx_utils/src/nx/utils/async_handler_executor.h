@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <coroutine>
 #include <memory>
 #include <tuple>
 #include <utility>
@@ -131,6 +132,18 @@ public:
                 submit(std::move(handler), std::forward<decltype(args)>(args)...);
             };
     }
+
+    struct NX_UTILS_API Awaiter
+    {
+        Awaiter(std::shared_ptr<Impl> impl): m_impl(std::move(impl)) {}
+        bool await_ready() const noexcept;
+        void await_suspend(std::coroutine_handle<> h);
+        void await_resume() const;
+    private:
+        std::shared_ptr<Impl> m_impl;
+    };
+
+    auto operator co_await() const noexcept { return Awaiter(this->m_impl); }
 
 private:
     void submitImpl(MoveOnlyFunc<void()>&& handler) const;
