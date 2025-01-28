@@ -25,10 +25,10 @@ class NX_VMS_COMMON_API QnFfmpegAudioTranscoder: public AbstractCodecTranscoder
 public:
     struct Config
     {
-        AVCodecID targetCodecId;
+        AVCodecID targetCodecId = AV_CODEC_ID_NONE;
         int bitrate = -1;
         // Sets destination frame size.
-        int dstFrameSize;
+        int dstFrameSize = 0;
     };
 
 public:
@@ -100,8 +100,8 @@ private:
 
 private:
     const Config& m_config;
-    AVCodecContext* m_encoderCtx;
-    AVCodecContext* m_decoderCtx;
+    AVCodecContext* m_encoderCtx = nullptr;
+    AVCodecContext* m_decoderCtx = nullptr;
     FfmpegAudioResampler m_resampler;
     bool m_resamplerInitialized = false;
 
@@ -111,10 +111,10 @@ private:
      */
     CodecParametersConstPtr m_context;
 
-    int m_dstSampleRate;
-    bool m_isOpened;
+    int m_dstSampleRate = 0;
+    bool m_isOpened = false;
     int m_channelNumber = 0;
-    int m_bitrate;
+    int m_bitrate = -1;
 };
 
 using QnFfmpegAudioTranscoderPtr = std::unique_ptr<QnFfmpegAudioTranscoder>;

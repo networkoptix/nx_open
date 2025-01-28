@@ -322,7 +322,6 @@ bool QnUniversalRtpEncoder::open(
     }
 
     m_transcoder.setPacketizedMode(true);
-    m_transcoder.setUseRealTimeOptimization(m_config.useRealTimeOptimization);
     bool status = false;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {

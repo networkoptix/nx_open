@@ -68,10 +68,7 @@ int getDefaultBitrate(AVCodecContext* context)
 } // namespace
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(const Config& config):
-    m_config(config),
-    m_encoderCtx(nullptr),
-    m_decoderCtx(nullptr),
-    m_isOpened(false)
+    m_config(config)
 {
 }
 
@@ -286,6 +283,7 @@ void QnFfmpegAudioTranscoder::setSampleRate(int value)
 {
     m_dstSampleRate = value;
 }
+
 void QnFfmpegAudioTranscoder::tuneContextsWithMedia(
     AVCodecContext* inCtx,
     AVCodecContext* outCtx,

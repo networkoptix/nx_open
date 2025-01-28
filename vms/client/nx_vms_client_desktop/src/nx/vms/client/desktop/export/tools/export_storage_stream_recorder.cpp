@@ -233,7 +233,6 @@ CodecParametersPtr ExportStorageStreamRecorder::getVideoCodecParameters(
         if (m_transcoderFixedFrameRate)
             config.fixedFrameRate = m_transcoderFixedFrameRate;
         config.params = suggestMediaStreamParams(m_dstVideoCodec, m_transcodeQuality);
-        config.quality = Qn::StreamQuality::highest;
 
         m_videoTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(
             config,

@@ -23,6 +23,18 @@ constexpr int kHeightAlign = 4;
 
 } // namespace
 
+bool useMultiThreadEncode(AVCodecID codec, QSize resolution)
+{
+    if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG)
+    {
+        // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
+        bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
+        if (isAtom || resolution.height() >= 1080)
+            return true;
+    }
+    return false;
+}
+
 QRect roundRect(const QRect& srcRect)
 {
     int left = qPower2Floor((unsigned) srcRect.left(), CL_MEDIA_ALIGNMENT);

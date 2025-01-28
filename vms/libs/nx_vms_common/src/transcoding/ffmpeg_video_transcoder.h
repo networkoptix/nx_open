@@ -25,7 +25,7 @@ public:
     struct Config
     {
         DecoderConfig decoderConfig;
-        AVCodecID targetCodecId;
+        AVCodecID targetCodecId = AV_CODEC_ID_NONE;
         bool useMultiThreadEncode = false;
         // Do not rewrite a "strange" timestamps, e.g. in case with seek.
         bool keepOriginalTimestamps = true;
@@ -79,15 +79,14 @@ private:
     QSize m_sourceResolution;
     int m_bitrate = -1;
 
-    AVCodecContext* m_encoderCtx;
+    AVCodecContext* m_encoderCtx = nullptr;
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
-    bool m_useMultiThreadEncode;
     QElapsedTimer m_encodeTimer;
-    qint64 m_lastEncodedTime;
-    qint64 m_averageCodingTimePerFrame;
-    qint64 m_averageVideoTimePerFrame;
-    qint64 m_droppedFrames;
+    qint64 m_lastEncodedTime = AV_NOPTS_VALUE;
+    qint64 m_averageCodingTimePerFrame = 0;
+    qint64 m_averageVideoTimePerFrame = 0;
+    qint64 m_droppedFrames = 0;
     CodecParametersConstPtr m_ctxPtr;
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;

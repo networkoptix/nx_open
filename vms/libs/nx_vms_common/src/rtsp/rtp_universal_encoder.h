@@ -21,7 +21,6 @@ public:
 
         bool absoluteRtcpTimestamps = false;
         bool addOnvifHeaderExtension = false;
-        bool useRealTimeOptimization = false;
         bool useMultipleSdpPayloadTypes = false;
         bool useRtcpNack = false;
         bool webRtcMode = false;

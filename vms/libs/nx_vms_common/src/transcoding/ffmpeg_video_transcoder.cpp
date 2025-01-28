@@ -25,7 +25,6 @@
 #include "filters/crop_image_filter.h"
 
 namespace {
-const static int kMaxEncodedFrameSize = 1024 * 1024 * 5;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 static const int kMaxDroppedFrames = 5;
@@ -70,11 +69,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
     const Config& config, nx::metric::Storage* metrics)
     :
     m_config(config),
-    m_encoderCtx(0),
-    m_lastEncodedTime(AV_NOPTS_VALUE),
-    m_averageCodingTimePerFrame(0),
-    m_averageVideoTimePerFrame(0),
-    m_droppedFrames(0),
     m_metrics(metrics)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -180,7 +174,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = m_config.fixedFrameRate ? m_config.fixedFrameRate : 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
-    if (m_useMultiThreadEncode && m_config.targetCodecId != AV_CODEC_ID_MJPEG)
+    if (m_config.useMultiThreadEncode && m_config.targetCodecId != AV_CODEC_ID_MJPEG)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     nx::media::ffmpeg::AvOptions options;

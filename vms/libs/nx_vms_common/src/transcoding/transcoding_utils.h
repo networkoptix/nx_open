@@ -29,6 +29,8 @@ enum class Error
     noDecoder,
     failedToWriteHeader
 };
+
+bool useMultiThreadEncode(AVCodecID codec, QSize resolution);
 QRect roundRect(const QRect& srcRect);
 QSize roundSize(const QSize& size);
 

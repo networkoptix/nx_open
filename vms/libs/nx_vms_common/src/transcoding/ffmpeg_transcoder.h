@@ -16,10 +16,9 @@ extern "C" {
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/move_only_func.h>
 #include <transcoding/transcoding_utils.h>
+#include <transcoding/media_transcoder.h>
 
 class QnLicensePool;
-class QnFfmpegVideoTranscoder;
-class QnFfmpegAudioTranscoder;
 
 class NX_VMS_COMMON_API QnFfmpegTranscoder
 {
@@ -31,8 +30,7 @@ public:
     {
         bool computeSignature = false;
         bool useAbsoluteTimestamp = false;
-        bool keepOriginalTimestamps = false;
-        DecoderConfig decoderConfig;
+        MediaTranscoder::Config mediaTranscoderConfig;
     };
 
 public:
@@ -80,8 +78,6 @@ public:
 
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
     void setSourceResolution(const QSize& resolution);
-    void setUseRealTimeOptimization(bool value);
-
     using BeforeOpenCallback = nx::utils::MoveOnlyFunc<void(
         QnFfmpegTranscoder* transcoder,
         const QnConstCompressedVideoDataPtr & video,
@@ -89,7 +85,7 @@ public:
 
     void setBeforeOpenCallback(BeforeOpenCallback callback);
 
-        /*
+    /*
     * Set ffmpeg video codec and params
     * @return Returns OperationResult::Success if no error or error code otherwise
     * @param codec codec to transcode
@@ -141,47 +137,36 @@ public:
     const QVector<int>& getPacketsSize();
 
 private:
-    int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media);
-    int finalizeInternal(nx::utils::ByteArray* const result);
-
-private:
+    bool transcodePacketInternal(const QnConstAbstractMediaDataPtr& media);
+    bool finalizeInternal(nx::utils::ByteArray* const result);
     bool isCodecSupported(AVCodecID id) const;
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
-    int muxPacket(const QnConstAbstractMediaDataPtr& packet);
-    AVPixelFormat getPixelFormatJpeg(const QnConstCompressedVideoDataPtr& video);
+    bool muxPacket(const QnConstAbstractMediaDataPtr& packet);
     bool handleSeek(const QnConstAbstractMediaDataPtr& packet);
     int openAndTranscodeDelayedData();
 
 private:
     Config m_config;
-    std::unique_ptr<QnFfmpegVideoTranscoder> m_vTranscoder;
-    std::unique_ptr<QnFfmpegAudioTranscoder> m_aTranscoder;
+    MediaTranscoder m_mediaTranscoder;
     AVCodecID m_videoCodec = AV_CODEC_ID_NONE;
     AVCodecID m_audioCodec = AV_CODEC_ID_NONE;
     nx::utils::ByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
 
-private:
     bool m_initialized = false;
     //! Make sure to correctly fill these member variables in overridden open() function.
     bool m_initializedAudio  =false;    // Incoming audio packets will be ignored.
     bool m_initializedVideo = false;    // Incoming video packets will be ignored.
-    nx::metric::Storage* m_metrics = nullptr;
 
-private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter = 0;
     bool m_packetizedMode = false;
-    QnLegacyTranscodingSettings m_transcodingSettings;
-    bool m_useRealTimeOptimization = false;
     BeforeOpenCallback m_beforeOpenCallback;
 
-private:
-    QSize m_sourceResolution;
     MediaSigner m_mediaSigner;
     AVCodecParameters* m_videoCodecParameters = nullptr;
     AVCodecParameters* m_audioCodecParameters = nullptr;
