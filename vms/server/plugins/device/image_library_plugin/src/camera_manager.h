@@ -7,7 +7,7 @@
 #include <plugins/plugin_tools.h>
 
 #include "dir_contents_manager.h"
-#include "plugin.h"
+#include "image_library_plugin.h"
 
 class MediaEncoder;
 

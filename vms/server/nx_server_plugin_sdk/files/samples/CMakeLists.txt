@@ -23,6 +23,7 @@ if(QT_DIR AND QT_HOST_PATH)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -85,9 +86,9 @@ file(GLOB_RECURSE SDK_SRC CONFIGURE_DEPENDS ${SDK_SRC_DIR}/*)
 
 add_library(nx_sdk STATIC ${SDK_SRC})
 target_include_directories(nx_sdk PUBLIC ${SDK_SRC_DIR})
-target_link_libraries(nx_sdk PRIVATE nx_kit)
+target_link_libraries(nx_sdk PUBLIC nx_kit)
 
-target_compile_definitions(nx_sdk PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}) #< for nxLibContext()
+target_compile_definitions(nx_sdk PUBLIC NX_PLUGIN_API=${API_EXPORT_MACRO}) #< for nxLibContext()
 
 #--------------------------------------------------------------------------------------------------
 # Add nx_sdk unit tests.
@@ -101,3 +102,4 @@ add_subdirectory(analytics samples/analytics)
 add_subdirectory(cloud_storage samples/cloud_storage)
 add_subdirectory(device samples/device)
 add_subdirectory(storage samples/storage)
+add_subdirectory(combined samples/combined)

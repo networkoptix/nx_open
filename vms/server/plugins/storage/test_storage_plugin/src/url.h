@@ -14,7 +14,7 @@ namespace utils {
 
 using ParamsMap = std::unordered_map<std::string, std::string>;
 
-class NX_PLUGIN_API Url
+class Url
 {
     enum class ParseState
     {
