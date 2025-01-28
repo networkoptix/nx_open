@@ -240,7 +240,6 @@ Control
                     {
                         text: highlightMatchingText(model[textRole])
                         checked: model[checkedRole]
-                        onCheckedChanged: model[checkedRole] = checked
                         iconSource: model[decorationRole] ?? ""
                         current: listView.activeFocus && ListView.isCurrentItem
 
@@ -254,6 +253,8 @@ Control
                         {
                             if (closePopupWhenClicked)
                                 popup.close()
+
+                            model[checkedRole] = checked
                         }
 
                         onYChanged:

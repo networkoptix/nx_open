@@ -15,9 +15,15 @@ ComboBox
     colorizeIcons: false
     textRole: "display"
     valueRole: "localeCode"
-    currentIndex: model.localeIndex(control.value)
 
     onCurrentValueChanged: control.value = currentValue ?? Branding.defaultLocale()
+
+    onValueChanged:
+    {
+        const localeIndex = model.localeIndex(value)
+        if (currentIndex !== localeIndex)
+            currentIndex = localeIndex
+    }
 
     view: ListView
     {

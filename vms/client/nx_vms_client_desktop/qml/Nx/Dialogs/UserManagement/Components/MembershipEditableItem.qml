@@ -46,7 +46,7 @@ Rectangle
         enabled: control.enabledProperty ? model[control.enabledProperty] : true
         checked: model[control.editableProperty]
 
-        onCheckedChanged: model[control.editableProperty] = checked
+        onClicked: model[control.editableProperty] = checked
 
         middleItem: ColoredImage
         {
