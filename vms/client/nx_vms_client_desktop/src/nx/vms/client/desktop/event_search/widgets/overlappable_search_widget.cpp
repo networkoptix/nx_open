@@ -5,7 +5,6 @@
 #include <QtWidgets/QStackedLayout>
 
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/event_search/widgets/abstract_search_widget.h>
 
 #include "abstract_search_widget.h"
@@ -38,16 +37,8 @@ OverlappableSearchWidget::OverlappableSearchWidget(
     d->stackedLayout->addWidget(d->searchWidget);
     d->stackedLayout->addWidget(PlaceholderWidget::create(
         qnSkin->icon(kFutureIcon).pixmap(64, 64),
-        AbstractSearchWidget::makePlaceholderText(
-            tr("Not supported"), tr("This tab will be available in future versions")),
-        tr("Learn more"),
-        []
-        {
-            CloudLayoutsIntroDialog introDialog(CloudLayoutsIntroDialog::Mode::info);
-            introDialog.exec();
-        },
-        this
-    ));
+        AbstractSearchWidget::makePlaceholderText(tr("Not supported"), /*description*/ {}),
+        this));
 }
 
 OverlappableSearchWidget::~OverlappableSearchWidget() = default;

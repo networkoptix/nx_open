@@ -30,7 +30,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/cross_system/cross_system_layout_resource.h>
-#include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -1239,9 +1238,6 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     const bool hasCrossSystemResources = std::any_of(
         openable.cbegin(), openable.cend(),
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
-
-    if (hasCrossSystemResources && !CloudLayoutsIntroDialog::confirm())
-        return;
 
     auto layout = hasCrossSystemResources
         ? LayoutResourcePtr(new CrossSystemLayoutResource())

@@ -47,7 +47,6 @@ void ShowOnceSettings::migrate()
             return oldSettings->value("show_once/" + name).toBool();
         };
 
-    cloudLayoutsPromo = readValue("CloudLayoutsPromo");
     cloudPromo = readValue("CloudPromoNotification");
     digestDisableNotification = readValue("DigestDisableNotification");
     sharedLayoutEdit = readValue("SharedLayoutEdit");

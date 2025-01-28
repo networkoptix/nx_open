@@ -15,12 +15,6 @@ public:
     void reset();
 
     /**
-     * Promo dialog for Cloud Layouts. Displayed on the first Cloud Layout creation (drop Cross-
-     * System Camera on the scene and save the Layout).
-     */
-    Property<bool> cloudLayoutsPromo{this, "cloudLayoutsPromo"};
-
-    /**
      * Cloud Promo informer. Displayed for Administrators if the System is not connected to the
      * Cloud.
      */

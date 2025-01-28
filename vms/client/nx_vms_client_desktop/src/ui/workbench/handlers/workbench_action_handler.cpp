@@ -76,7 +76,6 @@
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/cross_system/cloud_layouts_manager.h>
-#include <nx/vms/client/desktop/cross_system/dialogs/cloud_layouts_intro_dialog.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -681,9 +680,6 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
         resources.cbegin(), resources.cend(),
         [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::cross_system); });
 
-    if (hasCrossSystemResources && !CloudLayoutsIntroDialog::confirm())
-        return;
-
     MimeData data;
     data.setResources(resources);
 
@@ -951,30 +947,18 @@ void ActionHandler::at_openInLayoutAction_triggered()
     {
         NX_ASSERT(parameters.widgets().empty());
 
-        auto convertLayout =
-            [this, layout, parameters]()
-            {
-                // Convert common layout to cloud one.
-                auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
-                // Replace opened layout with the cloud one.
-                auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
-                if (!targetLayout)
-                    targetLayout = workbench()->addLayout(cloudLayout);
+        // Convert common layout to cloud one.
+        auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+        // Replace opened layout with the cloud one.
+        auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
+        if (!targetLayout)
+            targetLayout = workbench()->addLayout(cloudLayout);
 
-                if (NX_ASSERT(targetLayout))
-                    workbench()->setCurrentLayout(targetLayout);
+        if (NX_ASSERT(targetLayout))
+            workbench()->setCurrentLayout(targetLayout);
 
-                menu()->trigger(menu::OpenInCurrentLayoutAction, parameters);
-            };
+        menu()->trigger(menu::OpenInCurrentLayoutAction, parameters);
 
-        // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245).
-        executeDelayedParented(
-            [convertLayout]()
-            {
-                if (CloudLayoutsIntroDialog::confirm())
-                    convertLayout();
-            },
-            this);
         return;
     }
 
