@@ -111,11 +111,11 @@ void LogsManagementTableDelegate::paintLogLevelColumn(
 
     QBrush brush;
     if (option.text == "Error" || option.text == "Warning")
-        brush = {core::colorTheme()->color("attention.yellow"), Qt::SolidPattern};
+        brush = {core::colorTheme()->color("yellow_core"), Qt::SolidPattern};
     else if (option.text == "Info")
         brush = {core::colorTheme()->color("attention.blue"), Qt::SolidPattern};
     else if (option.text == "Debug" || option.text == "Verbose")
-        brush = {core::colorTheme()->color("attention.red"), Qt::SolidPattern};
+        brush = {core::colorTheme()->color("red_core"), Qt::SolidPattern};
     else
         return;
 
