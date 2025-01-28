@@ -292,7 +292,8 @@ void CameraHotspotItem::Private::openItem()
 void CameraHotspotItem::Private::openInNewTab()
 {
     auto parameters = menu::Parameters(hotspotResource());
-    parameters.setArguments(layoutPlaybackParameters());
+    if (!q->navigator()->syncEnabled())
+        parameters.setArguments(layoutPlaybackParameters());
     q->menu()->trigger(menu::OpenInNewTabAction, parameters);
 }
 
