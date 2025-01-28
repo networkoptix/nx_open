@@ -202,11 +202,11 @@ struct CloudCrossSystemContext::Private
     }
 
     CloudCrossSystemContext* const q;
-    std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
     SystemDescriptionPtr const systemDescription;
     Status status = Status::uninitialized;
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
-    std::unique_ptr<SystemContext> systemContext;
+    std::unique_ptr<SystemContext> systemContext;  //< Should be destroyed after dataLoader.
+    std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
     core::CloudCrossSystemAccessController* cloudCrossSystemAccessController = nullptr;
     core::UserResourcePtr user;
     CrossSystemServerResourcePtr server;
