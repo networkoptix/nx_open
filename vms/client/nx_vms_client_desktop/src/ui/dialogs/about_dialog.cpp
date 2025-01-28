@@ -270,6 +270,7 @@ void QnAboutDialog::initSaasSupportInfo()
     static constexpr auto kContentsColumn = 1;
     static constexpr auto kSpacerHeight = 2;
     static constexpr auto kCaptionFontWeight = QFont::Medium;
+    static constexpr auto kNormalFontWeight = QFont::Normal;
 
     const auto addLabelAtPosition =
         [this](const QString& text, int row, int column) -> QLabel*
@@ -288,14 +289,24 @@ void QnAboutDialog::initSaasSupportInfo()
         };
 
     const auto appendLabelRow =
-        [this, &addLabelAtPosition](const QString& text, QFont::Weight fontWeight = QFont::Normal)
+        [this, &addLabelAtPosition]
+            (const QString& text, QFont::Weight fontWeight = QFont::Normal, bool allowHtml = false)
         {
             auto layout = ui->supportLayout;
             auto label = addLabelAtPosition(text, layout->rowCount(), kContentsColumn);
             auto font = label->font();
             font.setWeight(fontWeight);
             label->setFont(font);
+            label->setTextFormat(allowHtml ? Qt::RichText : Qt::PlainText);
+            label->setOpenExternalLinks(allowHtml);
+
             return label;
+        };
+
+    const auto addHtmlLabelRow =
+        [&appendLabelRow](const QString& text)
+        {
+            return appendLabelRow(text, kNormalFontWeight, /*allowHtml*/ true);
         };
 
     const auto addSpacer =
@@ -315,14 +326,12 @@ void QnAboutDialog::initSaasSupportInfo()
 
     addSpacer();
     appendLabelRow(channelPartnerName, kCaptionFontWeight);
+
     addLabelAtPosition(tr("Partner information"), ui->supportLayout->rowCount() - 1, /*column*/ 0);
 
     // Web links.
     for (const auto& siteInfo: channelPartnerSupportData.sites)
-    {
-        auto webAddressLabel = appendLabelRow(html::link(QUrl(siteInfo.value)));
-        webAddressLabel->setOpenExternalLinks(true);
-    }
+        addHtmlLabelRow(html::link(QUrl(siteInfo.value)));
 
     // Phone numbers.
     if (!channelPartnerSupportData.phones.empty())
@@ -334,10 +343,13 @@ void QnAboutDialog::initSaasSupportInfo()
     {
         auto phoneText = html::phoneNumberLink(phoneInfo.value);
         if (!phoneInfo.description.isEmpty())
-            phoneText = nx::format("%1 - %2").args(phoneText, phoneInfo.description);
+        {
+            phoneText = nx::format("%1 - %2").args(
+                phoneText,
+                html::toPlainText(phoneInfo.description));
+        }
 
-        auto phoneLabel = appendLabelRow(phoneText);
-        phoneLabel->setOpenExternalLinks(true);
+        addHtmlLabelRow(phoneText);
     }
 
     // Email addresses.
@@ -346,17 +358,16 @@ void QnAboutDialog::initSaasSupportInfo()
         addSpacer();
         appendLabelRow(tr("Emails"), kCaptionFontWeight);
     }
+
     for (const auto& emailInfo: channelPartnerSupportData.emails)
-    {
-        auto emailLabel = appendLabelRow(html::mailtoLink(emailInfo.value));
-        emailLabel->setOpenExternalLinks(true);
-    }
+        addHtmlLabelRow(html::mailtoLink(emailInfo.value));
 
     // Custom data.
     for (const auto& customInfo: channelPartnerSupportData.custom)
     {
         addSpacer();
         appendLabelRow(customInfo.label, kCaptionFontWeight);
-        appendLabelRow(customInfo.value)->setWordWrap(true);
+        auto customValueLabel = appendLabelRow(customInfo.value);
+        customValueLabel->setWordWrap(true);
     }
 }
