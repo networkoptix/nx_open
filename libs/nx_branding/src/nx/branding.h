@@ -22,6 +22,9 @@ NX_BRANDING_API QString brandColor();
 /** Background color used to generate the customization color scheme. */
 NX_BRANDING_API QString brandBgColor();
 
+/** Contrast color that is used for the text of highlighted menu items and accented buttons. */
+NX_BRANDING_API QString brandContrastColor();
+
 /** Company name. */
 NX_BRANDING_API QString company();
 

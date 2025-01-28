@@ -239,40 +239,68 @@ QJsonObject generatedColorScheme(const ColorTree& basicColors, bool invertColors
         result.insert(QString("light%1").arg(i + 1), light.name());
     }
 
-    auto relativeLuminance =
-        [](const QColor& color) -> double
+    auto contrast =
+        [&]() -> QColor
         {
-            auto map =
-                [](double v) -> double
-                {
-                    return v <= 0.04045
-                        ? v / 12.92
-                        : pow((v + 0.055) / 1.055, 2.4);
-                };
+            auto themeName = colorTheme;
 
-            return 0.2126 * map(color.redF())
-                + 0.7152 * map(color.greenF())
-                + 0.0722 * map(color.blueF());
-        };
+            if (colorTheme == "cms_colors")
+            {
+                if (auto color = parseColor(nx::branding::brandContrastColor()); color.isValid())
+                    return color;
 
-    auto contrastRatio =
-        [&](const QColor& a, const QColor& b)
-        {
-            auto l1 = relativeLuminance(a);
-            auto l2 = relativeLuminance(b);
-            if (l1 < l2)
-                std::swap(l1, l2);
+                NX_INFO(NX_SCOPE_TAG,
+                    "Can't parse Contrast Color, it will be chosen automatically.");
 
-            return (l1 + 0.05) / (l2 + 0.05);
-        };
+                auto relativeLuminance =
+                    [](const QColor& color) -> double
+                    {
+                        auto map =
+                            [](double v) -> double
+                            {
+                                return v <= 0.04045
+                                    ? v / 12.92
+                                    : pow((v + 0.055) / 1.055, 2.4);
+                            };
 
-    auto dark1 = QColor::fromRgb(0, 0, 0);
-    auto light1 = QColor::fromRgb(255, 255, 255);
-    result.insert(
-        "brand_contrast",
-        contrastRatio(brand_core, dark1) > contrastRatio(brand_core, light1)
-            ? dark1.name()
-            : light1.name());
+                        return 0.2126 * map(color.redF())
+                            + 0.7152 * map(color.greenF())
+                            + 0.0722 * map(color.blueF());
+                    };
+
+                auto contrastRatio =
+                    [&](const QColor& a, const QColor& b)
+                    {
+                        auto l1 = relativeLuminance(a);
+                        auto l2 = relativeLuminance(b);
+                        if (l1 < l2)
+                            std::swap(l1, l2);
+
+                        return (l1 + 0.05) / (l2 + 0.05);
+                    };
+
+                // Currently, dark1 and light1 colors are always the same.
+                auto dark1 = QColor::fromRgb(0, 0, 0);
+                auto light1 = QColor::fromRgb(255, 255, 255);
+
+                return contrastRatio(brand_core, dark1) > contrastRatio(brand_core, light1)
+                    ? dark1.name()
+                    : light1.name();
+            }
+
+            if (colorTheme == "cms_name")
+                themeName = nx::branding::colorTheme();
+
+            if (themeName == "dark_green")
+                return "#0d1012"; //< dark4 in 'dark_green' legacy color theme.
+
+            if (themeName == "gray_white")
+                return invertColors ? "#ffffff" : "#000000";
+
+            return "#ffffff"; //< light1.
+        }();
+
+    result.insert("brand_contrast", contrast.name());
 
     return result;
 }

@@ -24,6 +24,11 @@ QString brandBgColor()
     return R"(${customization.brandBgColor})";
 }
 
+QString brandContrastColor()
+{
+    return R"(${customization.brandContrastColor})";
+}
+
 QString brandColor()
 {
     return R"(${customization.brandColor})";
