@@ -6,7 +6,7 @@
 
 namespace nx::vms::client::desktop::jsapi {
 
-/** Class contains global constants which may be used in the JS scripts. */
+/** Class contains global constants and methods which may be used in the JS scripts. */
 class Globals: public QObject
 {
     Q_OBJECT
@@ -41,6 +41,13 @@ public:
         invalid_args,
     };
     Q_ENUMS(ErrorCode)
+
+public:
+    /**
+     * Opens url in an external browser.
+     * @ingroup vms
+     */
+    Q_INVOKABLE void openUrlExternally(const QString& url);
 };
 
 } // namespace nx::vms::client::desktop::jsapi

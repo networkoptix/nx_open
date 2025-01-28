@@ -13,7 +13,7 @@ The API consist of some global objects injected to the client JavaScript code. T
 
 | Global object name | Description                                                   |
 | ------------------ | ------------------------------------------------------------- |
-| @ref vms           | Contains global constants.                                    |
+| @ref vms           | Contains global constants and methods.                        |
 | @ref vms-log       | Allows to log messages using the standard VMS logging system. |
 | @ref vms-resources | Object for the Resource management purposes.                  |
 | @ref vms-tabs      | Contains methods to work with multiple tabs.                  |
