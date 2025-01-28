@@ -13178,7 +13178,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Välj minst en layout</translation>
     </message>
     <message>
       <source>Select at least one User</source>
