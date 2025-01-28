@@ -1049,11 +1049,11 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>L'authentification Digest est obsolète et sera désactivée dans la prochaine version. Elle ne doit être utilisée que lorsque l'authentification Bearer par défaut ne peut pas être utilisée.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>L'authentification Digest est obsolète et sera désactivée dans la prochaine version. Elle ne doit être utilisée que si l'authentification Bearer par défaut ne peut pas être utilisée. Les identifiants des utilisateurs doivent uniquement comporter des lettres minuscules.</translation>
     </message>
   </context>
   <context>
