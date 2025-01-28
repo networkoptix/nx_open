@@ -1860,7 +1860,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation>すでに以下から継承しています</translation>
+      <translation>すでに以下から継承しています:</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
