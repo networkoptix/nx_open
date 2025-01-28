@@ -5,11 +5,12 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
-#include <QtSvg/QSvgRenderer>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/widgets/loading_indicator.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <ui/widgets/common/progress_widget.h>
 
 #include "../models/logs_management_model.h"
 #include "../widgets/logs_management_widget.h"
@@ -23,19 +24,33 @@ static constexpr qreal kOpacityForDisabledCheckbox = 0.3;
 
 } // namespace
 
+class LogsManagementTableDelegate::LogsManagementLoadingIndicator: public QLabel
+{
+public:
+    LogsManagementLoadingIndicator(const LogsManagementTableDelegate* owner, QWidget* parent):
+        QLabel(parent), m_owner(owner)
+    {
+        setFixedSize(nx::vms::client::core::kIconSize);
+        connect(owner->m_loadingIndicator.data(),
+            &LoadingIndicator::frameChanged,
+            this,
+            &LogsManagementLoadingIndicator::updateFrame);
+    }
+
+    void updateFrame(const QPixmap& /*pixmap*/)
+    {
+        setPixmap(m_owner->m_loadingIndicator->currentPixmap());
+    }
+    const LogsManagementTableDelegate* m_owner;
+};
+
 using Model = LogsManagementModel;
 
 LogsManagementTableDelegate::LogsManagementTableDelegate(LogsManagementWidget* parent):
     base_type(parent)
 {
+    m_loadingIndicator.reset(new LoadingIndicator(this));
     parentWidget = parent;
-
-    // TODO: @pprivalov switch to Sergey Panasenko' component instead of doing this
-    auto path = qnSkin->path("20x20/Outline/spinner.svg");
-    svg_renderer = new QSvgRenderer(path, parent->unitsTable());
-
-    connect(svg_renderer, &QSvgRenderer::repaintNeeded,
-        [this, parent] { parent->unitsTable()->viewport()->update(); });
 }
 
 void LogsManagementTableDelegate::paint(
@@ -55,10 +70,6 @@ void LogsManagementTableDelegate::paint(
 
         case Model::LogLevelColumn:
             paintLogLevelColumn(painter, styleOption, index);
-            break;
-
-        case Model::StatusColumn:
-            paintStatusColumn(painter, styleOption, index);
             break;
 
         default:
@@ -221,25 +232,10 @@ void LogsManagementTableDelegate::paintCheckBoxColumn(
     painter->restore();
 }
 
-void LogsManagementTableDelegate::paintStatusColumn(
-    QPainter* painter,
-    const QStyleOptionViewItem& styleOption,
-    const QModelIndex& index) const
+QWidget* LogsManagementTableDelegate::createEditor(
+    QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    if (!index.data(LogsManagementModel::DownloadingRole).toBool())
-    {
-        base_type::paint(painter, styleOption, index);
-        return;
-    }
-
-    QStyleOptionViewItem option(styleOption);
-    initStyleOption(&option, index);
-
-    auto bounds = option.rect;
-    bounds.moveTo(option.rect.center().x() - bounds.width() / 2,
-        option.rect.center().y() - bounds.height() / 2);
-    svg_renderer->render(painter, bounds);
-    QStyledItemDelegate::paint(painter, option, index);
+    return new LogsManagementLoadingIndicator(this, parent);
 }
 
 void LogsManagementTableDelegate::drawText(const QModelIndex& index,

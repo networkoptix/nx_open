@@ -43,6 +43,8 @@ const QString kFailedSuffix{"_failed"};
 const QString kNormalSuffix{""};
 const QString kPartialSuffix{"_partial"};
 
+constexpr size_t kProgressUpdateInterval = 25;
+
 bool needLogLevelWarningFor(const LogsManagementWatcher::UnitPtr& unit)
 {
     auto settings = unit->settings();
@@ -578,6 +580,7 @@ struct LogsManagementWatcher::Unit::Private
         m_initElapsed = 0;
         m_initBytesLoaded = 0;
         m_timer.start();
+        m_progressUpdateTimer.start();
 
         m_downloader->setOnResponseReceived(
             [this, sourceFilePath, callback](std::optional<size_t> size)
@@ -618,8 +621,11 @@ struct LogsManagementWatcher::Unit::Private
                 }
 
                 lock.unlock();
-                if (callback)
+                if (callback && m_progressUpdateTimer.elapsed() > kProgressUpdateInterval)
+                {
+                    m_progressUpdateTimer.restart();
                     callback();
+                }
             });
 
         m_downloader->setOnDone(
@@ -654,6 +660,7 @@ struct LogsManagementWatcher::Unit::Private
 
         if (m_collector)
         {
+            m_collector->pleaseStop();
             m_collector.reset();
         }
         if (m_downloader)
@@ -766,6 +773,7 @@ private:
     std::optional<size_t> m_fileSize;
 
     QElapsedTimer m_timer;
+    QElapsedTimer m_progressUpdateTimer;
     size_t m_initElapsed{0};
     size_t m_initBytesLoaded{0};
 

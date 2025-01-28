@@ -12,6 +12,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QResizeEvent>
 #include <QtWidgets/QFileDialog>
+#include <QtWidgets/QLabel>
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
@@ -136,16 +137,37 @@ void LogsManagementWidget::setupUi()
 
     setWarningStyle(ui->errorLabel);
 
+    auto updateLoadingAnimation =
+        [this]()
+        {
+            auto model = ui->unitsTable->model();
+            for (int i = 0; i < model->rowCount(); ++i)
+            {
+                auto index = ui->unitsTable->model()->index(i, LogsManagementModel::StatusColumn);
+                if (model->data(index, LogsManagementModel::DownloadingRole).toBool())
+                    ui->unitsTable->openPersistentEditor(index);
+                else
+                    ui->unitsTable->closePersistentEditor(index);
+            }
+        };
+
     connect(
         m_watcher, &LogsManagementWatcher::stateChanged,
         this, &LogsManagementWidget::updateWidgets);
 
     connect(
+        m_watcher, &LogsManagementWatcher::stateChanged,
+        this, updateLoadingAnimation);
+
+    connect(
         m_watcher, &LogsManagementWatcher::progressChanged, this,
-        [this](double progress)
+        [this, updateLoadingAnimation](double progress)
         {
             ui->progressBar->setValue(100 * progress); //< The range is [0..100].
             ui->downloadingPercentageLabel->setText(QString("%1%").arg((int)(100 * progress)));
+
+            if (progress <= 0.0001)
+                updateLoadingAnimation();
         });
 
     ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));

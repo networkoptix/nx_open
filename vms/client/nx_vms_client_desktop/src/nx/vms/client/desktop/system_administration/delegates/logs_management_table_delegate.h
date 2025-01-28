@@ -10,6 +10,7 @@
 
 class QSvgRenderer;
 namespace nx::vms::client::desktop {
+class LoadingIndicator;
 
 class LogsManagementTableDelegate: public QStyledItemDelegate
 {
@@ -39,17 +40,17 @@ private:
         const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const;
 
-    void paintStatusColumn(
-        QPainter* painter,
-        const QStyleOptionViewItem& styleOption,
-        const QModelIndex& index) const;
+    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
     void drawText(const QModelIndex& index, QRect textRect, QStyle* style, QStyleOptionViewItem option, QPainter* painter, bool extra) const;
+
+protected:
+    class LogsManagementLoadingIndicator;
 
 private:
     mutable QnTextPixmapCache m_textPixmapCache;
     LogsManagementWidget* parentWidget = nullptr;
-    QSvgRenderer* svg_renderer = nullptr;
+    QScopedPointer<LoadingIndicator> m_loadingIndicator;
 };
 
 } // namespace nx::vms::client::desktop
