@@ -1748,7 +1748,7 @@ void QnMediaResourceWidget::updateIconButton()
 
     if (hasArchive(d->camera))
     {
-        QIcon icon = m_recordingStatusHelper->icon();
+        QIcon icon = m_recordingStatusHelper->smallIcon();
         m_hudOverlay->playbackPositionItem()->setRecordingIcon(icon.pixmap(QSize(12, 12)));
     }
     else

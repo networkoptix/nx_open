@@ -41,7 +41,7 @@ public:
     QString tooltip() const;
     QString shortTooltip() const;
     QString qmlIconName() const;
-    QIcon icon() const;
+    QIcon smallIcon() const;
 
     static QString tooltip(
         RecordingStatus recordingStatus,
@@ -56,10 +56,10 @@ public:
         RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
 
-    static QIcon icon(
+    static QIcon smallIcon(
         RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
-    static QIcon icon(const QnVirtualCameraResourcePtr& camera);
+    static QIcon smallIcon(const QnVirtualCameraResourcePtr& camera);
 
     static void registerQmlType();
 

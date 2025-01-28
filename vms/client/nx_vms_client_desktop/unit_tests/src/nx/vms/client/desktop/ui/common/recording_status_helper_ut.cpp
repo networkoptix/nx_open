@@ -45,7 +45,7 @@ public:
     {
         QByteArray actualIcon;
         QDataStream stream1(&actualIcon, QIODevice::WriteOnly);
-        stream1 << m_recordingStatusHelper.icon();
+        stream1 << m_recordingStatusHelper.smallIcon();
 
         QByteArray expectedIcon;
         QDataStream stream2(&expectedIcon, QIODevice::WriteOnly);

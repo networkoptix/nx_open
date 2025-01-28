@@ -6,11 +6,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource/resource_type.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::core;
@@ -78,7 +77,7 @@ QVariant QnCameraListModel::data(const QModelIndex& index, int role) const
             switch(index.column())
             {
                 case RecordingColumn:
-                    return RecordingStatusHelper::icon(camera);
+                    return RecordingStatusHelper::smallIcon(camera);
                 case NameColumn:
                     return qnResIconCache->icon(camera);
                 case ServerColumn:

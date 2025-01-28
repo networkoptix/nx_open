@@ -177,9 +177,9 @@ QString RecordingStatusHelper::qmlIconName() const
     return qmlIconName(m_recordingStatus, m_metadataTypes);
 }
 
-QIcon RecordingStatusHelper::icon() const
+QIcon RecordingStatusHelper::smallIcon() const
 {
-    return icon(m_recordingStatus, m_metadataTypes);
+    return smallIcon(m_recordingStatus, m_metadataTypes);
 }
 
 QString RecordingStatusHelper::tooltip(
@@ -278,7 +278,7 @@ QString RecordingStatusHelper::qmlIconName(
     return QString();
 }
 
-QIcon RecordingStatusHelper::icon(
+QIcon RecordingStatusHelper::smallIcon(
     RecordingStatus recordingStatus,
     RecordingMetadataTypes /*metadataTypes*/)
 {
@@ -296,10 +296,10 @@ QIcon RecordingStatusHelper::icon(
     return QIcon();
 }
 
-QIcon RecordingStatusHelper::icon(const QnVirtualCameraResourcePtr& camera)
+QIcon RecordingStatusHelper::smallIcon(const QnVirtualCameraResourcePtr& camera)
 {
     const auto [recordingStatus, metadataTypes] = currentRecordingMode(camera);
-    return icon(recordingStatus, metadataTypes);
+    return smallIcon(recordingStatus, metadataTypes);
 }
 
 void RecordingStatusHelper::registerQmlType()
