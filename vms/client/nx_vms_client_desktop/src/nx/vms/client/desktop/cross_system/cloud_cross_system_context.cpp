@@ -8,6 +8,7 @@
 #include <camera/camera_data_manager.h>
 #include <client_core/client_core_module.h>
 #include <core/resource/camera_history.h>
+#include <core/resource_access/access_rights_manager.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
@@ -37,6 +38,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
@@ -393,7 +395,8 @@ struct CloudCrossSystemContext::Private
 
         dataLoader = std::make_unique<CloudCrossSystemContextDataLoader>(
             connection->serverApi(),
-            QString::fromStdString(connection->credentials().username));
+            QString::fromStdString(connection->credentials().username),
+            connection->moduleInformation().version);
 
         QObject::connect(dataLoader.get(),
             &CloudCrossSystemContextDataLoader::ready,
@@ -401,16 +404,15 @@ struct CloudCrossSystemContext::Private
             [this]()
             {
                 addUserToResourcePool(dataLoader->user());
+                if (const auto userGroups = dataLoader->userGroups())
+                    addUserGroups(userGroups.value());
                 addServersToResourcePool(dataLoader->servers());
-                if (NX_ASSERT(systemContext))
-                {
-                    systemContext->cameraHistoryPool()->resetServerFootageData(
-                        dataLoader->serverFootageData());
-                    systemContext->globalSettings()->update(dataLoader->systemSettings());
-                    systemContext->licensePool()->replaceLicenses(dataLoader->licenses());
-                    if (auto connection = systemContext->connection())
-                        updateTokenUpdater();
-                }
+                systemContext->cameraHistoryPool()->resetServerFootageData(
+                    dataLoader->serverFootageData());
+                systemContext->globalSettings()->update(dataLoader->systemSettings());
+                systemContext->licensePool()->replaceLicenses(dataLoader->licenses());
+                if (auto connection = systemContext->connection())
+                    updateTokenUpdater();
                 addCamerasToResourcePool(dataLoader->cameras());
                 addServerTaxonomyDescriptions(dataLoader->serverTaxonomyDescriptions());
                 updateStatus(Status::connected);
@@ -594,6 +596,18 @@ struct CloudCrossSystemContext::Private
         auto resourcePool = systemContext->resourcePool();
         resourcePool->addResource(user);
         systemContext->accessController()->setUser(user);
+    }
+
+    void addUserGroups(const nx::vms::api::UserGroupDataList& groups)
+    {
+        auto userGroupManager = systemContext->userGroupManager();
+        userGroupManager->resetAll(groups);
+
+        for (const auto& group: groups)
+        {
+            systemContext->accessRightsManager()->setOwnResourceAccessMap(group.id,
+                {group.resourceAccessRights.begin(), group.resourceAccessRights.end()});
+        }
     }
 
     void createThumbCameraResources(const CrossSystemLayoutResourceList& crossSystemLayoutsList)

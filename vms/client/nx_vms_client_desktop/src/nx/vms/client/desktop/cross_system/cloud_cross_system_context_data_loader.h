@@ -11,6 +11,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/server_model.h>
 #include <nx/vms/api/data/system_settings.h>
+#include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/api/data/user_model.h>
 
 namespace rest {
@@ -36,12 +37,14 @@ public:
     CloudCrossSystemContextDataLoader(
         rest::ServerConnectionPtr connection,
         const QString& username,
+        nx::utils::SoftwareVersion version,
         QObject* parent = nullptr);
     virtual ~CloudCrossSystemContextDataLoader() override;
 
     void start(bool requestUser);
 
     nx::vms::api::UserModel user() const;
+    std::optional<nx::vms::api::UserGroupDataList> userGroups() const;
     nx::vms::api::ServerInformationV1List servers() const;
     nx::vms::api::ServerModelV4List serverTaxonomyDescriptions() const;
     nx::vms::api::ServerFootageDataList serverFootageData() const;
