@@ -170,6 +170,7 @@ private:
 
     QRhi* const m_rhi;
     Settings m_settings;
+    int m_textureSizeMax = 0;
     QSize m_size;
     std::shared_ptr<RhiPaintEngineSyncData> inputData;
     bool isBgraSupported = false;

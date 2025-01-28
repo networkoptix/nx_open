@@ -254,9 +254,9 @@ RhiPaintDeviceRenderer::RhiPaintDeviceRenderer(QRhi* rhi, Settings settings):
     m_rhi(rhi),
     m_settings(settings)
 {
-    const int maxSize = m_rhi->resourceLimit(QRhi::TextureSizeMax);
+    m_textureSizeMax = m_rhi->resourceLimit(QRhi::TextureSizeMax);
     if (m_settings.cacheSize == 0)
-        m_settings.cacheSize = maxSize;
+        m_settings.cacheSize = m_textureSizeMax;
 }
 
 RhiPaintDeviceRenderer::~RhiPaintDeviceRenderer() {}
@@ -354,9 +354,7 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
     m_textureCache.setMaxCost(m_settings.cacheSize * m_settings.cacheSize);
     m_gradientCache.setMaxCost(kMaxCachedGradientTextures);
 
-    const int atlasSize = std::min(
-        m_rhi->resourceLimit(QRhi::TextureSizeMax),
-        m_settings.atlasSize);
+    const int atlasSize = std::min(m_textureSizeMax, m_settings.atlasSize);
 
     atlasTexture.reset(m_rhi->newTexture(QRhiTexture::RGBA8, QSize(atlasSize, atlasSize), 1));
     atlasTexture->create();
@@ -518,6 +516,10 @@ QImage RhiPaintDeviceRenderer::getImage(const QPixmap& pixmap)
 {
     QImage image = pixmap.toImage();
 
+    // Reduce image size if it does not fit into a texture.
+    if (const auto s = image.size(); s.width() > m_textureSizeMax || s.height() > m_textureSizeMax)
+        image = image.scaled(m_textureSizeMax, m_textureSizeMax, Qt::KeepAspectRatio);
+
     if (image.format() == QImage::Format_RGBA8888_Premultiplied)
         return image;
 
@@ -613,7 +615,7 @@ QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
         const auto textureFormat = image.format() == QImage::Format_ARGB32_Premultiplied
             ? QRhiTexture::BGRA8
             : QRhiTexture::RGBA8;
-        texture.reset(m_rhi->newTexture(textureFormat, pixmap.size(), 1));
+        texture.reset(m_rhi->newTexture(textureFormat, image.size(), 1));
         texture->create();
         rub->uploadTexture(texture.get(), image);
         const auto size = texture->pixelSize();
