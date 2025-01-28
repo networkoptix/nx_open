@@ -60,6 +60,9 @@ struct NX_VMS_API SiteInformation
     /**%apidoc Synchronized time of the VMS Site, in milliseconds since epoch. */
     std::chrono::milliseconds synchronizedTimeMs{0};
 
+    /**%apidoc Amount of pending Servers in the Site. */
+    std::optional<int> pendingServerCount = 0;
+
     SiteInformation() = default;
     SiteInformation(const ModuleInformation& module);
 
@@ -72,7 +75,7 @@ struct NX_VMS_API SiteInformation
 #define SiteInformation_Fields \
     (name)(customization)(version)(protoVersion)(restApiVersions)(cloudHost)(localId)(cloudId) \
     (cloudOwnerId)(organizationId)(endpoint)(servers)(edgeServerCount)(devices)(status)(ldapSyncId) \
-    (synchronizedTimeMs)
+    (synchronizedTimeMs)(pendingServerCount)
 NX_VMS_API_DECLARE_STRUCT_EX(SiteInformation, (json))
 NX_REFLECTION_INSTRUMENT(SiteInformation, SiteInformation_Fields)
 

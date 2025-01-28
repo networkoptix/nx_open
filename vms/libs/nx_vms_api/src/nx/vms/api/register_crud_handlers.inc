@@ -132,6 +132,7 @@ static void registerSystemRestHandlers(
      **%apidoc GET /rest/v{4-}/site/info
      * %caption Get Site info
      * %ingroup Site
+     * %struct SiteInfoFilter
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_with
      * %permissions Authorization is not required.
      * %return:{SiteInformation} Information about the Site.
