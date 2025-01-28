@@ -22,6 +22,9 @@ public:
 
     void setAlignment(int logicalIndex, Qt::Alignment alignment);
 
+    bool isCheckboxEnabled() const;
+    void setCheckboxEnabled(bool enabled);
+
 signals:
     void checkStateChanged(Qt::CheckState state);
 
@@ -42,6 +45,7 @@ private:
     bool m_highlightCheckedIndicator = false;
     Qt::CheckState m_checkState = Qt::Unchecked;
     QHash<int, Qt::Alignment> m_textAlignment;
+    bool m_enabled = true;
 };
 
 } // namespace nx::vms::client::desktop

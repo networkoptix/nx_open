@@ -47,6 +47,16 @@ void CheckableHeaderView::initStyleOptionForIndex(
     option->textAlignment = m_textAlignment.value(logicalIndex, defaultAlignment());
 }
 
+void CheckableHeaderView::setCheckboxEnabled(bool enabled)
+{
+    m_enabled = enabled;
+}
+
+bool CheckableHeaderView::isCheckboxEnabled() const
+{
+    return m_enabled;
+}
+
 void CheckableHeaderView::paintSection(
     QPainter* painter, const QRect& rect, int logicalIndex) const
 {
@@ -64,6 +74,8 @@ void CheckableHeaderView::paintSection(
     opt.features = QStyleOptionViewItem::HasCheckIndicator;
     opt.state |= QStyle::State_Raised;
     opt.state &= ~QStyle::State_HasFocus;
+    if (!isCheckboxEnabled())
+        opt.state &= ~QStyle::State_Enabled;
 
     if (opt.state.testFlag(QStyle::State_MouseOver)
         && (logicalIndexAt(mapFromGlobal(QCursor::pos())) != logicalIndex))

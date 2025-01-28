@@ -190,7 +190,7 @@ void LogsManagementWidget::setupUi()
     connect(m_watcher, &LogsManagementWatcher::stateChanged,
         [header](LogsManagementWatcher::State state)
         {
-            header->setEnabled(state == LogsManagementWatcher::State::empty
+            header->setCheckboxEnabled(state == LogsManagementWatcher::State::empty
                 || state == LogsManagementWatcher::State::hasSelection);
         });
 
