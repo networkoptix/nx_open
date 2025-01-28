@@ -6650,11 +6650,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation>仮想カメラ、USBカメラ、またはWebカメラはサーバー間で移動できません。これらのデバイスは %1 に残ります:</translation>
+      <translation>仮想カメラ、USBカメラ、Webカメラはサーバー間で移動できません。これらのデバイスは %1 に残ります:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation>USBカメラ、またはWebカメラはサーバー間で移動できません。これらのデバイスは %1 に残ります:</translation>
+      <translation>USB カメラや Web カメラは、サーバー間で移動できません。これらのデバイスは %1 に残ります:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6670,7 +6670,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation>USBカメラやWebカメラはサーバー間で移動できません</translation>
+      <translation>USB カメラや Web カメラは、サーバー間で移動できません。</translation>
     </message>
     <message>
       <source>Only some of the selected devices can be moved to %1</source>
