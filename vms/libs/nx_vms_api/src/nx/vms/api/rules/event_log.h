@@ -13,6 +13,7 @@
 #include "../data/server_time_period.h"
 #include "common.h"
 #include "event_log_fwd.h"
+#include "event_log_v3.h"
 
 namespace nx::vms::api::rules {
 
@@ -23,8 +24,7 @@ NX_REFLECTION_ENUM_CLASS(EventLogFlag,
     acknowledge = 1 << 0,
 
     /**%apidoc There is recording archive exists for the time and device of the event. */
-    videoLinkExists = 1 << 1
-)
+    videoLinkExists = 1 << 1)
 Q_DECLARE_FLAGS(EventLogFlags, EventLogFlag)
 
 struct NX_VMS_API EventLogFilter: public nx::vms::api::ServerTimePeriod
@@ -122,16 +122,12 @@ QN_FUSION_DECLARE_FUNCTIONS(EventLogRecord, (json)(ubjson)(sql_record), NX_VMS_A
 
 std::string NX_VMS_API toString(const EventLogRecord& record);
 
-// Helper function for log data sorting & merging.
+// Helper functions for log data sorting & merging.
 inline quint64 getTimestamp(const EventLogRecord& record) { return record.timestampMs.count(); }
-
-struct NX_VMS_API EventLogRecordWithLegacyTypes: EventLogRecord
+inline quint64 getLegacyTimestamp(const EventLogRecordV3& record)
 {
-    api::ActionType actionType;
-};
-#define EventLogRecordWithLegacyTypes_Fields EventLogRecord_Fields (actionType)
-NX_REFLECTION_INSTRUMENT(EventLogRecordWithLegacyTypes, EventLogRecordWithLegacyTypes_Fields)
-QN_FUSION_DECLARE_FUNCTIONS(EventLogRecordWithLegacyTypes, (json), NX_VMS_API)
+    return record.eventParams.eventTimestampUsec / 1000;
+}
 
 } // namespace nx::vms::rules
 
