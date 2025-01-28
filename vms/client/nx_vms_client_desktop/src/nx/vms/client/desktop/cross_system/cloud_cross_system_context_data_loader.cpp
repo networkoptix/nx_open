@@ -22,6 +22,7 @@ namespace {
 
 static constexpr auto kRequestDataRetryTimeout = 30s;
 static constexpr auto kCamerasRefreshPeriod = 10min;
+static const nx::utils::SoftwareVersion kUserGroupsApiSupportedVersion(6, 0);
 
 } // namespace
 
@@ -30,10 +31,12 @@ struct CloudCrossSystemContextDataLoader::Private
     CloudCrossSystemContextDataLoader* const q;
     rest::ServerConnectionPtr const connection;
     const QString username;
+    const nx::utils::SoftwareVersion version;
     bool doRequestUser = true;
 
     std::optional<rest::Handle> currentRequest;
     std::optional<UserModel> user;
+    std::optional<UserGroupDataList> userGroups;
     std::optional<ServerInformationList> servers;
     std::optional<ServerFootageDataList> serverFootageData;
     std::optional<SystemSettings> systemSettings;
@@ -74,6 +77,44 @@ struct CloudCrossSystemContextDataLoader::Private
 
         return connection->getRawResult(
             QString("/rest/v3/users/") + QUrl::toPercentEncoding(username),
+            {},
+            std::move(callback),
+            q->thread());
+    }
+
+    rest::Handle requestUserGroups()
+    {
+        NX_VERBOSE(this, "Requesting userGroups");
+        auto callback = nx::utils::guarded(q,
+            [this](
+                bool success,
+                ::rest::Handle requestId,
+                QByteArray data,
+                nx::network::http::HttpHeaders /*headers*/)
+            {
+                NX_ASSERT(currentRequest && *currentRequest == requestId);
+                currentRequest = std::nullopt;
+
+                if (!success)
+                {
+                    NX_WARNING(this, "UserGroups request failed");
+                    return;
+                }
+
+                UserGroupDataList result;
+                if (!QJson::deserialize(data, &result))
+                {
+                    NX_WARNING(this, "UserGroups reply cannot be deserialized");
+                    return;
+                }
+
+                NX_VERBOSE(this, "UserGroups loaded successfully");
+                userGroups = result;
+                requestData();
+            });
+
+        return connection->getRawResult(
+            QString("/rest/v3/userGroups/"),
             {},
             std::move(callback),
             q->thread());
@@ -294,6 +335,10 @@ struct CloudCrossSystemContextDataLoader::Private
         {
             currentRequest = requestUser();
         }
+        else if (!userGroups && version >= kUserGroupsApiSupportedVersion)
+        {
+            currentRequest = requestUserGroups();
+        }
         else if (!servers)
         {
             currentRequest = requestServers();
@@ -322,13 +367,15 @@ struct CloudCrossSystemContextDataLoader::Private
 CloudCrossSystemContextDataLoader::CloudCrossSystemContextDataLoader(
     rest::ServerConnectionPtr connection,
     const QString& username,
+    nx::utils::SoftwareVersion version,
     QObject* parent)
     :
     QObject(parent),
     d(new Private{
         .q = this,
         .connection = connection,
-        .username = username
+        .username = username,
+        .version = version
         })
 {
 }
@@ -356,6 +403,12 @@ void CloudCrossSystemContextDataLoader::requestData()
 UserModel CloudCrossSystemContextDataLoader::user() const
 {
     return d->user.value_or(UserModel());
+}
+
+std::optional<nx::vms::api::UserGroupDataList>
+    CloudCrossSystemContextDataLoader::userGroups() const
+{
+    return d->userGroups;
 }
 
 ServerInformationList CloudCrossSystemContextDataLoader::servers() const
