@@ -163,7 +163,9 @@ struct NX_VMS_API PluginInfo
     QString statusMessage;
 
     /**%apidoc
-     * If the plugin status is "notLoadedBecauseOfError", describes the error.
+     * If the plugin status is "notLoadedBecauseOfError", describes the error. Can be "internalError"
+     * regardless of the status, in which case the statusMessage field contains the error message
+     * and the original status message and error code obtained while loading the plugin.
      */
     Error errorCode = Error::noError;
 
