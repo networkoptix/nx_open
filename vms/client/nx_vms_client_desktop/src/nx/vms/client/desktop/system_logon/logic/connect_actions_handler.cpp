@@ -818,8 +818,6 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
 {
     static constexpr auto kCloseTimeout = 10s;
 
-    NX_VERBOSE(this, "Directly connecting to the server %1", logonData.address);
-
     auto callback = d->makeSingleConnectionCallback(
         [this, logonData](RemoteConnectionFactory::ConnectionOrError result)
         {
@@ -861,7 +859,7 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& log
             }
         });
 
-    NX_VERBOSE(this, "Executing connect to the %1", logonData.address);
+    NX_VERBOSE(this, "Connecting in non-desktop mode to the %1", logonData.address);
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
     d->currentConnectionProcess =
         remoteConnectionFactory->connect(logonData, callback, systemContext());
@@ -1063,7 +1061,7 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
             }
         });
 
-    NX_VERBOSE(this, "Executing connect to the %1", connectionInfo->address);
+    NX_VERBOSE(this, "Executing connect to the cloud site: %1", connectionInfo->address);
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
     d->currentConnectionProcess =

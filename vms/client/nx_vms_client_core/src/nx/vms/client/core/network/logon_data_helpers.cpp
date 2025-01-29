@@ -91,6 +91,10 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
                 result.expectedServerId->toString());
         }
     }
+    else
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Preferred cloud server was not found");
+    }
 
     if (auto systemVersion = system->version(); !systemVersion.isNull())
     {
@@ -143,7 +147,7 @@ std::optional<LogonData> cloudLogonData(const QnSystemDescriptionPtr& system)
             {
                 url = system->getServerHost(nx::Uuid());
                 NX_DEBUG(NX_SCOPE_TAG,
-                    "Connecting to the cloud system which was not pinged yet: %1",
+                    "Choosing initial server for not pinged site: %1",
                     url);
             }
         }
