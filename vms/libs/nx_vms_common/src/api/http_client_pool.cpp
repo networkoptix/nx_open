@@ -504,7 +504,6 @@ struct ClientPool::Private
 
         {
             NX_MUTEX_LOCKER lock(&mutex);
-
             for (const auto&[_, connection]: connectionPool)
             {
                 requests.push_back(connection->context);
