@@ -29,6 +29,8 @@ Page
     [
         IconButton
         {
+            id: searchButton
+
             padding: 0
             icon.source: lp("/images/search.png")
             enabled: camerasGrid.enabled
