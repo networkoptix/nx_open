@@ -166,8 +166,7 @@ void LogsManagementWidget::setupUi()
             ui->progressBar->setValue(100 * progress); //< The range is [0..100].
             ui->downloadingPercentageLabel->setText(QString("%1%").arg((int)(100 * progress)));
 
-            if (progress <= 0.0001)
-                updateLoadingAnimation();
+            updateLoadingAnimation();
         });
 
     ui->unitsTable->setModel(new LogsManagementModel(this, m_watcher));

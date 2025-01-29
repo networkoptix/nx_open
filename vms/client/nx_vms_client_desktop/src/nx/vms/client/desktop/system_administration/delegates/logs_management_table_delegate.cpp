@@ -31,6 +31,7 @@ public:
         QLabel(parent), m_owner(owner)
     {
         setFixedSize(nx::vms::client::core::kIconSize);
+        setScaledContents(true);
         connect(owner->m_loadingIndicator.data(),
             &LoadingIndicator::frameChanged,
             this,
