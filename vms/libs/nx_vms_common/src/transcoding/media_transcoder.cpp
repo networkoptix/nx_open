@@ -2,6 +2,8 @@
 
 #include "media_transcoder.h"
 
+#include <QtCore/QThread>
+
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 #include <transcoding/filters/abstract_image_filter.h>
@@ -11,6 +13,7 @@ MediaTranscoder::MediaTranscoder(const Config& config, nx::metric::Storage* metr
     m_config(config),
     m_metrics(metrics)
 {
+    QThread::currentThread()->setPriority(QThread::LowPriority);
 }
 
 bool MediaTranscoder::setVideoCodec(

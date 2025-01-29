@@ -161,6 +161,9 @@ bool QnFfmpegAudioTranscoder::initResampler()
 int QnFfmpegAudioTranscoder::transcodePacket(
     const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
+    if (!m_isOpened)
+        return -1;
+
     if (result)
         result->reset();
 

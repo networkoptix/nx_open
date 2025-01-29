@@ -17,6 +17,7 @@ extern "C" {
 #include <nx/utils/move_only_func.h>
 #include <transcoding/transcoding_utils.h>
 #include <transcoding/media_transcoder.h>
+#include <transcoding/ffmpeg_muxer.h>
 
 class QnLicensePool;
 
@@ -28,61 +29,30 @@ public:
 
     struct Config
     {
-        bool computeSignature = false;
-        bool useAbsoluteTimestamp = false;
         MediaTranscoder::Config mediaTranscoderConfig;
+        FfmpegMuxer::Config muxerConfig;
     };
 
 public:
     QnFfmpegTranscoder(const Config& config, nx::metric::Storage* metrics);
     ~QnFfmpegTranscoder();
 
-    /*
-    * Set ffmpeg container by name
-    * @return Returns true if no error or false on error
-    */
-    bool setContainer(const QString& value);
-    void setFormatOption(const QString& option, const QString& value);
-    AVCodecParameters* getVideoCodecParameters() const;
-    AVCodecParameters* getAudioCodecParameters() const;
-    AVFormatContext* getFormatContext() const { return m_formatCtx; }
-
+    FfmpegMuxer& muxer() { return m_muxer; };
+    const FfmpegMuxer& muxer() const { return m_muxer; };
     /*
     * Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
     * Destination codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
     * @return Returns true if no error or false otherwise
     */
     bool open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio);
-
-    //!Adds tag to the file. Maximum length of tags and allowed names are format dependent
-    /*!
-        This implementation always returns \a false
-        \return true on success
-    */
-    bool addTag(const char* name, const char* value);
-
-    void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
-    bool inMiddleOfStream() const { return m_inMiddleOfStream; }
-    void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
-
-    QByteArray getSignature(QnLicensePool* licensePool, const nx::Uuid& serverId);
-
-    struct PacketTimestamp
-    {
-        uint64_t ntpTimestamp = 0;
-        uint32_t rtpTimestamp = 0;
-    };
-    PacketTimestamp getLastPacketTimestamp() const { return m_lastPacketTimestamp; }
-    void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
-    void setSeeking() { m_isSeeking = true; };
-
+    void setSeeking();
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
     void setSourceResolution(const QSize& resolution);
+
     using BeforeOpenCallback = nx::utils::MoveOnlyFunc<void(
         QnFfmpegTranscoder* transcoder,
         const QnConstCompressedVideoDataPtr & video,
         const QnConstCompressedAudioDataPtr & audio)>;
-
     void setBeforeOpenCallback(BeforeOpenCallback callback);
 
     /*
@@ -112,7 +82,7 @@ public:
     */
     bool setAudioCodec(AVCodecID codec, TranscodeMethod method);
 
-    /*
+    /*p
     * Transcode media data and write it to specified nx::utils::ByteArray
     * @param result transcoded data block. If NULL, only decoding is done
     * @return Returns OperationResult::Success if no error or error code otherwise
@@ -123,60 +93,26 @@ public:
     * @return Returns OperationResult::Success if no error or error code otherwise
     */
     int finalize(nx::utils::ByteArray* const result);
-    //!Flushes codec buffer. Use after \a open() call to flush muxed header.
-    void flush(nx::utils::ByteArray* const result);
-
-    /**
-     * Return description of the last error code
-     */
-    QString getLastErrorMessage() const;
-
-    // For internal use only, move to protected!
-    int writeBuffer(const char* data, int size);
-    void setPacketizedMode(bool value);
-    const QVector<int>& getPacketsSize();
 
 private:
     bool transcodePacketInternal(const QnConstAbstractMediaDataPtr& media);
     bool finalizeInternal(nx::utils::ByteArray* const result);
     bool isCodecSupported(AVCodecID id) const;
-    //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
-    AVIOContext* createFfmpegIOContext();
-    void closeFfmpegContext();
-    bool muxPacket(const QnConstAbstractMediaDataPtr& packet);
     bool handleSeek(const QnConstAbstractMediaDataPtr& packet);
     int openAndTranscodeDelayedData();
 
 private:
-    Config m_config;
     MediaTranscoder m_mediaTranscoder;
+    FfmpegMuxer m_muxer;
     AVCodecID m_videoCodec = AV_CODEC_ID_NONE;
     AVCodecID m_audioCodec = AV_CODEC_ID_NONE;
-    nx::utils::ByteArray m_internalBuffer;
-    QVector<int> m_outputPacketSize;
 
     bool m_initialized = false;
-    //! Make sure to correctly fill these member variables in overridden open() function.
-    bool m_initializedAudio  =false;    // Incoming audio packets will be ignored.
-    bool m_initializedVideo = false;    // Incoming video packets will be ignored.
 
-    QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter = 0;
-    bool m_packetizedMode = false;
     BeforeOpenCallback m_beforeOpenCallback;
-
-    MediaSigner m_mediaSigner;
-    AVCodecParameters* m_videoCodecParameters = nullptr;
-    AVCodecParameters* m_audioCodecParameters = nullptr;
-    AVFormatContext* m_formatCtx = nullptr;
-
-    QString m_container;
-    qint64 m_baseTime = AV_NOPTS_VALUE;
-    PacketTimestamp m_lastPacketTimestamp;
-    bool m_inMiddleOfStream = false;
-    qint64 m_startTimeOffset = 0;
-    int m_rtpMtu = MTU_SIZE;
     bool m_isSeeking = false;
+    bool m_firstSeek = true;
 };

@@ -51,7 +51,7 @@ public:
     void setSrtpEncryptionData(const nx::vms::server::rtsp::EncryptionData& data);
     nx::vms::server::rtsp::SrtpEncryptor* encryptor() const;
     bool isTranscodingEnabled() const;
-    QnFfmpegTranscoder::PacketTimestamp getLastTimestamps() const;
+    FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     void setSeeking();
     int payloadType() const;
 private:

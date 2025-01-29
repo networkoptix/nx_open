@@ -99,7 +99,7 @@ private:
     QnAbstractMediaDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
 
 private:
-    const Config& m_config;
+    const Config m_config;
     AVCodecContext* m_encoderCtx = nullptr;
     AVCodecContext* m_decoderCtx = nullptr;
     FfmpegAudioResampler m_resampler;

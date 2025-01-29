@@ -41,12 +41,12 @@ bool FileTranscoder::setDestFile( const QString& filePath )
 
 bool FileTranscoder::setContainer( const QString& containerName )
 {
-    return m_transcoder.setContainer(containerName);
+    return m_transcoder.muxer().setContainer(containerName);
 }
 
 bool FileTranscoder::addTag( const QString& name, const QString& value )
 {
-    return m_transcoder.addTag(name.toUtf8().constData(), value.toUtf8().constData());
+    return m_transcoder.muxer().addTag(name.toUtf8().constData(), value.toUtf8().constData());
 }
 
 bool FileTranscoder::setVideoCodec(

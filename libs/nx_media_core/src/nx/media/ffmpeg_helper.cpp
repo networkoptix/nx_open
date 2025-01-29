@@ -10,6 +10,7 @@
 #include <nx/media/audio/format.h>
 #include <nx/media/av_codec_helper.h>
 #include <nx/media/codec_parameters.h>
+#include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_data_packet.h>
@@ -152,6 +153,19 @@ CodecParametersPtr QnFfmpegHelper::createVideoCodecParametersAnnexB(
     {
         avCodecParams->width = streamResolution.width();
         avCodecParams->height = streamResolution.height();
+    }
+
+    if (data->compressionType == AV_CODEC_ID_MJPEG) // TODO rename function or move it to other place.
+    {
+        nx::media::jpeg::ImageInfo info;
+        nx::media::jpeg::readJpegImageInfo((const uint8_t*)data->data(), data->dataSize(), &info);
+        if (info.pixelFormat == AV_PIX_FMT_NONE)
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to parse MJPEG header");
+            avCodecParams->format = AV_PIX_FMT_YUV420P;
+        }
+        else
+            avCodecParams->format = info.pixelFormat;
     }
     return codecParams;
 }

@@ -259,11 +259,11 @@ void QnUniversalRtpEncoder::buildSdp(
     if (transcoding || !m_isVideo || !m_config.useMultipleSdpPayloadTypes)
     {
         CodecParameters codecpar(m_isVideo
-            ? m_transcoder.getVideoCodecParameters()
-            : m_transcoder.getAudioCodecParameters());
+            ? m_transcoder.muxer().getVideoCodecParameters()
+            : m_transcoder.muxer().getAudioCodecParameters());
 
         m_sdpAttributes = getSdpAttributesFromContext(
-            m_transcoder.getFormatContext(), m_payloadType, m_config.webRtcMode);
+            m_transcoder.muxer().getFormatContext(), m_payloadType, m_config.webRtcMode);
     }
     else
     {
@@ -312,16 +312,16 @@ bool QnUniversalRtpEncoder::open(
         ? QnFfmpegTranscoder::TM_FfmpegTranscode
         : QnFfmpegTranscoder::TM_DirectStreamCopy;
 
-    if (!m_transcoder.setContainer("rtp") || !isCodecSupported(dstCodec))
+    if (!m_transcoder.muxer().setContainer("rtp") || !isCodecSupported(dstCodec))
         return false;
 
     if (m_config.absoluteRtcpTimestamps)
     {
         // disable ffmpeg rtcp report in oder to build it manually
-        m_transcoder.setFormatOption("rtpflags", "+skip_rtcp");
+        m_transcoder.muxer().setFormatOption("rtpflags", "+skip_rtcp");
     }
 
-    m_transcoder.setPacketizedMode(true);
+    m_transcoder.muxer().setPacketizedMode(true);
     bool status = false;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {
@@ -355,7 +355,7 @@ bool QnUniversalRtpEncoder::open(
 
 void QnUniversalRtpEncoder::setMtu(int mtu)
 {
-    m_transcoder.setRtpMtu(mtu);
+    m_transcoder.muxer().setRtpMtu(mtu);
 }
 
 QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId, int port)
@@ -430,12 +430,12 @@ bool QnUniversalRtpEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     if (m_eof)
         return false;
 
-    const QVector<int> packets = m_transcoder.getPacketsSize();
+    const QVector<int> packets = m_transcoder.muxer().getPacketsSize();
     if (m_outputPos >= (int) m_outputBuffer.size() - nx::rtp::RtpHeader::kSize ||
         m_packetIndex >= packets.size())
         return false;
 
-    auto timestamps = m_transcoder.getLastPacketTimestamp();
+    auto timestamps = m_transcoder.muxer().getLastPacketTimestamp();
     nx::rtp::RtpHeader* rtpHeader =
         (nx::rtp::RtpHeader*)(m_outputBuffer.data() + m_outputPos);
 
@@ -524,9 +524,9 @@ void QnUniversalRtpEncoder::setSeeking()
     m_transcoder.setSeeking();
 }
 
-QnFfmpegTranscoder::PacketTimestamp QnUniversalRtpEncoder::getLastTimestamps() const
+FfmpegMuxer::PacketTimestamp QnUniversalRtpEncoder::getLastTimestamps() const
 {
-    return m_transcoder.getLastPacketTimestamp();
+    return m_transcoder.muxer().getLastPacketTimestamp();
 }
 
 nx::vms::server::rtsp::SrtpEncryptor* QnUniversalRtpEncoder::encryptor() const
