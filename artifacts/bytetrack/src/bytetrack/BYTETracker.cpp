@@ -15,7 +15,8 @@
 byte_track::BYTETracker::BYTETracker(const byte_track::ByteTrackerConfig& config):
     m_config(config)
 {
-    NX_ASSERT(m_config.goodDetectionThreshold >= m_config.trackBirthThreshold);
+    // Only good detections are eligible for track birth.
+    NX_ASSERT(m_config.goodDetectionThreshold <= m_config.trackBirthThreshold);
 }
 
 byte_track::BYTETracker::~BYTETracker()
