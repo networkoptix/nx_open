@@ -244,7 +244,7 @@ static Ptr<Interface> queryInterfaceOfOldSdk(
  * @return Reference counter, or 0 if the pointer is null.
  */
 template<class RefCountable>
-int refCount(const Ptr<RefCountable>& ptr)
+static int refCount(const Ptr<RefCountable>& ptr)
 {
     return refCount(ptr.get());
 }
