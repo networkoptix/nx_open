@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Verktygstips text</translation>
     </message>
   </context>
   <context>
@@ -89,11 +89,11 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Ogiltig fälttyp har angetts</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Oväntad valideringspolicy</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -117,7 +117,7 @@
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Alla servrar är inte lämpliga</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Händelseenheter</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -190,15 +190,15 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Fältet %1 värde måste anges för den angivna valideringspolicyn</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>Vald lokal layout kan endast visas för dess ägare %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Ingen av de valda användarna har tillgång till den valda layouten</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
@@ -210,47 +210,47 @@
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Utvalda enheter togs bort</numerusform>
+        <numerusform>Utvalda enheter togs bort</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Utvalda kameror togs bort</numerusform>
+        <numerusform>Utvalda kameror togs bort</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Utvalda servrar togs bort</numerusform>
+        <numerusform>Utvalda servrar togs bort</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>Valda layouter togs bort</numerusform>
+        <numerusform>Valda layouter togs bort</numerusform>
       </translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>Tidsvärdet får inte vara mindre än noll</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>Varaktighet kan inte vara mindre än noll</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>Värdet får inte vara mindre än %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>Värdet får inte vara mer än %1</translation>
     </message>
     <message>
       <source>To Users</source>
@@ -268,7 +268,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Tom text är inte tillåten</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -298,7 +298,7 @@
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Analys händelsetyp är inte vald</translation>
     </message>
   </context>
   <context>
@@ -325,7 +325,7 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Analys händelsetyp är inte vald</translation>
     </message>
   </context>
   <context>
@@ -406,7 +406,7 @@
     <message>
       <source>%1 was disconnected</source>
       <comment>Device name will be substituted</comment>
-      <translation type="unfinished">%1 was disconnected</translation>
+      <translation>%1 kopplades bort</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     </message>
     <message>
       <source>Generic Event from %1</source>
-      <translation type="unfinished">Generic Event from %1</translation>
+      <translation>Generisk händelse från %1</translation>
     </message>
   </context>
   <context>
@@ -544,25 +544,25 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>HTTP-autentisering</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Användar- och lösenordsfält ska fyllas i vid grundläggande eller sammandragsmetod som valts</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Tokenfältet ska fyllas i om bärarautentiseringstypen har valts</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>HTTP Method should be known</source>
-      <translation type="unfinished">HTTP Method should be known</translation>
+      <translation>HTTP-metoden bör vara känd</translation>
     </message>
   </context>
   <context>
@@ -576,7 +576,7 @@
     <name>nx::vms::rules::LdapSyncIssueEvent</name>
     <message>
       <source>LDAP Sync Issue Event</source>
-      <translation type="unfinished">LDAP Sync Issue Event</translation>
+      <translation>Ldap Sync-problemhändelse</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
@@ -625,7 +625,7 @@
     <message>
       <source>%1 has a license problem</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 has a license problem</translation>
+      <translation>%1 har ett licensproblem</translation>
     </message>
   </context>
   <context>
@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>Lista med det angivna id &apos;%1&apos; har ogiltig objekttyp - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -748,11 +748,11 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>Noll varaktighet kan inte anges för händelsetillståndet `%1</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>Noll varaktighet kan inte anges för händelsetillståndet `%1</translation>
     </message>
   </context>
   <context>
@@ -801,23 +801,23 @@
     <message>
       <source>Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Power limit exceeded (%1)</translation>
+      <translation>Effektgränsen har överskridits (%1)</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>PoE över budget på %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>Aktuell strömförbrukning: %1 watt</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>Övre förbrukningsgräns: %1 watt</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>Nedre förbrukningsgräns: %1 watt</translation>
     </message>
   </context>
   <context>
@@ -869,15 +869,15 @@
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>`%1` varningar för händelsefilterfält:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>`%1` fältvarningar från åtgärdsbyggaren:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>Regeln är inte klar. Ett filter och en byggare krävs</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
@@ -1193,11 +1193,11 @@
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>Url måste vara giltig</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>Url får inte innehålla användare eller lösenord</translation>
     </message>
   </context>
   <context>

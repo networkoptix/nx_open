@@ -68,11 +68,11 @@
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>Begäran är obehörig på grund av ett okänt fel.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Sessionsnyckeln är för gammal för den här webbplatsen.</translation>
     </message>
   </context>
   <context>
@@ -136,11 +136,11 @@
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>Sessionen är för gammal enligt webbplatsens konfiguration.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>Resursen finns inte längre på servern.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Service ej auktoriserad.</translation>
     </message>
   </context>
 </TS>

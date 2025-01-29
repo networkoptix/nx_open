@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation>アップデートパッケージを確認中</translation>
+      <translation>更新パッケージを確認中</translation>
     </message>
   </context>
   <context>
@@ -6670,7 +6670,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export Archive</source>
-      <translation>アーカイブのエクスポート</translation>
+      <translation>アーカイブの
+エクスポート</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
@@ -10318,11 +10319,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation>アップデートファイルの確認に失敗しました。</translation>
+      <translation>更新ファイルの確認に失敗しました。</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation>アップデートを確認</translation>
+      <translation>更新を確認中</translation>
     </message>
   </context>
   <context>
@@ -13630,11 +13631,11 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation>現在のプラットフォームのクライアント更新パッケージがありません。</translation>
+      <translation>現在のプラットフォーム用のクライアント更新パッケージがありません。</translation>
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation>クライアントのアップデートが利用可能か確認できません。インターネット接続を確認して、もう一度お試しください。</translation>
+      <translation>クライアントの更新が利用可能か確認できません。インターネット接続をご確認のうえ、再度お試しください。</translation>
     </message>
     <message>
       <source>Client auto-updates</source>
