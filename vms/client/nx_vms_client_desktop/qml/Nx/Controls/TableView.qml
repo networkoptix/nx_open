@@ -135,6 +135,11 @@ TableView
         height: control.height - impl.reservedHeight
     }
 
+    ScrollBar.horizontal: ScrollBar
+    {
+        policy: ScrollBar.AsNeeded
+    }
+
     delegate: BasicSelectableTableCellDelegate {}
 
     onLayoutChanged:
@@ -162,7 +167,8 @@ TableView
 
         y: control.contentY
         z: 2 //< Is needed for hiding scrolled rows.
-        width: parent.width
+        // Have to use the width of the header since the width of the control can be smaller.
+        width: headerRow.width
         height: buttonHeight + separator.height + 8
 
         color: ColorTheme.colors.dark7
@@ -171,6 +177,8 @@ TableView
 
         Row
         {
+            id: headerRow
+
             Repeater
             {
                 id: repeater
@@ -194,7 +202,7 @@ TableView
 
             y: columnsHeader.buttonHeight
 
-            width: control.width
+            width: headerRow.width
             height: 1
 
             color: ColorTheme.colors.dark12

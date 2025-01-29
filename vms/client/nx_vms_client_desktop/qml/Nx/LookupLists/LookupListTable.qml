@@ -24,11 +24,6 @@ CheckableTableView
     columnSpacing: 0
     rowSpacing: 0
 
-    ScrollBar.horizontal: ScrollBar
-    {
-        policy: ScrollBar.AsNeeded
-    }
-
     columnWidthProvider: function (column)
     {
         return column ? Math.max(100, columnWidth(column)) : 35
