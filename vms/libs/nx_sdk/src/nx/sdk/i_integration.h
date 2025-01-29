@@ -48,8 +48,12 @@ public:
      * Prototype of an extern "C" plugin entry point function for multi-IIntegration Plugins.
      *
      * The Server calls this function multiple times, passing sequential values starting from 0,
-     * until the function returns null. Each non-null result is processed the same way as the
-     * result of the single-IIntegration entry point function.
+     * until the function returns null. Each non-null result is processed similarly to the
+     * single-IIntegration entry point functions (either the old-SDK or the new-SDK one), thus
+     * it is possible to pack different IIntegration types into the same plugin dynamic library. If
+     * an old-SDK Integration is returned, its pointer must be reinterpret-casted from
+     * nxpl::PluginInterface - it is safe because nxpl::PluginInterface is ABI-compatible with
+     * IIntegration.
      *
      * If this function is exported from the Plugin library and returns at least one Plugin
      * instance, the single-IIntegration entry point function will not be called.
