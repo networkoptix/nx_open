@@ -226,6 +226,16 @@ static Ptr<RefCountable> makePtr(Args&&... args)
 }
 
 /**
+ * Increments the reference counter and returns a new owning smart pointer, changing the pointer
+ * type via reinterpret_cast. If ptr is null, just returns null.
+ */
+template</*explicit*/ class NewRefCountable, /*deduced*/ class OldRefCountable>
+static Ptr<NewRefCountable> reinterpretPtr(const Ptr<OldRefCountable>& ptr)
+{
+    return shareToPtr(reinterpret_cast<NewRefCountable*>(ptr.get()));
+}
+
+/**
  * Calls queryInterface() from old SDK and returns a smart pointer to its result, possibly null.
  * @param refCountable Can be null, then null will be returned.
  */
