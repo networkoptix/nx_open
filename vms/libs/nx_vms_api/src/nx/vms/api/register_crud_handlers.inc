@@ -2683,6 +2683,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct ObjectTrackFilter
      * %param[unused] id
+     * %param[unused] _orderBy
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
@@ -2692,7 +2693,10 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * Retrieves the specified Object Track.
      * %caption Get Object Track
      * %ingroup Analytics
-     * %struct ObjectTrackFilter
+     * %param:uuid id Object Track id
+     * %param[opt]:boolean isLocal If false, then the request is forwarded to every other online
+     * Server and the results are merged. Otherwise, the request is processed on the receiving
+     * Server only.
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.

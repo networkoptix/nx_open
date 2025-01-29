@@ -508,15 +508,6 @@ struct ObjectTrackFilterFreeText
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilterFreeText, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilterFreeText, ObjectTrackFilterFreeText_Fields)
 
-// All sorts are preformed manually, not in the SQL database request.
-NX_REFLECTION_ENUM_CLASS(ObjectTrackSortField,
-    id,
-    deviceId,
-    objectTypeId,
-    title,
-    analyticsEngineId
-)
-
 struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
 {
     /**%apidoc[opt]:stringArray
@@ -552,11 +543,8 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
      */
     std::optional<int> limit;
 
-    /**%apidoc[opt] */
-    ObjectTrackSortField _orderBy = ObjectTrackSortField::id;
-
     /**%apidoc[opt]:enum
-     * Sort order of Object Tracks by a Track start timestamp. Sorting is applied after _orderBy.
+     * Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
      */
@@ -575,7 +563,7 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
 };
 #define ObjectTrackFilter_Fields IdData_Fields ObjectTrackFilterFreeText_Fields \
     (deviceId)(objectTypeId)(startTimeMs)(endTimeMs)(boundingBox)(limit) \
-    (_orderBy)(sortOrder)(analyticsEngineId)(isLocal)
+    (sortOrder)(analyticsEngineId)(isLocal)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
 
