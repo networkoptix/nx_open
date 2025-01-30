@@ -264,10 +264,11 @@ void DeviceSearcher::onSomeBytesRead(
     if (uuidHeader == foundDeviceReply.headers.end())
         return;
 
+    constexpr std::string_view kUuidPrefix = "uuid:";
     auto uuidStr = uuidHeader->second;
-    if (!nx::utils::startsWith(uuidStr, "uuid:"))
+    if (!nx::utils::startsWith(uuidStr, kUuidPrefix))
         return;
-    uuidStr = std::get<0>(nx::utils::split_n<2>(uuidStr, ':'))[1];
+    uuidStr = uuidStr.substr(kUuidPrefix.size());
 
     using namespace nx::network::http;
     nx::utils::Url descriptionUrl(locationHeader->second);
