@@ -19,7 +19,7 @@ file(GLOB_RECURSE ANALYTICS_PLUGIN_UNIT_TESTS_SRC CONFIGURE_DEPENDS
 
 add_executable(analytics_plugin_ut ${ANALYTICS_PLUGIN_UNIT_TESTS_SRC})
 
-target_link_libraries(analytics_plugin_ut PRIVATE nx_sdk)
+target_link_libraries(analytics_plugin_ut PRIVATE nx_kit nx_sdk)
 if(NOT WIN32)
     target_link_libraries(analytics_plugin_ut
         PRIVATE

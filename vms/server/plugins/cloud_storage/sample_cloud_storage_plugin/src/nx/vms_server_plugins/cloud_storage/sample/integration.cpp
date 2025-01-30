@@ -39,4 +39,9 @@ void Integration::getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResul
         new nx::sdk::String(nx::kit::Json(kIntegrationManifest).dump()));
 }
 
-} // namespace nx::vms_server_plugins::cloud_storage::sample
+} // nx::vms_server_plugins::cloud_storage::sample
+
+extern "C" NX_PLUGIN_API nx::sdk::IIntegration* createNxPlugin()
+{
+    return new nx::vms_server_plugins::cloud_storage::sample::Integration;
+}

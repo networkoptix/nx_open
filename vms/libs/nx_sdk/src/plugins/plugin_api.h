@@ -93,12 +93,10 @@ namespace nxpl
     class Plugin: public nxpl::PluginInterface
     {
     public:
-        /** Prototype of an extern "C" plugin entry point function. */
-        struct EntryPoint
-        {
-            static constexpr char kFuncName[] = "createNXPluginInstance";
-            typedef PluginInterface* (*Func)();
-        };
+        static constexpr const char* kEntryPointFuncName = "createNXPluginInstance";
+
+        /** Prototype of a plugin entry point function. */
+        typedef PluginInterface* (*EntryPointFunc)();
 
         /** Name of the plugin, used for information purpose only. */
         virtual const char* name() const = 0;

@@ -16,12 +16,6 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::test::IBase"); }
 };
 
-class IBase2: public Interface<IBase2, IRefCountable>
-{
-public:
-    static auto interfaceId() { return makeId("nx::sdk::test::IBase2"); }
-};
-
 class IData: public Interface<IData, IBase>
 {
 public:
@@ -44,12 +38,6 @@ public:
     }
 };
 bool Base::s_destructorCalled = false;
-
-class Base2: public RefCountable<IBase2>
-{
-public:
-    Base2() = default;
-};
 
 class Data: public RefCountable<IData>
 {
@@ -84,7 +72,7 @@ void assertEq(
     // This is the only correct way to access the ref counter of an arbitrary interface.
     const int increasedRefCount = actual->addRef();
     const int actualRefCount = actual->releaseRef();
-    ASSERT_EQ(increasedRefCount, actualRefCount + 1); //< Check the test integrity.
+    ASSERT_EQ(increasedRefCount, actualRefCount + 1); //< Check test integrity.
     ASSERT_EQ(expectedRefCount, actualRefCount);
 }
 
@@ -243,15 +231,6 @@ TEST(Ptr, releasePtrAndReset)
     data2.reset(); //< reset()
     ASSERT_TRUE(Data::s_destructorCalled); //< Data(1) deleted
     ASSERT_EQ(nullptr, data2.get());
-}
-
-TEST(Ptr, reinterpretToPtr)
-{
-    auto base = makePtr<Base>();
-    Ptr<Base2> base2 = reinterpretPtr<Base2>(base);
-
-    ASSERT_EQ(reinterpret_cast<void*>(base.get()), reinterpret_cast<void*>(base2.get()));
-    ASSERT_EQ(2, base->refCountThreadUnsafe());
 }
 
 } // namespace ptr_ut

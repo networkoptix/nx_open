@@ -72,7 +72,6 @@ macro(_collect_nx_sdk_file_names)
     _add_cloud_storage_samples()
     _add_storage_samples()
     _add_video_source_samples()
-    _add_combined_samples()
 endmacro()
 
 macro(_add_sample_plugin_files target)
@@ -102,43 +101,29 @@ macro(_add_sample_plugin_files target)
 endmacro()
 
 macro(_add_analytics_samples)
-    _add_sample_plugin_files(analytics/sample_analytics_plugin
-        SOURCE_PATTERNS "src/*" "plugin/plugin.cpp")
+    _add_sample_plugin_files(analytics/sample_analytics_plugin SOURCE_PATTERNS "src/*")
     _add_sample_plugin_files(analytics/stub_analytics_plugin
         SOURCE_PATTERNS "src/*" "object_streamer_files/*"
     )
-    _add_sample_plugin_files(analytics/unit_tests/src
-        SOURCE_PATTERNS "*")
+    _add_sample_plugin_files(analytics/unit_tests/src SOURCE_PATTERNS "*")
 endmacro()
 
 macro(_add_cloud_storage_samples)
-    _add_sample_plugin_files(cloud_storage/sample_cloud_storage_plugin
-        SOURCE_PATTERNS "src/*" "plugin/plugin.cpp")
-    _add_sample_plugin_files(cloud_storage/stub_cloud_storage_plugin
-        SOURCE_PATTERNS "src/*")
+    _add_sample_plugin_files(cloud_storage/sample_cloud_storage_plugin SOURCE_PATTERNS "src/*")
+    _add_sample_plugin_files(cloud_storage/stub_cloud_storage_plugin SOURCE_PATTERNS "src/*")
 endmacro()
 
 macro(_add_storage_samples)
     _add_sample_plugin_files(storage/ftp_storage_plugin
-        SOURCE_PATTERNS "src/*" "readme.md"
-        EXTRA_FILES ${open_source_root}/artifacts/ftplibpp
+        SOURCE_PATTERNS "src/*" "readme.md" EXTRA_FILES ${open_source_root}/artifacts/ftplibpp
     )
-    _add_sample_plugin_files(storage/test_storage_plugin
-        SOURCE_PATTERNS "src/*" "plugin/plugin.cpp" "readme.md")
+    _add_sample_plugin_files(storage/test_storage_plugin SOURCE_PATTERNS "src/*" "readme.md")
 endmacro()
 
 macro(_add_video_source_samples)
-    _add_sample_plugin_files(device/axis_camera_plugin
-        SOURCE_PATTERNS "src/*" "readme.md")
-    _add_sample_plugin_files(device/image_library_plugin
-        SOURCE_PATTERNS "src/*" "plugin/plugin.cpp" "readme.md")
-    _add_sample_plugin_files(device/rpi_camera_plugin
-        SOURCE_PATTERNS "src/*" "readme.md")
-endmacro()
-
-macro(_add_combined_samples)
-    _add_sample_plugin_files(combined/combined_plugin
-        SOURCE_PATTERNS "plugin/plugin.cpp")
+    _add_sample_plugin_files(device/axis_camera_plugin SOURCE_PATTERNS "src/*" "readme.md")
+    _add_sample_plugin_files(device/image_library_plugin SOURCE_PATTERNS "src/*" "readme.md")
+    _add_sample_plugin_files(device/rpi_camera_plugin SOURCE_PATTERNS "src/*" "readme.md")
 endmacro()
 
 message(STATUS "Generating files for Nx SDK")

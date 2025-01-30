@@ -33,36 +33,30 @@ public:
     }
 
     /**
-     * Prototype of an extern "C" plugin entry point function for single-IIntegration Plugins.
+     * Prototype of a plugin entry point function for single-IIntegration Plugins.
      *
      * The Server calls this function only when the Plugin library does not export the
      * multi-IIntegration entry point function.
      */
-    struct EntryPoint
-    {
-        static constexpr char kFuncName[] = "createNxPlugin";
-        typedef IIntegration* (*Func)();
-    };
+    typedef IIntegration* (*EntryPointFunc)();
+
+    /** Name of a plugin entry point function for single-IIntegration plugins. */
+    static constexpr const char* kEntryPointFuncName = "createNxPlugin";
 
     /**
-     * Prototype of an extern "C" plugin entry point function for multi-IIntegration Plugins.
+     * Prototype of a plugin entry point function for multi-IIntegration Plugins.
      *
      * The Server calls this function multiple times, passing sequential values starting from 0,
-     * until the function returns null. Each non-null result is processed similarly to the
-     * single-IIntegration entry point functions (either the old-SDK or the new-SDK one), thus
-     * it is possible to pack different IIntegration types into the same plugin dynamic library. If
-     * an old-SDK Integration is returned, its pointer must be reinterpret-casted from
-     * nxpl::PluginInterface - it is safe because nxpl::PluginInterface is ABI-compatible with
-     * IIntegration.
+     * until the function returns null. Each non-null result is processed the same way as the
+     * result of the single-IIntegration entry point function.
      *
      * If this function is exported from the Plugin library and returns at least one Plugin
      * instance, the single-IIntegration entry point function will not be called.
      */
-    struct MultiEntryPoint
-    {
-        static constexpr char kFuncName[] = "createNxPluginByIndex";
-        typedef IIntegration* (*Func)(int instanceIndex);
-    };
+    typedef IIntegration* (*MultiEntryPointFunc)(int instanceIndex);
+
+    /** Name of a Plugin entry point function for multi-IIntegration Plugins. */
+    static constexpr const char* kMultiEntryPointFuncName = "createNxPluginByIndex";
 
     /**
      * Provides an object which the plugin can use for calling back to access some data and

@@ -220,3 +220,11 @@ int TestStorageFactory::releaseRef() const
 {
     return pReleaseRef();
 }
+
+extern "C"
+{
+    NX_PLUGIN_API nxpl::PluginInterface* createNXPluginInstance()
+    {
+        return new TestStorageFactory();
+    }
+}

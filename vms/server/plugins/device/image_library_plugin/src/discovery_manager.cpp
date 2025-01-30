@@ -11,7 +11,7 @@
 
 #include "camera_manager.h"
 #include "dir_iterator.h"
-#include "image_library_plugin.h"
+#include "plugin.h"
 #include "utils.h"
 
 #include <nx/kit/debug.h>

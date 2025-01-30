@@ -1,7 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "image_library_plugin.h"
+#include "plugin.h"
 #include "discovery_manager.h"
+
+extern "C"
+{
+    NX_PLUGIN_API nxpl::PluginInterface* createNXPluginInstance()
+    {
+        return new ImageLibraryPlugin();
+    }
+}
 
 static ImageLibraryPlugin* imageLibraryPluginInstance = NULL;
 
