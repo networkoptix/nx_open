@@ -5206,7 +5206,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>borttagbar</translation>
     </message>
     <message>
       <source>Unknown size</source>
