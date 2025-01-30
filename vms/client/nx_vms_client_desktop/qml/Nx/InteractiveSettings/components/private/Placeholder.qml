@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Controls
 
 import nx.vms.client.core
@@ -20,7 +21,7 @@ Control
     property alias header: header.text
     property alias headerFont: header.font
     property alias description: description.text
-    property alias imageSource: image.source
+    property alias imageSource: image.sourcePath
     readonly property real positionRatio: 2/3
     property var preferredWidth
 
@@ -34,7 +35,7 @@ Control
             Layout.preferredHeight: positionRatio
         }
 
-        Image
+        ColoredImage
         {
             id: image
 
@@ -43,6 +44,7 @@ Control
             Layout.alignment: Qt.AlignCenter
 
             sourceSize: Qt.size(Layout.preferredWidth, Layout.preferredHeight)
+            primaryColor: "dark17"
         }
 
         Label
@@ -52,7 +54,8 @@ Control
             color: ColorTheme.colors.dark17
             visible: text
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: FontConfig.large.pixelSize
+            font.pixelSize: 16
+            font.weight: Font.Medium
             lineHeightMode: Text.FixedHeight
             lineHeight: 20
             wrapMode: Text.Wrap
@@ -74,7 +77,8 @@ Control
             color: ColorTheme.colors.dark17
             visible: text
             horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: FontConfig.large.pixelSize
+            font.pixelSize: 14
+            font.weight: Font.Normal
             lineHeightMode: Text.FixedHeight
             lineHeight: 16
             wrapMode: Text.Wrap

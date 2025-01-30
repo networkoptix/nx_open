@@ -21,7 +21,7 @@ Item
         anchors.fill: parent
 
         visible: !loading
-        imageSource: "image://skin/analytics_icons/placeholders/no_settings.svg"
+        imageSource: "image://skin/64x64/Outline/nosettings.svg"
     }
 
     NxDotPreloader

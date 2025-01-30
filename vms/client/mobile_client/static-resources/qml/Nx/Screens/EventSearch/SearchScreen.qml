@@ -167,8 +167,8 @@ Page
         {
             primaryColor: textItem.color
             sourcePath: controller.analyticsSearchMode
-                ? "image://skin/analytics_icons/placeholders/no_objects.svg"
-                : "image://skin/analytics_icons/placeholders/no_bookmarks.svg"
+                ? "image://skin/64x64/Outline/noobjects.svg"
+                : "image://skin/64x64/Outline/nobookmarks.svg"
             anchors.horizontalCenter: parent.horizontalCenter
         }
 

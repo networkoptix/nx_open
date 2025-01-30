@@ -8,7 +8,7 @@ import "private"
 Placeholder
 {
     property string icon: "default"
-    imageSource: `image://skin/analytics_icons/placeholders/${icon}.svg`
+    imageSource: `image://skin/64x64/Outline/${icon}.svg`
     property bool fillWidth: true
     property bool stretchable: true
 }

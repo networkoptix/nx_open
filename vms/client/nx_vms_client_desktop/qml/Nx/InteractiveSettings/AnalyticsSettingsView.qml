@@ -26,11 +26,12 @@ StackLayout
 
         Placeholder
         {
-            y: 64
+            anchors.centerIn: parent
             width: parent.width
             preferredWidth: 260
             headerFont.pixelSize: 14
-            imageSource: "image://skin/64x64/Outline/integrations.svg?primary=dark17"
+            headerFont.weight: Font.Normal
+            imageSource: "image://skin/64x64/Outline/integrations.svg"
             header: qsTr("Integrations allow the seamless utilization of video analytics on"
                 + " various devices from the VMS.\nSelect an Integration to begin configuring its"
                 + " parameters.")
