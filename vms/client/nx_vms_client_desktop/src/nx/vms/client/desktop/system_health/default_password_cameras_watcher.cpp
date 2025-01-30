@@ -14,12 +14,23 @@ struct DefaultPasswordCamerasWatcher::Private
     {
     }
 
+    bool canChangePassword(nx::vms::api::ResourceStatus cameraStatus)
+    {
+        switch (cameraStatus)
+        {
+            case nx::vms::api::ResourceStatus::unauthorized:
+            case nx::vms::api::ResourceStatus::online:
+            case nx::vms::api::ResourceStatus::recording:
+                return true;
+        }
+
+        return false;
+    }
+
     void handleCameraChanged(const QnVirtualCameraResourcePtr& camera)
     {
-        const bool canChangePassword = camera->isOnline();
-
         bool changed = false;
-        if (canChangePassword && camera->needsToChangeDefaultPassword())
+        if (canChangePassword(camera->getStatus()) && camera->needsToChangeDefaultPassword())
         {
             changed = !camerasWithDefaultPassword.contains(camera);
             camerasWithDefaultPassword.insert(camera);
