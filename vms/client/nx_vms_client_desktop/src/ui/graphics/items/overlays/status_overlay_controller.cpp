@@ -77,7 +77,7 @@ const OverlayInfoMap& overlayInfo()
                 kErrorIconPath}},
         {Qn::RestrictedOverlay,
             {QnStatusOverlayWidget::ErrorStyle::red,
-                QnStatusOverlayWidget::tr("STREAM LIMITATION"),
+                QnStatusOverlayWidget::tr("CONNECTION LOST"),
                 kPaidIconPath}},
         {Qn::InformationRequiredOverlay,
             {QnStatusOverlayWidget::ErrorStyle::white,

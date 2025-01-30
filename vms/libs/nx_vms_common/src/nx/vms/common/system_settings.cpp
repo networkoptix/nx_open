@@ -2655,7 +2655,7 @@ SystemSettings::Errors SystemSettings::update(const api::SystemSettings& value)
             else \
                 errors.emplace(api::SystemSettingName::ITEM); \
         }
-    BOOST_PP_SEQ_FOR_EACH(VALUE, value, SettingsBase_Fields)
+    BOOST_PP_SEQ_FOR_EACH(VALUE, value, UnsaveableSystemSettings_Fields)
     #undef VALUE
     return errors;
 }

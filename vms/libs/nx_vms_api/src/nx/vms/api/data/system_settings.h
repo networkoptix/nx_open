@@ -424,8 +424,9 @@ struct NX_VMS_API SystemSettings: SaveableSystemSettings, SettingsBase
         return result;
     }
 };
-#define SystemSettings_Fields SaveableSystemSettings_Fields SettingsBase_Fields \
+#define UnsaveableSystemSettings_Fields SettingsBase_Fields \
     (cloudSystemID)(localSystemId)(system2faEnabled)
+#define SystemSettings_Fields SaveableSystemSettings_Fields UnsaveableSystemSettings_Fields
 QN_FUSION_DECLARE_FUNCTIONS(SystemSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SystemSettings, SystemSettings_Fields)
 NX_REFLECTION_TAG_TYPE(SystemSettings, jsonSerializeChronoDurationAsNumber)

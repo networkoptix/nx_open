@@ -463,18 +463,23 @@ struct CloudCrossSystemContext::Private
                 if (result != ResultCode::ok)
                 {
                     NX_VERBOSE(this, "Issue access token error result: %1", result);
+                    updateStatus(Status::connectionFailure);
                     return;
                 }
 
                 if (response.error)
                 {
                     NX_VERBOSE(this, "Issue access token error response: %1", response.error);
+                    updateStatus(Status::connectionFailure);
                     return;
                 }
 
                 auto connection = systemContext->connection();
                 if (!connection)
+                {
+                    updateStatus(Status::connectionFailure);
                     return;
+                }
 
                 auto credentials = connection->credentials();
                 credentials.authToken = nx::network::http::BearerAuthToken(response.access_token);
