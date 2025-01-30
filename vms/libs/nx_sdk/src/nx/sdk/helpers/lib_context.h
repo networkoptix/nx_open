@@ -96,8 +96,11 @@ std::map<std::string, std::string>& unitTestOptions();
  * runtime linking algorithm.
  */
 extern "C" NX_SDK_API ILibContext* nxLibContext();
-static constexpr const char* kNxLibContextFuncName = "nxLibContext";
-typedef ILibContext* (*NxLibContextFunc)();
+struct LibContextEntryPoint
+{
+    static constexpr char kFuncName[] = "nxLibContext";
+    typedef ILibContext* (*Func)();
+};
 
 /**
  * Informs the Server about the version of the SDK which was used to build the particular Plugin or
@@ -114,8 +117,11 @@ typedef ILibContext* (*NxLibContextFunc)();
  * runtime linking algorithm.
  */
 extern "C" NX_SDK_API const char* nxSdkVersion();
-static constexpr const char* kNxSdkVersionFuncName = "nxSdkVersion";
-typedef const char* (*NxSdkVersionFunc)();
+struct SdkVersionEntryPoint
+{
+    static constexpr char kFuncName[] = "nxSdkVersion";
+    typedef const char* (*Func)();
+};
 
 /**
  * Defines options (key=value string map) passed to the Plugin when running it from a unit test.
@@ -129,7 +135,10 @@ typedef const char* (*NxSdkVersionFunc)();
  * runtime linking algorithm.
  */
 extern "C" NX_SDK_API void nxSetUnitTestOptions(const IStringMap* options);
-static constexpr const char* kNxSetUnitTestOptionsFuncName = "nxSetUnitTestOptions";
-typedef void (*NxSetUnitTestOptionsFunc)(const IStringMap* options);
+struct SetUnitTestOptionsEntryPoint
+{
+    static constexpr char kFuncName[] = "nxSetUnitTestOptions";
+    typedef void (*Func)(const IStringMap* options);
+};
 
 } // namespace nx::sdk

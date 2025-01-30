@@ -11,7 +11,7 @@
 
 struct FsStubNode;
 
-class NX_PLUGIN_API TestStorage :
+class TestStorage:
     public nx_spl::Storage,
     public PluginRefCounter<TestStorage>
 {

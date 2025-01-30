@@ -23,7 +23,7 @@ struct VfsPair
     VfsPair() : root(nullptr) {}
 };
 
-/**
+/*
 Json object should have the following structure:
 {
     "sample": "/path/to/sample/file",
@@ -49,5 +49,6 @@ Json object should have the following structure:
 }
 */
 
-NX_PLUGIN_API bool buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPair* outVfsPair);
-}
+bool buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPair* outVfsPair);
+
+} // namespace utils

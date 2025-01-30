@@ -163,7 +163,9 @@ struct NX_VMS_API PluginInfo
     QString statusMessage;
 
     /**%apidoc
-     * If the plugin status is "notLoadedBecauseOfError", describes the error.
+     * If the plugin status is "notLoadedBecauseOfError", describes the error. Can be "internalError"
+     * regardless of the status, in which case the statusMessage field contains the error message
+     * and the original status message and error code obtained while loading the plugin.
      */
     Error errorCode = Error::noError;
 
@@ -193,8 +195,9 @@ struct NX_VMS_API PluginInfo
     int instanceIndex = -1;
 
     /**%apidoc
-     * For Plugins created via multi-IIntegration entry point function, an Id of the IIntegration instance
-     * corresponding to this PluginInfo instance. Otherwise, empty.
+     * For Plugins created via multi-IIntegration entry point function, an id of the IIntegration
+     * instance corresponding to this PluginInfo instance, or, if the id is not available -
+     * instanceIndex as a string. Otherwise, empty.
      */
     QString instanceId;
 };

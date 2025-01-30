@@ -16,7 +16,7 @@ enum class FileCategory
     infoTxt
 };
 
-class NX_PLUGIN_API TestIODevice :
+class TestIODevice:
     public nx_spl::IODevice,
     public PluginRefCounter<TestIODevice>
 {

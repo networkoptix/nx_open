@@ -501,12 +501,13 @@ static void unloadLib(LibHandle libHandle)
     #endif
 }
 
-static void* resolveLibFunc(LibHandle libHandle, const std::string& funcName)
+template<typename EntryPoint>
+static typename EntryPoint::Func resolveLibFunc(LibHandle libHandle)
 {
     #if defined(_WIN32)
-        return GetProcAddress(libHandle, funcName.c_str());
+        return reinterpret_cast<typename EntryPoint::Func>(GetProcAddress(libHandle, EntryPoint::kFuncName));
     #else
-        return dlsym(libHandle, funcName.c_str());
+        return reinterpret_cast<typename EntryPoint::Func>(dlsym(libHandle, EntryPoint::kFuncName));
     #endif
 }
 
@@ -538,18 +539,14 @@ static void testPluginLibrary(const std::string& libFilename)
     NX_PRINT << "Testing plugin library " << nx::kit::utils::toString(libFilename);
 
     const auto libHandle = loadLib(libFilename);
-
-    const auto entryPointFunc = reinterpret_cast<nx::sdk::IIntegration::EntryPointFunc>(
-        resolveLibFunc(libHandle, nx::sdk::IIntegration::kEntryPointFuncName));
-
-    const auto multiEntryPointFunc = reinterpret_cast<nx::sdk::IIntegration::MultiEntryPointFunc>(
-        resolveLibFunc(libHandle, nx::sdk::IIntegration::kMultiEntryPointFuncName));
+    const auto entryPointFunc = resolveLibFunc<nx::sdk::IIntegration::EntryPoint>(libHandle);
+    const auto multiEntryPointFunc =
+        resolveLibFunc<nx::sdk::IIntegration::MultiEntryPoint>(libHandle);
 
     // Obtain plugin's LibContext and fill in the plugin libName.
-    const auto nxLibContextFunc = reinterpret_cast<NxLibContextFunc>(
-        resolveLibFunc(libHandle, kNxLibContextFuncName));
-    ASSERT_TRUE(nxLibContextFunc != nullptr);
-    ILibContext* const pluginLibContext = nxLibContextFunc();
+    const auto libContextFunc = resolveLibFunc<LibContextEntryPoint>(libHandle);
+    ASSERT_TRUE(libContextFunc != nullptr);
+    ILibContext* const pluginLibContext = libContextFunc();
     ASSERT_TRUE(pluginLibContext != nullptr);
     const std::string pluginLibName = getPluginLibName(libFilename);
     pluginLibContext->setName(pluginLibName.c_str());
@@ -601,14 +598,12 @@ static bool findPluginLibFilenames(const std::string& argv0)
     }
 
     std::string lineStr;
-    int line = 0;
     while (std::getline(file, lineStr))
     {
         lineStr = nx::kit::utils::trimString(lineStr);
         if (lineStr.empty() || nx::kit::utils::stringStartsWith(lineStr, "#"))
             continue;
         g_pluginLibFilenames.emplace_back(nx::kit::utils::absolutePath(exeDir, lineStr));
-        ++line;
     }
 
     if (g_pluginLibFilenames.empty())

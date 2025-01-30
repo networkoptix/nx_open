@@ -3,7 +3,7 @@
 nx_add_server_plugin_test(test_storage_plugin_ut
     NO_QT
     PRIVATE_LIBS
-        test_storage_plugin
+        test_storage_plugin_integration
         nx_sdk
     FOLDER server/tests
 )
