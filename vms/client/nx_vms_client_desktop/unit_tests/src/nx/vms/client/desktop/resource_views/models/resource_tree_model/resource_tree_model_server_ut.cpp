@@ -4,6 +4,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 
@@ -938,7 +939,10 @@ TEST_F(ResourceTreeModelTest, edgeServerDisplaysServerNameWhenMultipleResourcesR
     // Server gets EDGE camera name.
     ASSERT_EQ(kUniqueEdgeCameraName, edgeServer->getName());
 
-    QObject::connect(resourcePool(), &QnResourcePool::resourceRemoved, resourcePool(),
+    // Make sure connect is broken after the test body.
+    nx::utils::ScopedConnection c = QObject::connect(
+        resourcePool(),
+        &QnResourcePool::resourceRemoved,
         [&](const QnResourcePtr& resource)
         {
             // Resources are removed from pool before this signal is emitted.

@@ -2,15 +2,16 @@
 
 #include "metatypes.h"
 
+#include <mutex>
 #include <string>
 
 #include <analytics/common/object_metadata.h>
-#include <common/common_meta_types.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/metatypes.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/vms/common/common_meta_types.h>
 #include <nx/vms/event/level.h>
 #include <nx/vms/rules/basic_event.h>
 #include <nx/vms/rules/camera_conflict_list.h>
@@ -25,14 +26,9 @@
 
 namespace nx::vms::rules {
 
-void Metatypes::initialize()
+void initializeMetatypesInternal()
 {
-    static std::atomic_bool initialized = false;
-
-    if (initialized.exchange(true))
-        return;
-
-    QnCommonMetaTypes::initialize();
+    common::initializeMetaTypes();
 
     // Register types and serializers in alphabetical order.
 
@@ -101,5 +97,11 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<std::string>();
     QnJsonSerializer::registerSerializer<nx::network::http::SerializableCredentials>();
 };
+
+void Metatypes::initialize()
+{
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeMetatypesInternal);
+}
 
 } // namespace nx::vms::rules

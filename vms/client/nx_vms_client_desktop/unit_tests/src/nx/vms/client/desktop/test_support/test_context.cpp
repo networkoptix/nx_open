@@ -8,7 +8,6 @@
 #include <client/client_startup_parameters.h>
 #include <client_core/client_core_module.h>
 #include <nx/branding.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -16,41 +15,28 @@
 
 namespace nx::vms::client::desktop::test {
 
-struct Context::Private
-{
-    std::unique_ptr<ApplicationContext> appContext;
-};
+namespace {
 
-Context::Context():
-    d(new Private())
+static std::unique_ptr<ApplicationContext> sAppContext;
+
+} // namespace
+
+Context::Context()
 {
-    QCoreApplication::setOrganizationName(nx::branding::company());
-    QCoreApplication::setApplicationName("Unit tests");
-    d->appContext = std::make_unique<ApplicationContext>(
-        ApplicationContext::Mode::unitTests,
-        QnStartupParameters());
+    NX_ASSERT(appContext(), "Desktop client System Context heavily depends on Application Context "
+        "existance. Use AppContextBasedTest as a base class instead.");
 }
 
 Context::~Context()
 {
-    if (systemContext()->messageProcessor())
-        systemContext()->deleteMessageProcessor();
-
-    QCoreApplication::setOrganizationName(QString());
-    QCoreApplication::setApplicationName(QString());
-}
-
-QnClientCoreModule* Context::clientCoreModule() const
-{
-    return d->appContext->clientCoreModule();
 }
 
 SystemContext* Context::systemContext() const
 {
-    return d->appContext->currentSystemContext();
+    return appContext()->currentSystemContext();
 }
 
-MessageProcessorMock* ContextBasedTest::createMessageProcessor()
+MessageProcessorMock* SystemContextBasedTest::createMessageProcessor()
 {
     auto messageProcessor = systemContext()->createMessageProcessor<MessageProcessorMock>();
 
@@ -59,11 +45,31 @@ MessageProcessorMock* ContextBasedTest::createMessageProcessor()
     return messageProcessor;
 }
 
-QnLayoutResourcePtr ContextBasedTest::createLayout()
+QnLayoutResourcePtr SystemContextBasedTest::createLayout()
 {
     LayoutResourcePtr layout(new LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     return layout;
+}
+
+void SystemContextBasedTest::initAppContext(ApplicationContext::Features features)
+{
+    sAppContext = std::make_unique<ApplicationContext>(
+        ApplicationContext::Mode::unitTests,
+        QnStartupParameters(),
+        features);
+}
+
+void SystemContextBasedTest::deinitAppContext()
+{
+    sAppContext.reset();
+}
+
+void SystemContextBasedTest::TearDown()
+{
+    base_type::TearDown();
+    if (systemContext()->messageProcessor())
+        systemContext()->deleteMessageProcessor();
 }
 
 } // namespace nx::vms::client::desktop::test

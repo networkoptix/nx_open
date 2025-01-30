@@ -57,24 +57,19 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->lookupListManager = std::make_unique<LookupListManager>();
     d->pixelationSettings = std::make_unique<PixelationSettings>(this);
 
+    // Some tests do not use network. It is OK to not initialize the pool for them.
+    if (nx::network::SocketGlobals::isInitialized())
+        d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
+
     switch (d->mode)
     {
         case Mode::crossSystem:
         case Mode::cloudLayouts:
         case Mode::server:
-            d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
             break;
+
         case Mode::client:
-            d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
-            d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
-            d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
-            break;
         case Mode::unitTests:
-            if (nx::network::SocketGlobals::isInitialized())
-            {
-                // Some tests do not use network. It is OK to not initialize the pool for them.
-                d->httpClientPool = std::make_unique<network::http::ClientPool>(this);
-            }
             d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
             d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
             break;

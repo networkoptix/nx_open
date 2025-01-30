@@ -2,14 +2,14 @@
 
 #include "client_meta_types.h"
 
-#include <atomic>
+#include <mutex>
 
 #include <QtQml/QtQml>
 
 #include <api/server_rest_connection.h>
 #include <client/client_globals.h>
+#include <client_core/client_core_meta_types.h>
 #include <client_core/client_core_module.h>
-#include <common/common_meta_types.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/client_camera.h>
 #include <core/resource/file_processor.h>
@@ -124,8 +124,7 @@ Q_DECLARE_METATYPE(nx::cloud::db::api::ResultCode)
 Q_DECLARE_METATYPE(nx::cloud::db::api::SystemData)
 Q_DECLARE_METATYPE(rest::ServerConnectionPtr)
 
-using namespace nx::vms::client;
-using namespace nx::vms::client::desktop;
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -174,21 +173,14 @@ QString uuidToString(const nx::Uuid& uuid)
 
 } // namespace
 
-void QnClientMetaTypes::initialize()
+void initializeMetatypesInternal()
 {
-    static std::atomic_bool initialized = false;
-
-    if (initialized.exchange(true))
-        return;
-
-    nx::vms::client::core::initializeMetaTypes();
+    core::initializeMetaTypes();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QColor> >();
     qRegisterMetaType<QValidator::State>();
-
     qRegisterMetaType<LayoutResourcePtr>();
-
     qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<Qn::ItemDataRole>();
@@ -198,30 +190,24 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<menu::IDType>("menu::IDType");
     qRegisterMetaType<menu::Parameters>();
     qRegisterMetaType<ThumbnailsSearchState>();
-
     qRegisterMetaType<Qn::LightModeFlags>();
-
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnPingUtility::PingResponse>();
     qRegisterMetaType<ServerFileCache::OperationResult>();
-
     qRegisterMetaType<UploadState>();
     qRegisterMetaType<VirtualCameraState>();
     qRegisterMetaType<VirtualCameraUpload>();
-
     qRegisterMetaType<nx::cloud::db::api::ResultCode>();
     qRegisterMetaType<nx::cloud::db::api::SystemData>();
     qRegisterMetaType<rest::ServerConnectionPtr>();
-
     qRegisterMetaType<ExportMediaPersistentSettings>();
-
     qRegisterMetaType<QnNotificationLevel::Value>();
-
     qRegisterMetaType<nx::vms::common::update::Information>();
     qRegisterMetaType<UpdateDeliveryInfo>();
     qRegisterMetaType<UpdateContents>();
-
-    qRegisterMetaType<nx::vms::client::desktop::ArchiveFrameExtractor::Result>();
+    qRegisterMetaType<ArchiveFrameExtractor::Result>();
+    qRegisterMetaType<RecordScheduleCellData>();
+    qRegisterMetaType<QnClientCameraResource>();
 
     QMetaType::registerConverter<QVariantMap, QnTimePeriod>(variantMapToTimePeriod);
     QMetaType::registerConverter<QString, QnResourcePtr>(stringToResource);
@@ -235,16 +221,18 @@ void QnClientMetaTypes::initialize()
     WebViewController::registerMetaType();
 
     QnJsonSerializer::registerSerializer<Qn::ImageBehavior>();
-
-    qRegisterMetaType<RecordScheduleCellData>();
-    qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
-    qRegisterMetaType<QnClientCameraResource>();
-
-    registerQmlTypes();
 }
 
-void QnClientMetaTypes::registerQmlTypes()
+void initializeMetaTypes()
 {
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeMetatypesInternal);
+}
+
+void registerQmlTypesInternal()
+{
+    core::registerQmlTypes();
+
     SystemContext::registerQmlType();
     AccessRightsList::registerQmlTypes();
     LayoutModel::registerQmlType();
@@ -357,3 +345,11 @@ void QnClientMetaTypes::registerQmlTypes()
     ldap_settings::registerQmlType();
     BlurMaskPreview::registerQmlType();
 }
+
+void registerQmlTypes()
+{
+    static std::once_flag registered;
+    std::call_once(registered, &registerQmlTypesInternal);
+}
+
+} // namespace nx::vms::client::desktop

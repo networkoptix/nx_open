@@ -3,6 +3,7 @@
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QApplication>
 
+#include <nx/branding.h>
 #include <nx/utils/test_support/run_test.h>
 
 int main(int argc, char** argv)
@@ -12,6 +13,8 @@ int main(int argc, char** argv)
         qputenv("QT_QPA_PLATFORM", "offscreen");
 
     QQuickWindow::setGraphicsApi(QSGRendererInterface::GraphicsApi::Software);
+    QCoreApplication::setOrganizationName(nx::branding::company());
+    QCoreApplication::setApplicationName("Unit tests");
 
     QApplication application(argc, argv);
 

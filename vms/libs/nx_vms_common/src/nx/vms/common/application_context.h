@@ -30,20 +30,37 @@ protected:
     using PeerType = nx::vms::api::PeerType;
 
 public:
-    enum class Feature
+    enum class FeatureFlag
     {
         none = 0,
         networking = 1 << 0,
         translations = 1 << 1,
 
-        all = networking | translations
+        all = -1
     };
-    Q_DECLARE_FLAGS(Features, Feature)
+    Q_DECLARE_FLAGS(FeatureFlags, FeatureFlag)
+
+    struct Features
+    {
+        FeatureFlags flags = FeatureFlag::none;
+
+        Features() = default;
+        Features(FeatureFlags flags): flags(flags){}
+
+        Features& withFlag(FeatureFlag flag)
+        {
+            flags.setFlag(flag);
+            return *this;
+        }
+
+        static Features all() { return {FeatureFlag::all}; }
+        static Features none() { return {FeatureFlag::none}; }
+    };
 
     ApplicationContext(
         PeerType localPeerType = PeerType::notDefined,
         const QString& customCloudHost = QString(),
-        Features features = Feature::all,
+        Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 

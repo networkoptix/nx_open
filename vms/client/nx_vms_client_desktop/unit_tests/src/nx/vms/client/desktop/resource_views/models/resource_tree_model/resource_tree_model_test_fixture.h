@@ -30,8 +30,18 @@ namespace entity_resource_tree { class ResourceTreeComposer; };
 
 namespace test {
 
+struct WithCrossSiteFeatures
+{
+    static ApplicationContext::Features features()
+    {
+        auto result = ApplicationContext::Features::none();
+        result.flags.setFlag(ApplicationContext::FeatureFlag::cross_site);
+        return result;
+    }
+};
+
 class ResourceTreeModelTest:
-    public nx::vms::client::desktop::test::ContextBasedTest,
+    public AppContextBasedTest<WithCrossSiteFeatures>,
     public ::testing::WithParamInterface<nx::vms::api::WebPageSubtype>
 {
 protected:

@@ -12,13 +12,13 @@
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/certificate_storage.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/test_support/unit_test_application.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 #include <utils/common/synctime.h>
 
@@ -122,8 +122,9 @@ public:
     RemoteConnectionFactoryTest()
     {
         systemContext = std::make_unique<SystemContext>(
-            SystemContext::Mode::unitTests, nx::Uuid::createUuid());
-        appContext()->addSystemContext(systemContext.get());
+            SystemContext::Mode::unitTests,
+            nx::Uuid::createUuid());
+        appContext.addSystemContext(systemContext.get());
 
         requestsManager = std::make_shared<RemoteConnectionFactoryRequestsManager>();
 
@@ -313,7 +314,12 @@ public:
 
 public:
     // RemoteConnectionFactory uses application secure settings for connection cache.
-    UnitTestApplication application;
+    ApplicationContext appContext{
+        ApplicationContext::Mode::unitTests,
+        nx::vms::api::PeerType::notDefined,
+        /*customCloudHost*/ QString(),
+        /*customExternalResourceFile*/ QString(),
+        ApplicationContext::Features::none()};
 
     std::unique_ptr<SystemContext> systemContext;
 

@@ -7,11 +7,10 @@
 #include <QtCore/QObject>
 #include <QtQml/QQmlEngine>
 
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 
 namespace nx::vms::client::desktop::test {
-
-class Context;
 
 class QmlTestEnvironment: public QObject
 {
@@ -24,7 +23,7 @@ public:
     SystemContext* systemContext() const;
 
 private:
-    std::unique_ptr<Context> m_testContext;
+    std::unique_ptr<ApplicationContext> m_appContext;
 };
 
 } // namespace nx::vms::client::desktop::test

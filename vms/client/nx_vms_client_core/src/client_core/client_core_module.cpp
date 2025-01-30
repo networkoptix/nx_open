@@ -44,20 +44,24 @@ QnClientCoreModule::QnClientCoreModule(
     else
         s_instance = this;
 
-    systemContext->storeToQmlContext(appContext()->qmlEngine()->rootContext());
     d->sessionTokenTerminator = std::make_unique<SessionTokenTerminator>();
 
-    const auto qmlEngine = appContext()->qmlEngine();
-    qmlEngine->addImageProvider("skin", new nx::vms::client::core::SkinImageProvider());
-    qmlEngine->addImageProvider("remote", new nx::vms::client::core::RemoteAsyncImageProvider(
-        systemContext));
+    if (const auto qmlEngine = appContext()->qmlEngine())
+    {
+        systemContext->storeToQmlContext(qmlEngine->rootContext());
+        qmlEngine->addImageProvider("skin", new nx::vms::client::core::SkinImageProvider());
+        qmlEngine->addImageProvider("remote", new nx::vms::client::core::RemoteAsyncImageProvider(
+            systemContext));
+    }
 }
 
 QnClientCoreModule::~QnClientCoreModule()
 {
-    const auto qmlEngine = appContext()->qmlEngine();
-    qmlEngine->removeImageProvider("remote");
-    qmlEngine->removeImageProvider("skin");
+    if (const auto qmlEngine = appContext()->qmlEngine())
+    {
+        qmlEngine->removeImageProvider("remote");
+        qmlEngine->removeImageProvider("skin");
+    }
 
     if (s_instance == this)
         s_instance = nullptr;

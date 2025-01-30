@@ -36,11 +36,11 @@ public:
 
     virtual void TearDown() override
     {
+        ContextBasedTest::TearDown();
         resourceAccessReset.reset();
         resourceAccessChanged.reset();
         resolver.reset();
         manager.reset();
-        ContextBasedTest::TearDown();
     }
 
 public:

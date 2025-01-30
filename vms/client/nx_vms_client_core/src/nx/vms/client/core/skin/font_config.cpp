@@ -109,7 +109,8 @@ FontConfig::FontConfig(
     NX_DEBUG(this, "Base file: %1, override file: %2", basicFontsFileName, overrideFontsFileName);
 
     d->fontMap = readFontMap(basicFontsFileName, baseFont);
-    d->fontMap.insert(readFontMap(overrideFontsFileName, baseFont));
+    if (!overrideFontsFileName.isEmpty())
+        d->fontMap.insert(readFontMap(overrideFontsFileName, baseFont));
 
     const auto normalFont = font("normal");
     NX_INFO(this, "Loaded %1 fonts, default config font family: %2, weight: %3, size %4px",

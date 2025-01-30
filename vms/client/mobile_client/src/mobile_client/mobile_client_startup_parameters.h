@@ -5,7 +5,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QUrl>
 
-#include <mobile_client/mobile_client_meta_types.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 

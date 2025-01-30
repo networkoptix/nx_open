@@ -27,11 +27,17 @@ namespace {
 
 class SnapshotLayoutResource: public QnLayoutResource
 {
-    const LayoutResourcePtr m_parentLayout;
+    const QWeakPointer<LayoutResource> m_parentLayout;
 
 public:
     SnapshotLayoutResource(const LayoutResourcePtr& parentLayout): m_parentLayout(parentLayout) {}
-    virtual QnLayoutResourcePtr transientLayout() const override { return m_parentLayout; }
+    virtual QnLayoutResourcePtr transientLayout() const override
+    {
+        if (auto parent = m_parentLayout.lock(); NX_ASSERT(parent))
+            return parent->toSharedPointer(parent.get());
+
+        return {};
+    }
 };
 
 const auto unsavedChangedGuard(const LayoutResourcePtr& layout)

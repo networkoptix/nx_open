@@ -89,8 +89,12 @@ public:
         removeResources(QnResourceList() << resource);
     }
 
-    //!Empties all internal dictionaries. Needed for correct destruction order at application stop
-    void clear();
+    /**
+     * Clear all internal dictionaries. Needed for correct destruction order at application stop or
+     * between the unit tests launches.
+     * @param notify Whether corresponding `resourcesRemoved()` signal should be sent.
+     */
+    void clear(bool notify);
 
     using ResourceFilter = nx::vms::common::ResourceFilter;
 

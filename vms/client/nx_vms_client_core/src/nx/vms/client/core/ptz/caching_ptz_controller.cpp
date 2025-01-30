@@ -2,7 +2,6 @@
 
 #include "caching_ptz_controller.h"
 
-#include <common/common_meta_types.h>
 #include <core/resource/resource.h>
 #include <nx/utils/algorithm/index_of.h>
 #include <utils/common/delayed.h>

@@ -5,5 +5,6 @@
 namespace nx::vms::client::core {
 
 NX_VMS_CLIENT_CORE_API void initializeMetaTypes();
+NX_VMS_CLIENT_CORE_API void registerQmlTypes();
 
 } // namespace nx::vms::client::core

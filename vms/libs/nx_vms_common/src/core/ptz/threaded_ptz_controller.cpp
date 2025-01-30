@@ -5,7 +5,6 @@
 #include <QtCore/QThreadPool>
 #include <QtCore/QVariant>
 
-#include <common/common_meta_types.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <nx/utils/thread/mutex.h>
 

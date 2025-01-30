@@ -2,7 +2,7 @@
 
 #include "metatypes.h"
 
-#include <atomic>
+#include <mutex>
 
 #include <QtCore/QList>
 
@@ -59,13 +59,8 @@
 
 namespace nx::vms::api {
 
-void Metatypes::initialize()
+void initializeMetatypesInternal()
 {
-    static std::atomic_bool initialized = false;
-
-    if (initialized.exchange(true))
-        return;
-
     // Fully qualified namespaces are not needed here but are mandatory in all signal declarations.
 
     qRegisterMetaType<GlobalPermission>();
@@ -166,5 +161,11 @@ void Metatypes::initialize()
     QnJsonSerializer::registerSerializer<nx::vms::api::Credentials>();
     QnJsonSerializer::registerSerializer<QList<nx::vms::api::Credentials>>();
 };
+
+void Metatypes::initialize()
+{
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeMetatypesInternal);
+}
 
 } // namespace nx::vms::api

@@ -31,9 +31,6 @@ public:
     using ActionConstructor = std::function<BasicAction*()>;
     using Actions = std::vector<ActionPtr>;
 
-    // TODO: #spanasenko Remove this when VMS-55348 is fixed.
-    static bool bypassScopedLocaleForTest;
-
     ActionBuilder(nx::Uuid id, const QString& actionType, const ActionConstructor& ctor);
     virtual ~ActionBuilder() override;
 

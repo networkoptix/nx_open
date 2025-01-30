@@ -4,11 +4,11 @@
 
 #include <QtCore/QCollator>
 
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/avi/avi_resource.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 
 namespace nx::vms::client::desktop {
@@ -19,9 +19,19 @@ using namespace index_condition;
 void ResourceTreeModelSortingGroupingTest::SetUp()
 {
     base_class::SetUp();
-    const auto user = loginAsPowerUser("power_user");
-    const auto userId = user->getId();
-    createAllKindsOfResources(userId);
+    const bool resourcesCreated = (!currentUser().isNull());
+    if (!resourcesCreated)
+    {
+        const auto user = loginAsPowerUser("power_user");
+        const auto userId = user->getId();
+        createAllKindsOfResources(userId);
+    }
+}
+
+void ResourceTreeModelSortingGroupingTest::TearDown()
+{
+    // Intentionally do nothing here to avoid long resource pool re-population.
+    // base_class::TearDown();
 }
 
 QStringList ResourceTreeModelSortingGroupingTest::sortingSignificantStrings() const

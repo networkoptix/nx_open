@@ -2,7 +2,7 @@
 
 #include "metatypes.h"
 
-#include <atomic>
+#include <mutex>
 
 #include "async_handler_executor_detail.h"
 #include "buffer.h"
@@ -14,13 +14,8 @@
 
 namespace nx::utils {
 
-void Metatypes::initialize()
+void initializeMetatypesInternal()
 {
-    static std::atomic_bool initialized = false;
-
-    if (initialized.exchange(true))
-        return;
-
     // Fully qualified namespaces are not needed here but are mandatory in all signal declarations.
     qRegisterMetaType<Buffer>();
 
@@ -53,5 +48,11 @@ void Metatypes::initialize()
     QMetaType::registerConverter<std::chrono::seconds, std::chrono::microseconds>();
     QMetaType::registerConverter<std::chrono::milliseconds, std::chrono::microseconds>();
 };
+
+void Metatypes::initialize()
+{
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeMetatypesInternal);
+}
 
 } // namespace nx::utils

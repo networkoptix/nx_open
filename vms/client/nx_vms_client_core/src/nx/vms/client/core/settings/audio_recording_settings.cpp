@@ -10,7 +10,7 @@
 #include <nx/utils/property_storage/filesystem_backend.h>
 
 #if defined(Q_OS_WIN)
-#include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
+    #include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
 #endif // defined(Q_OS_WIN)
 
 namespace nx::vms::client::core {
@@ -90,14 +90,14 @@ AudioRecordingSettings::AudioRecordingSettings():
     Storage(new nx::utils::property_storage::FileSystemBackend(
         QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
             + "/settings/screen_recording")),
-    m_devices(fetchDevicesList())
+    m_devices([this] { return fetchDevicesList(); })
 {
     load();
 }
 
 QList<AudioDeviceInfo> AudioRecordingSettings::availableDevices() const
 {
-    return m_devices;
+    return m_devices.get();
 }
 
 AudioDeviceInfo AudioRecordingSettings::primaryAudioDevice() const
@@ -166,7 +166,7 @@ AudioDeviceInfo AudioRecordingSettings::getDeviceByName(const QString& name) con
 {
     if (!name.isEmpty())
     {
-        for (const AudioDeviceInfo& info: m_devices)
+        for (const AudioDeviceInfo& info: availableDevices())
         {
             if (name == info.fullName())
                 return info;

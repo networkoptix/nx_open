@@ -6,7 +6,6 @@
 #include <QtCore/QSize>
 
 #include <client_core/local_connection_data.h>
-#include <mobile_client/mobile_client_meta_types.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/singleton.h>

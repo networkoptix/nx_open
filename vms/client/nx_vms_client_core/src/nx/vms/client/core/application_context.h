@@ -45,12 +45,54 @@ public:
         unitTests
     };
 
+    enum class FeatureFlag
+    {
+        none = 0,
+        qml = 1 << 0,
+
+        all = -1
+    };
+    Q_DECLARE_FLAGS(FeatureFlags, FeatureFlag)
+
+    struct Features
+    {
+        common::ApplicationContext::Features base;
+        bool ignoreCustomization = false;
+        FeatureFlags flags = FeatureFlag::none;
+
+        Features() = default;
+        Features(
+            common::ApplicationContext::Features base,
+            FeatureFlags flags)
+            :
+            base(base),
+            flags(flags)
+        {
+        }
+
+        static Features all()
+        {
+            return {
+                common::ApplicationContext::Features::all(),
+                FeatureFlag::all
+            };
+        }
+
+        static Features none()
+        {
+            return {
+                common::ApplicationContext::Features::none(),
+                FeatureFlag::none
+            };
+        }
+    };
+
     ApplicationContext(
         Mode mode,
-        PeerType peerType,
-        const QString& customCloudHost,
-        bool ignoreCustomization,
+        PeerType peerType = PeerType::notDefined,
+        const QString& customCloudHost = {},
         const QString& customExternalResourceFile = {},
+        Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 

@@ -2,7 +2,7 @@
 
 #include "client_core_meta_types.h"
 
-#include <atomic>
+#include <mutex>
 
 #include <QtCore/QAbstractItemModel>
 #include <QtQml/QtQml>
@@ -10,7 +10,6 @@
 #include <qt_helpers/scene_position_listener.h>
 
 #include <client/forgotten_systems_manager.h>
-#include <common/common_meta_types.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -21,7 +20,6 @@
 #include <nx/vms/api/types/dewarping_types.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
-#include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
@@ -82,6 +80,7 @@
 #include <nx/vms/client/core/utils/model_item_flags_watcher.h>
 #include <nx/vms/client/core/utils/persistent_index_watcher.h>
 #include <nx/vms/client/core/utils/quick_item_mouse_tracker.h>
+#include <nx/vms/common/common_meta_types.h>
 #include <nx/vms/rules/metatypes.h>
 #include <ui/models/authentication_data_model.h>
 #include <ui/models/model_data_accessor.h>
@@ -89,24 +88,25 @@
 
 namespace nx::vms::client::core {
 
-void initializeMetaTypes()
+void initializeMetatypesInternal()
 {
-    static std::atomic_bool initialized = false;
-
-    if (initialized.exchange(true))
-        return;
-
-    ColorTheme::registerQmlType();
-
-    QnCommonMetaTypes::initialize();
+    common::initializeMetaTypes();
     nx::vms::rules::Metatypes::initialize();
 
     QnJsonSerializer::registerSerializer<EncodedCredentials>();
 
     qRegisterMetaType<nx::media::PlayerStatistics>();
-
     qRegisterMetaType<MotionSelection>();
+}
 
+void initializeMetaTypes()
+{
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeMetatypesInternal);
+}
+
+void registerQmlTypesInternal()
+{
     // To create properties of type QAbstractItemModel* in QML and to assign C++ object properties
     // of that type from QML.
     qmlRegisterUncreatableType<QAbstractItemModel>("Nx.Core", 1, 0, "AbstractItemModel",
@@ -184,7 +184,6 @@ void initializeMetaTypes()
     CameraButtonData::registerQmlType();
     AccessHelper::registerQmlType();
     RowCountWatcher::registerQmlType();
-
     EventSearch::registerQmlTypes();
     ResourceIdentificationThumbnail::registerQmlType();
     AnalyticsSearchSetup::registerQmlType();
@@ -195,7 +194,6 @@ void initializeMetaTypes()
     analytics::TaxonomyManager::registerQmlTypes();
     analytics::IconManager::registerQmlType();
     FetchRequest::registerQmlType();
-    ColorTheme::registerQmlType();
     TranslationListModel::registerQmlType();
     MultilineTextItem::registerQmlType();
     NameValueTableCalculator::registerQmlType();
@@ -240,6 +238,12 @@ void initializeMetaTypes()
         "API", "API is a namespace");
     qmlRegisterUncreatableMetaObject(
         Qn::staticMetaObject, "nx.vms.common", 1, 0, "CommonGlobals", "");
+}
+
+void registerQmlTypes()
+{
+    static std::once_flag registered;
+    std::call_once(registered, &registerQmlTypesInternal);
 }
 
 } // namespace nx::vms::client::core

@@ -52,6 +52,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/controllers/web_view_controller.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
+#include <nx/vms/client/mobile/mobile_client_meta_types.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
@@ -64,7 +65,6 @@
 #include <watchers/available_cameras_watcher.h>
 
 #include "mobile_client_message_processor.h"
-#include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
 #include "mobile_client_startup_parameters.h"
 
@@ -117,7 +117,7 @@ QnMobileClientModule::QnMobileClientModule(
 
     m_remoteLogManager = std::make_unique<RemoteLogManager>();
 
-    QnMobileClientMetaTypes::initialize();
+    initializeMetaTypes();
 
     /* Init singletons. */
 

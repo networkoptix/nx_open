@@ -67,9 +67,51 @@ public:
         unitTests,
     };
 
+    enum class FeatureFlag
+    {
+        none = 0,
+        cross_site = 1 << 0,
+
+        all = -1
+    };
+    Q_DECLARE_FLAGS(FeatureFlags, FeatureFlag)
+
+    struct Features
+    {
+        core::ApplicationContext::Features core;
+        FeatureFlags flags = FeatureFlag::none;
+
+        Features() = default;
+        Features(
+            core::ApplicationContext::Features core,
+            FeatureFlags flags)
+            :
+            core(core),
+            flags(flags)
+        {
+        }
+
+        static Features all()
+        {
+            return {
+                core::ApplicationContext::Features::all(),
+                FeatureFlag::all
+            };
+        }
+
+        static Features none()
+        {
+            return {
+                core::ApplicationContext::Features::none(),
+                FeatureFlag::none
+            };
+        }
+    };
+
     ApplicationContext(
         Mode mode,
         const QnStartupParameters& startupParameters,
+        Features features = Features::all(),
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 

@@ -439,7 +439,7 @@ public:
 
 PlayerSetQualityTest::PlayerSetQualityTest()
 {
-    m_context.systemContext()->resourcePool()->clear(); //< Just in case.
+    m_context.systemContext()->resourcePool()->clear(/*notify*/ true); //< Just in case.
     m_server->setUrl("http://localhost:7001");
     m_context.systemContext()->resourcePool()->addResource(m_server);
     m_context.systemContext()->resourcePool()->addResource(m_camera);
@@ -447,7 +447,7 @@ PlayerSetQualityTest::PlayerSetQualityTest()
 
 PlayerSetQualityTest::~PlayerSetQualityTest()
 {
-    m_context.systemContext()->resourcePool()->clear();
+    m_context.systemContext()->resourcePool()->clear(/*notify*/ true);
 }
 
 void PlayerSetQualityTest::test(const TestCase& testCase)

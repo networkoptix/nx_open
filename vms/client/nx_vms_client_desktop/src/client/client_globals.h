@@ -7,7 +7,6 @@
 #include <QtCore/QFlags>
 #include <QtCore/QInternal>
 
-#include <common/common_meta_types.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/vms/client/core/client_core_globals.h>
 

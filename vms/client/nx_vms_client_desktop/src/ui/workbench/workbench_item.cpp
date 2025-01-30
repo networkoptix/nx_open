@@ -4,7 +4,6 @@
 
 #include <QtCore/QCollator>
 
-#include <common/common_meta_types.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/fuzzy.h>

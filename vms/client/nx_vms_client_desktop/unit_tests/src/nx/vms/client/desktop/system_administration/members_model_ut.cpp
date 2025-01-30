@@ -17,17 +17,14 @@ namespace nx::vms::client::desktop {
 
 namespace test {
 
-class MembersModelTest: public nx::vms::client::desktop::test::ContextBasedTest
+class MembersModelTest: public ContextBasedTest
 {
 public:
     virtual void SetUp() override
     {
+        ContextBasedTest::SetUp();
         m_model.reset(new MembersModel(systemContext()));
         createData();
-    }
-
-    virtual void TearDown() override
-    {
     }
 
     void createData()

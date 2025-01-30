@@ -21,9 +21,9 @@ namespace test {
 
 using TestModel = ServerListModel;
 
-class ServerListModelTest: public ContextBasedTest
+class ServerListModelTest: public QmlContextBasedTest
 {
-public:
+protected:
     virtual void SetUp() override
     {
         QQmlComponent component(appContext()->qmlEngine());
@@ -38,7 +38,7 @@ public:
     {
         m_modelTester.reset();
         m_testModel.reset();
-        resourcePool()->clear();
+        resourcePool()->clear(/*notify*/ true);
     }
 
     QnMediaServerResourcePtr registerNewServer(const QString& name)

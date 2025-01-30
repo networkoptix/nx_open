@@ -260,10 +260,7 @@ void LookupListImportEntriesModel::setLookupListEntriesModel(
         return;
 
     if (d->listEntriesModel)
-        disconnect(d->listEntriesModel);
-
-    beginResetModel();
-    reset();
+        d->listEntriesModel->disconnect(this);
 
     d->listEntriesModel = lookupListEntriesModel;
 
@@ -271,6 +268,7 @@ void LookupListImportEntriesModel::setLookupListEntriesModel(
     {
         connect(d->listEntriesModel,
             &LookupListEntriesModel::listModelChanged,
+            this,
             [this](LookupListModel* listModel)
             {
                 if (listModel)
@@ -279,9 +277,10 @@ void LookupListImportEntriesModel::setLookupListEntriesModel(
                     emit headerDataChanged(Qt::Horizontal, 0, d->columnHeaders.size());
                 }
             });
-        emit lookupListEntriesModelChanged();
     }
-    endResetModel();
+    reset();
+
+    emit lookupListEntriesModelChanged();
 }
 
 bool LookupListImportEntriesModel::fixupRequired()

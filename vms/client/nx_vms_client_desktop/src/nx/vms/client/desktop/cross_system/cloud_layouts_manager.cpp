@@ -59,9 +59,14 @@ nx::utils::Url actualLayoutsEndpoint()
             return endpoint;
     }
 
+    // Some tests do not use network. Socket globals are unaccessible in this case.
+    const QString cloudHost = nx::network::SocketGlobals::isInitialized()
+        ? QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost())
+        : nx::branding::cloudHost();
+
     return nx::network::url::Builder()
         .setScheme(kSecureUrlSchemeName)
-        .setHost(nx::network::SocketGlobals::cloud().cloudHost())
+        .setHost(cloudHost)
         .toUrl();
 }
 

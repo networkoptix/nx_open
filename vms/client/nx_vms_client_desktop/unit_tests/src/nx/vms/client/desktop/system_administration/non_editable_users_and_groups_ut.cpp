@@ -5,6 +5,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
@@ -17,17 +18,9 @@ namespace nx::vms::client::desktop {
 
 namespace test {
 
-class NonEditableUsersAndGroupsTest: public nx::vms::client::desktop::test::ContextBasedTest
+class NonEditableUsersAndGroupsTest: public ContextBasedTest
 {
 public:
-    virtual void SetUp() override
-    {
-    }
-
-    virtual void TearDown() override
-    {
-    }
-
     void loginAs(const nx::Uuid& userId)
     {
         auto resourcePool = systemContext()->resourcePool();
@@ -35,7 +28,7 @@ public:
         ASSERT_TRUE(!user.isNull());
         systemContext()->accessController()->setUser(user);
 
-        QObject::connect(systemContext()->nonEditableUsersAndGroups(),
+        connections << QObject::connect(systemContext()->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::userModified,
             [this](const QnUserResourcePtr& user)
             {
@@ -46,19 +39,18 @@ public:
                 signalLog << nx::format("%1 %2", action, user->getName());
             });
 
-        QObject::connect(systemContext()->nonEditableUsersAndGroups(),
+        connections << QObject::connect(systemContext()->nonEditableUsersAndGroups(),
             &NonEditableUsersAndGroups::groupModified,
             [this](const nx::Uuid& groupId)
             {
-                const auto action =
-                    systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId)
-                        ? "added"
-                        : "removed";
+                const bool added =
+                    systemContext()->nonEditableUsersAndGroups()->containsGroup(groupId);
+
+                const auto action = added ? "added" : "removed";
 
                 const auto group = systemContext()->userGroupManager()->find(groupId);
-                ASSERT_TRUE(group);
-
-                signalLog << nx::format("%1 %2", action, group->name);
+                if (group)
+                    signalLog << nx::format("%1 %2", action, group->name);
             });
     }
 
@@ -184,6 +176,7 @@ public:
         systemContext()->userGroupManager()->addOrUpdate(group);
     }
 
+    nx::utils::ScopedConnections connections;
     const QSet<nx::Uuid> kPredefinedGroups = nx::utils::toQSet(api::kPredefinedGroupIds);
     QList<QString> signalLog;
 };

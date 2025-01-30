@@ -13,6 +13,7 @@
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/storage_resource_stub.h>
+#include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
@@ -296,6 +297,16 @@ void QnResourcePoolTestHelper::removeUserGroup(const nx::Uuid& groupId)
 
 void QnResourcePoolTestHelper::clear()
 {
-    resourcePool()->clear();
-    systemContext()->userGroupManager()->resetAll({});
+    using namespace nx::vms::common;
+
+    systemContext()->accessRightsManager()->resetAccessRights({});
+    resourcePool()->clear(/*notify*/ true);
+    systemContext()->showreelManager()->resetShowreels();
+
+    // We cannot use `resetAll` method as `NonEditableUsersAndGroups` is connected to the `reset`
+    // signal via queued connection. Thus groups are not actually removed from cache.
+    // systemContext()->userGroupManager()->resetAll({});
+    auto groups = systemContext()->userGroupManager()->ids(UserGroupManager::Selection::custom);
+    for (auto groupId: groups)
+        systemContext()->userGroupManager()->remove(groupId);
 }

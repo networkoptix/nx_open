@@ -49,13 +49,12 @@ class SystemFinderTest: public ::testing::Test
 public:
     SystemFinderTest()
     {
-        QCoreApplication::setOrganizationName(nx::branding::company());
-        QCoreApplication::setApplicationName("Unit tests");
         appContext = std::make_unique<ApplicationContext>(
             ApplicationContext::Mode::unitTests,
             nx::vms::api::PeerType::desktopClient,
             /*customCloudHost*/ QString(),
-            /*ignoreCustomization*/ false);
+            /*customExternalResourceFile*/ QString(),
+            ApplicationContext::Features::none());
         systemFinder = std::make_unique<QnSystemFinderMock>();
     }
 

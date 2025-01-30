@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 
+#include <nx/branding.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/test_support/run_test.h>
 
@@ -11,6 +12,8 @@ int main(int argc, char** argv)
     if (qgetenv("QT_QPA_PLATFORM").isEmpty())
         qputenv("QT_QPA_PLATFORM", "offscreen");
 
+    QCoreApplication::setOrganizationName(nx::branding::company());
+    QCoreApplication::setApplicationName("Unit tests");
     QGuiApplication application(argc, argv);
 
     nx::network::SocketGlobals::InitGuard sgGuard(

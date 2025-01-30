@@ -1,10 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifdef TRACE_REFCOUNT_CHANGE
-
 #include "ref_count_tracing_mixin.h"
 
-#include <cstring>
+#ifdef TRACE_REFCOUNT_CHANGE
 
 nx::utils::debug::AllocationAnalyzer RefcountTracingMixin::allocationAnalyzer;
 nx::Mutex RefcountTracingMixin::mutex;

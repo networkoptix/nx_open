@@ -238,6 +238,7 @@ protected:
     {
         m_logicalIdsWatcher.reset();
         m_store.reset();
+        ContextBasedTest::TearDown();
     }
 
 private:

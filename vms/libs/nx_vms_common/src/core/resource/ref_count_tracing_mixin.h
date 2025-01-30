@@ -5,12 +5,9 @@
 #include <set>
 #include <string>
 
-#include <boost/stacktrace.hpp>
-
+#include <nx/utils/debug/allocation_analyzer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-
-#include <nx/utils/debug/allocation_analyzer.h>
 
 class NX_VMS_COMMON_API RefcountTracingMixin
 {

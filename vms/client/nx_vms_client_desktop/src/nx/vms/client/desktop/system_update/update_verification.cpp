@@ -64,9 +64,14 @@ bool checkCloudHost(
     if (targetVersion < kCloudRequiredVersion)
         return true;
 
+    // Networking may be uninitialized in unit tests.
+    const QString cloudHost = nx::network::SocketGlobals::isInitialized()
+        ? QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost())
+        : nx::branding::cloudHost();
+
     /* Update is allowed if either target version has the same cloud host or
        there are no servers linked to the cloud in the system. */
-    if (cloudUrl == nx::network::SocketGlobals::cloud().cloudHost())
+    if (cloudUrl == cloudHost)
         return true;
 
     const bool isBoundToCloud = !systemContext->globalSettings()->cloudSystemId().isEmpty();

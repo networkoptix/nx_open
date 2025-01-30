@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/utils/property_storage/storage.h>
+#include <nx/utils/value_cache.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_device_info.h>
 
 namespace nx::vms::client::core {
@@ -29,7 +30,7 @@ private:
     AudioDeviceInfo getDeviceByName(const QString& name) const;
 
 private:
-    QList<AudioDeviceInfo> m_devices;
+    nx::utils::CachedValue<QList<AudioDeviceInfo>> m_devices;
 };
 
 } // namespace nx::vms::client::core

@@ -62,6 +62,8 @@ static void initializeResources()
 
 namespace nx::vms::client::core {
 
+using CommonFeatureFlag = common::ApplicationContext::FeatureFlag;
+
 struct ApplicationContext::Private
 {
     void initializeSettings()
@@ -100,6 +102,31 @@ struct ApplicationContext::Private
         qmlEngine->addImageProvider(ThumbnailImageProvider::id, thumbnailProvider);
         qmlEngine->addImageProvider(core::VisibleItemDataDecoratorModel::PreviewProvider::id,
             new core::VisibleItemDataDecoratorModel::PreviewProvider());
+
+        nx::setOnAssertHandler(
+            [](const QString&)
+            {
+                std::cerr << "\nQML stacktrace:\n";
+
+                const QV4::ExecutionEngine* engine = appContext()->qmlEngine()->handle();
+                if (!engine->qmlContext()) //< Avoid a crash when called without QML stack.
+                {
+                    std::cerr << "  <no QML context available>" << std::endl;
+                    return;
+                }
+
+                const QVector<QV4::StackFrame> stackTrace = engine->stackTrace(20);
+                for (int i = 0; i < stackTrace.size(); ++i)
+                {
+                    const QUrl url(stackTrace.at(i).source);
+                    const QString fileName = url.isLocalFile() ? url.toLocalFile() : url.toString();
+
+                    std::cerr << nx::format("  #%1 %2 in %3:%4\n",
+                        i, stackTrace.at(i).function, fileName, stackTrace.at(i).line).toStdString();
+                }
+
+                std::cerr << std::endl;
+            });
     }
 
     void initializeNetworkModules()
@@ -108,7 +135,7 @@ struct ApplicationContext::Private
         using Protocol = ServerCompatibilityValidator::Protocol;
 
         ServerCompatibilityValidator::DeveloperFlags developerFlags;
-        if (ignoreCustomization)
+        if (features.ignoreCustomization)
             developerFlags.setFlag(ServerCompatibilityValidator::DeveloperFlag::ignoreCustomization);
 
         if (!nx::vms::common::ServerCompatibilityValidator::isInitialized())
@@ -143,7 +170,7 @@ struct ApplicationContext::Private
 
     ApplicationContext* const q;
     const ApplicationContext::Mode mode;
-    const bool ignoreCustomization = false;
+    const Features features;
 
     std::unique_ptr<ThreadPool::Manager> threadPoolManager{new ThreadPool::Manager()};
     std::unique_ptr<QQmlEngine> qmlEngine;
@@ -166,19 +193,19 @@ ApplicationContext::ApplicationContext(
     Mode mode,
     PeerType peerType,
     const QString& customCloudHost,
-    bool ignoreCustomization,
     const QString& customExternalResourceFile,
+    Features features,
     QObject* parent)
     :
     common::ApplicationContext(
         peerType,
         customCloudHost,
-        common::ApplicationContext::Feature::all,
+        features.base,
         parent),
     d(new Private{
         .q = this,
         .mode = mode,
-        .ignoreCustomization = ignoreCustomization,
+        .features = features,
         .skin = std::make_unique<nx::vms::client::core::Skin>(QStringList{":/skin"}),
         .customExternalResourceFile = customExternalResourceFile
         }
@@ -189,7 +216,12 @@ ApplicationContext::ApplicationContext(
     initializeMetaTypes();
 
     d->initializeSettings();
-    d->initializeQmlEngine();
+
+    if (features.flags.testFlag(FeatureFlag::qml))
+    {
+        registerQmlTypes();
+        d->initializeQmlEngine();
+    }
 
     d->colorTheme = std::make_unique<ColorTheme>();
 
@@ -210,36 +242,14 @@ ApplicationContext::ApplicationContext(
             break;
     }
 
-    nx::setOnAssertHandler(
-        [](const QString&)
-        {
-            std::cerr << "\nQML stacktrace:\n";
-
-            const QV4::ExecutionEngine* engine = appContext()->qmlEngine()->handle();
-            if (!engine->qmlContext()) //< Avoid a crash when called without QML stack.
-            {
-                std::cerr << "  <no QML context available>" << std::endl;
-                return;
-            }
-
-            const QVector<QV4::StackFrame> stackTrace = engine->stackTrace(20);
-            for (int i = 0; i < stackTrace.size(); ++i)
-            {
-                const QUrl url(stackTrace.at(i).source);
-                const QString fileName = url.isLocalFile() ? url.toLocalFile() : url.toString();
-
-                std::cerr << nx::format("  #%1 %2 in %3:%4\n",
-                    i, stackTrace.at(i).function, fileName, stackTrace.at(i).line).toStdString();
-            }
-
-            std::cerr << std::endl;
-        });
-    translationManager()->startLoadingTranslations();
+    if (features.base.flags.testFlag(CommonFeatureFlag::translations))
+        translationManager()->startLoadingTranslations();
 }
 
 ApplicationContext::~ApplicationContext()
 {
-    translationManager()->stopLoadingTranslations();
+    if (d->features.base.flags.testFlag(CommonFeatureFlag::translations))
+        translationManager()->stopLoadingTranslations();
     d->uninitializeExternalResources();
 
     nx::setOnAssertHandler(nullptr);
@@ -247,6 +257,7 @@ ApplicationContext::~ApplicationContext()
 
 void ApplicationContext::initializeNetworkModules()
 {
+    NX_ASSERT(d->features.base.flags.testFlag(CommonFeatureFlag::networking));
     d->initializeNetworkModules();
 }
 

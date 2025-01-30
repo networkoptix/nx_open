@@ -16,9 +16,7 @@
 
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
-#include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
-#include <common/common_meta_types.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>

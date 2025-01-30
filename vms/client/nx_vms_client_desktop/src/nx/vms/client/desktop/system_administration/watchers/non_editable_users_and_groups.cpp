@@ -54,7 +54,7 @@ NonEditableUsersAndGroups::NonEditableUsersAndGroups(SystemContext* systemContex
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
                 {
-                    disconnect(user.get(), nullptr, this, nullptr);
+                    user->disconnect(this);
 
                     if (m_nonUniqueUserTracker.remove(user->getId()))
                         emit nonUniqueUsersChanged();

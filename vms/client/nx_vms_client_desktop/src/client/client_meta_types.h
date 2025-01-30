@@ -8,23 +8,21 @@
 #include <QtGui/QColor>
 #include <QtGui/QValidator>
 
-#include <client_core/client_core_meta_types.h>
-#include <common/common_meta_types.h>
 #include <nx/utils/uuid.h>
 
+namespace nx::vms::client::desktop {
+
 /**
- * Convenience class for uniform initialization of metatypes in client module.
- *
  * Also initializes metatypes from common and client_core module.
  */
-class NX_VMS_CLIENT_DESKTOP_API QnClientMetaTypes
-{
-public:
-    static void initialize();
+NX_VMS_CLIENT_DESKTOP_API void initializeMetaTypes();
 
-private:
-    static void registerQmlTypes();
-};
+/**
+ * Also registers QML types from client_core module.
+ */
+NX_VMS_CLIENT_DESKTOP_API void registerQmlTypes();
+
+} // namespace nx::vms::client::desktop
 
 Q_DECLARE_METATYPE(Qt::KeyboardModifiers)
 Q_DECLARE_METATYPE(QVector<nx::Uuid>)

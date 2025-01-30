@@ -12,6 +12,7 @@ class ResourceTreeModelSortingGroupingTest: public ResourceTreeModelTest
     using base_class = ResourceTreeModelTest;
 public:
     virtual void SetUp() override;
+    virtual void TearDown() override;
 
 protected:
     QStringList sortingSignificantStrings() const;

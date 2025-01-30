@@ -22,6 +22,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -32,6 +33,7 @@
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/user_management/user_group_manager.h>
 #include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {
@@ -67,8 +69,7 @@ void ResourceTreeModelTest::TearDown()
     m_resourceTreeComposer.clear();
     m_newResourceTreeModel.clear();
     logout();
-    systemContext()->accessRightsManager()->resetAccessRights({});
-    resourcePool()->clear();
+    SystemContextBasedTest::TearDown();
 }
 
 QnResourcePool* ResourceTreeModelTest::resourcePool() const

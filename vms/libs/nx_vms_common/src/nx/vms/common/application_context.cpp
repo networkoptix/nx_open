@@ -4,7 +4,6 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <common/common_meta_types.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
 #include <nx/branding.h>
@@ -16,6 +15,7 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/vms/common/common_meta_types.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
@@ -99,13 +99,13 @@ ApplicationContext::ApplicationContext(
     QnInstanceStorage instanceStorage;
 
     initializeResources();
-    QnCommonMetaTypes::initialize();
+    initializeMetaTypes();
 
     d->longRunnablePool = std::make_unique<QnLongRunnablePool>();
     d->longRunableCleanup = std::make_unique<QnLongRunableCleanup>();
     QnFfmpegHelper::registerLogCallback();
 
-    if (features.testFlag(Feature::networking))
+    if (features.flags.testFlag(FeatureFlag::networking))
         d->initNetworking(customCloudHost);
 
     d->syncTime = std::make_unique<QnSyncTime>();
@@ -113,7 +113,7 @@ ApplicationContext::ApplicationContext(
     d->timerManager = std::make_unique<nx::utils::TimerManager>("CommonTimerManager");
     d->metricsStorage = std::make_unique<ApplicationMetricsStorage>();
 
-    if (features.testFlag(Feature::translations))
+    if (features.flags.testFlag(FeatureFlag::translations))
         d->translationManager = std::make_unique<nx::i18n::TranslationManager>();
 }
 
@@ -130,7 +130,7 @@ ApplicationContext::~ApplicationContext()
     d->longRunableCleanup.reset();
     d->longRunnablePool.reset();
 
-    if (d->features.testFlag(Feature::networking))
+    if (d->features.flags.testFlag(FeatureFlag::networking))
         d->deinitNetworking();
 
     d->translationManager.reset();

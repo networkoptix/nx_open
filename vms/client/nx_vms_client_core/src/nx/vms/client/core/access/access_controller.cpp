@@ -415,6 +415,9 @@ void AccessController::Private::handleResourcesRemoved(const QnResourceList& res
 
     NX_VERBOSE(q, "Resources removed, permissions maybe changed for %1", resources);
     emit q->permissionsMaybeChanged(resources, AccessController::QPrivateSignal{});
+
+    if (user && resources.contains(user))
+        q->setUser({});
 }
 
 void AccessController::Private::handleAccessChanged(const nx::Uuid& subjectId)

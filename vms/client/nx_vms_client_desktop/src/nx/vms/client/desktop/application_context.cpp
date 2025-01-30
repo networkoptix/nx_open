@@ -665,17 +665,20 @@ struct ApplicationContext::Private
     }
 };
 
+using CoreFeatureFlag = core::ApplicationContext::FeatureFlag;
+
 ApplicationContext::ApplicationContext(
     Mode mode,
     const QnStartupParameters& startupParameters,
+    Features features,
     QObject* parent)
     :
     core::ApplicationContext(
         toCoreMode(mode),
         peerType(startupParameters),
         actualCloudHost(),
-        /*ignoreCustomization*/ false,
         /*customExternalResourceFile*/ "client_external.dat",
+        features.core,
         parent),
     d(new Private{
         .q = this,
@@ -686,7 +689,10 @@ ApplicationContext::ApplicationContext(
     initDeveloperOptions(startupParameters);
     initializeResources();
     initializeExternalResources();
-    QnClientMetaTypes::initialize();
+    initializeMetaTypes();
+    if (features.core.flags.testFlag(CoreFeatureFlag::qml))
+        registerQmlTypes();
+
     d->initSkin();
     storeFontConfig(
         new FontConfig(initializeBaseFont(), ":/skin/basic_fonts.json", ini().fontConfigPath));
@@ -700,9 +706,11 @@ ApplicationContext::ApplicationContext(
         case Mode::unitTests:
         {
             d->initializeSystemContext();
-            d->initializeCrossSystemModules(); //< For the resources tree tests.
+            if (features.flags.testFlag(FeatureFlag::cross_site))
+                d->initializeCrossSystemModules(); //< For the resources tree tests.
             d->initializeClientCoreModule();
-            d->initializeQml();
+            if (features.core.flags.testFlag(CoreFeatureFlag::qml))
+                d->initializeQml();
             d->resourcesChangesManager = std::make_unique<ResourcesChangesManager>();
             break;
         }

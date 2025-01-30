@@ -4,10 +4,21 @@
 
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
-#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/mobile/system_context.h>
 
 namespace nx::vms::client::mobile {
+
+namespace {
+
+core::ApplicationContext::Features makeFeatures()
+{
+    auto result = core::ApplicationContext::Features::all();
+    result.ignoreCustomization = qnSettings->ignoreCustomization();
+    return result;
+}
+
+} // namespace
 
 struct ApplicationContext::Private
 {
@@ -18,8 +29,8 @@ ApplicationContext::ApplicationContext(QObject* parent):
     base_type(Mode::mobileClient,
         nx::vms::api::PeerType::mobileClient,
         qnSettings->customCloudHost(),
-        qnSettings->ignoreCustomization(),
         /*customExternalResourceFile*/ {},
+        makeFeatures(),
         parent),
     d(new Private{})
 {

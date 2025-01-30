@@ -632,11 +632,16 @@ void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
 {
+    // Networking may be uninitialized in unit tests.
+    const QString cloudHost = nx::network::SocketGlobals::isInitialized()
+        ? QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost())
+        : nx::branding::cloudHost();
+
     nx::vms::api::ModuleInformation moduleInformation;
     moduleInformation.type = nx::vms::api::ModuleInformation::mediaServerId();
     moduleInformation.customization = nx::branding::customization();
-    moduleInformation.realm = nx::network::AppInfo::realm().c_str();
-    moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
+    moduleInformation.realm = QString::fromStdString(nx::network::AppInfo::realm());
+    moduleInformation.cloudHost = cloudHost;
     moduleInformation.name = getName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)

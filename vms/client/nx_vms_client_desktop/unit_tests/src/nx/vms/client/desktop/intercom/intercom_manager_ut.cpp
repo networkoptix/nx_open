@@ -1,25 +1,25 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <memory>
 
+#include <gtest/gtest.h>
+
 #include <client/desktop_client_message_processor.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/access_rights_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
 #include <nx/vms/api/data/user_group_data.h>
-#include <nx/vms/common/intercom/utils.h>
-#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/client/desktop/test_support/client_camera_resource_stub.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
+#include <nx/vms/common/intercom/utils.h>
+#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
@@ -43,7 +43,6 @@ protected:
         intercomManager.reset();
         logout();
         ContextBasedTest::TearDown();
-        systemContext()->deleteMessageProcessor();
     }
 
     nx::vms::client::core::AccessController* accessController() const

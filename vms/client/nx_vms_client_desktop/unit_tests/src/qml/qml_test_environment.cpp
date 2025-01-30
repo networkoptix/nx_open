@@ -3,9 +3,8 @@
 #include "qml_test_environment.h"
 
 #include <client/client_meta_types.h>
-#include <client_core/client_core_meta_types.h>
+#include <client/client_startup_parameters.h>
 #include <nx/utils/external_resources.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 
 using namespace nx::utils;
@@ -17,16 +16,25 @@ namespace {
 
 static const QString kQmlRoot = ":/qml/";
 
+static const ApplicationContext::Features kFeatures =
+    []
+    {
+        ApplicationContext::Features result = ApplicationContext::Features::none();
+        result.core.flags.setFlag(core::ApplicationContext::FeatureFlag::qml);
+        return result;
+    }();
+
 } // namespace
 
 QmlTestEnvironment::QmlTestEnvironment(QObject* parent):
     QObject(parent),
-    m_testContext(new Context())
+    m_appContext(new ApplicationContext(
+        ApplicationContext::Mode::unitTests,
+        /*startupParameters*/ QnStartupParameters{},
+        kFeatures))
 {
     engine()->setBaseUrl(QUrl(kQmlRoot));
     engine()->addImportPath(kQmlRoot);
-    core::initializeMetaTypes();
-    QnClientMetaTypes::initialize();
     registerExternalResource("client_core_external.dat");
     registerExternalResource("client_external.dat");
 }
@@ -39,12 +47,12 @@ QmlTestEnvironment::~QmlTestEnvironment()
 
 QQmlEngine* QmlTestEnvironment::engine() const
 {
-    return appContext()->qmlEngine();
+    return m_appContext->qmlEngine();
 }
 
 SystemContext* QmlTestEnvironment::systemContext() const
 {
-    return m_testContext->systemContext();
+    return m_appContext->currentSystemContext();
 }
 
 } // namespace test

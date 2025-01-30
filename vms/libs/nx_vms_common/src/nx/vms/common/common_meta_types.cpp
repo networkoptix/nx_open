@@ -2,7 +2,7 @@
 
 #include "common_meta_types.h"
 
-#include <atomic>
+#include <mutex>
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
@@ -85,15 +85,10 @@
 #include <recording/time_period_list.h>
 #include <utils/math/space_mapper.h>
 
-using namespace nx::vms::common;
+namespace nx::vms::common {
 
-void QnCommonMetaTypes::initialize()
+void initializeMetatypesInternal()
 {
-    static std::atomic_bool initialized = false;
-
-    if (initialized.exchange(true))
-        return;
-
     nx::utils::Metatypes::initialize();
     nx::vms::api::Metatypes::initialize();
 
@@ -280,5 +275,12 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<nx::String>();
-
 }
+
+void initializeMetaTypes()
+{
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeMetatypesInternal);
+}
+
+} // namespace nx::vms::common

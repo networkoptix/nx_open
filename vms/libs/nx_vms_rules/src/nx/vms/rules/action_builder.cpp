@@ -282,15 +282,7 @@ QVariantMap makeOverride(UuidSelection users, QString emails)
     if (!NX_ASSERT(!locale.isEmpty()))
         return {};
 
-    // TODO: https://networkoptix.atlassian.net/browse/VMS-55348: This code leads to ~5
-    // second delay in action generation during unit tests.  Added a flag in the test
-    // to bypass this, but it should be fixed properly.
-    // It may be easier to add QCoreApplication::processEvents() near sleep() call to allow
-    // the main thread to process language switch task.
-    if (ActionBuilder::bypassScopedLocaleForTest)
-        return {};
-
-    // Application context is not initialized in unit tests.
+    // Application context may be uninitialized in some unit tests.
     if (auto appContext = nx::vms::common::appContext())
     {
         // Some unit tests do not have translations manager.
@@ -302,8 +294,6 @@ QVariantMap makeOverride(UuidSelection users, QString emails)
 }
 
 } // namespace
-
-bool ActionBuilder::bypassScopedLocaleForTest = false;
 
 using namespace std::chrono;
 

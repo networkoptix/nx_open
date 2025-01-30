@@ -52,7 +52,7 @@ QnResourcePool::QnResourcePool(nx::vms::common::SystemContext* systemContext, QO
 
 QnResourcePool::~QnResourcePool()
 {
-    clear();
+    clear(/*notify*/ false);
     NX_DEBUG(this, "Removing");
 }
 
@@ -478,9 +478,9 @@ std::pair<QnUserResourcePtr, bool> QnResourcePool::userByName(const QString& nam
     return it->second.main();
 }
 
-void QnResourcePool::clear()
+void QnResourcePool::clear(bool notify)
 {
-    QVector<QnResourcePtr> tempList;
+    QnResourceList tempList;
     {
         NX_WRITE_LOCKER lk(&m_resourcesMutex);
 
@@ -508,6 +508,9 @@ void QnResourcePool::clear()
         resource->addFlags(Qn::removed);
         resource->disconnect(this);
     }
+
+    if (notify)
+        emit resourcesRemoved(tempList);
 }
 
 bool QnResourcePool::containsIoModules() const

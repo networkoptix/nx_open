@@ -30,6 +30,7 @@ class AccessControllerTest: public ContextBasedTest
 protected:
     virtual void TearDown()
     {
+        logout();
         m_currentUser.clear();
         ContextBasedTest::TearDown();
     }
