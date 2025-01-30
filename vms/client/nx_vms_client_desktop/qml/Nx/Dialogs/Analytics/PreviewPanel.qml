@@ -58,12 +58,12 @@ Rectangle
     onSelectedItemChanged:
     {
         intervalPreview.resource = null
-        intervalPreview.timestampMs = 0
+        intervalPreview.startTimeMs = 0
 
         if (selectedItem?.previewResource)
         {
             intervalPreview.resource = selectedItem.previewResource
-            intervalPreview.timestampMs = selectedItem.previewTimestampMs
+            intervalPreview.startTimeMs = selectedItem.previewTimestampMs
             intervalPreview.durationMs = selectedItem.previewDurationMs
             intervalPreview.aspectRatio = selectedItem.previewAspectRatio
         }

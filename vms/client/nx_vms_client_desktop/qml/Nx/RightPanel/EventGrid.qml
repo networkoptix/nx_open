@@ -64,10 +64,10 @@ GridView
         items.forEach(
             (item) =>
             {
-                if (!item || !item.videoPreviewTimestampMs)
+                if (!item || !item.videoPreviewStartTimeMs)
                     return
 
-                timestampSum += item.videoPreviewTimestampMs
+                timestampSum += item.videoPreviewStartTimeMs
                 validCount++
             })
 

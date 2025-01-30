@@ -26,7 +26,6 @@ TileBase
 
     // The following properties are used by tooltip preview in analytics results.
     readonly property alias previewState: preview.previewState
-    readonly property alias videoPreviewTimestampMs: preview.videoPreviewTimestampMs
     readonly property alias videoPreviewResource: preview.videoPreviewResource
     readonly property alias previewAspectRatio: preview.previewAspectRatio
     readonly property int tileIndex: index

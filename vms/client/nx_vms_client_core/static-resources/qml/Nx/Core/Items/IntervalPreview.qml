@@ -21,9 +21,8 @@ Item
     property bool autoplay: true
     property bool snippedPreview: false
 
-    property real timestampMs: -1
     property real durationMs: 0
-    property real startTimeMs: timestampMs - durationMs / 2
+    property real startTimeMs: -1
 
     property real speedFactor: 1.0
 
@@ -300,6 +299,6 @@ Item
             control.play()
     }
 
-    onTimestampMsChanged:
+    onStartTimeMsChanged:
         loader.previewState = EventSearch.PreviewState.initial
 }

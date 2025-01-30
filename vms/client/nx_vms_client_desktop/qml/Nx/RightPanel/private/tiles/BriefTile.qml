@@ -80,7 +80,7 @@ TileBase
                 && tile.controller.videoPreviewMode == RightPanelGlobals.VideoPreviewMode.selection
                 && tile.controller.selectedRow === index
 
-            videoPreviewTimestampMs: (model && model.previewTimestampMs) || 0
+            videoPreviewStartTimeMs: (model && model.previewTimestampMs) || 0
 
             videoPreviewResource: model ? model.previewResource : null
         }
