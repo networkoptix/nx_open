@@ -383,6 +383,7 @@ struct NX_VMS_API TierOveruseData: public TierUsageData
 NX_REFLECTION_INSTRUMENT(TierOveruseData, TierOveruseData_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(TierOveruseData, (json), NX_VMS_API)
 using TierOveruseMap = std::map<nx::vms::api::SaasTierLimitName, TierOveruseData>;
+using TierUseMap = std::map<nx::vms::api::SaasTierLimitName, TierUsageData>;
 
 struct NX_VMS_API SaasWithServices: SaasData
 {
@@ -390,10 +391,13 @@ struct NX_VMS_API SaasWithServices: SaasData
      * ID. */
     std::map<nx::Uuid, nx::vms::api::SaasService> servicesAvailable;
 
-    /**%apidoc Tiers limitation list for the Site. */
-    std::map<nx::vms::api::SaasTierLimitName, TierUsageData> tierLimits;
+    /**%apidoc Tiers usage list for the Site. */
+    std::map<nx::vms::api::SaasTierLimitName, TierUsageData> tierUsages;
+
+    /**%apidoc Tiers overuse details. */
+    std::map<nx::vms::api::SaasTierLimitName, TierOveruseData> tiersOveruse;
 };
-#define SaasWithServices_Fields SaasData_Fields(servicesAvailable)(tierLimits)
+#define SaasWithServices_Fields SaasData_Fields(servicesAvailable)(tierUsages)(tiersOveruse)
 NX_REFLECTION_INSTRUMENT(SaasWithServices, SaasWithServices_Fields)
 QN_FUSION_DECLARE_FUNCTIONS(SaasWithServices, (json), NX_VMS_API)
 
