@@ -99,7 +99,7 @@ extern "C" NX_SDK_API ILibContext* nxLibContext();
 struct LibContextEntryPoint
 {
     static constexpr char kFuncName[] = "nxLibContext";
-    typedef ILibContext* (*Func)();
+    using Func = decltype(&nxLibContext);
 };
 
 /**
@@ -120,7 +120,7 @@ extern "C" NX_SDK_API const char* nxSdkVersion();
 struct SdkVersionEntryPoint
 {
     static constexpr char kFuncName[] = "nxSdkVersion";
-    typedef const char* (*Func)();
+    using Func = decltype(&nxSdkVersion);
 };
 
 /**
@@ -138,7 +138,7 @@ extern "C" NX_SDK_API void nxSetUnitTestOptions(const IStringMap* options);
 struct SetUnitTestOptionsEntryPoint
 {
     static constexpr char kFuncName[] = "nxSetUnitTestOptions";
-    typedef void (*Func)(const IStringMap* options);
+    using Func = decltype(&nxSetUnitTestOptions);
 };
 
 } // namespace nx::sdk

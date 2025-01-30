@@ -25,6 +25,7 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_integration.h>
 #include <nx/sdk/analytics/i_uncompressed_video_frame.h>
+#include <nx/sdk/entry_points.h>
 #include <nx/sdk/helpers/device_info.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/lib_context.h>
@@ -539,9 +540,9 @@ static void testPluginLibrary(const std::string& libFilename)
     NX_PRINT << "Testing plugin library " << nx::kit::utils::toString(libFilename);
 
     const auto libHandle = loadLib(libFilename);
-    const auto entryPointFunc = resolveLibFunc<nx::sdk::IIntegration::EntryPoint>(libHandle);
-    const auto multiEntryPointFunc =
-        resolveLibFunc<nx::sdk::IIntegration::MultiEntryPoint>(libHandle);
+    const auto integrationEntryPointFunc = resolveLibFunc<nx::sdk::IntegrationEntryPoint>(libHandle);
+    const auto multiIntegrationEntryPointFunc =
+        resolveLibFunc<nx::sdk::MultiIntegrationEntryPoint>(libHandle);
 
     // Obtain plugin's LibContext and fill in the plugin libName.
     const auto libContextFunc = resolveLibFunc<LibContextEntryPoint>(libHandle);
@@ -551,11 +552,11 @@ static void testPluginLibrary(const std::string& libFilename)
     const std::string pluginLibName = getPluginLibName(libFilename);
     pluginLibContext->setName(pluginLibName.c_str());
 
-    ASSERT_TRUE(entryPointFunc != nullptr || multiEntryPointFunc != nullptr);
-    if (multiEntryPointFunc) //< Do not use entryPointFunc even if it is exported.
+    ASSERT_TRUE(integrationEntryPointFunc != nullptr || multiIntegrationEntryPointFunc != nullptr);
+    if (multiIntegrationEntryPointFunc) //< Do not use entryPointFunc even if it is exported.
     {
         int instanceIndex = 0;
-        while (const auto integration = Ptr(multiEntryPointFunc(instanceIndex)))
+        while (const auto integration = Ptr(multiIntegrationEntryPointFunc(instanceIndex)))
         {
             if (g_integrationInstanceIndex == -1 || g_integrationInstanceIndex == instanceIndex)
             {
@@ -566,9 +567,9 @@ static void testPluginLibrary(const std::string& libFilename)
             ++instanceIndex;
         }
     }
-    else if (entryPointFunc)
+    else if (integrationEntryPointFunc)
     {
-        const auto integration = Ptr(entryPointFunc());
+        const auto integration = Ptr(integrationEntryPointFunc());
         ASSERT_TRUE(integration != nullptr);
         testIntegration(integration);
     }

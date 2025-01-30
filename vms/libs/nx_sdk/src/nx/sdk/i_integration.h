@@ -9,19 +9,16 @@ namespace nx::sdk {
 class IUtilityProvider;
 
 /**
- * The main interface that any VMS Plugin implements. The plugin's dynamic library should export
- * only an extern-C function with the name and prototype defined in this interface, which acts as a
- * getter/factory for a single object implementing this interface.
+ * Base interface for derived interfaces representing various Integration types. Objects
+ * implementing such interfaces are created in the plugins by exported functions declared in
+ * nx/sdk/entry_points.h, and are destroyed (via releaseRef()) on the process shutdown. Such object
+ * acts as a starting point for all Integration features - they are accessible via other objects
+ * created by this one.
  *
- * The only object of this class is created by a Server on its start, and is destroyed (via
- * releaseRef()) on the Server shutdown.
- *
- * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
- * with a guaranteed barrier between the calls), thus, no synchronization is required for the
+ * All methods of all Integration objects and objects that they create, directly or indirectly, are
+ * guaranteed to be called without overlapping even if from different threads (i.e. with a
+ * guaranteed fence between the calls), thus, no synchronization is required for the
  * implementation.
- *
- * ATTENTION: If the Plugins's dynamic library is linked to any dynamic libraries, including the
- * ones from the OS, consult @ref md_src_nx_sdk_dynamic_libraries to avoid potential issues.
  */
 class IIntegration: public Interface<IIntegration>
 {
@@ -33,42 +30,10 @@ public:
     }
 
     /**
-     * Prototype of an extern "C" plugin entry point function for single-IIntegration Plugins.
+     * Provides an object which the Integration can use for calling back to access some data and
+     * functionality provided by the process that uses the Integration.
      *
-     * The Server calls this function only when the Plugin library does not export the
-     * multi-IIntegration entry point function.
-     */
-    struct EntryPoint
-    {
-        static constexpr char kFuncName[] = "createNxPlugin";
-        typedef IIntegration* (*Func)();
-    };
-
-    /**
-     * Prototype of an extern "C" plugin entry point function for multi-IIntegration Plugins.
-     *
-     * The Server calls this function multiple times, passing sequential values starting from 0,
-     * until the function returns null. Each non-null result is processed similarly to the
-     * single-IIntegration entry point functions (either the old-SDK or the new-SDK one), thus
-     * it is possible to pack different IIntegration types into the same plugin dynamic library. If
-     * an old-SDK Integration is returned, its pointer must be reinterpret-casted from
-     * nxpl::PluginInterface - it is safe because nxpl::PluginInterface is ABI-compatible with
-     * IIntegration.
-     *
-     * If this function is exported from the Plugin library and returns at least one Plugin
-     * instance, the single-IIntegration entry point function will not be called.
-     */
-    struct MultiEntryPoint
-    {
-        static constexpr char kFuncName[] = "createNxPluginByIndex";
-        typedef IIntegration* (*Func)(int instanceIndex);
-    };
-
-    /**
-     * Provides an object which the plugin can use for calling back to access some data and
-     * functionality provided by the process that uses the plugin.
-     *
-     * For details, see the documentation for IUtilityProvider.
+     * For the details, see the documentation for IUtilityProvider.
      */
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) = 0;
 };
