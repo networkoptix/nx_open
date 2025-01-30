@@ -252,6 +252,17 @@ TileBase
         }
     }
 
+    MouseArea
+    {
+        id: mouseArea
+
+        anchors.fill: tileContent
+        onClicked: (mouse) =>
+        {
+            tileController.clicked(index, mouse.button, mouse.modifiers)
+        }
+    }
+
     ImageButton
     {
         id: closeButton
