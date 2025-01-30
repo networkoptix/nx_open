@@ -2694,9 +2694,6 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Get Object Track
      * %ingroup Analytics
      * %param:uuid id Object Track id
-     * %param[opt]:boolean isLocal If false, then the request is forwarded to every other online
-     * Server and the results are merged. Otherwise, the request is processed on the receiving
-     * Server only.
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.

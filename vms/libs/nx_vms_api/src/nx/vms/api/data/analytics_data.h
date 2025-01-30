@@ -557,16 +557,10 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
      * If specified, only Object Tracks detected by specified engine will be considered for search.
      */
     std::optional<nx::Uuid> analyticsEngineId;
-
-    /**%apidoc[opt]
-     * If false, then the request is forwarded to every other online Server and the results are merged.
-     * Otherwise, the request is processed on the receiving Server only.
-     */
-    bool isLocal = false;
 };
 #define ObjectTrackFilter_Fields IdData_Fields ObjectTrackFilterFreeText_Fields \
     (deviceId)(objectTypeId)(startTimeMs)(endTimeMs)(boundingBox)(limit) \
-    (sortOrder)(analyticsEngineId)(isLocal)
+    (sortOrder)(analyticsEngineId)
 NX_VMS_API_DECLARE_STRUCT_EX(ObjectTrackFilter, (json));
 NX_REFLECTION_INSTRUMENT(ObjectTrackFilter, ObjectTrackFilter_Fields)
 
