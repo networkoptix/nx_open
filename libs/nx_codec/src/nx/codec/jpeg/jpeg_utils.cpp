@@ -39,11 +39,8 @@ AVPixelFormat convertYuv(uint32_t pixFmtMask, uint8_t bits)
     switch (pixFmtMask)
     {
         case 0x11111100:
-        {
-            if (bits <= 8)
-                return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV444P16;
-        }
-        [[fallthrough]];
+            return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV444P16;
+
         case 0x12121100:
         case 0x22122100:
         case 0x21211100:

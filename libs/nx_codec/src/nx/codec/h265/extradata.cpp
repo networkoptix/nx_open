@@ -90,7 +90,6 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     if (!parseNalUnit(hvcc.vps[0].data(), hvcc.vps[0].size(), vps))
         return std::vector<uint8_t>();
 
-    hvcc.lengthSizeMinusOne = kNaluLengthSizeBytes - 1;
     hvcc.configurationVersion = 1;
     hvcc.general_tier_flag = false;
     hvcc.general_level_idc = 0;
@@ -101,7 +100,7 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     hvcc.avgFrameRate = 0;
     hvcc.constantFrameRate = 0;
     hvcc.numTemporalLayers = 0;
-    hvcc.lengthSizeMinusOne = 3;
+    hvcc.lengthSizeMinusOne = kNaluLengthSizeBytes - 1;
 
     // VPS
     updatePTL(vps.profile_tier_level, hvcc);

@@ -27,23 +27,6 @@ int calc_rbsp_trailing_bits_cnt(uint8_t val)
     memset( useDefaultScalingMatrix8x8Flag, 0, sizeof(useDefaultScalingMatrix8x8Flag) );
 }
 
-int PictureParameterSet::deserializeID(quint8* buffer, quint8* end)
-{
-    int rez = NALUnit::deserialize(buffer, end);
-    if (rez != 0)
-        return rez;
-    if (end - buffer < 2)
-        return NOT_ENOUGHT_BUFFER;
-    bitReader.setBuffer(buffer + 1, end);
-    return 0;
-    try {
-        pic_parameter_set_id = bitReader.getGolomb();
-    }
-    catch (nx::utils::BitStreamException const&) {
-        return NOT_ENOUGHT_BUFFER;
-    }
-}
-
 int PictureParameterSet::deserialize()
 {
     quint8* nalEnd = m_nalBuffer + m_nalBufferLen;

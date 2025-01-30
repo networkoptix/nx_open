@@ -41,7 +41,6 @@ public:
 
     PictureParameterSet();
     int deserialize();
-    int deserializeID(quint8* buffer, quint8* end);
 
 private:
     int m_ppsLenInMbit = 0;
