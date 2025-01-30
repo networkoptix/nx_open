@@ -410,28 +410,29 @@ void initialize(Manager* manager, Action* root)
 
     factory.beginSubMenu();
     {
+        factory(OpenNewTabAction)
+            .flags(Main | TitleBar | SingleTarget | NoTarget | GlobalHotkey)
+            .mode(DesktopMode)
+            .text(ContextMenu::tr("Layout"))
+            .pulledText(ContextMenu::tr("New Layout"))
+            .shortcut("Ctrl+T")
+            .condition(!condition::showreelIsRunning())
+            .icon(qnSkin->icon(kAddIcon));
+
         factory(OpenNewWindowAction)
             .flags(Main | GlobalHotkey)
             .mode(DesktopMode)
             .text(ContextMenu::tr("Window"))
             .pulledText(ContextMenu::tr("New Window"))
             .shortcut("Ctrl+N")
-            .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
-
-        factory(OpenNewTabAction)
-            .flags(Main | TitleBar | SingleTarget | NoTarget | GlobalHotkey)
-            .mode(DesktopMode)
-            .text(ContextMenu::tr("Layout Tab"))
-            .pulledText(ContextMenu::tr("New Layout Tab"))
-            .shortcut("Ctrl+T")
-            .condition(!condition::showreelIsRunning())
-            .icon(qnSkin->icon(kAddIcon));
+            .condition(condition::isLoggedIn()
+                && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
 
         factory(OpenWelcomeScreenAction)
             .flags(Main | GlobalHotkey)
             .mode(DesktopMode)
-            .text(ContextMenu::tr("Welcome Screen Tab"))
-            .pulledText(ContextMenu::tr("New Welcome Screen Tab"))
+            .text(ContextMenu::tr("Welcome Screen"))
+            .pulledText(ContextMenu::tr("New Welcome Screen"))
             .shortcut("Ctrl+Shift+T")
             .condition(condition::homeTabIsNotActive(ActionVisibility::DisabledAction) &&
                 ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
