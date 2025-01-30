@@ -123,8 +123,11 @@ bool Index::updateTail(AbstractMetadataBinaryFile* indexFile)
 
     // rewrite last record if exists
     if (!records.isEmpty())
+    {
         indexFile->seek(kMetadataIndexHeaderSize + (records.size() - 1) * kIndexRecordSize);
-    return indexFile->write((const char*)&records.last(), kIndexRecordSize) == kIndexRecordSize;
+        return indexFile->write((const char*)&records.last(), kIndexRecordSize) == kIndexRecordSize;
+    }
+    return true;
 }
 
 bool Index::truncateToBytes(qint64 mediaSize, bool noGeometryMode)
