@@ -46,7 +46,7 @@
     </message>
     <message>
       <source>Improve network performance</source>
-      <translation type="unfinished">Improve network performance</translation>
+      <translation>Popraw wydajność sieci</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>

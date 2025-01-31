@@ -1767,7 +1767,7 @@
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays</translation>
+      <translation>Wymuś SSL dla przekaźników w chmurze</translation>
     </message>
     <message>
       <source>Enable recording on EDGE</source>
@@ -1803,11 +1803,11 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Częstotliwość aktualizacji pamięci podręcznej tokenów sesji zdalnej (innych serwerów i chmury)</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud)</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud)</translation>
+      <translation>Przekroczono limit czasu pamięci podręcznej tokenów sesji zdalnej (innych serwerów i chmury)</translation>
     </message>
     <message>
       <source>Default video codec</source>
@@ -1835,11 +1835,11 @@
     </message>
     <message>
       <source>Persistent Servers for update storage</source>
-      <translation type="unfinished">Persistent Servers for update storage</translation>
+      <translation>Stałe serwery do przechowywania aktualizacji</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored</source>
-      <translation type="unfinished">Persistent Servers where updates are stored</translation>
+      <translation>Stałe serwery, na których przechowywane są aktualizacje</translation>
     </message>
     <message>
       <source>VMS Server version specific features</source>
@@ -1847,15 +1847,15 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording</source>
-      <translation type="unfinished">Additional local FS storage types for recording</translation>
+      <translation>Dodatkowe lokalne typy pamięci FS do nagrywania</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure</translation>
+      <translation>Wymuś uprawnienia punktu montowania magazynu danych analitycznych w przypadku awarii</translation>
     </message>
     <message>
       <source>Check video stream period (milliseconds)</source>
-      <translation type="unfinished">Check video stream period (milliseconds)</translation>
+      <translation>Sprawdź okres strumienia wideo (w milisekundach)</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
@@ -1891,7 +1891,7 @@
     </message>
     <message>
       <source>Enable WebSocket for P2P</source>
-      <translation type="unfinished">Enable WebSocket for P2P</translation>
+      <translation>Włącz WebSocket dla P2P</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins</source>
@@ -1951,7 +1951,7 @@
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds)</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds)</translation>
+      <translation>Aktywność tokena sesji autoryzacyjnej (w sekundach)</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
