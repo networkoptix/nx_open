@@ -445,6 +445,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
             if (req.arp_flags & ATF_COM)
             {
                 auto rawData = (const unsigned char*) &req.arp_ha.sa_data[0];
+                close(s);
                 return nx::utils::MacAddress::fromRawData(rawData);
             }
         }

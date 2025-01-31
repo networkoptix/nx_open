@@ -126,6 +126,7 @@ QnPingUtility::PingResponse QnPingUtility::ping(quint16 seq) {
     in_addr_t addr = inet_addr(m_hostAddress.toLatin1().data());
     if (addr == INADDR_NONE)
     {
+        close(fd);
         qDebug() << "Failed conversion" << m_hostAddress << "to inet addr";
         return result;
     }
