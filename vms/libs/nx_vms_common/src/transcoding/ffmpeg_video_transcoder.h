@@ -41,6 +41,8 @@ public:
         Qn::StreamQuality quality;
         // It used to skip some video frames inside GOP when transcoding is used.
         int64_t startTimeUs = 0;
+        // Set this to true if stream will mux into RTP.
+        bool rtpContatiner = false;
     };
 
 public:

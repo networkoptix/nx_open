@@ -209,6 +209,12 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         }
     }
 
+    if (m_config.rtpContatiner && m_config.targetCodecId == AV_CODEC_ID_MJPEG)
+    {
+        options.set("force_duplicated_matrix", 1, 0);
+        options.set("huffman", "default");
+    }
+
     if (avcodec_open2(m_encoderCtx, avCodec, options) < 0)
     {
         NX_WARNING(this, "Could not initialize video encoder.");

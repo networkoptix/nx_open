@@ -22,6 +22,8 @@ public:
     {
         bool keepOriginalTimestamps = false;
         bool useRealTimeOptimization = false;
+        // Set this to true if stream will mux into RTP.
+        bool rtpContatiner = false;
         DecoderConfig decoderConfig;
     };
 
