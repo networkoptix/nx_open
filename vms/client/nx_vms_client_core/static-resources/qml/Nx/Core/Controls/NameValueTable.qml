@@ -256,6 +256,30 @@ Item
                         color: ColorTheme.darker(control.valueColor, 10)
                         font: control.valueFont
                     }
+
+                    onWidthChanged:
+                    {
+                        if (!valueRowRepeater.count)
+                            return
+
+                        var lastIndex = valueRowRepeater.count - 1
+                        var sumWidth = 0
+                        for (var i = 0; i < valueRowRepeater.count; ++i)
+                        {
+                            const item = valueRowRepeater.itemAt(i)
+                            if (sumWidth > 0)
+                                sumWidth += spacing
+                            sumWidth += item.implicitWidth
+                            if (sumWidth > width)
+                            {
+                                lastIndex = i - 1
+                                break
+                            }
+                        }
+
+                        // At least one elided value we should show.
+                        lastVisibleIndex = Math.max(0, lastIndex)
+                    }
                 }
             }
         }
@@ -267,7 +291,43 @@ Item
 
             const labels = children.filter(child => child.objectName === "cellLabel")
             const values = children.filter(child => child.objectName === "cellValues")
-            NameValueTableCalculator.calculateWidths(grid, labels, values)
+            const calculateImplicitWidth = (items) =>
+                items.reduce((prevMax, item) => Math.max(prevMax, item.implicitWidth), 0)
+
+            const implicitLabelWidth = calculateImplicitWidth(labels)
+            const implicitValuesWidth = calculateImplicitWidth(values)
+
+            const availableWidth =
+                grid.width - grid.columnSpacing - grid.leftPadding - grid.rightPadding
+            const preferredLabelWidth = availableWidth * control.labelFraction
+            const preferredValuesWidth = availableWidth - preferredLabelWidth
+
+            let labelWidth = 0
+            const availableLabelWidth = availableWidth - implicitValuesWidth
+
+            // If value is shorter than its preferred space...
+            if (implicitValuesWidth < preferredValuesWidth)
+            {
+                // Label may occupy not less than its preferred space
+                // and no more than its available space.
+                labelWidth = Math.max(preferredLabelWidth,
+                    Math.min(implicitLabelWidth, availableLabelWidth))
+            }
+            else // If value is longer than its preferred space...
+            {
+                // Label may occupy not less than its available space
+                // and no more than its preferred space.
+                labelWidth = Math.max(availableLabelWidth,
+                    Math.min(implicitLabelWidth, preferredLabelWidth))
+            }
+
+            const valuesWidth = availableWidth - labelWidth
+
+            for (const label of labels)
+                label.width = labelWidth
+
+            for (const value of values)
+                value.width = valuesWidth
         }
     }
 
