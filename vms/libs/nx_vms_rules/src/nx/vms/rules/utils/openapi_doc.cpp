@@ -106,9 +106,27 @@ QJsonObject createUuidListDescriptor(bool isSet)
 {
     QJsonObject result;
     result[kTypeProperty] = "array";
-    result["items"] = QJsonObject{{kTypeProperty, "string"}, {"format", "uuid"}};
+    result[kItemsProperty] = QJsonObject{{kTypeProperty, "string"}, {"format", "uuid"}};
     result["uniqueItems"] = isSet;
     result[kExampleProperty] = QJsonArray({"{00000000-0000-0000-0000-000000000000}"});
+    return result;
+}
+
+QJsonObject createKeyValueListDescriptor()
+{
+    QJsonObject result;
+    result[kTypeProperty] = "array";
+    result[kItemsProperty] =
+        QJsonObject{
+            {kTypeProperty, "object"},
+            {kPropertyKey, QJsonObject{
+                {"key", QJsonObject{{kTypeProperty, "string"}}},
+                {"value", QJsonObject{{kTypeProperty, "string"}}}}
+            }
+        };
+    result[kExampleProperty] = QJsonArray(
+        {QJsonObject{{"key", "User-Agent"}, {"value", "Custom user agent"}}});
+
     return result;
 }
 
@@ -353,6 +371,9 @@ QJsonObject getPropertyOpenApiDescriptor(const QMetaType& metaType, bool addDefa
 
     if (metaType == QMetaType::fromType<StreamQuality>())
         return createStreamQualityDescriptor(addDefaultValue);
+
+    if (metaType == QMetaType::fromType<QList<KeyValueObject>>())
+        return createKeyValueListDescriptor();
 
     return createBasicTypeDescriptor(metaType, addDefaultValue);
 }

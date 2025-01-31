@@ -152,6 +152,7 @@ void Initializer::registerFields() const
     registerActionField<ExtractDetailField>(this->m_context);
     registerActionField<EventDevicesField>();
     registerActionField<HttpAuthTypeField>();
+    registerActionField<HttpHeadersField>();
     registerActionField<HttpMethodField>();
     registerActionField<TargetLayoutField>();
     registerActionField<OptionalTimeField>();

@@ -10,6 +10,7 @@
 #include "fps_field.h"
 #include "http_auth_field.h"
 #include "http_auth_type_field.h"
+#include "http_headers_field.h"
 #include "http_method_field.h"
 #include "int_field.h"
 #include "optional_time_field.h"

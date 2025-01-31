@@ -2,6 +2,7 @@
 
 #include "picker_factory.h"
 
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/rules/action_builder_field.h>
 #include <nx/vms/rules/action_builder_fields/builtin_fields.h>
 #include <nx/vms/rules/camera_validation_policy.h>
@@ -20,8 +21,10 @@
 #include "flags_picker_widget.h"
 #include "fps_picker_widget.h"
 #include "http_auth_picker_widget.h"
+#include "http_headers_picker_widget.h"
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
+#include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "object_lookup_picker_widget.h"
 #include "oneline_text_picker_widget.h"
@@ -270,11 +273,14 @@ PickerWidget* createActionFieldWidget(
     if (fieldId == fieldMetatype<vms::rules::FpsField>())
         return createPickerImpl<FpsPicker>(field, context, parent);
 
-    if (fieldId == fieldMetatype<nx::vms::rules::HttpMethodField>())
-        return createPickerImpl<HttpMethodPicker>(field, context, parent);
-
     if (fieldId == fieldMetatype<nx::vms::rules::HttpAuthField>())
         return createPickerImpl<HttpAuthPicker>(field, context, parent);
+
+    if (fieldId == fieldMetatype<nx::vms::rules::HttpHeadersField>() && ini().developerMode)
+        return createPickerImpl<HttpHeadersPickerWidget>(field, context, parent);
+
+    if (fieldId == fieldMetatype<nx::vms::rules::HttpMethodField>())
+        return createPickerImpl<HttpMethodPicker>(field, context, parent);
 
     if (fieldId == fieldMetatype<nx::vms::rules::TargetLayoutField>())
         return createPickerImpl<SingleTargetLayoutPicker>(field, context, parent);

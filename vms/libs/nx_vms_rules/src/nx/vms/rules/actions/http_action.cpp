@@ -4,6 +4,7 @@
 
 #include "../action_builder_fields/content_type_field.h"
 #include "../action_builder_fields/http_auth_field.h"
+#include "../action_builder_fields/http_headers_field.h"
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
 #include "../action_builder_fields/text_with_fields.h"
@@ -34,6 +35,9 @@ const ItemDescriptor& HttpAction::manifest()
             makeFieldDescriptor<HttpMethodField>("method",
                 NX_DYNAMIC_TRANSLATABLE(tr("Method")),
                 {"If not set, it will be calculated automatically."}),
+            makeFieldDescriptor<HttpHeadersField>("headers",
+                NX_DYNAMIC_TRANSLATABLE(tr("Custom headers")),
+                {}),
             makeFieldDescriptor<TextWithFields>(utils::kContentFieldName,
                 NX_DYNAMIC_TRANSLATABLE(tr("Content")),
                 {},
@@ -79,6 +83,16 @@ QString HttpAction::content() const
 void HttpAction::setContent(const QString& content)
 {
     m_content = content;
+}
+
+QList<KeyValueObject> HttpAction::headers() const
+{
+    return m_headers;
+}
+
+void HttpAction::setHeaders(QList<KeyValueObject> headers)
+{
+    m_headers = std::move(headers);
 }
 
 std::string HttpAction::login() const

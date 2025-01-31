@@ -20,6 +20,7 @@ class NX_VMS_RULES_API HttpAction: public nx::vms::rules::BasicAction
 
     FIELD(std::chrono::microseconds, interval, setInterval)
     Q_PROPERTY(QString url READ url WRITE setUrl)
+    Q_PROPERTY(QList<KeyValueObject> headers READ headers WRITE setHeaders)
     Q_PROPERTY(QString content READ content WRITE setContent)
     FIELD(QString, contentType, setContentType)
     FIELD(QString, method, setMethod)
@@ -33,6 +34,9 @@ public:
 
     QString content() const;
     void setContent(const QString& content);
+
+    QList<KeyValueObject> headers() const;
+    void setHeaders(QList<KeyValueObject> headers);
 
     std::string login() const;
     std::string password() const;
@@ -49,6 +53,7 @@ private:
     AuthenticationInfo m_auth;
     QString m_url;
     QString m_content;
+    QList<KeyValueObject> m_headers;
 };
 
 } // namespace nx::vms::rules

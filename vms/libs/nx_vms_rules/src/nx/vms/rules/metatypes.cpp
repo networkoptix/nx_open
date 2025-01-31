@@ -96,6 +96,10 @@ void initializeMetatypesInternal()
 
     QnJsonSerializer::registerSerializer<std::string>();
     QnJsonSerializer::registerSerializer<nx::network::http::SerializableCredentials>();
+
+    qRegisterMetaType<KeyValueObject>();
+    QnJsonSerializer::registerSerializer<KeyValueObject>();
+    QnJsonSerializer::registerSerializer<QList<KeyValueObject>>();
 };
 
 void Metatypes::initialize()

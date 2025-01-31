@@ -11,4 +11,5 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(SerializableCredentials, (json), SerializableCr
 namespace nx::vms::rules {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(UuidSelection, (json), UuidSelection_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AuthenticationInfo, (json), AuthenticationInfo_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(KeyValueObject, (json), NameValueObject_Fields)
 } // namespace nx::vms::rules

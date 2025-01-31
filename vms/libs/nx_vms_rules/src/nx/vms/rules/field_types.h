@@ -52,6 +52,18 @@ struct AuthenticationInfo
 
 #define AuthenticationInfo_Fields (credentials)(authType)
 QN_FUSION_DECLARE_FUNCTIONS(AuthenticationInfo, (json), NX_VMS_RULES_API);
+
+struct KeyValueObject
+{
+    QString key;
+    QString value;
+
+    bool operator==(const KeyValueObject&) const = default;
+};
+
+#define NameValueObject_Fields (key)(value)
+QN_FUSION_DECLARE_FUNCTIONS(KeyValueObject, (json), NX_VMS_RULES_API);
+
 } // namespace nx::vms::rules
 
 

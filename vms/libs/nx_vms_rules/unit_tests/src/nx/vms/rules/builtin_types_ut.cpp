@@ -355,6 +355,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<ActionFlagField>();
     testActionFieldRegistration<FpsField>();
     testActionFieldRegistration<HttpAuthTypeField>();
+    testActionFieldRegistration<HttpHeadersField>();
     testActionFieldRegistration<HttpMethodField>();
     testActionFieldRegistration<OptionalTimeField>();
     testActionFieldRegistration<OutputPortField>();

@@ -15,15 +15,16 @@
 namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::rules::utils {
-static constexpr auto kDescriptionProperty = "description";
-static constexpr auto kExampleProperty = "example";
 static constexpr auto kDefaultProperty = "default";
-static constexpr auto kTypeProperty = "type";
-static constexpr auto kEnumProperty = "enum";
-static constexpr auto kMinProperty = "minimum";
-static constexpr auto kMaxProperty = "maximum";
-static constexpr auto kPropertyKey = "properties";
+static constexpr auto kDescriptionProperty = "description";
 static constexpr auto kDocOpenApiSchemePropertyName = "openApiSchema";
+static constexpr auto kEnumProperty = "enum";
+static constexpr auto kExampleProperty = "example";
+static constexpr auto kItemsProperty = "items";
+static constexpr auto kMaxProperty = "maximum";
+static constexpr auto kMinProperty = "minimum";
+static constexpr auto kPropertyKey = "properties";
+static constexpr auto kTypeProperty = "type";
 
 /**
  * Adds default, minimum, max values from Field properties, if presented.
