@@ -619,7 +619,7 @@ void EventRibbon::Private::closeExpiredTiles()
     const auto unreadCountGuard = makeUnreadCountGuard();
 
     for (const auto& index: std::as_const(expired))
-        m_model->removeRows(index.row(), 1);
+        m_model->removeRow(index.row());
 
     NX_VERBOSE(q, "Expired %1 tiles", expired.size());
     NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));

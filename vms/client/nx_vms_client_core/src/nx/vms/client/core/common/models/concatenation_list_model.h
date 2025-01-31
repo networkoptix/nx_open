@@ -60,8 +60,10 @@ private:
     void sourceRowsAboutToBeMoved(const QModelIndex& sourceParent, int sourceFirst, int sourceLast,
         const QModelIndex& destinationParent, int destinationRow);
     void sourceRowsMoved();
-    void sourceLayoutAboutToBeChanged();
-    void sourceLayoutChanged();
+    void sourceLayoutAboutToBeChanged(const QList<QPersistentModelIndex>& /*parents*/,
+        QAbstractItemModel::LayoutChangeHint hint);
+    void sourceLayoutChanged(const QList<QPersistentModelIndex>& /*parents*/,
+        QAbstractItemModel::LayoutChangeHint hint);
 
     int sourceModelPosition(const QAbstractItemModel* sourceModel) const;
     int mapFromSourceRow(const QAbstractItemModel* sourceModel, int row) const;

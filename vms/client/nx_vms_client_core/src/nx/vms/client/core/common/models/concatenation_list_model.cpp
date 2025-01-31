@@ -3,6 +3,7 @@
 #include "concatenation_list_model.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::core {
 
@@ -33,6 +34,8 @@ void ConcatenationListModel::setModels(const QList<QAbstractListModel*>& models)
 {
     m_modelConnections = {};
     m_models = models;
+
+    NX_VERBOSE(this, "Models set to: %1", m_models);
 
     for (const auto model: m_models)
         connectToModel(model);
@@ -103,6 +106,18 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
     if (parent.isValid())
         return false;
 
+    const auto sourceCounts =
+        [this]() -> QString
+        {
+            QStringList result;
+            for (auto model: m_models)
+                result.push_back(QString::number(sourceRowCount(model)));
+            return result.join(", ");
+        };
+
+    NX_VERBOSE(this, "Remove %1 row(s) at index %2, total count is %3 (%4), ignoredModel=%5",
+        count, row, rowCount(), sourceCounts(), m_ignoredModel);
+
     if (row < 0 || count < 0 || row + count > rowCount())
     {
         NX_ASSERT(false, "Rows are out of range");
@@ -111,6 +126,8 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
 
     if (count == 0)
         return true;
+
+    bool result = true;
 
     int startRow = 0;
     for (auto model: m_models)
@@ -127,8 +144,10 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
         const auto localFirst = row - startRow;
         const auto localCount = qMin(localFirst + count, sourceRows) - localFirst;
 
-        if (!model->removeRows(localFirst, localCount))
-            return false;
+        NX_VERBOSE(this, "Removing %1 source row(s) at index %2 from %3",
+            localCount, localFirst, model);
+
+        result = model->removeRows(localFirst, localCount) && result;
 
         count -= localCount;
         if (count == 0)
@@ -138,7 +157,9 @@ bool ConcatenationListModel::removeRows(int row, int count, const QModelIndex& p
         row = startRow;
     }
 
-    return true;
+    // Returns true only if all requested rows were removed.
+    // This case isn't documented, but seems consistent with QSortFilterProxyModel implementation.
+    return result;
 }
 
 void ConcatenationListModel::connectToModel(QAbstractListModel* model)
@@ -188,6 +209,8 @@ void ConcatenationListModel::connectToModel(QAbstractListModel* model)
 void ConcatenationListModel::sourceModelAboutToBeReset()
 {
     const auto model = qobject_cast<QAbstractListModel*>(sender());
+    NX_VERBOSE(this, "Source model about to be reset: %1", model);
+
     NX_ASSERT(model && !m_ignoredModel);
     const auto count = model->rowCount();
     if (!count)
@@ -208,6 +231,8 @@ void ConcatenationListModel::sourceModelAboutToBeReset()
 void ConcatenationListModel::sourceModelReset()
 {
     const auto model = qobject_cast<QAbstractListModel*>(sender());
+    NX_VERBOSE(this, "Source model reset: %1", model);
+
     NX_ASSERT(model && m_ignoredModel);
     const auto count = model->rowCount();
     if (!count)
@@ -229,12 +254,14 @@ void ConcatenationListModel::sourceRowsAboutToBeInserted(const QModelIndex& /*pa
     int first, int last)
 {
     const auto model = qobject_cast<const QAbstractListModel*>(sender());
+    NX_VERBOSE(this, "Source rows (%1-%2) about to be inserted: %3", first, last, model);
     NX_ASSERT(model);
     beginInsertRows(QModelIndex(), mapFromSourceRow(model, first), mapFromSourceRow(model, last));
 }
 
 void ConcatenationListModel::sourceRowsInserted()
 {
+    NX_VERBOSE(this, "Source rows inserted: %1", sender());
     endInsertRows();
 }
 
@@ -242,12 +269,14 @@ void ConcatenationListModel::sourceRowsAboutToBeRemoved(const QModelIndex& /*par
     int first, int last)
 {
     const auto model = qobject_cast<const QAbstractListModel*>(sender());
+    NX_VERBOSE(this, "Source rows (%1-%2) about to be removed: %3", first, last, model);
     NX_ASSERT(model);
     beginRemoveRows(QModelIndex(), mapFromSourceRow(model, first), mapFromSourceRow(model, last));
 }
 
 void ConcatenationListModel::sourceRowsRemoved()
 {
+    NX_VERBOSE(this, "Source rows removed: %1", sender());
     endRemoveRows();
 }
 
@@ -255,6 +284,8 @@ void ConcatenationListModel::sourceRowsAboutToBeMoved(const QModelIndex& /*sourc
     int sourceFirst, int sourceLast, const QModelIndex& /*destinationParent*/, int destinationRow)
 {
     const auto model = qobject_cast<const QAbstractListModel*>(sender());
+    NX_VERBOSE(this, "Source rows (%1-%2) about to be moved to %3: %4", sourceFirst, sourceLast,
+        destinationRow, model);
     NX_ASSERT(model);
     beginMoveRows(
         QModelIndex(), mapFromSourceRow(model, sourceFirst), mapFromSourceRow(model, sourceLast),
@@ -263,12 +294,16 @@ void ConcatenationListModel::sourceRowsAboutToBeMoved(const QModelIndex& /*sourc
 
 void ConcatenationListModel::sourceRowsMoved()
 {
+    NX_VERBOSE(this, "Source rows moved: %1", sender());
     endMoveRows();
 }
 
-void ConcatenationListModel::sourceLayoutAboutToBeChanged()
+void ConcatenationListModel::sourceLayoutAboutToBeChanged(
+    const QList<QPersistentModelIndex>& /*parents*/,
+    QAbstractItemModel::LayoutChangeHint hint)
 {
-    emit layoutAboutToBeChanged({}, QAbstractItemModel::VerticalSortHint);
+    NX_VERBOSE(this, "Source layout about to be changed (%1): %2", hint, sender());
+    emit layoutAboutToBeChanged({}, hint);
 
     NX_ASSERT(m_changingIndices.empty());
     m_changingIndices.clear(); //< Just in case.
@@ -284,13 +319,17 @@ void ConcatenationListModel::sourceLayoutAboutToBeChanged()
     }
 }
 
-void ConcatenationListModel::sourceLayoutChanged()
+void ConcatenationListModel::sourceLayoutChanged(
+    const QList<QPersistentModelIndex>& /*parents*/,
+    QAbstractItemModel::LayoutChangeHint hint)
 {
+    NX_VERBOSE(this, "Source layout changed (%1): %2", hint, sender());
+
     for (const auto& changed: m_changingIndices)
         changePersistentIndex(changed.first, mapFromSource(changed.second));
 
     m_changingIndices.clear();
-    emit layoutChanged({}, QAbstractItemModel::VerticalSortHint);
+    emit layoutChanged({}, hint);
 }
 
 } // namespace nx::vms::client::core

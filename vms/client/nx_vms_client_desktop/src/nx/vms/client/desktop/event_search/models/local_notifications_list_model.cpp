@@ -235,11 +235,24 @@ bool LocalNotificationsListModel::setData(const QModelIndex& index, const QVaria
     return true;
 }
 
-bool LocalNotificationsListModel::removeRows(int row, int count, const QModelIndex&)
+bool LocalNotificationsListModel::removeRows(int row, int count, const QModelIndex& parent)
 {
+    if (parent.isValid() || !NX_ASSERT(row >= 0 && count >= 0 && row + count <= rowCount()))
+        return false;
+
+    if (count == 0)
+        return true;
+
+    const int oldRowCount = rowCount();
+
     for (int i = row; i < row + count; ++i)
         windowContext()->localNotificationsManager()->cancel(m_notifications[i]);
-    return false;
+
+    const int newRowCount = rowCount();
+
+    // Returns true only if all requested rows were removed.
+    // This case isn't documented, but seems consistent with QSortFilterProxyModel implementation.
+    return newRowCount == oldRowCount - count;
 }
 
 } // namespace nx::vms::client::desktop
