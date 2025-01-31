@@ -40,7 +40,10 @@ constexpr int kBackgroundRectHeight = 196;
 constexpr int kMaskSize = 170;
 
 constexpr int kPostIconSpacing = 16;
-constexpr int kPostTextSpacing = 24;
+constexpr int kPostCaptionSpacing = 24;
+constexpr int kIconHeight = 48;
+// Keep indents from top and bottom equal to height of the top buttons panel.
+constexpr int kButtonPanelHeightIndent = 44 * 2;
 
 void disableFocus(QGraphicsItem* item)
 {
@@ -221,7 +224,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_caption(new QLabel()),
     m_button(new QPushButton()),
     m_postIconSpacer(new QSpacerItem(1, kPostIconSpacing, QSizePolicy::Fixed)),
-    m_postCaptionSpacer(new QSpacerItem(1, kPostTextSpacing, QSizePolicy::Fixed)),
+    m_postCaptionSpacer(new QSpacerItem(1, kPostCaptionSpacing, QSizePolicy::Fixed)),
     m_customButton(new QPushButton())
 {
     makeTransparentForMouse(this);
@@ -592,38 +595,28 @@ void QnStatusOverlayWidget::updateAreaSizes()
     qreal scale = 1.0
         / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11()
             + sceneToViewport.m12() * sceneToViewport.m12());
+    const bool buttonVisible = m_visibleControls.testFlag(Control::kButton);
 
-    bool showExtras = m_customButton->isVisible();
+    // Show complete overlay if icon, caption and button may fit into screen and button required.
+    // Show icon and caption if fit into screen and button NOT required
+    // Show icon and button if fit into screen only without caption
+    // Show only icon if other elements don't fit into screen
+    const int completeHeight = kButtonPanelHeightIndent + kIconHeight + kPostIconSpacing
+        + m_caption->height() + kPostCaptionSpacing + m_button->height();
+    const int iconCaptionHeight = kButtonPanelHeightIndent + kIconHeight + kPostIconSpacing
+        + m_caption->height();
+    const int iconButtonHeight = kButtonPanelHeightIndent + kIconHeight + kPostIconSpacing
+        + m_button->height();
 
-    const qreal minHeight = 212 * scale;
-    // Do not show extras on too small items
-    showExtras = showExtras && (rect.height() > minHeight * 1);
+    const bool showCaption = m_captionVisible
+        && (buttonVisible ? (rect.height() >= completeHeight * scale)
+                          : (rect.height() >= iconCaptionHeight * scale));
+    const bool showButton = buttonVisible && rect.height() >= iconButtonHeight * scale;
 
-    auto setVisible =
-        [](bool visible, bool objectVisible, QWidget* widget, QSpacerItem* spacer, int spacerSize)
-        {
-            if (visible)
-            {
-                spacer->changeSize(1, objectVisible ? spacerSize : 0);
-                widget->setVisible(objectVisible);
-            }
-            else
-            {
-                spacer->changeSize(1, 0);
-                widget->hide();
-            }
-        };
-
-    setVisible(rect.height() <= minHeight * 2,
-        m_captionVisible,
-        m_caption,
-        m_postCaptionSpacer,
-        kPostTextSpacing);
-    setVisible(rect.height() <= minHeight,
-        m_visibleControls.testFlag(Control::kButton),
-        m_button,
-        m_postIconSpacer,
-        kPostIconSpacing);
+    m_postIconSpacer->changeSize(1, showButton || showCaption ? kPostIconSpacing : 0);
+    m_caption->setVisible(showCaption);
+    m_postCaptionSpacer->changeSize(1, showCaption ? kPostCaptionSpacing : 0);
+    m_button->setVisible(showButton);
 
     m_preloaderHolder->setFixedSize(rect.size());
     m_centralHolder->setFixedSize(QSizeF(rect.width(), height));
@@ -631,7 +624,7 @@ void QnStatusOverlayWidget::updateAreaSizes()
     const bool showCentralArea = (!m_visibleControls.testFlag(Control::kPreloader)
         && !m_visibleControls.testFlag(Control::kImageOverlay));
 
-    m_extrasHolder->setVisible(showCentralArea && showExtras);
+    m_extrasHolder->setVisible(showCentralArea && m_customButton->isVisible());
 
     qreal extrasHeight = .0;
     if (m_extrasHolder->isVisible())
@@ -641,7 +634,7 @@ void QnStatusOverlayWidget::updateAreaSizes()
         extrasHeight = containerGeometry.height() * scale;
         m_extrasHolder->setFixedSize(QSizeF(rect.width(), extrasHeight));
 
-        int textBottomY = m_caption->height() + kPostTextSpacing;
+        int textBottomY = m_caption->height() + kPostCaptionSpacing;
         if (!scene()->views().empty())
         {
             auto view = scene()->views().first();
