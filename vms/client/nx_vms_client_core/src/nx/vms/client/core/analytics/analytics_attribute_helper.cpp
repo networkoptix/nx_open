@@ -89,7 +89,7 @@ public:
     {
         const std::vector<QString> items = colorType->items();
         const auto item = std::find_if(items.begin(), items.end(),
-            [color](const QString& item){ return item.toLower() == color; });
+            [color](const QString& item){ return item.toLower() == color.toLower(); });
 
         return item != items.end() ? QColor(colorType->color(*item)) : QColor::fromString(color);
     }
