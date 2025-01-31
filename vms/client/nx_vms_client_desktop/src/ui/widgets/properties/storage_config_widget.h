@@ -54,6 +54,7 @@ private:
         hasRemovableStorage = 1 << 3,
         cloudBackupStorageBeingEnabled = 1 << 4,
         backupStorageBeingReplacedByCloudStorage = 1 << 5,
+        notEnoughLicensesForCloudStorage = 1 << 6,
     };
     Q_DECLARE_FLAGS(StorageConfigWarningFlags, StorageConfigWarningFlag)
 
@@ -110,12 +111,20 @@ private:
     QMenu* createStorageArchiveModeMenu(const QnStorageModelInfo& storageInfo);
 
 private:
-    void applyStoragesChanges(
+
+    struct RollbackData
+    {
+        QnStorageModelInfoList storages;
+        QnResourceList toRemove;
+    };
+
+    RollbackData applyStoragesChanges(
         QnStorageResourceList& result,
         const QnStorageModelInfoList& storages) const;
 
     bool hasStoragesChanges(const QnStorageModelInfoList& storages) const;
     bool isServerOnline() const;
+    void rollbackChanges(const QnStorageConfigWidget::RollbackData& data);
 
 private:
     QScopedPointer<Ui::StorageConfigWidget> ui;

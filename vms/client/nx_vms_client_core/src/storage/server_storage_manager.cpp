@@ -352,7 +352,9 @@ void QnServerStorageManager::checkStoragesStatusInternal(const QnResourcePtr& re
     checkStoragesStatus(getServerForResource(resource));
 }
 
-void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
+void QnServerStorageManager::saveStorages(
+    const QnStorageResourceList& storages,
+    nx::utils::MoveOnlyFunc<void(ec2::ErrorCode)> callback)
 {
     auto messageBusConnection = systemContext()->messageBusConnection();
 
@@ -364,8 +366,11 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList& storages)
 
     messageBusConnection->getMediaServerManager(nx::network::rest::kSystemSession)->saveStorages(
         apiStorages,
-        [storages](int /*reqID*/, ec2::ErrorCode error)
+        [storages, callback = std::move(callback)](int reqID, ec2::ErrorCode error)
         {
+            if (callback)
+                callback(error);
+
             if (error != ec2::ErrorCode::ok)
                 return;
 

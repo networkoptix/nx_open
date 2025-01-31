@@ -105,6 +105,8 @@ public:
      */
     bool isOverflow() const;
 
+    int overflowLicenseCount() const;
+
     /*
      * @return Information about available license usages per service.
      *     key - megapixels, value - service usage info.

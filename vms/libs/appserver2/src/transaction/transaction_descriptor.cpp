@@ -1020,6 +1020,9 @@ struct ModifyStorageAccess
         const nx::network::rest::UserAccessData& accessData,
         const nx::vms::api::StorageData& param)
     {
+        if (hasSystemAccess(accessData))
+            return Result(ErrorCode::ok);
+
         if (param.url.isEmpty())
         {
             NX_DEBUG(this, "Declining save storage request because provided url is empty");
@@ -1061,7 +1064,7 @@ struct ModifyStorageAccess
         data.request = param;
         amendOutputDataIfNeeded(accessData, systemContext->resourceAccessManager(), &data.request);
 
-        return transaction_descriptor::canModifyStorage(data);
+        return transaction_descriptor::canModifyStorage(systemContext, data);
     }
 };
 
@@ -3092,31 +3095,45 @@ DescriptorBaseContainer transactionDescriptors = {
 
 namespace transaction_descriptor {
 
-Result canModifyStorage(const CanModifyStorageData& data)
+Result canModifyStorage(SystemContext* systemContext, const CanModifyStorageData& data)
 {
     if (data.modifyResourceResult != ErrorCode::ok)
         return data.modifyResourceResult;
 
     // For now only backup cloud storages are supported. It may change later.
-    if (data.request.storageType == nx::vms::api::kCloudStorageType
-        && !data.request.isBackup)
+    if (data.request.storageType == nx::vms::api::kCloudStorageType && !data.request.isBackup)
     {
-        return Result(
-            ErrorCode::forbidden,
+        return Result(ErrorCode::forbidden,
             nx::format(
-                detail::ServerApiErrors::tr(
-                    "%1 storage can be only in the backup storage pool.",
+                detail::ServerApiErrors::tr("%1 storage can be only in the backup storage pool.",
                     /*comment*/ "%1 is the short cloud name (like Cloud)"),
                 nx::branding::shortCloudName()));
     }
 
-    if (data.request.storageType != nx::vms::api::kCloudStorageType
-        && data.hasUsedCloudStorage
-        && data.request.usedForWriting
-        && data.request.isBackup)
+    if (data.request.storageType == nx::vms::api::kCloudStorageType && data.request.usedForWriting)
+    {
+        nx::vms::license::saas::CloudStorageServiceUsageHelper helper(systemContext);
+        if (helper.isOverflow())
+        {
+            NX_DEBUG(NX_SCOPE_TAG,
+                "Can't enable cloud storage because "
+                "there is not enough saas service licenses");
+
+            return Result(ErrorCode::forbidden,
+                nx::format(detail::ServerApiErrors::tr(
+                    "%1 storage cannot be enabled due to insufficient services.",
+                    /*comment*/ "%1 is the short cloud name (like Cloud)"))
+                    .arg(nx::branding::shortCloudName()));
+        }
+    }
+
+    if (data.request.storageType != nx::vms::api::kCloudStorageType && data.hasUsedCloudStorage
+        && data.request.usedForWriting && data.request.isBackup)
     {
         const auto errorMessage = detail::ServerApiErrors::tr(
-            "Can't enable UsedForWriting because used Cloud Storage is present");
+            "Can't enable writing for local storage because there is an active %1 storage",
+            /*comment*/ "%1 is the short cloud name (like Cloud)")
+            .arg(nx::branding::shortCloudName());
         return Result(ErrorCode::forbidden, errorMessage);
     }
 
@@ -3129,15 +3146,14 @@ Result canModifyStorage(const CanModifyStorageData& data)
     {
         data.logErrorFunc(nx::format(
             "Got inconsistent update request for storage '%1'. Urls differ.", data.request.id));
-        return Result(
-            ErrorCode::forbidden,
+        return Result(ErrorCode::forbidden,
             detail::ServerApiErrors::tr("Changing storage URL is prohibited."));
     }
 
     if (data.hasExistingStorage)
     {
-        const auto archiveModeIt = std::find_if(
-            data.request.addParams.cbegin(), data.request.addParams.cend(),
+        const auto archiveModeIt = std::find_if(data.request.addParams.cbegin(),
+            data.request.addParams.cend(),
             [](const auto& p) { return p.name == ResourcePropertyKey::kStorageArchiveMode; });
 
         if (archiveModeIt != data.request.addParams.cend())
@@ -3148,10 +3164,10 @@ Result canModifyStorage(const CanModifyStorageData& data)
 
             if (!r)
             {
-                data.logErrorFunc(nx::format(
-                    "Failed to deserialize ArchiveMode property value '%1'",  archiveModeIt->value));
-                return Result(
-                    ErrorCode::forbidden,
+                data.logErrorFunc(
+                    nx::format("Failed to deserialize ArchiveMode property value '%1'",
+                        archiveModeIt->value));
+                return Result(ErrorCode::forbidden,
                     detail::ServerApiErrors::tr("Invalid `storageArchiveMode` value."));
             }
 
@@ -3159,11 +3175,9 @@ Result canModifyStorage(const CanModifyStorageData& data)
             {
                 data.logErrorFunc(nx::format(
                     "Changing ArchiveMode to undefined is prohibited for existing storage'"));
-                return Result(
-                    ErrorCode::forbidden,
-                    detail::ServerApiErrors::tr(
-                        "Changing `storageArchiveMode` to undefined is "
-                        "prohibited for existing storage."));
+                return Result(ErrorCode::forbidden,
+                    detail::ServerApiErrors::tr("Changing `storageArchiveMode` to undefined is "
+                                                "prohibited for existing storage."));
             }
         }
     }

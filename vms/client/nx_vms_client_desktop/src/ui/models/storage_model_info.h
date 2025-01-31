@@ -26,6 +26,8 @@ struct QnStorageModelInfo
     QnStorageModelInfo();
     explicit QnStorageModelInfo(const nx::vms::api::StorageSpaceDataV1& reply);
     explicit QnStorageModelInfo(const QnStorageResourcePtr& storage);
+
+    void save(const QnStorageResourcePtr& storage) const;
 };
 
 typedef QList<QnStorageModelInfo> QnStorageModelInfoList;

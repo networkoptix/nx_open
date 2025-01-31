@@ -92,7 +92,9 @@ struct CanModifyStorageData
     bool hasUsedCloudStorage = false;
 };
 
-Result canModifyStorage(const CanModifyStorageData& data);
+Result canModifyStorage(
+    nx::vms::common::SystemContext* systemContext,
+    const CanModifyStorageData& data);
 
 } // namespace transaction_descriptor
 

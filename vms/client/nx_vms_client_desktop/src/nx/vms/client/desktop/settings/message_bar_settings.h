@@ -43,6 +43,8 @@ public:
     Property<bool> multiServerUpdateWeekendWarning{this, "multiServerUpdateWeekendWarning", true};
     Property<bool> multiServerUpdateCustomClientWarning{
         this, "multiServerUpdateCustomClientWarning", true};
+    Property<bool> notEnoughLicensesForCloudStorageClientError{
+        this, "notEnoughLicensesForCloudStorageClientError", true};
 };
 
 MessageBarSettings* messageBarSettings();

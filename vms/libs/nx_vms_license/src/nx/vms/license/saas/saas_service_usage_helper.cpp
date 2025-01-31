@@ -416,6 +416,17 @@ bool CloudStorageServiceUsageHelper::isOverflow() const
         });
 }
 
+int CloudStorageServiceUsageHelper::overflowLicenseCount() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_cache)
+        updateCacheUnsafe();
+    int result = 0;
+    for (const auto& [_, data]: *m_cache)
+        result += std::max(0, data.inUse - data.available);
+    return result;
+}
+
 std::map<int, LicenseSummaryData> CloudStorageServiceUsageHelper::allInfoByMegapixels() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

@@ -41,6 +41,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/license/saas/saas_service_usage_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <storage/server_storage_manager.h>
 #include <ui/common/indents.h>
@@ -788,8 +789,12 @@ QnStorageConfigWidget::StorageConfigWarningFlags
     {
         const auto storageResource =
             resourcePool()->getResourceById<QnStorageResource>(storageInfo.id);
+        if (!storageResource)
+            continue;
 
-        if (!storageResource || storageResource->getParentId() != m_server->getId())
+        const bool isForeignStorage = storageResource->getParentId() != m_server->getId()
+            && !storageResource->isCloudStorage();
+        if (isForeignStorage)
             continue;
 
         // Metadata related flags.
@@ -826,6 +831,9 @@ QnStorageConfigWidget::StorageConfigWarningFlags
             && storageInfo.storageType == nx::reflect::toString(StorageType::cloud))
         {
             flags.setFlag(cloudBackupStorageBeingEnabled);
+            nx::vms::license::saas::CloudStorageServiceUsageHelper helper(systemContext());
+            flags.setFlag(notEnoughLicensesForCloudStorage, helper.isOverflow());
+
         }
 
         if (!storageInfo.isUsed && storageResource->isUsedForWriting() && storageResource->isBackup())
@@ -906,6 +914,19 @@ void QnStorageConfigWidget::updateWarnings()
                 .level = BarDescription::BarLevel::Warning,
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
+    }
+    if (flags.testFlag(notEnoughLicensesForCloudStorage))
+    {
+        nx::vms::license::saas::CloudStorageServiceUsageHelper helper(systemContext());
+        messages.push_back({
+            .text = tr(
+                "%1 storage cannot be enabled due to insufficient services. Add %n more suitable "
+                "services or reduce the number of cameras with backup enabled.",
+                /*comment*/ "%1 is the short cloud name (like Cloud)",
+                helper.overflowLicenseCount()).arg(nx::branding::shortCloudName()),
+            .level = BarDescription::BarLevel::Error,
+            .isEnabledProperty =
+                &messageBarSettings()->notEnoughLicensesForCloudStorageClientError});
     }
     ui->messageBarBlock->setMessageBars(messages);
 }
@@ -1266,10 +1287,12 @@ void QnStorageConfigWidget::updateRebuildInfo()
     }
 }
 
-void QnStorageConfigWidget::applyStoragesChanges(
+QnStorageConfigWidget::RollbackData QnStorageConfigWidget::applyStoragesChanges(
     QnStorageResourceList& result,
     const QnStorageModelInfoList& storages) const
 {
+    RollbackData rollbackData;
+
     auto existing = m_server->getStorages();
     for (const auto& storageData: storages)
     {
@@ -1283,9 +1306,8 @@ void QnStorageConfigWidget::applyStoragesChanges(
                 || storageData.isBackup != storage->isBackup()
                 || storageData.archiveMode != storage->storageArchiveMode())
             {
-                storage->setUsedForWriting(storageData.isUsed);
-                storage->setBackup(storageData.isBackup);
-                storage->setStorageArchiveMode(storageData.archiveMode);
+                rollbackData.storages.push_back(QnStorageModelInfo(storage));
+                storageData.save(storage);
                 result.push_back(storage);
             }
         }
@@ -1294,6 +1316,7 @@ void QnStorageConfigWidget::applyStoragesChanges(
             QnClientStorageResourcePtr storage =
                 QnClientStorageResource::newStorage(m_server, storageData.url);
             NX_ASSERT(storage->getId() == storageData.id, "Id's must be equal");
+            rollbackData.toRemove.push_back(storage);
 
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
@@ -1304,6 +1327,8 @@ void QnStorageConfigWidget::applyStoragesChanges(
             result.push_back(storage);
         }
     }
+
+    return rollbackData;
 }
 
 bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& storages) const
@@ -1350,7 +1375,7 @@ void QnStorageConfigWidget::applyChanges()
     if (cloudStorageToggledOn())
         updateBackupSettingsForCloudStorage();
 
-    applyStoragesChanges(storagesToUpdate, m_model->storages());
+    auto rollbackData = applyStoragesChanges(storagesToUpdate, m_model->storages());
 
     QSet<nx::Uuid> newIdList;
     for (const auto& storageData: m_model->storages())
@@ -1367,13 +1392,34 @@ void QnStorageConfigWidget::applyChanges()
 
     const auto storageManager = systemContext()->serverStorageManager();
     if (!storagesToUpdate.empty())
-        storageManager->saveStorages(storagesToUpdate);
+    {
+        storageManager->saveStorages(
+            storagesToUpdate,
+            [this, rollbackData = std::move(rollbackData)](ec2::ErrorCode errorCode)
+            {
+                if (errorCode != ec2::ErrorCode::ok)
+                {
+                    rollbackChanges(rollbackData);
+                    loadDataToUi();
+                }
+            });
+    }
 
     if (!storagesToRemove.empty())
         storageManager->deleteStorages(storagesToRemove);
 
     updateWarnings();
     emit hasChangesChanged();
+}
+
+void QnStorageConfigWidget::rollbackChanges(const QnStorageConfigWidget::RollbackData& data)
+{
+    resourcePool()->removeResources(data.toRemove);
+    for (const auto& storageData: data.storages)
+    {
+        if (auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id))
+            storageData.save(storage);
+    }
 }
 
 void QnStorageConfigWidget::discardChanges()

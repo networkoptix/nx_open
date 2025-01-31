@@ -62,3 +62,10 @@ QnStorageModelInfo::QnStorageModelInfo(const QnStorageResourcePtr& storage)
             : nx::vms::api::StorageArchiveMode::exclusive;
     }
 }
+
+void QnStorageModelInfo::save(const QnStorageResourcePtr& storage) const
+{
+    storage->setUsedForWriting(isUsed);
+    storage->setBackup(isBackup);
+    storage->setStorageArchiveMode(archiveMode);
+}
