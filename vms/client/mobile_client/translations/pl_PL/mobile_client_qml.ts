@@ -50,7 +50,7 @@
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
-      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+      <translation>Uruchom ponownie aplikację, aby zastosować zmiany.</translation>
     </message>
     <message>
       <source>Maximum decoders count</source>
@@ -367,7 +367,7 @@
     <name>PluginSelector</name>
     <message>
       <source>Plugin</source>
-      <translation type="unfinished">Plugin</translation>
+      <translation>Wtyczka</translation>
     </message>
   </context>
   <context>
