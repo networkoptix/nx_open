@@ -3565,11 +3565,11 @@ Lisensnøkkel: %2</translation>
     </message>
     <message>
       <source>Open Event video</source>
-      <translation type="unfinished">Open Event video</translation>
+      <translation>Åpne hendelsesvideo</translation>
     </message>
     <message>
       <source>Open Event camera</source>
-      <translation type="unfinished">Open Event camera</translation>
+      <translation>Åpne hendelseskamera</translation>
     </message>
   </context>
   <context>
