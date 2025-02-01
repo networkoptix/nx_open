@@ -869,7 +869,7 @@
     </message>
     <message>
       <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
+      <translation>Skriv inn krypteringspassordet på skrivebordsklienten for å dekryptere dette arkivet, eller be nettstedadministratoren om hjelp.</translation>
     </message>
   </context>
   <context>

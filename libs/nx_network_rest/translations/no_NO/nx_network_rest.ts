@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Sesjonsnøkkelen er for gammel for dette nettstedet.</translation>
     </message>
   </context>
   <context>

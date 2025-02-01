@@ -202,7 +202,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Noen brukere har ikke tilgang til det valgte oppsettet</translation>
     </message>
     <message>
       <source>For</source>

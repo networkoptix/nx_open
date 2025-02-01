@@ -46,7 +46,7 @@
     </message>
     <message>
       <source>Improve network performance</source>
-      <translation type="unfinished">Improve network performance</translation>
+      <translation>Popraw wydajność sieci</translation>
     </message>
     <message>
       <source>Maximum decoders count</source>
@@ -58,7 +58,7 @@
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
-      <translation type="unfinished">Please restart the app to apply the changes.</translation>
+      <translation>Uruchom ponownie aplikację, aby zastosować zmiany.</translation>
     </message>
   </context>
   <context>
@@ -367,7 +367,7 @@
     <name>PluginSelector</name>
     <message>
       <source>Plugin</source>
-      <translation type="unfinished">Plugin</translation>
+      <translation>Wtyczka</translation>
     </message>
   </context>
   <context>

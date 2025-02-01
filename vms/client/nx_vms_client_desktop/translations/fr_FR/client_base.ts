@@ -7585,7 +7585,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>%1 will be removed from the Site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the Site and replaced by the selected camera</translation>
+      <translation>%1 sera supprimé du site et remplacé par la caméra sélectionnée</translation>
     </message>
   </context>
   <context>
@@ -7998,7 +7998,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</source>
-      <translation type="unfinished">%1 Layouts are &lt;b&gt;cross-site layouts&lt;/b&gt; that allow you to work with devices from different Sites. Currently, only some features of regular layouts are available, but we will continue to expand the capabilities of %1 Layouts in future versions</translation>
+      <translation>Les mises en page %1 sont des mises en page &lt;b&gt;intersites&lt;/b&gt; qui vous permettent de travailler avec des appareils de différents sites. Actuellement, seules certaines fonctionnalités des mises en page standard sont disponibles, mais nous continuerons d'étendre les capacités des mises en page %1 dans les versions futures</translation>
     </message>
   </context>
   <context>
@@ -8075,7 +8075,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>Etes-vous sûr de vouloir vous déconnecter ?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8095,17 +8095,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>Le propriétaire du site local est absent ou désactivé.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>Site connecté à %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>Échec de la connexion du site à %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
@@ -8120,7 +8120,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>Entrez le mot de passe de votre compte pour vous connecter au site à %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8149,11 +8149,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>Fusionner le serveur avec le site</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>Entrez le mot de passe de votre compte pour fusionner le serveur avec le site</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8234,11 +8234,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Cette caméra nécessite un mot de passe pour être configurée. Demandez à l'administrateur de votre site de le faire.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Certaines caméras sélectionnées nécessitent la configuration d'un mot de passe. Demandez à l'administrateur de votre site de le faire.</translation>
     </message>
   </context>
   <context>
@@ -8381,7 +8381,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>Le nombre maximum d'appareils pour le site est atteint</translation>
     </message>
   </context>
   <context>
@@ -8489,15 +8489,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Open event video</source>
-      <translation type="unfinished">Open event video</translation>
+      <translation>Ouvrir la vidéo de l'événement</translation>
     </message>
     <message>
       <source>Open event device</source>
-      <translation type="unfinished">Open event device</translation>
+      <translation>Ouvrir l'appareil de l'événement</translation>
     </message>
     <message>
       <source>Open event camera</source>
-      <translation type="unfinished">Open event camera</translation>
+      <translation>Ouvrir la caméra de l'événement</translation>
     </message>
   </context>
   <context>
@@ -8557,11 +8557,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::EventTile</name>
     <message>
       <source>UNKNOWN</source>
-      <translation type="unfinished">UNKNOWN</translation>
+      <translation>INCONNU</translation>
     </message>
     <message numerus="yes">
       <source> + %n</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> + %n</numerusform>
         <numerusform> + %n</numerusform>
       </translation>
@@ -8899,7 +8899,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>View video without redaction</source>
-      <translation type="unfinished">View video without redaction</translation>
+      <translation>Voir la vidéo sans rédaction</translation>
     </message>
   </context>
   <context>
@@ -9014,19 +9014,19 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>Les serveurs de l’autre site apparaîtront dans l’arborescence des ressources.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>Connexion au site actuel...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>Le serveur sera bientôt connecté au site</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>Impossible de fusionner %1 vers notre site.</translation>
     </message>
   </context>
   <context>
@@ -9106,7 +9106,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>Cet ID est déjà utilisé. Utilisez le bouton "Générer" pour en trouver un disponible.</translation>
     </message>
   </context>
   <context>
@@ -9215,7 +9215,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Tous les utilisateurs et groupes LDAP seront supprimés.&lt;br&gt;&lt;br&gt;Les paramètres LDAP seront également supprimés.</translation>
     </message>
   </context>
   <context>
@@ -9323,8 +9323,8 @@ Le niveau de journalisation &quot;%1&quot; vous fournira plus d'informations gra
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>Le niveau de log sélectionné peut dégrader les performances.
+N'oubliez pas de retourner le niveau de log à son paramètre par défaut après avoir collecté suffisamment de logs.</translation>
     </message>
   </context>
   <context>
@@ -9390,7 +9390,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>Le niveau de log réduit les performances</translation>
     </message>
   </context>
   <context>
@@ -9420,35 +9420,35 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>La journalisation de débogage est activée sur le client</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>La journalisation de débogage est activée.
+Les performances du client sont dégradées.</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>La journalisation de débogage est activée</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>La journalisation de débogage est activée.
+Les performances du client sont dégradées.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
-      <translation type="unfinished">Logs download canceled</translation>
+      <translation>Téléchargement des logs annulé</translation>
     </message>
     <message>
       <source>Downloading logs...</source>
-      <translation type="unfinished">Downloading logs...</translation>
+      <translation>Téléchargement des logs...</translation>
     </message>
     <message>
       <source>Logs download failed</source>
-      <translation type="unfinished">Logs download failed</translation>
+      <translation>Échec du téléchargement des logs</translation>
     </message>
   </context>
   <context>
@@ -9459,27 +9459,27 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Downloading...</source>
-      <translation type="unfinished">Downloading...</translation>
+      <translation>Téléchargement...</translation>
     </message>
     <message>
       <source>Download completed with errors</source>
-      <translation type="unfinished">Download completed with errors</translation>
+      <translation>Téléchargement terminé avec erreurs</translation>
     </message>
     <message>
       <source>Download success</source>
-      <translation type="unfinished">Download success</translation>
+      <translation>Téléchargement réussi</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n sélectionné :</numerusform>
+        <numerusform>%n sélectionnés :</numerusform>
       </translation>
     </message>
     <message>
       <source>Retry (%1)</source>
-      <translation type="unfinished">Retry (%1)</translation>
+      <translation>Réessayer (%1)</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -9494,23 +9494,23 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Lookup List remove request failed</source>
-      <translation type="unfinished">Lookup List remove request failed</translation>
+      <translation>La demande de suppression de la liste de recherche a échoué</translation>
     </message>
     <message>
       <source>Could not add object to the List</source>
-      <translation type="unfinished">Could not add object to the List</translation>
+      <translation>Impossible d'ajouter l'objet à la liste</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Un objet n'a pas d'attributs qui correspondent à la liste sélectionnée</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>L'objet a été ajouté à la liste</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>Un objet a été ajouté avec succès au &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9563,7 +9563,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>Tous les autres fichiers texte</translation>
     </message>
   </context>
   <context>
@@ -9640,7 +9640,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>Entrez le mot de passe de votre compte pour fusionner les sites</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9649,11 +9649,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Fusion des sites...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>Il s'agit de l'URL actuelle du site.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
