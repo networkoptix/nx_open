@@ -5058,7 +5058,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Eksklusiv</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5066,7 +5066,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Isolert</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -5190,11 +5190,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Isolert</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Eksklusiv</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5206,7 +5206,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>flyttbar</translation>
     </message>
     <message>
       <source>Unknown size</source>
