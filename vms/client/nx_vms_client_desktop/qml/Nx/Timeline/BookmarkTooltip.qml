@@ -96,6 +96,8 @@ Page
 
                 ImageButton
                 {
+                    implicitWidth: 30
+                    implicitHeight: 30
                     icon.source: "image://skin/20x20/Solid/play.svg"
                     icon.width: 20
                     icon.height: 20
@@ -106,6 +108,8 @@ Page
 
                 ImageButton
                 {
+                    implicitWidth: 30
+                    implicitHeight: 30
                     icon.source: "image://skin/20x20/Solid/edit.svg"
                     icon.width: 20
                     icon.height: 20
@@ -117,6 +121,8 @@ Page
 
                 ImageButton
                 {
+                    implicitWidth: 30
+                    implicitHeight: 30
                     icon.source: "image://skin/20x20/Solid/download.svg"
                     icon.width: 20
                     icon.height: 20
@@ -133,6 +139,8 @@ Page
 
                 ImageButton
                 {
+                    implicitWidth: 30
+                    implicitHeight: 30
                     icon.source: "image://skin/20x20/Solid/delete.svg"
                     icon.width: 20
                     icon.height: 20
