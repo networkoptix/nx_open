@@ -16,7 +16,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/actions/system_health_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
@@ -96,6 +96,8 @@ QnCameraHistoryPool::QnCameraHistoryPool(
         });
 }
 
+QnCameraHistoryPool::~QnCameraHistoryPool() {}
+
 void QnCameraHistoryPool::setHistoryCheckDelay(int value)
 {
     m_historyCheckDelay = value;
@@ -151,55 +153,56 @@ void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageP
 
     if (messageProcessor)
     {
-        connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-            [this](const vms::event::AbstractActionPtr& businessAction)
-            {
-                vms::api::EventType eventType = businessAction->getRuntimeParams().eventType;
-                if (eventType >= vms::api::EventType::siteHealthEvent
-                    && eventType <= vms::api::EventType::maxSiteHealthEvent)
-                {
-                    auto healthMessage = MessageType(eventType - vms::api::EventType::siteHealthEvent);
-                    if (healthMessage == MessageType::archiveRebuildFinished
-                        || healthMessage == MessageType::archiveFastScanFinished
-                        || healthMessage == MessageType::remoteArchiveSyncError)
-                    {
-                        auto eventParams = businessAction->getRuntimeParams();
-                        QSet<nx::Uuid> cameras;
-
-                        if (healthMessage == MessageType::remoteArchiveSyncError)
-                        {
-                            if (eventParams.metadata.cameraRefs.empty())
-                                return;
-
-                            for (const auto& flexibleId: eventParams.metadata.cameraRefs)
-                            {
-                                auto camera = camera_id_helper::findCameraByFlexibleId(
-                                    resourcePool(), flexibleId);
-                                if (camera)
-                                    cameras.insert(camera->getId());
-                            }
-                        }
-                        else
-                        {
-                            cameras = getServerFootageData(eventParams.eventResourceId);
-                        }
-
-                        for (const auto& cameraId: cameras)
-                            invalidateCameraHistory(cameraId);
-
-                        for (const auto& cameraId: cameras)
-                        {
-                            if (const auto camera = toCamera(cameraId))
-                                emit cameraFootageChanged(camera);
-                        }
-                    }
-                }
-            });
+        connect(messageProcessor, &QnCommonMessageProcessor::serverRuntimeEventOccurred,
+            this, &QnCameraHistoryPool::onServerRuntimeEvent);
     }
+
     m_messageProcessor = messageProcessor;
 }
 
-QnCameraHistoryPool::~QnCameraHistoryPool() {}
+void QnCameraHistoryPool::onServerRuntimeEvent(
+    const nx::vms::api::ServerRuntimeEventData & eventData)
+{
+    const auto action = nx::vms::event::SystemHealthAction::fromServerRuntimeEvent(eventData);
+    if (!action)
+        return;
+
+    auto healthMessage = MessageType(action->eventType() - vms::api::EventType::siteHealthEvent);
+    if (healthMessage == MessageType::archiveRebuildFinished
+        || healthMessage == MessageType::archiveFastScanFinished
+        || healthMessage == MessageType::remoteArchiveSyncError)
+    {
+        const auto eventParams = action->getRuntimeParams();
+        QSet<nx::Uuid> cameras;
+
+        if (healthMessage == MessageType::remoteArchiveSyncError)
+        {
+            if (eventParams.metadata.cameraRefs.empty())
+                return;
+
+            for (const auto& flexibleId: eventParams.metadata.cameraRefs)
+            {
+                auto camera = camera_id_helper::findCameraByFlexibleId(
+                    resourcePool(), flexibleId);
+                if (camera)
+                    cameras.insert(camera->getId());
+            }
+        }
+        else
+        {
+            cameras = getServerFootageData(eventParams.eventResourceId);
+        }
+
+        for (const auto& cameraId: cameras)
+            invalidateCameraHistory(cameraId);
+
+        for (const auto& cameraId: cameras)
+        {
+            if (const auto camera = toCamera(cameraId))
+                emit cameraFootageChanged(camera);
+        }
+    }
+}
 
 bool QnCameraHistoryPool::isCameraHistoryValid(const QnVirtualCameraResourcePtr& camera) const
 {

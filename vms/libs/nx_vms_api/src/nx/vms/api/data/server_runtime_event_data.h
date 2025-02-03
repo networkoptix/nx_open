@@ -26,6 +26,8 @@ enum class ServerRuntimeEventType
 
     /** Saas service was automatically disabled due to licenses issue */
     serviceDisabled = 5,
+
+    systemHealthMessage = 6,
 };
 
 template<typename Visitor>

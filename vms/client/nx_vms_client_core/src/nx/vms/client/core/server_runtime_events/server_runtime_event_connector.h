@@ -5,9 +5,11 @@
 #include <vector>
 
 #include <nx/utils/uuid.h>
-#include <nx/vms/api/data/server_runtime_event_data.h>
+#include <nx/vms/event/event_fwd.h>
 
 class QnCommonMessageProcessor;
+
+namespace nx::vms::api { struct ServerRuntimeEventData; }
 
 namespace nx::vms::client::core {
 
@@ -24,6 +26,7 @@ signals:
     void analyticsStorageParametersChanged(nx::Uuid serverId);
     void deviceAdvancedSettingsManifestChanged(const std::set<nx::Uuid>& deviceIds);
     void serviceDisabled(nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
+    void systemHealthMessage(const nx::vms::event::AbstractActionPtr& action);
 
 private:
     void at_serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);

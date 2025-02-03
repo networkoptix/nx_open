@@ -466,31 +466,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    // Cross-system contexts have no message processor.
-    if (auto messageProcessor = systemContext->messageProcessor())
-    {
-        connect(
-            messageProcessor,
-            &QnCommonMessageProcessor::businessActionReceived,
-            this,
-            [this](const nx::vms::event::AbstractActionPtr &businessAction)
-            {
-                if (businessAction->actionType() != ActionType::executePtzPresetAction)
-                    return;
-
-                const auto &actionParams = businessAction->getParams();
-                if (actionParams.actionResourceId != d->resource->getId())
-                    return;
-
-                if (m_ptzController)
-                {
-                    m_ptzController->activatePreset(
-                        actionParams.presetId,
-                        QnAbstractPtzController::MaxPtzSpeed);
-                }
-            });
-    }
-
     connect(action(menu::ToggleSyncAction), &QAction::triggered, this,
         &QnMediaResourceWidget::handleSyncStateChanged);
 

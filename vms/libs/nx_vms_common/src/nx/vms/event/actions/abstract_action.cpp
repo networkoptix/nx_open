@@ -282,6 +282,8 @@ QList<ActionType> allActions()
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 AbstractAction::AbstractAction(const ActionType actionType, const EventParameters& runtimeParams):
     m_actionType(actionType),
     m_toggleState(EventState::undefined),
@@ -298,6 +300,11 @@ AbstractAction::~AbstractAction()
 ActionType AbstractAction::actionType() const
 {
     return m_actionType;
+}
+
+EventType AbstractAction::eventType() const
+{
+    return m_runtimeParams.eventType;
 }
 
 void AbstractAction::setResources(const QVector<nx::Uuid>& resources)

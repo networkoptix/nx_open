@@ -2741,35 +2741,6 @@ struct VideoWallControlAccess
     }
 };
 
-struct ActionControlAccess
-{
-    Result operator()(SystemContext* systemContext,
-        const nx::network::rest::UserAccessData& accessData,
-        const nx::vms::api::EventActionData& data)
-    {
-        if (hasSystemAccess(accessData))
-            return {};
-
-        auto [userAccessInfo, result] = userAccessorInfo(*systemContext, accessData);
-        if (!result)
-        {
-            return std::move(result);
-        }
-
-        if (data.actionType != api::ActionType::cameraOutputAction
-            && !userAccessInfo.permissions.testFlag(GlobalPermission::generateEvents))
-        {
-            auto userResource = systemContext->resourcePool()->getResourceById(
-                accessData.userId).dynamicCast<QnUserResource>();
-            return {ErrorCode::forbidden, nx::format(ServerApiErrors::tr(
-                "the User %1 doesn't have 'generateEvents' permission"),
-                userResource ? userResource->getName() : accessData.userId.toSimpleString())};
-        }
-
-        return checkActionPermission(systemContext, accessData, data);
-    }
-};
-
 struct ShowreelAccess
 {
     Result operator()(

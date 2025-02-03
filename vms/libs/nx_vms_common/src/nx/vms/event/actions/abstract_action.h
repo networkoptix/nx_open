@@ -65,6 +65,7 @@ public:
     virtual ~AbstractAction();
 
     ActionType actionType() const;
+    EventType eventType() const;
 
     /**
      * Resource depend of action type.

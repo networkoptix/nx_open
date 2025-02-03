@@ -53,8 +53,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/actions/common_action.h>
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -319,71 +317,10 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
                 }
             });
     }
-
-    connect(system()->messageProcessor(), &QnCommonMessageProcessor::businessActionReceived,
-        this, &LayoutActionHandler::at_businessActionReceived);
 }
 
 LayoutActionHandler::~LayoutActionHandler()
 {
-}
-
-void LayoutActionHandler::at_businessActionReceived(
-    const vms::event::AbstractActionPtr& businessAction)
-{
-    if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
-        return;
-
-    const auto& actionParams = businessAction->getParams();
-    const auto layout = system()->resourcePool()->getResourceById<LayoutResource>(
-        actionParams.actionResourceId);
-    if (!layout)
-        return;
-
-    // We can get here while connecting if there are a lot of resources on the server.
-    const auto currentUser = system()->user();
-    if (!currentUser)
-        return;
-
-    if (!actionParams.allUsers)
-    {
-        const auto checkUserAcessibility =
-            [&]()
-            {
-                // Either user or his role should be mentioned in actionParams.additionalResources
-                // so that user can handle this action.
-                const auto& permitted = actionParams.additionalResources;
-                if (std::find(permitted.begin(), permitted.end(), currentUser->getId()) != permitted.end())
-                    return true;
-
-                const auto groups = nx::vms::common::userGroupsWithParents(currentUser);
-                for (const auto& groupId: groups)
-                {
-                    if (std::find(permitted.begin(), permitted.end(), groupId) != permitted.end())
-                        return true;
-                }
-
-                return false;
-            };
-
-        if (!checkUserAcessibility())
-            return;
-    }
-
-    if (ResourceAccessManager::hasPermissions(layout, Qn::ReadPermission))
-    {
-        using namespace std::chrono;
-        menu()->trigger(menu::OpenInNewTabAction, layout);
-        if (actionParams.recordBeforeMs > 0)
-        {
-            const microseconds navigationTime = qnSyncTime->currentTimePoint()
-                - milliseconds(actionParams.recordBeforeMs);
-
-            using namespace menu;
-            menu()->triggerIfPossible(JumpToTimeAction,
-                Parameters().withArgument(core::TimestampRole, navigationTime));
-        }
-    }
 }
 
 void LayoutActionHandler::at_forgetLayoutPasswordAction_triggered()

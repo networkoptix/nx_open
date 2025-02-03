@@ -7,6 +7,8 @@
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/actions/common_action.h>
 
+namespace nx::vms::api { struct ServerRuntimeEventData; }
+
 namespace nx::vms::event {
 
 class NX_VMS_COMMON_API SystemHealthAction: public CommonAction
@@ -18,6 +20,9 @@ public:
         common::system_health::MessageType message,
         nx::Uuid eventResourceId = {},
         const nx::common::metadata::Attributes& attributes = {});
+
+    static AbstractActionPtr fromServerRuntimeEvent(
+        const nx::vms::api::ServerRuntimeEventData& data);
 };
 
 using SystemHealthActionPtr = QSharedPointer<SystemHealthAction>;

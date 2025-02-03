@@ -162,12 +162,8 @@ private:
 QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d_ptr(new QnWorkbenchTextOverlaysHandlerPrivate(this)),
-    m_helper(new nx::vms::event::StringsHelper(systemContext()))
+    d_ptr(new QnWorkbenchTextOverlaysHandlerPrivate(this))
 {
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::businessActionReceived,
-        this, &QnWorkbenchTextOverlaysHandler::at_eventActionReceived);
-
     connect(display(), &QnWorkbenchDisplay::widgetAdded,
         this, &QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded);
 
@@ -178,67 +174,6 @@ QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
 
 QnWorkbenchTextOverlaysHandler::~QnWorkbenchTextOverlaysHandler()
 {
-}
-
-void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
-    const vms::event::AbstractActionPtr& businessAction)
-{
-    if (businessAction->actionType() != vms::api::ActionType::showTextOverlayAction)
-        return;
-
-    if (!context()->user())
-        return;
-
-    const auto& actionParams = businessAction->getParams();
-
-    const auto state = businessAction->getToggleState();
-    const bool isProlongedAction = businessAction->isProlonged();
-    const bool couldBeInstantEvent = (state == vms::api::EventState::undefined);
-
-    /* Do not accept instant events for prolonged actions. */
-    if (isProlongedAction && couldBeInstantEvent)
-        return;
-
-    auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-        businessAction->getResources());
-
-    if (actionParams.useSource)
-    {
-        cameras << businessAction->getSourceResources(
-            resourcePool()).filtered<QnVirtualCameraResource>();
-    }
-
-    /* Remove duplicates. */
-    std::sort(cameras.begin(), cameras.end());
-    cameras.erase(std::unique(cameras.begin(), cameras.end()), cameras.end());
-
-    const auto timeout = std::chrono::milliseconds(
-        isProlongedAction ? -1 : actionParams.durationMs);
-
-    const auto id = businessAction->getRuleId();
-    const bool finished = isProlongedAction && (state == vms::api::EventState::inactive);
-
-    Q_D(QnWorkbenchTextOverlaysHandler);
-
-    if (finished)
-    {
-        for (const auto& camera: cameras)
-            d->hideTextOverlays(camera, id);
-    }
-    else
-    {
-        const QString text = actionParams.text.trimmed();
-        const auto runtimeParams = businessAction->getRuntimeParams();
-        const auto rawCaption = m_helper->eventAtResource(runtimeParams, Qn::RI_WithUrl);
-        const auto rawDescription = m_helper->eventDetails(
-            runtimeParams,
-            nx::vms::event::AttrSerializePolicy::singleLine);
-
-        const QString textHtml = formatOverlayText(text, rawCaption, rawDescription);
-
-        for (const auto& camera: cameras)
-            d->showTextOverlays(camera, id, textHtml, timeout);
-    }
 }
 
 void QnWorkbenchTextOverlaysHandler::at_resourceWidgetAdded(QnResourceWidget* widget)

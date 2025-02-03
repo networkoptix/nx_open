@@ -5,7 +5,10 @@
 #include <functional>
 
 #include <api/common_message_processor.h>
-#include <nx/fusion/serialization/json.h>
+#include <nx/reflect/json.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/server_runtime_event_data.h>
+#include <nx/vms/event/actions/system_health_action.h>
 
 namespace nx::vms::client::core {
 
@@ -26,8 +29,6 @@ void ServerRuntimeEventConnector::setMessageProcessor(QnCommonMessageProcessor* 
 void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
     const ServerRuntimeEventData& eventData)
 {
-    static const nx::log::Tag kLogTag(typeid(*this));
-
     switch (eventData.eventType)
     {
         case ServerRuntimeEventType::undefined:
@@ -86,7 +87,18 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
 
             return;
         }
+        case ServerRuntimeEventType::systemHealthMessage:
+        {
+            if (const auto action =
+                nx::vms::event::SystemHealthAction::fromServerRuntimeEvent(eventData))
+            {
+                emit(systemHealthMessage(action));
+            }
+
+            return;
+        }
     }
+
     NX_WARNING(this, "Unexpected event type %1", eventData.eventType);
 }
 

@@ -414,12 +414,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this,
         &QnCommonMessageProcessor::resetEventRules,
         connectionType);
-    connect(
-        eventManager.get(),
-        &ec2::AbstractBusinessEventNotificationManager::gotBroadcastAction,
-        this,
-        &QnCommonMessageProcessor::on_broadcastBusinessAction,
-        connectionType);
 
     const auto vmsRulesManager = connection->vmsRulesNotificationManager();
     connect(
@@ -878,11 +872,6 @@ void QnCommonMessageProcessor::on_eventRuleAddedOrUpdated(const nx::vms::api::Ev
 void QnCommonMessageProcessor::on_businessEventRemoved(const nx::Uuid& id)
 {
     m_context->eventRuleManager()->removeRule(id);
-}
-
-void QnCommonMessageProcessor::on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action)
-{
-    emit businessActionReceived(action);
 }
 
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(

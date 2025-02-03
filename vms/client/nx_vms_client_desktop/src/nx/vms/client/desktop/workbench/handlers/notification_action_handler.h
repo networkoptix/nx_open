@@ -33,15 +33,13 @@ signals:
     void systemHealthEventAdded(MessageType message, const QVariant& params);
     void systemHealthEventRemoved(MessageType message, const QVariant& params);
 
-    void notificationAdded(const nx::vms::event::AbstractActionPtr& action);
-    void notificationRemoved(const nx::vms::event::AbstractActionPtr& action);
     void cleared();
 
 private:
     void clear();
 
     void at_context_userChanged();
-    void at_businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
+    void onSystemHealthMessage(const nx::vms::event::AbstractActionPtr& action);
     void at_serviceDisabled(
         nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
 
@@ -55,12 +53,6 @@ private:
         MessageType message,
         const QVariant& params,
         bool visible);
-
-    void handleAcknowledgeEventAction();
-    void handleFullscreenCameraAction(const nx::vms::event::AbstractActionPtr& action);
-    void handleExitFullscreenAction(const nx::vms::event::AbstractActionPtr& action);
-
-    void showSplash(const nx::vms::event::AbstractActionPtr &action);
 };
 
 } // namespace nx::vms::client::desktop

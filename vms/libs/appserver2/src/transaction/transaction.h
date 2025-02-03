@@ -950,18 +950,7 @@ APPLY(803, resetEventRules, nx::vms::api::ResetEventRulesData, \
     InvalidFilterFunc(), /*< filter read func */ \
     AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-/**%apidoc */ \
-APPLY(804, broadcastAction, nx::vms::api::EventActionData, \
-    false, /*< isPersistent */ \
-    false, /*< isSystem */ \
-    false, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), \
-    BusinessEventNotificationManagerHelper(), \
-    ActionControlAccess(), /*< save permission checker */ \
-    AllowForAllAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    AllowForAllAccessOut(), /*< check remote peer rights for outgoing transaction */ \
-    RegularTransactionType()) /*< regular transaction type */ \
+/* Transaction 804 (broadcastAction) removed, the code is forbidden. */ \
 /**%apidoc[proprietary] */ \
 APPLY(810, getVmsRules, nx::vms::api::rules::RuleList, \
     false, /*< isPersistent */ \

@@ -35,16 +35,6 @@ ErrorCode AbstractEventRulesManager::deleteRuleSync(const nx::Uuid& ruleId)
         });
 }
 
-ErrorCode AbstractEventRulesManager::broadcastEventActionSync(
-    const nx::vms::api::EventActionData& data)
-{
-    return detail::callSync(
-        [&](auto handler)
-        {
-            broadcastEventAction(data, std::move(handler));
-        });
-}
-
 ErrorCode AbstractEventRulesManager::resetBusinessRulesSync()
 {
     return detail::callSync(

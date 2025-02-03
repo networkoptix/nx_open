@@ -16,8 +16,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/json.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -30,7 +30,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/event/actions/common_action.h>
+#include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/utils/event.h>
@@ -63,43 +63,29 @@ bool actionAllowedForUser(
     if (!user)
         return false;
 
-    const auto eventType = action->getRuntimeParams().eventType;
-    if (eventType >= nx::vms::api::EventType::siteHealthEvent
-        && eventType <= nx::vms::api::EventType::maxSiteHealthEvent)
+    const auto healthMessage = nx::vms::common::system_health::MessageType(
+        action->eventType() - nx::vms::api::EventType::siteHealthEvent);
+
+    if (healthMessage == nx::vms::common::system_health::MessageType::showIntercomInformer
+        || healthMessage == nx::vms::common::system_health::MessageType::showMissedCallInformer)
     {
-        const auto healthMessage = nx::vms::common::system_health::MessageType(
-            eventType - nx::vms::api::EventType::siteHealthEvent);
+        const auto& runtimeParameters = action->getRuntimeParams();
 
-        if (healthMessage == nx::vms::common::system_health::MessageType::showIntercomInformer
-            || healthMessage == nx::vms::common::system_health::MessageType::showMissedCallInformer)
-        {
-            const auto& runtimeParameters = action->getRuntimeParams();
+        const auto systemContext =
+            qobject_cast<nx::vms::client::desktop::SystemContext*>(user->systemContext());
+        if (!NX_ASSERT(systemContext))
+            return false;
 
-            const auto systemContext =
-                qobject_cast<nx::vms::client::desktop::SystemContext*>(user->systemContext());
-            if (!NX_ASSERT(systemContext))
-                return false;
+        const QnResourcePtr cameraResource =
+            systemContext->resourcePool()->getResourceById(runtimeParameters.eventResourceId);
 
-            const QnResourcePtr cameraResource =
-                systemContext->resourcePool()->getResourceById(runtimeParameters.eventResourceId);
+        const bool hasViewPermission = cameraResource &&
+            systemContext->accessController()->hasPermissions(
+                cameraResource,
+                Qn::ViewContentPermission);
 
-            const bool hasViewPermission = cameraResource &&
-                systemContext->accessController()->hasPermissions(
-                    cameraResource,
-                    Qn::ViewContentPermission);
-
-            if (hasViewPermission)
-                return true;
-        }
-    }
-
-    switch (action->actionType())
-    {
-        case nx::vms::event::ActionType::fullscreenCameraAction:
-        case nx::vms::event::ActionType::exitFullscreenAction:
+        if (hasViewPermission)
             return true;
-        default:
-            break;
     }
 
     const auto params = action->getParams();
@@ -164,9 +150,6 @@ NotificationActionHandler::NotificationActionHandler(
         this, &NotificationActionHandler::at_context_userChanged);
 
     const auto messageProcessor = systemContext->clientMessageProcessor();
-    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        &NotificationActionHandler::at_businessActionReceived);
-
     connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, this,
         [this](const nx::Uuid& id)
         {
@@ -179,81 +162,14 @@ NotificationActionHandler::NotificationActionHandler(
         &nx::vms::client::core::ServerRuntimeEventConnector::serviceDisabled,
         this,
         &NotificationActionHandler::at_serviceDisabled);
-
-    connect(this, &NotificationActionHandler::notificationAdded,
+    connect(eventConnector,
+        &nx::vms::client::core::ServerRuntimeEventConnector::systemHealthMessage,
         this,
-        [this](const AbstractActionPtr& action)
-        {
-            NX_VERBOSE(this, "A notification is added: %1", toString(action));
-        });
-
-    connect(this, &NotificationActionHandler::notificationRemoved,
-        this,
-        [this](const AbstractActionPtr& action)
-        {
-            NX_VERBOSE(this, "A notification is removed: %1", toString(action));
-        });
+        &NotificationActionHandler::onSystemHealthMessage);
 }
 
 NotificationActionHandler::~NotificationActionHandler()
 {
-}
-
-void NotificationActionHandler::handleFullscreenCameraAction(
-    const nx::vms::event::AbstractActionPtr& action)
-{
-    const auto params = action->getParams();
-    const auto camera = system()->resourcePool()->getResourceById(params.actionResourceId)
-        .dynamicCast<QnVirtualCameraResource>();
-
-    if (!NX_ASSERT(camera))
-        return;
-
-    const auto currentLayout = workbench()->currentLayout();
-    const auto layoutResource = currentLayout->resource();
-    if (!layoutResource)
-        return;
-
-    const auto resources = action->getResources();
-    const bool layoutIsAllowed = resources.contains(layoutResource->getId());
-    if (!layoutIsAllowed)
-        return;
-
-    auto items = currentLayout->items(camera);
-    auto iter = std::find_if(items.begin(), items.end(),
-        [](const QnWorkbenchItem* item)
-        {
-            return item->zoomRect().isNull();
-        });
-
-    if (iter != items.end())
-    {
-        workbench()->setItem(Qn::ZoomedRole, *iter);
-        if (params.recordBeforeMs > 0)
-        {
-            const microseconds navigationTime = qnSyncTime->currentTimePoint()
-                - milliseconds(params.recordBeforeMs);
-
-            using namespace menu;
-            menu()->triggerIfPossible(JumpToTimeAction,
-                Parameters().withArgument(nx::vms::client::core::TimestampRole, navigationTime));
-        }
-    }
-}
-
-void NotificationActionHandler::handleExitFullscreenAction(
-    const nx::vms::event::AbstractActionPtr& action)
-{
-    const auto currentLayout = workbench()->currentLayout();
-    const auto layoutResource = currentLayout->resource();
-    if (!layoutResource)
-        return;
-
-    const bool layoutIsAllowed = action->getResources().contains(layoutResource->getId());
-    if (!layoutIsAllowed)
-        return;
-
-    workbench()->setItem(Qn::ZoomedRole, nullptr);
 }
 
 void NotificationActionHandler::clear()
@@ -263,36 +179,10 @@ void NotificationActionHandler::clear()
 
 void NotificationActionHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
-    const auto eventType = action->getRuntimeParams().eventType;
-    const bool isSystemHealthEvent = eventType >= vms::api::EventType::siteHealthEvent
-        && eventType <= vms::api::EventType::maxSiteHealthEvent;
+    const auto healthMessage = action->eventType() - vms::api::EventType::siteHealthEvent;
+    addSystemHealthEvent((MessageType)healthMessage, action);
 
-    if (NX_ASSERT(isSystemHealthEvent, "Events from the old rules engine must not occur"))
-    {
-        int healthMessage = eventType - vms::api::EventType::siteHealthEvent;
-        addSystemHealthEvent(MessageType(healthMessage), action);
-        return;
-    }
-
-    bool alwaysNotify = false;
-    switch (action->actionType())
-    {
-        case vms::api::ActionType::showOnAlarmLayoutAction:
-        case vms::api::ActionType::playSoundAction:
-            //case vms::event::playSoundOnceAction: -- handled outside without notification
-            alwaysNotify = true;
-            break;
-
-        default:
-            break;
-    }
-
-    if (!alwaysNotify && !rules::isEventWatched(system()->user()->settings(), eventType))
-        return;
-
-    emit notificationAdded(action);
-
-    showSplash(action);
+    NX_VERBOSE(this, "A notification is added: %1", toString(action));
 }
 
 void NotificationActionHandler::addSystemHealthEvent(
@@ -309,20 +199,15 @@ void NotificationActionHandler::setSystemHealthEventVisible(
 
 void NotificationActionHandler::removeNotification(const vms::event::AbstractActionPtr& action)
 {
-    const vms::api::EventType eventType = action->getRuntimeParams().eventType;
-
-    if (eventType >= vms::api::EventType::siteHealthEvent
-        && eventType <= vms::api::EventType::maxSiteHealthEvent)
+    if (const auto eventType = action->eventType(); isSiteHealth(eventType))
     {
         const int healthMessage = eventType - vms::api::EventType::siteHealthEvent;
 
         setSystemHealthEventVisibleInternal(
             MessageType(healthMessage), QVariant::fromValue(action), false);
     }
-    else
-    {
-        emit notificationRemoved(action);
-    }
+
+    NX_VERBOSE(this, "A notification is removed: %1", toString(action));
 }
 
 void NotificationActionHandler::setSystemHealthEventVisibleInternal(
@@ -410,8 +295,8 @@ void NotificationActionHandler::at_serviceDisabled(
     setSystemHealthEventVisibleInternal(messageType, QVariant::fromValue(resources), true);
 }
 
-void NotificationActionHandler::at_businessActionReceived(
-    const vms::event::AbstractActionPtr& action)
+void NotificationActionHandler::onSystemHealthMessage(
+    const nx::vms::event::AbstractActionPtr& action)
 {
     NX_ASSERT(action->actionType() == nx::vms::api::ActionType::showPopupAction,
         "Old engine is disabled, so only system health events should get here.");
@@ -440,110 +325,20 @@ void NotificationActionHandler::at_businessActionReceived(
         return;
     }
 
-    switch (action->actionType())
+    switch (action->getToggleState())
     {
-        case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::EventState::undefined:
+        case vms::api::EventState::active:
             addNotification(action);
             break;
 
-        case vms::api::ActionType::playSoundOnceAction:
-        {
-            const QString filename = action->getParams().url;
-            const QString filePath = system()->serverNotificationCache()->getFullPath(filename);
-            // If file doesn't exist then it's already deleted or not downloaded yet.
-            // I think it should not be played when downloaded.
-            AudioPlayer::playFileAsync(filePath);
+        case vms::api::EventState::inactive:
+            removeNotification(action);
             break;
-        }
-
-        // IMPORTANT: System Health Events are coming as showPopupAction.
-        case vms::api::ActionType::showPopupAction: //< Fallthrough
-        case vms::api::ActionType::playSoundAction:
-        {
-            switch (action->getToggleState())
-            {
-                case vms::api::EventState::undefined:
-                case vms::api::EventState::active:
-                    addNotification(action);
-                    break;
-
-                case vms::api::EventState::inactive:
-                    removeNotification(action);
-                    break;
-
-                default:
-                    break;
-            }
-            break;
-        }
-
-        case vms::api::ActionType::sayTextAction:
-        {
-            AudioPlayer::sayTextAsync(action->getParams().sayText);
-            break;
-        }
-
-        case ActionType::fullscreenCameraAction:
-        {
-            handleFullscreenCameraAction(action);
-            break;
-        }
-
-        case ActionType::exitFullscreenAction:
-        {
-            handleExitFullscreenAction(action);
-            break;
-        }
 
         default:
             break;
     }
-}
-
-void NotificationActionHandler::showSplash(
-    const vms::event::AbstractActionPtr& businessAction)
-{
-    /*
-    * We are displaying notifications in the two use cases:
-    * on ShowOnAlarmLayoutAction
-    * and on ShowPopupAction (including prolonged PlaySoundAction as its subtype)
-    * / showIntercomInformer / showMissedCallInformer.
-    * In first case we got at_notificationsHandler_businessActionAdded called once for each camera, that
-    * should be displayed on the alarm layout (including source cameras and custom cameras if required).
-    * In second case we should manually collect resources from event sources.
-    */
-    QSet<QnResourcePtr> targetResources;
-    vms::api::ActionType actionType = businessAction->actionType();
-    if (actionType == vms::api::ActionType::showOnAlarmLayoutAction)
-    {
-        if (const auto resource = system()->resourcePool()->getResourceById(
-            businessAction->getParams().actionResourceId))
-        {
-            targetResources.insert(resource);
-        }
-    }
-    else
-    {
-        NX_ASSERT(actionType == vms::api::ActionType::showPopupAction
-            || actionType == vms::api::ActionType::playSoundAction);
-        vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
-
-        if (const auto resource = system()->resourcePool()->getResourceById(
-            eventParams.eventResourceId))
-        {
-            targetResources.insert(resource);
-        }
-
-        if (eventParams.eventType >= vms::api::EventType::userDefinedEvent)
-        {
-            QnResourceList cameras = system()->resourcePool()->getCamerasByFlexibleIds(
-                eventParams.metadata.cameraRefs);
-            targetResources.unite({cameras.cbegin(), cameras.cend()});
-        }
-    }
-
-    display()->showNotificationSplash(
-        targetResources.values(), QnNotificationLevel::valueOf(businessAction));
 }
 
 } // namespace nx::vms::client::desktop

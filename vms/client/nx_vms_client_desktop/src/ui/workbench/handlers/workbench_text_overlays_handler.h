@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/rules/action_executor.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -23,7 +22,6 @@ public:
     virtual ~QnWorkbenchTextOverlaysHandler();
 
 private:
-    void at_eventActionReceived(const nx::vms::event::AbstractActionPtr& businessAction);
     void at_resourceWidgetAdded(QnResourceWidget* widget);
 
     virtual void execute(const nx::vms::rules::ActionPtr& action);
@@ -31,5 +29,4 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnWorkbenchTextOverlaysHandler);
     const QScopedPointer<QnWorkbenchTextOverlaysHandlerPrivate> d_ptr;
-    QScopedPointer<nx::vms::event::StringsHelper> m_helper;
 };

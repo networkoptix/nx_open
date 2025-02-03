@@ -5,9 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/async_handler_executor.h>
-#include <nx/utils/uuid.h>
 #include <nx/vms/api/data/event_rule_data.h>
-#include <nx/vms/event/event_fwd.h>
 
 #include "../ec_api_common.h"
 
@@ -21,7 +19,6 @@ signals:
     void addedOrUpdated(const nx::vms::api::EventRuleData& rule, ec2::NotificationSource source);
     void removed(const nx::Uuid& id);
     void businessRuleReset(const nx::vms::api::EventRuleDataList& rules);
-    void gotBroadcastAction(const QSharedPointer<nx::vms::event::AbstractAction>& action);
 };
 
 /*!
@@ -51,13 +48,6 @@ public:
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
 
     ErrorCode deleteRuleSync(const nx::Uuid& ruleId);
-
-    virtual int broadcastEventAction(
-        const nx::vms::api::EventActionData& data,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) = 0;
-
-    ErrorCode broadcastEventActionSync(const nx::vms::api::EventActionData& data);
 
     virtual int resetBusinessRules(
         Handler<> handler,

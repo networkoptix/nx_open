@@ -8,7 +8,6 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
-#include <nx/vms/event/event_fwd.h>
 
 class QnWorkbenchLayout;
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
@@ -37,7 +36,6 @@ private:
     void at_openMissedCallIntercomLayoutAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
-    void at_businessActionReceived(const vms::event::AbstractActionPtr& businessAction);
     void at_forgetLayoutPasswordAction_triggered();
     void at_openInNewTabAction_triggered();
 

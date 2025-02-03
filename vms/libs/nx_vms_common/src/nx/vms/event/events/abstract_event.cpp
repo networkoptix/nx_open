@@ -181,6 +181,11 @@ EventTypePredicate isApplicableForLicensingMode(SystemContext* systemContext)
         };
 }
 
+bool isSiteHealth(EventType eventType)
+{
+    return eventType >= EventType::siteHealthEvent && eventType <= EventType::maxSiteHealthEvent;
+}
+
 QList<EventType> allEvents(const EventTypePredicateList& predicates)
 {
     QList<EventType> result;

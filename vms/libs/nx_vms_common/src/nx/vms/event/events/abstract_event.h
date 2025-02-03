@@ -34,6 +34,8 @@ NX_VMS_COMMON_API bool isNonDeprecatedEvent(EventType eventType);
 NX_VMS_COMMON_API EventTypePredicate isApplicableForLicensingMode(
     nx::vms::common::SystemContext* systemContext);
 
+NX_VMS_COMMON_API bool isSiteHealth(EventType eventType);
+
 /**
  * @return Predicate that returns true for an event type if it's child of the given event type.
  */

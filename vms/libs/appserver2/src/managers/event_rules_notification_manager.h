@@ -11,13 +11,6 @@ namespace ec2 {
 class QnBusinessEventNotificationManager: public AbstractBusinessEventNotificationManager
 {
 public:
-    QnBusinessEventNotificationManager()
-    {
-    }
-
-    void triggerNotification(
-        const QnTransaction<nx::vms::api::EventActionData>& tran,
-        NotificationSource /*source*/);
     void triggerNotification(
         const QnTransaction<nx::vms::api::IdData>& tran,
         NotificationSource /*source*/);

@@ -97,7 +97,6 @@ signals:
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
 
-    void businessActionReceived(const QSharedPointer<nx::vms::event::AbstractAction>& action);
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
     void vmsEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
@@ -185,7 +184,6 @@ private:
     void on_licenseRemoved(const QnLicensePtr &license);
 
     void on_businessEventRemoved(const nx::Uuid &id);
-    void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 

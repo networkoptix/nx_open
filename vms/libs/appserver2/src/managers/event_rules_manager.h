@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <nx/utils/concurrent.h>
-#include <nx/vms/ec2/ec2_thread_pool.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <transaction/transaction.h>
 
@@ -26,11 +24,6 @@ public:
 
     virtual int deleteRule(
         const nx::Uuid& ruleId,
-        Handler<> handler,
-        nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
-
-    virtual int broadcastEventAction(
-        const nx::vms::api::EventActionData& data,
         Handler<> handler,
         nx::utils::AsyncHandlerExecutor handlerExecutor = {}) override;
 
@@ -98,24 +91,6 @@ int EventRulesManager<T>::deleteRule(
     processor().processUpdateAsync(
         ApiCommand::removeEventRule,
         nx::vms::api::IdData(ruleId),
-        [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
-        {
-            handler(requestId, std::move(args)...);
-        });
-    return requestId;
-}
-
-template<class T>
-int EventRulesManager<T>::broadcastEventAction(
-    const nx::vms::api::EventActionData& data,
-    Handler<> handler,
-    nx::utils::AsyncHandlerExecutor handlerExecutor)
-{
-    const int requestId = generateRequestID();
-    using namespace std::placeholders;
-    processor().processUpdateAsync(
-        ApiCommand::broadcastAction,
-        data,
         [requestId, handler = handlerExecutor.bind(std::move(handler))](auto&&... args) mutable
         {
             handler(requestId, std::move(args)...);

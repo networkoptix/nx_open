@@ -16,6 +16,8 @@
 
 class QnCommonMessageProcessor;
 
+namespace nx::vms::api { struct ServerRuntimeEventData; }
+
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
  *  Terms:
@@ -178,6 +180,8 @@ private:
 
     /** Mark camera history as dirty and subject to update. */
     void invalidateCameraHistory(const nx::Uuid &cameraId);
+
+    void onServerRuntimeEvent(const nx::vms::api::ServerRuntimeEventData& eventData);
 
 private:
     void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
