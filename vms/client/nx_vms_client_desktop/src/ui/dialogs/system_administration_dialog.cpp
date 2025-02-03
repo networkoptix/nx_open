@@ -6,6 +6,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/branding.h>
+#include <nx/network/rest/result.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/system_settings.h>
 #include <nx/vms/client/core/access/access_controller.h>
@@ -169,7 +170,7 @@ void QnSystemAdministrationDialog::applyChanges()
         return;
 
     auto callback = nx::utils::guarded(this,
-        [this](
+        [this, sessionLimitChanged = d->editableSystemSettings.sessionLimitS.has_value()](
             bool /*success*/,
             rest::Handle requestId,
             rest::ServerConnection::ErrorOrEmpty response)
@@ -181,6 +182,18 @@ void QnSystemAdministrationDialog::applyChanges()
             if (!response)
             {
                 auto error = response.error();
+
+                // If the session duration is set to be less than the current token's lifetime, the
+                // settings will be applied. The current connection to the server will then be
+                // terminated before we receive a response to the request. Upon disconnection, the
+                // dialog will trigger discardChanges(). This will cause the request to be canceled
+                // with a serviceUnavailable error. This error should not be displayed as a critical
+                // message to the user.
+                if (error.errorId == nx::network::rest::ErrorId::serviceUnavailable
+                    && sessionLimitChanged)
+                {
+                    return;
+                }
                 NX_DEBUG(this, "Can't save system settings, code: %1, error: %2",
                     error.errorId, error.errorString);
                 QnSessionAwareMessageBox::critical(

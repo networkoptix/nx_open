@@ -525,7 +525,11 @@ void SecuritySettingsWidget::applyChanges()
         ui->forceVideoTrafficEncryptionCheckBox->isChecked();
     editableSystemSettings->watermarkSettings = m_watermarkSettings;
     editableSystemSettings->pixelationSettings = m_pixelationSettings;
-    editableSystemSettings->sessionLimitS = calculateSessionLimit();
+    if (const auto sessionLimit = calculateSessionLimit();
+        sessionLimit != systemSettings()->sessionTimeoutLimit().value_or(kNoLimitSessionDuration))
+    {
+        editableSystemSettings->sessionLimitS = sessionLimit;
+    }
     editableSystemSettings->useSessionLimitForCloud =
         ui->useSessionLimitForCloudComboBox->isChecked();
     editableSystemSettings->storageEncryption = ui->archiveEncryptionGroupBox->isChecked();
