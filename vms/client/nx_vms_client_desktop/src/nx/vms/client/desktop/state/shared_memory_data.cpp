@@ -160,8 +160,12 @@ PipeFilterType exceptPids(const QSet<SharedMemoryData::PidType>& pids)
 
 PipeFilterType withinSession(const SessionId& sessionId)
 {
-    return std::ranges::views::filter(ProcessPredicate(
-        [=](const Process& process) { return process.sessionId == sessionId; }));
+    return std::ranges::views::filter(
+        ProcessPredicate(
+            [=](const Process& process)
+            {
+                return process.pid != 0 && process.sessionId == sessionId;
+            }));
 }
 
 PipeFilterType all()
