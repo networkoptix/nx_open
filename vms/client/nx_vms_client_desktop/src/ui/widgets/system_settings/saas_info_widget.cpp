@@ -72,7 +72,7 @@ QUrl channelPartnerUrl(const nx::vms::common::saas::ServiceManager* serviceManag
 {
     const auto webPagesInfo = serviceManager->data().channelPartner.supportInformation.sites;
     return !webPagesInfo.empty()
-        ? QUrl(webPagesInfo.front().value)
+        ? QUrl::fromUserInput(webPagesInfo.front().value)
         : QUrl();
 }
 

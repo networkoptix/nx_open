@@ -331,7 +331,7 @@ void QnAboutDialog::initSaasSupportInfo()
 
     // Web links.
     for (const auto& siteInfo: channelPartnerSupportData.sites)
-        addHtmlLabelRow(html::link(QUrl(siteInfo.value)));
+        addHtmlLabelRow(html::link(QUrl::fromUserInput(siteInfo.value)));
 
     // Phone numbers.
     if (!channelPartnerSupportData.phones.empty())
