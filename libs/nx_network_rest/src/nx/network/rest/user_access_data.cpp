@@ -28,6 +28,17 @@ UserAccessData::UserAccessData(
 {
 }
 
+UserAccessData::UserAccessData(
+    nx::Uuid userId, Token token,
+    Duration age, Duration expiresIn,
+    std::string sessionId, TimePoint now)
+    :
+    UserAccessData(
+        std::move(userId), std::move(token), age, expiresIn, now)
+{
+    m_sessionId = std::move(sessionId);
+}
+
 // TODO: In future versions all sessions should have normal timestamps, but for legacy auth we're
 // going to use this really big value.
 constexpr UserAccessData::Duration kDefaultDuration = std::chrono::days(100);
@@ -82,6 +93,11 @@ void UserAccessData::setToken(Token token, Duration duration, std::optional<Time
     m_token = std::move(token);
     m_issued = std::move(issued);
     m_siteDuration = std::move(duration);
+}
+
+const std::string& UserAccessData::sessionId() const
+{
+    return m_sessionId.empty() ? m_token : m_sessionId;
 }
 
 QString UserAccessData::toString() const

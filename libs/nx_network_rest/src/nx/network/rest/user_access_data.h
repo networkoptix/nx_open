@@ -40,6 +40,10 @@ struct NX_NETWORK_REST_API UserAccessData
     explicit UserAccessData(
         nx::Uuid userId, Token token,
         Duration age, Duration expiresIn, TimePoint now = nx::utils::monotonicTime());
+    explicit UserAccessData(
+        nx::Uuid userId, Token token,
+        Duration age, Duration expiresIn,
+        std::string sessionId, TimePoint now = nx::utils::monotonicTime());
 
     UserAccessData() = default;
     UserAccessData(const UserAccessData&) = default;
@@ -65,6 +69,8 @@ struct NX_NETWORK_REST_API UserAccessData
         Token token, Duration duration,
         std::optional<TimePoint> issued = nx::utils::monotonicTime());
 
+    const std::string& sessionId() const;
+
     QString toString() const;
 
 private:
@@ -72,6 +78,7 @@ private:
     std::optional<TimePoint> m_issued;
     Duration m_siteDuration{0};
     std::optional<Duration> m_userDuration;
+    std::string m_sessionId;
 };
 
 NX_NETWORK_REST_API QString toString(UserAccessData::Access access);

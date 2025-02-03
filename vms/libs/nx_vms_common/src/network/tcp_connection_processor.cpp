@@ -11,7 +11,6 @@
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
 #include <nx/metric/metrics_storage.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
@@ -812,10 +811,9 @@ nx::network::rest::AuthSession QnTCPConnectionProcessor::authSession(
 {
     Q_D(const QnTCPConnectionProcessor);
     const auto user = resourcePool()->getResourceById(accessRights.userId);
-    // TODO: Use a refresh token instead of an access token for the cloud users.
-    const auto token = accessRights.token();
+    const auto sessionId = accessRights.sessionId();
     return {
-        token.empty() ? nx::Uuid{} : nx::Uuid::fromArbitraryData(token),
+        sessionId.empty() ? nx::Uuid{} : nx::Uuid::fromArbitraryData(sessionId),
         user ? user->getName() : QString(),
         d->request,
         d->socket->getForeignAddress().address};
