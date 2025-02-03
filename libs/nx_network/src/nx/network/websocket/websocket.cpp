@@ -195,7 +195,13 @@ void WebSocket::stopWhileInAioThread()
 {
     m_pingTimer.reset();
     m_pongTimer.reset();
-    m_socket.reset();
+    if (m_socket)
+    {
+        // Timer is inherited from BasicPollable and is stopped in the destructor while
+        // AbstractSocket is not.
+        m_socket->pleaseStopSync();
+        m_socket.reset();
+    }
 }
 
 void WebSocket::setIsLastFrame()
