@@ -10,13 +10,13 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
-#include <nx/vms/client/core/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
+#include <nx/vms/client/desktop/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
@@ -74,7 +74,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 {
     if (mode == Mode::crossSystem)
     {
-        resetAccessController(new core::CloudCrossSystemAccessController(this));
+        resetAccessController(new CloudCrossSystemAccessController(this));
     }
     else
     {

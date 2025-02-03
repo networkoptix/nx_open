@@ -20,7 +20,6 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
+#include <nx/vms/client/desktop/access/cloud_cross_system_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
@@ -78,7 +78,7 @@ struct CloudCrossSystemContext::Private
             SystemContext::Mode::crossSystem,
             appContext()->peerId());
 
-        cloudCrossSystemAccessController = static_cast<core::CloudCrossSystemAccessController*>(
+        cloudCrossSystemAccessController = static_cast<CloudCrossSystemAccessController*>(
             systemContext->accessController());
 
         systemContext->startModuleDiscovery(
@@ -207,7 +207,7 @@ struct CloudCrossSystemContext::Private
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
     std::unique_ptr<SystemContext> systemContext;  //< Should be destroyed after dataLoader.
     std::unique_ptr<CloudCrossSystemContextDataLoader> dataLoader;
-    core::CloudCrossSystemAccessController* cloudCrossSystemAccessController = nullptr;
+    CloudCrossSystemAccessController* cloudCrossSystemAccessController = nullptr;
     core::UserResourcePtr user;
     CrossSystemServerResourcePtr server;
     std::unique_ptr<core::CloudSessionTokenUpdater> tokenUpdater;
@@ -445,7 +445,10 @@ struct CloudCrossSystemContext::Private
 
     void issueAccessToken()
     {
-        const QString cloudSystemId = systemContext->globalSettings()->cloudSystemId();
+        auto cloudSystemId = systemContext->globalSettings()->cloudSystemId();
+        if (cloudSystemId.isEmpty() && systemDescription)
+            cloudSystemId = systemDescription->id();
+
         const auto remoteConnectionCredentials =
             qnCloudStatusWatcher->remoteConnectionCredentials();
 
@@ -802,6 +805,12 @@ bool CloudCrossSystemContext::needsCloudAuthorization()
 
 void CloudCrossSystemContext::cloudAuthorize()
 {
+    if (!d->systemContext->connection())
+    {
+        initializeConnectionWithUserInteraction();
+        return;
+    }
+
     d->issueRefreshToken();
     d->issueAccessToken();
 }

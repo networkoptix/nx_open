@@ -2,7 +2,7 @@
 
 #include "cloud_cross_system_access_controller.h"
 
-namespace nx::vms::client::core {
+namespace nx::vms::client::desktop {
 
 CloudCrossSystemAccessController::CloudCrossSystemAccessController(
     SystemContext* systemContext, QObject* parent):

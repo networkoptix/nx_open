@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/desktop/access/access_controller.h>
 
-namespace nx::vms::client::core {
+namespace nx::vms::client::desktop {
 
-class NX_VMS_CLIENT_CORE_API CloudCrossSystemAccessController: public AccessController
+class NX_VMS_CLIENT_DESKTOP_API CloudCrossSystemAccessController: public AccessController
 {
     using base_type = AccessController;
 
@@ -17,4 +17,4 @@ public:
     using base_type::updateAllPermissions;
 };
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::client::desktop
