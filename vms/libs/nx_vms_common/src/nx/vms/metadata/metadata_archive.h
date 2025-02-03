@@ -17,37 +17,49 @@ namespace nx::vms::metadata {
 static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8;
 
 #pragma pack(push, 1)
-    struct IndexRecord
-    {
-        quint32 start = 0;    //< Relative time in milliseconds as an offset from a file header.
-        quint16 duration;
-        quint8 extraWords = 0;
-        quint8 recCount = 0;
-        //< Record duration. Up to 4.5 hours.
-        quint8 recordCount() const { return recCount + 1; }
-        void setRecordCount(quint8 recordCount) { recCount = recordCount - 1; }
-    };
-
+    /**%apidoc
+     * The metadata binary index file consists of a serialized IndexHeader structure, followed by
+     * serialized IndexRecord entries. This file describes the location of the data in the main
+     * metadata file.
+     */
     struct IndexHeader
     {
+        /**%apidoc Additional flags. */
         enum Flags
         {
             noFlags = 0,
+
+            /**%apidoc
+             * Metadata records in the file are not sorted. This flag is set if time goes into the
+             * past while the file is being written.
+             */
             hasDiscontinue = 1
         };
 
+        /**%apidoc Base UTC time in milliseconds used to calculate the full time of IndexRecord. */
         qint64 startTimeMs = 0;
+
+        /**%apidoc The time interval used for grouping metadata into a single record. */
         qint16 intervalMs = 0;
+
+        /**%apidoc Metadata file version. */
         qint8 version = 0;
 
-        // Base size of the each record in bytes.
+        /**%apidoc
+         * Base size of each record in bytes. The full record size in the main metadata file is
+         * calculated as baseRecordSize + extraWords * wordSize.
+         */
         quint16 recordSize = 0;
 
         quint8 flags = 0;
 
-        // Multiplier for the variable 'extraWords'.
-        // Record size is calculated as: baseRecordSize + extraWords * wordSize.
+        /**%apidoc
+         * Multiplier for the variable extraWords. The Full record size in the main metadata file
+         * is calculated as baseRecordSize + extraWords * wordSize.
+         */
         quint8 wordSize = 0;
+
+        /**%apidoc Reserved for future use. */
         char dummy[1];
 
         int noGeometryRecordSize() const { return recordSize - kGeometrySize; }
@@ -55,6 +67,34 @@ static const int kGeometrySize = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 
         bool variousRecordSizeSupported() const { return version >= 4; }
 
     };
+
+    struct IndexRecord
+    {
+        /**%apidoc
+         * Relative time in milliseconds as an offset from the file header field startTimeMs.
+         */
+        quint32 start = 0;
+
+        /**%apidoc Record duration in milliseconds. */
+        quint16 duration;
+
+        /**%apidoc
+         * Addition record size in words. The word size dis efined in the IndexHeader. This field
+         * is used for Analytics data and is always zero for Motion data.
+         */
+        quint8 extraWords = 0;
+
+        /**%apidoc
+         * Number of records minus 1 in the main metadata file that are described by a single
+         * IndexRecord. This value is always 0 for Motion metadata and is used for Analytics data
+         * only.
+         */
+        quint8 recCount = 0;
+
+        quint8 recordCount() const { return recCount + 1; }
+        void setRecordCount(quint8 recordCount) { recCount = recordCount - 1; }
+    };
+
 #pragma pack(pop)
 
 inline bool operator < (const IndexRecord& first, const IndexRecord& other) { return first.start < other.start; }
