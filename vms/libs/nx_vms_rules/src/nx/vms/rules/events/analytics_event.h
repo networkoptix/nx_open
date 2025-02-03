@@ -18,6 +18,7 @@ class NX_VMS_RULES_API AnalyticsEvent: public AnalyticsEngineEvent
     FIELD(nx::common::metadata::Attributes, attributes, setAttributes)
     FIELD(nx::Uuid, objectTrackId, setObjectTrackId)
     FIELD(QString, key, setKey)
+    FIELD(QRectF, boundingBox, setBoundingBox)
 
 public:
     AnalyticsEvent() = default;
@@ -32,7 +33,8 @@ public:
         const QString& eventTypeId,
         const nx::common::metadata::Attributes& attributes,
         nx::Uuid objectTrackId,
-        const QString& key);
+        const QString& key,
+        const QRectF& boundingBox);
 
     virtual QString subtype() const override;
     virtual QString resourceKey() const override;

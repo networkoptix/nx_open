@@ -28,7 +28,8 @@ AnalyticsEvent::AnalyticsEvent(
     const QString& eventTypeId,
     const nx::common::metadata::Attributes& attributes,
     nx::Uuid objectTrackId,
-    const QString& key)
+    const QString& key,
+    const QRectF& boundingBox)
     :
     AnalyticsEngineEvent(timestamp, caption, description, deviceId, engineId),
     m_eventTypeId(eventTypeId),
@@ -37,6 +38,8 @@ AnalyticsEvent::AnalyticsEvent(
     m_key(key)
 {
     setState(state);
+    if (boundingBox.isValid())
+        setBoundingBox(boundingBox);
 }
 
 QString AnalyticsEvent::subtype() const

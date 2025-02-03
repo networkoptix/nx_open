@@ -6,6 +6,7 @@ namespace nx::vms::rules::utils {
 
 constexpr auto kAcknowledgeFieldName = "acknowledge";
 constexpr auto kAttributesFieldName = "attributes";
+constexpr auto kBoundingBoxFieldName = "boundingBox";
 constexpr auto kCaptionFieldName = "caption";
 constexpr auto kContentFieldName = "content";
 constexpr auto kDescriptionFieldName = "description";
