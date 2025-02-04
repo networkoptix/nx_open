@@ -238,7 +238,7 @@
     <name>DownloadMediaButton</name>
     <message>
       <source>Download next</source>
-      <translation type="unfinished">Download next</translation>
+      <translation>Pobierz następny</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
@@ -262,7 +262,7 @@
     <name>FiltersScreen</name>
     <message>
       <source>Search Filters</source>
-      <translation type="unfinished">Search Filters</translation>
+      <translation>Filtry wyszukiwania</translation>
     </message>
   </context>
   <context>
@@ -707,7 +707,7 @@
     </message>
     <message>
       <source>Early access to new features</source>
-      <translation type="unfinished">Early access to new features</translation>
+      <translation>Wcześniejszy dostęp do nowych funkcji</translation>
     </message>
     <message>
       <source>Enable software decoder fallback</source>
