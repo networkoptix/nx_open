@@ -22,7 +22,8 @@ CheckBox
     property alias colors: checkIndicator.colors
     property alias checkedColors: checkIndicator.checkedColors
 
-    readonly property alias currentColor: checkIndicator.primaryColor
+    property alias textColor: controlText.color
+    property alias textOpacity: controlText.opacity
 
     padding: 0
     topPadding: 1
@@ -121,7 +122,7 @@ CheckBox
             font: control.font
             text: control.text
             opacity: checkIndicator.opacity
-            color: control.currentColor
+            color: checkIndicator.primaryColor
             visible: relevant
         }
     }

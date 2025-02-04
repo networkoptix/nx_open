@@ -48,6 +48,9 @@ MembershipSettings
             if (section == UserSettingsGlobal.kLdapGroupsSection)
                 return qsTr("LDAP", "Acronym for The Lightweight Directory Access Protocol")
 
+            if (section == UserSettingsGlobal.kOrgGroupsSection)
+                return qsTr("Organization", "Section with groups from organisation")
+
             return section === UserSettingsGlobal.kBuiltInGroupsSection
                 ? qsTr("Built-in", "Section name in a list of items: 'Built-in groups'")
                 : qsTr("Custom", "Section name in a list of items: 'Custom groups'")
@@ -208,11 +211,18 @@ MembershipSettings
         {
             id: groupTreeHeader
             onRemoveClicked: model.isParent = false
-            iconSource: model.isPredefined
-                ? "image://skin/20x20/Solid/group_default.svg"
-                : model.isLdap
+            iconSource:
+            {
+                if (model.isPredefined)
+                    return "image://skin/20x20/Solid/group_default.svg"
+
+                if (model.isOrganization)
+                    return "image://skin/20x20/Solid/group_organization.svg"
+
+                return model.isLdap
                     ? "image://skin/20x20/Solid/group_ldap.svg"
                     : "image://skin/20x20/Solid/group.svg"
+            }
 
             offset: 0
             interactive: model.isParent

@@ -35,6 +35,7 @@ class UserSettingsGlobal: public QObject
     Q_PROPERTY(QString kBuiltInGroupsSection MEMBER kBuiltInGroupsSection CONSTANT)
     Q_PROPERTY(QString kCustomGroupsSection MEMBER kCustomGroupsSection CONSTANT)
     Q_PROPERTY(QString kLdapGroupsSection MEMBER kLdapGroupsSection CONSTANT)
+    Q_PROPERTY(QString kOrgGroupsSection MEMBER kOrgGroupsSection CONSTANT)
 
 public:
     UserSettingsGlobal();
@@ -45,6 +46,7 @@ public:
     static const QString kBuiltInGroupsSection;
     static const QString kCustomGroupsSection;
     static const QString kLdapGroupsSection;
+    static const QString kOrgGroupsSection;
 
     enum UserType
     {

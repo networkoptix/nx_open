@@ -117,6 +117,7 @@ public:
         CanEditParents,
         CanEditMembers,
         IsPredefined,
+        IsOrganization,
         UserType
     };
 

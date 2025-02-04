@@ -11,8 +11,22 @@ using namespace nx::vms::api;
 
 namespace nx::vms::client::core {
 
+UserResource::UserResource(nx::vms::api::UserType userType, nx::vms::api::UserExternalId externalId):
+    QnUserResource(userType, externalId)
+{
+    connect(this, &QnUserResource::userGroupsChanged, this,
+        [this]()
+        {
+            for (const auto& id: orgGroupIds())
+            {
+                if(!m_externalToLocalOrgGroupIds.contains(id))
+                    m_externalToLocalOrgGroupIds[id] = nx::Uuid::createUuid();
+            }
+        });
+}
+
 UserResource::UserResource(UserModelV1 data):
-    QnUserResource(data.type, data.externalId.value_or(UserExternalIdModel()))
+    UserResource(data.type, data.externalId.value_or(UserExternalIdModel()))
 {
     setIdUnsafe(data.id);
     setName(data.name);
@@ -40,7 +54,7 @@ UserResource::UserResource(UserModelV1 data):
 }
 
 UserResource::UserResource(UserModelV3 data):
-    QnUserResource(data.type, data.externalId.value_or(UserExternalIdModel()))
+    UserResource(data.type, data.externalId.value_or(UserExternalIdModel()))
 {
     setIdUnsafe(data.id);
     setName(data.name);
@@ -125,6 +139,11 @@ bool UserResource::shouldMaskUser() const
         return false;
 
     return systemContext->user().get() != this;
+}
+
+std::map<nx::Uuid, nx::Uuid> UserResource::mappedOrgGroupIds() const
+{
+    return m_externalToLocalOrgGroupIds;
 }
 
 } // namespace nx::vms::client::core

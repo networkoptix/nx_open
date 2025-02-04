@@ -634,6 +634,7 @@ QHash<int, QByteArray> MembersModel::roleNames() const
     roles[CanEditParents] = "canEditParents";
     roles[CanEditMembers] = "canEditMembers";
     roles[IsPredefined] = "isPredefined";
+    roles[IsOrganization] = "isOrganization";
     roles[UserType] = "userType";
     return roles;
 }
@@ -805,6 +806,8 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
         case GroupSectionRole:
             if (m_cache->info(id).userType == api::UserType::ldap)
                 return UserSettingsGlobal::kLdapGroupsSection;
+            if (m_cache->info(id).isOrgGroup)
+                return UserSettingsGlobal::kOrgGroupsSection;
             return PredefinedUserGroups::contains(id)
                 ? UserSettingsGlobal::kBuiltInGroupsSection
                 : UserSettingsGlobal::kCustomGroupsSection;
@@ -814,6 +817,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
 
         case IsTemporary:
             return m_cache->info(id).userType == api::UserType::temporaryLocal;
+
+        case IsOrganization:
+             return m_cache->info(id).isOrgGroup;
 
         case Cycle:
             return m_groupsWithCycles.contains(id);
@@ -844,6 +850,9 @@ QVariant MembersModel::data(const QModelIndex& index, int role) const
         {
             if (index.data(MembersModel::IsPredefined).toBool())
                 return "20x20/Solid/group_default.svg";
+
+            if (m_cache->info(id).isOrgGroup)
+                return "20x20/Solid/group_organization.svg";
 
             return index.data(MembersModel::IsLdap).toBool()
                 ? "20x20/Solid/group_ldap.svg"
@@ -937,7 +946,22 @@ QList<MembersModelGroup> MembersModel::parentGroups() const
 
     QList<MembersModelGroup> result;
     for (const auto& groupId: directParents)
-        result << MembersModelGroup::fromId(systemContext(), groupId);
+    {
+        MembersModelGroup memberModel;
+        if (const auto info = m_cache->info(groupId); info.isOrgGroup)
+        {
+            memberModel.id = groupId;
+            memberModel.description = info.description;
+            memberModel.text = info.name;
+            memberModel.isPredefined = false;
+            memberModel.isLdap = false;
+        }
+        else
+        {
+            memberModel = MembersModelGroup::fromId(systemContext(), groupId);
+        }
+        result << memberModel;
+    }
 
     return result;
 }

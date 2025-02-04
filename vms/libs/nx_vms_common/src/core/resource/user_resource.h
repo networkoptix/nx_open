@@ -147,6 +147,7 @@ public:
 
     std::vector<nx::Uuid> orgGroupIds() const;
     void setOrgGroupIds(const std::vector<nx::Uuid>& value);
+    virtual std::map<nx::Uuid, nx::Uuid> mappedOrgGroupIds() const;
 
     void setResourceAccessRights(const std::map<nx::Uuid, nx::vms::api::AccessRights>& value);
 

@@ -70,6 +70,9 @@ Item
         if (model.isPredefined)
             return "image://skin/20x20/Solid/group_default.svg"
 
+        if (model.isOrganization)
+            return "image://skin/20x20/Solid/group_organization.svg"
+
         return model.isLdap
             ? "image://skin/20x20/Solid/group_ldap.svg"
             : "image://skin/20x20/Solid/group.svg"

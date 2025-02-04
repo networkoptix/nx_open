@@ -28,6 +28,7 @@ const QString UserSettingsGlobal::kGroupsSection = "G";
 const QString UserSettingsGlobal::kBuiltInGroupsSection = "B";
 const QString UserSettingsGlobal::kCustomGroupsSection = "C";
 const QString UserSettingsGlobal::kLdapGroupsSection = "L";
+const QString UserSettingsGlobal::kOrgGroupsSection = "O";
 
 UserSettingsGlobal::UserSettingsGlobal()
 {

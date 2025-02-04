@@ -1148,9 +1148,17 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
         && user->fullName().isEmpty();
 
     // List of groups.
-    // TODO: Split site's and organization's groups
-    for (const nx::Uuid& groupId: user->allGroupIds())
+    for (const nx::Uuid& groupId: user->siteGroupIds())
         state.parentGroups.insert(MembersModelGroup::fromId(systemContext(), groupId));
+
+    for (const auto& [orgGroupId, localOrgGroupId]: user->mappedOrgGroupIds())
+    {
+        auto memberModel = MembersModelGroup::fromId(systemContext(), orgGroupId);
+        memberModel.id = localOrgGroupId;
+        memberModel.isPredefined = false;
+        memberModel.isLdap = false;
+        state.parentGroups.insert(memberModel);
+    }
 
     state.sharedResources = systemContext()->accessRightsManager()->ownResourceAccessMap(
         user->getId());

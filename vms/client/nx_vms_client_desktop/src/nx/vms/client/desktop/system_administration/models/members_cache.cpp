@@ -118,6 +118,19 @@ void MembersCache::loadInfo(nx::vms::common::SystemContext* systemContext)
 
             addTmpUser({}, id);
         }
+
+        for (const auto& [orgGroupId, localOrgGroupId]: user->mappedOrgGroupIds())
+        {
+            if (m_info.contains(localOrgGroupId))
+                continue;
+
+            auto info = infoFromContext(systemContext, orgGroupId);
+            info.isOrgGroup = true;
+            info.isGroup = true;
+            info.userType = api::UserType::cloud;
+            m_info.insert(localOrgGroupId, info);
+            members.groups << localOrgGroupId;
+        }
     }
 
     sortSubjects(members.users);
@@ -236,7 +249,12 @@ void MembersCache::modify(
 
     for (const auto& id: added)
     {
-        const auto idInfo = (m_info[id] = infoFromContext(m_systemContext, id));
+        Info idInfo;
+        // Information about organizational groups is not stored in the group manager.
+        if (m_info.contains(id) && m_info[id].isOrgGroup)
+            idInfo = m_info[id];
+        else
+            idInfo = (m_info[id] = infoFromContext(m_systemContext, id));
 
         addTo({}, id, idInfo);
         const auto parents = m_subjectContext->subjectHierarchy()->directParents(id);

@@ -51,7 +51,7 @@ Control
 
             primaryColor: control.color(control.primaryColors, control.checkedPrimaryColors)
             secondaryColor: control.color(control.secondaryColors, control.checkedSecondaryColors)
-            opacity: enabled ? 1.0 : 0.3
+            opacity: 1.0
             visible: !!control.iconSource
             sourcePath: control.iconSource
             sourceSize: Qt.size(20, 20)
@@ -66,7 +66,7 @@ Control
 
             elide: Text.ElideRight
             color: control.color(control.primaryColors, control.checkedPrimaryColors)
-            opacity: enabled ? 1.0 : 0.3
+            opacity: 1.0
             textFormat: Text.StyledText
             font.pixelSize: FontConfig.normal.pixelSize
         }

@@ -36,26 +36,53 @@ MultiSelectionComboBox
 
     listView.Layout.maximumHeight: 200
     listView.section.property: "groupSection"
-    listView.section.delegate: Rectangle
+    listView.section.delegate: Item
     {
-        id: sectionBorder
+        id: groupSection
+        height: 28
+        width: parent ? parent.width : headerText.width
+        baselineOffset: headerText.y + headerText.baselineOffset
 
-        clip: true
-        height: y > 0 ? 7 : 0 //< Hide the first item.
-        width: control.listView.width
-        color: ColorTheme.colors.dark13
+        Text
+        {
+            id: groupSectionText
+
+            anchors.top: parent.top
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.leftMargin: 8
+
+            height: 12
+            font: Qt.font({pixelSize: 10, weight: Font.Medium})
+            color: ColorTheme.colors.light10
+
+            text:
+            {
+                if (section == UserSettingsGlobal.kLdapGroupsSection)
+                    return qsTr("LDAP", "Acronym for The Lightweight Directory Access Protocol")
+
+                if (section == UserSettingsGlobal.kOrgGroupsSection)
+                    return qsTr("ORGANIZATION", "Section with groups from organisation")
+
+                return section === UserSettingsGlobal.kBuiltInGroupsSection
+                    ? qsTr("BUILT-IN", "Section name in a list of items: 'Built-in groups'")
+                    : qsTr("CUSTOM", "Section name in a list of items: 'Custom groups'")
+            }
+        }
 
         Rectangle
         {
             anchors
             {
+                bottom: parent.bottom
+                bottomMargin: 4
                 left: parent.left
+                leftMargin: 8
                 right: parent.right
-                leftMargin: 6
-                rightMargin: 6
-                verticalCenter: parent.verticalCenter
+                rightMargin: 8
             }
             height: 1
+            width: parent.width
             color: ColorTheme.colors.dark11
         }
     }

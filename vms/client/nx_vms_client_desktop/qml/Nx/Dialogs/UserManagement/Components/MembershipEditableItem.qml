@@ -58,11 +58,8 @@ Rectangle
             sourcePath: iconPath(model)
             sourceSize: Qt.size(width, height)
 
-            opacity: groupCheckbox.enabled ? 1.0 : 0.3
-
-            primaryColor: groupCheckbox.enabled
-                ? checkableItem.selectedColor
-                : ColorTheme.colors.light10
+            opacity: 1.0
+            primaryColor: checkableItem.selectedColor
 
             secondaryColor: "light4"
         }
@@ -75,6 +72,8 @@ Rectangle
 
         textFormat: Text.StyledText
         middleSpacing: 0
+        textColor: checkableItem.selectedColor
+        textOpacity: 1.0
         text:
         {
             const result = highlightMatchingText(checkableItem.text)
