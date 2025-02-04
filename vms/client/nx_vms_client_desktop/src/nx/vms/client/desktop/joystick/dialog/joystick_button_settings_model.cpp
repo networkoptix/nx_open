@@ -67,7 +67,7 @@ QString getLayoutUuid(const ButtonDescriptor& buttonDescription, int actionIndex
     if (paramIter == parametersList.end())
         return QString();
 
-    return nx::Uuid(paramIter->second).toString();
+    return nx::Uuid(paramIter->second).toString(QUuid::WithBraces);
 }
 
 QString formButtonName(const QString& rawButtonName)

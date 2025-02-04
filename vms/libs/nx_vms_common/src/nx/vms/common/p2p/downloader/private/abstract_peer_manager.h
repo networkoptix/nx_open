@@ -104,7 +104,7 @@ public:
     }
 
     /** @return Human readable peer name. This is mostly used in logs. */
-    virtual QString peerString(const nx::Uuid& peerId) const { return peerId.toString(); }
+    virtual QString peerString(const nx::Uuid& peerId) const { return peerId.toSimpleString(); }
     virtual QList<nx::Uuid> getAllPeers() const = 0;
     virtual QList<nx::Uuid> peers() const = 0;
     virtual int distanceTo(const nx::Uuid& peerId) const = 0;

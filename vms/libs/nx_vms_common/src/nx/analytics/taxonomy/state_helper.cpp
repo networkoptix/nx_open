@@ -86,7 +86,7 @@ std::set<ScopedEntity<EntityType>> supportedScopedEntityTypes(
     for (const auto& [engineId, entityTypeIds]: supportedEntityTypeIdsFetcher(device))
     {
         ScopedEntity<EntityType> scopedEntityType;
-        scopedEntityType.engine = taxonomyState->engineById(engineId.toString());
+        scopedEntityType.engine = taxonomyState->engineById(engineId.toString(QUuid::WithBraces));
         if (!scopedEntityType.engine)
             continue;
 
@@ -232,7 +232,8 @@ std::set<ScopedEntity<EntityType>> compatibleScopedEntityTypes(
     for (const auto& engine: device->compatibleAnalyticsEngineResources())
     {
         ScopedEntity<EntityType> scopedEntityType;
-        scopedEntityType.engine = taxonomyState->engineById(engine->getId().toString());
+        scopedEntityType.engine =
+            taxonomyState->engineById(engine->getId().toString(QUuid::WithBraces));
         if (!scopedEntityType.engine)
             continue;
 
@@ -254,7 +255,7 @@ std::set<ScopedEntity<EntityType>> compatibleScopedEntityTypes(
 
             scopedEntityType.entityType = entityType;
 
-            const QString engineId = engine->getId().toString();
+            const QString engineId = engine->getId().toString(QUuid::WithBraces);
             for (const AbstractScope* scope: entityType->scopes())
             {
                 const AbstractEngine* taxonomyEngine = scope->engine();

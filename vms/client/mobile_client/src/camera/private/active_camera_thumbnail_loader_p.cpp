@@ -121,7 +121,7 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
             if (camera)
             {
                 thumbnailId =
-                    QStringLiteral("%1/%2").arg(camera->getId().toString()).arg(position);
+                    NX_FMT("%1/%2", camera->getId().toString(QUuid::WithBraces), position);
                 emit q->thumbnailIdChanged();
             }
         });

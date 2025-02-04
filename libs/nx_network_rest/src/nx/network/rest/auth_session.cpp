@@ -95,7 +95,7 @@ QString AuthSession::toString() const
 {
     const auto encoded = [](QString value) { return value.replace(kDelimiter, char('_')); };
     QString result;
-    result.append(id.toString());
+    result.append(id.toString(QUuid::WithBraces));
     result.append(kDelimiter);
     result.append(encoded(userName));
     result.append(kDelimiter);

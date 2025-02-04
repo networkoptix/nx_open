@@ -933,7 +933,7 @@ nx::Uuid QnResourceWidget::uuid() const
 
 QString QnResourceWidget::uuidString() const
 {
-    return uuid().toString();
+    return uuid().toString(QUuid::WithBraces);
 }
 
 QString QnResourceWidget::toString() const

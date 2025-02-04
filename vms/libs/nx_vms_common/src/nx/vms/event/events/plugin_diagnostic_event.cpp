@@ -27,7 +27,7 @@ PluginDiagnosticEvent::PluginDiagnosticEvent(
 {
     m_metadata.level = level;
     if (!device.isNull())
-        m_metadata.cameraRefs.push_back(device->getId().toString());
+        m_metadata.cameraRefs.push_back(device->getId().toString(QUuid::WithBraces));
 }
 
 bool PluginDiagnosticEvent::checkEventParams(const EventParameters& params) const

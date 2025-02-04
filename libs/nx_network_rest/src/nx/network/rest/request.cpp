@@ -416,4 +416,23 @@ void Request::renameParameter(const QString& oldName, const QString& newName)
     m_paramsCache->rename(oldName, newName);
 }
 
+void Request::removeFieldsFromParams(const NxReflectFields& fields, rapidjson::Value* params)
+{
+    for (const auto& f: fields)
+    {
+        auto m = params->FindMember(f.name);
+        if (m == params->MemberEnd())
+            continue;
+
+        if (m->value.IsObject())
+        {
+            removeFieldsFromParams(f.fields, &m->value);
+            if (m->value.MemberCount() != 0)
+                continue;
+        }
+
+        params->EraseMember(m);
+    }
+}
+
 } // namespace nx::network::rest

@@ -69,7 +69,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
-    layout->setName(nx::Uuid::createUuid().toString());
+    layout->setName(nx::Uuid::createUuid().toSimpleString());
     return layout;
 }
 
@@ -123,8 +123,8 @@ nx::CameraResourceStubPtr QnResourcePoolTestHelper::createDesktopCamera(
     camera->setModel("virtual desktop camera"); //< TODO: #sivanov Globalize the constant.
     camera->setName(user->getName());
     camera->setPhysicalId(
-        nx::Uuid::createUuid().toString() //< Running client instance id must be here.
-        + user->getId().toString());
+        nx::Uuid::createUuid().toString(QUuid::WithBraces) //< Running client instance id must be here.
+        + user->getId().toString(QUuid::WithBraces));
     return camera;
 }
 

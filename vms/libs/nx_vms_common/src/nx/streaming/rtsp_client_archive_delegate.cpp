@@ -1097,7 +1097,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
     // TODO: #sivanov This place is the only reason to have `auditId` access in the common system
     // context class.
     session->setAdditionAttribute(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, camera->systemContext()->auditId().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, camera->systemContext()->auditId().toSimpleByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1");
     session->setAdditionAttribute(
         Qn::CUSTOM_USERNAME_HEADER_NAME, QString::fromStdString(m_credentials.username).toUtf8());

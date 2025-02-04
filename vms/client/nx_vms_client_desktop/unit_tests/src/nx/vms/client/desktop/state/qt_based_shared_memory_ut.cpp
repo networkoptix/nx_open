@@ -25,7 +25,7 @@ SharedMemoryData generateRandomData()
     {
         data.pid = nx::utils::random::number<SharedMemoryData::PidType>();
         const auto localSystemId = nx::Uuid::createUuid();
-        data.sessionId = SessionId(localSystemId, localSystemId.toString(), randomString());
+        data.sessionId = SessionId(localSystemId, localSystemId.toSimpleString(), randomString());
         sessionsToAdd.insert(data.sessionId);
         for (int i = 0; i < 64; ++i)
         {
@@ -39,7 +39,7 @@ SharedMemoryData generateRandomData()
             SharedMemoryData::Command::saveWindowState,
             SharedMemoryData::Command::restoreWindowState});
         if (data.command == SharedMemoryData::Command::restoreWindowState)
-            data.commandData = nx::Uuid::createUuid().toString().toLatin1();
+            data.commandData = nx::Uuid::createUuid().toSimpleByteArray();
     }
 
     std::transform(sessionsToAdd.begin(), sessionsToAdd.end(), result.sessions.begin(),

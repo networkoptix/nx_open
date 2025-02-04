@@ -53,7 +53,7 @@ static InternalState makeInitialInternalState(
         internalState.integrationById[id] = new Integration(std::move(descriptor));
 
     for (auto& [id, descriptor]: descriptors.engineDescriptors)
-        internalState.engineById[id.toString()] = new Engine(std::move(descriptor));
+        internalState.engineById[id.toString(QUuid::WithBraces)] = new Engine(std::move(descriptor));
 
     for (auto& [id, descriptor]: descriptors.groupDescriptors)
         internalState.groupById[id] = new Group(std::move(descriptor));

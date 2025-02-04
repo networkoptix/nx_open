@@ -188,7 +188,7 @@ bool IOModuleMonitor::open()
     d->multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     d->multipartContentParser->setNextFilter(std::make_shared<MessageBodyParser>(this));
 
-    d->httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toStdString());
+    d->httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toSimpleStdString());
     nx::utils::Url requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
     QUrlQuery query;

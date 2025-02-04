@@ -19,7 +19,7 @@ QDir calculatePath(SystemContext* systemContext)
 
     const auto connection = systemContext->connection();
     const QString systemId = connection
-        ? connection->moduleInformation().localSystemId.toString()
+        ? connection->moduleInformation().localSystemId.toString(QUuid::WithBraces)
         : kLocalSettingsPlaceholder;
 
     return QDir(QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()

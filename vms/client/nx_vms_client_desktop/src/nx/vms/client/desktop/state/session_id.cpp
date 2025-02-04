@@ -81,7 +81,7 @@ QString SessionId::toQString() const
 QString SessionId::legacyIdString() const
 {
     return QString::fromLatin1(
-        makeSessionId(m_localSystemId.toString(), m_userId)
+        makeSessionId(m_localSystemId.toString(QUuid::WithBraces), m_userId)
             .toBase64(QByteArray::Base64UrlEncoding));
 }
 

@@ -74,8 +74,10 @@ bool deserialize(QnJsonContext* ctx, const QJsonValue& value, nx::Buffer* target
     return true;
 }
 
-void serialize(QnJsonContext *, const nx::Uuid &value, QJsonValue *target) {
-    *target = QnLexical::serialized(value);
+void serialize(QnJsonContext* context, const nx::Uuid& value, QJsonValue* target)
+{
+    *target = value.toString(
+        context->serializeUuidWithBraces() ? QUuid::WithBraces : QUuid::WithoutBraces);
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, nx::Uuid *target) {

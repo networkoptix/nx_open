@@ -19,8 +19,8 @@ namespace nx::vms::client::core::test {
 
 namespace {
 
-const QString kCloudId1 = nx::Uuid::createUuid().toString();
-const QString kCloudId2 = nx::Uuid::createUuid().toString();
+const QString kCloudId1 = nx::Uuid::createUuid().toString(QUuid::WithBraces);
+const QString kCloudId2 = nx::Uuid::createUuid().toString(QUuid::WithBraces);
 const nx::Uuid kLocalId1 = nx::Uuid::createUuid();
 const nx::Uuid kLocalId2 = nx::Uuid::createUuid();
 

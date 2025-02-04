@@ -946,7 +946,8 @@ void QnAuditLogDialog::at_gotdata(
     {
         for (auto& rec: records)
         {
-            rec.addParam(QnAuditLogModel::kSourceServerParamName, serverId.toByteArray());
+            rec.addParam(
+                QnAuditLogModel::kSourceServerParamName, serverId.toByteArray(QUuid::WithBraces));
             m_allData.push_back(std::move(rec));
         }
     }

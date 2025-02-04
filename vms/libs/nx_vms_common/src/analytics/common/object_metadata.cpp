@@ -69,7 +69,7 @@ QString baseMetadataToString(const BaseMetadata& metadata)
         + ", y " + QString::number(metadata.boundingBox.y())
         + ", width " + QString::number(metadata.boundingBox.width())
         + ", height " + QString::number(metadata.boundingBox.height())
-        + ", trackId " + metadata.trackId.toString();
+        + ", trackId " + metadata.trackId.toString(QUuid::WithBraces); //< Must be QUuid::WithBraces.
     return s;
 }
 

@@ -215,6 +215,8 @@ private:
     template<typename T>
     std::tuple<T, NxReflectFields> parseContentByReflectOrThrow() const;
 
+    static void removeFieldsFromParams(const NxReflectFields& fields, rapidjson::Value* params);
+
 private:
     const nx::network::http::Request* const m_httpRequest = nullptr;
     std::optional<JsonRpcContext> m_jsonRpcContext;
@@ -489,6 +491,8 @@ std::tuple<T, Request::NxReflectFields> Request::parseContentByReflectOrThrow() 
     }
     else if (m_jsonRpcContext && m_jsonRpcContext->request.params)
     {
+        if (m_jsonRpcContext->request.params->IsObject())
+            removeFieldsFromParams(fields, m_jsonRpcContext->request.params);
         const nx::reflect::json::DeserializationContext deserializationContext{
             *m_jsonRpcContext->request.params, (int) nx::reflect::json::DeserializationFlag::fields};
         return {std::move(data),

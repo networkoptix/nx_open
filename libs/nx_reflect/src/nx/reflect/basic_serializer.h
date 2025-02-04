@@ -173,10 +173,16 @@ void serialize(
             || (IsUnorderedAssociativeContainerV<C> && !IsUnorderedSetContainerV<C>)
     >* = nullptr)
 {
+    constexpr bool hasSpecificToStringForKey =
+        requires(const SerializationContext& c, const typename C::key_type& v) { c.toString(v); };
+
     ctx->composer.startObject();
     for (auto it = data.begin(); it != data.end(); ++it)
     {
-        ctx->composer.writeAttributeName(nx::reflect::toString(it->first));
+        if constexpr (hasSpecificToStringForKey)
+            ctx->composer.writeAttributeName(ctx->toString(it->first));
+        else
+            ctx->composer.writeAttributeName(nx::reflect::toString(it->first));
         serializeAdl(ctx, it->second);
     }
     ctx->composer.endObject(data.size());

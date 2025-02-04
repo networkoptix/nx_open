@@ -94,7 +94,7 @@ QByteArray DeprecatedMulticastFinder::RevealResponse::serialize()
 {
     QVariantMap map;
     map["application"] = type;
-    map["seed"] = id.toString();
+    map["seed"] = id.toSimpleString();
     map["version"] = version.toString();
     map["customization"] = customization;
     map["brand"] = brand;
@@ -104,11 +104,11 @@ QByteArray DeprecatedMulticastFinder::RevealResponse::serialize()
     map["sslAllowed"] = sslAllowed;
     map["port"] = port;
     map["protoVersion"] = protoVersion;
-    map["runtimeId"] = runtimeId.toString();
+    map["runtimeId"] = runtimeId.toSimpleString();
     map["flags"] = QString::fromStdString(nx::reflect::toString(serverFlags));
     map["cloudSystemId"] = cloudSystemId;
     map["cloudHost"] = cloudHost;
-    map["localSystemId"] = localSystemId.toByteArray();
+    map["localSystemId"] = localSystemId.toSimpleByteArray();
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 

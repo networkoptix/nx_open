@@ -46,7 +46,7 @@ Connection::Connection(
     const auto serializedPeer = localPeer.dataFormat == Qn::SerializationFormat::ubjson
         ? QnUbjson::serialized(localPeer) : QJson::serialized(localPeer);
     headers.emplace(Qn::EC2_PEER_DATA, serializedPeer.toBase64());
-    headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toByteArray());
+    headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toSimpleStdString());
 
     addAdditionalRequestHeaders(std::move(headers));
 

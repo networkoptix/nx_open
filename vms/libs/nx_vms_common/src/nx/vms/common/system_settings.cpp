@@ -2563,7 +2563,7 @@ void SystemSettings::setMasterCloudSyncList(const std::vector<nx::Uuid>& idList)
 {
     QStringList result;
     for (const auto& id: idList)
-        result << id.toString();
+        result << id.toSimpleString();
     d->masterCloudSyncListAdaptor->setValue(result.join(";"));
 }
 

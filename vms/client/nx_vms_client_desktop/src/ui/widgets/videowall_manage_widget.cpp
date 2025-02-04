@@ -265,7 +265,7 @@ QString QnVideowallManageWidget::jsonModel()
     for (auto const& item: model().items)
     {
         QJsonObject jsonItem;
-        jsonItem["uuid"] = item.id.toString();
+        jsonItem["uuid"] = item.id.toString(QUuid::WithBraces);
         jsonItem["name"] = item.name;
         jsonItem["added"] = item.isAdded;
         // Write ScreenSnaps.

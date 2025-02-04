@@ -260,7 +260,7 @@ std::function<QString(const QnResourcePtr&, int)> parentServerIdGetter()
     return
         [](const QnResourcePtr& resource, int /*order*/)
         {
-            return resource->getParentId().toString();
+            return resource->getParentId().toString(QUuid::WithBraces);
         };
 }
 

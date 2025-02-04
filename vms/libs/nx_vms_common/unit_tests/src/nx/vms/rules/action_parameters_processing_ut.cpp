@@ -203,7 +203,7 @@ TEST_F(ActionParametersProcessingTest, analyticsEvent)
 
     EXPECT_EQ(actionParameters.text,
         createText({
-            {kCameraId, id.toString()},
+            {kCameraId, id.toString(QUuid::WithBraces)},
             {kCameraName, camera()->getUserDefinedName()},
             {kCaption, "C"},
             {kDescription, "D"},
@@ -223,7 +223,7 @@ TEST_F(ActionParametersProcessingTest, analyticsEventWithKeywords)
 
     EXPECT_EQ(actionParameters.text,
         createText({
-            {kCameraId, id.toString()},
+            {kCameraId, id.toString(QUuid::WithBraces)},
             {kCameraName, Placeholder::cameraName}, //< Invalid camera id, name should not be processed.
             {kCaption, Placeholder::description},
             {kDescription, Placeholder::eventType},

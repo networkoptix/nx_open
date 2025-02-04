@@ -29,7 +29,7 @@ QString LicenseIssueEvent::encodeCameras(const UuidSet& cameras)
 {
     QStringList stringList;
     for (const auto id : cameras)
-        stringList.push_back(id.toString());
+        stringList.push_back(id.toString(QUuid::WithBraces));
 
     return stringList.join(kDelimiter);
 }

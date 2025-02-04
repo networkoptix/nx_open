@@ -18,7 +18,7 @@ Engine::Engine(EngineDescriptor engineDescriptor, QObject* parent):
 
 QString Engine::id() const
 {
-    return m_descriptor.id.toString();
+    return m_descriptor.id.toString(QUuid::WithBraces);
 }
 
 QString Engine::name() const

@@ -39,7 +39,7 @@ SoftTriggerEvent::SoftTriggerEvent(
 QString SoftTriggerEvent::aggregationSubKey() const
 {
     // All the soft trigger events must be considered as unique events.
-    return nx::Uuid::createUuid().toString();
+    return nx::Uuid::createUuid().toSimpleString();
 }
 
 QString SoftTriggerEvent::resourceKey() const

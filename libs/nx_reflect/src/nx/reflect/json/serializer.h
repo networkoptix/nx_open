@@ -8,6 +8,7 @@
 #include <rapidjson/writer.h>
 
 #include <nx/reflect/basic_serializer.h>
+#include <nx/reflect/flags.h>
 #include <nx/reflect/type_utils.h>
 
 #include "json_tags.h"
@@ -50,6 +51,9 @@ private:
 struct SerializationContext
 {
     JsonComposer composer;
+    int flags = (int) SerializationFlag::uuidWithBraces;
+
+    bool uuidWithBraces() const { return flags & ((int) SerializationFlag::uuidWithBraces); }
 
     template<typename T>
     unsigned int beforeSerialize(const T&)

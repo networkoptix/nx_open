@@ -158,7 +158,7 @@ QVariant LogsManagementModel::data(const QModelIndex& index, int role) const
                 && unit->state() != LogsManagementWatcher::Unit::DownloadState::complete;
 
         case QnUuidRole:
-            return unit->id().toString();
+            return unit->id().toString(QUuid::WithBraces);
     }
 
     switch (index.column())

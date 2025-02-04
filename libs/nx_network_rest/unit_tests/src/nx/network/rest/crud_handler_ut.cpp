@@ -63,7 +63,7 @@ static const QString kJsonTemplateV3 = R"json({
 })json";
 
 static const QString kJsonTemplateV4 = R"json({
-    "deviceId": "{00000000-0000-0000-0000-000000000000}",
+    "deviceId": "00000000-0000-0000-0000-000000000000",
     "name": "",
     "description": "",
     "startTimeMs": 0,
@@ -192,8 +192,9 @@ TEST_P(CrudHandlerTest, BookmarkPatch)
     NX_INFO(this, "eventRuleId");
     response = handler.executePatch(
         request(R"json({"eventRuleId": "{3771fd64-9b41-4216-8800-9610d40b9c16}"})json"));
-    ASSERT_TRUE(response.content->body.contains(
-        R"json("eventRuleId":"{3771fd64-9b41-4216-8800-9610d40b9c16}")json"));
+    ASSERT_TRUE(response.content->body.contains(GetParam() == *kRestApiV3
+            ? R"json("eventRuleId":"{3771fd64-9b41-4216-8800-9610d40b9c16}")json"
+            : R"json("eventRuleId":"3771fd64-9b41-4216-8800-9610d40b9c16")json"));
 }
 
 TEST_P(CrudHandlerTest, ObjectTrackGet)
@@ -212,8 +213,8 @@ TEST_P(CrudHandlerTest, ObjectTrackGet)
     auto response{handler.executeRequestOrThrow(&request)};
     ASSERT_EQ(nx::utils::formatJsonString(response.content->body), R"json([
     {
-        "id": "{00000000-0000-0000-0000-000000000000}",
-        "deviceId": "{00000000-0000-0000-0000-000000000000}",
+        "id": "00000000-0000-0000-0000-000000000000",
+        "deviceId": "00000000-0000-0000-0000-000000000000",
         "objectTypeId": "",
         "firstAppearanceTimeMs": 0,
         "lastAppearanceTimeMs": 0,
@@ -226,7 +227,7 @@ TEST_P(CrudHandlerTest, ObjectTrackGet)
             "boundingBox": "1,2,3x4",
             "streamIndex": ""
         },
-        "analyticsEngineId": "{00000000-0000-0000-0000-000000000000}"
+        "analyticsEngineId": "00000000-0000-0000-0000-000000000000"
     }
 ])json");
 }

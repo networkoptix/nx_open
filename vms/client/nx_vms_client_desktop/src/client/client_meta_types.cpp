@@ -162,13 +162,13 @@ QString resourceListToString(const QnResourceList& list)
 {
     QStringList ids;
     for (const auto& r: list)
-        ids << r->getId().toString();
+        ids << r->getId().toString(QUuid::WithBraces);
     return ids.join(',');
 }
 
 QString uuidToString(const nx::Uuid& uuid)
 {
-    return uuid.toString();
+    return uuid.toString(QUuid::WithBraces);
 }
 
 } // namespace

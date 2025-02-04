@@ -404,7 +404,7 @@ void ConnectionBase::startConnection()
         nx::network::websocket::addClientHeaders(
             &headers, kP2pProtoName, nx::network::websocket::CompressionType::perMessageDeflate);
     }
-    m_connectionGuid = nx::Uuid::createUuid().toByteArray();
+    m_connectionGuid = nx::Uuid::createUuid().toSimpleByteArray();
     headers.emplace(Qn::EC2_CONNECTION_GUID_HEADER_NAME, m_connectionGuid);
     if (!s_noPingSupportClientHeader)
         headers.emplace(Qn::EC2_PING_ENABLED_HEADER_NAME, "true");

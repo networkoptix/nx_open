@@ -24,7 +24,7 @@ InternetOnlyPeerManager::~InternetOnlyPeerManager()
 
 QString InternetOnlyPeerManager::peerString(const nx::Uuid& peerId) const
 {
-    return peerId.isNull() ? QStringLiteral("Internet") : peerId.toString();
+    return peerId.isNull() ? QStringLiteral("Internet") : peerId.toSimpleString();
 }
 
 QList<nx::Uuid> InternetOnlyPeerManager::getAllPeers() const

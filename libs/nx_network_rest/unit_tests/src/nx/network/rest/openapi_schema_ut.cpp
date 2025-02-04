@@ -683,8 +683,8 @@ TEST_P(OpenApiSchemaTest, XmlResponse)
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<reply>"
                     "<element>"
-                        "<id>{00000000-0000-0000-0000-000000000000}</id>"
-                        "<parentId>{00000000-0000-0000-0000-000000000000}</parentId>"
+                        "<id>00000000-0000-0000-0000-000000000000</id>"
+                        "<parentId>00000000-0000-0000-0000-000000000000</parentId>"
                         "<name>\u0414\u043e\u043c</name>"
                         "<cellAspectRatio>0</cellAspectRatio>"
                         "<cellSpacing>0.05000000074505806</cellSpacing>"
@@ -762,8 +762,8 @@ TEST_P(OpenApiSchemaTest, CsvResponse)
             "fixedHeight,"
             "logicalId"
             "\r\n"
-            "{00000000-0000-0000-0000-000000000000},"
-            "{00000000-0000-0000-0000-000000000000},"
+            "00000000-0000-0000-0000-000000000000,"
+            "00000000-0000-0000-0000-000000000000,"
             "\u0414\u043e\u043c,"
             "0,"
             "0.05000000074505806,"
@@ -816,8 +816,8 @@ TEST_P(OpenApiSchemaTest, PrettyResponse)
             :
                 R"json([
     {
-        "id": "{00000000-0000-0000-0000-000000000000}",
-        "parentId": "{00000000-0000-0000-0000-000000000000}",
+        "id": "00000000-0000-0000-0000-000000000000",
+        "parentId": "00000000-0000-0000-0000-000000000000",
         "name": ")json" "\u0414\u043e\u043c" R"json(",
         "cellAspectRatio": 0.0,
         "cellSpacing": 0.05000000074505806,
@@ -852,29 +852,30 @@ TEST_P(OpenApiSchemaTest, Base64)
 
 TEST_P(OpenApiSchemaTest, Map)
 {
+    auto [possibleLeftBrace, possibleRightBrace] = GetParam() == *kRestApiV3
+        ? std::make_pair(QString{"{"}, QString{"}"})
+        : std::make_pair(QString{}, QString{});
     HandlerPool pool;
     pool.setSchemas(m_schemas);
     pool.registerHandler(PathRouter::replaceVersionWithRegex("rest/v{3-}/map"),
         GlobalPermission::none, std::make_unique<MockMapHandler>());
     std::unique_ptr<Request> requestPut = restRequest(
         {"PUT /rest/{version}/map"},
-        /*suppress newline*/ 1 + (const char*)
-R"json(
-{
-    "{00000000-0000-0000-0000-000000000000}": {
+        nx::format(R"json({
+    "%0100000000-0000-0000-0000-000000000000%02": {
         "list": [
             {
-                "id": "{22222222-2222-2222-2222-222222222222}",
+                "id": "%0122222222-2222-2222-2222-222222222222%02",
                 "name": "2"
             },
             {
-                "id": "{11111111-1111-1111-1111-111111111111}",
+                "id": "%0111111111-1111-1111-1111-111111111111%02",
                 "name": "1"
             }
         ],
         "name": "0"
     }
-})json");
+})json", possibleLeftBrace, possibleRightBrace).toUtf8());
     auto handler = pool.findHandlerOrThrow(requestPut.get());
     ASSERT_TRUE(handler);
     Response response = handler->executeRequestOrThrow(requestPut.get());
@@ -885,23 +886,21 @@ R"json(
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(
         nx::utils::formatJsonString(response.content->body).toStdString(),
-        /*suppress newline*/ 1 + (const char*)
-R"json(
-{
-    "{00000000-0000-0000-0000-000000000000}": {
+        nx::format(R"json({
+    "%0100000000-0000-0000-0000-000000000000%02": {
         "list": [
             {
-                "id": "{11111111-1111-1111-1111-111111111111}",
+                "id": "%0111111111-1111-1111-1111-111111111111%02",
                 "name": "1"
             },
             {
-                "id": "{22222222-2222-2222-2222-222222222222}",
+                "id": "%0122222222-2222-2222-2222-222222222222%02",
                 "name": "2"
             }
         ],
         "name": "0"
     }
-})json");
+})json", possibleLeftBrace, possibleRightBrace).toStdString());
 
     requestGet = restRequest({"GET /rest/{version}/map?_with=*.list.name HTTP/1.1"});
     handler = pool.findHandlerOrThrow(requestGet.get());
@@ -910,10 +909,8 @@ R"json(
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(
         nx::utils::formatJsonString(response.content->body).toStdString(),
-        /*suppress newline*/ 1 + (const char*)
-R"json(
-{
-    "{00000000-0000-0000-0000-000000000000}": {
+        nx::format(R"json({
+    "%0100000000-0000-0000-0000-000000000000%02": {
         "list": [
             {
                 "name": "2"
@@ -923,7 +920,7 @@ R"json(
             }
         ]
     }
-})json");
+})json", possibleLeftBrace, possibleRightBrace).toStdString());
 
     std::unique_ptr<Request> requestGetFiltered = restRequest(
         {"GET /rest/{version}/map?{00000000-0000-0000-0000-000000000000}.list.name=1 HTTP/1.1"});
@@ -933,19 +930,17 @@ R"json(
     ASSERT_EQ(response.statusCode, http::StatusCode::ok);
     ASSERT_EQ(
         nx::utils::formatJsonString(response.content->body).toStdString(),
-        /*suppress newline*/ 1 + (const char*)
-R"json(
-{
-    "{00000000-0000-0000-0000-000000000000}": {
+        NX_FMT(R"json({
+    "%0100000000-0000-0000-0000-000000000000%02": {
         "list": [
             {
-                "id": "{11111111-1111-1111-1111-111111111111}",
+                "id": "%0111111111-1111-1111-1111-111111111111%02",
                 "name": "1"
             }
         ],
         "name": "0"
     }
-})json");
+})json", possibleLeftBrace, possibleRightBrace).toStdString());
 }
 
 INSTANTIATE_TEST_SUITE_P(Rest, OpenApiSchemaTest, ::testing::ValuesIn(kRestApiV3, kRestApiEnd),

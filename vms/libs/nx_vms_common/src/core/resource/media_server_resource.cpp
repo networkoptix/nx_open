@@ -571,7 +571,7 @@ nx::Uuid QnMediaServerResource::metadataStorageId() const
 
 void QnMediaServerResource::setMetadataStorageId(const nx::Uuid& value)
 {
-    setProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey, value.toString());
+    setProperty(ResourcePropertyKey::Server::kMetadataStorageIdKey, value.toSimpleString());
 }
 
 void QnMediaServerResource::setRedundancy(bool value)

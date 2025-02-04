@@ -611,7 +611,7 @@ void QnTransactionTransportBase::doOutgoingConnect(
         ConnectionType::toString(m_connectionType));   //incoming means this peer wants to receive data via this connection
     m_httpClient->addAdditionalHeader(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        m_localPeer.instanceId.toStdString());
+        m_localPeer.instanceId.toSimpleStdString());
     m_httpClient->addAdditionalHeader(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
         std::to_string(m_localPeerProtocolVersion));

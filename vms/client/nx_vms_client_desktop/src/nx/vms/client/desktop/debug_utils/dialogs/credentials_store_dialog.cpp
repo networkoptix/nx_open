@@ -42,7 +42,8 @@ struct CredentialsStoreDialog::Private
         const auto& data = appContext()->coreSettings()->systemAuthenticationData();
         for (auto [systemId, credentialsList]: data)
         {
-            const auto system = appContext()->systemFinder()->getSystem(systemId.toString());
+            const auto system =
+                appContext()->systemFinder()->getSystem(systemId.toString(QUuid::WithBraces));
             QString title = system ? system->name() : systemId.toSimpleString();
 
             QStandardItem* item = new QStandardItem(title);

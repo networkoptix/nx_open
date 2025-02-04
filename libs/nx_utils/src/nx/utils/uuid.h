@@ -11,6 +11,9 @@
 
 #include <nx/reflect/instrument.h>
 
+namespace nx::reflect { struct DeserializationResult; }
+namespace nx::reflect::json_detail { struct DeserializationContext; }
+
 namespace nx {
 
 class NX_UTILS_API Uuid
@@ -33,18 +36,17 @@ public:
     const QUuid& getQUuid() const;
 
     Q_INVOKABLE bool isNull() const;
-    const QByteArray toByteArray() const;
+    const QByteArray toByteArray(QUuid::StringFormat format) const;
     const QByteArray toRfc4122() const;
 
-    /** @return GUID in braces. */
-    Q_INVOKABLE const QString toString() const;
+    Q_INVOKABLE const QString toString(QUuid::StringFormat format = QUuid::WithBraces) const;
 
     /** @return GUID without braces */
     Q_INVOKABLE QString toSimpleString() const;
 
     QByteArray toSimpleByteArray() const;
 
-    std::string toStdString() const;
+    std::string toStdString(QUuid::StringFormat format) const;
 
     /** @return GUID without braces. */
     std::string toSimpleStdString() const;
@@ -102,6 +104,7 @@ public:
     static bool isUuidString(const QByteArray& data);
     static bool isUuidString(const QString& data);
     static bool isUuidString(const std::string& data);
+    static bool isUuidString(const std::string_view& data);
 
     static Uuid fromString(const std::string_view& str);
 
@@ -111,7 +114,15 @@ private:
     friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, Uuid& id);
 };
 
-NX_REFLECTION_TAG_TYPE(Uuid, useStringConversionForSerialization)
+NX_UTILS_API nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json_detail::DeserializationContext& context, Uuid* data);
+
+template<typename SerializationContext>
+inline void serialize(SerializationContext* context, const Uuid& value)
+{
+    context->composer.writeString(value.toStdString(
+        context->uuidWithBraces() ? QUuid::WithBraces : QUuid::WithoutBraces));
+}
 
 NX_UTILS_API QString changedGuidByteOrder(const QString& guid);
 

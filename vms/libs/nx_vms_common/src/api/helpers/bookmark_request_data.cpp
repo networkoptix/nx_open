@@ -53,7 +53,7 @@ nx::network::rest::Params bookmarksToParam(const nx::vms::common::CameraBookmark
     result.insert(kTimeoutParam, QnLexical::serialized(bookmark.timeout));
     result.insert(kStartTimeMsParam, QnLexical::serialized(bookmark.startTimeMs));
     result.insert(kDurationMsParam, QnLexical::serialized(bookmark.durationMs));
-    result.insert(kCameraIdParam, bookmark.cameraId.toString());
+    result.insert(kCameraIdParam, bookmark.cameraId.toSimpleString());
 
     for (const QString& tag: bookmark.tags)
         result.insert(kTagParam, tag);

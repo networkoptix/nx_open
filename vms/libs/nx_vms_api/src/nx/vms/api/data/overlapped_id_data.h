@@ -60,7 +60,7 @@ struct NX_VMS_API OverlappedIdsRequest: IdData
     int overlappedId = -1;
 
     OverlappedIdsRequest getId() const { return *this; }
-    operator QString() const { return id.toString() + '.' + groupId; }
+    operator QString() const { return id.toSimpleString() + '.' + groupId; }
 };
 #define OverlappedIdsRequest_Fields (id)(groupId)(overlappedId)
 

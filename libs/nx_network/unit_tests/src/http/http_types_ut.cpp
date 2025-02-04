@@ -905,7 +905,7 @@ TEST(HttpTypesRequest, removeCookieSingleCookie)
     static constexpr char kTestRequest[] =
         "GET http://192.168.0.25:7001/ HTTP/1.0\r\n"
         "Accept-Language: en-us,en;q=0.5\r\n"
-        "Cookie: x-runtime-guid={e0ede7dc-4add-4dfd-ba6c-3b660f206e15}\r\n"
+        "Cookie: x-runtime-guid=e0ede7dc-4add-4dfd-ba6c-3b660f206e15\r\n"
         "Accept-Encoding: gzip,deflate\t\n";
 
     Request request;

@@ -296,7 +296,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
         if (!request)
             request = makeRequestWithCertificateValidation(context, url);
         request->addAdditionalHeader(
-            Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toStdString());
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toSimpleStdString());
 
         std::promise<ResultType> promise;
         auto future = promise.get_future();
@@ -322,7 +322,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
             std::move(data));
         request->setRequestBody(std::move(messageBody));
         request->addAdditionalHeader(
-            Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toStdString());
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME, context->auditId.toSimpleStdString());
 
         std::promise<ResultType> promise;
         auto future = promise.get_future();

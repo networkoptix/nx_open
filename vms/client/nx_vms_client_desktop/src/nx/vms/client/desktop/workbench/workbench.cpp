@@ -107,8 +107,8 @@ public:
             m_workbench->submit(m_state);
 
             DelegateState result;
-            result[kCurrentLayoutId] = m_state.currentLayoutId.toString();
-            result[kRunningTourId] = m_state.runningTourId.toString();
+            result[kCurrentLayoutId] = m_state.currentLayoutId.toString(QUuid::WithBraces);
+            result[kRunningTourId] = m_state.runningTourId.toString(QUuid::WithBraces);
             QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
             *state = result;
         }

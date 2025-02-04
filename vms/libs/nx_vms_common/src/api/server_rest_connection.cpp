@@ -318,7 +318,7 @@ void proxyRequestUsingServer(
     nx::network::http::ClientPool::Request& request,
     const nx::Uuid& proxyServerId)
 {
-    nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, proxyServerId.toByteArray());
+    nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, proxyServerId.toSimpleStdString());
     nx::network::http::insertOrReplaceHeader(&request.headers, header);
 }
 
@@ -1508,7 +1508,7 @@ Handle ServerConnection::getEngineAnalyticsSettings(
     return executeGet(
         "/ec2/analyticsEngineSettings",
         nx::network::rest::Params{
-            {"analyticsEngineId", engine->getId().toString()}
+            {"analyticsEngineId", engine->getId().toSimpleString()}
         },
         extractJsonResult<nx::vms::api::analytics::EngineSettingsResponse>(std::move(callback)),
         targetThread);
@@ -1565,8 +1565,8 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
     return executeGet(
         "/ec2/deviceAnalyticsSettings",
         nx::network::rest::Params{
-            {"deviceId", device->getId().toString()},
-            {"analyticsEngineId", engine->getId().toString()},
+            {"deviceId", device->getId().toSimpleString()},
+            {"analyticsEngineId", engine->getId().toSimpleString()},
         },
         extractJsonResult<DeviceAgentSettingsResponse>(std::move(callback)),
         targetThread);
@@ -1584,7 +1584,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     request.settingsValues = settingsValues;
     request.settingsModel = settingsModel;
     request.analyticsEngineId = engine->getId();
-    request.deviceId = device->getId().toString();
+    request.deviceId = device->getId().toSimpleString();
 
     return executePost<nx::network::rest::JsonResult>(
         "/ec2/deviceAnalyticsSettings",
@@ -1605,7 +1605,7 @@ Handle ServerConnection::deviceAnalyticsActiveSettingsChanged(
 {
     nx::vms::api::analytics::DeviceAgentActiveSettingChangedRequest request;
     request.analyticsEngineId = engine->getId();
-    request.deviceId = device->getId().toString();
+    request.deviceId = device->getId().toSimpleString();
     request.activeSettingName = activeElement;
     request.settingsModel = settingsModel;
     request.settingsValues = settingsValues;
@@ -2175,7 +2175,7 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
                         callback(success, id, result ? std::move(*result) : ResultType(), errorString);
                 };
 
-            invoke(context, internal_callback, success, serverId.toString());
+            invoke(context, internal_callback, success, serverId.toSimpleString());
         };
 }
 
@@ -3435,7 +3435,7 @@ bool setupAuth(
 
     // This header is used by the server to identify the client login session for audit.
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toSimpleStdString());
 
     const QnRoute route = QnRouter::routeTo(server);
 
@@ -3476,7 +3476,7 @@ bool setupAuth(
     if (!connection)
         return false;
 
-    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
+    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toSimpleStdString());
     request.credentials = getRequestCredentials(connection, server);
 
     QString userName;
@@ -3516,7 +3516,7 @@ void setupAuthDirect(
     request.credentials = std::move(credentials);
 
     // This header is used by the server to identify the client login session for audit.
-    request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toByteArray());
+    request.headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toSimpleStdString());
 
     // This header was used to migrate digest in the old server's db. Most probably is not needed.
     request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,

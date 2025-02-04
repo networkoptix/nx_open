@@ -47,7 +47,8 @@ struct VmsRulesActionHandler::Private
         if (!NX_ASSERT(cameras.size() <= 1, "Filter is not applicable for several cameras"))
             return;
 
-        rulesDialog->setFilter(cameras.isEmpty() ? "" : cameras.front()->getId().toString());
+        rulesDialog->setFilter(
+            cameras.isEmpty() ? "" : cameras.front()->getId().toString(QUuid::WithBraces));
     }
 
     void initialiseLookupLists()

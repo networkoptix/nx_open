@@ -66,7 +66,7 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
 
     nx::network::rest::Params params;
     params.insert("clientId", sourceId);
-    params.insert("resourceId", targetResource->getId().toString());
+    params.insert("resourceId", targetResource->getId().toSimpleString());
     params.insert("action", active ? "start" : "stop");
 
     const auto requestCallback = nx::utils::guarded(q,

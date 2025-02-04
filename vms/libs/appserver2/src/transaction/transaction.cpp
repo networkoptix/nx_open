@@ -108,7 +108,7 @@ nx::Uuid QnAbstractTransaction::makeHash(
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData);
     hash.addData(data.url.toUtf8());
-    hash.addData(data.id.toString().toUtf8());
+    hash.addData(data.id.toByteArray(QUuid::WithBraces));
     return nx::Uuid::fromRfc4122(hash.result());
 }
 

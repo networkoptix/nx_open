@@ -257,7 +257,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             if (auto context = systemContext())
             {
                 return context->resourcePropertyDictionary()->hasProperty(
-                    ResourcePropertyKey::kAudioInputDeviceId, getId().toString());
+                    ResourcePropertyKey::kAudioInputDeviceId, getId().toSimpleString());
             }
 
             return false;
@@ -1950,7 +1950,7 @@ void QnVirtualCameraResource::setAudioInputDeviceId(const nx::Uuid& deviceId)
         return;
     }
 
-    setProperty(ResourcePropertyKey::kAudioInputDeviceId, deviceId.toString());
+    setProperty(ResourcePropertyKey::kAudioInputDeviceId, deviceId.toSimpleString());
 }
 
 bool QnVirtualCameraResource::isTwoWayAudioEnabled() const
@@ -2017,7 +2017,7 @@ void QnVirtualCameraResource::setAudioOutputDeviceId(const nx::Uuid& deviceId)
         return;
     }
 
-    setProperty(ResourcePropertyKey::kAudioOutputDeviceId, deviceId.toString());
+    setProperty(ResourcePropertyKey::kAudioOutputDeviceId, deviceId.toSimpleString());
 }
 
 bool QnVirtualCameraResource::isManuallyAdded() const

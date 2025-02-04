@@ -203,13 +203,13 @@ void RadassResourceManager::setCacheDirectory(const QString& value)
 
 void RadassResourceManager::switchLocalSystemId(const nx::Uuid& localSystemId)
 {
-    d->loadFromFile(localSystemId.toString());
+    d->loadFromFile(localSystemId.toString(QUuid::WithBraces));
 }
 
 void RadassResourceManager::saveData(const nx::Uuid& localSystemId,
     QnResourcePool* resourcePool) const
 {
-    d->saveToFile(localSystemId.toString(), resourcePool);
+    d->saveToFile(localSystemId.toString(QUuid::WithBraces), resourcePool);
 }
 
 } // namespace nx::vms::client::desktop

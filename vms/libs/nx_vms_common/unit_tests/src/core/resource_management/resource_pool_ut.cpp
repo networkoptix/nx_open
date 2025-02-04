@@ -144,7 +144,7 @@ TEST_F(QnResourcePoolTest, findCameraTest)
 
     using namespace nx::camera_id_helper;
     runThreads("flexibleId id", /*expectSuccess*/ true,
-        [&](auto c) { return findCameraByFlexibleId(resourcePool(), c->getId().toString()); });
+        [&](auto c) { return findCameraByFlexibleId(resourcePool(), c->getId().toString(QUuid::WithBraces)); });
     runThreads("flexibleId simple id", /*expectSuccess*/ true,
         [&](auto c) { return findCameraByFlexibleId(resourcePool(), c->getId().toSimpleString()); });
     runThreads("flexibleId physicalId", /*expectSuccess*/ true,

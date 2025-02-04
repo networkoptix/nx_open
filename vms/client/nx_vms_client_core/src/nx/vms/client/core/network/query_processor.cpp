@@ -43,7 +43,7 @@ struct QueryProcessor::Private
 
         // This header is used by the server to identify the client login session for audit.
         httpClient->addAdditionalHeader(
-            Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toStdString());
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME, auditId.toSimpleStdString());
 
         httpClient->setCredentials(credentials);
 

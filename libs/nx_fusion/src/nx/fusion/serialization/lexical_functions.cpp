@@ -102,7 +102,7 @@ bool deserialize(const QString &value, bool *target)
 
 void serialize(const nx::Uuid &value, QString *target)
 {
-    *target = value.toString();
+    *target = value.toString(QUuid::WithBraces);
 }
 
 bool deserialize(const QString &value, nx::Uuid *target)

@@ -62,7 +62,7 @@ EventParameters AnalyticsSdkObjectDetected::getRuntimeParamsEx(
 
 QString AnalyticsSdkObjectDetected::getExternalUniqueKey() const
 {
-    return m_metadata.trackId.toString();
+    return m_metadata.trackId.toSimpleString();
 }
 
 bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params) const

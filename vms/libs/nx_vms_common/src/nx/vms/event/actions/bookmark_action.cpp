@@ -15,7 +15,7 @@ QString BookmarkAction::getExternalUniqKey() const
 {
     return lit("%1%2")
         .arg(base_type::getExternalUniqKey())
-        .arg(getRuleId().toString());
+        .arg(getRuleId().toSimpleString());
 }
 
 } // namespace event

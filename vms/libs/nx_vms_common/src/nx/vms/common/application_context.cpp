@@ -186,7 +186,7 @@ QString ApplicationContext::moduleDisplayName(const nx::Uuid& id) const
     NX_MUTEX_LOCKER lock(&d->mutex);
     auto itr = d->longToShortInstanceId.find(id);
     return itr != d->longToShortInstanceId.end() ?
-        QString::number(itr.value()) : id.toString();
+        QString::number(itr.value()) : id.toSimpleString();
 }
 
 

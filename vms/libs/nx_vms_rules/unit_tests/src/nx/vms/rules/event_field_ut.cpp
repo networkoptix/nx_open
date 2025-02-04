@@ -112,7 +112,7 @@ TEST_F(TextLookupFieldTest, emptyLookupList)
     const auto listId = makeAndRegisterList();
 
     TextLookupField field{systemContext(), &kDummyDescriptor};
-    field.setValue(listId.toString());
+    field.setValue(listId.toString(QUuid::WithBraces));
 
     field.setCheckType(TextLookupCheckType::inList);
     // An empty List will always return false for 'inList' comparison.
@@ -166,7 +166,7 @@ TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
         });
 
     TextLookupField field{systemContext(), &kDummyDescriptor};
-    field.setValue(listId.toString());
+    field.setValue(listId.toString(QUuid::WithBraces));
 
     field.setCheckType(TextLookupCheckType::inList);
     // Check attributes lookup list contains.
@@ -195,7 +195,7 @@ TEST_F(ObjectLookupFieldTest, emptyLookupList)
     const auto listId = makeAndRegisterList();
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
-    field.setValue(listId.toString());
+    field.setValue(listId.toString(QUuid::WithBraces));
 
     field.setCheckType(ObjectLookupCheckType::inList);
     // An empty List will always return false for 'inList' comparison.
@@ -227,7 +227,7 @@ TEST_F(ObjectLookupFieldTest, emptyListAttributeMatchAnyInputValue)
         });
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
-    field.setValue(listId.toString());
+    field.setValue(listId.toString(QUuid::WithBraces));
 
     field.setCheckType(ObjectLookupCheckType::inList);
     ASSERT_TRUE(field.match(QVariant::fromValue(Attributes{{"foo", "1"}})));
@@ -270,7 +270,7 @@ TEST_F(ObjectLookupFieldTest, lookupInListWorksProperly)
         });
 
     ObjectLookupField field{systemContext(), &kDummyDescriptor};
-    field.setValue(listId.toString());
+    field.setValue(listId.toString(QUuid::WithBraces));
 
     field.setCheckType(ObjectLookupCheckType::inList);
     // Check attributes lookup list contains.

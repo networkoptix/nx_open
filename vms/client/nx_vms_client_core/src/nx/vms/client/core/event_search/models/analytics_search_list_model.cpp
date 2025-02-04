@@ -403,8 +403,11 @@ QString AnalyticsSearchListModel::Private::engineName(
     if (!taxonomyState)
         return {};
 
-    if (const auto engine = taxonomyState->engineById(track.analyticsEngineId.toString()))
+    if (const auto engine =
+        taxonomyState->engineById(track.analyticsEngineId.toString(QUuid::WithBraces)))
+    {
         return engine->name();
+    }
 
     return {};
 }

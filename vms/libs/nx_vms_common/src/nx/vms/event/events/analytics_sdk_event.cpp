@@ -79,10 +79,8 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 QString AnalyticsSdkEvent::getExternalUniqueKey() const
 {
-    static constexpr char recordSeparator[] = "\x1E";
-    const QString key =
-        m_eventTypeId + recordSeparator + m_objectTrackId.toString() + recordSeparator + m_key;
-    NX_VERBOSE(this, "Event's ExternalUniqueKey: %1", nx::kit::utils::toString(key.toStdString()));
+    auto key{m_eventTypeId + "\x1E" + m_objectTrackId.toSimpleString() + "\x1E" + m_key};
+    NX_VERBOSE(this, "Event's ExternalUniqueKey: %1", key);
     return key;
 }
 

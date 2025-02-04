@@ -331,7 +331,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
 
     // Layout id.
     {
-        if (!writeData("uuid.bin", d->layout->getId().toByteArray()))
+        if (!writeData("uuid.bin", d->layout->getId().toByteArray(QUuid::WithBraces)))
             return false;
     }
 

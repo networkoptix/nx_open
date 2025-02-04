@@ -33,7 +33,7 @@ const auto uuidItemCreator =
     [](const nx::Uuid& id) -> AbstractItemPtr
     {
         return GenericItemBuilder()
-            .withRole(Qt::DisplayRole, QVariant::fromValue(id.toString()))
+            .withRole(Qt::DisplayRole, QVariant::fromValue(id.toString(QUuid::WithBraces)))
             .withFlags({Qt::ItemIsEnabled, Qt::ItemIsSelectable});
     };
 

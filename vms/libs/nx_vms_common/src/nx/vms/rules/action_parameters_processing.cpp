@@ -37,7 +37,7 @@ void processTextFieldSubstitutions(
     }
     else if (data.eventType == EventType::analyticsSdkEvent)
     {
-        substitutions.push_back({Keyword::cameraId, data.eventResourceId.toString()});
+        substitutions.push_back({Keyword::cameraId, data.eventResourceId.toString(QUuid::WithBraces)});
         substitutions.push_back({Keyword::caption, data.caption});
         substitutions.push_back({Keyword::description, data.description});
         substitutions.push_back({Keyword::eventType, data.getAnalyticsEventTypeId()});

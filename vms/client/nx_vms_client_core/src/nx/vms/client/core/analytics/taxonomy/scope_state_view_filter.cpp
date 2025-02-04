@@ -26,7 +26,7 @@ ScopeStateViewFilter::ScopeStateViewFilter(
     QStringList ids = {engine ? engine->id() : ""};
 
     for (const nx::Uuid& id: devices)
-        ids.push_back(id.toString());
+        ids.push_back(id.toString(QUuid::WithBraces));
 
     d->id = ids.join(" ");
 }

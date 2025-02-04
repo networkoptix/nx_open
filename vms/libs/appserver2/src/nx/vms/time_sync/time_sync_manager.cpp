@@ -134,7 +134,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
         systemContext()->certificateVerifier()->makeAdapterFunc(
             route.gatewayId.isNull() ? route.id : route.gatewayId, url));
     httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
-    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toStdString());
+    httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toSimpleStdString());
 
     nx::utils::ElapsedTimer rttTimer;
     // With gateway repeat request twice to make sure we have opened tunnel to the target server.

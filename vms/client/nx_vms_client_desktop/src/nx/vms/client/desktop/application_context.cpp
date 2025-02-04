@@ -232,8 +232,8 @@ QString calculateLogNameSuffix(
     if (!startupParams.videoWallGuid.isNull())
     {
         QString result = startupParams.videoWallItemGuid.isNull()
-            ? startupParams.videoWallGuid.toString()
-            : startupParams.videoWallItemGuid.toString();
+            ? startupParams.videoWallGuid.toString(QUuid::WithBraces)
+            : startupParams.videoWallItemGuid.toString(QUuid::WithBraces);
         result.replace(QRegularExpression(QLatin1String("[{}]")), QLatin1String("_"));
         return result;
     }

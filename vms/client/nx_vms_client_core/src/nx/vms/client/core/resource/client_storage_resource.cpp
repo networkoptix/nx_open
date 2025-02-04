@@ -28,7 +28,7 @@ QnClientStorageResourcePtr QnClientStorageResource::newStorage(
         storage->setIdUnsafe(fillID(parentServer->getId(), url));
     }
 
-    storage->setName(nx::Uuid::createUuid().toString());
+    storage->setName(nx::Uuid::createUuid().toSimpleString());
     storage->setUrl(url);
     return storage;
 }

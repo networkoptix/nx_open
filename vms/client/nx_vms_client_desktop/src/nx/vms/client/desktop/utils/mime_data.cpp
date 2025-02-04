@@ -404,7 +404,7 @@ void MimeData::addContextInformation(const WindowContext* context)
     if (!user)
         return;
 
-    setData(kUserIdMimeType, user->getId().toByteArray());
+    setData(kUserIdMimeType, user->getId().toByteArray(QUuid::WithBraces));
 
     if (user->isCloud())
     {

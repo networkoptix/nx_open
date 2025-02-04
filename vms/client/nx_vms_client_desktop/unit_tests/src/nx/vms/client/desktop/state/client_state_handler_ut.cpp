@@ -115,10 +115,10 @@ public:
     virtual void saveState(DelegateState* state, SubstateFlags flags) override
     {
         if (flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
-            state->insert(kIndependentKey, data().independent.toString());
+            state->insert(kIndependentKey, data().independent.toString(QUuid::WithBraces));
 
         if (flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
-            state->insert(kSpecificKey, data().specific.toString());
+            state->insert(kSpecificKey, data().specific.toString(QUuid::WithBraces));
     }
 
 private:
@@ -153,10 +153,10 @@ SessionState makeSessionState(const Session& session, ClientStateDelegate::Subst
         DelegateState substate;
 
         if (flags.testFlag(ClientStateDelegate::Substate::systemIndependentParameters))
-            substate[kIndependentKey] = session.data[i].independent.toString();
+            substate[kIndependentKey] = session.data[i].independent.toString(QUuid::WithBraces);
 
         if (flags.testFlag(ClientStateDelegate::Substate::systemSpecificParameters))
-            substate[kSpecificKey] = session.data[i].specific.toString();
+            substate[kSpecificKey] = session.data[i].specific.toString(QUuid::WithBraces);
 
         result[QString("%1_%2").arg(kDelegateId).arg(i)] = substate;
     }

@@ -193,7 +193,7 @@ QVariant QnLayoutsModelUnsorted::data(const QModelIndex& index, int role) const
             }
 
         case UuidRole:
-            return item.id.isNull() ? QString() : item.id.toString();
+            return item.id.isNull() ? QString() : item.id.toSimpleString();
 
         case ItemTypeRole:
             return static_cast<int>(item.type());

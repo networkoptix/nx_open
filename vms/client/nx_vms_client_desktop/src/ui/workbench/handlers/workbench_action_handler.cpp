@@ -288,7 +288,7 @@ ActionHandler::ActionHandler(QObject *parent) :
             if (const nx::Uuid& engineId = menu()->currentParameters(sender()).resource()->getId();
                 !engineId.isNull())
             {
-                url.setQuery("engineId=" + engineId.toString());
+                url.setQuery("engineId=" + engineId.toString(QUuid::WithBraces));
             }
 
             openSystemAdministrationDialog(QnSystemAdministrationDialog::Analytics, url);

@@ -121,9 +121,9 @@ void VmsServerConnector::connectTo(const SocketAddress& address, DoneCallback on
 
     // Prepare the request headers and send the request.
     HttpHeaders headers;
-    headers.emplace(Qn::SERVER_GUID_HEADER_NAME, m_exitNodeId.toStdString());
+    headers.emplace(Qn::SERVER_GUID_HEADER_NAME, m_exitNodeId.toSimpleStdString());
     if (!m_resourceId.isNull())
-        headers.emplace(Qn::WEB_RESOURCE_ID_HEADER_NAME, m_resourceId.toStdString());
+        headers.emplace(Qn::WEB_RESOURCE_ID_HEADER_NAME, m_resourceId.toSimpleStdString());
 
     m_httpClient->setAdditionalHeaders(headers);
     m_httpClient->doUpgrade(

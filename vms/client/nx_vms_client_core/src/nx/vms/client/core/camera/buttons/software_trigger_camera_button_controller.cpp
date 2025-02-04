@@ -364,7 +364,7 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
     params.insert("event_type",
         nx::reflect::toString(nx::vms::api::EventType::softwareTriggerEvent));
     params.insert("inputPortId", eventParams.inputPortId);
-    params.insert("eventResourceId", q->resource()->getId().toString());
+    params.insert("eventResourceId", q->resource()->getId().toString(QUuid::WithBraces));
     params.insert("caption", eventParams.getTriggerName());
     params.insert("description", eventParams.getTriggerIcon());
 

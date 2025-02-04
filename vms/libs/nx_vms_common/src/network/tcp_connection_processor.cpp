@@ -864,7 +864,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
     {
         d->response.headers.insert(nx::network::http::HttpHeader(
             Qn::SERVER_GUID_HEADER_NAME,
-            peerId().toByteArray()));
+            peerId().toSimpleStdString()));
     }
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );

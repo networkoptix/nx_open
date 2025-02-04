@@ -341,7 +341,7 @@ private:
 
     void addAdditionAttrs( nx::network::http::Request* const request );
     void processTextData(const QByteArray& textData);
-    static QByteArray getGuid();
+    static std::string getGuid();
     void registerRTPChannel(int rtpNum, int rtcpNum, int trackIndex);
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendRequestInternal(nx::network::http::Request&& request);

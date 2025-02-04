@@ -112,6 +112,9 @@ public:
     bool isChronoSerializedAsDouble() const { return m_chronoSerializedAsDouble; }
     void setChronoSerializedAsDouble(bool value) { m_chronoSerializedAsDouble = value; }
 
+    bool serializeUuidWithBraces() const { return m_serializeUuidWithBraces; }
+    void setSerializeUuidWithBraces(bool value) { m_serializeUuidWithBraces = value; }
+
     const std::pair<QString, QString>& getFailedKeyValue() const { return m_failed; }
     void setFailedKeyValue(const std::pair<QString, QString>& failed)
     {
@@ -131,8 +134,11 @@ private:
     bool m_strictMode = false;
     bool m_deserializeReplacesExistingOptional = true;
 
-    // TODO: Make `m_chronoSerializedAsDouble = true` after version 4.0 support is dropped.
+    // TODO: #ekarpov Make `m_chronoSerializedAsDouble = true` after version 4.0 support is dropped.
     bool m_chronoSerializedAsDouble = false;
+
+    // TODO: #ekarpov Make `m_serializeUuidWithBraces = false` after REST v3 support is dropped.
+    bool m_serializeUuidWithBraces = true;
 
     std::pair<QString, QString> m_failed;
     mutable std::unordered_set<std::type_index> m_typeRecursions;

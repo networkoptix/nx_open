@@ -207,7 +207,7 @@ constexpr auto visitAllConversions(Visitor&& visitor)
                 const auto details = record.get<MitmDetails>();
 
                 if (!details->id.isNull())
-                    legacyRecord.addParam("serverId", details->id.toByteArray());
+                    legacyRecord.addParam("serverId", details->id.toSimpleByteArray());
                 if (!details->expectedPem.isEmpty())
                     legacyRecord.addParam("expectedPem", details->expectedPem);
                 if (!details->actualPem.isEmpty())

@@ -383,7 +383,7 @@ bool CameraAdvancedParamsWidget::sendSetCameraParams(const QnCameraAdvancedParam
         return false;
 
     QnCameraAdvancedParamsPostBody body;
-    body.cameraId = d->cameraId.toString();
+    body.cameraId = d->cameraId.toString(QUuid::WithBraces);
     for (const auto& value: values)
         body.paramValues.insert(value.id, value.value);
 

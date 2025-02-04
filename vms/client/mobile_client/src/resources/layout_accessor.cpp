@@ -40,7 +40,7 @@ LayoutAccessor::~LayoutAccessor()
 
 QString LayoutAccessor::layoutId() const
 {
-    return d->layout ? d->layout->getId().toString() : QString();
+    return d->layout ? d->layout->getId().toSimpleString() : QString{};
 }
 
 void LayoutAccessor::setLayoutId(const QString& id)

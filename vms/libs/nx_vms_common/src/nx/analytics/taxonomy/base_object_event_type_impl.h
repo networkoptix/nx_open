@@ -263,7 +263,7 @@ public:
             if (!scope.engineId.isNull())
             {
                 if (Engine* engine =
-                    inOutInternalState->getTypeById<Engine>(scope.engineId.toString()); engine)
+                    inOutInternalState->getTypeById<Engine>(scope.engineId.toString(QUuid::WithBraces)))
                 {
                     taxonomyScope->setEngine(engine);
                 }

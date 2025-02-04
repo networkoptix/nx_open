@@ -28,7 +28,7 @@ struct AuthAllowedUrls
 
     static Key key(const nx::Uuid& systemId, const QString& username)
     {
-        return systemId.toString() + username;
+        return systemId.toString(QUuid::WithBraces) + username;
     }
 };
 

@@ -6,6 +6,7 @@
 #include <string>
 
 #include <nx/reflect/basic_serializer.h>
+#include <nx/reflect/flags.h>
 #include <nx/reflect/type_utils.h>
 
 namespace nx::reflect::urlencoded {
@@ -50,6 +51,9 @@ private:
 struct SerializationContext
 {
     UrlencodedComposer composer;
+    int flags = (int) SerializationFlag::uuidWithBraces;
+
+    bool uuidWithBraces() const { return flags & ((int) SerializationFlag::uuidWithBraces); }
 
     template<typename T>
     int beforeSerialize(const T&) { return -1; /*dummy*/ }

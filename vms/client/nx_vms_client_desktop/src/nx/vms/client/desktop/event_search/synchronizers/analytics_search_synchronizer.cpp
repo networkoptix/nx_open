@@ -467,10 +467,15 @@ void AnalyticsSearchSynchronizer::updateEngineIdFromSettings()
     if (m_analyticsSetup->engine() == engineId)
         return;
 
-    if (system()->taxonomyManager()->currentTaxonomy()->engineById(engineId.toString()))
+    if (system()->taxonomyManager()->currentTaxonomy()->engineById(
+            engineId.toString(QUuid::WithBraces)))
+    {
         m_analyticsSetup->setEngine(engineId);
+    }
     else
+    {
         m_analyticsSetup->setEngine({});
+    }
 }
 
 void AnalyticsSearchSynchronizer::updateFiltersFromSettings()

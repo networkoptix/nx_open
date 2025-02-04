@@ -49,7 +49,7 @@ inline bool fromQVariant(const QVariant& value, nx::Uuid* result)
 
 inline QVariant toQVariant(const nx::Uuid& value)
 {
-    return QVariant::fromValue(value.toString());
+    return QVariant::fromValue(value.toSimpleString());
 }
 
 template<typename T>

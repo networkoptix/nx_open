@@ -6,6 +6,7 @@
 
 #include <QtCore/QCryptographicHash>
 
+#include <nx/reflect/json/deserializer.h>
 #include <nx/utils/log/assert.h>
 
 namespace {
@@ -79,6 +80,13 @@ bool Uuid::isUuidString(const std::string& data)
         || data.size() == 38; //< {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
 }
 
+bool Uuid::isUuidString(const std::string_view& data)
+{
+    return data.empty()
+        || data.size() == 36 //< xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        || data.size() == 38; //< {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+}
+
 const QUuid& Uuid::getQUuid() const
 {
     return m_uuid;
@@ -89,9 +97,9 @@ bool Uuid::isNull() const
     return m_uuid.isNull();
 }
 
-const QByteArray Uuid::toByteArray() const
+const QByteArray Uuid::toByteArray(QUuid::StringFormat format) const
 {
-    return m_uuid.toByteArray();
+    return m_uuid.toByteArray(format);
 }
 
 const QByteArray Uuid::toRfc4122() const
@@ -99,9 +107,9 @@ const QByteArray Uuid::toRfc4122() const
     return m_uuid.toRfc4122();
 }
 
-const QString Uuid::toString() const
+const QString Uuid::toString(QUuid::StringFormat format) const
 {
-    return m_uuid.toString();
+    return m_uuid.toString(format);
 }
 
 QString Uuid::toSimpleString() const
@@ -114,9 +122,9 @@ QByteArray Uuid::toSimpleByteArray() const
     return m_uuid.toByteArray(QUuid::WithoutBraces);
 }
 
-std::string Uuid::toStdString() const
+std::string Uuid::toStdString(QUuid::StringFormat format) const
 {
-    const auto& byteArray = toByteArray();
+    const auto& byteArray = toByteArray(format);
     return std::string(byteArray.constData(), byteArray.size());
 }
 
@@ -253,6 +261,28 @@ QDebug operator<<(QDebug dbg, const Uuid& id)
 QDataStream& operator>>(QDataStream& s, Uuid& id)
 {
     return s >> id.m_uuid;
+}
+
+nx::reflect::DeserializationResult deserialize(
+    const nx::reflect::json::DeserializationContext& context, Uuid* data)
+{
+    if (!context.value.IsString())
+    {
+        return {false,
+            "String value is expected",
+            nx::reflect::json_detail::getStringRepresentation(context.value)};
+    }
+
+    if (!Uuid::isUuidString(
+            std::string_view{context.value.GetString(), (size_t) context.value.GetStringLength()}))
+    {
+        return {
+            false, "Not a UUID", nx::reflect::json_detail::getStringRepresentation(context.value)};
+    }
+
+    *data = Uuid::fromStringSafe(
+        std::string_view{context.value.GetString(), context.value.GetStringLength()});
+    return {};
 }
 
 } // namespace nx

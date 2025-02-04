@@ -76,7 +76,7 @@ bool VideoWallShortcutHelper::createShortcut(const QnVideoWallResourcePtr& video
 
     QStringList arguments;
     arguments << "--videowall";
-    arguments << videowall->getId().toString();
+    arguments << videowall->getId().toString(QUuid::WithBraces);
 
     const nx::utils::Url serverUrl = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
@@ -110,7 +110,7 @@ void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
 {
     NX_ASSERT(!value || serverUrl.isValid(), "Url must be filled when enabling the autorun");
 
-    const QString key = qApp->applicationName() + ' ' + videowallUuid.toString();
+    const QString key = qApp->applicationName() + ' ' + videowallUuid.toString(QUuid::WithBraces);
 
     const QString path = toWindowsRegistryFormat(binaryPath());
     if (path.isEmpty())
@@ -118,7 +118,7 @@ void VideoWallShortcutHelper::setVideoWallAutorunEnabled(
 
     QStringList arguments;
     arguments << "--videowall";
-    arguments << videowallUuid.toString();
+    arguments << videowallUuid.toString(QUuid::WithBraces);
     arguments << "--auth";
     arguments << QString::fromUtf8(serverUrl.toEncoded());
 

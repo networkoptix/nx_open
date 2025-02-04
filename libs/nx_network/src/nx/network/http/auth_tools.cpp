@@ -72,7 +72,7 @@ BearerAuthToken::BearerAuthToken(const std::string_view& token)
 
 VideoWallAuthToken::VideoWallAuthToken(const nx::Uuid& videoWallId)
 {
-    setBearerToken(prefix + videoWallId.toStdString());
+    setBearerToken(prefix + videoWallId.toSimpleStdString());
 }
 
 Credentials::Credentials(

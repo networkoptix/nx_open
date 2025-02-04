@@ -35,10 +35,10 @@ QnForgottenSystemsManager::QnForgottenSystemsManager()
                         });
 
                     if (rawSystem->isOnline() && isCompatible
-                        && (isForgotten(id) || isForgotten(localId.toString())))
+                        && (isForgotten(id) || isForgotten(localId.toString(QUuid::WithBraces))))
                     {
                         rememberSystem(id);
-                        rememberSystem(localId.toString());
+                        rememberSystem(localId.toString(QUuid::WithBraces));
                     }
                 };
 

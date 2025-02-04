@@ -34,9 +34,9 @@ nx::utils::Url QnNetworkProxyFactory::urlToResource(
             nx::utils::Url url(baseUrl);
             QUrlQuery query(url.query());
             if (proxyQueryParameterName.isEmpty())
-                url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
+                url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString(QUuid::WithBraces)).arg(url.path()));
             else
-                query.addQueryItem(proxyQueryParameterName, resource->getId().toString());
+                query.addQueryItem(proxyQueryParameterName, resource->getId().toSimpleString());
 
             url.setQuery(query);
             url.setHost(proxy.hostName());

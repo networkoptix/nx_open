@@ -133,7 +133,7 @@ nx::network::rest::Params QnChunksRequestData::toParams() const
         result.insert(kLocalParam, QString());
     result.insert(kFormatParam, format);
     for (const auto& resource: resList)
-        result.insert(kCameraIdParam, resource->getId().toString());
+        result.insert(kCameraIdParam, resource->getId().toSimpleString());
 
     return result;
 }

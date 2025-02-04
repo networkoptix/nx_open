@@ -91,7 +91,7 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
 {
     auto result = QnMultiserverRequestData::toParams();
 
-    result.insert(kCameraIdParam, request.camera ? request.camera->getId().toString() : QString());
+    result.insert(kCameraIdParam, request.camera ? request.camera->getId().toSimpleString() : QString());
     result.insert(kTimeParam,
         nx::api::CameraImageRequest::isSpecialTimeValue(request.timestampMs)
             ? kLatestTimeValue
@@ -109,7 +109,7 @@ nx::network::rest::Params QnThumbnailRequestData::toParams() const
     result.insert(kRoundMethodParam, nx::reflect::toString(request.roundMethod));
     result.insert(kAspectRatioParam, nx::reflect::toString(request.aspectRatio));
     result.insert(kStreamSelectionModeParam, nx::reflect::toString(request.streamSelectionMode));
-    result.insert(kObjectTrackIdParam, request.objectTrackId.toByteArray());
+    result.insert(kObjectTrackIdParam, request.objectTrackId.toSimpleString());
     return result;
 }
 

@@ -202,7 +202,7 @@ void WindowContext::setCurrentSystem(SystemContext* value)
 QString WindowContext::userId() const
 {
     if (auto user = system()->user())
-        return user->getId().toString();
+        return user->getId().toString(QUuid::WithBraces);
     return QString();
 }
 

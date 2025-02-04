@@ -92,7 +92,8 @@ QString Strings::plugin(common::SystemContext* context, nx::Uuid pluginId)
     if (!taxonomyState)
         return {};
 
-    const AbstractEngine* engineInfo = taxonomyState->engineById(pluginId.toString());
+    const AbstractEngine* engineInfo =
+        taxonomyState->engineById(pluginId.toString(QUuid::WithBraces));
     if (engineInfo)
         return engineInfo->name();
 

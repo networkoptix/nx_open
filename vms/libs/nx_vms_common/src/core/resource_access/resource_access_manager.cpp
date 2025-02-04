@@ -82,7 +82,7 @@ bool verifyDesktopCameraOnLayout(
         return false;
 
     // User can push only own screen (check by uuid).
-    if (!desktopCamera->getPhysicalId().endsWith(subject.user()->getId().toString()))
+    if (!desktopCamera->getPhysicalId().endsWith(subject.user()->getId().toString(QUuid::WithBraces)))
         return false;
 
     // User can push only own screen (check by name).

@@ -123,7 +123,7 @@ void ParametersVisualizationModel::Private::addPluginFilterValue(Items& result)
             if (!analyticsSetup)
                 return {};
 
-            const auto selectedEngineId = analyticsSetup->engine().toString();
+            const auto selectedEngineId = analyticsSetup->engine().toString(QUuid::WithBraces);
             if (selectedEngineId.isEmpty())
                 return {};
 

@@ -46,11 +46,11 @@ nx::Uuid EventParameters::getParamsHash() const
             break;
 
         case EventType::cameraDisconnectEvent:
-            paramKey += '_' + eventResourceId.toByteArray();
+            paramKey += '_' + eventResourceId.toByteArray(QUuid::WithBraces);
             break;
 
         case EventType::networkIssueEvent:
-            paramKey += '_' + eventResourceId.toByteArray();
+            paramKey += '_' + eventResourceId.toByteArray(QUuid::WithBraces);
             paramKey += '_' + QByteArray::number(int(reasonCode));
             break;
 

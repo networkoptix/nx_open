@@ -838,7 +838,7 @@ size_t Engine::processEvent(const EventPtr& event)
             auto cacheKey = event->cacheKey();
             if (!cacheKey.isEmpty())
             {
-                cacheKey += id.toString();
+                cacheKey += id.toSimpleString();
 
                 m_eventCache.rememberEvent(cacheKey);
                 if (m_eventCache.isReportedRecently(cacheKey))

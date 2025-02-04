@@ -54,7 +54,7 @@ DeviceSearchV1::DeviceSearchV1(DeviceSearchV2&& origin):
 void DeviceSearchBase::stripIdToLocal()
 {
     if (!id.isEmpty())
-        id = searchId().toString();
+        id = searchId().toString(QUuid::WithBraces);
 }
 
 QString DeviceSearchV2::targetUrl() const

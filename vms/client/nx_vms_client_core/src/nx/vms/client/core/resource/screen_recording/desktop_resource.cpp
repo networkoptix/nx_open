@@ -87,7 +87,7 @@ AudioLayoutConstPtr DesktopResource::getAudioLayout(
 
 QString DesktopResource::calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId)
 {
-    return moduleId.toString() + userId.toString();
+    return moduleId.toString(QUuid::WithBraces) + userId.toString(QUuid::WithBraces);
 }
 
 } // namespace nx::vms::client::core

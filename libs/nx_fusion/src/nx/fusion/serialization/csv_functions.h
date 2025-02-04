@@ -60,7 +60,7 @@ void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
 
 template<class Output>
 void serialize(const nx::Uuid &value, QnCsvStreamWriter<Output> *stream) {
-    stream->writeUtf8Field(value.toByteArray());
+    stream->writeUtf8Field(value.toByteArray(QUuid::WithBraces));
 }
 
 template<class Output>

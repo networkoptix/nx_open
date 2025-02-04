@@ -407,7 +407,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         pcUuid = nx::Uuid::createUuid();
         appContext()->localSettings()->pcUuid = pcUuid;
     }
-    m_controlMode.pcUuid = pcUuid.toString();
+    m_controlMode.pcUuid = pcUuid.toString(QUuid::WithBraces);
 
     /* Common connections */
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
@@ -785,9 +785,9 @@ void QnWorkbenchVideoWallHandler::openNewWindow(nx::Uuid videoWallId, const QnVi
     QStringList arguments;
     arguments
         << "--videowall"
-        << videoWallId.toString()
+        << videoWallId.toString(QUuid::WithBraces)
         << "--videowall-instance"
-        << item.uuid.toString()
+        << item.uuid.toString(QUuid::WithBraces)
         << "--auth"
         << QnStartupParameters::createAuthenticationString(logonData);
 
@@ -2789,7 +2789,7 @@ void QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged()
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::MotionSelectionChanged);
-    message[uuidKey] = widget->item()->uuid().toString();
+    message[uuidKey] = widget->item()->uuid().toString(QUuid::WithBraces);
     message[valueKey] = QString::fromUtf8(QJson::serialized<MotionSelection>(
         widget->motionSelection()));
     sendMessage(message);
@@ -2805,7 +2805,7 @@ void QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged()
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::MediaDewarpingParamsChanged);
-    message[uuidKey] = widget->item()->uuid().toString();
+    message[uuidKey] = widget->item()->uuid().toString(QUuid::WithBraces);
     message[valueKey] = QString::fromUtf8(QJson::serialized(widget->dewarpingParams()));
     sendMessage(message, /*cached*/ true);
 }
@@ -2866,7 +2866,9 @@ void QnWorkbenchVideoWallHandler::at_workbench_itemChanged(Qn::ItemRole role)
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::ItemRoleChanged);
     message[roleKey] = QString::number(role);
-    message[uuidKey] = workbench()->item(role) ? workbench()->item(role)->uuid().toString() : QString();
+    message[uuidKey] = workbench()->item(role)
+        ? workbench()->item(role)->uuid().toString(QUuid::WithBraces)
+        : QString();
     sendMessage(message);
 }
 
@@ -2878,7 +2880,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
     if (!m_controlMode.active)
         return;
 
-    const auto itemUuid = item->uuid().toString();
+    const auto itemUuid = item->uuid().toString(QUuid::WithBraces);
 
     {
         QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
@@ -2921,7 +2923,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode(QnW
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemRemoved);
-    message[uuidKey] = item->uuid().toString();
+    message[uuidKey] = item->uuid().toString(QUuid::WithBraces);
     sendMessage(message);
 }
 
@@ -2933,8 +2935,8 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkAdded(
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::ZoomLinkAdded);
-    message[uuidKey] = item->uuid().toString();
-    message[zoomUuidKey] = zoomTargetItem->uuid().toString();
+    message[uuidKey] = item->uuid().toString(QUuid::WithBraces);
+    message[zoomUuidKey] = zoomTargetItem->uuid().toString(QUuid::WithBraces);
     sendMessage(message);
     NX_VERBOSE(this, "SENDER: zoom Link added %1 %2", item->uuid(), zoomTargetItem->uuid());
 }
@@ -2947,8 +2949,8 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkRemoved(
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::ZoomLinkRemoved);
-    message[uuidKey] = item->uuid().toString();
-    message[zoomUuidKey] = zoomTargetItem->uuid().toString();
+    message[uuidKey] = item->uuid().toString(QUuid::WithBraces);
+    message[zoomUuidKey] = zoomTargetItem->uuid().toString(QUuid::WithBraces);
     sendMessage(message);
     NX_VERBOSE(this, "SENDER: zoom Link removed %1 %2", item->uuid(), zoomTargetItem->uuid());
 }
@@ -3082,7 +3084,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role)
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemDataChanged);
     message[roleKey] = QString::number(role);
-    message[uuidKey] = item->uuid().toString();
+    message[uuidKey] = item->uuid().toString(QUuid::WithBraces);
     message[valueKey] = QString::fromUtf8(json);
     sendMessage(message, cached);
 }

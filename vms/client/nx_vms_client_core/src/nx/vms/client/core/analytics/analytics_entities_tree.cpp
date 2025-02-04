@@ -65,8 +65,10 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
 
         for (const auto scope: entity->scopes())
         {
-            if (const auto engine = scope->engine(); engine &&
-                (unresolved.engineId.isNull() || engine->id() == unresolved.engineId.toString()))
+            if (const auto engine = scope->engine();
+                engine
+                && (unresolved.engineId.isNull()
+                    || engine->id() == unresolved.engineId.toString(QUuid::WithBraces)))
             {
                 result.push_back(ScopedEntity<EntityType>(engine, scope->group(), entity));
             }

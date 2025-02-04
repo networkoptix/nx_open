@@ -222,7 +222,7 @@ QString deviceId(SubstitutionContext* substitution, common::SystemContext* conte
     if (const auto resource =
             context->resourcePool()->getResourceById(eventSourceId(substitution->event)))
     {
-        return resource->getId().toString();
+        return resource->getId().toString(QUuid::WithBraces);
     }
     return {};
 }

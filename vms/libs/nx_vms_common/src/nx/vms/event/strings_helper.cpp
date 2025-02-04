@@ -385,7 +385,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
         if (taxonomyState)
         {
             const AbstractEngine* engineInfo =
-                taxonomyState->engineById(params.analyticsEngineId.toString());
+                taxonomyState->engineById(params.analyticsEngineId.toString(QUuid::WithBraces));
 
             if (engineInfo)
                 result << tr("Plugin: %1").arg(engineInfo->name());

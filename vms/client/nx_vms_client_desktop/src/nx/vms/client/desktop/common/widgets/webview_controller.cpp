@@ -352,7 +352,8 @@ struct WebViewController::Private: public QObject
         // so do it before setting the url.
         const bool isProxied = resource && !resource->getParentId().isNull();
 
-        root->setProperty(kResourceIdProperty, isProxied ? resource->getId().toString() : "");
+        root->setProperty(
+            kResourceIdProperty, isProxied ? resource->getId().toString(QUuid::WithBraces) : "");
     }
 
     void acceptAuth(const QString& username, const QString& password)

@@ -76,7 +76,8 @@ QString ServerFileCache::getFullPath(const QString &filename) const {
     /* Avoid empty folder name and collisions with our folders such as 'log'. */
     const auto systemId = globalSettings()->localSystemId();
     //NX_ASSERT(!systemId.isNull());
-    QString systemName = '_' + nx::utils::replaceNonFileNameCharacters(systemId.toString(), '_');
+    QString systemName =
+        '_' + nx::utils::replaceNonFileNameCharacters(systemId.toString(QUuid::WithBraces), '_');
 
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     return QDir::toNativeSeparators(QString(lit("%1/cache/%2/%3/%4"))

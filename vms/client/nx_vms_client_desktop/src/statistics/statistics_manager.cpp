@@ -230,8 +230,8 @@ void QnStatisticsManager::saveCurrentStatistics()
         return;
 
     // Appends mandatory metrics
-    metrics.insert(kSessionIdMetricTag, m_sessionId.toString());
-    metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
+    metrics.insert(kSessionIdMetricTag, m_sessionId.toString(QUuid::WithBraces));
+    metrics.insert(kClientMachineIdMetricTag, m_clientId.toString(QUuid::WithBraces));
 
     m_storage->storeMetrics(metrics);
 }

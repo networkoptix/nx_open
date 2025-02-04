@@ -128,7 +128,7 @@ QString QnCameraListModel::layoutId() const
 {
     Q_D(const QnCameraListModel);
     const auto layout = d->model->layout();
-    return layout ? layout->getId().toString() : QString();
+    return layout ? layout->getId().toSimpleString() : QString{};
 }
 
 void QnCameraListModel::setLayoutId(const QString& layoutId)

@@ -17,8 +17,8 @@ nx::Uuid ObjectTrackFacade::id(const Type& data)
         return data.id;
 
     NX_WARNING(NX_SCOPE_TAG, "Object track can't have empty id, generating it from the data.");
-    return nx::Uuid::fromArbitraryData(data.analyticsEngineId.toString()
-        + data.deviceId.toString()
+    return nx::Uuid::fromArbitraryData(data.analyticsEngineId.toSimpleString()
+        + data.deviceId.toSimpleString()
         + QString::number(data.firstAppearanceTimeUs));
 }
 

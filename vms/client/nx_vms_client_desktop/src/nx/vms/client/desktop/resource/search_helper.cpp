@@ -98,7 +98,7 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
         {
             // Check ids by at least 4 character substring match, both with and without braces.
             checkParameter(Parameter::id, camera->getId().toSimpleString(), kIdMatchLength);
-            checkParameter(Parameter::id, camera->getId().toString(), kIdMatchLength);
+            checkParameter(Parameter::id, camera->getId().toString(QUuid::WithBraces), kIdMatchLength);
             checkParameter(Parameter::mac, camera->getMAC().toString());
             checkParameter(Parameter::host, camera->getHostAddress());
             checkParameter(Parameter::model, camera->getModel());

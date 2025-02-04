@@ -36,7 +36,7 @@ QString LicenseIssueEvent::aggregationSubKey() const
 {
     QStringList cameras;
     for (const auto id: m_deviceIds)
-        cameras << id.toString();
+        cameras << id.toString(QUuid::WithBraces);
     cameras.sort();
     return utils::makeKey(cameras);
 }

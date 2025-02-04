@@ -172,7 +172,7 @@ struct UserGroupListModel::Private
             [&]() -> QString
             {
                 if (common::PredefinedUserGroups::contains(groupId))
-                    return groupId.toString();
+                    return groupId.toString(QUuid::WithBraces);
 
                 return QString::number(ldapDefaultKey);
             };

@@ -6,6 +6,7 @@
 
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::json {
 
@@ -106,6 +107,13 @@ struct SerializationContextBase
 
     template<typename T>
     void afterSerialize(const T&, unsigned int) {}
+
+    constexpr bool uuidWithBraces() const { return false; }
+
+    std::string toString(const nx::Uuid& value) const
+    {
+        return value.toStdString(uuidWithBraces() ? QUuid::WithBraces : QUuid::WithoutBraces);
+    }
 };
 
 } // namespace details
