@@ -17,6 +17,7 @@
     #include <fileapi.h>
 #else
     #include <fcntl.h>
+    #include <sys/mman.h>
 #endif
 
 namespace nx::vms::client::desktop {
@@ -68,6 +69,13 @@ struct FileBasedSharedMemory::Private
             {
                 lock();
                 setData({});
+                // Ensure that default constructed data is written to disk because the resize()
+                // caused on-disk data to be zeroed.
+                #if defined(Q_OS_WIN)
+                    NX_ASSERT(FlushViewOfFile(memory, kSharedDataSize));
+                #else
+                    NX_ASSERT(msync(memory, kSharedDataSize, MS_SYNC) == 0);
+                #endif
                 unlock();
             }
         }
