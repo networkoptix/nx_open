@@ -827,6 +827,7 @@ static void registerServerRestHandlers(
         std::make_unique<LogSettingsHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{2-}/servers/{id}/logArchive
+     * %jsonrpc[unused]
      * %caption Get log archive
      * %ingroup Servers
      * %struct LogArchiveFilter
@@ -868,9 +869,10 @@ static void registerServerRestHandlers(
      * %return:{StaticWebContentInfo}
      *     %param[unused] id
      *
-     **%apidoc PUT /rest/v{2-}/servers/{id}/staticWebContent/upload
+     **%apidoc:binary PUT /rest/v{2-}/servers/{id}/staticWebContent/upload
      * Uploads the static web content directly as a binary archive. This request cancels any
      * background download and forcefully sets the uploaded content as the static web content.
+     * %jsonrpc[unused]
      * %caption Upload static web content
      * %ingroup Servers
      * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
@@ -1117,6 +1119,7 @@ static void registerServerRestHandlers(
 
     /**%apidoc GET /rest/v{4-}/servers/{serverId}/qrcode/image
      * Get QR Code image from the Server specified by {serverId}.
+     * %jsonrpc[unused]
      * %caption Get Server QR code image
      * %ingroup Server Data
      * %struct DeploymentCodeRequestData
@@ -1955,6 +1958,7 @@ static void registerDeviceHandlers(
      * if the Bookmark is shared, but must require the password parameter if sharing specifies one.
      * If required and possible, media stream transcoding is performed on-the-fly. Bookmark Media
      * Example can be found here [/ui/bookmark.html](/ui/bookmark.html).
+     * %jsonrpc[unused]
      * %caption Bookmark HTTP Stream
      * %ingroup Device Media
      * %struct BookmarkStreamSettings
@@ -1970,6 +1974,7 @@ static void registerDeviceHandlers(
      * if the Bookmark is shared, but must require the password parameter if sharing specifies one.
      * If required and possible, media stream transcoding is performed on-the-fly. Bookmark Media
      * Example can be found here [/ui/bookmark.html](/ui/bookmark.html).
+     * %jsonrpc[unused]
      * %caption Bookmark HTTP Stream (format)
      * %ingroup Device Media
      * %struct BookmarkStreamSettings
@@ -2123,6 +2128,7 @@ static void registerDeviceHandlers(
 
     /**%apidoc GET /rest/v2/devices/{id}/image
      * Retrieves a thumbnail image from the Device.
+     * %jsonrpc[unused]
      * %caption Get Device thumbnail
      * %ingroup Device Media
      * %struct ThumbnailFilter
@@ -2133,6 +2139,7 @@ static void registerDeviceHandlers(
      *
      **%apidoc GET /rest/v{3-}/devices/{id}/image
      * Retrieves a thumbnail image from the Device.
+     * %jsonrpc[unused]
      * %caption Get Device thumbnail
      * %ingroup Device Media
      * %struct ThumbnailFilter
@@ -2149,6 +2156,7 @@ static void registerDeviceHandlers(
      * Opens an HTTP video stream from the Device. It is not exactly an API function but rather a
      * URL format which may contain any Device id. Live stream and archive can be downloaded. If
      * required and possible, media stream transcoding is performed on-the-fly.
+     * %jsonrpc[unused]
      * %caption Device HTTP Stream
      * %ingroup Device Media
      * %struct MediaStreamSettings
@@ -2161,6 +2169,7 @@ static void registerDeviceHandlers(
      * Opens an HTTP video stream from the Device. It is not exactly an API function but rather a
      * URL format which may contain any Device id. Live stream and archive can be downloaded. If
      * required and possible, media stream transcoding is performed on-the-fly.
+     * %jsonrpc[unused]
      * %caption Device HTTP Stream (format)
      * %ingroup Device Media
      * %struct MediaStreamSettings
@@ -2191,6 +2200,7 @@ static void registerDeviceHandlers(
      * <br/>
      * <code>https://&lt;server_ip&gt;:&lt;port&gt;/webrtc/?camera_id=12AB42FD5912&position=1674240507000000&stream=0&resolutionWhenTranscoding=320x240&resolution=240p&rotation=auto&speed=1.0&deliveryMethod=srtp</code>
      *
+     * %jsonrpc[unused]
      * %caption Open WebRTC Tracker
      * %ingroup Device Media
      * %struct WebRtcTrackerSettings
@@ -2216,11 +2226,12 @@ static void registerDeviceHandlers(
      * The player uses the WebRTC Tracker endpoint under the hood.
      * <code>https://&lt;server_ip&gt;:&lt;port&gt;/webrtc-camera</code>
      *
+     * %jsonrpc[unused]
      * %caption Open WebRTC Tracker
      * %ingroup Device Media
      * %struct WebRtcCameraTrackerSettings
      * %param[ref] _local,_strict,_ticket
-     * %permissions Readm write and save permissions on selected Device.
+     * %permissions Read, write and save permissions on selected Device.
      * %return None.
      */
     reg("rest/v{4-}/devices/:id/webrtc-camera", GlobalPermission::none,
@@ -2724,6 +2735,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * Retrieves the Best Shot image for an Analytics Object Track. The image is returned with its
      * original MIME type - either one of `image/png`, `image/jpeg`, or `image/tiff`.
      *
+     * %jsonrpc[unused]
      * %caption Get Track Best Shot image
      * %ingroup Analytics
      * %param:uuid id Id of the Analytics Object Track.
@@ -2737,6 +2749,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * Retrieves the Best Shot image for an Analytics Object Track. The image is returned with the
      * MIME type corresponding to the specified format.
      *
+     * %jsonrpc[unused]
      * %caption Get Track Best Shot image, fmt
      * %ingroup Analytics
      * %param:uuid id Id of the Analytics Object Track.
@@ -2754,10 +2767,11 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
         GlobalPermission::powerUser,
         std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule, serverConnector));
 
-     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage
+    /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage
      * Retrieves the Title image for an Analytics Object Track. The image is returned with its
      * original MIME type - either one of `image/png`, `image/jpeg`, or `image/tiff`.
      *
+     * %jsonrpc[unused]
      * %caption Get Track Title image
      * %ingroup Analytics
      * %param:uuid id Id of the Analytics Object Track.
@@ -2771,6 +2785,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * Retrieves the Title image for an Analytics Object Track. The image is returned with the MIME
      * type corresponding to the specified format.
      *
+     * %jsonrpc[unused]
      * %caption Get Track Title image, fmt
      * %ingroup Analytics
      * %param:uuid id Id of the Analytics Object Track.
@@ -2914,6 +2929,7 @@ static void registerMiscRestHandlers(
     /**%apidoc:{std::variant<std::vector<Request>, Request>} POST /jsonrpc
      * Allows executing API requests in the JSON RPC format over HTTP. For more information see the
      * JSON-RPC section in the API Information page.
+     * %jsonrpc[unused]
      * %caption JSON-RPC (HTTP)
      * %ingroup Utilities
      * %param[ref] _ticket
@@ -2924,6 +2940,7 @@ static void registerMiscRestHandlers(
      * Allows executing API requests in the JSON RPC format over a WebSocket. For more information
      * see the JSON-RPC section in the API Information page. JSON-RPC WebSocket Example can be
      * found here [/ui/jsonrpc.html](/ui/jsonrpc.html).
+     * %jsonrpc[unused]
      * %caption JSON-RPC (WebSocket)
      * %ingroup Utilities
      * %param[ref] _ticket
@@ -2934,6 +2951,7 @@ static void registerMiscRestHandlers(
      * Allows executing API requests in the JSON RPC format over a WebSocket. For more information
      * see the JSON-RPC section in the API Information page. JSON-RPC WebSocket Example can be found
      * here [/ui/jsonrpc.html](/ui/jsonrpc.html).
+     * %jsonrpc[unused]
      * %caption JSON-RPC (WebSocket options)
      * %ingroup Utilities
      * %param[ref] _ticket

@@ -143,7 +143,7 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.build_requires("apidoctool/3.0" "#d64fbd2e42475cc531b5011fb70c2791")
+        self.build_requires("apidoctool/3.0" "#10fdc5093c8c0b6cc2d8e5ad9f4dd594")
         self.build_requires("qt-host/6.8.2" "#5012ea06550555073e3848021822b33c")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
 

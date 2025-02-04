@@ -21,6 +21,7 @@ void LocalConnectionFactory::registerTransactionBusHandlers(
      * <br/>
      * Refer to the "Transaction Bus" section in the API function tree for the documentation.
      *
+     * %jsonrpc[unused]
      * %caption Transaction Bus (WebSocket)
      * %ingroup Utilities
      * %return A ready-to-use WebSocket connection, read-only as of now.
@@ -41,6 +42,7 @@ void LocalConnectionFactory::registerTransactionBusHandlers(
      * <br/>
      * Refer to the "Transaction Bus" section in the API function tree for the documentation.
      *
+     * %jsonrpc[unused]
      * %caption Transaction Bus (HTTP)
      * %ingroup Utilities
      * %param[opt]:option noInitialData If specified, then the initial database is not sent to a

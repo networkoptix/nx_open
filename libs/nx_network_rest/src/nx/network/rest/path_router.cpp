@@ -90,6 +90,15 @@ Handler* PathRouter::findHandlerOrThrow(Request* request, const QString& pathIgn
     auto result = m_root->findHandler(*request, pathIgnorePrefix);
     if (result.handler)
     {
+        if (request->jsonRpcContext())
+        {
+            const auto& method = request->jsonRpcContext()->request.method;
+            if ((method.ends_with(".subscribe") || method.ends_with(".unsubscribe"))
+                && result.handler->subscriptionId(*request).isEmpty())
+            {
+                return nullptr;
+            }
+        }
         request->setConcreteIdProvided(result.handler->isConcreteIdProvidedInPath(&result));
         result.handler->modifyPathRouteResultOrThrow(&result);
         if (!result.validationPath.isEmpty())

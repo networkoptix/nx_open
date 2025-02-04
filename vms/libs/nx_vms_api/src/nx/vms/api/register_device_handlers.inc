@@ -250,6 +250,7 @@ void registerDeviceBaseHandlers(
 
     /**%apidoc GET /rest/v{4-}/devices/{deviceId}/io
      * Returns current IO states from Device
+     * %jsonrpc subscribe
      * %caption Get IO States
      * %ingroup Devices
      * %struct DeviceIoFilter
@@ -261,6 +262,7 @@ void registerDeviceBaseHandlers(
      *
      **%apidoc GET /rest/v{4-}/devices/%2A/io
      * Returns current IO states from Devices
+     * %jsonrpc subscribe
      * %caption Get IO States
      * %ingroup Devices
      * %struct DeviceIoFilter

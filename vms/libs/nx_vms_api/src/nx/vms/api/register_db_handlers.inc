@@ -96,6 +96,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{4-}/servers
      * Retrieves all Server records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Servers
      * %ingroup Servers
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -118,6 +119,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{4-}/servers/{id}
      * Retrieves the specified Server record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Server
      * %ingroup Servers
      * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
@@ -175,6 +177,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{1-}/servers/{serverId}/storages
      * Retrieves all Storage records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Storages
      * %ingroup Server Data
      * %param:string serverId Server id. Can be obtained from "id" field via
@@ -200,6 +203,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{1-}/servers/{serverId}/storages/{id}
      * Retrieves the specified Storage record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Storage
      * %ingroup Server Data
      * %param:string serverId Server id. Can be obtained from "id" field via
@@ -392,6 +396,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{4-}/devices
      * Retrieves all Device records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Devices
      * %ingroup Devices
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -412,6 +417,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{4-}/devices/{id}
      * Retrieves the specified Device record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Device
      * %ingroup Devices
      * %param:string id Device id (can be obtained from "id", "physicalId" or "logicalId" field via
@@ -532,6 +538,7 @@ void registerRestHandlers(
      *
      * %apidoc GET /rest/v{4-}/devices/%2A/virtual
      * Retrieves a list of virtual Devices.
+     * %jsonrpc subscribe
      * %caption Get Virtual Devices
      * %ingroup Virtual Devices
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -540,6 +547,7 @@ void registerRestHandlers(
      *
      * %apidoc GET /rest/v{4-}/devices/{id}/virtual
      * Retrieves a virtual device by id.
+     * %jsonrpc subscribe
      * %caption Get Virtual Device
      * %ingroup Virtual Devices
      * %param:string id Virtual device id (can be obtained from "id", "physicalId" or "logicalId"
@@ -740,6 +748,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{4-}/users
      * Retrieves all User records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Users
      * %ingroup Users
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -761,6 +770,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{4-}/users/{id}
      * Retrieves the specified User record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get User
      * %ingroup Users
      * %param:string id User id or url-encoded name (can be obtained from "id" or "name" fields via
@@ -818,6 +828,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{1-}/storedFiles
      * Retrieves all Stored File records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Stored Files
      * %ingroup Stored Files
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -826,6 +837,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{1-}/storedFiles/{path}
      * Retrieves the specified Stored File record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Stored File
      * %ingroup Stored Files
      * %param:string path Stored File path (can be obtained from `path` field via
@@ -859,6 +871,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{1-}/licenses
      * Retrieves all License records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Licenses
      * %ingroup Licenses
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -867,6 +880,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{1-}/licenses/{key}
      * Retrieves the specified License record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get License
      * %ingroup Licenses
      * %param:string key License key (existing key can be obtained from "key" field via
@@ -964,6 +978,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{3-}/userGroups
      * Retrieves all User Group records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get User Groups
      * %ingroup User Groups
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -983,6 +998,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{3-}/userGroups/{id}
      * Retrieves the specified User Group record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get User Group
      * %ingroup User Groups
      * %param:uuid id User Group id (can be obtained from "id" field via
@@ -1031,6 +1047,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{1-}/layouts
      * Retrieves all Layout records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Layouts
      * %ingroup Layouts
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -1049,6 +1066,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{1-}/layouts/{id}
      * Retrieves the specified Layout record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Layout
      * %ingroup Layouts
      * %param:string id Layout unique id or logical id.
@@ -1090,6 +1108,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{2-}/layouts/{layoutId}/items
      * Retrieves all Layout Items for the specified Layout record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Layout Items
      * %ingroup Layouts
      * %param:string layoutId Layout unique id or logical id.
@@ -1099,6 +1118,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/layouts/{layoutId}/items/{id}
      * Retrieves the specified Layout Item for the specified Layout record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Layout Item
      * %ingroup Layouts
      * %struct LayoutItemFilter
@@ -1215,6 +1235,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{2-}/showreels
      * Retrieves all Showreel records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Showreels
      * %ingroup Showreels
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -1233,6 +1254,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/showreels/{id}
      * Retrieves the specified Showreel record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Showreel
      * %ingroup Showreels
      * %param:uuid id Showreel unique id.
@@ -1273,6 +1295,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{3-}/lookupLists
      * Retrieves Lookup List records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Lookup List
      * %ingroup Lookup Lists
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -1291,6 +1314,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{3-}/lookupLists/{id}
      * Retrieves the specified Lookup List record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Lookup List
      * %ingroup Lookup Lists
      * %param:uuid id Lookup List unique id.
@@ -1333,6 +1357,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{1-}/videoWalls
      * Retrieves all Video Wall records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Video Walls
      * %ingroup Video Walls
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -1351,6 +1376,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{1-}/videoWalls/{id}
      * Retrieves the specified Video Wall record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Video Wall
      * %ingroup Video Walls
      * %param:uuid id Video Wall unique id.
@@ -1453,6 +1479,7 @@ void registerRestHandlers(
 
     /**%apidoc GET /rest/v{3-}/webPages
      * Retrieves all Web Page records stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Web Pages
      * %ingroup Web Pages
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -1471,6 +1498,7 @@ void registerRestHandlers(
      *
      **%apidoc GET /rest/v{3-}/webPages/{id}
      * Retrieves the specified Web Page record stored in the Site.
+     * %jsonrpc subscribe
      * %caption Get Web Page
      * %ingroup Web Pages
      * %param:uuid id Web Page unique id.
@@ -1551,6 +1579,7 @@ void registerRestHandlers(
      * intended for manual modification. This data is only intended for restoring via
      * `POST /rest/v{2-3}/system/database`.
      *
+     * %jsonrpc[unused]
      * %caption Dump Site database
      * %ingroup Site
      * %param[ref] _language,_strict,_ticket
@@ -1577,6 +1606,7 @@ void registerRestHandlers(
      * intended for manual modification. This data is only intended for restoring via
      * `POST /rest/v{4-}/site/database`.
      *
+     * %jsonrpc[unused]
      * %caption Dump Site database
      * %ingroup Site
      * %param[ref] _language,_strict,_ticket
@@ -1585,6 +1615,7 @@ void registerRestHandlers(
      **%apidoc:binary POST /rest/v{4-}/site/database
      * Loads the Site database (shared among all Servers) from the binary dump provided. The
      * Server will be restarted after loading.
+     * %jsonrpc[unused]
      * %caption Load Site database
      * %ingroup Site
      * %param[ref] _strict,_ticket

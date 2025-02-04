@@ -53,6 +53,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/log
      * Read Event Log from all Servers.
+     * %jsonrpc subscribe
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
@@ -62,6 +63,7 @@ void registerRuleHandlers(
      *
      **%apidoc GET /rest/v{4-}/events/log/{serverId}
      * Read Event Log from single Server.
+     * %jsonrpc subscribe
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
@@ -77,6 +79,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/acknowledges
      * Retrieves notifications to acknowledge for the given user.
+     * %jsonrpc subscribe
      * %caption Notifications to acknowledge
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
@@ -85,6 +88,7 @@ void registerRuleHandlers(
      *
      **%apidoc GET /rest/v{4-}/events/acknowledges/{id}
      * Retrieves notification with the given event ID.
+     * %jsonrpc subscribe
      * %caption Notification to acknowledge
      * %ingroup Events
      * %param:uuid id Event ID.
@@ -197,6 +201,7 @@ void registerRuleHandlers(
      *
      **%apidoc GET /rest/v{4-}/events/rules/{id}
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * %jsonrpc subscribe
      * %caption Get Rule
      * %ingroup Events
      * %param:string id
@@ -206,6 +211,7 @@ void registerRuleHandlers(
      *
      **%apidoc GET /rest/v{4-}/events/rules
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * %jsonrpc subscribe
      * %caption Get all Rules
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with

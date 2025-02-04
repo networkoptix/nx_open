@@ -21,6 +21,7 @@ void registerUtilitiesHandlers(
      * General information about VMS Server API for details). Most of the 3rd party players and
      * libraries (vlc, ffmpeg, live555, etc.) support only standard RTSP, which can be used only
      * for the Users with enabled Basic/Digest authentication.
+     * %jsonrpc[unused]
      * %caption RTSP streaming
      * %ingroup Utilities
      * %param:uuid deviceId Device id (can be obtained from "id", "physicalId" or "logicalId" field
@@ -82,6 +83,7 @@ void registerUtilitiesHandlers(
      * <code>
      * wss://&lt;server_ip&gt;:&lt;port&gt;/api/http_audio?camera_id=2a4717bb-1d3e-4878-a28b-af4eaedbfb89&format=f32le&sample_rate=44100&channels=1
      * </code>
+     * %jsonrpc[unused]
      * %caption Audio backchannel streaming
      * %ingroup Utilities
      * %param:uuid camera_id Device id (can be obtained from "id", "physicalId" or "logicalId" field
@@ -126,6 +128,7 @@ void registerUtilitiesHandlers(
      * https://&lt;server_ip&gt;:&lt;port&gt;/proxy/https/{72934575-ceb7-54bb-23a0-84b81cf1d3f1}/showLog
      * </code>
      * </p>
+     * %jsonrpc[unused]
      * %caption Proxying
      * %ingroup Utilities
      * %param:string protocol
