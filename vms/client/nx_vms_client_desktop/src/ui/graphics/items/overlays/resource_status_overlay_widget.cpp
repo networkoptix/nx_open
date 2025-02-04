@@ -617,6 +617,7 @@ void QnStatusOverlayWidget::updateAreaSizes()
     m_caption->setVisible(showCaption);
     m_postCaptionSpacer->changeSize(1, showCaption ? kPostCaptionSpacing : 0);
     m_button->setVisible(showButton);
+    m_centralContainer->layout()->update();
 
     m_preloaderHolder->setFixedSize(rect.size());
     m_centralHolder->setFixedSize(QSizeF(rect.width(), height));
