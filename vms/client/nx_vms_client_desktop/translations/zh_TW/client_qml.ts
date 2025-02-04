@@ -1042,11 +1042,11 @@
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>摘要式身份認證已棄用並將在下個版本停用，僅應在無法使用預設的 Bearer 身份認證時使用。</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>摘要式身份認證已棄用並將在下個版本停用，僅應在無法使用預設的 Bearer 身份認證時使用。使用者登入名稱只能包含小寫字母。</translation>
     </message>
   </context>
   <context>
