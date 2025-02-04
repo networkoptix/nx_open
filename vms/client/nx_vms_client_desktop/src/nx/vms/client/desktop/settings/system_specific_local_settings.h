@@ -43,7 +43,8 @@ public:
     /** Estimated update delivery date (in msecs since epoch). */
     Property<qint64> updateDeliveryDate{this, "updateDeliveryDate"};
 
-	Property<bool> desktopCameraWasUsedAtPreviousLogin{this, "desktopCameraWasUsedAtPreviousLogin"};
+    Property<bool> desktopCameraWasUsedAtPreviousLogin{this,
+        "desktopCameraWasUsedAtPreviousLogin"};
 
     /** List of muted layout item ids.
      *
@@ -52,6 +53,10 @@ public:
      * the resource pool. This works because even live viewers have access to layout resources
      * for all other users (even though they don't see them in the UI). */
     Property<std::set<nx::Uuid>> mutedItemIds{this, "mutedItemIds"};
+
+    /** Notification of Channel Partner User on a site was closed by user */
+    Property<bool> channelPartnerUserNotificationClosed{this,
+        "channelPartnerUserNotificationClosed"};
 };
 
 } // namespace nx::vms::client::desktop

@@ -29,7 +29,7 @@ static constexpr qsizetype kMaximumResourceInformersLineLimit = 3;
 static constexpr qsizetype kMaximumResourceLineLimit = 1;
 static constexpr char kMultipleResourcesSeparator = ',';
 static constexpr int kTileTitleLineLimit = 2;
-static constexpr int kTileDescriptionLineLimit = 4;
+static constexpr int kTileDescriptionLineLimit = 5;
 } // namespace
 
 using namespace std::chrono;

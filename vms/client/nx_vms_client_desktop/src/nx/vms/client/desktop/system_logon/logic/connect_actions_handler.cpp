@@ -42,6 +42,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
+#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
@@ -49,6 +50,7 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
+#include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
@@ -57,11 +59,13 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
@@ -110,6 +114,8 @@
 using namespace std::chrono;
 using namespace nx::vms::client::core;
 
+namespace nx::vms::client::desktop {
+
 namespace {
 
 static const int kMessagesDelayMs = 5000;
@@ -121,9 +127,18 @@ bool isConnectionToCloud(const LogonData& logonData)
     return logonData.userType == nx::vms::api::UserType::cloud;
 }
 
-} // namespace
+bool userIsChannelPartner(const QnUserResourcePtr& user)
+{
+    return user->attributes().testFlag(nx::vms::api::UserAttribute::hidden);
+}
 
-namespace nx::vms::client::desktop {
+bool systemContainsChannelPartnerUser(nx::vms::client::desktop::SystemContext* system)
+{
+    return system->resourcePool()->contains<UserResource>(
+        [](const UserResourcePtr& user) { return userIsChannelPartner(user); });
+}
+
+} // namespace
 
 QString toString(ConnectActionsHandler::LogicalState state)
 {
@@ -221,6 +236,45 @@ struct ConnectActionsHandler::Private
             if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::Online)
                 reconnectToLastCloudSystemIfNeeded();
         }
+    }
+
+    void showChannelPartnerUserNotification()
+    {
+        if (!q->system()->localSettings()->channelPartnerUserNotificationClosed())
+            return;
+
+        const bool isChannelPartnerUser = userIsChannelPartner(q->system()->user());
+        const auto isPowerUser = q->system()->accessController()->hasPowerUserPermissions();
+        if (isChannelPartnerUser || !isPowerUser)
+            return;
+
+        if (!systemContainsChannelPartnerUser(q->system()))
+            return;
+
+        const auto notificationsManager = q->workbench()->windowContext()->localNotificationsManager();
+        const auto channelPartnerNotificationId = notificationsManager->add(
+            tr("Channel Partner users have access to this site"),
+            tr("Channel Partner users' access is managed at the Organization level, "
+                "and they are not visible in site user management."
+                "<br/><br/><a href=\"%1\">Learn more</a>")
+            //TODO: #dfisenko add link (see VMS-57189)
+            .arg(HelpTopic::relativeUrlForTopic(HelpTopic::Id::ServerSettings_General)),
+            /*cancellable*/ true);
+        notificationsManager->setIconPath(
+            channelPartnerNotificationId, "20x20/Outline/warning.svg");
+        notificationsManager->setLevel(
+            channelPartnerNotificationId, QnNotificationLevel::Value::ImportantNotification);
+        connect(notificationsManager, &workbench::LocalNotificationsManager::cancelRequested,
+            [localSettings = q->system()->localSettings(),
+            notificationsManager,
+            channelPartnerNotificationId](
+                const nx::Uuid& notificationId)
+            {
+                if (notificationId == channelPartnerNotificationId)
+                    notificationsManager->remove(channelPartnerNotificationId);
+
+                localSettings->channelPartnerUserNotificationClosed = true;
+            });
     }
 };
 
@@ -760,6 +814,8 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 integrations::connectionEstablished(
                     system()->user(),
                     system()->messageBusConnection());
+
+                d->showChannelPartnerUserNotification();
 
                 // Reload all dialogs and dependent data.
                 // It's done delayed because some things - for example systemSettings() -
