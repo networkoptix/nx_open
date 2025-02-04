@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <licensing/license_fwd.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/qt_direct_connect.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
@@ -245,6 +246,7 @@ private:
     std::vector<nx::utils::SharedGuardPtr> m_qtSignalGuards;
 
     nx::utils::CachedValue<std::chrono::milliseconds> m_tierGracePeriodExpirationTime;
+    nx::utils::AsyncOperationGuard m_guard;
 };
 
 } // nx::vms::common::saas

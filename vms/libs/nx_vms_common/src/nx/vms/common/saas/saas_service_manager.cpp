@@ -84,10 +84,12 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
     m_tierGracePeriodExpirationTime([this]() { return calculateGracePeriodTime(); })
 {
     connect(
-        resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyChanged,
-        [this](const nx::Uuid& resourceId, const QString& key)
+        resourcePropertyDictionary(),
+        &QnResourcePropertyDictionary::propertyChanged,
+        [this, guard = m_guard.sharedGuard()](const nx::Uuid& resourceId, const QString& key)
         {
-            if (!resourceId.isNull())
+            const auto lock = guard->lock();
+            if (!lock  || !resourceId.isNull())
                 return;
 
             const auto dictionary = resourcePropertyDictionary();
@@ -114,10 +116,12 @@ ServiceManager::ServiceManager(SystemContext* context, QObject* parent):
         });
 
     connect(
-        resourcePropertyDictionary(), &QnResourcePropertyDictionary::propertyRemoved,
-        [this](const nx::Uuid& resourceId, const QString& key)
+        resourcePropertyDictionary(),
+        &QnResourcePropertyDictionary::propertyRemoved,
+        [this, guard = m_guard.sharedGuard()](const nx::Uuid& resourceId, const QString& key)
         {
-            if (!resourceId.isNull())
+            const auto lock = guard->lock();
+            if (!lock  || !resourceId.isNull())
                 return;
 
             if (key == kSaasDataPropertyKey)
