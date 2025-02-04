@@ -384,6 +384,15 @@ signals:
      */
     void resourcesRemoved(const QnResourceList& resources);
 
+    /**
+     * Emitted whenever any resource property is changed.
+     */
+    void propertyChanged(
+        const QnResourcePtr& resource,
+        const QString& key,
+        const QString& prevValue,
+        const QString& newValue);
+
     void resourceChanged(const QnResourcePtr& resource);
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
 
