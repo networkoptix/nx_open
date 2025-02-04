@@ -944,11 +944,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>A nivel do sitio, os membros do grupo teñen permisos para:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>A nivel do sitio, a persoa usuaria ten permisos para:</translation>
     </message>
   </context>
   <context>
@@ -1072,7 +1072,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Existe outro grupo co mesmo nome. Recoméndase asignar nomes únicos aos grupos.</translation>
     </message>
   </context>
   <context>
@@ -1224,7 +1224,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Xestionar Integracións</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1331,7 +1331,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Inicia sesión no sitio para configurar como abrir deseños</translation>
     </message>
   </context>
   <context>
@@ -1401,11 +1401,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Conecta o teu sitio a un servidor LDAP para facilitar a xestión de usuarias/os</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>A importación continua desde o servidor LDAP está desactivada para este sitio. As actualizacións dos grupos e da pertenza de usuarios e grupos realizaranse unicamente mediante a sincronización manual.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>

@@ -6430,7 +6430,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation>前に開始</translation>
+      <translation>前も含める</translation>
     </message>
     <message>
       <source>End</source>
