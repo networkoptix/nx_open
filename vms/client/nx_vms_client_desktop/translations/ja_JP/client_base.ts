@@ -8234,7 +8234,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>システムを %1 に接続できませんでした</translation>
+      <translation>システムを %1 に接続できません</translation>
     </message>
     <message>
       <source>Connect System to %1</source>
