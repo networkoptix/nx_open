@@ -395,6 +395,8 @@ nx::vms::api::BackupSettings BackupSettingsViewWidget::globalBackupSettings() co
 void BackupSettingsViewWidget::loadState(const ServerSettingsDialogState& state)
 {
     m_isCloudBackupStorage = state.backupStoragesStatus.usesCloudBackupStorage;
+    resourceViewWidget()->treeHeaderView()->setSectionHidden(
+        backup_settings_view::ResolutionColumn, !m_isCloudBackupStorage);
 
     const auto storageServicesStatus = state.saasProperties.cloudStorageServicesStatus;
     if (storageServicesStatus.status == nx::vms::api::UseStatus::overUse)
