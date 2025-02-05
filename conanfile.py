@@ -71,7 +71,12 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#b9bb17f3bf3fcf3b1562a0ee030dcdd5"
+    ffmpeg_version_and_revision = "7.0.1#1ae7b4cd56fad2bc08086139420d8c48"
+
+    python_requires = (
+        "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
+        "os_deps_activator/0.1" "#0934b05ff3e186f21b70f84a5420e569",
+    )
 
     def configure(self):
         self.options["vms_help"].customization = "metavms"
@@ -168,7 +173,7 @@ class NxOpenConan(ConanFile):
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#29029859608219dca154603c384f5442")
-        self.requires("qt/6.8.1" "#e01173df8db41583ad916d3b7ea9b0f6")
+        self.requires("qt/6.8.1" "#a56398b3b604ad1fdc1ae9834dfeca82")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
@@ -189,15 +194,15 @@ class NxOpenConan(ConanFile):
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
                 self.requires("cuda-toolkit/12.5.1" "#0272783ab5f85d21ae421dd8366a3296")
-                self.requires("libvpl/2023.4.0" "#5f8cdb7f1df8161cbb957e1f4486d32e")
+                self.requires("libvpl/2023.4.0" "#22d0df9697d26ecbb784e71a2c882e05")
                 self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
-                self.requires("libva/2.22.0" "#80b7709c721fc7f0aa72cb42f5b91e2b")
-                self.requires("intel-media-sdk/19.4" "#9f323b944fa3e04572e9da7134f9ef3e")
-                self.requires("intel-onevpl/23.4.2" "#f16d6aba048c856f7d6e4680090e0a47")
-                self.requires("intel-gmmlib/22.5.2" "#52c5832c9ea9dcc989b58c480de6733a")
+                self.requires("libva/2.22.0" "#c3156ed8aeb0461f978b086681a2aa18")
+                self.requires("intel-media-sdk/19.4" "#a3645f9972ae962e6ec4f426831bffea")
+                self.requires("intel-onevpl/23.4.2" "#f6cce96833acd40bc8e2f0d1759650df")
+                self.requires("intel-gmmlib/22.5.2" "#a9a4be5e7f657758b6300e3b09074628")
                 self.requires("intel-media-driver/23.4.3" "#9f52c4393479e16d22aaa6c6b57ecf99")
                 self.requires("nv-codec-headers/12.1.14.0" "#65e2d80efd67e46fc41f135f2468e3df")
 
@@ -206,7 +211,7 @@ class NxOpenConan(ConanFile):
             if not self.isArm32:
                 self._os_deps_package = "os_deps_for_desktop_linux"
                 self.requires("os_deps_for_desktop_linux/ubuntu_focal"
-                    "#f868663898d0f151c0a02d83969887c4")
+                    "#e89b9e29cdcfa7699fa4810eae291feb")
 
         if self.haveDesktopClient:
             if self.isMacos:
@@ -214,7 +219,7 @@ class NxOpenConan(ConanFile):
             self.requires("pathkit/78de037" "#22007955c2c497d518f7efa9b3a45766")
 
         if self.isWindows or self.isAndroid or (self.isLinux and not self.isArm32):
-            self.requires("openal/ec2ffbfa" "#baf81c7873a6dc2c60d67bb41efd9aa4")
+            self.requires("openal/ec2ffbfa" "#7a3cdb640bc7c4409c25e55161c30d6a")
 
         if self.isWindows:
             self.requires("directx/june2010" "#a0cbbd6a9cfef629fae6d2cf5a18bcdd")
@@ -239,8 +244,8 @@ class NxOpenConan(ConanFile):
     def prepare_pkg_config_files(self):
         if self.isLinux:
             pc_files_dir = Path(self.install_folder) / "os_deps_pkg_config"
-            script = self.deps_user_info[self._os_deps_package].pkg_config_transformer_script
-            self.run(f"{script} -o {pc_files_dir}")
+            self.python_requires["os_deps_activator"].module.activate_pkg_config(
+                self, pc_files_dir=pc_files_dir)
 
     def import_files_from_package(self, package, src, dst, glob):
         if package not in self.deps_cpp_info.deps:

@@ -16,7 +16,6 @@ qt/*:compiler.cppstd=gnu20
 icu/*:data_packaging=library
 libmysqlclient/*:shared=True
 libpq/*:shared=True
-qt/*:os_deps_package=os_deps_for_desktop_linux/ubuntu_focal
 opencv/*:fPIC=True
 opencv/*:with_gtk=False
 opencv/*:with_cufft=False
