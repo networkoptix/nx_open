@@ -524,7 +524,8 @@ void RhiVideoRenderer::uploadFrame(QVideoFrame* videoFrame, QRhiResourceUpdateBa
 
     if (const auto videoBuffer = QVideoFramePrivate::hwBuffer(*videoFrame))
     {
-        if (auto textures = videoBuffer->mapTextures(d->rhi))
+        QVideoFrameTexturesUPtr oldTextures;
+        if (auto textures = videoBuffer->mapTextures(*d->rhi, oldTextures))
         {
             d->textures = std::move(textures);
             if (d->textures->texture(0))

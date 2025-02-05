@@ -126,7 +126,7 @@ public:
     {
     }
 
-    virtual quint64 textureHandle(QRhi*, int plane) const override
+    virtual quint64 textureHandle(QRhi&, int plane) override
     {
         return plane == 0 ? m_textureHolder.textureId() : 0;
     }

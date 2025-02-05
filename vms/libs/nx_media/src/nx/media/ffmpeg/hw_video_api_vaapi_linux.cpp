@@ -377,12 +377,13 @@ public:
     {
     }
 
-    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(QRhi* rhi) override
+    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(
+        QRhi& rhi, QVideoFrameTexturesUPtr& /*oldTextures*/) override
     {
         if (!m_frame->hw_frames_ctx)
             return {};
 
-        auto converter = getTextureConverterForRhi(rhi);
+        auto converter = getTextureConverterForRhi(&rhi);
 
         auto fCtx = (AVHWFramesContext*) m_frame->hw_frames_ctx->data;
 
@@ -451,7 +452,7 @@ public:
         NX_ASSERT(nPlanes == desc->nplanes);
         nPlanes = desc->nplanes;
 
-        rhi->makeThreadLocalNativeContextCurrent();
+        rhi.makeThreadLocalNativeContextCurrent();
 
         QOpenGLFunctions functions(converter->m_glContext);
 

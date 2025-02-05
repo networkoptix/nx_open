@@ -19,7 +19,7 @@ NX_MEDIA_API AVPixelFormat getFormat(const AVFrame* frame);
 
 std::unique_ptr<QRhiTexture> createTextureFromHandle(
     const QVideoFrameFormat& fmt,
-    QRhi* rhi,
+    QRhi& rhi,
     int plane,
     quint64 handle,
     int layout = 0,

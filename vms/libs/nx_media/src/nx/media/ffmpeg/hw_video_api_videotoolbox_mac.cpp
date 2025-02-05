@@ -93,12 +93,13 @@ public:
         CVPixelBufferUnlockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
     }
 
-    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(QRhi* rhi) override
+    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(
+        QRhi& rhi, QVideoFrameTexturesUPtr& /*oldTextures*/) override
     {
         CVPixelBufferRef buffer = (CVPixelBufferRef) m_frame->data[3];
         if (!m_textureSet)
-            m_textureSet = MacTextureMapper::create(buffer, rhi);
-        return m_textureSet->mapTextures(rhi);
+            m_textureSet = MacTextureMapper::create(buffer, &rhi);
+        return m_textureSet->mapTextures(&rhi);
     }
 
     QVideoFrameFormat format() const override

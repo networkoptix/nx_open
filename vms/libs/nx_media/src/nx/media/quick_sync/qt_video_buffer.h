@@ -39,7 +39,7 @@ public:
 
     virtual void unmap() override {}
 
-    virtual quint64 textureHandle(QRhi*, int /*plane*/) const override
+    virtual quint64 textureHandle(QRhi&, int /*plane*/) override
     {
         return reinterpret_cast<quint64>(m_surfaceData.surface);
     }

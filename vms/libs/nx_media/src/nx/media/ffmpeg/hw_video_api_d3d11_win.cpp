@@ -375,7 +375,8 @@ public:
     {
     }
 
-    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(QRhi* rhi) override
+    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(
+        QRhi& rhi, QVideoFrameTexturesUPtr& /*oldTextures*/) override
     {
         const auto fCtx = reinterpret_cast<AVHWFramesContext*>(m_frame->hw_frames_ctx->data);
         const auto ctx = fCtx->device_ctx;
@@ -392,7 +393,7 @@ public:
         if (!avDeviceCtx)
             return {};
 
-        auto converter = getTextureConverterForRhi(rhi);
+        auto converter = getTextureConverterForRhi(&rhi);
 
         const QSize frameSize{m_frame->width, m_frame->height};
         ComPtr<ID3D11Texture2D> output = converter->copyTexture(

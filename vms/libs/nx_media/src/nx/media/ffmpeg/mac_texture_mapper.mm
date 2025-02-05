@@ -295,7 +295,7 @@ void MacTextureSet::createTextures(CVImageBufferRef buffer, QRhi* rhi)
             kCFAllocatorDefault,
             metalCache,
             buffer, nil,
-            rhiTextureFormatToMetalFormat(textureDescription->textureFormat[plane]),
+            rhiTextureFormatToMetalFormat(textureDescription->rhiTextureFormat(plane, rhi)),
             planeWidth, planeHeight,
             plane,
             &m_cvMetalTexture[plane]);
@@ -354,7 +354,7 @@ std::unique_ptr<QVideoFrameTextures> MacTextureSet::mapTextures(QRhi* rhi)
     for (size_t plane = 0; plane < textures->m_textures.size(); ++plane)
     {
         textures->m_textures[plane] = nx::media::createTextureFromHandle(
-            m_format, rhi, plane, m_handles[plane]);
+            m_format, *rhi, plane, m_handles[plane]);
     }
 
     return textures;

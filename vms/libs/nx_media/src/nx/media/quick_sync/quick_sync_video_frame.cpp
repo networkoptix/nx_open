@@ -2,6 +2,7 @@
 
 #include "quick_sync_video_frame.h"
 
+#include <QtGui/rhi/qrhi.h>
 #include <QtMultimedia/private/qvideoframe_p.h>
 
 #include <nx/media/quick_sync/quick_sync_surface.h>
@@ -17,13 +18,17 @@ namespace {
 
 mfxFrameSurface1* getSurface(const nx::media::VideoFramePtr& frame)
 {
+    // None of our video buffers need QRhi to return a texture handle. However the `textureHandle`
+    // method interface requires a reference, so we create a dummy.
+    static std::unique_ptr<QRhi> nullRhi(QRhi::create(QRhi::Null, nullptr));
+
     QHwVideoBuffer* videoBuffer = QVideoFramePrivate::hwBuffer(*frame.get());
 
     NX_ASSERT(dynamic_cast<nx::media::quick_sync::QtVideoBuffer*>(videoBuffer)
         || dynamic_cast<nx::media::quick_sync::MfxQtVideoBuffer*>(videoBuffer));
 
     return reinterpret_cast<mfxFrameSurface1*>(
-        videoBuffer->textureHandle(/*unused*/ nullptr, /*unused*/ 0));
+        videoBuffer->textureHandle(*nullRhi.get(), /*unused*/ 0));
 }
 
 } // namespace

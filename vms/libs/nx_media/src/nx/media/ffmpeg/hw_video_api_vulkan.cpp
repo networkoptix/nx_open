@@ -70,7 +70,8 @@ public:
     {
     }
 
-    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(QRhi* rhi) override
+    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(
+        QRhi& rhi, QVideoFrameTexturesUPtr& /*oldTextures*/) override
     {
         if (!m_frame->hw_frames_ctx)
             return {};

@@ -50,7 +50,7 @@ QVideoFrameFormat::PixelFormat toQtPixelFormat(const AVFrame* frame)
 
 std::unique_ptr<QRhiTexture> createTextureFromHandle(
     const QVideoFrameFormat& fmt,
-    QRhi* rhi,
+    QRhi& rhi,
     int plane,
     quint64 handle,
     int layout,
@@ -72,20 +72,20 @@ std::unique_ptr<QRhiTexture> createTextureFromHandle(
 
     if (pixelFormat == QVideoFrameFormat::Format_SamplerExternalOES)
     {
-        if (nx::build_info::isAndroid() && rhi->backend() == QRhi::OpenGLES2)
+        if (nx::build_info::isAndroid() && rhi.backend() == QRhi::OpenGLES2)
             textureFlags |= QRhiTexture::ExternalOES;
     }
     else if (pixelFormat == QVideoFrameFormat::Format_SamplerRect)
     {
-        if (nx::build_info::isMacOsX() && rhi->backend() == QRhi::OpenGLES2)
+        if (nx::build_info::isMacOsX() && rhi.backend() == QRhi::OpenGLES2)
             textureFlags |= QRhiTexture::TextureRectangleGL;
     }
 
-    if (texDesc->textureFormat[plane] == QRhiTexture::UnknownFormat)
+    if (texDesc->textureFormat[plane] == QVideoTextureHelper::TextureDescription::UnknownFormat)
         return {};
 
     std::unique_ptr<QRhiTexture> tex(
-        rhi->newTexture(texDesc->textureFormat[plane], planeSize, 1, textureFlags));
+        rhi.newTexture(texDesc->rhiTextureFormat(plane, &rhi), planeSize, 1, textureFlags));
 
     if (tex->createFrom({handle, layout}))
         return tex;

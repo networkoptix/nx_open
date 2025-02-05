@@ -144,14 +144,14 @@ class NxOpenConan(ConanFile):
 
     def build_requirements(self):
         self.build_requires("apidoctool/3.0" "#d64fbd2e42475cc531b5011fb70c2791")
-        self.build_requires("qt-host/6.8.1" "#85e70e412be85fa75148b0c341cd78fb")
+        self.build_requires("qt-host/6.8.2" "#5012ea06550555073e3848021822b33c")
         self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
 
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
                 self.build_requires("clang/18.1.6" "#701e83b53a73cea5282566e4190fc859")
-            self.build_requires("sdk-gcc/7.5" "#8043121c286249d893120d712317d3d3")
+            self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
 
         if self.isWindows:
             self.build_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
@@ -173,7 +173,7 @@ class NxOpenConan(ConanFile):
         self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#29029859608219dca154603c384f5442")
-        self.requires("qt/6.8.1" "#a56398b3b604ad1fdc1ae9834dfeca82")
+        self.requires("qt/6.8.2" "#d7777ba7dad7e6773e924b41162f67ba")
         self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
         self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
         self.requires("concurrentqueue/1.0.4" "#957c470e9abc81ff3850bbe39fc11135")
