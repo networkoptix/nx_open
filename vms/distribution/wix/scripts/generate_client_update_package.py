@@ -152,7 +152,7 @@ def create_client_update_file(config, output_file):
         tools.zip_all_files(zip, config['help_directory'])
         tools.zip_all_files(zip, os.path.join(config['ucrt_directory'], 'bin'))
         tools.zip_all_files(zip, os.path.join(config['vcrt_directory'], 'bin'))
-        tools.zip_all_files(zip, os.path.join(config['fonts_directory'], 'bin'))
+        tools.zip_files_to(zip, tools.find_all_files(config['fonts_directory']), binaries_dir)
 
         zip.write(os.path.join(binaries_dir, 'client_external.dat'), 'client_external.dat')
         zip.write(os.path.join(binaries_dir, 'client_core_external.dat'), 'client_core_external.dat')
