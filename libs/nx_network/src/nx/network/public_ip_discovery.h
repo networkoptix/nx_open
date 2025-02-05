@@ -56,7 +56,7 @@ private:
     void setStage(Stage value);
 
     QHostAddress m_publicIP;
-    Stage m_stage;
+    std::atomic<Stage> m_stage;
     QStringList m_primaryUrls;
     QStringList m_secondaryUrls;
     mutable nx::Mutex m_mutex;
