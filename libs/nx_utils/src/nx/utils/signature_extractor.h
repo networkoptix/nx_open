@@ -60,7 +60,7 @@ template<typename functor, std::size_t n>
 struct FunctionArgumentType<
     functor,
     n,
-    typename std::conditional<false, decltype(& functor::operator ()), void>::type
+    std::void_t<decltype(&functor::operator())>
 >
 : FunctionArgumentType<decltype(& functor::operator ()), n>
 {

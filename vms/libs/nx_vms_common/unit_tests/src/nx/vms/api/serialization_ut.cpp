@@ -141,7 +141,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .forceLiveCacheForPrimaryStream = QString{"auto"},
     .frameOptionsHeader = QString{"SAMEORIGIN"},
     .insecureDeprecatedApiEnabled = false,
-    .insecureDeprecatedApiInUseEnabled = false,
+    .insecureDeprecatedApiInUseEnabled = true,
     .installedPersistentUpdateStorage = PersistentUpdateStorage{},
     .installedUpdateInformation = QByteArray{},
     .keepIoPortStateIntactOnInitialization = false,

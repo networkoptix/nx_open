@@ -9,6 +9,13 @@
 namespace nx {
 namespace utils {
 
+template <typename L, typename R, typename = void>
+struct IsComparable: std::false_type {};
+
+template <typename L, typename R>
+struct IsComparable<L, R,
+    std::void_t<decltype(std::declval<L>() == std::declval<R>())>> : std::true_type {};
+
 template<typename ForwardIt, typename T>
 ForwardIt binary_find(ForwardIt first, ForwardIt last, const T& value)
 {
@@ -318,6 +325,26 @@ template <typename T, typename Allocator>
 {
     unique_sort(items);
     return items;
+}
+
+template<typename Container, typename UnaryPred,
+    typename = std::enable_if_t<std::is_invocable_v<UnaryPred, typename Container::value_type>>>
+[[nodiscard]] bool any_of(const Container &c, UnaryPred &&p)
+{
+    return std::any_of(c.cbegin(), c.cend(), std::forward<UnaryPred>(p));
+}
+
+template<typename Container, typename T,
+    typename = std::enable_if_t<IsComparable<typename Container::value_type, T>::value>>
+[[nodiscard]] bool any_of(const Container &c, const T& v)
+{
+    return std::any_of(c.cbegin(), c.cend(), [&v](const auto& e) { return v == e; });
+}
+
+template <typename T>
+[[nodiscard]] bool any_of(const std::initializer_list<T>& list, const T& v)
+{
+    return std::any_of(list.begin(), list.end(), [&v](const T& e) { return v == e; });
 }
 
 } // namespace utils
