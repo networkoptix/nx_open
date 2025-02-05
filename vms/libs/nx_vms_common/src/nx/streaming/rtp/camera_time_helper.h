@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/timestamp_adjustment_history.h>
 
 namespace nx::streaming::rtp {
@@ -55,6 +56,7 @@ public:
     void setTimePolicy(TimePolicy policy);
     void resetBadCameraTimeState();
     void reset();
+    void stopWaitingSenderReport();
 
     std::chrono::microseconds replayAdjustmentFromHistory(
         std::chrono::microseconds cameraTimestamp);
@@ -66,6 +68,7 @@ private:
     const std::chrono::milliseconds m_streamsSyncThreshold;
     const std::chrono::milliseconds m_forceCameraTimeThreshold;
     const std::chrono::milliseconds m_maxExpectedMetadataDelay;
+    nx::utils::ElapsedTimer m_waitSenderReportTimer; //< need to wait Sender Report before sending BadCameraTime event
     const std::string m_resourceId;
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
     bool m_badCameraTimeState = false;

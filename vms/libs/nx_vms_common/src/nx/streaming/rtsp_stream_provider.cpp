@@ -322,7 +322,11 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
 
             nx::rtp::RtcpSenderReport rtcpReport;
             if (!m_ignoreRtcpReports && track.ioDevice)
+            {
                 rtcpReport = track.ioDevice->getSenderReport();
+                if (rtcpReport.ntpTimestamp != 0)
+                    track.timeHelper->stopWaitingSenderReport();
+            }
 
             QnAbstractMediaDataPtr result = parser->nextData(rtcpReport);
             if (!result)

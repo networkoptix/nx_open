@@ -14,6 +14,7 @@ using namespace std::chrono;
 namespace {
 
 constexpr auto kMaxAdjustmentHistoryRecordAge = 30s;
+constexpr auto kWaitSenderReportThreshold = 20s;
 
 } // namespace
 
@@ -25,7 +26,9 @@ CameraTimeHelper::CameraTimeHelper(const std::string& resourceId, const TimeOffs
     m_maxExpectedMetadataDelay(milliseconds(nxStreamingIni().maxExpectedMetadataDelayMs)),
     m_resourceId(resourceId),
     m_adjustmentHistory(kMaxAdjustmentHistoryRecordAge)
-{}
+{
+    m_waitSenderReportTimer.restart();
+}
 
 void CameraTimeHelper::setTimePolicy(TimePolicy policy)
 {
@@ -41,6 +44,11 @@ void CameraTimeHelper::reset()
 {
     m_localOffset.initialized = false;
     m_adjustmentHistory.reset();
+}
+
+void CameraTimeHelper::stopWaitingSenderReport()
+{
+    m_waitSenderReportTimer.invalidate();
 }
 
 std::chrono::microseconds CameraTimeHelper::replayAdjustmentFromHistory(
@@ -98,7 +106,7 @@ microseconds CameraTimeHelper::getTime(
                 m_adjustmentHistory.record(cameraTime, 0us);
             return cameraTime;
         }
-        else if (!m_badCameraTimeState)
+        else if (!m_badCameraTimeState && m_waitSenderReportTimer.hasExpired(kWaitSenderReportThreshold))
         {
             NX_DEBUG(this,
                 "ResourceId: %1, camera time is not accurate: %2ms, system time: %3ms"
