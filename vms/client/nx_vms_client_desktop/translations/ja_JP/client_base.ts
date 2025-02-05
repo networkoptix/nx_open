@@ -8070,7 +8070,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>システムを %1 に接続できませんでした</translation>
+      <translation>システムを %1 に接続できません</translation>
     </message>
     <message>
       <source>Connect System to %1</source>
