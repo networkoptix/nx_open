@@ -199,6 +199,10 @@ void LayoutBackgroundSettingsWidget::initCache(SystemContext* systemContext, boo
         ? systemContext->localFileCache()
         : systemContext->serverImageCache();
 
+    // Cross-site and CSL contexts have no file caches.
+    if (!d->cache)
+        return;
+
     connect(
         d->cache,
         &ServerFileCache::fileDownloaded,
