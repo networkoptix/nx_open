@@ -95,6 +95,37 @@ void QnAbstractArchiveStreamReader::addMediaFilter(const std::shared_ptr<Abstrac
     m_filters.push_back(filter);
 }
 
+void QnAbstractArchiveStreamReader::resetRealtimeDelay()
+{
+    m_sendTimeBaseUs = -1;
+}
+
+std::chrono::milliseconds QnAbstractArchiveStreamReader::getDelay(int64_t timestamp)
+{
+    if (!m_realTimeSpeed.has_value())
+        return std::chrono::milliseconds();
+
+    if (m_sendTimeBaseUs == -1)
+    {
+        m_timer.restart();
+        m_sendTimeBaseUs = timestamp;
+        return std::chrono::milliseconds();
+    }
+
+    const int64_t dtUs = (timestamp - m_sendTimeBaseUs) / *m_realTimeSpeed;
+    const auto sleepTime = std::chrono::milliseconds(dtUs / 1000) - m_timer.elapsed();
+    if (sleepTime > MAX_FRAME_DURATION)
+    {
+        m_timer.restart();
+        m_sendTimeBaseUs = timestamp;
+        return std::chrono::milliseconds(); //< Ignore archive gaps.
+    }
+    if (sleepTime.count() > 0)
+        return sleepTime;
+
+    return std::chrono::milliseconds();
+}
+
 void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
@@ -109,7 +140,6 @@ void QnAbstractArchiveStreamReader::run()
             break;
 
         // check queue sizes
-
         if (!dataCanBeAccepted())
         {
             emit waitForDataCanBeAccepted();
@@ -118,6 +148,19 @@ void QnAbstractArchiveStreamReader::run()
         }
 
         QnAbstractMediaDataPtr data = getNextData();
+
+        if (m_realTimeSpeed.has_value())
+        {
+            auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
+            if (mediaRes && !mediaRes->hasVideo(this) && data->dataType == QnAbstractMediaData::AUDIO)
+                std::this_thread::sleep_for(getDelay(data->timestamp));
+            else if (data->dataType == QnAbstractMediaData::VIDEO)
+            {
+                auto d = getDelay(data->timestamp);
+                NX_ERROR(this, "delay: %1, speed: %2, data->timestamp: %3, m_sendTimeBaseUs - %4", d, *m_realTimeSpeed, data->timestamp, m_sendTimeBaseUs);
+                std::this_thread::sleep_for(d);
+            }
+        }
 
         if (data)
         {

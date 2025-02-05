@@ -6,6 +6,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/abstract_navigator.h>
 #include <nx/string.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/move_only_func.h>
 
 struct QnTimePeriod;
@@ -112,7 +113,11 @@ public:
     virtual std::chrono::microseconds currentTime() const = 0;
 
     virtual bool jumpToEx(qint64 mksec, qint64 skipTime, bool bindPositionToPlaybackMask, qint64* outJumpTime, bool useDelegate = true) = 0;
+
+    void setRealtimeSpeed(float value) { m_realTimeSpeed = value; }
+
 protected:
+    void resetRealtimeDelay();
 
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:
@@ -133,7 +138,15 @@ protected:
     QnAbstractArchiveDelegate* m_delegate = nullptr;
     QnAbstractNavigator* m_navDelegate = nullptr;
     nx::utils::MoveOnlyFunc<void()> m_noDataHandler;
+
 private:
+    std::chrono::milliseconds getDelay(int64_t timestamp);
+private:
+    // For realtime delay.
+    std::optional<float> m_realTimeSpeed{};
+    nx::utils::ElapsedTimer m_timer; //< Timer for realtime playback delay.
+    int64_t m_sendTimeBaseUs = -1;
+
     bool m_enabled = true;
     std::vector<std::shared_ptr<AbstractMediaDataFilter>> m_filters;
 };

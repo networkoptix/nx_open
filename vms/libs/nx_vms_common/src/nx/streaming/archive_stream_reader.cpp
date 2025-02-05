@@ -144,7 +144,7 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
 
 void QnArchiveStreamReader::resumeMedia()
 {
-
+    resetRealtimeDelay();
     if (m_navDelegate) {
         m_navDelegate->resumeMedia();
         return;
@@ -1249,6 +1249,7 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 {
+    resetRealtimeDelay();
     return jumpToEx(mksec, skipTime, true, nullptr);
 }
 
