@@ -312,6 +312,7 @@ void AioThread::stopMonitoringInternal(Pollable* sock, aio::EventType eventType)
     if (inAIOThread)
     {
         // Removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack).
+        NX_MUTEX_LOCKER lock(&m_mutex);
         m_taskQueue->removeSocketFromPollSet(sock, eventType);
         return;
     }
