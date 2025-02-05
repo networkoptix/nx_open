@@ -144,10 +144,18 @@ void LogsManagementWidget::setupUi()
             for (int i = 0; i < model->rowCount(); ++i)
             {
                 auto index = ui->unitsTable->model()->index(i, LogsManagementModel::StatusColumn);
-                if (model->data(index, LogsManagementModel::DownloadingRole).toBool())
-                    ui->unitsTable->openPersistentEditor(index);
-                else
-                    ui->unitsTable->closePersistentEditor(index);
+                ui->unitsTable->openPersistentEditor(index);
+            }
+        };
+
+    auto closeEditors =
+        [this]()
+        {
+            auto model = ui->unitsTable->model();
+            for (int i = 0; i < model->rowCount(); ++i)
+            {
+                auto index = ui->unitsTable->model()->index(i, LogsManagementModel::StatusColumn);
+                ui->unitsTable->closePersistentEditor(index);
             }
         };
 
@@ -244,9 +252,10 @@ void LogsManagementWidget::setupUi()
         });
 
     connect(ui->unitsTable->model(), &QAbstractTableModel::dataChanged,
-        [this](const QModelIndex& topLeft, const QModelIndex& bottomRight,
+        [this, closeEditors](const QModelIndex& topLeft, const QModelIndex& bottomRight,
             const QList<int>& )
         {
+            closeEditors();
             addTableWidgets(topLeft, bottomRight);
             update();
         });

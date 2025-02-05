@@ -27,10 +27,10 @@ static constexpr qreal kOpacityForDisabledCheckbox = 0.3;
 class LogsManagementTableDelegate::LogsManagementLoadingIndicator: public QLabel
 {
 public:
-    LogsManagementLoadingIndicator(const LogsManagementTableDelegate* owner, QWidget* parent):
-        QLabel(parent), m_owner(owner)
+    LogsManagementLoadingIndicator(const LogsManagementTableDelegate* owner, QWidget* parent, QModelIndex index):
+        QLabel(parent), m_owner(owner), m_index(index)
     {
-        setFixedSize(nx::vms::client::core::kIconSize);
+        setFixedSize(core::kIconSize);
         setScaledContents(true);
         connect(owner->m_loadingIndicator.data(),
             &LoadingIndicator::frameChanged,
@@ -40,9 +40,14 @@ public:
 
     void updateFrame(const QPixmap& /*pixmap*/)
     {
-        setPixmap(m_owner->m_loadingIndicator->currentPixmap());
+        if (m_index.data(LogsManagementModel::DownloadingRole).toBool())
+            setPixmap(m_owner->m_loadingIndicator->currentPixmap());
+        else
+            setPixmap(m_index.data(Qt::DecorationRole).value<QIcon>().pixmap(core::kIconSize));
     }
+
     const LogsManagementTableDelegate* m_owner;
+    const QModelIndex m_index;
 };
 
 using Model = LogsManagementModel;
@@ -71,6 +76,9 @@ void LogsManagementTableDelegate::paint(
 
         case Model::LogLevelColumn:
             paintLogLevelColumn(painter, styleOption, index);
+            break;
+
+        case Model::StatusColumn:
             break;
 
         default:
@@ -236,7 +244,7 @@ void LogsManagementTableDelegate::paintCheckBoxColumn(
 QWidget* LogsManagementTableDelegate::createEditor(
     QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    return new LogsManagementLoadingIndicator(this, parent);
+    return new LogsManagementLoadingIndicator(this, parent, index);
 }
 
 void LogsManagementTableDelegate::drawText(const QModelIndex& index,
