@@ -124,7 +124,7 @@ def create_mobile_client_archive(config, output_file):
 
         tools.zip_all_files(zip, Path(config['ucrt_directory']) / 'bin')
         tools.zip_all_files(zip, Path(config['vcrt_directory']) / 'bin')
-        tools.zip_all_files(zip, Path(config['fonts_directory']) / 'bin')
+        tools.zip_files_to(zip, tools.find_all_files(config['fonts_directory']), binaries_dir)
 
         zip.write(binaries_dir / 'client_core_external.dat', 'client_core_external.dat')
         zip.write(binaries_dir / 'bytedance_iconpark.dat', 'bytedance_iconpark.dat')
