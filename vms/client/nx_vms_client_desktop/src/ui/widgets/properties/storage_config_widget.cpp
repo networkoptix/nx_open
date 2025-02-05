@@ -1599,8 +1599,10 @@ void QnStorageConfigWidget::updateRebuildUi(
     }
     else
     {
+        const auto cloudStorage = m_model->cloudBackupStorage();
+        const bool cloudStorageIsUsed = cloudStorage && cloudStorage->isUsed;
         ui->rebuildBackupWidget->loadData(reply, true);
-        ui->rebuildBackupButton->setEnabled(canStartRebuild);
+        ui->rebuildBackupButton->setEnabled(canStartRebuild && !cloudStorageIsUsed);
         ui->rebuildBackupButton->setVisible(reply.state == nx::vms::api::RebuildState::none);
     }
 }
