@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <utility>
 
@@ -74,7 +75,7 @@ public:
 
 protected:
     T m_val;
-    mutable bool m_accessed = false;
+    mutable std::atomic<bool> m_accessed = false;
 };
 
 } // namespace detail
