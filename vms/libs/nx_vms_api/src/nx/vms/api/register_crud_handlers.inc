@@ -2606,6 +2606,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct AnalyticsDeviceSettings
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{AnalyticsDeviceSettings}
      *
@@ -2615,6 +2616,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct AnalyticsDeviceSettings
      * %param[ref] _format,_language,_strict,_ticket
+     * %param[ref] _local
      * %permissions Power User.
      * %return:{AnalyticsDeviceSettings}
      */
