@@ -362,7 +362,7 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
         "[Feature] Enables Objects search on Cross System Layouts.");
 
     // VMS-41660
-    NX_INI_FLAG(false, foldersForLayoutsInResourceTree,
+    NX_INI_FLAG(true, foldersForLayoutsInResourceTree,
         "[Feature] Enables folders for layouts in the Resource Tree.");
 
     NX_INI_FLAG(true, perItemMute,
