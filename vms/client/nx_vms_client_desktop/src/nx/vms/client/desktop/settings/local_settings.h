@@ -55,7 +55,7 @@ public:
         "Whether hardware video decoding is used, if available."};
     Property<int> maxIntelHardwareDecoders{this, "maxIntelHardwareDecoders", 8,
         "Maximum number of hardware decoders for Intel QS."};
-    Property<int> maxNVidiaHardwareDecoders{ this, "maxNVidiaHardwareDecoders", 64,
+    Property<int> maxNVidiaHardwareDecoders{ this, "maxNVidiaHardwareDecoders", 16,
         "Maximum number of hardware decoders for NVidia." };
 
     Property<QString> locale{this, "locale", nx::branding::defaultLocale()};
