@@ -417,7 +417,6 @@ core::ImageProvider* EventTile::imageProvider() const
     return ui->imagePreviewWidget->imageProvider();
 }
 
-
 void EventTile::setImageProvider(core::ImageProvider* value, bool forceUpdate)
 {
     if (imageProvider() == value && !forceUpdate)

@@ -170,9 +170,6 @@ void CameraThumbnailProvider::doLoadAsync()
         return;
     }
 
-    if (tryLoad())
-        return;
-
     const bool isLiveRequest =
         nx::api::CameraImageRequest::isSpecialTimeValue(m_request.timestampMs);
 
