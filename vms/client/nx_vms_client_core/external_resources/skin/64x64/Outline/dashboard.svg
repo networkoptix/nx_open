@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" fill="none" viewBox="0 0 72 72">
+  <g class="64x64/Outline/dashboard">
+    <path fill="#53707F" fill-rule="evenodd" d="M61 11H40v16h21V11ZM40 9a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h21a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2H40Zm-29 2h21v26H11V11Zm-2 0a2 2 0 0 1 2-2h21a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V11Zm31 24h21v26H40V35Zm-2 0a2 2 0 0 1 2-2h21a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2H40a2 2 0 0 1-2-2V35ZM11 45h21v16H11V45Zm-2 0a2 2 0 0 1 2-2h21a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V45Z" class="Primary" clip-rule="evenodd"/>
+  </g>
+</svg>
