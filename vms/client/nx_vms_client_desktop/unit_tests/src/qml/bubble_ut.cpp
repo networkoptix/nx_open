@@ -162,6 +162,23 @@ TEST_F(BubbleTest, automaticEdgeSelection)
     ASSERT_TRUE(result.has_value());
     ASSERT_EQ(result->pointerEdge, Qt::LeftEdge);
 
+    // When the bubble doesn't fit both left and right side, the side with more space is preferred.
+    calculateParameters(&result,
+        Qt::Horizontal,
+        /*targetRect*/ QRectF(100, 100, 50, 100),
+        /*enclosingRect*/ QRectF(0, 0, 300, 400));
+
+    ASSERT_TRUE(result.has_value());
+    ASSERT_EQ(result->pointerEdge, Qt::LeftEdge);
+
+    calculateParameters(&result,
+        Qt::Horizontal,
+        /*targetRect*/ QRectF(200, 100, 50, 100),
+        /*enclosingRect*/ QRectF(0, 0, 300, 400));
+
+    ASSERT_TRUE(result.has_value());
+    ASSERT_EQ(result->pointerEdge, Qt::RightEdge);
+
     setSize(100, 100, Qt::Vertical);
 
     // Fits only the top side.
@@ -284,7 +301,7 @@ TEST_F(BubbleTest, bubbleDoesntFit)
         /*targetRect*/ QRectF(50, 100, 350, 100),
         /*enclosingRect*/ QRectF(0, 0, 400, 400));
 
-    ASSERT_FALSE(result.has_value());
+    ASSERT_TRUE(result.has_value());
 
     // Horizontal bubble doesn't fit vertically.
     calculateParameters(&result,

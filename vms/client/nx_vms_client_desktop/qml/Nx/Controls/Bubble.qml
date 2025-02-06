@@ -443,11 +443,10 @@ Item
             const rightSpace = enclosingRect.right - targetRect.right
             const leftSpace = targetRect.left - enclosingRect.left
 
-            // If the bubble doesn't fit horizontally...
-            if (Math.max(rightSpace, leftSpace) < requiredWidth)
-                return undefined
+            const selectedEdge = requiredWidth <= rightSpace
+                ? Qt.LeftEdge
+                : rightSpace >= leftSpace ? Qt.LeftEdge : Qt.RightEdge
 
-            const selectedEdge = requiredWidth <= rightSpace ? Qt.LeftEdge : Qt.RightEdge
             const leftShift = bubble.containDecorationsInside ? control.leftInset : 0
 
             const bubbleX = selectedEdge === Qt.LeftEdge

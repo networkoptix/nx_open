@@ -188,6 +188,7 @@ BubbleToolTip* CameraHotspotItem::Private::createTooltip() const
     {
         const auto tooltip = new BubbleToolTip(q->windowContext());
         tooltip->setTooltipOffset(kTooltipOffset);
+        tooltip->setEnclosingRect(q->scene()->views().first()->window()->geometry());
         tooltip->setText(tooltipText());
         tooltip->setTarget(tooltipGlobalPos());
         return tooltip;
