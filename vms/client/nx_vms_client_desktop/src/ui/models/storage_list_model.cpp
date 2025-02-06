@@ -301,9 +301,6 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 return QString();
             }
 
-            if (isCloudBackupStorage(storageData))
-                return QString();
-
             return toString(storageData.archiveMode);
         }
 
