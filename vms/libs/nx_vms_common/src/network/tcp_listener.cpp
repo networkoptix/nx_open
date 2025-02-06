@@ -105,7 +105,10 @@ QnTcpListener::~QnTcpListener()
 void QnTcpListener::stop()
 {
     Q_D(QnTcpListener);
-    d->isStopped = true;
+    {
+        NX_MUTEX_LOCKER lock(&d->connectionMtx);
+        d->isStopped = true;
+    }
     QnLongRunnable::stop();
 }
 
@@ -389,20 +392,24 @@ void QnTcpListener::run()
 void QnTcpListener::processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
 {
     Q_D(QnTcpListener);
+
+    int connectionCount = 0;
     {
         NX_MUTEX_LOCKER lock(&d->connectionMtx);
         if (d->isStopped)
             return;
+
+        connectionCount = d->connections.size();
     }
 
-    if (d->connections.size() > d->maxConnections)
+    if (connectionCount > d->maxConnections)
     {
         if (!d->ddosWarned)
         {
             NX_WARNING(this,
                 "Amount of TCP connections reached %1 of %2. Possible ddos attack!"
                 " Reject %3 from %4",
-                d->connections.size(), d->maxConnections, socket, socket->getForeignAddress());
+                connectionCount, d->maxConnections, socket, socket->getForeignAddress());
             d->ddosWarned = true;
         }
         return;
