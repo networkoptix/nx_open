@@ -72,7 +72,7 @@
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Språk för aviseringar</translation>
     </message>
   </context>
   <context>
@@ -123,23 +123,23 @@
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Offline klientuppdateringar</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Offlineuppdateringar är aktiverade och filer lagras på servrar.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Aktivera detta alternativ kommer att aktivera nedladdning av ytterligare filer till servrar som kan användas för att uppdatera anslutande klienter även utan internetåtkomst.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Detta kommer att ta bort alla uppdateringsfiler på servrar.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Fortsätt ändå?</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -168,7 +168,7 @@
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Välj / Avmarkera alla</translation>
     </message>
   </context>
   <context>
@@ -230,11 +230,11 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Vyinställningar</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Tabellinställningar</translation>
     </message>
   </context>
   <context>
@@ -253,11 +253,11 @@
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Kontrollera systemadministrationsinställningar för att konfigurera denna integrering.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Denna integration har inga inställningar på systemnivå.</translation>
     </message>
   </context>
   <context>
@@ -276,8 +276,8 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Integrationer möjliggör sömlöst utnyttjande av videoanalys på olika enheter från VMS.
+Välj en integration för att börja konfigurera dess parametrar.</translation>
     </message>
   </context>
   <context>
@@ -346,7 +346,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Fel parkopplingskod</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -406,7 +406,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Delad med länk</translation>
     </message>
   </context>
   <context>
@@ -697,25 +697,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Välj typ</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Om du tar bort attribut raderas all associerad data</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Om du tar bort listan raderas all data i den.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Radera lista?</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Den här listan är associerad med %n händelseregler. Är du säker på att du vill ta bort den?</numerusform>
+        <numerusform>Den här listan är associerad med %n händelseregler. Är du säker på att du vill ta bort den?</numerusform>
       </translation>
     </message>
   </context>
@@ -741,15 +741,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Exportera lista</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Exporting</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Öppna filmapp...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -825,7 +825,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filter hjälper till att kontrollera åtkomst till webbplatsen och synkronisering genom att ange vilka användare och/eller grupper från Base DN som är tillåtna.</translation>
     </message>
   </context>
   <context>
@@ -922,7 +922,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Vissa värden kunde inte matchas automatiskt. Kartlägg dem manuellt.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -944,11 +944,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>På platsnivå har gruppmedlemmar behörighet att:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>På webbplatsnivå har användaren behörighet att:</translation>
     </message>
   </context>
   <context>
@@ -1072,7 +1072,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Det finns en annan grupp med samma namn. Det rekommenderas att tilldela unika namn till grupperna.</translation>
     </message>
   </context>
   <context>
@@ -1224,7 +1224,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Hantera integrationer</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1239,7 +1239,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Denna integration har inga inställningar på systemnivå.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -1331,7 +1331,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Logga in på systemet för att konfigurera hur man öppnar layouter</translation>
     </message>
   </context>
   <context>
@@ -1401,19 +1401,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Anslut ditt system till en LDAP-server för enklare användarhantering</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Kontinuerlig import från LDAP-servern är inaktiverad för detta system. Uppdateringar till grupper och användare och grupper medlemskap kommer att ske enbart genom manuell synkronisering.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Inga användare eller grupper matchar synkroniseringsinställningarna och läggs till i systemet DB. Se till att LDAP-serverns parametrar och filter är konfigurerade korrekt.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Vänligen använd försiktighet när du ändrar LDAP-inställningar. Felaktig konfiguration kan störa systemtillgänglighet för ett stort antal användare samtidigt.</translation>
     </message>
   </context>
   <context>
@@ -1472,11 +1472,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Importera lista</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Alternativ för import</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1488,11 +1488,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Avgränsare:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Data innehåller sidhuvud</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1508,31 +1508,31 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importerar</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Det gick inte att öppna filen</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Se till att filen finns och att du har tillgång till den valda filen</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Fixar importerade poster</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Det gick inte att importera den valda filen</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Filen verkar vara tom.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Se till att den valda filen finns och att du har åtkomst.</translation>
     </message>
   </context>
   <context>
@@ -1559,7 +1559,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 valt:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1575,11 +1575,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Kunde inte spara filen</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Se till att du har tillgång till den valda mappen och tillräckligt med diskutrymme</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -1587,7 +1587,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Exportera vald</translation>
     </message>
   </context>
   <context>
@@ -1702,9 +1702,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>med %n attribut</numerusform>
+        <numerusform>med %n attribut</numerusform>
       </translation>
     </message>
     <message>
@@ -1751,7 +1751,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Integrering parkopplingskod</translation>
     </message>
   </context>
   <context>
@@ -1843,15 +1843,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Obligatorisk behörighetsgrupp</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Visa behörigheter</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Dölj behörigheter</translation>
     </message>
   </context>
   <context>
@@ -1889,11 +1889,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Välj objekt</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Alla objekt</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1986,14 +1986,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtrera på</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Välj attribut</translation>
     </message>
   </context>
   <context>
@@ -2126,11 +2126,11 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Servern är inte konfigurerad för fjärråtkomstfunktion</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Verktyget för fjärråtkomst är för närvarande inaktiverat. Aktivera det eller kontakta din administratör för att aktivera det.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2142,15 +2142,15 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Anslut %1 klientapplikation till localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Lokal port</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Ett fel uppstod</translation>
     </message>
     <message>
       <source>Username</source>
@@ -2162,7 +2162,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Fjärråtkomst är inte tillgängligt</translation>
     </message>
   </context>
   <context>
@@ -2374,19 +2374,19 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att aktivera/inaktivera integrationsanvändningen för den aktuella enheten måste systemet vara i aktivt skick. Kontakta din kanalpartner för mer information</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att aktivera/inaktivera integrationsanvändningen för den aktuella enheten måste systemet vara i aktivt skick. Kontakta din kanalpartner för mer information</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Systemet har stängts av. För att möjliggöra denna integrationsanvändning för aktuell enhet måste systemet vara i aktivt tillstånd. Kontakta din kanalpartner för mer information</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Webbplatsen har stängts av. För att aktivera denna integrationsanvändning för någon enhet måste webbplatsen vara i aktivt tillstånd. Kontakta din kanalpartner för mer information</translation>
     </message>
   </context>
   <context>
@@ -2469,7 +2469,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Acceptera registreringsförfrågningar för API-integrationer</translation>
     </message>
   </context>
   <context>
@@ -2666,19 +2666,19 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Inga favoritsajter</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Inga dolda webbplatser</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Du kan lägga till system till favoriter från snabbmenyn</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Du kan dölja webbplatser från huvudlistan från snabbmenyn</translation>
     </message>
   </context>
   <context>
@@ -2840,11 +2840,11 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Den tillagda webbplatsen kommer snabbt att bli synlig för användare med ett befintligt molnkonto, medan användare utan ett befintligt molnkonto kommer att få instruktioner via e-post.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Aviseringsspråk</translation>
     </message>
   </context>
   <context>
@@ -2984,11 +2984,11 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Aviseringsspråk</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Gränssnittsspråk</translation>
     </message>
   </context>
   <context>
@@ -3038,7 +3038,7 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 valt:</translation>
     </message>
     <message>
       <source>Schedule</source>

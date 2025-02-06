@@ -107,23 +107,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>Under händelsens varaktighet</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>Av bestämd varaktighet</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>Händelse inträffar</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>Händelsen startar</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>Händelsen stannar</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -194,7 +194,7 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>Avbruten</translation>
     </message>
     <message>
       <source>Added</source>
@@ -1162,48 +1162,48 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Anslut till webbplatsen</translation>
     </message>
     <message>
       <source>Layout Tab</source>
-      <translation type="unfinished">Layout Tab</translation>
+      <translation>Fliken Layout</translation>
     </message>
     <message>
       <source>New Layout Tab</source>
-      <translation type="unfinished">New Layout Tab</translation>
+      <translation>Ny layoutflik</translation>
     </message>
     <message>
       <source>Welcome Screen Tab</source>
-      <translation type="unfinished">Welcome Screen Tab</translation>
+      <translation>Fliken Välkomstskärm</translation>
     </message>
     <message>
       <source>New Welcome Screen Tab</source>
-      <translation type="unfinished">New Welcome Screen Tab</translation>
+      <translation>Ny flik på välkomstskärmen</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Webbplatsadministration...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>Webbplatsuppdatering...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>Listhantering...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>Öppna integrationer...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Slå samman webbplatser...</translation>
     </message>
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>Öppet i</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1218,7 +1218,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>Dedikerat fönster</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1226,11 +1226,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>JavaScript API...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>Slå samman till för närvarande ansluten plats...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1501,11 +1501,11 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>Om din plats inte har tillgång till Internet, skicka den medföljande licensnyckeln och maskinvaru-ID till %1 för att ta emot aktiveringsfilen.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>Om din plats inte har tillgång till Internet, skicka den medföljande licensnyckeln och maskinvaru-ID till ditt regionala/licenssupportteam för att få aktiveringsfilen:</translation>
     </message>
   </context>
   <context>
@@ -1635,7 +1635,7 @@ Licensnyckel: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Anslut till sajten</translation>
     </message>
   </context>
   <context>
@@ -1750,7 +1750,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation type="unfinished">Enter a short Site description here.</translation>
+      <translation>Ange en kort platsbeskrivning här.</translation>
     </message>
   </context>
   <context>
@@ -2103,7 +2103,7 @@ Licensnyckel: %2</translation>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Site shut down. To attach to a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site shut down. To attach to a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Platsen stängd. För att ansluta till en videovägg måste platsen vara i aktivt tillstånd. %1</translation>
     </message>
   </context>
   <context>
@@ -2201,36 +2201,36 @@ Licensnyckel: %2</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa enheter tas bort från sajten</numerusform>
+        <numerusform>Dessa enheter tas bort från sajten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa kameror tas bort från sajten</numerusform>
+        <numerusform>Dessa kameror tas bort från sajten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from Site</numerusform>
-        <numerusform>These servers are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa servrar tas bort från sajten</numerusform>
+        <numerusform>Dessa servrar tas bort från System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from Site</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from Site</numerusform>
-        <numerusform>These users are removed from Site</numerusform>
+      <translation>
+        <numerusform>Dessa användare tas bort från System</numerusform>
+        <numerusform>Dessa användare tas bort från System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
       <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>Dessa resurser tas bort från webbplatsen</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
       </translation>
     </message>
@@ -2418,15 +2418,15 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Webbplatsens namn har ändrats</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Sammanslagning av sajten</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Anslutning till serverproxy</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
