@@ -73,7 +73,12 @@ void ResourceTreeComposer::onTreeSettingsChanged()
         m_entityByFilter.at(FilterMode::noFilter).get());
 
     emit saveExpandedState();
+
     composition->setSubEntity(devicesGroup, createDevicesEntity());
+    composition->setSubEntity(healthMonitorsGroup, showHealthMonitorsGroup()
+        ? m_entityBuilder->createHealthMonitorsGroupEntity()
+        : AbstractEntityPtr());
+
     emit restoreExpandedState();
 }
 
@@ -95,10 +100,20 @@ AbstractEntityPtr ResourceTreeComposer::createDevicesEntity() const
         : m_entityBuilder->createCamerasAndDevicesGroupEntity(showProxiedResources);
 }
 
+bool ResourceTreeComposer::showHealthMonitorsGroup() const
+{
+    if (!m_resourceTreeSettings)
+        return false;
+
+    const bool userCanSeeServers = accessController()->hasPowerUserPermissions()
+        || systemSettings()->showServersInTreeForNonAdmins();
+
+    return !userCanSeeServers;
+}
+
 void ResourceTreeComposer::rebuildEntity()
 {
     const auto currentUser = accessController()->user();
-    const bool isAdmin = accessController()->hasPowerUserPermissions();
 
     if (m_attachedModel)
         m_attachedModel->setRootEntity(nullptr);
@@ -112,6 +127,13 @@ void ResourceTreeComposer::rebuildEntity()
         composition->setSubEntity(separatorItem, m_entityBuilder->createSeparatorEntity());
 
         composition->setSubEntity(devicesGroup, createDevicesEntity());
+
+        if (showHealthMonitorsGroup())
+        {
+            composition->setSubEntity(
+                healthMonitorsGroup, m_entityBuilder->createHealthMonitorsGroupEntity());
+        }
+
         composition->setSubEntity(layoutsGroup, m_entityBuilder->createLayoutsGroupEntity());
         composition->setSubEntity(showreelsGroup, m_entityBuilder->createShowreelsGroupEntity());
         composition->setSubEntity(videowallsList, m_entityBuilder->createVideowallsEntity());

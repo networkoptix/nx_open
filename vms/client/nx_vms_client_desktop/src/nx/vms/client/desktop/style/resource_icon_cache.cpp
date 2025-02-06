@@ -124,6 +124,8 @@ NX_DECLARE_COLORIZED_ICON(kEncoderIcon, "20x20/Solid/encoder.svg",\
 NX_DECLARE_COLORIZED_ICON(kEncoderNotificationIcon, "20x20/Outline/encoder.svg",\
     kTreeThemeSubstitutions)
 
+NX_DECLARE_COLORIZED_ICON(kHealthMonitorsIcon, "20x20/Solid/health_monitors.svg",\
+    kTreeThemeSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kHealthMonitorOfflineIcon, "20x20/Solid/health_monitor_offline.svg",\
     kTreeThemeOfflineSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kHealthMonitorIcon, "20x20/Solid/health_monitor.svg",\
@@ -343,6 +345,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(Server | Incompatible | ReadOnly, IconWithDescription(kServerIncompatibleIcon));
     // Read-only server we are connected to.
     m_cache.insert(Server | Control | ReadOnly, IconWithDescription(kServerIncompatibleIcon));
+    m_cache.insert(HealthMonitors, IconWithDescription(kHealthMonitorsIcon));
     m_cache.insert(HealthMonitor, IconWithDescription(kHealthMonitorIcon));
     m_cache.insert(HealthMonitor | Offline, IconWithDescription(kHealthMonitorOfflineIcon));
 

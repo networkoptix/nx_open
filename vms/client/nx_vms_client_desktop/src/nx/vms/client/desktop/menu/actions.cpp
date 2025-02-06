@@ -1141,7 +1141,9 @@ void initialize(Manager* manager, Action* root)
             .flags(Tree | Table | Scene | SingleTarget | MultiTarget | ResourceTarget
                 | LayoutItemTarget | WidgetTarget)
             .text(ContextMenu::tr("New Tab", /*comment*/ "The \"Open in\" submenu item"))
-            .condition(new OpenInNewEntityCondition());
+            .condition(
+                !condition::parentTreeNodeType(ResourceTree::NodeType::healthMonitors)
+                && ConditionWrapper(new OpenInNewEntityCondition()));
 
         factory(OpenInNewWindowAction)
             .mode(DesktopMode)
@@ -1149,7 +1151,8 @@ void initialize(Manager* manager, Action* root)
                 | LayoutItemTarget | WidgetTarget)
             .text(ContextMenu::tr("New Window", /*comment*/ "The \"Open in\" submenu item"))
             .condition(
-                ConditionWrapper(new OpenInNewEntityCondition())
+                !condition::parentTreeNodeType(ResourceTree::NodeType::healthMonitors)
+                && ConditionWrapper(new OpenInNewEntityCondition())
                 && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
             );
 
@@ -1161,6 +1164,23 @@ void initialize(Manager* manager, Action* root)
             .condition(condition::isWebPageOrIntegration());
     }
     factory.endSubMenu();
+
+    factory(MonitorInNewTabAction)
+        .mode(DesktopMode)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Monitor in New Tab"))
+        .condition(
+            condition::parentTreeNodeType(ResourceTree::NodeType::healthMonitors)
+            && ConditionWrapper(new OpenInNewEntityCondition()));
+
+    factory(MonitorInNewWindowAction)
+        .mode(DesktopMode)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Monitor in New Window"))
+        .condition(
+            condition::parentTreeNodeType(ResourceTree::NodeType::healthMonitors)
+            && ConditionWrapper(new OpenInNewEntityCondition())
+            && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow)));
 
     factory(OpenInAlarmLayoutAction)
         .mode(DesktopMode)

@@ -30,6 +30,7 @@ public:
         Server,
         Servers,
         HealthMonitor,
+        HealthMonitors,
 
         Layout,
         ExportedLayout,

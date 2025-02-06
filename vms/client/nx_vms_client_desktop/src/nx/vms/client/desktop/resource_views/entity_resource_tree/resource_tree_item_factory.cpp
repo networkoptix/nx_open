@@ -479,8 +479,8 @@ AbstractItemPtr ResourceTreeItemFactory::createHealthMonitorsItem() const
 {
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, tr("Health Monitors"))
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::Servers))
-        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::servers));
+        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::HealthMonitors))
+        .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::healthMonitors));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createVideoWallsItem(QString customName) const

@@ -359,6 +359,28 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createServersGroupEntity(
         FlatteningGroupEntity::AutoFlatteningPolicy::singleChildPolicy);
 }
 
+AbstractEntityPtr ResourceTreeEntityBuilder::createHealthMonitorsGroupEntity() const
+{
+    const auto healthMonitorItemCreator =
+        [this](const QnResourcePtr& resource)
+        {
+            return std::make_unique<HealthMonitorResourceItemDecorator>(
+                serverResourceItemCreator(m_itemFactory.get(), user())(resource));
+        };
+
+    auto healthMonitorsList = makeKeyList<QnResourcePtr>(
+        healthMonitorItemCreator,
+        serversOrder());
+
+    healthMonitorsList->installItemSource(
+        m_itemKeySourcePool->serversSource(user(), /*reduceEdgeServers*/ false));
+
+    return makeFlatteningGroup(
+        m_itemFactory->createHealthMonitorsItem(),
+        std::move(healthMonitorsList),
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
+}
+
 AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasAndDevicesGroupEntity(
     bool showProxiedResources) const
 {

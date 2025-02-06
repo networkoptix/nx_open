@@ -262,6 +262,8 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
 
     connect(action(menu::OpenInNewTabAction), &QAction::triggered, this,
         &LayoutActionHandler::at_openInNewTabAction_triggered);
+    connect(action(menu::MonitorInNewTabAction), &QAction::triggered, this,
+        &LayoutActionHandler::at_openInNewTabAction_triggered);
 
     connect(action(menu::OpenIntercomLayoutAction), &QAction::triggered, this,
         &LayoutActionHandler::at_openIntercomLayoutAction_triggered);

@@ -558,6 +558,12 @@ enum IDType
     OpenInNewTabAction,
 
     /**
+     * Opens selected server resources as health monitors in a new tab, same as OpenInNewTabAction
+     * except appearance of related context menu item.
+     */
+    MonitorInNewTabAction,
+
+    /**
      * Opens Intercom Layout when clicking on a notification tile.
      * Closes the call notification on all clients.
      */
@@ -578,6 +584,12 @@ enum IDType
      * Opens selected resources in a new window.
      */
     OpenInNewWindowAction,
+
+    /**
+     * Opens selected server resources in a new window as health monitors, same as
+     * OpenInNewWindowAction except appearance of related context menu item.
+     */
+    MonitorInNewWindowAction,
 
     /**
      * Opens selected resource in a new dialog.

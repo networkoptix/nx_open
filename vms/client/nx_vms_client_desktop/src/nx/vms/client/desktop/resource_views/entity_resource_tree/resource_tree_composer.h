@@ -67,6 +67,7 @@ private:
         currentUserItem,
         separatorItem,
         devicesGroup,
+        healthMonitorsGroup,
         layoutsGroup,
         showreelsGroup,
         videowallsList,
@@ -80,6 +81,7 @@ private:
     void onUserChanged();
     void onTreeSettingsChanged();
     entity_item_model::AbstractEntityPtr createDevicesEntity() const;
+    bool showHealthMonitorsGroup() const;
     void rebuildEntity();
     entity_item_model::AbstractEntity* entityForCurrentFilterMode() const;
 

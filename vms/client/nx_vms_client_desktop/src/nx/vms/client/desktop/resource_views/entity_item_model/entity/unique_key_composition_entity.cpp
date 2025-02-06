@@ -2,8 +2,8 @@
 
 #include "unique_key_composition_entity.h"
 
-#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/entity/entity_notification_guard.h>
+#include <nx/vms/client/desktop/resource_views/entity_item_model/entity_model_mapping.h>
 
 namespace nx::vms::client::desktop {
 namespace entity_item_model {
@@ -105,6 +105,12 @@ bool UniqueKeyCompositionEntity<Key>::isPlanar() const
 template <class Key>
 void UniqueKeyCompositionEntity<Key>::setSubEntity(const Key& key, AbstractEntityPtr subEntityPtr)
 {
+    if (!subEntityPtr)
+    {
+        removeSubEntity(key);
+        return;
+    }
+
     auto itr = std::lower_bound(std::cbegin(m_subEntities), std::cend(m_subEntities),
         KeyEntityPair(key));
 

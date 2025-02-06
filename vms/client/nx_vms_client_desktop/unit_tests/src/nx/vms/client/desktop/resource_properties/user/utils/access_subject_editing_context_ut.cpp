@@ -266,7 +266,7 @@ TEST_F(AccessSubjectEditingContextTest, resourceAccessTreeItemInfo)
     EXPECT_EQ(info.outerSpecialResourceGroupId, nx::Uuid{});
     EXPECT_EQ(info.relevantAccessRights, AccessRight::view);
 
-    index = indexOf(NodeType::servers);
+    index = indexOf(NodeType::healthMonitors);
     info = AccessSubjectEditingContext::resourceAccessTreeItemInfo(index);
     EXPECT_EQ(info.type, ResourceAccessTreeItem::Type::specialResourceGroup);
     EXPECT_EQ(info.target.groupId(), kAllServersGroupId);

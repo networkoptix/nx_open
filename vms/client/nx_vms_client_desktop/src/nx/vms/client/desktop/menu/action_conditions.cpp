@@ -2037,6 +2037,19 @@ ConditionWrapper treeNodeType(QSet<ResourceTree::NodeType> types)
         });
 }
 
+ConditionWrapper parentTreeNodeType(ResourceTree::NodeType type)
+{
+    return new CustomBoolCondition(
+        [type](const Parameters& parameters, WindowContext* /*context*/)
+        {
+            if (!parameters.hasArgument(Qn::ParentNodeTypeRole))
+                return false;
+
+            return type
+                == parameters.argument(Qn::ParentNodeTypeRole).value<ResourceTree::NodeType>();
+        });
+}
+
 ConditionWrapper isShowreelReviewMode()
 {
     return new CustomBoolCondition(

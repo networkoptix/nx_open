@@ -30,6 +30,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
     currentUser, //< Root node, displaying current user.
     separator, //< Root node for spacing between header and main part of the tree.
     servers, //< Root node for servers.
+    healthMonitors, // Root node for health monitors.
     camerasAndDevices, //< Root node for devices when representation without servers is turned on.
     layouts, //< Root node for current user's layouts and shared layouts.
     showreels, //< Root node for the Showreels.

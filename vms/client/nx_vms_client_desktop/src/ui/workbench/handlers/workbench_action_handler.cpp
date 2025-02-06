@@ -326,6 +326,8 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(menu::OpenInNewWindowAction), &QAction::triggered, this,
         &ActionHandler::at_openInNewWindowAction_triggered);
+    connect(action(menu::MonitorInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_openInNewWindowAction_triggered);
 
     connect(action(menu::OpenCurrentLayoutInNewWindowAction), &QAction::triggered, this,
         &ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered);

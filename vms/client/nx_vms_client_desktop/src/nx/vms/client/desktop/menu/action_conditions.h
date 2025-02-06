@@ -654,6 +654,8 @@ inline ConditionWrapper treeNodeType(ResourceTree::NodeType type)
     return treeNodeType(QSet<ResourceTree::NodeType>{type});
 }
 
+ConditionWrapper parentTreeNodeType(ResourceTree::NodeType type);
+
 /** Visible in Showreel preview mode only. */
 ConditionWrapper isShowreelReviewMode();
 

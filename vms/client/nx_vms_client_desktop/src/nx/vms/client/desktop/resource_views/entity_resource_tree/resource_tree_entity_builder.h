@@ -46,6 +46,7 @@ public:
     AbstractEntityPtr createSeparatorEntity() const;
 
     AbstractEntityPtr createServersGroupEntity(bool showProxiedResources) const;
+    AbstractEntityPtr createHealthMonitorsGroupEntity() const;
     AbstractEntityPtr createCamerasAndDevicesGroupEntity(bool showProxiedResources) const;
     AbstractEntityPtr createLayoutsGroupEntity() const;
 

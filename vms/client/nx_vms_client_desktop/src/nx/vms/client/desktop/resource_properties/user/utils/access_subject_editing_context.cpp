@@ -770,7 +770,7 @@ nx::Uuid AccessSubjectEditingContext::specialResourceGroup(ResourceTree::NodeTyp
         case ResourceTree::NodeType::webPages:
             return nx::vms::api::kAllWebPagesGroupId;
 
-        case ResourceTree::NodeType::servers:
+        case ResourceTree::NodeType::healthMonitors:
             return nx::vms::api::kAllServersGroupId;
 
         default:
