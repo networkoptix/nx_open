@@ -6,12 +6,9 @@
 
 namespace nx::network {
 
-DatagramPipeline::DatagramPipeline():
-    m_socket(SocketFactory::createDatagramSocket())
+DatagramPipeline::DatagramPipeline(std::unique_ptr<AbstractDatagramSocket> socket):
+    m_socket(std::move(socket))
 {
-    // TODO: #akolesnikov Should report this error to the caller.
-    NX_ASSERT(m_socket->setNonBlockingMode(true));
-
     bindToAioThread(getAioThread());
 }
 

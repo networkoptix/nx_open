@@ -46,10 +46,14 @@ void TunnelAcceptor::accept(AcceptHandler handler)
         [this, handler = std::move(handler)]() mutable
         {
             m_acceptHandler = std::move(handler);
-            m_udpMediatorConnection = std::make_unique<
-                hpm::api::MediatorServerUdpConnection>(
-                    m_mediatorUdpEndpoint,
-                    m_mediatorConnection->credentialsProvider());
+            auto socket = SocketFactory::createDatagramSocket();
+            if (!socket || !socket->setNonBlockingMode(true))
+                return executeAcceptHandler(SystemError::getLastOSErrorCode());
+
+            m_udpMediatorConnection = std::make_unique<hpm::api::MediatorServerUdpConnection>(
+                m_mediatorConnection->credentialsProvider(),
+                std::move(socket),
+                m_mediatorUdpEndpoint);
 
             m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());
             if (!m_udpMediatorConnection->socket()->bind(SocketAddress::anyAddress))

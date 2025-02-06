@@ -24,23 +24,15 @@ template<class SocketServerType>
 class MultiAddressServer:
     public AbstractStatisticsProvider
 {
-    template<typename... Args>
-    static std::unique_ptr<SocketServerType> realFactoryFunc(Args... params)
-    {
-        return std::make_unique<SocketServerType>(params...);
-    }
-
 public:
     /**
      * Arguments are copied to the actual server object.
      */
     template<typename... Args>
-    MultiAddressServer(Args... args)
+    MultiAddressServer(Args&&... args):
+        m_socketServerFactory([... args = std::forward<Args>(args)]() mutable
+            { return std::make_unique<SocketServerType>(std::forward<Args>(args)...); })
     {
-        // TODO: #akolesnikov This is work around gcc 4.8 bug. Return to lambda in gcc 4.9.
-        typedef std::unique_ptr<SocketServerType>(*RealFactoryFuncType)(Args...);
-        m_socketServerFactory =
-            std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
     // TODO: #akolesnikov Inherit this class from QnStoppableAsync.

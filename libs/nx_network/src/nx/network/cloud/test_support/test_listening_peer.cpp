@@ -99,6 +99,13 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+static std::unique_ptr<AbstractDatagramSocket> datagramSocket()
+{
+    auto socket = SocketFactory::createDatagramSocket();
+    NX_CRITICAL(socket && socket->setNonBlockingMode(true));
+    return socket;
+}
+
 TestListeningPeer::TestListeningPeer(
     const network::SocketAddress& mediatorUdpEndpoint,
     const nx::utils::Url& mediatorTcpUrl,
@@ -114,10 +121,8 @@ TestListeningPeer::TestListeningPeer(
         ? nx::Uuid::createUuid().toSimpleStdString()
         : std::move(serverName)),
     m_mediatorUdpEndpoint(mediatorUdpEndpoint),
-    m_mediatorUdpClient(
-        std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
-            mediatorUdpEndpoint,
-            m_mediatorConnector.get())),
+    m_mediatorUdpClient(std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
+        m_mediatorConnector.get(), datagramSocket(), mediatorUdpEndpoint)),
     m_action(ActionToTake::proceedWithConnection),
     m_cloudConnectionMethodMask((int) network::cloud::ConnectType::udpHp),
     m_cloudSystemIdForModuleInformation(m_systemData.id),
@@ -341,10 +346,10 @@ void TestListeningPeer::onConnectionRequested(
 
     if (!m_mediatorUdpClient)
     {
-        m_mediatorUdpClient =
-            std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
-                m_mediatorConnector->address()->stunUdpEndpoint,
-                m_mediatorConnector.get());
+        m_mediatorUdpClient = std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
+            m_mediatorConnector.get(),
+            datagramSocket(),
+            m_mediatorConnector->address()->stunUdpEndpoint);
         m_mediatorUdpClient->bindToAioThread(getAioThread());
     }
 

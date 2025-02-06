@@ -49,8 +49,8 @@ public:
     static const int kDefaultMaxRetransmissions;
     static const int kDefaultMaxRedirectCount;
 
-    UdpClient();
-    UdpClient(SocketAddress serverAddress);
+    UdpClient(std::unique_ptr<AbstractDatagramSocket> socket);
+    UdpClient(std::unique_ptr<AbstractDatagramSocket> socket, SocketAddress serverAddress);
     virtual ~UdpClient() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;

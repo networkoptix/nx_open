@@ -4,10 +4,11 @@
 
 #include <memory>
 
+#include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
 
-#include "abstract_server_connection.h"
 #include "abstract_message_handler.h"
+#include "abstract_server_connection.h"
 #include "udp_message_response_sender.h"
 
 namespace nx {
@@ -15,7 +16,13 @@ namespace network {
 namespace stun {
 
 UdpServer::UdpServer(AbstractMessageHandler* messageHandler):
-    m_messagePipeline(this),
+    m_messagePipeline(
+        []()
+        {
+            auto socket = SocketFactory::createDatagramSocket();
+            NX_CRITICAL(socket && socket->setNonBlockingMode(true));
+            return socket;
+        }(), this),
     m_messageHandler(messageHandler),
     m_activeRequestCounter(std::make_shared<nx::utils::Counter>())
 {

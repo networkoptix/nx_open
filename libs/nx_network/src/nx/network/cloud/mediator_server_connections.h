@@ -25,9 +25,9 @@ class MediatorServerConnection:
     public BaseMediatorClient<NetworkClientType>
 {
 public:
-    template<typename Arg>
-    MediatorServerConnection(Arg arg, AbstractCloudSystemCredentialsProvider* connector):
-        BaseMediatorClient<NetworkClientType>(std::move(arg)),
+    template<typename... Args>
+    MediatorServerConnection(AbstractCloudSystemCredentialsProvider* connector, Args&&... args):
+        BaseMediatorClient<NetworkClientType>(std::forward<Args>(args)...),
         m_connector(connector)
     {
         NX_ASSERT(m_connector);

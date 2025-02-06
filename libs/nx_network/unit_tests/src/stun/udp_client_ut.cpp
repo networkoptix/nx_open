@@ -27,6 +27,13 @@ namespace network {
 namespace stun {
 namespace test {
 
+static std::unique_ptr<AbstractDatagramSocket> datagramSocket()
+{
+    auto socket = SocketFactory::createDatagramSocket();
+    NX_CRITICAL(socket && socket->setNonBlockingMode(true));
+    return socket;
+}
+
 class UdpClient:
     public ::testing::Test
 {
@@ -39,7 +46,7 @@ public:
     {
         addServer();
 
-        m_client = std::make_unique<stun::UdpClient>();
+        m_client = std::make_unique<stun::UdpClient>(datagramSocket());
     }
 
     ~UdpClient()
@@ -269,7 +276,7 @@ TEST_F(UdpClient, client_test_sync)
     for (int i = 1; i < LOCAL_SERVERS_COUNT; ++i)
         addServer();
 
-    stun::UdpClient client;
+    stun::UdpClient client{datagramSocket()};
     auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     for (int i = 0; i < REQUESTS_TO_SEND; ++i)
@@ -300,7 +307,7 @@ TEST_F(UdpClient, multiple_concurrent_async_requests)
 
     addAdditionalServers(kLocalServersCount-1);
 
-    stun::UdpClient client;
+    stun::UdpClient client{datagramSocket()};
     auto clientGuard = nx::utils::makeScopeGuard([&client](){ client.pleaseStopSync(); });
 
     issueMultipleRequestsToRandomServers(&client, kRequestToSendCount);
@@ -319,7 +326,7 @@ TEST_F(UdpClient, client_retransmits_general)
 {
     ignoreNextMessage();
 
-    stun::UdpClient client;
+    stun::UdpClient client{datagramSocket()};
     auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     nx::network::stun::Message requestMessage(
@@ -354,7 +361,7 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
 
     ignoreNextMessage(kMaxRetransmissionCount+1);
 
-    stun::UdpClient client;
+    stun::UdpClient client{datagramSocket()};
     auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::milliseconds(10));
@@ -384,7 +391,7 @@ TEST_F(UdpClient, client_cancellation)
 {
     const int REQUESTS_TO_SEND = 3;
 
-    stun::UdpClient client;
+    stun::UdpClient client{datagramSocket()};
     auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::seconds(100));
@@ -437,7 +444,7 @@ TEST_F(UdpClient, client_response_injection)
     std::optional<Message> response;
     SystemError::ErrorCode responseErrorCode = SystemError::noError;
 
-    stun::UdpClient client;
+    stun::UdpClient client{datagramSocket()};
     auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     ASSERT_TRUE(client.bind(SocketAddress(HostAddress::localhost, 0)));
@@ -671,7 +678,7 @@ private:
         doNotAddAlternateServer,
     };
 
-    stun::UdpClient m_client;
+    stun::UdpClient m_client{datagramSocket()};
     std::pair<SystemError::ErrorCode, stun::Message> m_response;
 
     void init()

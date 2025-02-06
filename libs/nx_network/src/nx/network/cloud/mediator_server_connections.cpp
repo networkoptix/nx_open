@@ -7,9 +7,8 @@ namespace nx::hpm::api {
 MediatorServerTcpConnection::MediatorServerTcpConnection(
     std::shared_ptr<nx::network::stun::AbstractAsyncClient> stunClient,
     AbstractCloudSystemCredentialsProvider* connector)
-:
-    MediatorServerConnection<network::stun::AsyncClientUser>(
-        std::move(stunClient), connector)
+    :
+    MediatorServerConnection<network::stun::AsyncClientUser>(connector, std::move(stunClient))
 {
 }
 

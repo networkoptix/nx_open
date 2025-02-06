@@ -87,9 +87,8 @@ class MediatorClientConnection:
     using base_type = AbstractClientType;
 
 public:
-    template<typename ... Args>
-    MediatorClientConnection(Args ... args):
-        base_type(std::forward<Args>(args) ...)
+    template<typename... Args>
+    MediatorClientConnection(Args&&... args): base_type(std::forward<Args>(args)...)
     {
     }
 

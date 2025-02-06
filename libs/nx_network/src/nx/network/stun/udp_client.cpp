@@ -25,14 +25,14 @@ UdpClient::RequestContext::RequestContext():
 /* UdpClient                                */
 /********************************************/
 
-UdpClient::UdpClient():
-    UdpClient(SocketAddress())
+UdpClient::UdpClient(std::unique_ptr<AbstractDatagramSocket> socket):
+    UdpClient(std::move(socket), SocketAddress{})
 {
 }
 
-UdpClient::UdpClient(SocketAddress serverAddress):
+UdpClient::UdpClient(std::unique_ptr<AbstractDatagramSocket> socket, SocketAddress serverAddress):
     m_receivingMessages(false),
-    m_messagePipeline(this),
+    m_messagePipeline(std::move(socket), this),
     m_retransmissionTimeout(kDefaultRetransmissionTimeOut),
     m_maxRetransmissions(kDefaultMaxRetransmissions),
     m_serverAddress(std::move(serverAddress))

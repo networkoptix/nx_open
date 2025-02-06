@@ -219,9 +219,18 @@ void CrossNatConnector::issueConnectRequestToMediator()
 std::tuple<SystemError::ErrorCode, std::unique_ptr<hpm::api::MediatorClientUdpConnection>>
     CrossNatConnector::prepareForUdpHolePunching()
 {
-    auto mediatorUdpClient =
-        std::make_unique<api::MediatorClientUdpConnection>(
-            m_mediatorAddress->stunUdpEndpoint);
+    auto socket = SocketFactory::createDatagramSocket();
+    if (!socket || !socket->setNonBlockingMode(true))
+    {
+        const auto error = SystemError::getLastOSErrorCode();
+        NX_DEBUG(this, nx::format(socket
+            ? "Failed to set non-blocking mode for datagram socket %1"
+            : "Failed to create datagram socket %1", SystemError::toString(error)));
+        return std::make_tuple(error, nullptr);
+    }
+
+    auto mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
+        std::move(socket), m_mediatorAddress->stunUdpEndpoint);
     mediatorUdpClient->bindToAioThread(getAioThread());
 
     if (!mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
@@ -341,6 +350,19 @@ void CrossNatConnector::holePunchingDone(TunnelConnectResult connectResult)
     // We are in aio thread.
     m_timer->cancelSync();
 
+    auto socket = SocketFactory::createDatagramSocket();
+    if (!socket || !socket->setNonBlockingMode(true))
+    {
+        const auto error = SystemError::getLastOSErrorCode();
+        NX_DEBUG(this, nx::format(socket
+            ? "Failed to set non-blocking mode for datagram socket %1"
+            : "Failed to create datagram socket %1", SystemError::toString(error)));
+
+        connectResult.connection.reset();
+        connectResult.resultCode = api::NatTraversalResultCode::noResponseFromMediator;
+        connectResult.sysErrorCode = error;
+    }
+
     m_connectResultReport.sysErrorCode = connectResult.sysErrorCode;
     if (connectResult.resultCode == api::NatTraversalResultCode::noResponseFromMediator)
     {
@@ -354,7 +376,8 @@ void CrossNatConnector::holePunchingDone(TunnelConnectResult connectResult)
     m_connectResultReport.resultCode = connectResult.resultCode;
     m_connectResultReport.stats = std::move(connectResult.stats);
 
-    m_connectResultReportSender = std::make_unique<stun::UnreliableMessagePipeline>(this);
+    m_connectResultReportSender =
+        std::make_unique<stun::UnreliableMessagePipeline>(std::move(socket), this);
     m_connectResultReportSender->bindToAioThread(getAioThread());
     stun::Message connectResultReportMessage(
         stun::Header(

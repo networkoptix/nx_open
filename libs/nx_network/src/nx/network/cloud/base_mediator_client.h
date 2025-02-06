@@ -18,11 +18,8 @@ class BaseMediatorClient:
     public NetworkClientType
 {
 public:
-    //TODO #akolesnikov #msvc2015 variadic template
-    template<typename Arg1Type>
-        BaseMediatorClient(Arg1Type arg1)
-    :
-        NetworkClientType(std::move(arg1))
+    template<typename... Args>
+    BaseMediatorClient(Args&&... args): NetworkClientType(std::forward<Args>(args)...)
     {
     }
 

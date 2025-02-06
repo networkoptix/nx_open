@@ -24,7 +24,7 @@ class NX_NETWORK_API DatagramPipeline:
     using BaseType = aio::BasicPollable;
 
 public:
-    DatagramPipeline();
+    DatagramPipeline(std::unique_ptr<AbstractDatagramSocket> socket);
     virtual ~DatagramPipeline() override;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -144,7 +144,10 @@ public:
     /**
      * @param customPipeline UnreliableMessagePipeline does not take ownership of customPipeline.
      */
-    UnreliableMessagePipeline(CustomPipeline* customPipeline):
+    UnreliableMessagePipeline(
+        std::unique_ptr<AbstractDatagramSocket> socket, CustomPipeline* customPipeline)
+        :
+        DatagramPipeline(std::move(socket)),
         m_customPipeline(customPipeline)
     {
     }
