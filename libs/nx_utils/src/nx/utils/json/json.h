@@ -278,7 +278,7 @@ void serialize(SerializationContext* context, const Value& value)
     else if (value.IsNumber())
     {
         const auto doubleValue = value.GetDouble();
-        const auto intValue = static_cast<int>(doubleValue);
+        const auto intValue = static_cast<std::int64_t>(doubleValue);
         if (static_cast<double>(intValue) == doubleValue)
             context->composer.writeInt(intValue);
         else
