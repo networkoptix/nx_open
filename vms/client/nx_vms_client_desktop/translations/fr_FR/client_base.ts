@@ -3760,7 +3760,7 @@ Clé de licence : %2</translation>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation>Circuit à la terre</translation>
+      <translation>Circuit Fermé</translation>
     </message>
     <message>
       <source>Invalid state</source>
