@@ -106,6 +106,7 @@ Dialog
             {
                 id: delegateItem
 
+                ListView.delayRemove: objectList.dragItem === listItem
                 height: objectList.itemHeight
                 width: objectList.width
 
@@ -164,7 +165,7 @@ Dialog
 
                         ColoredImage
                         {
-                            id: dragImage
+                            id: dragIcon
 
                             enabled: listItem.draggable
 
