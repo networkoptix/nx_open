@@ -12,7 +12,7 @@
 
 Q_MOC_INCLUDE("core/resource/resource.h")
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core{
 
 enum class RecordingStatus
 {
@@ -24,13 +24,16 @@ enum class RecordingStatus
     noRecordingNoArchive
 };
 
-class NX_VMS_CLIENT_DESKTOP_API RecordingStatusHelper: public QObject
+class NX_VMS_CLIENT_CORE_API RecordingStatusHelper: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(QString tooltip READ tooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString shortTooltip READ shortTooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString qmlIconName READ qmlIconName NOTIFY recordingModeChanged)
+    Q_PROPERTY(QString qmlSmallIconName READ qmlSmallIconName NOTIFY recordingModeChanged)
+    Q_PROPERTY(QSize smallIconSize READ smallIconSize CONSTANT)
+    Q_PROPERTY(QSize normalIconSize READ normalIconSize CONSTANT)
 
 public:
     RecordingStatusHelper(QObject* parent = nullptr);
@@ -41,7 +44,11 @@ public:
     QString tooltip() const;
     QString shortTooltip() const;
     QString qmlIconName() const;
+    QString qmlSmallIconName() const;
     QIcon smallIcon() const;
+
+    QSize smallIconSize() const;
+    QSize normalIconSize() const;
 
     static QString tooltip(
         RecordingStatus recordingStatus,
@@ -54,6 +61,8 @@ public:
 
     static QString qmlIconName(
         RecordingStatus recordingStatus,
+        nx::vms::api::RecordingMetadataTypes metadataTypes);
+    static QString qmlSmallIconName(RecordingStatus recordingStatus,
         nx::vms::api::RecordingMetadataTypes metadataTypes);
 
     static QIcon smallIcon(
@@ -81,4 +90,4 @@ private:
     nx::utils::ScopedConnections m_connections;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

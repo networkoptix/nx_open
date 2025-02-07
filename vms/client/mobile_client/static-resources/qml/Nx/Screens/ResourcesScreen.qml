@@ -87,12 +87,6 @@ Page
 
         active: activePage
 
-        ScrollIndicator.vertical: ScrollIndicator
-        {
-            leftPadding: 2
-            width: 4
-        }
-
         onOpenVideoScreen:
             (resource, thumbnailUrl, camerasModel) =>
                 handleOpenVideoScreenRequest(resource, thumbnailUrl, camerasModel)

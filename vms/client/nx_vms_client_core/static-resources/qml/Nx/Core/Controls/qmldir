@@ -10,3 +10,4 @@ Preview 1.0 Preview.qml
 RectangularMask 1.0 RectangularMask.qml
 ColoredImage 1.0 ColoredImage.qml
 ToolTip 1.0 ToolTip.qml
+RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml

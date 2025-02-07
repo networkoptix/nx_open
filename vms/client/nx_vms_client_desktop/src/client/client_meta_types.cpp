@@ -86,7 +86,6 @@
 #include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
 #include <nx/vms/client/desktop/ui/common/item_grabber.h>
 #include <nx/vms/client/desktop/ui/common/keyboard_modifiers.h>
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/whats_this.h>
 #include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
@@ -331,7 +330,6 @@ void registerQmlTypesInternal()
     CursorManager::registerQmlType();
     CustomCursor::registerQmlType();
     CustomCursors::registerQmlType();
-    RecordingStatusHelper::registerQmlType();
     FocusFrameItem::registerQmlType();
     MotionRegionsItem::registerQmlType();
     GlobalToolTip::registerQmlType();

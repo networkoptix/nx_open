@@ -38,6 +38,8 @@ ApplicationWindow
     readonly property real availableWidth: width - rightPadding - leftPadding
     readonly property real availableHeight: height - bottomPadding - topLevelWarning.height
 
+    readonly property bool isPortraitLayout: width <= height
+
     contentItem.x: leftPadding
 
     visible: true
@@ -58,7 +60,7 @@ ApplicationWindow
 
         y: topLevelWarning.height
         width: mainWindow.availableWidth
-        height: mainWindow.availableHeight - keyboardHeight
+        height: mainWindow.availableHeight - keyboardHeight - screenNavigationBar.heightOffset
 
         property real keyboardHeight: mainWindow.keyboardHeight
         Behavior on keyboardHeight
@@ -84,6 +86,11 @@ ApplicationWindow
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
+    }
+
+    ScreenNavigationBar
+    {
+        id: screenNavigationBar
     }
 
     UiController

@@ -19,6 +19,7 @@ ListView
         width: camerasList.width
         text: model.resourceName
         status: model.resourceStatus
+        resource: model.resource
         thumbnail: model.thumbnail
 
         onClicked: openVideoScreen(model.resource, model.thumbnail, camerasList.model)

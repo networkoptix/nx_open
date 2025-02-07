@@ -8,8 +8,8 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::core;

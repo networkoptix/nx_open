@@ -6,26 +6,67 @@ import QtQuick.Window
 import Nx.Core
 import Nx.Mobile
 
-GridView
+Flickable
 {
-    id: camerasGrid
+    id: control
 
-    property real spacing: 8
     property alias layoutId: camerasModel.layoutId
     property bool keepStatuses: false
     property bool active: false
     property alias filterIds: camerasModel.filterIds
-
-    cellWidth: (width - leftMargin - rightMargin) / d.columnsCount
-    cellHeight: cellWidth * 9 / 16 + 24 + 16
-
+    property alias count: repeater.count
     signal openVideoScreen(var resource, var thumbnailUrl, var camerasModel)
+
+    contentWidth: width
+    contentHeight: flowLayout.height
+
+    function itemAtIndex(index)
+    {
+        return repeater.itemAt(index)
+    }
+
+    Flow
+    {
+        id: flowLayout
+
+        spacing: 2
+        width: d.availableWidth
+
+        Repeater
+        {
+            id: repeater
+
+            model: QnCameraListModel
+            {
+                id: camerasModel
+            }
+
+            CameraItem
+            {
+                aspectRatio: d.kAspectRatio
+                width: d.cellWidth
+                height: d.cellHeight
+
+                text: model.resourceName
+                status: model.resourceStatus
+                thumbnail: model.thumbnail
+                keepStatus: control.keepStatuses
+                resource: model.resource
+                active: control.active
+
+                onClicked: control.openVideoScreen(model.resource, model.thumbnail, camerasModel)
+
+                onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
+            }
+        }
+    }
 
     NxObject
     {
         id: d
 
-        readonly property real maxItemWidth: 320 + camerasGrid.spacing
+        readonly property real kAspectRatio: 9 / 16
+        readonly property real availableWidth: control.width - leftMargin - rightMargin
         property int maxColumnsCount:
         {
             switch (Screen.primaryOrientation)
@@ -38,32 +79,16 @@ GridView
             }
         }
 
-        readonly property int columnsCount:
+        readonly property int columnsCount: d.getColumnsCount(/**/320)
+        readonly property real cellWidth: Math.floor(
+            (d.availableWidth - (d.columnsCount - 1) * flowLayout.spacing) / d.columnsCount)
+        readonly property real cellHeight: cellWidth * kAspectRatio
+
+        function getColumnsCount(itemWidth)
         {
-            const columns = Math.ceil(camerasGrid.width / maxItemWidth)
-            return Math.max(2, Math.min(columns, maxColumnsCount))
+            const spacing = flowLayout.spacing
+            const columns = Math.ceil((d.availableWidth - spacing) / (spacing + itemWidth))
+            return Math.max(2, Math.min(columns, d.maxColumnsCount))
         }
-    }
-
-    model: QnCameraListModel
-    {
-        id: camerasModel
-    }
-
-    delegate: CameraItem
-    {
-        width: cellWidth
-        height: cellHeight
-
-        text: model.resourceName
-        status: model.resourceStatus
-        thumbnail: model.thumbnail
-        keepStatus: camerasGrid.keepStatuses
-        resource: model.resource
-        active: camerasGrid.active
-
-        onClicked: camerasGrid.openVideoScreen(model.resource, model.thumbnail, camerasModel)
-
-        onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
     }
 }

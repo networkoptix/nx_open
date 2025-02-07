@@ -32,7 +32,11 @@ public:
         LoginToCloudScreen,
         DigestLoginToCloudScreen,
         CameraSettingsScreen,
-        BetaFeaturesScreen
+        BetaFeaturesScreen,
+        DetailsScreen,
+        EventSearchMenuScreen,
+        EventSearchScreen,
+        MenuScreen
     };
 
     Q_ENUM(Screen)

@@ -130,11 +130,6 @@ Drawer
                 bottomPadding: mainWindow.bottomPadding + 8
                 anchors.bottom: parent.bottom
 
-                BottomSeparator
-                {
-                    visible: disconnectButton.visible
-                }
-
                 SideNavigationButton
                 {
                     icon: lp("/images/plus.png")
@@ -145,32 +140,6 @@ Drawer
                         bottomContent.enabled = false
                         sideNavigation.close()
                         Workflow.openNewSessionScreen()
-                    }
-                }
-
-                SideNavigationButton
-                {
-                    id: disconnectButton
-
-                    icon: lp("/images/disconnect.png")
-                    text: qsTr("Disconnect from Server")
-                    visible: !disconnectedDummy.visible
-                    onClicked:
-                    {
-                        bottomContent.enabled = false
-                        sessionManager.stopSession()
-                    }
-                }
-
-                SideNavigationButton
-                {
-                    icon: lp("/images/settings.png")
-                    text: qsTr("Settings")
-                    onClicked:
-                    {
-                        bottomContent.enabled = false
-                        sideNavigation.close()
-                        Workflow.openSettingsScreen()
                     }
                 }
 

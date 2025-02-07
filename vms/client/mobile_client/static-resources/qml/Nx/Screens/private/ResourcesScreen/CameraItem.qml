@@ -27,13 +27,10 @@ Control
     property alias resource: mediaResourceHelper.resource
     property var mediaPlayer
     property bool active: false
+    property real aspectRatio: 9 / 16
 
     signal clicked()
     signal thumbnailRefreshRequested()
-
-    padding: 4
-    implicitWidth: 200
-    implicitHeight: contentItem.implicitHeight + 2 * padding
 
     QtObject
     {
@@ -76,20 +73,23 @@ Control
         color: ColorTheme.colors.windowBackground
     }
 
-    contentItem: Column
+    contentItem: Item
     {
-        id: contentColumn
-
-        spacing: 8
-        width: parent.availableWidth
-        anchors.centerIn: parent
+        id: itemHolder
 
         Rectangle
         {
             id: thumbnailContainer
 
             width: parent.width
-            height: parent.width * 9 / 16
+            height:
+            {
+                const dummyModeOffset = d.showTumbnailDummy
+                    ? cameraInfo.height + cameraInfo.margin * 2
+                    : 0
+                return parent.width * cameraItem.aspectRatio - dummyModeOffset
+            }
+
             color: d.showTumbnailDummy ? ColorTheme.colors.dark7 : ColorTheme.colors.dark4
 
             Loader
@@ -126,29 +126,60 @@ Control
             }
         }
 
-        Row
+        Rectangle
         {
-            width: parent.width
-            spacing: 6
+            id: cameraInfo
 
-            StatusIndicator
+            readonly property int margin: 4
+            readonly property int padding: 6
+            readonly property int spacing: 2
+
+            radius: 3
+            color: ColorTheme.transparent(ColorTheme.colors.dark8, 0.6)
+
+            x: margin
+            y: parent.height - height - margin
+            height: 26
+
+            width:
+            {
+                const indicatorSpace = statusIndicator.width
+                    ? statusIndicator.width + spacing
+                    : 0
+
+                return indicatorSpace + label.width + padding * 2
+            }
+
+            RecordingStatusIndicator
             {
                 id: statusIndicator
 
-                status: d.status
-                y: 4
+                x: cameraInfo.padding
+                anchors.verticalCenter: parent.verticalCenter
+
+                useSmallIcon: true
+                resource: cameraItem.resource
+                sourceSize: Qt.size(10, 10)
             }
 
             Text
             {
                 id: label
 
-                width: parent.width - x - parent.spacing
-                height: 24
-                font.pixelSize: 16
-                font.weight: d.showTumbnailDummy ? Font.DemiBold : Font.Normal
+                x: statusIndicator.width
+                   ? statusIndicator.x + statusIndicator.width + cameraInfo.spacing
+                   : cameraInfo.padding
+                width:
+                {
+                    const maxWidth =
+                        itemHolder.width - label.x - cameraInfo.padding - cameraInfo.margin * 2
+                    return Math.min(implicitWidth, maxWidth)
+                }
+
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: 12
                 elide: Text.ElideRight
-                color: d.showTumbnailDummy ? ColorTheme.colors.dark11 : ColorTheme.windowText
+                color: ColorTheme.colors.light4
             }
         }
     }
@@ -178,6 +209,10 @@ Control
             leftPadding: 8
             rightPadding: 8
             property real availableWidth: width - leftPadding - rightPadding
+
+            scale: thumbnailContainer.height < height
+                ? thumbnailContainer.height / height
+                : 1
 
             Image
             {

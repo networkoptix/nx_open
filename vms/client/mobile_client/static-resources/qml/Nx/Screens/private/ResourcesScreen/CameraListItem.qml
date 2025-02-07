@@ -17,6 +17,7 @@ Control
     property alias text: label.text
     property alias thumbnail: thumbnail.source
     property int status
+    property alias resource: statusIndicator.resource
 
     signal clicked
     signal pressAndHold
@@ -89,10 +90,10 @@ Control
             height: 1
         }
 
-        StatusIndicator
+        RecordingStatusIndicator
         {
             id: statusIndicator
-            status: cameraItem.status
+
             anchors.verticalCenter: parent.verticalCenter
         }
 

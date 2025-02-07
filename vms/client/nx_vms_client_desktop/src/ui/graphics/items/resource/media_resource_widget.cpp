@@ -52,6 +52,7 @@
 #include <nx/utils/property_storage/property.h>
 #include <nx/utils/trace/trace.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/media/consuming_motion_metadata_provider.h>
 #include <nx/vms/client/core/motion/motion_grid.h>
@@ -91,7 +92,6 @@
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/analytics_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/audio_spectrum_overlay_widget.h>
@@ -351,6 +351,8 @@ QVector<QRectF> getBoundingBoxes(
 }
 
 } // namespace
+
+using nx::vms::client::core::RecordingStatusHelper;
 
 QnMediaResourceWidget::QnMediaResourceWidget(
     nx::vms::client::desktop::SystemContext* systemContext,

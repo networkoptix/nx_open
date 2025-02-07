@@ -12,21 +12,21 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <utils/common/synctime.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 using namespace nx::vms::api;
 
 namespace {
 
-const core::SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
+const SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
     {QIcon::Normal, {.primary = "light10"}}
 };
 
-const core::SvgIconColorer::ThemeSubstitutions kRecordingTheme = {
+const SvgIconColorer::ThemeSubstitutions kRecordingTheme = {
     {QIcon::Normal, {.primary = "red_l1"}}
 };
 
@@ -44,7 +44,7 @@ bool hasArchive(const QnVirtualCameraResourcePtr& camera)
         systemContext->cameraHistoryPool()->getCameraFootageData(camera, /*filterOnlineServers*/ true);
 
     return !footageServers.empty();
-};
+}
 
 using namespace std::chrono;
 
@@ -152,7 +152,7 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
         {
             m_connections << connect(
                 systemContext->serverTimeWatcher(),
-                &core::ServerTimeWatcher::timeZoneChanged,
+                &ServerTimeWatcher::timeZoneChanged,
                 this,
                 &RecordingStatusHelper::updateRecordingMode);
         }
@@ -177,9 +177,24 @@ QString RecordingStatusHelper::qmlIconName() const
     return qmlIconName(m_recordingStatus, m_metadataTypes);
 }
 
+QString RecordingStatusHelper::qmlSmallIconName() const
+{
+    return qmlSmallIconName(m_recordingStatus, m_metadataTypes);
+}
+
 QIcon RecordingStatusHelper::smallIcon() const
 {
     return smallIcon(m_recordingStatus, m_metadataTypes);
+}
+
+QSize RecordingStatusHelper::smallIconSize() const
+{
+    return QSize(16, 16);
+}
+
+QSize RecordingStatusHelper::normalIconSize() const
+{
+    return QSize(20, 20);
 }
 
 QString RecordingStatusHelper::tooltip(
@@ -275,7 +290,25 @@ QString RecordingStatusHelper::qmlIconName(
         case RecordingStatus::recordingScheduled:
             return "image://skin/20x20/Solid/record_part.svg";
     }
-    return QString();
+    return QString{};
+}
+
+QString RecordingStatusHelper::qmlSmallIconName(RecordingStatus recordingStatus,
+    nx::vms::api::RecordingMetadataTypes metadataTypes)
+{
+    switch (recordingStatus)
+    {
+        case RecordingStatus::recordingContinious:
+        case RecordingStatus::recordingMetadataOnly:
+        case RecordingStatus::recordingMetadataAndLQ:
+            return kRecordingIcon.iconPath();
+        case RecordingStatus::noRecordingOnlyArchive:
+            return kArchiveIcon.iconPath();
+        case RecordingStatus::recordingScheduled:
+            return kNotRecordingIcon.iconPath();
+        default:
+            return {};
+    }
 }
 
 QIcon RecordingStatusHelper::smallIcon(
@@ -292,8 +325,9 @@ QIcon RecordingStatusHelper::smallIcon(
             return qnSkin->icon(kArchiveIcon);
         case RecordingStatus::recordingScheduled:
             return qnSkin->icon(kNotRecordingIcon);
+        default:
+            return {};
     }
-    return QIcon();
 }
 
 QIcon RecordingStatusHelper::smallIcon(const QnVirtualCameraResourcePtr& camera)
@@ -304,7 +338,7 @@ QIcon RecordingStatusHelper::smallIcon(const QnVirtualCameraResourcePtr& camera)
 
 void RecordingStatusHelper::registerQmlType()
 {
-    qmlRegisterType<RecordingStatusHelper>("nx.vms.client.desktop", 1, 0, "RecordingStatusHelper");
+    qmlRegisterType<RecordingStatusHelper>("nx.vms.client.core", 1, 0, "RecordingStatusHelper");
 }
 
 void RecordingStatusHelper::updateRecordingMode()
@@ -323,4 +357,4 @@ void RecordingStatusHelper::updateRecordingMode()
     emit recordingModeChanged();
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

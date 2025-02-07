@@ -5,12 +5,12 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
-#include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/common/test_support/test_context.h>
 #include <utils/common/synctime.h>
 
@@ -29,7 +29,7 @@ NX_DECLARE_COLORIZED_ICON(kRecordingIcon, "16x16/Solid/recordingnow.svg", kRecor
 
 class RecordingStatusHelperTest: public ContextBasedTest
 {
-    RecordingStatusHelper m_recordingStatusHelper;
+    core::RecordingStatusHelper m_recordingStatusHelper;
     nx::CameraResourceStubPtr m_camera;
 
 public:

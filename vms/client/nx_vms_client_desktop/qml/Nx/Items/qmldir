@@ -6,7 +6,6 @@ DewarpingSettings 1.0 DewarpingSettings.qml
 FigureEditor 1.0 FigureEditor.qml
 FigurePreview 1.0 FigurePreview.qml
 Line 1.0 Line.qml
-RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
 ResourceBrowser 1.0 ResourceBrowser.qml
 ResourcePreview 1.0 ResourcePreview.qml
 ResourceSelectionDelegate 1.0 ResourceSelectionDelegate.qml

@@ -56,7 +56,7 @@ Page
     toolBar.contentItem.clip: false
     gradientToolbarBackground: true
 
-    toolBar.background.opacity: d.isPortraitLayout ? 0 : 1
+    toolBar.background.opacity: mainWindow.isPortraitLayout ? 0 : 1
 
     Rectangle
     {
@@ -84,21 +84,21 @@ Page
 
         audioEnabled: audioController.audioEnabled && eventDetailsScreen.activePage
 
-        y: !d.isPortraitLayout && header.visible
+        y: !mainWindow.isPortraitLayout && header.visible
            ? -header.height
            : 0
         x: -mainWindow.leftPadding
 
         width:
         {
-            return d.isPortraitLayout
+            return mainWindow.isPortraitLayout
                 ? parent.width
                 : mainWindow.width
         }
 
         height:
         {
-            if (!d.isPortraitLayout)
+            if (!mainWindow.isPortraitLayout)
                 return eventDetailsScreen.height
 
             const realWidth =
@@ -135,7 +135,7 @@ Page
 
             source: lp("/images/timeline_gradient.png")
             opacity: d.hasControls ? 1 : 0
-            visible: d.isPortraitLayout && opacity > 0
+            visible: mainWindow.isPortraitLayout && opacity > 0
         }
 
         IconButton
@@ -146,7 +146,7 @@ Page
             y: parent.height - height
             width: 48
             height: 48
-            visible: d.isPortraitLayout && !preview.cannotDecryptMedia
+            visible: mainWindow.isPortraitLayout && !preview.cannotDecryptMedia
 
             icon.source: lp("images/fullscreen_view_mode.svg")
             icon.width: 24
@@ -278,7 +278,7 @@ Page
         {
             labelPadding: 12
             anchors.verticalCenter: parent.verticalCenter
-            visible: !d.isPortraitLayout
+            visible: !mainWindow.isPortraitLayout
 
             icon.source: lp("/images/go_to_camera.svg")
             text: qsTr("Show on Camera")
@@ -346,15 +346,15 @@ Page
 
     Text
     {
-        parent: d.isPortraitLayout
+        parent: mainWindow.isPortraitLayout
             ? preview
             : playbackPanel
 
         visible: !preview.cannotDecryptMedia
-        x: d.isPortraitLayout
+        x: mainWindow.isPortraitLayout
             ? 16
             : parent.width - width - 16 - (headerButton.visible ? headerButton.width + 16 : 0)
-        y: d.isPortraitLayout
+        y: mainWindow.isPortraitLayout
             ? parent.height - height - 14
             : (parent.height - height) / 2
 
@@ -369,27 +369,27 @@ Page
     {
         id: headerButton
 
-        parent: d.isPortraitLayout
+        parent: mainWindow.isPortraitLayout
             ? preview
             : playbackPanel
 
         visible: !preview.cannotDecryptMedia
-        x: d.isPortraitLayout
+        x: mainWindow.isPortraitLayout
             ? parent.width - width - goFullscreenModeButton.width
             : parent.width - width - 16;
 
-        y: d.isPortraitLayout
+        y: mainWindow.isPortraitLayout
             ? parent.height - height
             : (parent.height - height) / 2
         padding: 0
-        icon.source: d.isPortraitLayout
+        icon.source: mainWindow.isPortraitLayout
             ? lp("/images/go_to_camera.svg")
             : lp("/images/exit_fullscreen_mode.svg")
         icon.width: 24
         icon.height: icon.height
         onClicked:
         {
-            if (d.isPortraitLayout)
+            if (mainWindow.isPortraitLayout)
             {
                 d.goToCamera()
             }
@@ -511,7 +511,7 @@ Page
     {
         target: d
         property: "hasControls"
-        value: d.isPortraitLayout || d.showControls
+        value: mainWindow.isPortraitLayout || d.showControls
     }
 
     QtObject
@@ -522,7 +522,6 @@ Page
 
         property ModelDataAccessor accessor: ModelDataAccessor {}
         property bool showControls: true
-        property bool isPortraitLayout: mainWindow.width < mainWindow.height
         property int exclusionAreaY: eventDetailsScreen.activePage
             ? slider.parent.mapToGlobal(0, slider.y).y * Screen.devicePixelRatio
             : 0
@@ -580,9 +579,17 @@ Page
 
         onHasControlsChanged: updateStatusBarVisibility()
 
-        onIsPortraitLayoutChanged: d.hasControls = true
-
         onExclusionAreaYChanged: updateGestureExclusionArea()
+    }
+
+    Connections
+    {
+        target: mainWindow
+
+        function onIsPortraitLayoutChanged()
+        {
+            d.hasControls = true
+        }
     }
 
     Component.onCompleted:

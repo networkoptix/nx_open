@@ -10,3 +10,4 @@ SettingsScreen 1.0 SettingsScreen.qml
 DeveloperSettingsScreen 1.0 DeveloperSettingsScreen.qml
 BetaFeaturesScreen 1.0 BetaFeaturesScreen.qml
 VideoDummy 1.0 VideoDummy.qml
+EventSearchMenuScreen 1.0 EventSearchMenuScreen.qml

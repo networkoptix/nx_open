@@ -48,7 +48,7 @@ QuickControls.Page
             {
                 id: toolBar
                 title: control && control.title
-                leftButtonIcon.source: lp("/images/arrow_back.png")
+                leftButtonIcon.source: d.kBackButtonIconSource
                 onLeftButtonClicked: control.leftButtonClicked()
                 onClicked: control.headerClicked()
             }
@@ -82,7 +82,7 @@ QuickControls.Page
             {
                 control.customBackHandler()
             }
-            else
+            else if (leftButtonIcon.source === d.kBackButtonIconSource)
             {
                 if (sideNavigation.opened)
                 {
@@ -124,5 +124,12 @@ QuickControls.Page
             sideNavigation.close()
 
         sideNavigation.enabled = sideNavigationEnabled
+    }
+
+    QtObject
+    {
+        id: d
+
+        readonly property string kBackButtonIconSource: lp("/images/arrow_back.png")
     }
 }

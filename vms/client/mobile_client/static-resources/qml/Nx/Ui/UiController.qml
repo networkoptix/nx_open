@@ -75,6 +75,14 @@ NxObject
                     return Controller.CameraSettingsScreen
                 case "betaFeaturesScreen":
                     return Controller.BetaFeaturesScreen
+                case "eventSearchScreen":
+                    return Controller.EventSearchScreen
+                case "eventDetailsScreen":
+                    return Controller.DetailsScreen
+                case "eventSearchMenuScreen":
+                    return Controller.EventSearchMenuScreen
+                case "menuScreen":
+                    return Controller.MenuScreen
                 default:
                     return Controller.UnknownScreen
             }

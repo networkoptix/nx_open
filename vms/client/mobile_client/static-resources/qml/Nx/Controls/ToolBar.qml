@@ -22,7 +22,7 @@ ToolBarBase
         anchors.verticalCenter: parent.verticalCenter
         x: 8
         padding: 0
-        visible: icon != ""
+        visible: icon.source != ""
         onClicked: leftButtonClicked()
         alwaysCompleteHighlightAnimation: false
     }
@@ -30,9 +30,14 @@ ToolBarBase
     PageTitleLabel
     {
         id: label
+
+        readonly property real buttonSpace:
+            8 + (leftButton.width ? leftButton.x + leftButton.width : 0)
+        readonly property real maxWidth: parent.width - buttonSpace - (controlsRow.width + 8)
+
+        x: Math.max(parent.width / 2 - width / 2, buttonSpace)
+        width: Math.max(0, Math.min(implicitWidth, maxWidth))
         anchors.verticalCenter: parent.verticalCenter
-        x: leftButton.visible ? 72 : 16
-        width: controlsRow.x - x - 8
     }
 
     Row

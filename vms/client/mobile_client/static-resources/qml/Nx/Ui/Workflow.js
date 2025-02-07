@@ -208,9 +208,9 @@ function openCameraSettingsScreen(mediaPlayer, audioSupported, audioController)
 function openEventSearchScreen(selectedResourceId, camerasModel, analyticsSearchMode)
 {
     if (hasScreenInStack("eventSearchScreen"))
-        popScreens(2) //< Pop video and event details screen.
+        popScreens(3) //< Pop video, event details, screen.
 
-    stackView.safePush(Qt.resolvedUrl("../Screens/EventSearch/SearchScreen.qml"),
+    stackView.safePush(Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"),
         {
             'camerasModel': camerasModel,
             'customResourceId': selectedResourceId,
@@ -241,6 +241,16 @@ function openEventDetailsScreen(camerasModel, bookmarksModel, currentIndex, isAn
 function openBetaFeaturesScreen()
 {
     stackView.safePush(Qt.resolvedUrl("../Screens/BetaFeaturesScreen.qml"))
+}
+
+function openEventSearchMenuScreen()
+{
+    stackView.safeReplace(null, Qt.resolvedUrl("../Screens/EventSearchMenuScreen.qml"))
+}
+
+function openMenuScreen()
+{
+    stackView.safeReplace(null, Qt.resolvedUrl("../Screens/MenuScreen.qml"))
 }
 
 function openDialog(path, properties)

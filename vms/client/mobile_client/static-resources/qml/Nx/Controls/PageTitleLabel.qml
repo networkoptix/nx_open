@@ -9,4 +9,6 @@ Text
     font.weight: Font.DemiBold
     color: ColorTheme.windowText
     elide: Text.ElideRight
+    horizontalAlignment: Text.AlignHCenter
+    verticalAlignment: Text.AlignVCenter
 }

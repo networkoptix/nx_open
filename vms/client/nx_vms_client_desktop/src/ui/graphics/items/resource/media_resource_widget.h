@@ -40,10 +40,11 @@
 struct QnMetaDataV1;
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 
+namespace nx::vms::client::core { class RecordingStatusHelper; }
+
 namespace nx::vms::client::desktop {
 
 class VoiceSpectrumPainter;
-class RecordingStatusHelper;
 class MediaResourceWidgetPrivate;
 class AnalyticsOverlayWidget;
 class AreaSelectOverlayWidget;
@@ -490,7 +491,7 @@ private:
     /** Whether motion selection cached paths are valid. */
     mutable bool m_motionSelectionCacheValid = false;
 
-    nx::vms::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
+    nx::vms::client::core::RecordingStatusHelper* m_recordingStatusHelper;
 
     QnPtzControllerPtr m_ptzController;
 

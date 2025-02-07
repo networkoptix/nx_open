@@ -25,6 +25,7 @@
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/camera/buttons/abstract_camera_button_controller.h>
+#include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
@@ -197,6 +198,7 @@ void registerQmlTypesInternal()
     TranslationListModel::registerQmlType();
     MultilineTextItem::registerQmlType();
     NameValueTableCalculator::registerQmlType();
+    RecordingStatusHelper::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 

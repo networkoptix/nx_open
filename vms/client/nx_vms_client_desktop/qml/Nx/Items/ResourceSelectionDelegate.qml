@@ -105,6 +105,10 @@ Item
                 {
                     id: recordingIcon
                     resource: delegateItem.resource
+                    color: (extras.flags & ResourceTree.ResourceExtraStatusFlag.recording
+                        || extras.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
+                        ? "red_l"
+                        : "dark17"
                 }
             }
         }
