@@ -187,8 +187,10 @@ QnBookmarksViewer::Impl::Impl(QWidget* tooltipParentWidget,
 
             if (m_bookmarkHoverProcessor->isHovered())
             {
+                // The cursor is outside both the bookmark tooltip and the timeline.
                 closeTooltip = !m_bookmarkTooltip->rect().contains(
-                    m_bookmarkTooltip->mapFromGlobal(QCursor::pos()));
+                    m_bookmarkTooltip->mapFromGlobal(QCursor::pos()))
+                    && (!m_timelineHoverProcessor || !m_timelineHoverProcessor->isHovered());
             }
             else
             {
