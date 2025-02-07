@@ -261,8 +261,12 @@ bool EncodedAudioInfo::setupFormat(QString& errMessage)
     {
         NX_DEBUG(this, "Input audio device doesn't support audio format %1. Try another one", m_audioFormat);
 
-        if (!m_audioDevice.supportedSampleFormats().contains(m_audioFormat.sampleFormat()))
-            m_audioFormat.setSampleFormat(m_audioDevice.preferredFormat().sampleFormat());
+        // Qt preferredFormat() often returns 'float' format because it uses WASAPI
+        // But this class capture audio with MME 'waveInOpen' old API,
+        // that supports integer formats only. So, that check is irrelevant.
+
+        //if (!m_audioDevice.supportedSampleFormats().contains(m_audioFormat.sampleFormat()))
+        //    m_audioFormat.setSampleFormat(m_audioDevice.preferredFormat().sampleFormat());
 
         // Set the nearest supported values.
 
