@@ -23,10 +23,13 @@ struct NX_VMS_COMMON_API QnThumbnailRequestData: QnMultiserverRequestData
         type(type)
     {}
 
-    QnThumbnailRequestData(nx::api::CameraImageRequest request, RequestType type):
+    QnThumbnailRequestData(nx::api::CameraImageRequest request,
+        RequestType type,
+        bool isLocal = false):
         request(std::move(request)),
         type(type)
     {
+        QnBaseMultiserverRequestData::isLocal = isLocal;
     }
 
     nx::api::CameraImageRequest request;
