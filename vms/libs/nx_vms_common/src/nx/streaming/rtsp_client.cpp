@@ -1152,7 +1152,7 @@ bool QnRtspClient::sendKeepAlive()
     return sendRequestInternal(std::move(request));
 }
 
-void QnRtspClient::sendBynaryResponse(const quint8* buffer, int size)
+void QnRtspClient::sendBinaryResponse(const quint8* buffer, int size)
 {
     if (m_tcpSock)
         m_tcpSock->send(buffer, size);

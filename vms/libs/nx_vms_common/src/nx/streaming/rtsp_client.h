@@ -289,7 +289,7 @@ public:
     */
     int readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxedData, int& channelNumber);
 
-    void sendBynaryResponse(const quint8* buffer, int size);
+    void sendBinaryResponse(const quint8* buffer, int size);
     void setPlayNowModeAllowed(bool value);
     bool isPlayNowMode() const;
     static quint8* prepareDemuxedData(std::vector<nx::utils::ByteArray*>& demuxedData, int channel, int reserve);

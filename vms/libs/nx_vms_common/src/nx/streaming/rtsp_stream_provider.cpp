@@ -273,7 +273,7 @@ void RtspStreamProvider::processTcpRtcp(quint8* buffer, int bufferSize, int buff
     {
         quint16* sizeField = (quint16*) (buffer+2);
         *sizeField = htons(outBufSize);
-        m_RtpSession.sendBynaryResponse(buffer, outBufSize+4);
+        m_RtpSession.sendBinaryResponse(buffer, outBufSize+4);
     }
     m_rtcpReportTimer.restart();
 }
@@ -288,7 +288,7 @@ void RtspStreamProvider::buildClientRTCPReport(quint8 chNumber)
     {
         quint16* sizeField = (quint16*) (buffer+2);
         *sizeField = htons(outBufSize);
-        m_RtpSession.sendBynaryResponse(buffer, outBufSize+4);
+        m_RtpSession.sendBinaryResponse(buffer, outBufSize+4);
     }
 }
 
