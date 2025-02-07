@@ -343,9 +343,6 @@ void RecordingStatusHelper::registerQmlType()
 
 void RecordingStatusHelper::updateRecordingMode()
 {
-    if (!m_camera)
-        return;
-
     const auto [newRecordingStatus, newMetadataTypes] = currentRecordingMode(m_camera);
 
     if (newRecordingStatus == m_recordingStatus && newMetadataTypes == m_metadataTypes)
