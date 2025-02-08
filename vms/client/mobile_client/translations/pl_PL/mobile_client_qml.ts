@@ -38,7 +38,7 @@
     </message>
     <message>
       <source>Ability to download video</source>
-      <translation type="unfinished">Ability to download video</translation>
+      <translation>Możliwość pobierania wideo</translation>
     </message>
     <message>
       <source>Speedup connections</source>
