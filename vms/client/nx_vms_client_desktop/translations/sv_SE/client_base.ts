@@ -6850,11 +6850,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
     <message>
       <source>Add To List</source>
-      <translation type="unfinished">Add To List</translation>
+      <translation>Lägg till lista</translation>
     </message>
     <message>
       <source>Create New List...</source>
-      <translation type="unfinished">Create New List...</translation>
+      <translation>Skapa ny lista...</translation>
     </message>
   </context>
   <context>
@@ -7166,15 +7166,15 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Webbplatsen stängs av</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the Site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the Site should be in active state. %1</translation>
+      <translation>För att säkerhetskopiera till en molnlagring bör systemet vara i aktivt tillstånd. %1</translation>
     </message>
     <message>
       <source>Site suspended. To make changes to backup configuration, the Site should be in active state. %1</source>
-      <translation type="unfinished">Site suspended. To make changes to backup configuration, the Site should be in active state. %1</translation>
+      <translation>Systemet är avstängt. För att göra ändringar i säkerhetskopieringskonfigurationen bör systemet vara i aktivt tillstånd. %1</translation>
     </message>
   </context>
   <context>
@@ -7249,7 +7249,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Missat samtal</translation>
     </message>
   </context>
   <context>
@@ -8110,12 +8110,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Anslut systemet till %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Anslut systemet till %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
