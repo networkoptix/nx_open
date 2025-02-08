@@ -255,6 +255,9 @@ BookmarkSearchListModel::BookmarkSearchListModel(
     d(new Private{.q = this})
 {
     setSystemContext(systemContext);
+
+    connect(d->textFilter.get(), &TextFilterSetup::textChanged,
+        this, &AbstractSearchListModel::clear);
 }
 
 BookmarkSearchListModel::BookmarkSearchListModel(SystemContext* systemContext, QObject* parent):
