@@ -90,9 +90,9 @@ Prerequisites:
     - ATTENTION: When linking to the C++ runtime dynamically (Visual Studio does it by default),
         avoid using the latest build tools (toolset) to avoid crashes - see the details in
         [src/nx/sdk/dynamic_libraries.md](@ref md_src_nx_sdk_dynamic_libraries).
-- Linux (Ubuntu 18.04, 20.04, 22.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
+- Linux (Ubuntu 20.04, 22.04, 24.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
     cross-compiling:
-    - g++ >= 7.5
+    - g++ >= 9.5
     - make or Ninja
 - Qt6 (required by certain samples only)
 - Raspberry Pi sysroot (required by certain samples only)

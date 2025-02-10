@@ -89,18 +89,6 @@ Take the `<version>` value from `requirements.txt`.
 
 **Python 3.8+** should be installed and available on `PATH` as both `python` and `python3`. A
 possible installation procedure of Python 3.8 could look like the following:
-- **Ubuntu 18**: The default version of Python in the Ubuntu 18 distribution is `python3.6`
-    (Ubuntu 18.04.5 LTS), so it is necessary to upgrade it - some tricks are required. Perform
-    the following steps to install the required Python version and configure it:
-    ```
-    sudo apt update
-    sudo apt install python3.8 python3-pip -y
-    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 100
-    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100
-    sudo python -m pip install pip --upgrade
-    find /usr/lib/python3/dist-packages -name "*apt_*.cpython-3?m*" -exec sh -c \
-        "new_name=\$(echo {} | cut -d. -f1); sudo ln -s {} \${new_name}.so" \;
-    ```
 - **Ubuntu 20**: Make `python` command equivalent to `python3`:
     ```
     sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100

@@ -61,8 +61,8 @@ Prerequisites:
 ```
 - CMake >= 3.14
 - Windows (7, 10 or 11): Microsoft Visual Studio >= 2012
-- Linux (Ubuntu 18.04, 20.04, 22.04)
-    - g++ >= 7.5
+- Linux (Ubuntu 20.04, 22.04, 24.04)
+    - g++ >= 9.5
     - make or Ninja
 ```
 

@@ -37,7 +37,7 @@ as well as the component source code.
 
 Supported target platforms and architectures:
 - Windows 10 x64 (Microsoft Visual Studio).
-- Linux Ubuntu 18.04, 20.04, 22.04 (GCC or Clang) x64, ARM 32/64 (cross-compiling on Linux x64).
+- Linux Ubuntu 20.04, 22.04, 24.04 (GCC or Clang) x64, ARM 32/64 (cross-compiling on Linux x64).
 - macOS Monterey 12.6.3 (Xcode with Clang) x64, Apple M1/M2.
 
 Build prerequisites:
