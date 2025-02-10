@@ -10287,17 +10287,17 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Välj typer...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Alla meddelanden</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n aviseringstyper</numerusform>
+        <numerusform>%n aviseringstyper</numerusform>
       </translation>
     </message>
   </context>
@@ -10305,7 +10305,7 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Välj Aviseringstyper</translation>
     </message>
   </context>
   <context>
@@ -10566,7 +10566,7 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     <message>
       <source>The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The site is not connected to %1. Mobile notifications work only when the site is connected to %1.</translation>
+      <translation>Platsen är inte ansluten till %1. Mobilaviseringar fungerar bara när sajten är ansluten till %1.</translation>
     </message>
   </context>
   <context>
@@ -10665,11 +10665,11 @@ Du kan tvinga rörelsedetektering, men det kan leda till en betydande ökning av
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Automatisk uppdatering av integration</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Uppdatera webbsida automatiskt</translation>
     </message>
   </context>
   <context>
@@ -11074,8 +11074,8 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Kvalitets- och FPS-inställningar är inaktiverade på grund av &quot;Tillåt optimering av kamerainställningar&quot; i &quot;Site Administration&quot; dialogrutan.
+Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
     </message>
   </context>
   <context>
@@ -11177,21 +11177,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Ytterligare konfiguration kan krävas på servermaskinen.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Krypteringslösenordet kommer att krävas för att återställa arkivet.
+Varning: Detta lösenord kan inte återställas. Om du förlorar det, arkivet kommer inte att återställas.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Krypterar arkivera data för att förhindra att den visas utanför webbplatsen. Du kommer inte behöva ange krypteringslösenordet för att visa videoarkivet på denna webbplats.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>Obegränsad livslängd för användarsessioner hotar den övergripande webbplatssäkerheten och kan leda till prestandaförsämring</translation>
     </message>
   </context>
   <context>
@@ -11202,14 +11202,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>%n objekt valda</numerusform>
+        <numerusform>%n objekt valda</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Alla objekt</translation>
     </message>
   </context>
   <context>
@@ -11621,15 +11621,15 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>Platsen överskrider dess Organisation&apos;s gränser och kan bli icke-funktionell snart. Vänligen justera din användning för att undvika störningar i tjänsterna.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Öppna Inställningar</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Öppna tjänster</translation>
     </message>
   </context>
   <context>
@@ -11653,12 +11653,12 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Din åtkomst till webbplatsen upphör %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>Din åtkomst till webbplatsen upphör om %1</translation>
     </message>
   </context>
   <context>
@@ -11727,7 +11727,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Denna åtgärd stöds inte för meddelanden från andra webbplatser</translation>
     </message>
   </context>
   <context>
@@ -11885,7 +11885,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Det finns flera grupper med detta namn. För att upprätthålla en tydlig och organiserad struktur, föreslår vi att tillhandahålla unika namn för varje grupp.</translation>
     </message>
   </context>
   <context>
@@ -11944,7 +11944,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Platsfel</translation>
     </message>
   </context>
   <context>
@@ -11996,7 +11996,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Det finns en annan användare med denna inloggning. För att undvika problem krävs det att alla användare har en unik inloggning.</translation>
     </message>
   </context>
   <context>
@@ -12142,7 +12142,7 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Detta kommer omedelbart att ta bort en åtkomst till platsen för denna användare</translation>
     </message>
   </context>
   <context>
@@ -12461,11 +12461,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>Ej tillgänglig i dedikerat fönsterläge</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>Flytta det här fönstret till layouten för att använda denna funktionalitet</translation>
     </message>
   </context>
   <context>
@@ -12491,7 +12491,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>Det gick inte att ansluta till platsen eftersom den har blivit offline</translation>
     </message>
   </context>
   <context>
@@ -12582,7 +12582,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>Hoppa över version</translation>
     </message>
   </context>
   <context>
@@ -12850,11 +12850,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>Resurs hittades inte</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>Parametern kunde inte hittas</translation>
     </message>
   </context>
   <context>
@@ -13045,11 +13045,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>Lägg till titel eller kommentar</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>Regeln är inte giltig och kanske inte fungerar</translation>
     </message>
   </context>
   <context>
@@ -13068,7 +13068,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>Token</translation>
     </message>
   </context>
   <context>
@@ -13207,19 +13207,19 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>När händelsen inträffar</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>När händelsen startar</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>När händelsen slutar</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>Välj tillstånd</translation>
     </message>
   </context>
   <context>
@@ -13242,11 +13242,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Innehåller inte nyckelord</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Innehåller inte listposter</translation>
     </message>
   </context>
   <context>
@@ -13309,15 +13309,15 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>Begränsning</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>Tillåten</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>Nuvarande</translation>
     </message>
   </context>
   <context>
@@ -13682,10 +13682,10 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Analysdatabasen bör endast lagras på en lokal enhet och kan ta upp stora mängder utrymme.
+När en plats för att lagra analysdata är vald, kan det inte lätt ändras utan att förlora befintliga data. Vi rekommenderar att välja platsen noga och att undvika att använda systempartitionen eftersom det kan orsaka allvarliga fel.
+Som standard lagras analysdata på %1.
+Du kan välja en annan lagringsplats i fliken &quot;Storage Management&quot; i serverinställningarna.</translation>
     </message>
   </context>
   <context>
@@ -13832,7 +13832,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>Automatiska klientuppdateringar</translation>
     </message>
   </context>
   <context>
