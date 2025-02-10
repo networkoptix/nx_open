@@ -307,6 +307,18 @@ public slots:
     void pause();
 
     /**
+     * Go to a next video frame. Method accessible in pause mode only.
+     * Otherwise it does nothing.
+     */
+    void nextFrame();
+
+    /**
+     * Go to a previous video frame. Method accessible in pause mode only.
+     * Otherwise it does nothing.
+     */
+    void previousFrame();
+
+    /**
      * Preview mode similar to pause mode but optimized for fast seek.
      */
     void preview();

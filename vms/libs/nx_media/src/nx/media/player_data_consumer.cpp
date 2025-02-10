@@ -61,6 +61,8 @@ PlayerDataConsumer::PlayerDataConsumer(
         this, &PlayerDataConsumer::onBeforeJump);
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccurred,
         this, &PlayerDataConsumer::onJumpOccurred);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::prevFrameOccurred,
+        this, [this]() {clearUnprocessedData();});
 }
 
 PlayerDataConsumer::~PlayerDataConsumer()

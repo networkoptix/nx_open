@@ -418,10 +418,8 @@ void Player::Private::at_hurryUp()
 
 void Player::Private::at_jumpOccurred(int sequence)
 {
-    if (!videoFrameToRender)
-        return;
-    FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
-    if (sequence && sequence != metadata.sequence)
+    int seq = videoFrameToRender ? FrameMetadata::deserialize(videoFrameToRender).sequence : -1;
+    if (sequence && sequence != seq)
     {
         // Drop deprecate frame
         clearCurrentFrame();
@@ -1140,6 +1138,7 @@ void Player::play()
     d->updateAudio();
 
     d->lastVideoPtsMs.reset();
+    d->archiveReader->resumeMedia();
     d->at_hurryUp(); //< renew receiving frames
 
     NX_DEBUG(this, "play() END");
@@ -1151,7 +1150,25 @@ void Player::pause()
     NX_DEBUG(this, "pause()");
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
+    d->archiveReader->pauseMedia();
     d->updateAudio();
+}
+
+void Player::nextFrame()
+{
+    NX_DEBUG(this, "nextFrame()");
+    if (d->state != State::Paused)
+        return;
+    d->archiveReader->nextFrame();
+    d->presentNextFrame();
+}
+
+void Player::previousFrame()
+{
+    NX_DEBUG(this, "previousFrame()");
+    if (d->state != State::Paused)
+        return;
+    d->archiveReader->previousFrame(d->positionMs * 1000);
 }
 
 void Player::preview()
