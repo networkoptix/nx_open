@@ -272,6 +272,7 @@ void WebSocket::sendAsync(const nx::Buffer* buffer, IoCompletionHandler handler)
 
 void WebSocket::sendAsync(Frame&& frame, IoCompletionHandler handler)
 {
+    NX_ASSERT(handler);
     post(
         [this, frame = std::move(frame), handler = std::move(handler)]() mutable
         {

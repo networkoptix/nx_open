@@ -120,7 +120,15 @@ public:
         CloudAuthenticate cloudAuthenticate;
         cloudAuthenticate.accessToken = QString::fromStdString(credentials.authToken.value);
         const nx::Buffer writeBuffer = nx::reflect::json::serialize(cloudAuthenticate);
-        p2pWebsocketTransport->sendAsync(&writeBuffer, {});
+        p2pWebsocketTransport->sendAsync(&writeBuffer,
+            [this](SystemError::ErrorCode errorCode, std::size_t /*bytesTransferred*/)
+            {
+                if (errorCode != SystemError::noError)
+                {
+                    NX_DEBUG(this, "Failed to send data to the cloud. Error code: %1", errorCode);
+                    scheduleReconnect();
+                }
+            });
     }
 
 private:
