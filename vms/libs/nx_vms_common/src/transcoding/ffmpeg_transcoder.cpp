@@ -225,6 +225,23 @@ void QnFfmpegTranscoder::setSourceResolution(const QSize& resolution)
     m_mediaTranscoder.setSourceResolution(resolution);
 }
 
+bool QnFfmpegTranscoder::open(const AVCodecParameters* codecParameters)
+{
+    m_mediaTranscoder.resetVideo();
+    m_mediaTranscoder.resetAudio();
+
+    bool result = false;
+    if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO)
+        result = m_muxer.addVideo(codecParameters);
+    else if (codecParameters->codec_type == AVMEDIA_TYPE_AUDIO)
+        result = m_muxer.addAudio(codecParameters);
+
+    if (!result)
+        return false;
+
+    return m_muxer.open();
+}
+
 bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
     if (!video)

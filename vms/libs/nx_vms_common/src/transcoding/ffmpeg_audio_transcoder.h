@@ -75,6 +75,8 @@ public:
      */
     AVCodecContext* getCodecContext();
 
+    AVCodecParameters* getCodecParameters();
+
     /**
      * \brief Sets destination sample rate.
      * \param value Desired destination sample rate.
@@ -109,7 +111,7 @@ private:
      * Wrapper for m_encoderContext.
      * Used to create our own media packets from AVPacket ffmpeg structure.
      */
-    CodecParametersConstPtr m_context;
+    CodecParametersConstPtr m_codecParamaters;
 
     int m_dstSampleRate = 0;
     bool m_isOpened = false;

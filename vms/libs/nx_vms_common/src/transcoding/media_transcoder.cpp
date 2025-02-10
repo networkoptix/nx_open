@@ -38,8 +38,16 @@ bool MediaTranscoder::setVideoCodec(
     config.targetCodecId = codec;
     config.useMultiThreadEncode = nx::transcoding::useMultiThreadEncode(codec, resolution);
     config.rtpContatiner = m_config.rtpContatiner;
+
+    return setVideoCodec(config, m_transcodingSettings);
+}
+
+bool MediaTranscoder::setVideoCodec(
+    QnFfmpegVideoTranscoder::Config config,
+    QnLegacyTranscodingSettings transcodingSettings)
+{
     m_vTranscoder = std::make_unique<QnFfmpegVideoTranscoder>(config, m_metrics);
-    auto filterChain = QnImageFilterHelper::createFilterChain(m_transcodingSettings);
+    auto filterChain = QnImageFilterHelper::createFilterChain(transcodingSettings);
     m_vTranscoder->setFilterChain(filterChain);
     return true;
 }

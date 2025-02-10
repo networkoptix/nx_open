@@ -45,6 +45,10 @@ public:
     * @return Returns true if no error or false otherwise
     */
     bool open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio);
+
+    // Direct stream copy of one stream only to support usage as muxer in QnUniversalRtpEncoder.
+    bool open(const AVCodecParameters* codecParameters);
+
     void setSeeking();
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
     void setSourceResolution(const QSize& resolution);

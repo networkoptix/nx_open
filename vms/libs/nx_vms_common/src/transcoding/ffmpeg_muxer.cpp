@@ -230,6 +230,7 @@ bool FfmpegMuxer::open()
 {
     if (m_formatCtx->nb_streams == 0)
         return false;
+
     m_formatCtx->pb = createFfmpegIOContext();
     int rez = avformat_write_header(m_formatCtx, 0);
     if (rez < 0)

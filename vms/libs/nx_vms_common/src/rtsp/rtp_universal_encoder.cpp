@@ -210,10 +210,10 @@ QList<QString> getSdpAttributesFromContext(AVFormatContext* fmt, int payloadType
     return result;
 }
 
-QList<QString> getSdpAttributesFromMedia(
-    QnConstAbstractMediaDataPtr media, int payloadType, bool webRtcMode)
+QList<QString> getSdpAttributesFromCodecpar(
+    const AVCodecParameters* codecParameters, int payloadType, bool webRtcMode)
 {
-    if (!media->context)
+    if (!codecParameters)
         return QList<QString>();
 
     // We need to build AVFormatContext due to ffmpeg bug sdp.c:526(not checking oformat pointer).
@@ -231,7 +231,7 @@ QList<QString> getSdpAttributesFromMedia(
     memset(&ctx, 0, sizeof(ctx));
     ctx.nb_streams = 1;
     stream.codecpar = avcodec_parameters_alloc();
-    avcodec_parameters_copy(stream.codecpar, media->context->getAvCodecParameters());
+    avcodec_parameters_copy(stream.codecpar, codecParameters);
     streams[0] = &stream;
     ctx.streams = streams;
     QList<QString> sdp = getSdpAttributesFromContext(&ctx, payloadType, webRtcMode);
@@ -258,10 +258,6 @@ void QnUniversalRtpEncoder::buildSdp(
     m_sdpAttributes.clear();
     if (transcoding || !m_isVideo || !m_config.useMultipleSdpPayloadTypes)
     {
-        CodecParameters codecpar(m_isVideo
-            ? m_transcoder.muxer().getVideoCodecParameters()
-            : m_transcoder.muxer().getAudioCodecParameters());
-
         m_sdpAttributes = getSdpAttributesFromContext(
             m_transcoder.muxer().getFormatContext(), m_payloadType, m_config.webRtcMode);
     }
@@ -272,15 +268,19 @@ void QnUniversalRtpEncoder::buildSdp(
         if (quality != MEDIA_Quality_High && quality != MEDIA_Quality_ForceHigh)
             std::swap(highPayloadType, lowPayloadType);
 
-        if (mediaHigh)
+        if (mediaHigh && mediaHigh->context)
         {
-            m_sdpAttributes.append(
-                getSdpAttributesFromMedia(mediaHigh, highPayloadType, m_config.webRtcMode));
+            m_sdpAttributes.append(getSdpAttributesFromCodecpar(
+                    mediaHigh->context->getAvCodecParameters(),
+                    highPayloadType,
+                    m_config.webRtcMode));
         }
-        if (mediaLow)
+        if (mediaLow && mediaLow->context)
         {
-            m_sdpAttributes.append(
-                getSdpAttributesFromMedia(mediaLow, lowPayloadType, m_config.webRtcMode));
+            m_sdpAttributes.append(getSdpAttributesFromCodecpar(
+                mediaLow->context->getAvCodecParameters(),
+                lowPayloadType,
+                m_config.webRtcMode));
         }
         m_useSecondaryPayloadType = true;
     }
@@ -306,8 +306,8 @@ bool QnUniversalRtpEncoder::open(
     m_transcodingEnabled = dstCodec != AV_CODEC_ID_NONE;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
     m_sourceCodec = media->compressionType;
-    m_codec = m_transcodingEnabled ? dstCodec : media->compressionType;
-    m_payloadType = getPayloadType(m_codec, m_isVideo);
+    AVCodecID codec = m_transcodingEnabled ? dstCodec : media->compressionType;
+    m_payloadType = getPayloadType(codec, m_isVideo);
     QnFfmpegTranscoder::TranscodeMethod method = m_transcodingEnabled
         ? QnFfmpegTranscoder::TM_FfmpegTranscode
         : QnFfmpegTranscoder::TM_DirectStreamCopy;
@@ -334,14 +334,14 @@ bool QnUniversalRtpEncoder::open(
                 m_transcoder.setSourceResolution(sourceSize);
         }
         m_transcoder.setTranscodingSettings(extraTranscodeParams);
-        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, videoSize);
+        m_transcoder.setVideoCodec(codec, method, Qn::StreamQuality::normal, videoSize);
         status = m_transcoder.open(
             std::dynamic_pointer_cast<const QnCompressedVideoData>(media),
             QnConstCompressedAudioDataPtr());
     }
     else
     {
-        m_transcoder.setAudioCodec(m_codec, method);
+        m_transcoder.setAudioCodec(codec, method);
         status = m_transcoder.open(
             QnConstCompressedVideoDataPtr(),
             std::dynamic_pointer_cast<const QnCompressedAudioData>(media));
@@ -350,6 +350,37 @@ bool QnUniversalRtpEncoder::open(
         return false;
 
     buildSdp(mediaHigh, mediaLow, m_transcodingEnabled, requiredQuality);
+    return true;
+}
+
+bool QnUniversalRtpEncoder::open(const AVCodecParameters* codecParameters)
+{
+    if (!codecParameters)
+    {
+        NX_WARNING(this, "Empty codec parameters");
+        return false;
+    }
+    m_isVideo = codecParameters->codec_type == AVMEDIA_TYPE_VIDEO;
+    m_sourceCodec = codecParameters->codec_id;
+    
+    if (!m_transcoder.muxer().setContainer("rtp") || !isCodecSupported(codecParameters->codec_id))
+        return false;
+
+    if (m_config.absoluteRtcpTimestamps)
+    {
+        // disable ffmpeg rtcp report in oder to build it manually
+        m_transcoder.muxer().setFormatOption("rtpflags", "+skip_rtcp");
+    }
+
+    m_transcoder.muxer().setPacketizedMode(true);
+    if (!m_transcoder.open(codecParameters))
+    {
+        NX_WARNING(this, "Failed to open Ffmpeg muxer");
+        return false;
+    }
+    m_payloadType = getPayloadType(codecParameters->codec_id, m_isVideo);
+    m_sdpAttributes = getSdpAttributesFromCodecpar(
+        codecParameters, m_payloadType, m_config.webRtcMode);
     return true;
 }
 
@@ -512,11 +543,6 @@ void QnUniversalRtpEncoder::setSrtpEncryptionData(const EncryptionData& data)
         NX_WARNING(this, "Failure to init SRTP encryptor");
         m_encryptor.reset();
     }
-}
-
-bool QnUniversalRtpEncoder::isTranscodingEnabled() const
-{
-    return m_transcodingEnabled;
 }
 
 void QnUniversalRtpEncoder::setSeeking()

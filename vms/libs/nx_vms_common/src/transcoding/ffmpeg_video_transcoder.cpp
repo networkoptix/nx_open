@@ -144,6 +144,9 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     close();
 
+    if (!video)
+        return false;
+
     if (!prepareFilters(m_config.targetCodecId, video))
         return false;
 
@@ -222,9 +225,21 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         return false;
     }
 
+    if (!m_codecParamaters)
+        m_codecParamaters.reset(new CodecParameters(m_encoderCtx));
+
     m_encodeTimer.start();
     return true;
 }
+
+AVCodecParameters* QnFfmpegVideoTranscoder::getCodecParameters()
+{
+    if (m_codecParamaters)
+        return m_codecParamaters->getAvCodecParameters();
+
+    return nullptr;
+}
+
 
 int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
@@ -404,9 +419,9 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     resultVideoData->m_data.write((const char*) packet->data, packet->size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_config.targetCodecId);
 
-    if (!m_ctxPtr)
-        m_ctxPtr.reset(new CodecParameters(m_encoderCtx));
-    resultVideoData->context = m_ctxPtr;
+    if (!m_codecParamaters)
+        m_codecParamaters.reset(new CodecParameters(m_encoderCtx));
+    resultVideoData->context = m_codecParamaters;
     resultVideoData->width = m_encoderCtx->width;
     resultVideoData->height = m_encoderCtx->height;
     *result = QnCompressedVideoDataPtr(resultVideoData);

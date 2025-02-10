@@ -80,7 +80,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 {
-    if (!audio->context)
+    if (!audio || !audio->context)
     {
         NX_WARNING(this, "Audio context was not specified.");
         return false;
@@ -135,8 +135,19 @@ bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
         return false;
     }
 
+    if (!m_codecParamaters)
+        m_codecParamaters = CodecParametersConstPtr(new CodecParameters(m_encoderCtx));
+
     m_isOpened = true;
     return true;
+}
+
+AVCodecParameters* QnFfmpegAudioTranscoder::getCodecParameters()
+{
+    if (m_codecParamaters)
+        return m_codecParamaters->getAvCodecParameters();
+
+    return nullptr;
 }
 
 bool QnFfmpegAudioTranscoder::isOpened() const
@@ -304,10 +315,10 @@ void QnFfmpegAudioTranscoder::tuneContextsWithMedia(
 
 QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(const AVPacket &packet)
 {
-    if (!m_context)
-        m_context = CodecParametersConstPtr(new CodecParameters(m_encoderCtx));
+    if (!m_codecParamaters)
+        m_codecParamaters = CodecParametersConstPtr(new CodecParameters(m_encoderCtx));
 
-    auto resultAudioData = new QnWritableCompressedAudioData(packet.size, m_context);
+    auto resultAudioData = new QnWritableCompressedAudioData(packet.size, m_codecParamaters);
     resultAudioData->compressionType = m_config.targetCodecId;
 
     resultAudioData->timestamp = packet.pts;

@@ -30,7 +30,7 @@ enum class Error
     failedToWriteHeader
 };
 
-bool useMultiThreadEncode(AVCodecID codec, QSize resolution);
+NX_VMS_COMMON_API bool useMultiThreadEncode(AVCodecID codec, QSize resolution);
 QRect roundRect(const QRect& srcRect);
 QSize roundSize(const QSize& size);
 

@@ -149,7 +149,7 @@ void QnAbstractArchiveStreamReader::run()
 
         QnAbstractMediaDataPtr data = getNextData();
 
-        if (m_realTimeSpeed.has_value())
+        if (data && m_realTimeSpeed.has_value())
         {
             auto mediaRes = m_resource.dynamicCast<QnMediaResource>();
             if (mediaRes && !mediaRes->hasVideo(this) && data->dataType == QnAbstractMediaData::AUDIO)

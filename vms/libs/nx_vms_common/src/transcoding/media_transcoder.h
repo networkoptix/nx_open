@@ -46,6 +46,10 @@ public:
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());
 
+    bool setVideoCodec(
+        QnFfmpegVideoTranscoder::Config config,
+        QnLegacyTranscodingSettings transcodingSettings);
+
     /*
     * Set ffmpeg audio codec and params
     * @return Returns OperationResult::Success if no error or error code otherwise

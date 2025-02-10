@@ -38,6 +38,8 @@ public:
         const QSize& videoSize,
         const QnLegacyTranscodingSettings& extraTranscodeParams);
 
+    bool open(const AVCodecParameters* codecParameters);
+
     virtual QString getSdpMedia(bool isVideo, int trackId, int port = 0) override;
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
@@ -50,7 +52,6 @@ public:
     bool getNextNackPacket(nx::utils::ByteArray& sendBuffer);
     void setSrtpEncryptionData(const nx::vms::server::rtsp::EncryptionData& data);
     nx::vms::server::rtsp::SrtpEncryptor* encryptor() const;
-    bool isTranscodingEnabled() const;
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
     void setSeeking();
     int payloadType() const;
@@ -74,7 +75,6 @@ private:
     int m_outputPos = 0;
     int m_packetIndex = 0;
     QnFfmpegTranscoder m_transcoder;
-    AVCodecID m_codec = AV_CODEC_ID_NONE;
     AVCodecID m_sourceCodec = AV_CODEC_ID_NONE;
     bool m_isVideo = false;
     int m_payloadType = 0;

@@ -59,6 +59,7 @@ public:
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
     void close();
     AVCodecContext* getCodecContext();
+    AVCodecParameters* getCodecParameters();
 
     //!Returns picture size (in pixels) of output video stream
     QSize getOutputResolution() const;
@@ -89,7 +90,7 @@ private:
     qint64 m_averageCodingTimePerFrame = 0;
     qint64 m_averageVideoTimePerFrame = 0;
     qint64 m_droppedFrames = 0;
-    CodecParametersConstPtr m_ctxPtr;
+    CodecParametersConstPtr m_codecParamaters;
     nx::metric::Storage* m_metrics = nullptr;
     std::map<qint64, qint64> m_frameNumToPts;
     std::optional<int64_t> m_lastEncodedPts;
