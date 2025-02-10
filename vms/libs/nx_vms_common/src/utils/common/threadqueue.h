@@ -312,7 +312,7 @@ private:
 protected:
     std::vector<T> m_buffer;
     int m_headIndex;
-    int m_bufferLen;
+    std::atomic<int> m_bufferLen;
 
     int m_maxSize;
     mutable nx::Mutex m_mutex;
