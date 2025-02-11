@@ -18,7 +18,6 @@ CheckableTableView
     id: control
 
     required property Analytics.StateView taxonomy
-    property bool editing: false //< Shouldn't be changed outside this file.
     signal valueChanged
 
     columnSpacing: 0

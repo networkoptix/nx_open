@@ -19,10 +19,12 @@ TableView
     id: control
 
     property var sourceModel: null
+
+    property bool editing: false
+
     property bool horizontalHeaderVisible: false
     property alias headerBackgroundColor: columnsHeader.color
-    property alias horizontalHeaderEnabled: columnsHeader.enabled
-
+    property bool horizontalHeaderEnabled: true
     property alias headerDelegate: repeater.delegate
 
     property alias deleteShortcut: deleteShortcut
@@ -174,6 +176,7 @@ TableView
         color: ColorTheme.colors.dark7
 
         visible: control.horizontalHeaderVisible
+        enabled: control.horizontalHeaderEnabled && !control.editing
 
         Row
         {
@@ -218,18 +221,21 @@ TableView
     {
         id: deleteShortcut
         sequences: Qt.platform.os === "osx" ? ["Backspace", "Delete"] : ["Delete"]
-        enabled: control.activeFocus
+        enabled: control.activeFocus && !control.editing
     }
 
     Shortcut
     {
         id: enterShortcut
         sequences: ["Enter", "Return"]
-        enabled: control.activeFocus
+        enabled: control.activeFocus && !control.editing
     }
 
     Keys.onPressed: (event) =>
     {
+        if (editing)
+            return
+
         // At the moment only row selection is supported.
         // TODO: #mmalofeev add row selection for the ListNavigationHelper and use it here and in the delegate.
         if (selectionBehavior !== TableView.SelectRows)

@@ -13,6 +13,11 @@ TableView
 {
     id: root
 
+    function removeCheckedRows()
+    {
+        rowCheckModel.removeCheckedRows()
+    }
+
     readonly property bool hasCheckedRows: checkedRows.length > 0
     property alias checkedRows: rowCheckModel.checkedRows
 
@@ -62,7 +67,10 @@ TableView
         DelegateChoice
         {
             column: 0
-            BasicSelectableTableCheckableCellDelegate {}
+            BasicSelectableTableCheckableCellDelegate
+            {
+                enabled: !root.editing
+            }
         }
 
         DelegateChoice

@@ -25,6 +25,7 @@ public:
 
     QList<int> checkedRows() const;
     void setCheckedRows(const QList<int>& rows);
+    Q_INVOKABLE void removeCheckedRows();
 
     virtual void setSourceModel(QAbstractItemModel* sourceModel) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -49,6 +50,8 @@ public:
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
     virtual QHash<int, QByteArray> roleNames() const override;
+
+    virtual bool removeRows(int row, int count, const QModelIndex& parent) override;
 
     int sortColumn() const;
     Qt::SortOrder sortOrder() const;

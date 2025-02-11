@@ -51,6 +51,14 @@ void RowCheckModel::setCheckedRows(const QList<int>& rows)
     emit checkedRowsChanged();
 }
 
+void RowCheckModel::removeCheckedRows()
+{
+    for (const auto& checkedRow: m_checkedRows)
+        removeRow(checkedRow.row());
+
+    m_checkedRows.clear();
+}
+
 void RowCheckModel::setSourceModel(QAbstractItemModel* sourceModel)
 {
     beginResetModel();
@@ -320,6 +328,11 @@ QHash<int, QByteArray> RowCheckModel::roleNames() const
     auto result = base_type::roleNames();
     result[Qt::CheckStateRole] = "checkState";
     return result;
+}
+
+bool RowCheckModel::removeRows(int row, int count, const QModelIndex& parent)
+{
+    return sourceModel()->removeRows(row, count, parent);
 }
 
 } // namespace nx::vms::client::desktop

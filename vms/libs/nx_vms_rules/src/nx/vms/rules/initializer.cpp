@@ -10,6 +10,7 @@
 
 #include "action_builder_field_validators/action_text_field_validator.h"
 #include "action_builder_field_validators/http_auth_field_validator.h"
+#include "action_builder_field_validators/http_headers_field_validator.h"
 #include "action_builder_field_validators/http_method_field_validator.h"
 #include "action_builder_field_validators/layout_field_validator.h"
 #include "action_builder_field_validators/optional_time_field_validator.h"
@@ -187,6 +188,7 @@ void Initializer::registerFieldValidators() const
     // Action field validators.
     registerActionFieldValidator<ActionTextField, ActionTextFieldValidator>();
     registerActionFieldValidator<HttpAuthField, HttpAuthFieldValidator>();
+    registerActionFieldValidator<HttpHeadersField, HttpHeadersFieldValidator>();
     registerActionFieldValidator<HttpMethodField, HttpMethodFieldValidator>();
     registerActionFieldValidator<TargetLayoutField, LayoutFieldValidator>();
     registerActionFieldValidator<OptionalTimeField, OptionalTimeFieldValidator>();

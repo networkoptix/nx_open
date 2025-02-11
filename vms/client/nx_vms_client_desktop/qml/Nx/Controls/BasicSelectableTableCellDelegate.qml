@@ -17,6 +17,7 @@ Rectangle
     required property bool selected
     readonly property string decorationPath: model.decoration ?? ""
     property bool hovered: TableView.view ? TableView.view.hoveredRow === row : false
+    property var flags: TableView.view.model.flags(TableView.view.model.index(row, column))
 
     signal clicked()
     signal doubleClicked()
@@ -78,16 +79,35 @@ Rectangle
         anchors.fill: parent
         onClicked:
         {
+            control.TableView.view.closeEditor()
+
             if (control.TableView.view.selectionBehavior === TableView.SelectRows)
             {
                 control.TableView.view.selectionModel.select(
                     control.TableView.view.index(row, column),
                     ItemSelectionModel.ClearAndSelect | ItemSelectionModel.Rows)
-                control.TableView.view.focus = true
             }
+
+            if ((control.TableView.view.editTriggers & TableView.SingleTapped)
+                && (control.flags & Qt.ItemIsEditable))
+            {
+                control.TableView.view.edit(control.TableView.view.index(row, column))
+            }
+
             control.clicked()
         }
 
-        onDoubleClicked: control.doubleClicked()
+        onDoubleClicked:
+        {
+            control.TableView.view.closeEditor()
+
+            if ((control.TableView.view.editTriggers & TableView.DoubleTapped)
+                && (control.flags & Qt.ItemIsEditable))
+            {
+                control.TableView.view.edit(control.TableView.view.index(row, column))
+            }
+
+            control.doubleClicked()
+        }
     }
 }

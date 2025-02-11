@@ -40,6 +40,7 @@ Window
     property real fixedWidth: 0
     property real fixedHeight: 0
 
+    property bool rejectShortcutEnabled: true
     property bool acceptShortcutEnabled: true
 
     // Dig out the shadowed contentItem of Window.
@@ -55,6 +56,7 @@ Window
 
     Shortcut
     {
+        enabled: rejectShortcutEnabled
         sequence: "Esc"
         onActivated: dialog.reject()
     }
