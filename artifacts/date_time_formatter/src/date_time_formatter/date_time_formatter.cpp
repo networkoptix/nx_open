@@ -327,24 +327,40 @@ QString QnDateTimeFormatter::dateTimeToString(const QString &format,
                 break;
 
             case 'a':
+            {
                 used = true;
-                if (i + 1 < format.length() && format.at(i + 1).unicode() == 'p') {
+                bool isMixed = false;
+                if (i + 1 < format.length() && format.at(i + 1).toLower().unicode() == 'p')
+                {
+                    isMixed = format.at(i + 1).unicode() == 'P';
                     repeat = 2;
-                } else {
+                }
+                else
+                {
                     repeat = 1;
                 }
-                result.append(am_pm == AM ? q->amText().toLower() : q->pmText().toLower());
+                const auto text = am_pm == AM ? q->amText(): q->pmText();
+                result.append(isMixed ? text : text.toLower());
                 break;
+            }
 
             case 'A':
+            {
                 used = true;
-                if (i + 1 < format.length() && format.at(i + 1).unicode() == 'P') {
+                bool isMixed = false;
+                if (i + 1 < format.length() && format.at(i + 1).toLower().unicode() == 'p')
+                {
+                    isMixed = format.at(i + 1).unicode() == 'p';
                     repeat = 2;
-                } else {
+                }
+                else
+                {
                     repeat = 1;
                 }
-                result.append(am_pm == AM ? q->amText().toUpper() : q->pmText().toUpper());
+                const auto text = am_pm == AM ? q->amText() : q->pmText();
+                result.append(isMixed ? text : text.toUpper());
                 break;
+            }
 
             case 'z':
                 used = true;
