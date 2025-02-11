@@ -65,7 +65,7 @@
     <message>
       <source>Proxy LDAP requests %1 via server</source>
       <comment>%1 is a line break</comment>
-      <translation>サーバー経由で %1LDAP リクエストをプロキシする</translation>
+      <translation>LDAP リクエストの %1 プロキシサーバー</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
