@@ -63,11 +63,6 @@ bool isKeyFrame(const QnCompressedVideoDataPtr& encodedFrame)
     return encodedFrame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
 }
 
-void setDecodeTwiceFlag(const QnCompressedVideoDataPtr& encodedFrame)
-{
-    encodedFrame->flags.setFlag(QnAbstractMediaData::MediaFlags_DecodeTwice);
-}
-
 } // namespace
 
 struct ArchiveFrameExtractor::Private
@@ -108,7 +103,6 @@ struct ArchiveFrameExtractor::Private
 
         std::deque<DecodeJob> decodeQueue;
 
-        std::unique_ptr<QnFfmpegVideoDecoder> decoder;
         QSize scaleSize;
     };
     DecodeWorker decodeWorker;
@@ -312,34 +306,32 @@ struct ArchiveFrameExtractor::Private
 
             lock.unlock();
 
-            if (decodeWorker.decoder && isKeyFrame(decodeJob.frameSequence.front()))
-            {
-                setDecodeTwiceFlag(decodeJob.frameSequence.front());
-                decodeWorker.decoder->resetDecoder(decodeJob.frameSequence.front());
-            }
+            auto decoder = std::make_unique<QnFfmpegVideoDecoder>(
+                DecoderConfig(), /*metrics*/ nullptr, decodeJob.frameSequence.front());
 
-            if (!decodeWorker.decoder)
-            {
-                decodeWorker.decoder = std::make_unique<QnFfmpegVideoDecoder>(
-                    DecoderConfig(), /*metrics*/ nullptr, decodeJob.frameSequence.front());
-                setDecodeTwiceFlag(decodeJob.frameSequence.front());
-            }
-
-            CLVideoDecoderOutputPtr currentDecodedFrame(new CLVideoDecoderOutput);
-            CLVideoDecoderOutputPtr outputDecodedFrame(new CLVideoDecoderOutput);
+            CLVideoDecoderOutputPtr decodedFrame;
             for (const auto& compressedData: decodeJob.frameSequence)
             {
                 if (stop.load())
                     return;
-
-                if (decodeWorker.decoder->decode(compressedData, &currentDecodedFrame))
-                    std::swap(outputDecodedFrame, currentDecodedFrame);
+                CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput());
+                if (decoder->decode(compressedData, &frame))
+                    decodedFrame = frame;
+            }
+            {
+                // Flushing data.
+                CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput());
+                while (decoder->decode(QnCompressedVideoDataPtr(), &frame))
+                {
+                    decodedFrame = frame;
+                    frame.reset(new CLVideoDecoderOutput());
+                }
             }
 
-            if (outputDecodedFrame && !decodeJob.scaleSize.isEmpty())
-                outputDecodedFrame = outputDecodedFrame->scaled(decodeJob.scaleSize);
+            if (decodedFrame && !decodeJob.scaleSize.isEmpty())
+                decodedFrame = decodedFrame->scaled(decodeJob.scaleSize);
 
-            returnResult(decodeJob.request, outputDecodedFrame, outputDecodedFrame.isNull()
+            returnResult(decodeJob.request, decodedFrame, decodedFrame.isNull()
                 ? ResultCode::decodeFailed
                 : ResultCode::decoded);
         }
