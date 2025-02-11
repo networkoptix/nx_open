@@ -5,7 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QAction>
+#include <QtCore/QEvent>
 #include <QtGui/QFileOpenEvent>
+#include <QtGui/QMouseEvent>
 #include <QtGui/QWindowStateChangeEvent>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -462,6 +464,23 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
             m_initialized = true;
             setWelcomeScreenVisible(true);
         });
+
+#if defined Q_OS_MACOS
+    // Enforce focus on right click.
+    installEventHandler(this, QEvent::MouseButtonPress, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            if (isActiveWindow())
+                return;
+
+            if (auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
+                mouseEvent && mouseEvent->buttons().testAnyFlag(Qt::RightButton))
+            {
+                raise();
+                activateWindow();
+            }
+        });
+#endif
 
     updateWidgetsVisibility();
 }
