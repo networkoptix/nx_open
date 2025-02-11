@@ -68,7 +68,7 @@
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation>サーバー経由で LDAP リクエストをプロキシする</translation>
+      <translation>LDAP リクエストのプロキシサーバー</translation>
     </message>
   </context>
   <context>
