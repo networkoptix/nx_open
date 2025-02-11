@@ -54,7 +54,7 @@ public:
 
     virtual void getCloudUsersOfSystemDeprecated(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingExList, api::SystemSyncInfo)> completionHandler) override;
 
     virtual void saveCloudUserOfSystem(
         const std::string& systemId,
@@ -104,7 +104,7 @@ public:
 
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingExList, api::SystemSyncInfo)> completionHandler) override;
 
     virtual void saveCloudUserOfSystemV2(
         const std::string& systemId,

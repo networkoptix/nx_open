@@ -145,6 +145,10 @@ NX_REFLECTION_INSTRUMENT_ENUM(MergeRole, none, master, slave)
 
 NX_REFLECTION_INSTRUMENT(SystemMergeInfo, SystemMergeInfo_Fields)
 
+#define SystemSyncInfo_Fields (lastMergeId)
+
+NX_REFLECTION_INSTRUMENT(SystemSyncInfo, SystemSyncInfo_Fields)
+
 //-------------------------------------------------------------------------------------------------
 // UserSessionDescriptor
 

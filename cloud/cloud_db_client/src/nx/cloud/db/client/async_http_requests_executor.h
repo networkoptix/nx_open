@@ -6,12 +6,11 @@
 #include <deque>
 #include <functional>
 
+#include <nx/cloud/db/api/result_code.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/generic_api_client.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
-
-#include <nx/cloud/db/api/result_code.h>
 
 #include "data/types.h"
 
@@ -55,6 +54,18 @@ class ApiRequestsExecutor:
 public:
     using base_type::base_type;
     using base_type::makeAsyncCall;
+};
+
+template<const char* name>
+class HttpHeaderFetcher
+{
+public:
+    using type = std::string;
+
+    type operator()(const nx::network::http::Response& response) const
+    {
+        return nx::network::http::getHeaderValue(response.headers, name);
+    }
 };
 
 } // namespace nx::cloud::db::client

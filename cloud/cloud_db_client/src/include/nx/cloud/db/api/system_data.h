@@ -537,6 +537,12 @@ struct SystemMergeInfo
     std::string anotherSystemId;
 };
 
+struct SystemSyncInfo
+{
+    /**%apidoc Last mergeId received from VMS if system has been merged. */
+    std::string lastMergeId;
+};
+
 /**%apidoc Extended system information.
  * Adds information that is defined by the request context. E.g., user access level,
  * system health, etc...
@@ -579,6 +585,11 @@ struct SystemDataEx: SystemData
     /**%apidoc Organization name if system is owned by organization */
     std::string organizationName;
 
+    /**%apidoc Additional information for synchronization with system servers.
+     * Present only in calls used for system to cloud synchronization.
+     */
+    std::optional<SystemSyncInfo> syncInfo;
+
     SystemDataEx() = default;
 
     SystemDataEx(SystemData systemData):
@@ -592,7 +603,7 @@ struct SystemDataEx: SystemData
 // TODO: #akolesnikov Move NX_REFLECTION_INSTRUMENT for other types here as well.
 NX_REFLECTION_INSTRUMENT(SystemDataEx,
     (accessRole)(roleIds)(permissions)(stateOfHealth)(usageFrequency)(lastLoginTime)(mergeInfo) \
-    (capabilities)(version)(organizationName))
+    (capabilities)(version)(organizationName)(syncInfo))
 
 // Providing custom JSON serialization functions so that SystemDataEx::attributes are added on the
 // same level with other fields in the resulting JSON document.

@@ -87,7 +87,7 @@ public:
      */
     virtual void getCloudUsersOfSystemDeprecated(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharingExList, api::SystemSyncInfo)> completionHandler) = 0;
 
     /**
      * Shares the System to the User or modifies User permissions for the System if such User
@@ -164,7 +164,7 @@ public:
      */
     virtual void getCloudUsersOfSystem(
         const std::string& systemId,
-        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharingExList, api::SystemSyncInfo)> completionHandler) = 0;
 
     /**
      * Shares the System to the User or modifies User permissions for the System if such User
