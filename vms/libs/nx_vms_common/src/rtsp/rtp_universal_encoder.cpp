@@ -362,7 +362,7 @@ bool QnUniversalRtpEncoder::open(const AVCodecParameters* codecParameters)
     }
     m_isVideo = codecParameters->codec_type == AVMEDIA_TYPE_VIDEO;
     m_sourceCodec = codecParameters->codec_id;
-    
+
     if (!m_transcoder.muxer().setContainer("rtp") || !isCodecSupported(codecParameters->codec_id))
         return false;
 

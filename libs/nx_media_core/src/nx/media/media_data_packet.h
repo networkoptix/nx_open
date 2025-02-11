@@ -134,6 +134,8 @@ public:
     bool isLQ() const;
     bool isLive() const;
 
+    QString idForToStringFromPtr() const;
+
 public:
     QnAbstractStreamDataProvider* dataProvider;
     DataType dataType;

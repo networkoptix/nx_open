@@ -5,6 +5,7 @@
 #include <nx/media/config.h>
 #include <nx/media/motion_detection.h>
 #include <nx/utils/bit_stream.h>
+#include <nx/utils/log/format.h>
 
 #if defined(Q_OS_MACOS) && defined(__amd64)
 #include <smmintrin.h>
@@ -74,6 +75,12 @@ AVMediaType toAvMediaType(QnAbstractMediaData::DataType dataType)
     }
 
     return AVMEDIA_TYPE_UNKNOWN;
+}
+
+QString QnAbstractMediaData::idForToStringFromPtr() const
+{
+    return NX_FMT("%1, codec: %2, timestamp: %3ms, %4",
+        dataType, compressionType, timestamp / 1000, flags);
 }
 
 //------------------------------------- QnEmptyMediaData -----------------------------------------
