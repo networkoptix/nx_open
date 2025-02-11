@@ -162,6 +162,8 @@ Integer number data field. Supports minimum and maximum value limitations.
         "defaultValue": 5,
         "minValue": 0,
         "maxValue": 100,
+        "suffix": "s",
+        "step": 1,
         "isActive": false
     }
 
@@ -190,6 +192,9 @@ Floating point number data field. Supports minimum and maximum value limitations
         "defaultValue": 3.141,
         "minValue": 0.0,
         "maxValue": 100.0,
+        "decimals": 3,
+        "suffix": "s",
+        "step": 1,
         "isActive": false
     }
 

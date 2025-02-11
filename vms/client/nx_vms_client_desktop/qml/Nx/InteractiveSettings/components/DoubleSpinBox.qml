@@ -21,6 +21,7 @@ ActiveTextItem
     property alias value: spinBox.dValue
     property alias decimals: spinBox.decimals
     property alias step: spinBox.dStepSize
+    property alias suffix: spinBox.suffix
 
     defaultValueTooltipEnabled: true
 

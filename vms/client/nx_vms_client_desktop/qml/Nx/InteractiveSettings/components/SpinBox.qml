@@ -19,6 +19,8 @@ ActiveTextItem
     property alias minValue: spinBox.from
     property alias maxValue: spinBox.to
     property alias value: spinBox.value
+    property alias step: spinBox.stepSize
+    property alias suffix: spinBox.suffix
 
     readonly property bool filled: spinBox.value !== 0
 
