@@ -2,24 +2,22 @@
 
 #include "poe_settings_reducer.h"
 
-#include "poe_settings_table_view.h"
-
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_constants.h>
-#include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
-#include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
-#include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/api/data/network_block_data.h>
-#include <nx/utils/math/fuzzy.h>
 #include <nx/utils/mac_address.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/utils/math/fuzzy.h>
+#include <nx/vms/api/data/network_block_data.h>
+#include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_constants.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_data_builder.h>
+#include <nx/vms/client/desktop/node_view/details/node/view_node_helper.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
+#include <nx/vms/client/desktop/node_view/resource_node_view/resource_view_node_helpers.h>
+#include <nx/vms/rules/events/poe_over_budget_event.h>
+
+#include "poe_settings_table_view.h"
 
 namespace {
 
@@ -33,9 +31,21 @@ using NetworkPortState = nx::vms::api::NetworkPortState;
 
 static const QVariant kTextAlign = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
 
+QString poeOverallConsumptionString(double current, double limit)
+{
+    return nx::vms::rules::PoeOverBudgetEvent::overallConsumption(current, limit);
+}
+
+QString poeConsumptionString(double current, double limit)
+{
+    return qFuzzyIsNull(current) || current < 0
+        ? QString("0 W")
+        : poeOverallConsumptionString(current, limit);
+}
+
 QString getConsumptionText(const NetworkPortState& port)
 {
-    return nx::vms::event::StringsHelper::poeConsumptionString(
+    return poeConsumptionString(
         port.devicePowerConsumptionWatts, port.devicePowerConsumptionLimitWatts);
 }
 
@@ -235,8 +245,7 @@ node_view::details::NodeViewStatePatch PoeSettingsReducer::totalsDataChangesPatc
         }();
 
 
-    const auto text = nx::vms::event::StringsHelper::poeOverallConsumptionString(
-        consumption, data.upperPowerLimitWatts);
+    const auto text = poeOverallConsumptionString(consumption, data.upperPowerLimitWatts);
 
     const auto color = consumption > data.upperPowerLimitWatts
         ? core::colorTheme()->color("red")

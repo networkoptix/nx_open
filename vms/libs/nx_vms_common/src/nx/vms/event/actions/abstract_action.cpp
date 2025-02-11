@@ -7,61 +7,9 @@
 #include <api/helpers/camera_id_helper.h>
 #include <core/resource/camera_resource.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/helpers.h>
 
 namespace nx::vms::event {
-
-ActionFlags getFlags(ActionType actionType)
-{
-    static const QMap<ActionType, ActionFlags> flags = {
-        {ActionType::bookmarkAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::cameraOutputAction, {ActionFlag::canUseSourceCamera
-            | ActionFlag::canProlongateInstantAction}},
-        {ActionType::cameraRecordingAction, {ActionFlag::canUseSourceCamera
-            | ActionFlag::canProlongateInstantAction}},
-        {ActionType::fullscreenCameraAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::playSoundAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::playSoundOnceAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::sayTextAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::showOnAlarmLayoutAction, {ActionFlag::canUseSourceCamera}},
-        {ActionType::showTextOverlayAction, {ActionFlag::canUseSourceCamera}},
-    };
-
-    return flags.value(actionType);
-}
-
-bool requiresCameraResource(ActionType actionType)
-{
-    switch (actionType)
-    {
-        case ActionType::undefinedAction:
-        case ActionType::panicRecordingAction:
-        case ActionType::sendMailAction:
-        case ActionType::diagnosticsAction:
-        case ActionType::showPopupAction:
-        case ActionType::pushNotificationAction:
-        case ActionType::openLayoutAction:
-        case ActionType::exitFullscreenAction:
-        case ActionType::buzzerAction:
-            return false;
-
-        case ActionType::playSoundOnceAction:
-        case ActionType::playSoundAction:
-        case ActionType::sayTextAction:
-        case ActionType::cameraOutputAction:
-        case ActionType::bookmarkAction:
-        case ActionType::cameraRecordingAction:
-        case ActionType::executePtzPresetAction:
-        case ActionType::showTextOverlayAction:
-        case ActionType::showOnAlarmLayoutAction:
-        case ActionType::acknowledgeAction:
-        case ActionType::fullscreenCameraAction:
-            return true;
-
-        default:
-            return false;
-    }
-}
 
 bool requiresUserResource(ActionType actionType)
 {
@@ -96,58 +44,6 @@ bool requiresUserResource(ActionType actionType)
             NX_ASSERT(false, "All action types must be handled.");
             return false;
     }
-}
-
-// TODO: #vkutin #3.2 User resources and device resources of actions will be refactored.
-bool requiresAdditionalUserResource(ActionType actionType)
-{
-    switch (actionType)
-    {
-        case ActionType::undefinedAction:
-        case ActionType::panicRecordingAction:
-        case ActionType::cameraOutputAction:
-        case ActionType::cameraRecordingAction:
-        case ActionType::diagnosticsAction:
-        case ActionType::playSoundAction:
-        case ActionType::executePtzPresetAction:
-        case ActionType::showTextOverlayAction:
-        case ActionType::execHttpRequestAction:
-        case ActionType::acknowledgeAction:
-        case ActionType::sendMailAction:
-        case ActionType::openLayoutAction:
-        case ActionType::fullscreenCameraAction:
-        case ActionType::exitFullscreenAction:
-        case ActionType::buzzerAction:
-            return false;
-
-        case ActionType::bookmarkAction:
-        case ActionType::showPopupAction:
-        case ActionType::pushNotificationAction:
-        case ActionType::playSoundOnceAction:
-        case ActionType::sayTextAction:
-        case ActionType::showOnAlarmLayoutAction:
-            return true;
-
-        default:
-            NX_ASSERT(false, "All action types must be handled.");
-            return false;
-    }
-}
-
-bool requiresServerResource(ActionType actionType)
-{
-    switch (actionType)
-    {
-        case ActionType::buzzerAction:
-            return true;
-        default:
-            return false;
-    }
-}
-
-bool canProlongateInstantAction(ActionType actionType)
-{
-    return getFlags(actionType).testFlag(ActionFlag::canProlongateInstantAction);
 }
 
 bool hasToggleState(ActionType actionType)
@@ -226,11 +122,6 @@ bool allowsAggregation(ActionType actionType)
         default:
             return true;
     }
-}
-
-bool canUseSourceCamera(ActionType actionType)
-{
-    return getFlags(actionType).testFlag(ActionFlag::canUseSourceCamera);
 }
 
 bool isActionProlonged(ActionType actionType, const ActionParameters &parameters)

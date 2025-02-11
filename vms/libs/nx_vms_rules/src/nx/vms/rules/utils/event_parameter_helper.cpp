@@ -2,13 +2,14 @@
 
 #include "event_parameter_helper.h"
 
-#include <QStringView>
 #include <algorithm>
 
+#include <QtCore/QStringView>
+
+#include <analytics/common/object_metadata.h>
 #include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/analytics/taxonomy/utils.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/event/events/camera_disconnected_event.h>
 
 #include "../aggregated_event.h"
 #include "../engine.h"

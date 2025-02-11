@@ -68,15 +68,6 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/events/analytics_sdk_event.h>
-#include <nx/vms/event/events/analytics_sdk_object_detected.h>
-#include <nx/vms/event/events/fan_error_event.h>
-#include <nx/vms/event/events/plugin_diagnostic_event.h>
-#include <nx/vms/event/events/poe_over_budget_event.h>
-#include <nx/vms/event/events/server_certificate_error.h>
-#include <nx/vms/event/rule.h>
 #include <nx_ec/ec_api_common.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <recording/stream_recorder.h>
@@ -110,14 +101,6 @@ void initializeMetatypesInternal()
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceFlags>();
     QMetaType::registerConverter<Qn::ResourceFlags, int>();
-
-    qRegisterMetaType<nx::vms::event::EventReason>("nx::vms::event::EventReason");
-    qRegisterMetaType<nx::vms::event::PluginDiagnosticEventPtr>(
-        "nx::vms::event::PluginDiagnosticEventPtr");
-    qRegisterMetaType<nx::vms::event::PoeOverBudgetEventPtr>(
-        "nx::vms::event::PoeOverBudgetEventPtr");
-    qRegisterMetaType<nx::vms::event::FanErrorEventPtr>(
-        "nx::vms::event::FanErrorEventPtr");
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
@@ -169,12 +152,6 @@ void initializeMetatypesInternal()
 
     qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<std::optional<nx::recording::Error>>();
-
-    qRegisterMetaType<nx::vms::event::AbstractActionPtr>();
-    qRegisterMetaType<nx::vms::event::AbstractActionList>();
-    qRegisterMetaType<nx::vms::event::AbstractEventPtr>();
-    qRegisterMetaType<nx::vms::event::RulePtr>();
-    qRegisterMetaType<nx::vms::event::RuleList>();
 
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();

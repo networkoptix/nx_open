@@ -9,7 +9,6 @@
 #include <licensing/license.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/event/strings_helper.h>
 
 #include "../group.h"
 #include "../strings.h"
@@ -109,14 +108,28 @@ const ItemDescriptor& SaasIssueEvent::manifest()
 
 QString SaasIssueEvent::licenseMigrationReason() const
 {
-    return nx::vms::event::StringsHelper::licenseMigrationReason(m_reason);
-}
-
-bool SaasIssueEvent::isLicenseMigrationIssue() const
-{
     using namespace nx::vms::api;
 
     switch (m_reason)
+    {
+        case EventReason::licenseMigrationFailed:
+            return tr("Failed to migrate licenses.");
+
+        case EventReason::licenseMigrationSkipped:
+            return tr("Skipped import of licenses. Another migration attempt will be "
+                "automatically scheduled for later.");
+
+        default:
+            NX_ASSERT(false, "Unexpected reason code");
+            return {};
+    }
+}
+
+bool SaasIssueEvent::isLicenseMigrationIssue(nx::vms::api::EventReason reason)
+{
+    using namespace nx::vms::api;
+
+    switch (reason)
     {
         case EventReason::licenseMigrationFailed:
         case EventReason::licenseMigrationSkipped:
@@ -131,6 +144,11 @@ bool SaasIssueEvent::isLicenseMigrationIssue() const
             NX_ASSERT(false, "Unhandled reason code");
             return false;
     }
+}
+
+bool SaasIssueEvent::isLicenseMigrationIssue() const
+{
+    return isLicenseMigrationIssue(m_reason);
 }
 
 QString SaasIssueEvent::reason(nx::vms::common::SystemContext* context) const

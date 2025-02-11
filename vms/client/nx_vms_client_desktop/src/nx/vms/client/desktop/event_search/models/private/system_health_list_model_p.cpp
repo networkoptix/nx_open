@@ -40,8 +40,7 @@
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_health/system_health_data_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/helpers.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
@@ -378,7 +377,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 
     if (isServiceDisabledMessage(item.message))
     {
-        using namespace nx::vms::event;
+        using namespace nx::vms::api;
         EventReason eventReason;
         switch (item.message)
         {
@@ -397,7 +396,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         }
 
         QStringList tooltipLines;
-        tooltipLines << StringsHelper::servicesDisabledReason(eventReason, item.resources.size());
+        tooltipLines << servicesDisabledReason(eventReason, item.resources.size());
         tooltipLines << QString();
         const auto resourceInfoLevel = appContext()->localSettings()->resourceInfoLevel();
         for (const auto& resource: item.resources)
@@ -412,6 +411,33 @@ QString SystemHealthListModel::Private::toolTip(int index) const
 QString SystemHealthListModel::Private::decorationPath(int index) const
 {
     return decorationPath(system(), m_items[index].message);
+}
+
+QString SystemHealthListModel::Private::servicesDisabledReason(
+    nx::vms::api::EventReason reasonCode,
+    int channelCount)
+{
+    using namespace nx::vms::api;
+
+    switch (reasonCode)
+    {
+        case EventReason::notEnoughLocalRecordingServices:
+            return tr("Recording on %n channels was stopped due to service overuse.",
+                "", channelCount);
+
+        case EventReason::notEnoughCloudRecordingServices:
+            return tr("Cloud storage backup on %n channels was stopped due to service overuse.",
+                "", channelCount);
+
+        case EventReason::notEnoughIntegrationServices:
+            return tr("Paid integration service usage on %n channels was stopped due to service "
+                "overuse.", "", channelCount);
+            break;
+
+        default:
+            NX_ASSERT(false, "Unexpected reason code");
+            return {};
+    }
 }
 
 QColor SystemHealthListModel::Private::color(int index) const

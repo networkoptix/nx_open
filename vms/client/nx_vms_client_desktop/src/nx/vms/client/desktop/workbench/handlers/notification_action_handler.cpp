@@ -14,6 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/json.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
@@ -31,7 +32,7 @@
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/actions/system_health_action.h>
-#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/helpers.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/utils/event.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -132,6 +133,122 @@ bool isMessageWatched(const nx::vms::api::UserSettings& settings,
     nx::vms::common::system_health::MessageType messageType)
 {
     return isMessageWatched(settings, QString::fromStdString(reflect::toString(messageType)));
+}
+
+// Check if server required for this event to OCCUR.
+bool isSourceServerRequired(EventType eventType)
+{
+    switch (eventType)
+    {
+        case EventType::storageFailureEvent:
+        case EventType::backupFinishedEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::serverStartEvent:
+        case EventType::serverCertificateError:
+            return true;
+
+        default:
+            return requiresServerResource(eventType);
+    }
+}
+
+// Check if camera required for this event to OCCUR.
+bool isSourceCameraRequired(EventType eventType)
+{
+    switch (eventType)
+    {
+        case EventType::networkIssueEvent:
+            return true;
+
+        case EventType::pluginDiagnosticEvent:
+            return false;
+
+        default:
+            return requiresCameraResource(eventType);
+    }
+}
+
+/** Check whether the user has an access to this event. */
+bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user)
+{
+    if (!user || !user->systemContext())
+        return false;
+
+    const auto context = user->systemContext();
+
+    if (params.eventType == EventType::cameraIpConflictEvent)
+    {
+        const auto permission = Qn::WritePermission;
+        for (const auto& ref: params.metadata.cameraRefs)
+        {
+            auto camera = camera_id_helper::findCameraByFlexibleId(context->resourcePool(), ref);
+            if (!camera)
+            {
+                NX_DEBUG(NX_SCOPE_TAG,
+                    "Unable to find event %1 resource ref %2", params.eventType, ref);
+                continue;
+            }
+            if (context->resourceAccessManager()->hasPermission(user, camera, permission))
+                return true;
+        }
+
+        NX_VERBOSE(NX_SCOPE_TAG,
+            "User %1 has no permission %2 for the event %3", user, permission, params.eventType);
+        return false;
+    }
+
+    if (isSourceCameraRequired(params.eventType))
+    {
+        const auto camera = context->resourcePool()->getResourceById(params.eventResourceId)
+            .dynamicCast<QnVirtualCameraResource>();
+        // The camera could be removed by user manually.
+        if (!camera)
+            return false;
+
+        const auto hasPermission = context->resourceAccessManager()->hasPermission(
+            user, camera, Qn::ViewContentPermission);
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the camera %3",
+            user, hasPermission ? "has" : "has not", camera);
+        return hasPermission;
+    }
+
+    if (isSourceServerRequired(params.eventType))
+    {
+        const auto server = context->resourcePool()->getResourceById(params.eventResourceId)
+            .dynamicCast<QnMediaServerResource>();
+        if (!server)
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Event has occurred without its server %1", params.eventResourceId);
+            return false;
+        }
+
+        // Only admins should see notifications with servers.
+        const auto hasPermission = context->resourceAccessManager()->hasPowerUserPermissions(user);
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the server %3",
+            user, hasPermission ? "has" : "has not", server);
+        return hasPermission;
+    }
+
+    const auto resources = sourceResources(params, context->resourcePool());
+    if (!resources)
+    {
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source", user);
+        return true;
+    }
+
+    for (const auto& resource: *resources)
+    {
+        if (context->resourceAccessManager()->hasPermission(user, resource, Qn::ViewContentPermission))
+        {
+            NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, resource);
+            return true;
+        }
+    }
+
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 has not permission for the event from %2",
+        user, containerString(*resources));
+    return false;
 }
 
 } // namespace

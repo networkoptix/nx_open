@@ -25,7 +25,6 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/utils/audit_log_conversion.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/text/time_strings.h>

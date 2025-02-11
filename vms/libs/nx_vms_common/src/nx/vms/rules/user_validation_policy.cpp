@@ -12,7 +12,6 @@
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/event/strings_helper.h>
 #include <utils/email/email.h>
 
 using namespace nx::vms::api;
@@ -199,7 +198,7 @@ QString QnSubjectValidationPolicy::calculateAlert(
         return {};
 
     if (subjects.empty() && !m_allowEmptySelection)
-        return nx::vms::common::html::document(nx::vms::event::StringsHelper::needToSelectUserText());
+        return nx::vms::common::html::document(needToSelectUserText());
 
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
@@ -215,6 +214,11 @@ QString QnSubjectValidationPolicy::calculateAlert(
     }
 
     return {};
+}
+
+QString QnSubjectValidationPolicy::needToSelectUserText()
+{
+    return tr("Select at least one user");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -510,7 +514,7 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
     }
 
     if (totalCount == 0)
-        return nx::vms::event::StringsHelper::needToSelectUserText();
+        return needToSelectUserText();
 
     if (nonCloudCount != 0)
     {

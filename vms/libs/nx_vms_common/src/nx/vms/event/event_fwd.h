@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <QtCore/QList>
 #include <QtCore/QSharedPointer>
 
@@ -11,15 +9,8 @@
 
 namespace nx::vms::event {
 
-class AbstractEvent;
-typedef QSharedPointer<AbstractEvent> AbstractEventPtr;
-typedef QList<AbstractEventPtr> AbstractEventList;
-
 class AbstractAction;
 typedef QSharedPointer<AbstractAction> AbstractActionPtr;
-typedef QList<AbstractActionPtr> AbstractActionList;
-
-class PanicAction;
 
 class Rule;
 typedef QSharedPointer<Rule> RulePtr;

@@ -9,8 +9,6 @@
 #include "../call_notifications_list_model.h"
 #include "sound_controller.h"
 
-namespace nx::vms::event { class StringsHelper; }
-
 namespace nx::vms::client::desktop {
 
 class CallNotificationsListModel::Private:
@@ -31,12 +29,12 @@ private:
     void removeNotification(
         nx::vms::common::system_health::MessageType message,
         const QVariant& params);
-
-    QString tooltip(const vms::event::AbstractActionPtr& action) const;
+    QString tooltip(
+        nx::vms::common::system_health::MessageType message,
+        const QnVirtualCameraResourcePtr& camera) const;
 
 private:
     CallNotificationsListModel* const q = nullptr;
-    QScopedPointer<vms::event::StringsHelper> m_helper;
     SoundController m_soundController;
 };
 

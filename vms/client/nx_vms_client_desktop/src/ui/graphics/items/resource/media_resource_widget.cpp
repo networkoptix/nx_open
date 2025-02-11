@@ -115,7 +115,6 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>

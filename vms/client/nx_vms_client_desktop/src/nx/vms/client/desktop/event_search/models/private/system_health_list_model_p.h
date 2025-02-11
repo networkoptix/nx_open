@@ -69,6 +69,7 @@ private:
 
     static int priority(SystemContext* systemContext,MessageType message);
     static QString decorationPath(SystemContext* systemContext, MessageType message);
+    static QString servicesDisabledReason(nx::vms::api::EventReason reasonCode, int channelCount);
 
 private:
     struct Item

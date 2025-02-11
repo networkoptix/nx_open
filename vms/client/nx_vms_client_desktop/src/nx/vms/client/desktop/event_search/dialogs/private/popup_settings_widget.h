@@ -12,11 +12,7 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace Ui {
-class PopupSettingsWidget;
-}
-
-namespace nx::vms::event { class StringsHelper; }
+namespace Ui { class PopupSettingsWidget; }
 
 namespace nx::vms::client::desktop {
 
@@ -47,7 +43,6 @@ private:
     QMap<common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     bool m_updating;
     UserNotificationSettingsManager* const m_userNotificationSettingsManager;
-    std::unique_ptr<event::StringsHelper> m_stringsHelper;
 };
 
 } // namespace nx::vms::client::desktop

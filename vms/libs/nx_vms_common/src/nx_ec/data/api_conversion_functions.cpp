@@ -39,7 +39,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/action_factory.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/rule.h>
 #include <utils/email/email.h>
 

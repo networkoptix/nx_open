@@ -6,7 +6,6 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/vms/event/events/abstract_event.h>
 
 namespace nx {
 namespace vms {
@@ -17,6 +16,11 @@ namespace event {
 */
 class NX_VMS_COMMON_API Rule: public QObject
 {
+    using EventReason = nx::vms::api::EventReason;
+    using EventState = nx::vms::api::EventState;
+    using EventType = nx::vms::api::EventType;
+    using ActionType = nx::vms::api::ActionType;
+
 public:
     Rule();
     virtual ~Rule() override;

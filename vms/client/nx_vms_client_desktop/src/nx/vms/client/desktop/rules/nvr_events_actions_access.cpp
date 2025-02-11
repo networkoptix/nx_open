@@ -2,9 +2,8 @@
 
 #include "nvr_events_actions_access.h"
 
-#include <nx/vms/event/events/abstract_event.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 using namespace nx::vms::api;
 

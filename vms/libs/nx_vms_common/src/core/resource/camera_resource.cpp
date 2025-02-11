@@ -2396,11 +2396,6 @@ float QnVirtualCameraResource::rawSuggestBitrateKbps(
         codec);
 }
 
-bool QnVirtualCameraResource::captureEvent(const nx::vms::event::AbstractEventPtr& /*event*/)
-{
-    return false;
-}
-
 Qn::ConnectionRole QnVirtualCameraResource::toConnectionRole(nx::vms::api::StreamIndex index)
 {
     return index == nx::vms::api::StreamIndex::primary

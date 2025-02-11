@@ -23,7 +23,6 @@ inline bool isInstant(const EventPtr& event)
 
 /**
  * Returns event source to display in notification tile and tooltip.
- * Keep in sync with AbstractEvent.getResource().
  */
 NX_VMS_RULES_API nx::Uuid sourceId(const BasicEvent* event);
 

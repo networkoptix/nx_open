@@ -13,7 +13,6 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/strings_helper.h>
 #include <utils/common/synctime.h>
 
 using namespace std::chrono;
@@ -30,45 +29,6 @@ bool isChangedEnough(milliseconds first, milliseconds second, milliseconds minDi
 } // namespace
 
 namespace nx::vms::common {
-
-QnCameraBookmark bookmarkFromAction(
-    const vms::event::AbstractActionPtr& action,
-    const QnVirtualCameraResourcePtr& camera)
-{
-    if (!camera || !camera->systemContext())
-    {
-        NX_ASSERT(false, "Camera is invalid");
-        return QnCameraBookmark();
-    }
-
-    const auto actionParams = action->getParams();
-    const qint64 recordBeforeMs = actionParams.recordBeforeMs;
-    const qint64 recordAfterMs = actionParams.recordAfter;
-    const qint64 fixedDurationMs = actionParams.durationMs;
-
-    const auto runtimeParams = action->getRuntimeParams();
-    const qint64 startTimeMs = runtimeParams.eventTimestampUsec / 1000;
-    const qint64 endTimeMs = startTimeMs;
-
-    QnCameraBookmark bookmark;
-
-    bookmark.guid = nx::Uuid::createUuid();
-    bookmark.startTimeMs = milliseconds(startTimeMs - recordBeforeMs);
-    bookmark.durationMs = milliseconds(fixedDurationMs > 0
-        ? fixedDurationMs
-        : endTimeMs - startTimeMs);
-    bookmark.durationMs += milliseconds(recordBeforeMs + recordAfterMs);
-    bookmark.cameraId = camera->getId();
-    bookmark.creationTimeStampMs = qnSyncTime->value();
-
-    vms::event::StringsHelper helper(camera->systemContext());
-    bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = helper.eventDetails(action->getRuntimeParams(),
-        nx::vms::event::AttrSerializePolicy::singleLine).join('\n');
-    bookmark.tags = nx::utils::toQSet(
-        action->getParams().tags.split(',', Qt::SkipEmptyParts));
-    return bookmark;
-}
 
 QnCameraBookmarkList bookmarksAtPosition(
     const QnCameraBookmarkList& bookmarks, qint64 posMs)

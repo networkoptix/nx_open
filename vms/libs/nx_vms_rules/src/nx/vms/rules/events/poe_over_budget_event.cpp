@@ -64,14 +64,19 @@ QString PoeOverBudgetEvent::reason() const
     return tr("Power limit exceeded (%1)", "%1 is consumption").arg(overallConsumption());
 }
 
+QString PoeOverBudgetEvent::overallConsumption(double current, double limit)
+{
+    return nx::format("%1 W / %2 W",
+        formatValue(current),
+        formatValue(limit));
+}
+
 QString PoeOverBudgetEvent::overallConsumption() const
 {
     if (isEmpty())
         return {};
 
-    return nx::format("%1 W / %2 W",
-        formatValue(m_currentConsumptionW),
-        formatValue(m_upperLimitW));
+    return overallConsumption(m_currentConsumptionW, m_upperLimitW);
 }
 
 QString PoeOverBudgetEvent::description() const

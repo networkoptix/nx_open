@@ -26,7 +26,6 @@
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
@@ -149,6 +148,14 @@ QString buttonHint(bool prolonged, HintStyle hintStyle)
         : SoftwareTriggerCameraButtonController::tr("press and hold");
 }
 
+QString getSoftwareTriggerName(const QString& name)
+{
+    const auto triggerId = name.trimmed();
+    return triggerId.isEmpty()
+        ? SoftwareTriggerCameraButtonController::tr("Soft Trigger")
+        : triggerId;
+}
+
 CameraButtonData::Type prolongedToType(bool prolonged)
 {
     return prolonged
@@ -165,7 +172,7 @@ CameraButtonData buttonFromRule(
     const bool prolonged = rule->isActionProlonged();
     return CameraButtonData {
         .id = rule->id(),
-        .name = vms::event::StringsHelper::getSoftwareTriggerName(params.caption),
+        .name = getSoftwareTriggerName(params.caption),
         .hint = buttonHint(prolonged, hintStyle),
         .iconName = params.description,
         .type = prolongedToType(prolonged),
@@ -192,7 +199,7 @@ CameraButtonData buttonFromRule(
     const bool prolonged = nx::vms::rules::isProlonged(engine, rule->actionBuilders()[0]);
     return CameraButtonData {
         .id = rule->id(),
-        .name = StringsHelper::getSoftwareTriggerName(name->value()),
+        .name = getSoftwareTriggerName(name->value()),
         .hint = buttonHint(prolonged, hintStyle),
         .iconName = icon->value(),
         .type = prolongedToType(prolonged),
@@ -220,9 +227,9 @@ struct SoftwareTriggerCameraButtonController::Private
 
     void updateButtonAvailability(CameraButtonData button);
 
-    bool setEventTriggerState(const nx::Uuid& ruleId, vms::event::EventState state);
-    bool setVmsTriggerState(const nx::Uuid& ruleId, vms::event::EventState state);
-    void updateActiveTrigger(const nx::Uuid& ruleId, vms::event::EventState state, bool success);
+    bool setEventTriggerState(const nx::Uuid& ruleId, vms::api::EventState state);
+    bool setVmsTriggerState(const nx::Uuid& ruleId, vms::api::EventState state);
+    void updateActiveTrigger(const nx::Uuid& ruleId, vms::api::EventState state, bool success);
 };
 
 void SoftwareTriggerCameraButtonController::Private::updateButtons()
@@ -336,7 +343,7 @@ void SoftwareTriggerCameraButtonController::Private::updateButtonAvailability(Ca
 
 bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
     const nx::Uuid& ruleId,
-    vms::event::EventState state)
+    vms::api::EventState state)
 {
     const auto connection = q->systemContext()->connection();
     if (!connection)
@@ -382,7 +389,7 @@ bool SoftwareTriggerCameraButtonController::Private::setEventTriggerState(
 
 bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
     const nx::Uuid& ruleId,
-    vms::event::EventState state)
+    vms::api::EventState state)
 {
     auto api = q->systemContext()->connectedServerApi();
     if (!api)
@@ -407,7 +414,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
         idField->id(),
         q->resource()->getId(),
         q->systemContext()->accessController()->user()->getId(),
-        nx::vms::event::StringsHelper::getSoftwareTriggerName(nameField->value()),
+        getSoftwareTriggerName(nameField->value()),
         iconField->value());
 
     api->createEvent(nx::vms::rules::serialize(triggerEvent.get()).props,
@@ -428,10 +435,10 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
 
 void SoftwareTriggerCameraButtonController::Private::updateActiveTrigger(
     const nx::Uuid& ruleId,
-    vms::event::EventState state,
+    vms::api::EventState state,
     bool success)
 {
-    if (state == nx::vms::event::EventState::inactive)
+    if (state == nx::vms::api::EventState::inactive)
         q->safeEmitActionStopped(ruleId, success);
     else
         q->safeEmitActionStarted(ruleId, success);
@@ -515,11 +522,11 @@ bool SoftwareTriggerCameraButtonController::setButtonActionState(
         [state, button]()
         {
             if (state == ActionState::inactive)
-                return vms::event::EventState::inactive;
+                return vms::api::EventState::inactive;
 
             return button.instant()
-                ? vms::event::EventState::undefined
-                : vms::event::EventState::active;
+                ? vms::api::EventState::undefined
+                : vms::api::EventState::active;
         }();
 
     const auto& targetCamera = camera();

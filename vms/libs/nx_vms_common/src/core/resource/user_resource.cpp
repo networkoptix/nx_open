@@ -25,7 +25,6 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx/vms/event/events/abstract_event.h>
 #include <utils/common/id.h>
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>

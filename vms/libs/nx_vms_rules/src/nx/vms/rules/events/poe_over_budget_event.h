@@ -32,6 +32,8 @@ public:
     virtual QVariantMap details(common::SystemContext* context,
         const nx::vms::api::rules::PropertyMap& aggregatedInfo) const override;
 
+    static QString overallConsumption(double current, double limit);
+
     static const ItemDescriptor& manifest();
 
 private:

@@ -15,8 +15,6 @@
 class QSortFilterProxyModel;
 class QToolButton;
 
-namespace nx::vms::event { class StringsHelper; }
-
 namespace nx::vms::client::desktop {
 
 class EventRibbon;
@@ -61,7 +59,6 @@ private:
     NotificationTabModel* const m_model;
     QSortFilterProxyModel* const m_filterModel;
     QHash<RightPanel::SystemSelection, QAction*> m_systemSelectionActions;
-    std::unique_ptr<event::StringsHelper> m_stringHelper;
 };
 
 } // namespace nx::vms::client::desktop

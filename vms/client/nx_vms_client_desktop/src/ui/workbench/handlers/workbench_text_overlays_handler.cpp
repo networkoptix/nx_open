@@ -19,7 +19,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/actions/text_overlay_action.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>

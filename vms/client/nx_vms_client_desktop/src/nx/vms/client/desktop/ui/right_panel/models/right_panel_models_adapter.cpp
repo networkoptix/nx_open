@@ -69,9 +69,7 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/migration_utils.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/rules/strings.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
@@ -698,45 +696,9 @@ QVector<RightPanel::VmsEventGroup> RightPanelModelsAdapter::eventGroups() const
     if (!d->context())
         return {};
 
-    const auto systemContext = d->context()->system();
-    nx::vms::event::StringsHelper helper(systemContext);
-
-    QVector<RightPanel::VmsEventGroup> result{
-        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Common,
-            nx::vms::api::undefinedEvent,
-            "", //< Name is unused.
-            rules::Strings::anyEvent()
-        },
-        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::DeviceIssues,
-            nx::vms::api::anyCameraEvent,
-            rules::Strings::deviceIssues(systemContext),
-            rules::Strings::anyDeviceIssue(systemContext)},
-        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Server,
-            nx::vms::api::anyServerEvent,
-            rules::Strings::serverEvents(),
-            rules::Strings::anyServerEvent()},
-        RightPanel::VmsEventGroup{RightPanel::VmsEventGroup::Analytics,
-            nx::vms::api::analyticsSdkEvent,
-            rules::Strings::analyticsEvents(),
-            rules::Strings::anyAnalyticsEvent()}};
-
-    for (auto& group: result)
-    {
-        const auto parentId = group.id == nx::vms::api::undefinedEvent
-            ? nx::vms::api::anyEvent
-            : group.id;
-
-        for (const auto eventType: nx::vms::event::allEvents())
-        {
-            if (eventType != nx::vms::api::analyticsSdkEvent
-                && nx::vms::event::parentEvent(eventType) == parentId)
-            {
-                group.events.push_back({eventType, helper.eventName(eventType)});
-            }
-        }
-    }
-
-    return result;
+    // This method is used only in the QML version of the Right Panel, which is not actual right
+    // now. Correct implementation should use nx::vms::rules::Engine::eventGroups() method instead.
+    return {};
 }
 
 QAbstractItemModel* RightPanelModelsAdapter::analyticsEvents() const

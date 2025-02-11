@@ -35,7 +35,6 @@ QString eventName(SubstitutionContext* substitution, common::SystemContext* cont
 QString eventDescription(
     SubstitutionContext* substitution, common::SystemContext* context);
 
-// Keep in sync with StringHelper::eventDescription().
 QString extendedEventDescription(
     SubstitutionContext* substitution, common::SystemContext* context);
 QString eventDetails(

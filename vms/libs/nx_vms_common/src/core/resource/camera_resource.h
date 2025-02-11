@@ -29,7 +29,6 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/common/ptz/type.h>
 #include <nx/vms/common/resource/camera_hotspots_data.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <recording/time_period_list.h>
 #include <utils/common/aspect_ratio.h>
@@ -633,13 +632,6 @@ public:
         const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     static float rawSuggestBitrateKbps(
         Qn::StreamQuality quality, QSize resolution, int fps, const QString& codec);
-
-    /**
-     * All events emitted by analytics driver bound to the resource can be captured within
-     * this method.
-     * @return True if event has been captured, false otherwise.
-     */
-    virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
 
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 

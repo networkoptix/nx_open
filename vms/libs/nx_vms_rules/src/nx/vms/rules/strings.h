@@ -63,7 +63,6 @@ public:
 
     static QString eventName(Engine* engine, const QString& type);
     static QString eventName(common::SystemContext* context, const QString& type);
-    // Keep in sync with StringsHelper::eventDetails(). Includes reason.
     static QStringList eventDetails(const QVariantMap& details);
 
     static QString actionName(Engine* engine, const QString& type);

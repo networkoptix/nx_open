@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
 
 namespace nx {
 namespace vms {

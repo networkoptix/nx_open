@@ -38,6 +38,8 @@ public:
 
     static const ItemDescriptor& manifest();
 
+    static bool isLicenseMigrationIssue(nx::vms::api::EventReason reason);
+
 private:
     QString extendedCaption() const;
     QString reason(nx::vms::common::SystemContext* context) const;

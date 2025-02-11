@@ -1,20 +1,20 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "analytics_engine_resource.h"
-#include "analytics_plugin_resource.h"
 
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/analytics/utils.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/object_action.h>
+
+#include "analytics_plugin_resource.h"
 
 namespace nx::vms::common {
 

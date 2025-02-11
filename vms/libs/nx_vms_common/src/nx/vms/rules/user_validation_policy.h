@@ -37,6 +37,9 @@ public:
 
     bool isEmptySelectionAllowed() const;
 
+protected:
+    static QString needToSelectUserText();
+
 private:
     const bool m_allowEmptySelection;
 };

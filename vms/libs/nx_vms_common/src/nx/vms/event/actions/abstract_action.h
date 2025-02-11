@@ -18,35 +18,12 @@ class QnResourcePool;
 
 namespace nx::vms::event {
 
-enum class ActionFlag {
-    canUseSourceCamera = 1 << 0,
-
-    // Object Detection is registered as an instant event, which is repeated once per 3 seconds
-    // starting 5.1.4. To avoid multiple actions triggered for the single object, there is a
-    // workaround implemented: each rule is triggered only once per Object Track Id. But this
-    // workaround effectively prevents prolonged actions like Camera Recording or Camera Output
-    // from working correctly when user wants "Record while object is detected" scenarios. Thus we
-    // need another workaround level to skip "once per rule" check for some types of actions.
-    canProlongateInstantAction = 1 << 1,
-};
-
-Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
-Q_DECLARE_OPERATORS_FOR_FLAGS(ActionFlags)
-
-NX_VMS_COMMON_API ActionFlags getFlags(ActionType actionType);
-
-// TODO: #sivanov Fix to resourceTypeRequired: None, Camera, Server, User, etc.
-NX_VMS_COMMON_API bool requiresCameraResource(ActionType actionType);
 NX_VMS_COMMON_API bool requiresUserResource(ActionType actionType);
-NX_VMS_COMMON_API bool requiresServerResource(ActionType actionType);
-NX_VMS_COMMON_API bool requiresAdditionalUserResource(ActionType actionType);
 
-NX_VMS_COMMON_API bool canProlongateInstantAction(ActionType actionType);
 NX_VMS_COMMON_API bool hasToggleState(ActionType actionType);
 NX_VMS_COMMON_API bool canBeInstant(ActionType actionType);
 NX_VMS_COMMON_API bool supportsDuration(ActionType actionType);
 NX_VMS_COMMON_API bool allowsAggregation(ActionType actionType);
-NX_VMS_COMMON_API bool canUseSourceCamera(ActionType actionType);
 
 NX_VMS_COMMON_API bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
 
@@ -67,11 +44,6 @@ public:
     ActionType actionType() const;
     EventType eventType() const;
 
-    /**
-     * Resource depend of action type.
-     * see: requiresCameraResource()
-     * see: requiresUserResource()
-     */
     void setResources(const QVector<nx::Uuid>& resources);
 
     const QVector<nx::Uuid>& getResources() const;

@@ -19,14 +19,11 @@ static constexpr auto kAnalyticsObjectTypeDetailName = "analyticsObjectType";
 static constexpr auto kCaptionDetailName = "caption";
 static constexpr auto kClientActionDetailName = "clientAction";
 static constexpr auto kCustomIconDetailName = "customIcon";
-// Keep in sync with StringHelper::notificationDescription().
 static constexpr auto kDescriptionDetailName = "description";
 static constexpr auto kDestinationDetailName = "destination";
-// Keep in sync with StringsHelper::eventDetails(). Not include reason.
 static constexpr auto kDetailingDetailName = "detailing";
 
 // Verbose event caption with resource name. Used as email subject or bookmark name.
-// Keep in sync with StringsHelper::eventAtResource().
 static constexpr auto kExtendedCaptionDetailName = "extendedCaption";
 
 // Separate 'Caption' line in notification tooltip.

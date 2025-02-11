@@ -18,8 +18,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/migration_utils.h>
+#include <nx/vms/rules/strings.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
@@ -31,8 +31,7 @@ PopupSettingsWidget::PopupSettingsWidget(
     base_type(parent),
     ui(new Ui::PopupSettingsWidget),
     m_updating(false),
-    m_userNotificationSettingsManager{systemContext->userNotificationSettingsManager()},
-    m_stringsHelper(new event::StringsHelper(systemContext))
+    m_userNotificationSettingsManager{systemContext->userNotificationSettingsManager()}
 {
     ui->setupUi(this);
 
@@ -44,7 +43,9 @@ PopupSettingsWidget::PopupSettingsWidget(
     for (auto eventType: m_userNotificationSettingsManager->allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(m_stringsHelper->eventName(eventType));
+        checkbox->setText(rules::Strings::eventName(
+            systemContext,
+            event::convertToNewEvent(eventType)));
         ui->businessEventsLayout->addWidget(checkbox);
         m_eventRulesCheckBoxes[eventType] = checkbox;
 

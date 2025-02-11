@@ -10,14 +10,49 @@
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/common/saas/saas_utils.h>
+#include <nx/vms/event/helpers.h>
 #include <nx/vms/event/migration_utils.h>
-#include <nx/vms/event/strings_helper.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common::system_health;
+
+namespace {
+
+using namespace event;
+
+static const std::set<EventType> kEventsNotSupportedBySoftwareLicenseMode{
+    EventType::saasIssueEvent
+};
+
+static const std::set<EventType> kEventsNotSupportedBySaas{
+    EventType::licenseIssueEvent
+};
+
+/**
+ * @return Predicate that returns true for an event that is supported by the licensing model of
+ *     the system described by the given system context.
+ */
+EventTypePredicate isApplicableForLicensingMode(SystemContext* systemContext)
+{
+    const auto isSaasSystem = common::saas::saasInitialized(systemContext);
+    return
+        [isSaasSystem](const EventType eventType)
+        {
+            return isSaasSystem
+                ? !kEventsNotSupportedBySaas.contains(eventType)
+                : !kEventsNotSupportedBySoftwareLicenseMode.contains(eventType);
+        };
+}
+
+QList<EventType> visibleInSettingsEvents(SystemContext* systemContext)
+{
+    return allEvents({isNonDeprecatedEvent, isApplicableForLicensingMode(systemContext)});
+}
+
+} // namespace
 
 UserNotificationSettingsManager::UserNotificationSettingsManager(
     SystemContext* systemContext,
@@ -173,7 +208,7 @@ void UserNotificationSettingsManager::updateSupportedTypes()
     m_supportedMessageTypes = nx::utils::toQList(allMessageTypes(
         {isMessageVisibleInSettings, isMessageApplicableForLicensingMode(systemContext())}));
 
-    m_supportedEventTypes = event::visibleInSettingsEvents(systemContext());
+    m_supportedEventTypes = visibleInSettingsEvents(systemContext());
 }
 
 void UserNotificationSettingsManager::updateWatchedTypes()

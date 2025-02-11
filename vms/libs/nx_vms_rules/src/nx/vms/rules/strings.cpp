@@ -21,7 +21,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx/vms/time/formatter.h>
 
 #include "engine.h"

@@ -3,7 +3,6 @@
 #include "action_parameters.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/event/events/abstract_event.h>
 
 namespace nx {
 namespace vms {

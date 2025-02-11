@@ -6,7 +6,7 @@
 #include <nx/vms/api/data/server_runtime_event_data.h>
 #include <nx/vms/api/data/user_group_data.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/synctime.h>
 

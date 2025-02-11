@@ -133,7 +133,6 @@ QString eventDetails(SubstitutionContext* substitution, common::SystemContext* c
         .join(common::html::kLineBreak);
 }
 
-// Keep in sync with StringHelper::eventDescription().
 QString extendedEventDescription(
     SubstitutionContext* substitution, common::SystemContext* context)
 {

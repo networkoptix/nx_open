@@ -5,6 +5,7 @@
 #include <api/server_rest_connection.h>
 #include <client/client_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
@@ -22,7 +23,6 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/aggregation_info.h>
-#include <nx/vms/event/strings_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <transaction/message_bus_adapter.h>
@@ -103,7 +103,6 @@ CallNotificationsListModel::Private::Private(CallNotificationsListModel* q):
     base_type(),
     WindowContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(system())),
     m_soundController(this)
 {
     const auto handler = windowContext()->notificationActionHandler();
@@ -127,10 +126,6 @@ void CallNotificationsListModel::Private::addNotification(
     if (!messageIsSupported(message))
         return; //< Message type is processed in a separate model.
 
-    QnResourcePtr resource;
-    if (params.canConvert<QnResourcePtr>())
-        resource = params.value<QnResourcePtr>();
-
     vms::event::AbstractActionPtr action;
     if (params.canConvert<vms::event::AbstractActionPtr>())
         action = params.value<vms::event::AbstractActionPtr>();
@@ -145,7 +140,7 @@ void CallNotificationsListModel::Private::addNotification(
     const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
 
     EventData eventData;
-    eventData.toolTip = tooltip(action);
+    eventData.toolTip = tooltip(message, camera);
     eventData.helpId = rules::eventHelpId(runtimeParameters.eventType);
     eventData.level = QnNotificationLevel::valueOf(system(), message);
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
@@ -275,13 +270,20 @@ void CallNotificationsListModel::Private::removeNotification(
 }
 
 QString CallNotificationsListModel::Private::tooltip(
-    const vms::event::AbstractActionPtr& action) const
+    MessageType message,
+    const QnVirtualCameraResourcePtr& camera) const
 {
-    const QStringList tooltip = m_helper->eventDescription(
-        action,
-        vms::event::AggregationInfo(),
-        appContext()->localSettings()->resourceInfoLevel(),
-        nx::vms::event::AttrSerializePolicy::none);
+    QStringList tooltip;
+    if (message == MessageType::showIntercomInformer)
+        tooltip << tr("Call Request");
+    else if (message == MessageType::showMissedCallInformer)
+        tooltip << tr("Call Request Missed");
+
+    if (camera)
+    {
+        tooltip << tr("Source: %1").arg(QnResourceDisplayInfo(camera)
+            .toString(appContext()->localSettings()->resourceInfoLevel()));
+    }
 
     return tooltip.join(nx::vms::common::html::kLineBreak);
 }

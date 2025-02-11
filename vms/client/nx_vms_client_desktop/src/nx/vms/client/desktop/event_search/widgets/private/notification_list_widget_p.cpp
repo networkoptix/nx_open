@@ -44,8 +44,8 @@
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/migration_utils.h>
+#include <nx/vms/rules/strings.h>
 #include <ui/common/palette.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -93,8 +93,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q):
         m_ribbonContainer)),
     m_notificationSettingsDialog{new NotificationSettingsDialog{q}},
     m_model(new NotificationTabModel(windowContext(), this)),
-    m_filterModel(new QSortFilterProxyModel(q)),
-    m_stringHelper{new event::StringsHelper{system()}}
+    m_filterModel(new QSortFilterProxyModel(q))
 {
     m_headerWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_headerWidget->setStyleSheet(
@@ -380,7 +379,9 @@ void NotificationListWidget::Private::updateFilterNotificationsButtonAppearance(
     {
         if (!watchedEvents.empty())
         {
-            m_filterNotificationsButton->setText(m_stringHelper->eventName(watchedEvents.first()));
+            m_filterNotificationsButton->setText(rules::Strings::eventName(
+                system(),
+                event::convertToNewEvent(watchedEvents.first())));
         }
         else
         {
