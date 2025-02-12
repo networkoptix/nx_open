@@ -10,28 +10,73 @@
 #include <nx/build_info.h>
 
 #ifdef Q_OS_WIN
-#   include <Windows.h>
+#include <Windows.h>
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QEvent>
+#include <QtGui/QWindow>
+#include <QtQuick/QQuickWindow>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/private/qwidgetwindow_p.h>
+
+#include <utils/common/event_processors.h>
 
 enum {
     WM_QT_SENDPOSTEDEVENTS = WM_USER + 1 /* Copied from qeventdispatcher_win.cpp. */
 };
 
-class QnQtbugWorkaroundPrivate {
-public:
-    QnQtbugWorkaroundPrivate(): inSizeMove(false), ignoreNextPostedEventsMessage(false) {}
+namespace {
 
-    bool inSizeMove;
-    bool ignoreNextPostedEventsMessage;
+QColor windowColor(QWindow* window)
+{
+    if (const auto quickWindow = qobject_cast<QQuickWindow*>(window))
+        return quickWindow->color();
+
+    const auto widgetWindow = dynamic_cast<QWidgetWindow*>(window);
+    if (widgetWindow && widgetWindow->widget())
+        return widgetWindow->widget()->palette().window().color();
+
+    return qApp->palette().window().color();
+}
+
+} // namespace
+
+class QnQtbugWorkaroundPrivate
+{
+public:
+    QnQtbugWorkaroundPrivate() {}
+
+    bool inSizeMove = false;
+    bool ignoreNextPostedEventsMessage = false;
+
+    QHash<HWND, QPointer<QWindow>> windows;
 };
 
-QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
+QnQtbugWorkaround::QnQtbugWorkaround(QObject* parent):
     QObject(parent),
     d_ptr(new QnQtbugWorkaroundPrivate())
 {
     qApp->installNativeEventFilter(this);
+
+    /*
+     * There is a bug on Windows: white background flickering underneath content of native windows.
+     * To fix that we track windows and their native handles and forcefully paint proper background
+     * in response to WM_ERASEBKGND (see `nativeEventFilter` below).
+     */
+    installEventHandler(qApp, QEvent::PlatformSurface, this,
+        [this](QObject* watched, QEvent* event)
+        {
+            if (const auto window = qobject_cast<QWindow*>(watched))
+            {
+                Q_D(QnQtbugWorkaround);
+                const auto hwnd = (HWND) window->winId();
+                const auto e = static_cast<QPlatformSurfaceEvent*>(event);
+                if (e->surfaceEventType() == QPlatformSurfaceEvent::SurfaceCreated)
+                    d->windows.insert(hwnd, window);
+                else
+                    d->windows.remove(hwnd);
+            }
+        });
 }
 
 QnQtbugWorkaround::~QnQtbugWorkaround() {
@@ -65,6 +110,24 @@ bool QnQtbugWorkaround::nativeEventFilter(const QByteArray&, void* message, qint
     case WM_CAPTURECHANGED:
         d->inSizeMove = false;
         return false;
+
+    /*
+     * Force background painting for native windows.
+     */
+    case WM_ERASEBKGND:
+    {
+        const auto window = d->windows.value(msg->hwnd);
+        if (!window)
+            return false;
+        const auto color = windowColor(window).rgb();
+        const auto brush = ::CreateSolidBrush(RGB(qRed(color), qGreen(color), qBlue(color)));
+        RECT rc;
+        ::GetClientRect(msg->hwnd, &rc);
+        ::FillRect(reinterpret_cast<HDC>(msg->wParam), &rc, brush);
+        ::DeleteObject(brush);
+        return true;
+    }
+
     case WM_QT_SENDPOSTEDEVENTS:
         if(d->inSizeMove) {
             MSG msg;

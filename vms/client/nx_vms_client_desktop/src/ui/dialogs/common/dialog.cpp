@@ -25,9 +25,6 @@ QnDialog::QnDialog(QWidget* parent, Qt::WindowFlags flags):
 {
     cancelDrag(this);
 #if defined(Q_OS_WIN)
-    // VMS-42446: This is a workaround for white background blinking on dialog opening.
-    setWindowOpacity(0);
-
     if (ini().overrideDialogFramesWIN)
     {
         EmulatedNonClientArea::create(this, new DialogTitleBarWidget());
@@ -86,17 +83,6 @@ bool QnDialog::event(QEvent* event)
             if (layout())
                 layout()->activate();
             break;
-
-        // VMS-42446: This is a workaround for white background blinking on dialog opening.
-#if defined(Q_OS_WIN)
-        case QEvent::Hide:
-            setWindowOpacity(0);
-            break;
-
-        case QEvent::WindowActivate:
-            QTimer::singleShot(0, this, [this](){ this->setWindowOpacity(1); });
-            break;
-#endif // defined(Q_OS_WIN)
 
         default:
             break;
