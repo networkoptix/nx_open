@@ -14,6 +14,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/std/cpp20.h>
 
+#include "account_data.h"
 #include "permissions.h"
 
 namespace nx::cloud::db::api {
@@ -452,6 +453,9 @@ struct SystemSharingEx: SystemSharing
     /**%apidoc Shows if HTTP Digest authentication is allowed for this account.*/
     bool httpDigestAuthEnabled = false;
 
+    /**apidoc Notification filter for the account. */
+    api::AccountNotificationFilterSettings accountNotificationFilterSettings;
+
     bool operator==(const SystemSharingEx& rhs) const
     {
         return std::tie(
@@ -477,7 +481,7 @@ struct SystemSharingEx: SystemSharing
 };
 
 NX_REFLECTION_INSTRUMENT(SystemSharingEx, (systemId)(accountId)(accountFullName)(usageFrequency) \
-    (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled)(httpDigestAuthEnabled))
+    (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled)(httpDigestAuthEnabled)(accountNotificationFilterSettings))
 
 
 using SystemSharingExList = std::vector<SystemSharingEx>;

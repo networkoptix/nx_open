@@ -6,6 +6,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 
 #include "cdb_request_path.h"
+#include "data/account_data.h"
 #include "data/system_data.h"
 
 namespace nx::cloud::db::client {

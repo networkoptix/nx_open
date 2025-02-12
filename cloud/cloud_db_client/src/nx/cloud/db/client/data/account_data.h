@@ -146,4 +146,11 @@ NX_REFLECTION_INSTRUMENT(AccountForSharingRequest, AccountForSharingRequest_Fiel
 
 NX_REFLECTION_INSTRUMENT(AccountForSharing, AccountForSharing_Fields)
 
+//-------------------------------------------------------------------------------------------------
+// struct AccountNotificationFilterSettings
+
+#define AccountNotificationFilterSettings_Fields (eventFilter)(messageFilter)
+
+NX_REFLECTION_INSTRUMENT(AccountNotificationFilterSettings, AccountNotificationFilterSettings_Fields)
+
 } // namespace nx::cloud::db::api

@@ -75,6 +75,11 @@ public:
         api::AccountOrganizationAttrs orgAttrs,
         std::function<void(api::ResultCode)> completionHandler) override;
 
+    virtual void updateAccountNotificationFilterSettings(
+        const std::string& accountEmail,
+        api::AccountNotificationFilterSettings settings,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
 private:
     ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };

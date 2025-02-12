@@ -77,6 +77,11 @@ public:
         const std::string& accountEmail,
         api::AccountOrganizationAttrs orgAttrs,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    virtual void updateAccountNotificationFilterSettings(
+        const std::string& accountEmail,
+        api::AccountNotificationFilterSettings settings,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

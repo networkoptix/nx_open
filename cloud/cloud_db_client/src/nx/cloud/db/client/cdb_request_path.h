@@ -18,6 +18,9 @@ static constexpr char kAccountStatusPath[] = "/cdb/account/{accountEmail}/status
 static constexpr char kAccountSecuritySettingsPath[] = "/cdb/account/{accountEmail}/settings/security";
 static constexpr char kAccountForSharingPath[] = "/cdb/internal/v0/account/{accountEmail}/sharing-data";
 
+static constexpr char kAccountNotificationSettings[] =
+    "/cdb/v1/account/{accountEmail}/notificationSettings";
+
 static constexpr char kAccountOrganizationAttrsPath[] =
     "/cdb/internal/v0/account/{accountEmail}/organization-attrs";
 static constexpr char kInternalGetAccountsInfo[] =

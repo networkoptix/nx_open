@@ -292,4 +292,13 @@ struct AccountForSharing
     std::string locale;
 };
 
+struct AccountNotificationFilterSettings
+{
+    /**%apidoc List of disabled events. */
+    std::vector<std::string> eventFilter;
+
+    /**%apidoc List of disabled messages. */
+    std::vector<std::string> messageFilter;
+};
+
 } // namespace nx::cloud::db::api
