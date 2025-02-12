@@ -1,9 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <d3d11_1.h>
-
-#include <wrl/client.h>
-#include <wrl/wrappers/corewrappers.h>
+#include <d3d11_4.h>
 
 #include <QtGui/rhi/qrhi.h>
 #include <QtMultimedia/QVideoFrame>
@@ -19,219 +16,16 @@ extern "C" {
 #include <libavutil/hwcontext_d3d11va.h>
 } // extern "C"
 
-#include "texture_helper.h"
+#include "d3d_common.h"
 #include "hw_video_api.h"
+#include "texture_helper.h"
 
 using namespace Microsoft::WRL;
+using namespace std::chrono;
 
 namespace nx::media {
 
 namespace {
-
-/**
- * Helper class for synchronized transfer of a texture between two D3D devices. FFmpeg and RHI
- * use different D3D devices so we need to copy the texture between them.
- */
-class TextureBridge final
-{
-public:
-    /**
-     * Copy a texture at position index from device dev into a shared texture and crop texture
-     * size to the frame size
-     */
-    bool copyToSharedTex(
-        ID3D11Device* dev,
-        ID3D11DeviceContext* ctx,
-        const ComPtr<ID3D11Texture2D>& tex,
-        UINT index,
-        const QSize& frameSize);
-
-    /** Get a copy of the texture on a provided device */
-    ComPtr<ID3D11Texture2D> copyFromSharedTex(
-        const ComPtr<ID3D11Device1>& dev,
-        const ComPtr<ID3D11DeviceContext>& ctx);
-
-private:
-    bool ensureDestTex(const ComPtr<ID3D11Device1>& dev);
-    bool ensureSrcTex(
-        ID3D11Device* dev,
-        const ComPtr<ID3D11Texture2D>& tex,
-        const QSize& frameSize);
-    bool isSrcInitialized(
-        const ID3D11Device* dev,
-        const ComPtr<ID3D11Texture2D>& tex,
-        const QSize& frameSize) const;
-
-    bool recreateSrc(ID3D11Device* dev, const ComPtr<ID3D11Texture2D>& tex, const QSize& frameSize);
-
-    Wrappers::HandleT<Wrappers::HandleTraits::HANDLETraits> m_sharedHandle{};
-
-    const UINT m_srcKey = 0;
-    ComPtr<ID3D11Texture2D> m_srcTex;
-    ComPtr<IDXGIKeyedMutex> m_srcMutex;
-
-    const UINT m_destKey = 1;
-    ComPtr<ID3D11Device1> m_destDevice;
-    ComPtr<ID3D11Texture2D> m_destTex;
-    ComPtr<IDXGIKeyedMutex> m_destMutex;
-
-    ComPtr<ID3D11Texture2D> m_outputTex;
-};
-
-bool TextureBridge::copyToSharedTex(
-    ID3D11Device* dev,
-    ID3D11DeviceContext* ctx,
-    const ComPtr<ID3D11Texture2D>& tex,
-    UINT index,
-    const QSize& frameSize)
-{
-    if (!ensureSrcTex(dev, tex, frameSize))
-        return false;
-
-    // Ensure that texture is fully updated before we share it.
-    ctx->Flush();
-
-    if (m_srcMutex->AcquireSync(m_srcKey, INFINITE) != S_OK)
-        return false;
-
-    // Decoded frame texture may be larger than the frame size. Crop it to the frame size.
-    const D3D11_BOX crop{0, 0, 0, (UINT) frameSize.width(), (UINT) frameSize.height(), 1};
-    ctx->CopySubresourceRegion(m_srcTex.Get(), 0, 0, 0, 0, tex.Get(), index, &crop);
-
-    m_srcMutex->ReleaseSync(m_destKey);
-    return true;
-}
-
-ComPtr<ID3D11Texture2D> TextureBridge::copyFromSharedTex(
-    const ComPtr<ID3D11Device1>& dev,
-    const ComPtr<ID3D11DeviceContext>& ctx)
-{
-    if (!ensureDestTex(dev))
-        return {};
-
-    if (m_destMutex->AcquireSync(m_destKey, INFINITE) != S_OK)
-        return {};
-
-    ctx->CopySubresourceRegion(m_outputTex.Get(), 0, 0, 0, 0, m_destTex.Get(), 0, nullptr);
-
-    m_destMutex->ReleaseSync(m_srcKey);
-
-    return m_outputTex;
-}
-
-bool TextureBridge::ensureDestTex(const ComPtr<ID3D11Device1>& dev)
-{
-    if (m_destDevice != dev)
-    {
-        // We need to recreate texture when destination device changes.
-        m_destTex = nullptr;
-        m_destDevice = dev;
-    }
-
-    if (m_destTex)
-        return true;
-
-    if (m_destDevice->OpenSharedResource1(m_sharedHandle.Get(), IID_PPV_ARGS(&m_destTex)) != S_OK)
-        return false;
-
-    CD3D11_TEXTURE2D_DESC desc{};
-    m_destTex->GetDesc(&desc);
-
-    desc.MiscFlags = 0;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-    if (m_destDevice->CreateTexture2D(&desc, nullptr, m_outputTex.ReleaseAndGetAddressOf()) != S_OK)
-        return false;
-
-    return m_destTex.As(&m_destMutex) == S_OK;
-}
-
-bool TextureBridge::ensureSrcTex(
-    ID3D11Device* dev,
-    const ComPtr<ID3D11Texture2D>& tex,
-    const QSize& frameSize)
-{
-    if (!isSrcInitialized(dev, tex, frameSize))
-        return recreateSrc(dev, tex, frameSize);
-
-    return true;
-}
-
-bool TextureBridge::isSrcInitialized(
-    const ID3D11Device* dev,
-    const ComPtr<ID3D11Texture2D>& tex,
-    const QSize &frameSize) const
-{
-    if (!m_srcTex)
-        return false;
-
-    // We should reinitalize if device has changed.
-    ComPtr<ID3D11Device> texDevice;
-    m_srcTex->GetDevice(texDevice.GetAddressOf());
-    if (dev != texDevice.Get())
-        return false;
-
-    // Reinitialize if shared texture format or size has changed.
-    CD3D11_TEXTURE2D_DESC inputDesc{};
-    tex->GetDesc(&inputDesc);
-
-    CD3D11_TEXTURE2D_DESC currentDesc{};
-    m_srcTex->GetDesc(&currentDesc);
-
-    if (inputDesc.Format != currentDesc.Format)
-        return false;
-
-    const auto width = (UINT) frameSize.width();
-    const auto height = (UINT) frameSize.height();
-
-    return currentDesc.Width == width && currentDesc.Height == height;
-}
-
-bool TextureBridge::recreateSrc(
-    ID3D11Device* dev,
-    const ComPtr<ID3D11Texture2D>& tex,
-    const QSize& frameSize)
-{
-    m_sharedHandle.Close();
-
-    CD3D11_TEXTURE2D_DESC desc{};
-    tex->GetDesc(&desc);
-
-    const auto width = (UINT) frameSize.width();
-    const auto height = (UINT) frameSize.height();
-
-    CD3D11_TEXTURE2D_DESC texDesc{desc.Format, width, height};
-    texDesc.MipLevels = 1;
-    texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
-
-    if (dev->CreateTexture2D(
-            &texDesc,
-            /* pInitialData */ nullptr,
-            m_srcTex.ReleaseAndGetAddressOf()) != S_OK)
-    {
-        return false;
-    }
-
-    ComPtr<IDXGIResource1> res;
-    if (m_srcTex.As(&res) != S_OK)
-        return false;
-
-    const HRESULT hr = res->CreateSharedHandle(
-        /* pAttributes */ nullptr,
-        DXGI_SHARED_RESOURCE_READ,
-        /* lpName */ nullptr,
-        m_sharedHandle.GetAddressOf());
-
-    if (hr != S_OK || !m_sharedHandle.IsValid())
-        return false;
-
-    if (m_srcTex.As(&m_srcMutex) != S_OK || !m_srcMutex)
-        return false;
-
-    m_destTex = nullptr;
-    m_destMutex = nullptr;
-    return true;
-}
 
 ComPtr<ID3D11Device1> GetD3DDevice(QRhi* rhi)
 {
@@ -242,86 +36,231 @@ ComPtr<ID3D11Device1> GetD3DDevice(QRhi* rhi)
     const ComPtr<ID3D11Device> rhiDevice = static_cast<ID3D11Device*>(native->dev);
 
     ComPtr<ID3D11Device1> dev1;
-    if (rhiDevice.As(&dev1) != S_OK)
+    if (FAILED(rhiDevice.As(&dev1)))
         return nullptr;
 
     return dev1;
 }
 
-class TextureConverter
+struct SharedTexture
 {
-public:
-    TextureConverter(QRhi* rhi):
-        m_rhi(rhi),
-        m_rhiDevice(GetD3DDevice(rhi))
-    {
-        if (!m_rhiDevice)
-            return;
+    ComPtr<ID3D11Texture2D> texture;
+    DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+    QSize size;
+    Wrappers::HandleT<Wrappers::HandleTraits::HANDLETraits> handle;
+};
 
-        m_rhiDevice->GetImmediateContext(m_rhiCtx.GetAddressOf());
+class TexturePool: public TexturePoolBase<TexturePool, SharedTexture>
+{
+    friend class TexturePoolBase<TexturePool, SharedTexture>;
+
+public:
+    TexturePool(QRhi* rhi): m_rhiDevice(GetD3DDevice(rhi))
+    {
     }
 
-    ComPtr<ID3D11Texture2D> copyTexture(
+private:
+    std::shared_ptr<SharedTexture> newTexture(const CD3D11_TEXTURE2D_DESC& d, const QSize& size)
+    {
+        CD3D11_TEXTURE2D_DESC desc(d.Format, size.width(), size.height());
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.MipLevels = 1;
+        desc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+
+        auto shared = std::make_shared<SharedTexture>();
+
+        throwIfFailed(
+            m_rhiDevice->CreateTexture2D(
+                &desc,
+                /*pInitialData*/ nullptr,
+                shared->texture.ReleaseAndGetAddressOf()));
+
+        shared->format = desc.Format;
+        shared->size = size;
+
+        ComPtr<IDXGIResource1> res;
+        throwIfFailed(shared->texture.As(&res));
+
+        throwIfFailed(
+            res->CreateSharedHandle(
+                /* pAttributes */ nullptr,
+                DXGI_SHARED_RESOURCE_READ | DXGI_SHARED_RESOURCE_WRITE,
+                /* lpName */ nullptr,
+                shared->handle.GetAddressOf()));
+
+        return shared;
+    }
+
+private:
+    ComPtr<ID3D11Device1> m_rhiDevice;
+};
+
+// Helper for using either a fence or a query for waiting on GPU operations.
+class WaitHelper
+{
+public:
+    WaitHelper() = default;
+
+    void init(
+        const ComPtr<ID3D11Device1>& device,
+        const ComPtr<ID3D11DeviceContext>& context)
+    {
+        clear();
+
+        m_device = device;
+        m_context = context;
+
+        // Using ID3D11Fence requires Windows 10 Creators Update.
+        m_device.As(&m_device5);
+        m_context.As(&m_context4);
+
+        if (m_device5 && m_context4)
+        {
+            throwIfFailed(m_device5->CreateFence(
+                m_fenceValue, D3D11_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+        }
+        else
+        {
+            const D3D11_QUERY_DESC queryDesc{.Query = D3D11_QUERY_EVENT, .MiscFlags = 0};
+            throwIfFailed(m_device->CreateQuery(&queryDesc, &m_query));
+        }
+    }
+
+    void clear()
+    {
+        m_device.Reset();
+        m_context.Reset();
+        m_device5.Reset();
+        m_context4.Reset();
+        m_fence.Reset();
+        m_fenceValue = 0;
+        if (m_handle)
+            CloseHandle(m_handle);
+        m_handle = nullptr;
+        m_query.Reset();
+    }
+
+    ~WaitHelper()
+    {
+        clear();
+    }
+
+    // Wait for the device to finish processing. Uses either a fence or a query.
+    void wait(
+        const ComPtr<ID3D11Device1>& device,
+        const ComPtr<ID3D11DeviceContext>& context)
+    {
+        if (m_context.Get() != context.Get())
+            init(device, context);
+
+        if (m_fence)
+        {
+            ++m_fenceValue;
+            m_context4->Signal(m_fence.Get(), m_fenceValue);
+
+            if (m_fence->GetCompletedValue() < m_fenceValue)
+            {
+                if (!m_handle)
+                    m_handle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
+                throwIfFailed(m_fence->SetEventOnCompletion(m_fenceValue, m_handle));
+                WaitForSingleObject(m_handle, INFINITE);
+            }
+        }
+        else if (m_query)
+        {
+            int nextSleep = 2;
+
+            m_context->End(m_query.Get());
+
+            BOOL queryData = 0;
+            while(S_OK != m_context->GetData(m_query.Get(), &queryData, sizeof(queryData), 0))
+            {
+                nextSleep = std::min(nextSleep * 2, 64);
+                Sleep(nextSleep);
+            }
+        }
+    }
+
+private:
+    ComPtr<ID3D11Device1> m_device;
+    ComPtr<ID3D11DeviceContext> m_context;
+
+    ComPtr<ID3D11Device5> m_device5;
+    ComPtr<ID3D11DeviceContext4> m_context4;
+    ComPtr<ID3D11Fence> m_fence;
+    UINT64 m_fenceValue = 0;
+    HANDLE m_handle = nullptr;
+
+    ComPtr<ID3D11Query> m_query;
+};
+
+class DecoderData: public VideoApiDecoderData
+{
+public:
+    DecoderData(QRhi* rhi): m_texturePool(rhi)
+    {
+    }
+
+    ~DecoderData() override
+    {
+    }
+
+    std::shared_ptr<SharedTexture> copyFrameTexture(
         const AVD3D11VADeviceContext* avDeviceCtx,
         const ComPtr<ID3D11Texture2D>& ffmpegTex,
         UINT index,
         const QSize& frameSize)
     {
-        // Lock the FFmpeg device context while we copy from FFmpeg's
-        // frame pool into a shared texture because the underlying ID3D11DeviceContext
-        // is not thread safe.
         avDeviceCtx->lock(avDeviceCtx->lock_ctx);
+
         const auto autoUnlock = nx::utils::makeScopeGuard(
-            [&]
+            [&avDeviceCtx]
             {
                 avDeviceCtx->unlock(avDeviceCtx->lock_ctx);
             });
 
-        if (!m_bridge.copyToSharedTex(avDeviceCtx->device, avDeviceCtx->device_context,
-            ffmpegTex, index, frameSize))
-        {
-            return {};
-        }
+        CD3D11_TEXTURE2D_DESC desc{};
+        ffmpegTex->GetDesc(&desc);
 
-        // Get a copy of the texture on the RHI device
-        return m_bridge.copyFromSharedTex(m_rhiDevice, m_rhiCtx);
+        auto shared = m_texturePool.getTexture(desc, frameSize);
+
+        if (!shared)
+            return {};
+
+        // Ensure that texture is fully updated before we copy it.
+        avDeviceCtx->device_context->Flush();
+
+        ComPtr<ID3D11Device> dev = avDeviceCtx->device;
+        ComPtr<ID3D11Device1> hwDevice;
+        throwIfFailed(dev.As(&hwDevice));
+
+        ComPtr<ID3D11Texture2D> destTex;
+
+        throwIfFailed(
+            hwDevice->OpenSharedResource1(
+                shared->handle.Get(), IID_PPV_ARGS(&destTex)));
+
+        ID3D11DeviceContext* hwCtx = avDeviceCtx->device_context;
+
+        // Decoded frame texture may be larger than the frame size. Crop it to the frame size.
+        const D3D11_BOX crop{0, 0, 0, (UINT) frameSize.width(), (UINT) frameSize.height(), 1};
+        hwCtx->CopySubresourceRegion(destTex.Get(), 0, 0, 0, 0, ffmpegTex.Get(), index, &crop);
+        hwCtx->Flush();
+
+        m_waitHelper.wait(hwDevice, hwCtx);
+
+        return shared;
     }
 
 private:
-    QRhi* const m_rhi;
-    ComPtr<ID3D11Device1> m_rhiDevice;
-    ComPtr<ID3D11DeviceContext> m_rhiCtx;
-    TextureBridge m_bridge;
+    TexturePool m_texturePool;
+    WaitHelper m_waitHelper;
 };
-
-std::shared_ptr<TextureConverter> getTextureConverterForRhi(QRhi* rhi)
-{
-    static std::mutex mutex;
-    static QHash<QRhi*, std::shared_ptr<TextureConverter>> allRhis;
-
-    std::lock_guard lock(mutex);
-
-    if (auto converter = allRhis.value(rhi, {}))
-        return converter;
-
-    std::shared_ptr<TextureConverter> converter = std::make_shared<TextureConverter>(rhi);
-
-    rhi->addCleanupCallback(
-        [](QRhi* rhi)
-        {
-            std::lock_guard lock(mutex);
-            allRhis.remove(rhi);
-        });
-
-    allRhis[rhi] = converter;
-
-    return converter;
-}
 
 class VideoFrameTextures: public QVideoFrameTextures
 {
 public:
-    VideoFrameTextures(ComPtr<ID3D11Texture2D> d3d11Texture):
+    VideoFrameTextures(std::shared_ptr<SharedTexture> d3d11Texture):
         m_d3d11Texture(std::move(d3d11Texture))
     {
     }
@@ -334,7 +273,7 @@ public:
         return m_textures[plane].get();
     }
 
-    ComPtr<ID3D11Texture2D> m_d3d11Texture;
+    std::shared_ptr<SharedTexture> m_d3d11Texture;
     std::array<std::unique_ptr<QRhiTexture>, 4> m_textures;
 };
 
@@ -356,10 +295,41 @@ QVideoFrameFormat::PixelFormat toQtPixelFormat(DXGI_FORMAT format)
 class D3D11MemoryBuffer: public QHwVideoBuffer
 {
 public:
-    D3D11MemoryBuffer(const AVFrame* frame):
+    D3D11MemoryBuffer(const AVFrame* frame, std::shared_ptr<DecoderData> decoderData):
         QHwVideoBuffer(QVideoFrame::NoHandle),
         m_frame(frame)
     {
+        const auto fCtx = reinterpret_cast<AVHWFramesContext*>(m_frame->hw_frames_ctx->data);
+        const auto ctx = fCtx->device_ctx;
+
+        if (!ctx || ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
+            return;
+
+        const ComPtr<ID3D11Texture2D> ffmpegTex = reinterpret_cast<ID3D11Texture2D*>(
+            m_frame->data[0]);
+        const int index = static_cast<int>(reinterpret_cast<intptr_t>(m_frame->data[1]));
+
+        const auto* avDeviceCtx = static_cast<AVD3D11VADeviceContext*>(ctx->hwctx);
+
+        if (!avDeviceCtx)
+            return;
+
+        const QSize frameSize{m_frame->width, m_frame->height};
+
+        try
+        {
+            m_sharedTexture = decoderData->copyFrameTexture(
+                avDeviceCtx, ffmpegTex, index, frameSize);
+        }
+        catch (const _com_error& e)
+        {
+            // DirectX API can throw COM exception.
+            NX_WARNING(this, "COM Error: %1", QString::fromWCharArray(e.ErrorMessage()));
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Caught exception: %1", e.what());
+        }
     }
 
     virtual ~D3D11MemoryBuffer() override
@@ -378,31 +348,13 @@ public:
     virtual std::unique_ptr<QVideoFrameTextures> mapTextures(
         QRhi& rhi, QVideoFrameTexturesUPtr& /*oldTextures*/) override
     {
-        const auto fCtx = reinterpret_cast<AVHWFramesContext*>(m_frame->hw_frames_ctx->data);
-        const auto ctx = fCtx->device_ctx;
-
-        if (!ctx || ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
+        if (!m_sharedTexture)
             return {};
 
-        const ComPtr<ID3D11Texture2D> ffmpegTex = reinterpret_cast<ID3D11Texture2D*>(
-            m_frame->data[0]);
-        const int index = static_cast<int>(reinterpret_cast<intptr_t>(m_frame->data[1]));
-
-        const auto* avDeviceCtx = static_cast<AVD3D11VADeviceContext*>(ctx->hwctx);
-
-        if (!avDeviceCtx)
-            return {};
-
-        auto converter = getTextureConverterForRhi(&rhi);
-
-        const QSize frameSize{m_frame->width, m_frame->height};
-        ComPtr<ID3D11Texture2D> output = converter->copyTexture(
-            avDeviceCtx, ffmpegTex, index, frameSize);
-
-        std::unique_ptr<VideoFrameTextures> textures(new VideoFrameTextures(std::move(output)));
+        std::unique_ptr<VideoFrameTextures> textures(new VideoFrameTextures(m_sharedTexture));
 
         const QVideoFrameFormat frameFormat = format();
-        quint64 handle = reinterpret_cast<quint64>(textures->m_d3d11Texture.Get());
+        quint64 handle = reinterpret_cast<quint64>(textures->m_d3d11Texture->texture.Get());
         for (int plane = 0; plane < 4; ++plane)
             textures->m_textures[plane] = createTextureFromHandle(frameFormat, rhi, plane, handle);
 
@@ -426,6 +378,7 @@ public:
 
 private:
     const AVFrame* m_frame = nullptr;
+    std::shared_ptr<SharedTexture> m_sharedTexture;
 };
 
 } // namespace
@@ -459,7 +412,10 @@ public:
         if (!ctx || ctx->type != AV_HWDEVICE_TYPE_D3D11VA)
             return {};
 
-        auto result = std::make_shared<VideoFrame>(std::make_unique<D3D11MemoryBuffer>(frame));
+        auto result = std::make_shared<VideoFrame>(
+            std::make_unique<D3D11MemoryBuffer>(
+                frame,
+                std::dynamic_pointer_cast<DecoderData>(decoderData)));
         result->setStartTime(frame->pkt_dts);
 
         return result;
@@ -473,6 +429,11 @@ public:
         auto options = std::make_unique<nx::media::ffmpeg::AvOptions>();
         options->set("vendor_id", QByteArray::number(rhi->driverInfo().vendorId));
         return options;
+    }
+
+    virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi* rhi) const override
+    {
+        return std::make_shared<DecoderData>(rhi);
     }
 };
 
