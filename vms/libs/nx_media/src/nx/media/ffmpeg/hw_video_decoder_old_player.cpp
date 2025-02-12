@@ -29,6 +29,8 @@ AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
     {
         case QRhi::Implementation::D3D11:
             return AV_HWDEVICE_TYPE_D3D11VA;
+        case QRhi::Implementation::D3D12:
+            return AV_HWDEVICE_TYPE_D3D12VA;
         case QRhi::Implementation::Metal:
             return AV_HWDEVICE_TYPE_VIDEOTOOLBOX;
         case QRhi::Vulkan:
