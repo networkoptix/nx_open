@@ -44,6 +44,7 @@ static enum AVPixelFormat getHwFormat(AVCodecContext *ctx, const enum AVPixelFor
 HwVideoDecoder::HwVideoDecoder(
     AVHWDeviceType type,
     nx::metric::Storage* metrics,
+    const std::string& device,
     std::unique_ptr<AvOptions> options,
     InitFunc initFunc)
     :
@@ -53,6 +54,7 @@ HwVideoDecoder::HwVideoDecoder(
 {
     if (m_metrics)
         m_metrics->decoders()++;
+    m_device = device;
     m_options = std::move(options);
 }
 
@@ -197,7 +199,7 @@ bool HwVideoDecoder::initializeHardware(const QnConstCompressedVideoDataPtr& dat
     }
     else
     {
-        const char* hwDevice = nullptr;
+        const char* hwDevice = m_device.empty() ? nullptr : m_device.c_str();
         AVDictionary* options = m_options ? m_options->get() : nullptr;
         if ((status = av_hwdevice_ctx_create(&m_hwDeviceContext, m_type, hwDevice, options, 0)) < 0)
         {

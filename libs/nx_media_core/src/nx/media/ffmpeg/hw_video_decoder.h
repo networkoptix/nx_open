@@ -20,6 +20,7 @@ public:
     HwVideoDecoder(
         AVHWDeviceType type,
         nx::metric::Storage* metrics,
+        const std::string& device = {},
         std::unique_ptr<AvOptions> options = {},
         InitFunc initFunc = {});
     virtual ~HwVideoDecoder();
@@ -59,6 +60,7 @@ private:
     AVBufferRef* m_hwDeviceContext = nullptr;
     AVPixelFormat m_targetPixelFormat = AV_PIX_FMT_NONE;
     int m_lastDecodeResult = 0;
+    std::string m_device;
     std::unique_ptr<AvOptions> m_options = nullptr;
     nx::metric::Storage* m_metrics = nullptr;
     quint32 m_lastChannel = 0;

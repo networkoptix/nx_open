@@ -16,6 +16,11 @@ class QRhi;
 
 namespace nx::media {
 
+class VideoApiDecoderData {
+public:
+    virtual ~VideoApiDecoderData() = default;
+};
+
 class VideoApiRegistry
 {
     VideoApiRegistry() = default;
@@ -26,9 +31,13 @@ public:
         virtual ~Entry() = default;
 
         virtual AVHWDeviceType deviceType() const = 0;
-        virtual nx::media::VideoFramePtr makeFrame(const AVFrame* frame) const = 0;
+        virtual nx::media::VideoFramePtr makeFrame(
+            const AVFrame* frame,
+            std::shared_ptr<VideoApiDecoderData> decoderData) const = 0;
         virtual nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc(QRhi*) const { return {}; }
         virtual std::unique_ptr<nx::media::ffmpeg::AvOptions> options(QRhi*) const { return {}; }
+        virtual std::string device(QRhi*) const { return {}; }
+        virtual std::shared_ptr<VideoApiDecoderData> createDecoderData(QRhi*) const { return {}; }
     };
 
 public:

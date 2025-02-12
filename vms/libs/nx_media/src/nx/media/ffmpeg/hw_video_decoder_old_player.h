@@ -11,6 +11,8 @@ namespace nx::media::ffmpeg { class HwVideoDecoder; }
 
 namespace nx::media {
 
+class VideoApiDecoderData;
+
 class NX_MEDIA_API HwVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 {
 public:
@@ -36,6 +38,7 @@ public:
 private:
     QRhi* m_rhi = nullptr;
     std::shared_ptr<nx::media::ffmpeg::HwVideoDecoder> m_impl;
+    std::shared_ptr<VideoApiDecoderData> m_decoderData;
     QSize m_resolution;
     int m_lastStatus = 0;
     QnAbstractMediaData::MediaFlags m_lastFlags {};

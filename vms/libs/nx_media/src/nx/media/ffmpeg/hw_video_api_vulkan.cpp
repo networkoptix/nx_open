@@ -175,7 +175,9 @@ public:
         return AV_HWDEVICE_TYPE_VULKAN;
     }
 
-    virtual nx::media::VideoFramePtr makeFrame(const AVFrame* frame) const override
+    virtual nx::media::VideoFramePtr makeFrame(
+        const AVFrame* frame,
+        std::shared_ptr<VideoApiDecoderData>) const override
     {
         if (!frame)
             return {};

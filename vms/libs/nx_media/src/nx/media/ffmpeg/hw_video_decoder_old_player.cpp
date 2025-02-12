@@ -155,6 +155,7 @@ bool HwVideoDecoderOldPlayer::decode(
 
             std::unique_ptr<nx::media::ffmpeg::AvOptions> options;
             nx::media::ffmpeg::HwVideoDecoder::InitFunc initFunc;
+            std::string device;
 
             if (m_lastStatus != 0 || !m_isHW || !api)
             {
@@ -166,13 +167,18 @@ bool HwVideoDecoderOldPlayer::decode(
             {
                 initFunc = api->initFunc(m_rhi);
                 options = api->options(m_rhi);
+                device = api->device(m_rhi);
             }
 
             m_impl = std::make_shared<nx::media::ffmpeg::HwVideoDecoder>(
                 hwType,
                 /* metrics */ nullptr,
+                device,
                 std::move(options),
                 initFunc);
+
+            if (api)
+                m_decoderData = api->createDecoderData(m_rhi);
         }
     }
 
@@ -188,6 +194,7 @@ bool HwVideoDecoderOldPlayer::decode(
         if (m_lastStatus < 0)
         {
             NX_WARNING(this, "Failed to decode frame");
+            m_decoderData.reset();
             m_impl.reset();
         }
         return false;
@@ -204,12 +211,13 @@ bool HwVideoDecoderOldPlayer::decode(
         if (!api || (pixelFormat == QVideoFrameFormat::Format_Invalid && m_isHW))
         {
             NX_WARNING(this, "HW pixel format %1 is not supported", getFormat(frame));
+            m_decoderData.reset();
             m_impl.reset();
             m_isHW = false;
             return decode(data, outFramePtr);
         }
 
-        nx::media::VideoFramePtr result = api->makeFrame(frame);
+        nx::media::VideoFramePtr result = api->makeFrame(frame, m_decoderData);
 
         if (!result)
         {
@@ -227,6 +235,7 @@ bool HwVideoDecoderOldPlayer::decode(
 bool HwVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDataPtr& /*data*/)
 {
     NX_DEBUG(this, "Reset decoder");
+    m_decoderData.reset();
     m_impl.reset();
     return true;
 }

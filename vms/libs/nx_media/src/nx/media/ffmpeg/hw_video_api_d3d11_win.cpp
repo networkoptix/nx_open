@@ -443,7 +443,9 @@ public:
         return AV_HWDEVICE_TYPE_D3D11VA;
     }
 
-    virtual nx::media::VideoFramePtr makeFrame(const AVFrame* frame) const override
+    virtual nx::media::VideoFramePtr makeFrame(
+        const AVFrame* frame,
+        std::shared_ptr<VideoApiDecoderData> decoderData) const override
     {
         if (!frame)
             return {};
