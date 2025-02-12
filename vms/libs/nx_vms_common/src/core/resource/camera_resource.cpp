@@ -2935,18 +2935,6 @@ nx::vms::common::AnalyticsEngineResourceList
 
 void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<nx::Uuid>& engines)
 {
-    auto ensureEnginesAreActive =
-        [this, engines]
-        {
-            const auto server = getParentServer();
-            if (!server)
-                return false;
-
-            // Make sure all set engines are active.
-            return (engines - server->activeAnalyticsEngineIds()).empty();
-        };
-
-    //NX_ASSERT_HEAVY_CONDITION(ensureEnginesAreActive());
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
 
