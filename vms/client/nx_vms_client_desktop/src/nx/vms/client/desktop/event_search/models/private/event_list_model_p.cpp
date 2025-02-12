@@ -33,20 +33,20 @@ bool EventListModel::Private::addFront(const EventData& data)
         return false;
 
     ScopedInsertRows insertRows(q, 0, 0);
-    m_events.push_front(data.id, data);
+    NX_ASSERT(m_events.push_front(data.id, data));
     return true;
 }
 
 std::list<EventListModel::EventData> EventListModel::Private::addFront(std::list<EventData> events)
 {
-    eraseExistingEvents(events);
+    eraseExistingEventsAndDuplicates(events);
 
     if (!events.empty())
     {
         ScopedInsertRows insertRows(q, 0, events.size() - 1);
 
         for (auto eventIt = events.crbegin(); eventIt != events.crend(); ++eventIt)
-            m_events.push_front(eventIt->id, *eventIt);
+            NX_ASSERT(m_events.push_front(eventIt->id, *eventIt));
     }
 
     return events;
@@ -58,20 +58,20 @@ bool EventListModel::Private::addBack(const EventData& data)
         return false;
 
     ScopedInsertRows insertRows(q, m_events.size(), m_events.size());
-    m_events.push_back(data.id, data);
+    NX_ASSERT(m_events.push_back(data.id, data));
     return true;
 }
 
 std::list<EventListModel::EventData> EventListModel::Private::addBack(std::list<EventData> events)
 {
-    eraseExistingEvents(events);
+    eraseExistingEventsAndDuplicates(events);
 
     if (!events.empty())
     {
         ScopedInsertRows insertRows(q, m_events.size(), m_events.size() + events.size() - 1);
 
         for (const auto& event: events)
-            m_events.push_back(event.id, event);
+            NX_ASSERT(m_events.push_back(event.id, event));
     }
 
     return events;
@@ -179,14 +179,21 @@ QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const Eve
         });
 }
 
-void EventListModel::Private::eraseExistingEvents(std::list<EventData>& events) const
+void EventListModel::Private::eraseExistingEventsAndDuplicates(std::list<EventData>& events) const
 {
+    QSet<nx::Uuid> processed;
+
     for (auto eventIt = events.cbegin(); eventIt != events.cend();)
     {
-        if (m_events.contains(eventIt->id))
+        if (m_events.contains(eventIt->id) || processed.contains(eventIt->id))
+        {
             eventIt = events.erase(eventIt);
+        }
         else
+        {
+            processed.insert(eventIt->id);
             ++eventIt;
+        }
     }
 }
 

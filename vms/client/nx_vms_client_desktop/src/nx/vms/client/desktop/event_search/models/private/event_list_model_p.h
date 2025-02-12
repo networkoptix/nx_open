@@ -47,7 +47,7 @@ private:
     EventListModel* const q = nullptr;
     utils::KeyedList<nx::Uuid, EventData> m_events;
 
-    void eraseExistingEvents(std::list<EventData>& events) const;
+    void eraseExistingEventsAndDuplicates(std::list<EventData>& events) const;
 };
 
 } // namespace nx::vms::client::desktop
