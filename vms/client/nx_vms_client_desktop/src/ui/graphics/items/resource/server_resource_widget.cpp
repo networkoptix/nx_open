@@ -171,12 +171,13 @@ namespace {
         return first.description.toLower() > second.description.toLower();
     }
 
-    const int legendImageSize = 20;
-    const int legendFontSize = 20;
-    const int legendMaxLength = 60;
-    const int itemSpacing = 2;
+    const int legendImageSize = 12;
+    const int legendFontSize = 10;
+    const int legendMaxLength = 185;
 
     const char *legendKeyPropertyName = "_qn_legendKey";
+
+    const QString kGridAndFrameColor = "dark14";
 
 core::SvgIconColorer::ThemeSubstitutions kLight1Theme = {
     {QIcon::Normal, {.primary = "light1"}}
@@ -190,8 +191,11 @@ NX_DECLARE_COLORIZED_ICON(kLogIcon, "24x24/Outline/log.svg", kLight1Theme)
 // -------------------------------------------------------------------------- //
 // LegendButtonWidget
 // -------------------------------------------------------------------------- //
-class LegendButtonWidget: public QnImageButtonWidget {
+class LegendButtonWidget: public QnImageButtonWidget
+{
     typedef QnImageButtonWidget base_type;
+
+    static const int kSpacing = 4;
 
 public:
     LegendButtonWidget(const QString &text, const QColor &color, QGraphicsItem* parent = nullptr):
@@ -240,17 +244,17 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         switch (which) {
         case Qt::MinimumSize:
-            return QSizeF(legendImageSize, legendImageSize + itemSpacing);
+            return QSizeF(legendImageSize, legendImageSize + kSpacing);
         case Qt::PreferredSize: {
             QFont font;
             font.setPixelSize(legendFontSize);
             return QSizeF(
-                legendImageSize + QFontMetrics(font).horizontalAdvance(m_text) + itemSpacing * 2,
-                legendImageSize + itemSpacing);
+                legendImageSize + QFontMetrics(font).horizontalAdvance(m_text) + kSpacing * 2,
+                legendImageSize + kSpacing);
         }
         case Qt::MaximumSize: {
             QSizeF hint = base_type::sizeHint(which, constraint);
-            return QSizeF(hint.width(), legendImageSize + itemSpacing);
+            return QSizeF(hint.width(), legendImageSize + kSpacing);
         }
         default:
             break;
@@ -330,7 +334,7 @@ protected:
             * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
 
         const QRectF imgRect = QRectF(0, 0, legendImageSize, legendImageSize);
-        const int textOffset = legendImageSize + itemSpacing;
+        const int textOffset = legendImageSize + kSpacing;
         const QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
             QnScopedPainterPenRollback penRollback(
@@ -397,25 +401,20 @@ protected:
 
         QRectF rect = option->rect;
 
-        const bool isEmpty = m_widget->m_sortedKeys.isEmpty();
-
-        const qreal offsetX = isEmpty
-            ? itemSpacing
-            : itemSpacing * 2 + painter->fontMetrics().horizontalAdvance(QLatin1String("100%"));
-        const qreal offsetTop = isEmpty
-            ? itemSpacing
-            : painter->fontMetrics().height() + itemSpacing;
-        const qreal offsetBottom = itemSpacing;
+        const qreal horizontalOffset = 52;
+        const qreal offsetTop =
+            m_widget->titleBar()->geometry().y() + m_widget->titleBar()->geometry().height();
+        const qreal offsetBottom = 16;
 
         static constexpr qreal kFramePenWidth = 3.0;
 
-        const qreal ow = rect.width() - offsetX * 2;
-        const qreal oh = rect.height() - offsetTop - offsetBottom;
+        const qreal gridWidth = rect.width() - horizontalOffset * 2;
+        const qreal gridHeight = rect.height() - offsetTop;
 
-        if (ow <= 0 || oh <= 0)
+        if (gridWidth <= 0 || gridHeight <= 0)
             return;
 
-        const QRectF inner(offsetX, offsetTop, ow, oh);
+        const QRectF inner(horizontalOffset, offsetTop, gridWidth, gridHeight);
 
         // One point is cut from the beginning and one from the end.
         const auto pointsLimit = m_widget->m_pointsLimit - 2;
@@ -438,7 +437,7 @@ protected:
             const QSize graphSize = QSize(inner.width() + xStep, inner.height());
 
             painter->setClipRect(inner);
-            painter->translate(offsetX - elapsedStep * xStep, offsetTop);
+            painter->translate(horizontalOffset - elapsedStep * xStep, offsetTop);
 
             paintGraph(painter, graphSize, xStep);
         }
@@ -472,10 +471,8 @@ protected:
             QnScopedPainterPenRollback penRollback(painter);
             Q_UNUSED(penRollback)
 
-            static const QColor kFrameColor = core::colorTheme()->color("brand_core");
-
             QPen main_pen;
-            main_pen.setColor(kFrameColor);
+            main_pen.setColor(core::colorTheme()->color(kGridAndFrameColor, 100));
             main_pen.setWidthF(kFramePenWidth);
             main_pen.setJoinStyle(Qt::MiterJoin);
 
@@ -488,8 +485,8 @@ protected:
                 qreal baseOpacity = m_widget->isLegendVisible() ? 1.0 : 0.0;
                 painter->setOpacity(opacity * baseOpacity);
 
-                qreal xRight = inner.x() + ow + itemSpacing * 2;
-                foreach(QString key, m_widget->m_sortedKeys) {
+                foreach (QString key, m_widget->m_sortedKeys)
+                {
                     const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
                     if (!data.visible)
                         continue;
@@ -497,11 +494,16 @@ protected:
                     qreal interValue = displayValues[key];
                     if (interValue < 0)
                         continue;
+
+                    const QString text = QString("%1%").arg(qRound(interValue * 100.0));
+
+                    qreal xRight = inner.x() + inner.width()
+                        + (horizontalOffset - painter->fontMetrics().horizontalAdvance(text)) / 2;
                     qreal y = inner.y() + qMax(inner.y(), inner.height() * (1.0 - interValue));
 
                     main_pen.setColor(toTransparent(data.color, data.opacity));
                     painter->setPen(main_pen);
-                    painter->drawText(xRight, y, QString("%1%").arg(qRound(interValue * 100.0)));
+                    painter->drawText(xRight, y, text);
                 }
 
                 painter->setOpacity(opacity);
@@ -538,10 +540,8 @@ private:
 
         /* Draw grid */
         {
-            static const QColor kGridColor = core::colorTheme()->color("brand", 100);
-
             QPen grid;
-            grid.setColor(kGridColor);
+            grid.setColor(core::colorTheme()->color(kGridAndFrameColor, 100));
             grid.setWidthF(kGridPenWidth);
 
             QPainterPath grid_path;
@@ -707,30 +707,40 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter* painte
     return m_renderStatus;
 }
 
-void QnServerResourceWidget::addOverlays() {
+void QnServerResourceWidget::addOverlays()
+{
     m_statisticsOverlayWidget = new StatisticsOverlayWidget(this);
     m_statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 
-    QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    QGraphicsLinearLayout* mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     mainOverlayLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    mainOverlayLayout->setSpacing(0.5);
+    mainOverlayLayout->setSpacing(0);
     mainOverlayLayout->addItem(m_statisticsOverlayWidget);
 
-    for (int i = 0; i < ButtonBarCount; i++) {
+    QGraphicsLinearLayout* legendOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    legendOverlayLayout->setContentsMargins(0, 16, 0, 16);
+    legendOverlayLayout->setSpacing(4);
+
+    for (int i = 0; i < ButtonBarCount; ++i)
+    {
         m_legendButtonBar[i] = new QnImageButtonBar(this, {}, Qt::Horizontal);
-        m_legendButtonBar[i]->setOpacity(0.0);
+        m_legendButtonBar[i]->setOpacity(0);
+        m_legendButtonBar[i]->setSpacing(8);
 
-        connect(m_legendButtonBar[i], SIGNAL(checkedButtonsChanged()), this, SLOT(updateGraphVisibility()));
+        connect(m_legendButtonBar[i], &QnImageButtonBar::checkedButtonsChanged,
+            this, &QnServerResourceWidget::updateGraphVisibility);
 
-        QGraphicsLinearLayout *legendOverlayHLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-        legendOverlayHLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-        legendOverlayHLayout->addStretch();
-        legendOverlayHLayout->addItem(m_legendButtonBar[i]);
-        legendOverlayHLayout->addStretch();
-        mainOverlayLayout->addItem(legendOverlayHLayout);
+        QGraphicsLinearLayout* legendRowLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+        legendRowLayout->setContentsMargins(0, 0, 0, 0);
+        legendRowLayout->addStretch();
+        legendRowLayout->addItem(m_legendButtonBar[i]);
+        legendRowLayout->addStretch();
+        legendOverlayLayout->addItem(legendRowLayout);
     }
 
-    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
+    mainOverlayLayout->addItem(legendOverlayLayout);
+
+    QnViewportBoundWidget* mainOverlayWidget = new QnViewportBoundWidget(this);
     mainOverlayWidget->setLayout(mainOverlayLayout);
     mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     mainOverlayWidget->setOpacity(1.0);
@@ -809,7 +819,6 @@ void QnServerResourceWidget::updateLegend()
 
             data.button = newButton;
             data.bar->addButton(data.mask, data.button);
-
         }
     }
 }
