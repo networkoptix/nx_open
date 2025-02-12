@@ -62,6 +62,8 @@ public:
         "Maximum number of hardware decoders for Intel QS."};
     Property<int> maxNVidiaHardwareDecoders{ this, "maxNVidiaHardwareDecoders", 64,
         "Maximum number of hardware decoders for NVidia." };
+    Property<int> maxHardwareDecodingStreams{ this, "maxHardwareDecodingStreams", 16,
+        "Maximum number of hardware decoders." };
 
     Property<QString> logLevel{this, "logLevel", "none"};
     Property<qint64> maxLogFileSizeB{this, nx::log::kMaxLogFileSizeSymbolicName,

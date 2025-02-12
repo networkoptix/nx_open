@@ -410,6 +410,8 @@ bool canAddFFmpegHW(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
     return appContext()->localSettings()->hardwareDecodingEnabled()
         && appContext()->runtimeSettings()->graphicsApi() != GraphicsApi::legacyopengl
         && !reverseMode
+        && nx::media::HwVideoDecoderOldPlayer::instanceCount()
+            < appContext()->localSettings()->maxHardwareDecodingStreams()
         && nx::media::HwVideoDecoderOldPlayer::isSupported(data);
 }
 
@@ -456,6 +458,11 @@ bool QnVideoStreamDisplay::shouldUpdateDecoder(
     {
         if (!appContext()->localSettings()->hardwareDecodingEnabled())
             return true; // Decoder should be changed to software
+        if (nx::media::HwVideoDecoderOldPlayer::instanceCount()
+            > appContext()->localSettings()->maxHardwareDecodingStreams())
+        {
+            return true; //< Too many hardware decoders.
+        }
     }
     else
     {

@@ -47,6 +47,9 @@ private:
     bool isHardwareDecodingEnabled() const;
     void setHardwareDecodingEnabled(bool value);
 
+    int maxHardwareDecodingStreams() const;
+    void setMaxHardwareDecodingStreams(int value);
+
     int  maximumLiveBufferMs() const;
     void setMaximumLiveBufferMs(int value);
 

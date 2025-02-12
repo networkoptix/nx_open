@@ -82,11 +82,76 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="useHardwareDecodingCheckbox">
-       <property name="text">
-        <string>Use Hardware Video Decoding</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="useHardwareDecodingLayout" stretch="0,0,0">
+       <item>
+        <widget class="QCheckBox" name="useHardwareDecodingCheckbox">
+         <property name="text">
+          <string>Use Hardware Video Decoding</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="maxHardwareDecodingStreamsWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="maxHardwareDecodingStreamsLabel1">
+            <property name="text">
+             <string>with</string>
+            </property>
+            <property name="buddy">
+             <cstring>maxHardwareDecodingStreamsSpinBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="maxHardwareDecodingStreamsSpinBox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>64</number>
+            </property>
+            <property name="value">
+             <number>16</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="idleTimeoutLabel2">
+            <property name="text">
+             <string>Simultaneous Streams</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+      </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">

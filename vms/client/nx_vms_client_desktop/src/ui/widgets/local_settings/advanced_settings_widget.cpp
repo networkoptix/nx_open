@@ -93,6 +93,10 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::software)
         ui->disableBlurCheckbox->setEnabled(false);
 
+    // Legacy Nvidia NVDEC and Intel Quick Sync decoders have their own settings.
+    if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::legacyopengl)
+        ui->maxHardwareDecodingStreamsWidget->setVisible(false);
+
     ui->maximumLiveBufferLengthSpinBox->setSuffix(' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
     setHelpTopic(ui->doubleBufferCheckbox, HelpTopic::Id::SystemSettings_General_DoubleBuffering);
@@ -141,6 +145,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->useHardwareDecodingCheckbox, &QCheckBox::toggled, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->maxHardwareDecodingStreamsSpinBox, QnSpinboxIntValueChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     // Live buffer lengths slider/spin logic.
@@ -255,6 +262,7 @@ void QnAdvancedSettingsWidget::applyChanges()
     appContext()->localSettings()->maximumLiveBufferMs = maximumLiveBufferMs();
     appContext()->localSettings()->glBlurEnabled = isBlurEnabled();
     appContext()->localSettings()->hardwareDecodingEnabledProperty = isHardwareDecodingEnabled();
+    appContext()->localSettings()->maxHardwareDecodingStreams = maxHardwareDecodingStreams();
 
     const auto oldCertificateValidationLevel =
         appContext()->coreSettings()->certificateValidationLevel();
@@ -358,6 +366,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setMaximumLiveBufferMs(appContext()->localSettings()->maximumLiveBufferMs());
     setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
     setHardwareDecodingEnabled(appContext()->localSettings()->hardwareDecodingEnabled());
+    setMaxHardwareDecodingStreams(appContext()->localSettings()->maxHardwareDecodingStreams());
     setCertificateValidationLevel(appContext()->coreSettings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
 }
@@ -370,6 +379,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
         || appContext()->localSettings()->maximumLiveBufferMs() != maximumLiveBufferMs()
         || appContext()->localSettings()->glBlurEnabled() != isBlurEnabled()
         || appContext()->localSettings()->hardwareDecodingEnabled() != isHardwareDecodingEnabled()
+        || appContext()->localSettings()->maxHardwareDecodingStreams() != maxHardwareDecodingStreams()
         || appContext()->coreSettings()->certificateValidationLevel()
             != certificateValidationLevel();
 }
@@ -482,6 +492,16 @@ void QnAdvancedSettingsWidget::setHardwareDecodingEnabled(bool value)
     // disregarding previously set value, and there is no proper way to implement such behavior for
     // now.
     ui->useHardwareDecodingCheckbox->setChecked(value);
+}
+
+int QnAdvancedSettingsWidget::maxHardwareDecodingStreams() const
+{
+    return ui->maxHardwareDecodingStreamsSpinBox->value();
+}
+
+void QnAdvancedSettingsWidget::setMaxHardwareDecodingStreams(int value)
+{
+    ui->maxHardwareDecodingStreamsSpinBox->setValue(value);
 }
 
 int QnAdvancedSettingsWidget::maximumLiveBufferMs() const
