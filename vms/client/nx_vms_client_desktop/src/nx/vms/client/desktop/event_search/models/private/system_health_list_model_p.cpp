@@ -642,14 +642,14 @@ menu::Parameters SystemHealthListModel::Private::parameters(int index) const
                 return {};
 
             return menu::Parameters(servers.front())
-                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
+                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagementPage);
         }
 
         case MessageType::archiveRebuildFinished:
         case MessageType::archiveRebuildCanceled:
         {
             return menu::Parameters(m_items[index].getResource())
-                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
+                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagementPage);
         }
 
         case MessageType::cameraRecordingScheduleIsInvalid:

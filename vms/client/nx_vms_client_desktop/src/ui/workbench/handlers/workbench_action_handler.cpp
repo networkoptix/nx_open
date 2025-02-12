@@ -3148,7 +3148,7 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(mainWindowWidget()));
                     dialog->setWindowModality(Qt::ApplicationModal);
                     dialog->setServer(server);
-                    dialog->setCurrentPage(QnServerSettingsDialog::StorageManagmentPage);
+                    dialog->setCurrentPage(QnServerSettingsDialog::StorageManagementPage);
                     dialog->exec();
                 }
             }

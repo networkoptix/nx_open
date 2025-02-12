@@ -18,7 +18,7 @@ public:
     {
         SettingsPage,
         StatisticsPage,
-        StorageManagmentPage,
+        StorageManagementPage,
         PoePage,
         PluginsPage,
         BackupPage,

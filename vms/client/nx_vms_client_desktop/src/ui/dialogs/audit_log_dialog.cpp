@@ -765,16 +765,28 @@ void QnAuditLogDialog::processPlaybackAction(const QnLegacyAuditRecord* record)
     menu()->trigger(menu::OpenInNewTabAction, layout);
 }
 
-void QnAuditLogDialog::triggerAction(const QnLegacyAuditRecord* record, menu::IDType actionId,
-    int selectedPage)
+void QnAuditLogDialog::triggerAction(
+    const QnLegacyAuditRecord* record, menu::IDType actionId, int selectedPage)
 {
-    QnResourceList resList = system()->resourcePool()->getResourcesByIds(record->resources);
-    if (record->eventType == Qn::AR_StorageInsert || record->eventType == Qn::AR_StorageUpdate)
+    auto resList = system()->resourcePool()->getResourcesByIds(record->resources);
+    const bool isStorageRecord = record->eventType == Qn::AR_StorageInsert
+        || record->eventType == Qn::AR_StorageUpdate || record->eventType == Qn::AR_StorageRemove;
+
+    if (isStorageRecord)
     {
         for (int i = 0; i < resList.size(); ++i)
             resList[i] = resList[i]->getParentResource();
     }
     nx::utils::erase_if(resList, [](const QnResourcePtr& res) { return !res; });
+
+    if (resList.isEmpty() && isStorageRecord) // Try to add server for removed storage.
+    {
+        if (auto server = system()->resourcePool()->getResourceById(nx::Uuid(record->extractParam(
+            QnAuditLogModel::kSourceServerParamName))))
+        {
+            resList.append(server);
+        }
+    }
 
     if (resList.isEmpty())
     {
@@ -831,8 +843,9 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
 
         case Qn::AR_StorageUpdate:
         case Qn::AR_StorageInsert:
+        case Qn::AR_StorageRemove:
             triggerAction(record, menu::ServerSettingsAction,
-                QnServerSettingsDialog::StorageManagmentPage);
+                QnServerSettingsDialog::StorageManagementPage);
             break;
 
         case Qn::AR_CameraUpdate:
@@ -947,7 +960,8 @@ void QnAuditLogDialog::at_gotdata(
         for (auto& rec: records)
         {
             rec.addParam(
-                QnAuditLogModel::kSourceServerParamName, serverId.toByteArray(QUuid::WithBraces));
+                QnAuditLogModel::kSourceServerParamName,
+                serverId.toByteArray(QUuid::WithoutBraces));
             m_allData.push_back(std::move(rec));
         }
     }

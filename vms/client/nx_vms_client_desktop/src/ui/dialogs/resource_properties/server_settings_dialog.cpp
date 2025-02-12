@@ -113,7 +113,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     setTabWidget(ui->tabWidget);
 
     addPage(SettingsPage, d->generalPage, tr("General"));
-    addPage(StorageManagmentPage, d->storagesPage, tr("Storage Management"));
+    addPage(StorageManagementPage, d->storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, d->statisticsPage, tr("Storage Analytics"));
     addPage(PoePage, d->poeSettingsPage, tr("PoE"));
     addPage(BackupPage, d->backupPage, tr("Backup"));
