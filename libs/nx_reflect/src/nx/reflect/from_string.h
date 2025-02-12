@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "enum_string_conversion.h"
+#include "has_from_string.h"
 #include "type_utils.h"
 
 namespace nx::reflect {
@@ -38,34 +39,6 @@ struct HasFromBase64<
 
 template<typename... Args>
 inline constexpr bool HasFromBase64V = HasFromBase64<Args...>::value;
-
-//-------------------------------------------------------------------------------------------------
-
-template<typename T, typename = std::void_t<>>
-struct HasFromStdString: std::false_type {};
-
-template<typename T>
-struct HasFromStdString<
-    T,
-    std::void_t<decltype(T::fromStdString(std::declval<std::string>()))>
->: std::true_type {};
-
-template<typename... Args>
-inline constexpr bool HasFromStdStringV = HasFromStdString<Args...>::value;
-
-//-------------------------------------------------------------------------------------------------
-
-template<typename T, typename = std::void_t<>>
-struct HasFromString: std::false_type {};
-
-template<typename T>
-struct HasFromString<
-    T,
-    std::void_t<decltype(T::fromString(std::declval<std::string>()))>
->: std::true_type {};
-
-template<typename... Args>
-inline constexpr bool HasFromStringV = HasFromString<Args...>::value;
 
 //-------------------------------------------------------------------------------------------------
 

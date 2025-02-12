@@ -64,6 +64,12 @@ QString Options::toString() const
     return NX_FMT(R"json({"r": %1, "N": %2, "p": %3, "keySize": %4})json", r, N, p, keySize);
 }
 
+Options Options::fromString(const std::string&)
+{
+    NX_ASSERT(false, "Not callable");
+    return {};
+}
+
 std::string encodeOrThrow(
     const std::string& password,
     const std::string& salt,

@@ -39,6 +39,7 @@ struct NX_UTILS_API Options
     void validateOrThrow() const;
     bool isValid() const;
     QString toString() const;
+    static Options fromString(const std::string&);
 };
 
 NX_REFLECTION_TAG_TYPE(Options, useStringConversionForSerialization)

@@ -17,7 +17,7 @@ public:
     std::string toString() const;
 };
 QN_FUSION_DECLARE_FUNCTIONS(RectAsString, (json), NX_VMS_API)
-NX_REFLECTION_TAG_TYPE(RectAsString, useStringConversionForSerialization)
 bool NX_VMS_API fromString(const std::string& str, RectAsString* target);
+NX_REFLECTION_TAG_TYPE(RectAsString, useStringConversionForSerialization)
 
 } // namespace nx::vms::api

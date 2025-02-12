@@ -34,8 +34,6 @@ enum class Race
     unknown,
 };
 
-NX_REFLECTION_TAG_TYPE(Race, useStringConversionForSerialization)
-
 std::string toString(Race race)
 {
     switch (race)
@@ -60,6 +58,8 @@ bool fromString(const std::string& str, Race* value)
 
     return true;
 }
+
+NX_REFLECTION_TAG_TYPE(Race, useStringConversionForSerialization)
 
 //-------------------------------------------------------------------------------------------------
 

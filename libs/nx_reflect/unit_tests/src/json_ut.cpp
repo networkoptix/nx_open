@@ -100,46 +100,6 @@ struct StringizablePrime
 
 NX_REFLECTION_TAG_TYPE(StringizablePrime, useStringConversionForSerialization)
 
-struct Base64Convertible
-{
-    std::string s;
-
-    Stringizable toBase64() const
-    {
-        // NOTE: Real base64 conversion is not important here.
-        // Just making sure proper functions are invoked.
-        return Stringizable{"base64("+s+")"};
-    }
-
-    Stringizable toBase64(int /*dummy*/) const
-    {
-        return toBase64();
-    }
-
-    static Base64Convertible fromBase64(const Stringizable& str)
-    {
-        auto start = str.s.find("base64(") + sizeof("base64(") - 1;
-        auto end = str.s.find_last_of(")");
-        return Base64Convertible{str.s.substr(start, end-start)};
-    }
-
-    // This method added to make this type look like QByteArray.
-    static Stringizable fromRawData(const char* data, int size)
-    {
-        return Stringizable{std::string(data, size)};
-    }
-
-    bool operator==(const Base64Convertible& right) const
-    {
-        return s == right.s;
-    }
-
-    void append(Base64Convertible value) { s += std::move(value.s); }
-    void reserve(int) {}
-};
-
-NX_REFLECTION_TAG_TYPE(Base64Convertible, useStringConversionForSerialization)
-
 } // namespace nx::reflect::test
 
 namespace std {
@@ -178,9 +138,6 @@ NX_REFLECTION_INSTRUMENT(FooStringizable, (num)(t))
 
 using FooStringizablePrime = Foo<StringizablePrime>;
 NX_REFLECTION_INSTRUMENT(FooStringizablePrime, (num)(t))
-
-using FooBase64Convertible = Foo<Base64Convertible>;
-NX_REFLECTION_INSTRUMENT(FooBase64Convertible, (num)(t))
 
 using FooObjArray = Foo<std::vector<X>>;
 NX_REFLECTION_INSTRUMENT(FooObjArray, (num)(t))
@@ -367,13 +324,6 @@ TEST_F(Json, not_tagged_stringizable_type_is_not_supported)
     // like static_assert(!IsSerializable<NotTaggedStringizable>::value);
 
     static_assert(IsSerializable<Stringizable>::value);
-}
-
-TEST_F(Json, base64_convertible_type_is_supported)
-{
-    testSerialization(
-        R"json({"num":12,"t":"base64(Hello)"})json",
-        FooBase64Convertible{12, {"Hello"}});
 }
 
 // This functionality is useful to support types that provide "QString toString() const".

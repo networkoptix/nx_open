@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "enum_string_conversion.h"
+#include "has_to_string.h"
 #include "type_utils.h"
 
 namespace nx::reflect {
@@ -27,42 +28,6 @@ public:
 
 template<typename... Args>
 inline constexpr bool HasToBase64V = HasToBase64<Args...>::value;
-
-//-------------------------------------------------------------------------------------------------
-
-template <typename T>
-class HasToStdString
-{
-    typedef char one;
-    struct two { char x[2]; };
-
-    template <typename C> static one test(std::decay_t<decltype(std::declval<C>().toStdString())>*);
-    template <typename C> static two test(...);
-
-public:
-    static constexpr bool value = sizeof(test<T>(0)) == sizeof(char);
-};
-
-template<typename... Args>
-inline constexpr bool HasToStdStringV = HasToStdString<Args...>::value;
-
-//-------------------------------------------------------------------------------------------------
-
-template <typename T>
-class HasToString
-{
-    typedef char one;
-    struct two { char x[2]; };
-
-    template <typename C> static one test(std::decay_t<decltype(std::declval<C>().toString())>*);
-    template <typename C> static two test(...);
-
-public:
-    static constexpr bool value = sizeof(test<T>(0)) == sizeof(char);
-};
-
-template<typename... Args>
-inline constexpr bool HasToStringV = HasToString<Args...>::value;
 
 //-------------------------------------------------------------------------------------------------
 

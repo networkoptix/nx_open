@@ -60,11 +60,11 @@ struct ResourceUniqueId
 
     static ResourceUniqueId from(const QnResourcePtr& resource);
 };
-NX_REFLECTION_TAG_TYPE(ResourceUniqueId, useStringConversionForSerialization)
 
 // Functions for serialization and deserialization.
 std::string toString(const ResourceUniqueId& id);
 bool fromString(const std::string& str, ResourceUniqueId* id);
+NX_REFLECTION_TAG_TYPE(ResourceUniqueId, useStringConversionForSerialization)
 
 /**
  * Resource description.

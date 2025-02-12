@@ -67,10 +67,10 @@ enum Value: int
     gatewayTimeOut = 504,
 };
 
-NX_REFLECTION_TAG_TYPE(Value, useStringConversionForSerialization)
-
 NX_NETWORK_API std::string toString(Value);
 NX_NETWORK_API std::string toString(int);
+NX_NETWORK_API bool fromString(const std::string&, Value*);
+NX_REFLECTION_TAG_TYPE(Value, useStringConversionForSerialization)
 
 /** Returns true if  statusCode is 2xx */
 NX_NETWORK_API bool isSuccessCode(Value statusCode);

@@ -310,6 +310,13 @@ constexpr T createDefault() { return T{}; }
 
 //-------------------------------------------------------------------------------------------------
 
+#define NX_REFLECTION_SECOND_ARG(...) NX_REFLECTION_SECOND_ARG_(__VA_ARGS__)
+#define NX_REFLECTION_SECOND_ARG_(_, VALUE, ...) VALUE
+
+#define NX_REFLECTION_TAG_TYPE_LOOKUP(NAME) \
+    NX_REFLECTION_SECOND_ARG(NX_REFLECTION_TAG_TYPE_LOOKUP_(NAME), NX_REFLECTION_TAG_TYPE_)
+#define NX_REFLECTION_TAG_TYPE_LOOKUP_(NAME) NX_REFLECTION_TAG_TYPE_AS_SECOND_ARG_##NAME
+
 /**
  * Add a tag to the specified type.
  * A tag presence may be checked by evaluating the constexpr boolean expression
@@ -325,7 +332,8 @@ constexpr T createDefault() { return T{}; }
  * an undefined behavior may result due to different scopes of NX_REFLECTION_INSTRUMENT and
  * NX_REFLECTION_TAG_TYPE macros for the same type.
  */
-#define NX_REFLECTION_TAG_TYPE(TYPE, TAG) \
+#define NX_REFLECTION_TAG_TYPE(TYPE, TAG) NX_REFLECTION_TAG_TYPE_LOOKUP(TAG)(TAG, TYPE)
+#define NX_REFLECTION_TAG_TYPE_(TAG, TYPE) \
     static constexpr bool TAG(const TYPE*) { return true; }
 
 /**

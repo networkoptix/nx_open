@@ -6,6 +6,11 @@
 
 namespace nx::network::http::StatusCode {
 
+bool fromString(const std::string&, Value*)
+{
+    return NX_ASSERT(false, "Not callable");
+}
+
 std::string toString(int val)
 {
     return toString(Value(val));
