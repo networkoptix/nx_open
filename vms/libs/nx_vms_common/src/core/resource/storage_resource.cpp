@@ -135,7 +135,7 @@ QString QnStorageResource::urlWithoutCredentials(const QString& url)
 void QnStorageResource::updateInternal(const QnResourcePtr& source, NotifierList& notifiers)
 {
     NX_ASSERT(
-        source->getParentId() == getParentId() && source->getUrl() == getUrl(),
+        source->getParentId() == getParentId() && urlWithoutCredentials(source->getUrl()) == urlWithoutCredentials(),
         "Abnormal storage resource update. This parentId: %1, other parentId: %2"
         "This url: %3, other url: %4",
         getParentId(), source->getParentId(), getUrl(), source->getUrl());

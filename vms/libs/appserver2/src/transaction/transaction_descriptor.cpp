@@ -3112,8 +3112,11 @@ Result canModifyStorage(SystemContext* systemContext, const CanModifyStorageData
         return ErrorCode::ok;
 
     const auto existingStorage = data.getExistingStorageDataFunc();
-    if (existingStorage.parentId == data.request.parentId
-        && data.request.url != existingStorage.url)
+    const bool isDifferentUrl = data.request.storageType != nx::vms::api::kCloudStorageType
+        ? (QnStorageResource::urlWithoutCredentials(data.request.url)
+            != QnStorageResource::urlWithoutCredentials(existingStorage.url))
+        : data.request.url != existingStorage.url;
+    if (existingStorage.parentId == data.request.parentId && isDifferentUrl)
     {
         data.logErrorFunc(nx::format(
             "Got inconsistent update request for storage '%1'. Urls differ.", data.request.id));

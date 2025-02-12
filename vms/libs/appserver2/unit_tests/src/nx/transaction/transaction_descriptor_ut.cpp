@@ -67,6 +67,18 @@ TEST_F(CanModifyStorageTest, ResourceExists_EqualParentIds_EqualUrls)
     ASSERT_TRUE(getExistingStorageCalled);
 }
 
+TEST_F(CanModifyStorageTest, ResourceExists_EqualParentIds_DifferentCredentials)
+{
+    data.modifyResourceResult = ErrorCode::ok;
+    data.hasExistingStorage = true;
+    data.request.parentId = existingResource.parentId;
+    existingResource.url = "some://user:pass@host/some/path";
+    data.request.url = "some://user2:pass2@host/some/path";
+    ASSERT_EQ(ErrorCode::ok, canModifyStorage(&context, data));
+    ASSERT_FALSE(logFuncCalled);
+    ASSERT_TRUE(getExistingStorageCalled);
+}
+
 TEST_F(CanModifyStorageTest, ResourceExists_EqualParentIds_DifferentUrls)
 {
     data.modifyResourceResult = ErrorCode::ok;
