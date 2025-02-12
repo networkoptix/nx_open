@@ -408,6 +408,7 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
 bool canAddFFmpegHW(const QnConstCompressedVideoDataPtr& data, bool reverseMode)
 {
     return appContext()->localSettings()->hardwareDecodingEnabled()
+        && appContext()->runtimeSettings()->graphicsApi() != GraphicsApi::legacyopengl
         && !reverseMode
         && nx::media::HwVideoDecoderOldPlayer::isSupported(data);
 }
