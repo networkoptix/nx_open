@@ -48,8 +48,6 @@ public:
 
     // Direct stream copy of one stream only to support usage as muxer in QnUniversalRtpEncoder.
     bool open(const AVCodecParameters* codecParameters);
-
-    void setSeeking();
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
     void setSourceResolution(const QSize& resolution);
 
@@ -102,7 +100,6 @@ private:
     bool transcodePacketInternal(const QnConstAbstractMediaDataPtr& media);
     bool finalizeInternal(nx::utils::ByteArray* const result);
     bool isCodecSupported(AVCodecID id) const;
-    bool handleSeek(const QnConstAbstractMediaDataPtr& packet);
     int openAndTranscodeDelayedData();
 
 private:
@@ -117,6 +114,4 @@ private:
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter = 0;
     BeforeOpenCallback m_beforeOpenCallback;
-    bool m_isSeeking = false;
-    bool m_firstSeek = true;
 };

@@ -545,11 +545,6 @@ void QnUniversalRtpEncoder::setSrtpEncryptionData(const EncryptionData& data)
     }
 }
 
-void QnUniversalRtpEncoder::setSeeking()
-{
-    m_transcoder.setSeeking();
-}
-
 FfmpegMuxer::PacketTimestamp QnUniversalRtpEncoder::getLastTimestamps() const
 {
     return m_transcoder.muxer().getLastPacketTimestamp();

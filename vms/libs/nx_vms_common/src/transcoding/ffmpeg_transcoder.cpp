@@ -367,48 +367,12 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
     return true;
 }
 
-bool QnFfmpegTranscoder::handleSeek(const QnConstAbstractMediaDataPtr& media)
-{
-    if (m_firstSeek) // TODO bad design?
-    {
-        m_isSeeking = false;
-        m_firstSeek = false;
-    }
-
-    if (m_isSeeking)
-    {
-        if (m_mediaTranscoder.videoTranscoder())
-        {
-            const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
-            if (video)
-            {
-                if (!m_mediaTranscoder.openVideo(video)) //< Works as reopen too.
-                {
-                    NX_DEBUG(this, "Failed to reopen video transcoder");
-                    return false;
-                }
-                m_isSeeking = false;
-            }
-        }
-    }
-    return true;
-}
-
 bool QnFfmpegTranscoder::transcodePacketInternal(
     const QnConstAbstractMediaDataPtr& media)
 {
-    if (!handleSeek(media))
-        return false;
-
     return m_mediaTranscoder.transcodePacket(media,
         [this](const QnConstAbstractMediaDataPtr& media)
         {
             m_muxer.process(media);
         });
 }
-
-void QnFfmpegTranscoder::setSeeking()
-{
-    m_muxer.setSeeking();
-    m_isSeeking = true;
-};

@@ -53,7 +53,6 @@ public:
     void setSrtpEncryptionData(const nx::vms::server::rtsp::EncryptionData& data);
     nx::vms::server::rtsp::SrtpEncryptor* encryptor() const;
     FfmpegMuxer::PacketTimestamp getLastTimestamps() const;
-    void setSeeking();
     int payloadType() const;
 private:
     QSize getTargetSize(QnConstAbstractMediaDataPtr media, QSize targetSize);

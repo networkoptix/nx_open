@@ -65,6 +65,8 @@ public:
      */
     bool open(const CodecParametersConstPtr& context);
 
+    void close();
+
     /**
      * \return true if last call for open returns true, false otherwise.
      */
@@ -104,8 +106,7 @@ private:
     const Config m_config;
     AVCodecContext* m_encoderCtx = nullptr;
     AVCodecContext* m_decoderCtx = nullptr;
-    FfmpegAudioResampler m_resampler;
-    bool m_resamplerInitialized = false;
+    std::unique_ptr<FfmpegAudioResampler> m_resampler;
 
     /**
      * Wrapper for m_encoderContext.

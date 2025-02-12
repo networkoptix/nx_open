@@ -10,6 +10,7 @@ extern "C" {
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/util.h>
 #include <utils/media/ffmpeg_io_context.h>
 
 static const int IO_BLOCK_SIZE = 1024*16;
@@ -91,9 +92,6 @@ bool FfmpegMuxer::process(const QnConstAbstractMediaDataPtr& media)
         return true;
     }
 
-    if (!handleSeek(media))
-        return false;
-
     return muxPacket(media);
 }
 
@@ -146,6 +144,7 @@ void FfmpegMuxer::closeFfmpegContext()
         m_formatCtx->pb = nullptr;
         avformat_close_input(&m_formatCtx);
     }
+    m_lastPacketTimestamps.clear();
 }
 
 bool FfmpegMuxer::setContainer(const QString& container)
@@ -248,17 +247,49 @@ bool FfmpegMuxer::addTag(const char* name, const char* value)
     return av_dict_set(&m_formatCtx->metadata, name, value, 0) >= 0;
 }
 
-bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket)
+void FfmpegMuxer::checkDiscontinuity(const QnConstAbstractMediaDataPtr& data, int streamIndex)
+{
+    if (auto it = m_lastPacketTimestamps.find(streamIndex);
+        it != m_lastPacketTimestamps.end())
+    {
+        int64_t timeDiff = data->timestamp - it->second;
+        bool discontinuity = data->dataType == QnAbstractMediaData::GENERIC_METADATA
+            ? (timeDiff < 0) //< Metadata can have the same timestamps.
+            : (timeDiff <= 0);
+
+        if (!discontinuity)
+            discontinuity = timeDiff > MAX_FRAME_DURATION_MS * 1000;
+
+        if (discontinuity)
+        {
+            // Recalculate m_baseTime after seek by new frame timestamp. Timestamps should increase
+            // monotonously.
+            const int64_t kDefaultFrameDurationUs = 10; //< New dts should be more than previous one.
+            const int64_t streamedTimeUs =
+                m_lastPacketTimestamp.ntpTimestamp - m_baseTime + kDefaultFrameDurationUs;
+            m_baseTime = data->timestamp - m_startTimeOffset - streamedTimeUs;
+            NX_DEBUG(this, "Discontinuity on packet %1, last timestamp %2.", data, it->second);
+        }
+    }
+    m_lastPacketTimestamps[streamIndex] = data->timestamp;
+}
+
+bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
 {
     int streamIndex = 0;
-    if (m_initializedVideo && mediaPacket->dataType == QnAbstractMediaData::AUDIO)
+    if (m_initializedVideo && media->dataType == QnAbstractMediaData::AUDIO)
        streamIndex = 1;
 
     if (streamIndex >= (int)m_formatCtx->nb_streams)
     {
-        NX_DEBUG(this, "Invalid packet media type: %1, skip it", mediaPacket->dataType);
+        NX_DEBUG(this, "Invalid packet media type: %1, skip it", media->dataType);
         return true;
     }
+
+    if (m_baseTime == AV_NOPTS_VALUE)
+        m_baseTime = media->timestamp - m_startTimeOffset;
+
+    checkDiscontinuity(media, streamIndex); //< will update m_baseTime in case of discontinuity.
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     constexpr AVRational srcRate = {1, 1'000'000};
@@ -266,56 +297,34 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket)
     auto packet = avPacket.get();
 
     if (m_config.useAbsoluteTimestamp)
-        packet->pts = av_rescale_q(mediaPacket->timestamp, srcRate, stream->time_base);
+        packet->pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
     else
-        packet->pts = av_rescale_q(mediaPacket->timestamp - m_baseTime, srcRate, stream->time_base);
+        packet->pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
 
-    packet->data = (uint8_t*)mediaPacket->data();
-    packet->size = static_cast<int>(mediaPacket->dataSize());
-    if (mediaPacket->dataType == QnAbstractMediaData::AUDIO || mediaPacket->flags & AV_PKT_FLAG_KEY)
+    packet->data = (uint8_t*)media->data();
+    packet->size = static_cast<int>(media->dataSize());
+    if (media->dataType == QnAbstractMediaData::AUDIO || media->flags & AV_PKT_FLAG_KEY)
         packet->flags |= AV_PKT_FLAG_KEY;
 
     packet->stream_index = streamIndex;
     packet->dts = packet->pts;
 
-    m_lastPacketTimestamp.ntpTimestamp = mediaPacket->timestamp;
+    m_lastPacketTimestamp.ntpTimestamp = media->timestamp;
     m_lastPacketTimestamp.rtpTimestamp = packet->pts;
 
     int status = av_write_frame(m_formatCtx, packet);
     if (status < 0)
     {
-        NX_WARNING(this, "Muxing packet error: can't write AV packet, error: %1",
-            nx::media::ffmpeg::avErrorToString(status));
+        NX_WARNING(this, "Muxing packet error: can't write AV packet: %1, error: %2",
+            media, nx::media::ffmpeg::avErrorToString(status));
         return false;
     }
 
     if (m_config.computeSignature)
     {
-        auto context = mediaPacket->dataType == QnAbstractMediaData::VIDEO ?
+        auto context = media->dataType == QnAbstractMediaData::VIDEO ?
             m_videoCodecParameters : m_audioCodecParameters;
         m_mediaSigner.processMedia(context, packet->data, packet->size);
-    }
-    return true;
-}
-
-bool FfmpegMuxer::handleSeek(
-    const QnConstAbstractMediaDataPtr& media)
-{
-    if (m_baseTime == AV_NOPTS_VALUE)
-    {
-        m_baseTime = media->timestamp - m_startTimeOffset;
-        m_isSeeking = false;
-    }
-    else if (m_isSeeking)
-    {
-        if (m_config.keepOriginalTimestamps)
-        {
-            // Recalculate m_baseTime after seek by new frame timestamp.
-            m_baseTime =
-                media->timestamp
-                - (m_lastPacketTimestamp.ntpTimestamp - m_baseTime + m_startTimeOffset);
-        }
-        m_isSeeking = false;
     }
     return true;
 }

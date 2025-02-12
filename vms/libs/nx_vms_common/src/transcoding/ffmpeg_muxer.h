@@ -23,7 +23,6 @@ public:
     {
         bool computeSignature = false;
         bool useAbsoluteTimestamp = false;
-        bool keepOriginalTimestamps = false;
     };
 
 public:
@@ -70,12 +69,11 @@ public:
 
     struct PacketTimestamp
     {
-        uint64_t ntpTimestamp = 0;
+        int64_t ntpTimestamp = 0;
         uint32_t rtpTimestamp = 0;
     };
     PacketTimestamp getLastPacketTimestamp() const { return m_lastPacketTimestamp; }
     void setRtpMtu(int mtu) { m_rtpMtu = mtu; }
-    void setSeeking() { m_isSeeking = true; };
 
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
@@ -92,8 +90,8 @@ public:
 private:
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
-    bool handleSeek(const QnConstAbstractMediaDataPtr& packet);
     bool muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket);
+    void checkDiscontinuity(const QnConstAbstractMediaDataPtr& data, int streamIndex);
 
 private:
     Config m_config;
@@ -113,8 +111,8 @@ private:
     QString m_container;
     qint64 m_baseTime = AV_NOPTS_VALUE;
     PacketTimestamp m_lastPacketTimestamp;
+    std::map<int, int64_t> m_lastPacketTimestamps; //< By stream index.
     bool m_inMiddleOfStream = false;
     qint64 m_startTimeOffset = 0;
     int m_rtpMtu = MTU_SIZE;
-    bool m_isSeeking = false;
 };

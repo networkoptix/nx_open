@@ -74,8 +74,19 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(const Config& config):
 
 QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 {
-    avcodec_free_context(&m_encoderCtx);
-    avcodec_free_context(&m_decoderCtx);
+    close();
+}
+
+void QnFfmpegAudioTranscoder::close()
+{
+    if (m_encoderCtx)
+        avcodec_free_context(&m_encoderCtx);
+
+    if (m_decoderCtx)
+        avcodec_free_context(&m_decoderCtx);
+
+    m_resampler.reset();
+    m_isOpened = false;
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -91,6 +102,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 bool QnFfmpegAudioTranscoder::open(const CodecParametersConstPtr& context)
 {
     NX_ASSERT(context);
+    close();
 
     const AVCodec* avCodec = avcodec_find_encoder(m_config.targetCodecId);
     if (!avCodec)
@@ -166,7 +178,8 @@ bool QnFfmpegAudioTranscoder::initResampler()
         m_encoderCtx->sample_fmt,
         static_cast<uint32_t>(m_encoderCtx->frame_size)};
 
-    return m_resampler.init(config);
+    m_resampler = std::make_unique<FfmpegAudioResampler>();
+    return m_resampler->init(config);
 }
 
 int QnFfmpegAudioTranscoder::transcodePacket(
@@ -193,13 +206,8 @@ bool QnFfmpegAudioTranscoder::sendPacket(const QnConstAbstractMediaDataPtr& medi
 
     // 1. push media to decoder
     tuneContextsWithMedia(m_decoderCtx, m_encoderCtx, media);
-    if (!m_resamplerInitialized)
-    {
-        if (!initResampler())
-            return false;
-
-        m_resamplerInitialized = true;
-    }
+    if (!m_resampler && !initResampler())
+        return false;
 
     auto avPacket = av_packet_alloc();
     avPacket->data = (uint8_t*)(media->data());
@@ -240,7 +248,7 @@ bool QnFfmpegAudioTranscoder::sendPacket(const QnConstAbstractMediaDataPtr& medi
         }
 
         // 3. Resample data
-        if (!m_resampler.pushFrame(decodedFrame))
+        if (!m_resampler->pushFrame(decodedFrame))
         {
             NX_WARNING(this, "Could not allocate sample buffers");
             return false;
@@ -273,7 +281,7 @@ bool QnFfmpegAudioTranscoder::receivePacket(QnAbstractMediaDataPtr* const result
         }
 
         // 2. Send data to the encoder.
-        AVFrame* resampledFrame = m_resampler.nextFrame();
+        AVFrame* resampledFrame = m_resampler->nextFrame();
         if (!resampledFrame)
             return true;
 
