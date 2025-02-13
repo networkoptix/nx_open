@@ -157,7 +157,6 @@ void QnAbstractArchiveStreamReader::run()
             else if (data->dataType == QnAbstractMediaData::VIDEO)
             {
                 auto d = getDelay(data->timestamp);
-                NX_ERROR(this, "delay: %1, speed: %2, data->timestamp: %3, m_sendTimeBaseUs - %4", d, *m_realTimeSpeed, data->timestamp, m_sendTimeBaseUs);
                 std::this_thread::sleep_for(d);
             }
         }

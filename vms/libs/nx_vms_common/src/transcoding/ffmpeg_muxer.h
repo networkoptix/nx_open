@@ -9,8 +9,9 @@ extern "C" {
 }
 
 #include <export/signer.h>
-#include <nx/media/audio_data_packet.h>
+#include <nx/media/media_data_packet.h>
 #include <nx/utils/cryptographic_hash.h>
+#include <transcoding/timestamp_corrector.h>
 
 class QnLicensePool;
 
@@ -78,7 +79,7 @@ public:
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
     bool isCodecSupported(AVCodecID id) const;
-    void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
+    void setStartTimeOffset(int64_t value);
 
 public:
     // For internal use only, move to protected!
@@ -109,10 +110,8 @@ private:
     AVFormatContext* m_formatCtx = nullptr;
 
     QString m_container;
-    qint64 m_baseTime = AV_NOPTS_VALUE;
+    TimestampCorrector m_timestampCorrector;
     PacketTimestamp m_lastPacketTimestamp;
-    std::map<int, int64_t> m_lastPacketTimestamps; //< By stream index.
     bool m_inMiddleOfStream = false;
-    qint64 m_startTimeOffset = 0;
     int m_rtpMtu = MTU_SIZE;
 };

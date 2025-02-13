@@ -63,7 +63,8 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 
 FfmpegMuxer::FfmpegMuxer(const Config& config):
     m_config(config),
-    m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024, AV_INPUT_BUFFER_PADDING_SIZE)
+    m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024, AV_INPUT_BUFFER_PADDING_SIZE),
+    m_timestampCorrector(std::chrono::milliseconds(MAX_FRAME_DURATION_MS), std::chrono::milliseconds(1))
 {
 }
 
@@ -144,7 +145,7 @@ void FfmpegMuxer::closeFfmpegContext()
         m_formatCtx->pb = nullptr;
         avformat_close_input(&m_formatCtx);
     }
-    m_lastPacketTimestamps.clear();
+    m_timestampCorrector.clear();
 }
 
 bool FfmpegMuxer::setContainer(const QString& container)
@@ -247,31 +248,9 @@ bool FfmpegMuxer::addTag(const char* name, const char* value)
     return av_dict_set(&m_formatCtx->metadata, name, value, 0) >= 0;
 }
 
-void FfmpegMuxer::checkDiscontinuity(const QnConstAbstractMediaDataPtr& data, int streamIndex)
+void FfmpegMuxer::setStartTimeOffset(int64_t value)
 {
-    if (auto it = m_lastPacketTimestamps.find(streamIndex);
-        it != m_lastPacketTimestamps.end())
-    {
-        int64_t timeDiff = data->timestamp - it->second;
-        bool discontinuity = data->dataType == QnAbstractMediaData::GENERIC_METADATA
-            ? (timeDiff < 0) //< Metadata can have the same timestamps.
-            : (timeDiff <= 0);
-
-        if (!discontinuity)
-            discontinuity = timeDiff > MAX_FRAME_DURATION_MS * 1000;
-
-        if (discontinuity)
-        {
-            // Recalculate m_baseTime after seek by new frame timestamp. Timestamps should increase
-            // monotonously.
-            const int64_t kDefaultFrameDurationUs = 10; //< New dts should be more than previous one.
-            const int64_t streamedTimeUs =
-                m_lastPacketTimestamp.ntpTimestamp - m_baseTime + kDefaultFrameDurationUs;
-            m_baseTime = data->timestamp - m_startTimeOffset - streamedTimeUs;
-            NX_DEBUG(this, "Discontinuity on packet %1, last timestamp %2.", data, it->second);
-        }
-    }
-    m_lastPacketTimestamps[streamIndex] = data->timestamp;
+    m_timestampCorrector.setOffset(std::chrono::microseconds(value));
 }
 
 bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
@@ -286,21 +265,17 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
         return true;
     }
 
-    if (m_baseTime == AV_NOPTS_VALUE)
-        m_baseTime = media->timestamp - m_startTimeOffset;
-
-    checkDiscontinuity(media, streamIndex); //< will update m_baseTime in case of discontinuity.
-
     AVStream* stream = m_formatCtx->streams[streamIndex];
     constexpr AVRational srcRate = {1, 1'000'000};
     nx::media::ffmpeg::AvPacket avPacket;
     auto packet = avPacket.get();
 
-    if (m_config.useAbsoluteTimestamp)
-        packet->pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
-    else
-        packet->pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
+    bool allowEqualTimestamps = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
+    auto timestamp = m_config.useAbsoluteTimestamp
+        ? media->timestamp
+        : m_timestampCorrector.process(std::chrono::microseconds(media->timestamp), streamIndex, allowEqualTimestamps).count();
 
+    packet->pts = av_rescale_q(timestamp, srcRate, stream->time_base);
     packet->data = (uint8_t*)media->data();
     packet->size = static_cast<int>(media->dataSize());
     if (media->dataType == QnAbstractMediaData::AUDIO || media->flags & AV_PKT_FLAG_KEY)
