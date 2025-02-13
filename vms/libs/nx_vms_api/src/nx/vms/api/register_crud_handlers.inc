@@ -1754,7 +1754,8 @@ static void registerDeviceHandlers(
     nx::network::rest::HandlerPool* processorPool,
     QnMediaServerModule* serverModule,
     nx::vms::network::AbstractServerConnector* serverConnector,
-    auth::Authenticator* authenticator)
+    auth::Authenticator* authenticator,
+    MediaServerProcess* process)
 {
     const auto reg = processorPool->createRegisterHandlerFunctor();
 
@@ -1957,7 +1958,8 @@ static void registerDeviceHandlers(
      * Opens an HTTP video stream linked to the specified bookmark. Does not require authorization
      * if the Bookmark is shared, but must require the password parameter if sharing specifies one.
      * If required and possible, media stream transcoding is performed on-the-fly. Bookmark Media
-     * Example can be found here [/ui/bookmark.html](/ui/bookmark.html).
+     * Example can be found here [/ui/bookmark.html](/ui/bookmark.html). Not supported by
+     * iOS-based devices, in that case use: `/bookmarks/{bookmarkId}/hls`
      * %jsonrpc[unused]
      * %caption Bookmark HTTP Stream
      * %ingroup Device Media
@@ -1986,6 +1988,52 @@ static void registerDeviceHandlers(
      */
     reg("rest/v{4-}/devices/*/bookmarks/:bookmarkId/^media(\\.\\w+)?", GlobalPermission::none,
         std::make_unique<BookmarkStreamHandler>(authenticator, serverModule, serverConnector));
+
+    constexpr std::string_view kHlsBookmarkRestRegex =
+        "rest/v[4-9]/devices/\\*/bookmarks/[a-zA-Z0-9\\-\\_]+/hls(\\.\\w+)?(/.*)?";
+    /**%apidoc GET /rest/v{4-}/devices/%2A/bookmarks/{bookmarkId}/hls
+     * Opens HTTP Live Streaming (HLS) video stream for provided bookmark. It is not an API function
+     * but rather a URL format which may contain any bookmark Id. This protocol is supported by
+     * iOS-based devices (iPhone, iPad). For non-iOS devices, the preferred endpoint is
+     * `/rest/v{4-}/devices/%2A/bookmarks/{bookmarkId}/media`
+     * %jsonrpc[unused]
+     * %caption Bookmark HLS streaming
+     * %ingroup Device Media
+     * %param[opt]:string positionMs Bookmark archive position to open (as a string containing time in
+     *     milliseconds since epoch, or a local time formatted like
+     *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> -
+     *     the format is auto-detected). Time must be between bookmark start and end times, or
+     *     request will fail.
+     * %param[opt]:boolean hi If specified, only hi quality is available on streaming session. If
+     *     neither &lt;hi&gt; nor &lt;lo&gt; is specified then HLS client is allowed to perform
+     *     dynamic stream switching (to fit in available bandwidth and compensate for traffic
+     *     congestion).
+     * %param[opt]:boolean lo If specified, only low quality is available on streaming session. If
+     *     neither &lt;hi&gt; nor &lt;lo&gt; is specified then HLS client is allowed to perform
+     *     dynamic stream switching (to fit in available bandwidth and compensate for traffic
+     *     congestion).
+     * %param[opt]:string passwordProtection Password protection used to authenticate the request
+     *     if the Bookmark is password protected. Should be calculated as
+     *     `synchronizedTimeMs + ":" + sha256hex(sha256hex(bookmarkId + password) + synchronizedTimeMs))`
+     *     where `synchronizedTimeMs` should be obtained from `/rest/v{4-}/site/info`. Example:
+     *     ```
+     *     bookmarkId = '997d0166-0479-473f-8578-9b1c5aee14c6_00000000-8aeb-7d56-2bc7-67afae00335c'
+     *     password = 'password123'
+     *     synchronizedTimeMs = 1707754215123
+     *     sha256hex(997d0166-0479-473f-8578-9b1c5aee14c6_00000000-8aeb-7d56-2bc7-67afae00335cpassword123)
+     *     -- adad72a3a64631cfdbe5726b3c7a314df664f34905fae81266d302a91135b8c7
+     *     sha256hex(adad72a3a64631cfdbe5726b3c7a314df664f34905fae81266d302a91135b8c71707754215123)
+     *     -- 0e91c8bb106a4fcf1a407d896a21c6a96a7ed40c6161403af99985c3f1d405f7
+     *     ?passwordProtection=1707754215123:0e91c8bb106a4fcf1a407d896a21c6a96a7ed40c6161403af99985c3f1d405f7
+     *     ```
+     * %return Video stream in mpeg-2/ts format.
+     */
+    registerTcpHandler<nx::vms::server::hls::HttpLiveStreamingProcessor>(
+        process,
+        "HTTP",
+        std::regex{std::string{kHlsBookmarkRestRegex}},
+        kHlsBookmarkRestRegex.size(),
+        serverModule);
 
     /**%apidoc POST /rest/v1/devices/%2A/searches
      * Starts a new Device Search in the Site. The Device Search results may be obtained by the

@@ -158,7 +158,6 @@ struct NX_VMS_API BackupPositionExV4: BackupPositionV4
     using base_type = BackupPositionV4;
 
     BackupPositionExV4() = default;
-    BackupPositionExV4(const BackupPositionExV4&) = default;
     std::chrono::milliseconds toBackupLowMs{0};
     std::chrono::milliseconds toBackupHighMs{0};
 
