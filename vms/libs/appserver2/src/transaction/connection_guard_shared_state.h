@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <QMap>
-#include <QSet>
+#include <QtCore/QMap>
+#include <QtCore/QSet>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>

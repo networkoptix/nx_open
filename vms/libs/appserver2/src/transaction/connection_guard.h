@@ -2,16 +2,12 @@
 
 #pragma once
 
-#include <QtCore/QMap>
-#include <QtCore/QSet>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
-#include "connection_guard_shared_state.h"
+namespace ec2 {
 
-namespace ec2
-{
+class ConnectionGuardSharedState;
 
     /** While this object is alive peer with guid \a peerGuid is considered
         connected and cannot establish another transaction connection.

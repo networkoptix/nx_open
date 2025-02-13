@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/network/ssl/helpers.h>
+#include <nx/network/socket_factory.h>
 #include <nx/vms/common/system_context_aware.h>
 
 #include "p2p_connection_base.h"
@@ -28,7 +28,7 @@ public:
         const vms::api::PeerDataEx& localPeer,
         const nx::utils::Url& remotePeerUrl,
         std::unique_ptr<QObject> opaqueObject,
-        ConnectionLockGuard connectionLockGuard,
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
         ValidateRemotePeerFunc validateRemotePeerFunc);
 
     Connection(
@@ -40,7 +40,7 @@ public:
         const nx::network::rest::UserAccessData& userAccessData,
         const UnauthorizedWatcher& unauthorizedWatcher,
         std::unique_ptr<QObject> opaqueObject,
-        ConnectionLockGuard connectionLockGuard);
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard);
 
     void gotPostConnection(std::unique_ptr<nx::network::AbstractStreamServerSocket> socket);
 

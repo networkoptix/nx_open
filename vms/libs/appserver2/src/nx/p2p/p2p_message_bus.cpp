@@ -94,9 +94,15 @@ MessageBus::MessageBus(
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
-    TransactionMessageBusBase(peerType, systemContext, jsonTranSerializer, ubjsonTranSerializer),
-    m_miscData(this)
+    AbstractTransactionMessageBus(systemContext),
+    m_mutex(nx::Mutex::Recursive),
+    m_jsonTranSerializer(jsonTranSerializer),
+    m_ubjsonTranSerializer(ubjsonTranSerializer),
+    m_miscData(this),
+    m_thread(std::make_unique<QThread>()),
+    m_localPeerType(peerType)
 {
+    moveToThread(m_thread.get());
     [[maybe_unused]] static const int kMetaTypeRegistrator =
         []()
         {
@@ -108,7 +114,7 @@ MessageBus::MessageBus(
         }();
 
     m_thread->setObjectName("P2pMessageBus");
-    connect(m_thread, &QThread::started,
+    connect(m_thread.get(), &QThread::started,
         [this]()
         {
             if (!m_timer)
@@ -119,7 +125,7 @@ MessageBus::MessageBus(
             }
             m_timer->start(kDefaultTimerInterval);
         });
-    connect(m_thread, &QThread::finished,
+    connect(m_thread.get(), &QThread::finished,
         [this]()
         {
             m_timer->stop();
@@ -192,7 +198,10 @@ void MessageBus::start()
     m_peers.reset(new BidirectionRoutingInfo(localPeer()));
     addOfflinePeersFromDb();
     m_lastRuntimeInfo[localPeer()] = runtimeInfoManager()->localInfo().data;
-    base_type::start();
+
+    NX_ASSERT(!m_thread->isRunning());
+    if (!m_thread->isRunning())
+        m_thread->start();
     m_started = true;
 }
 
@@ -206,7 +215,14 @@ void MessageBus::stop()
     }
 
     dropConnections();
-    base_type::stop();
+
+    NX_VERBOSE(this, "Before stop");
+    if (m_thread->isRunning())
+    {
+        m_thread->exit();
+        m_thread->wait();
+    }
+    NX_VERBOSE(this, "After stop");
 }
 
 void MessageBus::addOutgoingConnectionToPeer(
@@ -239,7 +255,7 @@ void MessageBus::addOutgoingConnectionToPeer(
     NX_VERBOSE(this, "peer %1 addOutgoingConnection to peer %2 type %3 using url \"%4\"",
         peerName(localPeer().id),
         peerName(peer), peerType, _url);
-    executeInThread(m_thread, [this]() {doPeriodicTasks();});
+    executeInThread(m_thread.get(), [this]() {doPeriodicTasks();});
 }
 
 void MessageBus::deleteRemoveUrlById(const nx::Uuid& id)
@@ -367,12 +383,6 @@ void MessageBus::createOutgoingConnections(
                     continue; //< incoming connection in progress
             }
 
-            ConnectionLockGuard connectionLockGuard(
-                peerId(),
-                connectionGuardSharedState(),
-                remoteConnection.peerId,
-                ConnectionLockGuard::Direction::Outgoing);
-
             P2pConnectionPtr connection(new Connection(
                 remoteConnection.adapterFunc,
                 remoteConnection.credentials,
@@ -382,7 +392,11 @@ void MessageBus::createOutgoingConnections(
                 localPeerEx(),
                 remoteConnection.url,
                 std::make_unique<ConnectionContext>(),
-                std::move(connectionLockGuard),
+                std::make_unique<ConnectionLockGuard>(
+                    peerId(),
+                    connectionGuardSharedState(),
+                    remoteConnection.peerId,
+                    ConnectionLockGuard::Direction::Outgoing),
                 [this](const auto& remotePeer) { return validateRemotePeerData(remotePeer); }));
             connection->setMaxSendBufferSize(globalSettings()->maxP2pQueueSizeBytes());
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
@@ -1586,8 +1600,8 @@ void MessageBus::setDelayIntervals(const DelayIntervals& intervals)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_intervals = intervals;
-    executeInThread(
-        m_thread, [this]()
+    executeInThread(m_thread.get(),
+        [this]()
         {
             m_timer->setInterval(std::min(m_intervals.minInterval(), kDefaultTimerInterval));
         });
@@ -1754,6 +1768,41 @@ bool MessageBus::sendUnicastTransactionImpl(
         }
     }
     return result;
+}
+
+void MessageBus::setHandler(ECConnectionNotificationManager* handler)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_ASSERT(!m_thread->isRunning());
+    NX_ASSERT(m_handler == NULL, "Previous handler must be removed at this time");
+    m_handler = handler;
+}
+
+void MessageBus::removeHandler(ECConnectionNotificationManager* handler)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    NX_ASSERT(!m_thread->isRunning());
+    if (m_handler)
+    {
+        NX_ASSERT(m_handler == handler, "We must remove only current handler");
+        if (m_handler == handler)
+            m_handler = nullptr;
+    }
+}
+
+QnJsonTransactionSerializer* MessageBus::jsonTranSerializer() const
+{
+    return m_jsonTranSerializer;
+}
+
+QnUbjsonTransactionSerializer* MessageBus::ubjsonTranSerializer() const
+{
+    return m_ubjsonTranSerializer;
+}
+
+ConnectionGuardSharedState* MessageBus::connectionGuardSharedState()
+{
+    return &m_connectionGuardSharedState;
 }
 
 #define INSTANTIATE(unused1, unused2, T) \

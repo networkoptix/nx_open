@@ -10,12 +10,11 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/tran_state_data.h>
+#include <transaction/abstract_transaction_message_bus.h>
 #include <transaction/amend_transaction_data.h>
-#include <transaction/json_transaction_serializer.h>
+#include <transaction/connection_guard_shared_state.h>
 #include <transaction/transaction.h>
 #include <transaction/transaction_descriptor.h>
-#include <transaction/transaction_message_bus_base.h>
-#include <transaction/ubjson_transaction_serializer.h>
 
 #include "connection_context.h"
 #include "p2p_connection.h"
@@ -42,10 +41,9 @@ struct SubscribeForDataUpdateRecord
 };
 using SubscribeForDataUpdatesMessageType = QVector<SubscribeForDataUpdateRecord>;
 
-class MessageBus: public ec2::TransactionMessageBusBase
+class MessageBus: public ec2::AbstractTransactionMessageBus
 {
     Q_OBJECT
-    using base_type = ec2::TransactionMessageBusBase;
 
 public:
     const static QString kCloudPathPrefix;
@@ -100,6 +98,14 @@ public:
      * @return false if system identity time has been changed.
      */
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer);
+
+    virtual void setHandler(ECConnectionNotificationManager* handler) override;
+    virtual void removeHandler(ECConnectionNotificationManager* handler) override;
+
+    virtual QnJsonTransactionSerializer* jsonTranSerializer() const override;
+    virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
+
+    virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
 
 protected:
     template<class T>
@@ -242,6 +248,10 @@ public:
     bool isStarted() const { return m_started; }
 
 protected:
+    mutable nx::Mutex m_mutex;
+    ECConnectionNotificationManager* m_handler = nullptr;
+    QnJsonTransactionSerializer* m_jsonTranSerializer = nullptr;
+    QnUbjsonTransactionSerializer* m_ubjsonTranSerializer = nullptr;
     std::unique_ptr<BidirectionRoutingInfo> m_peers;
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
     DelayIntervals m_intervals;
@@ -304,6 +314,10 @@ private:
     std::set<vms::api::PeerData> m_lastAlivePeers;
     std::atomic<bool> m_started{false};
     QMap<nx::Uuid, Connection::State> m_lastConnectionState;
+
+    std::unique_ptr<QThread> m_thread;
+    const nx::vms::api::PeerType m_localPeerType;
+    ConnectionGuardSharedState m_connectionGuardSharedState;
 };
 
 } // namespace p2p

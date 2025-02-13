@@ -31,7 +31,6 @@ namespace ec2 {
 
 class ECConnectionNotificationManager;
 class TransactionMessageBusAdapter;
-class QnAbstractTransactionTransport;
 
 /*!
     \note All methods are asynchronous if other not specified

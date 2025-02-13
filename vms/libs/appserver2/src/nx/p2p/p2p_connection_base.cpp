@@ -18,7 +18,7 @@
 #include <nx/p2p/transport/p2p_websocket_transport.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/common/application_context.h>
-#include <transaction/transaction_message_bus_base.h>
+#include <transaction/abstract_transaction_message_bus.h>
 
 // For debug purpose only
 //#define CHECK_SEQUENCE

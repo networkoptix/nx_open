@@ -2,16 +2,12 @@
 
 #pragma once
 
-#include <QtCore/QThread>
-#include <QtNetwork/QHostAddress>
-
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/rest/auth_result.h>
-#include <nx/network/ssl/helpers.h>
+#include <nx/network/socket_factory.h>
 #include <nx/vms/common/system_context_aware.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 
-#include "connection_guard_shared_state.h"
 #include "transport_connection_info.h"
 
 namespace nx { namespace network { class SocketAddress; }}
@@ -20,11 +16,8 @@ namespace ec2 {
 
 class QnJsonTransactionSerializer;
 class QnUbjsonTransactionSerializer;
-class QnAbstractTransactionTransport;
-class TimeSynchronizationManager;
-
+class ConnectionGuardSharedState;
 class ECConnectionNotificationManager;
-namespace detail { class QnDbManager; }
 
 class AbstractTransactionMessageBus:
     public QObject,

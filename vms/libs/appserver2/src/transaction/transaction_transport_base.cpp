@@ -2,12 +2,10 @@
 
 #include "transaction_transport_base.h"
 
-#include <atomic>
-
-#include <QtCore/QDateTime>
-#include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
+#include <nx/cloud/db/api/ec2_request_paths.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/base64_decoder_filter.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_factory.h>
@@ -15,21 +13,18 @@
 #include <nx/utils/byte_stream/sized_data_decoder.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/to_string.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
-
-#include <nx/cloud/db/api/ec2_request_paths.h>
-#include <nx/network/cloud/cloud_connect_controller.h>
-
-#include <transaction/json_transaction_serializer.h>
-#include <transaction/ubjson_transaction_serializer.h>
-#include <transaction/transaction_transport_header.h>
-
-#include <nx/vms/api/types/connection_types.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/api/types/connection_types.h>
+
+#include "connection_guard.h"
+#include "json_transaction_serializer.h"
+#include "transaction_transport_header.h"
+#include "ubjson_transaction_serializer.h"
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -138,7 +133,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 QnTransactionTransportBase::QnTransactionTransportBase(
     const nx::Uuid& localSystemId,
     const std::string& connectionGuid,
-    ConnectionLockGuard connectionLockGuard,
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
     const api::PeerData& localPeer,
     const api::PeerData& remotePeer,
     ConnectionType::Type connectionType,
@@ -147,7 +142,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount,
     nx::network::aio::AbstractAioThread* aioThread)
-:
+    :
     QnTransactionTransportBase(
         localSystemId,
         nullptr,
@@ -161,8 +156,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionType = connectionType;
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
-    m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
-        std::move(connectionLockGuard));
+    m_connectionLockGuard = std::move(connectionLockGuard);
 
     nx::network::http::HttpHeaders::const_iterator ec2ProtoVersionIter =
         request.headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);

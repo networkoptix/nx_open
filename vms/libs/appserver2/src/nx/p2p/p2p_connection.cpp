@@ -26,7 +26,7 @@ Connection::Connection(
     const vms::api::PeerDataEx& localPeer,
     const nx::utils::Url &remotePeerUrl,
     std::unique_ptr<QObject> opaqueObject,
-    ConnectionLockGuard connectionLockGuard,
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
     ValidateRemotePeerFunc validateRemotePeerFunc)
     :
     ConnectionBase(
@@ -37,7 +37,7 @@ Connection::Connection(
         systemContext->globalSettings()->aliveUpdateInterval(),
         std::move(opaqueObject),
         std::move(adapterFunc),
-        std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
+        std::move(connectionLockGuard)),
     nx::vms::common::SystemContextAware(systemContext),
     m_validateRemotePeerFunc(std::move(validateRemotePeerFunc)),
     m_credentials(std::move(credentials))
@@ -72,7 +72,7 @@ Connection::Connection(
     const nx::network::rest::UserAccessData& userAccessData,
     const UnauthorizedWatcher& unauthorizedWatcher,
     std::unique_ptr<QObject> opaqueObject,
-    ConnectionLockGuard connectionLockGuard)
+    std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
     :
     ConnectionBase(
         remotePeer,
@@ -80,7 +80,7 @@ Connection::Connection(
         std::move(p2pTransport),
         requestUrlQuery,
         std::move(opaqueObject),
-        std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
+        std::move(connectionLockGuard)),
     nx::vms::common::SystemContextAware(systemContext),
     m_userAccessData(userAccessData),
     m_unauthorizedWatcher(std::move(unauthorizedWatcher))

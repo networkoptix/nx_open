@@ -8,7 +8,6 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QSet>
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/network/abstract_socket.h>
@@ -20,17 +19,15 @@
 #include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/rest/auth_result.h>
-#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/uuid.h>
 
 #include "abstract_transaction_transport.h"
-#include "connection_guard.h"
 
-namespace ec2
-{
+namespace ec2 {
 
+class ConnectionGuardSharedState;
+class ConnectionLockGuard;
 struct QnTransactionTransportHeader;
 
 namespace ConnectionType
@@ -101,7 +98,7 @@ public:
     QnTransactionTransportBase(
         const nx::Uuid& localSystemId,
         const std::string& connectionGuid,
-        ConnectionLockGuard connectionLockGuard,
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard,
         const nx::vms::api::PeerData& localPeer,
         const nx::vms::api::PeerData& remotePeer,
         ConnectionType::Type connectionType,
