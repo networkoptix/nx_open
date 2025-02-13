@@ -120,6 +120,8 @@ Request::Request(const nx::network::http::Request* httpRequest, std::optional<Co
 {
 }
 
+const QString Request::kFormatParam("_format");
+
 const http::Method& Request::method() const
 {
     return m_method;
@@ -158,13 +160,12 @@ Qn::SerializationFormat Request::responseFormatOrThrow() const
     if (m_responseFormat != Qn::SerializationFormat::unsupported)
         return m_responseFormat;
 
-    static const QString kFormat("_format");
-    if (const auto format = param(kFormat))
+    if (const auto format = param(kFormatParam))
     {
         m_responseFormat = nx::reflect::fromString(
             format->toStdString(), Qn::SerializationFormat::unsupported);
         if (m_responseFormat == Qn::SerializationFormat::unsupported)
-            throw Exception::invalidParameter(kFormat, *format);
+            throw Exception::invalidParameter(kFormatParam, *format);
         return m_responseFormat;
     }
 

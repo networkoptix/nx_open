@@ -27,6 +27,8 @@ private:
     mutable UserSession mutableUserSession;
 
 public:
+    static const QString kFormatParam;
+
     // TODO: These should be private, all data should be available by getters.
     const UserSession& userSession;
     const nx::network::HostAddress foreignAddress;
