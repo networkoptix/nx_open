@@ -47,7 +47,7 @@ function(nx_add_server_plugin target)
     endif()
 
     foreach(extra_file ${PLUGIN_EXTRA_FILES})
-        if(PLUGIN_EXTRA_FILES_SUBDIR STREQUAL "")
+        if(NOT PLUGIN_EXTRA_FILES_SUBDIR)
             set(destination "${CMAKE_BINARY_DIR}/${outputDirectory}")
         else()
             set(destination "${CMAKE_BINARY_DIR}/${outputDirectory}/${PLUGIN_EXTRA_FILES_SUBDIR}")
