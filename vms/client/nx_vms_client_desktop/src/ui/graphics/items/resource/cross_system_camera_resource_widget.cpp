@@ -35,7 +35,7 @@ struct QnCrossSystemCameraWidget::Private
                 return Qn::ResourceStatusOverlay::LoadingOverlay;
 
             if (status == CloudCrossSystemContext::Status::connectionFailure)
-                return Qn::ResourceStatusOverlay::RestrictedOverlay;
+                return Qn::ResourceStatusOverlay::UnauthorizedOverlay;
 
             return Qn::ResourceStatusOverlay::InformationRequiredOverlay;
         }
@@ -111,8 +111,7 @@ Qn::ResourceStatusOverlay QnCrossSystemCameraWidget::calculateStatusOverlay() co
 Qn::ResourceOverlayButton QnCrossSystemCameraWidget::calculateOverlayButton(
     Qn::ResourceStatusOverlay statusOverlay) const
 {
-    if (statusOverlay == Qn::ResourceStatusOverlay::RestrictedOverlay
-        || statusOverlay == Qn::ResourceStatusOverlay::UnauthorizedOverlay)
+    if (statusOverlay == Qn::ResourceStatusOverlay::UnauthorizedOverlay)
         return Qn::ResourceOverlayButton::Authorize;
 
     if (statusOverlay == Qn::ResourceStatusOverlay::InformationRequiredOverlay)
