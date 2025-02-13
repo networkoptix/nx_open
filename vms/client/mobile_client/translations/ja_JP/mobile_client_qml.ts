@@ -708,7 +708,7 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation>ソフトウェアデコーダーのフォールバックを有効にする</translation>
+      <translation>ソフトウェアデコーダーへのフォールバックを有効にする</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
