@@ -100,7 +100,6 @@ ConnectionBase::ConnectionBase(
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
     P2pTransportPtr p2pTransport,
-    const QUrlQuery& requestUrlQuery,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
 :
@@ -116,13 +115,6 @@ ConnectionBase::ConnectionBase(
     NX_ASSERT(m_localPeer.id != m_remotePeer.id);
 
     m_timer.bindToAioThread(m_p2pTransport->getAioThread());
-
-    const auto& queryItems = requestUrlQuery.queryItems();
-    std::transform(
-        queryItems.begin(), queryItems.end(),
-        std::inserter(m_remoteQueryParams, m_remoteQueryParams.end()),
-        [](const QPair<QString, QString>& item)
-            { return std::make_pair(item.first, item.second); });
 
     NX_DEBUG(this, "Created server p2p connection");
 }
@@ -667,11 +659,6 @@ void ConnectionBase::handleMessage(const nx::Buffer& message)
     emit gotMessage(weakPointer(), messageType, message.substr(messageHeaderSize(isClient)));
 }
 
-std::multimap<QString, QString> ConnectionBase::httpQueryParams() const
-{
-    return m_remoteQueryParams;
-}
-
 QObject* ConnectionBase::opaqueObject()
 {
     return m_opaqueObject.get();
@@ -685,6 +672,40 @@ void ConnectionBase::bindToAioThread(nx::network::aio::AbstractAioThread* aioThr
 
     if (m_p2pTransport)
         m_p2pTransport->bindToAioThread(aioThread);
+}
+
+bool ConnectionBase::skipTransactionForMobileClient(ApiCommand::Value command)
+{
+    switch (command)
+    {
+        case ApiCommand::getMediaServersEx:
+        case ApiCommand::saveCameras:
+        case ApiCommand::getCamerasEx:
+        case ApiCommand::getUsers:
+        case ApiCommand::saveLayouts:
+        case ApiCommand::getLayouts:
+        case ApiCommand::removeResource:
+        case ApiCommand::removeCamera:
+        case ApiCommand::removeMediaServer:
+        case ApiCommand::removeUser:
+        case ApiCommand::removeLayout:
+        case ApiCommand::saveCamera:
+        case ApiCommand::saveMediaServer:
+        case ApiCommand::saveUser:
+        case ApiCommand::saveUsers:
+        case ApiCommand::saveLayout:
+        case ApiCommand::setResourceStatus:
+        case ApiCommand::setResourceParam:
+        case ApiCommand::setResourceParams:
+        case ApiCommand::saveCameraUserAttributes:
+        case ApiCommand::saveMediaServerUserAttributes:
+        case ApiCommand::getCameraHistoryItems:
+        case ApiCommand::addCameraHistoryItem:
+            return false;
+        default:
+            break;
+    }
+    return true;
 }
 
 } // namespace p2p

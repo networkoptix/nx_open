@@ -36,7 +36,6 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         P2pTransportPtr p2pTransport,
-        const QUrlQuery& requestUrlQuery,
         const nx::network::rest::UserAccessData& userAccessData,
         const UnauthorizedWatcher& unauthorizedWatcher,
         std::unique_ptr<QObject> opaqueObject,

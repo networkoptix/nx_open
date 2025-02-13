@@ -4,8 +4,8 @@
 
 #include <chrono>
 
+#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QUrlQuery>
 
 #include <core/resource/shared_resource_pointer.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -15,11 +15,11 @@
 #include <nx/p2p/transport/i_p2p_transport.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/tran_state_data.h>
-#include <transaction/abstract_transaction_transport.h>
 #include <transaction/connection_guard.h>
 #include <utils/common/from_this_to_shared.h>
 
 #include "p2p_fwd.h"
+#include "transaction_filter.h"
 
 namespace ec2 {
 struct QnAbstractTransaction;
@@ -35,9 +35,7 @@ using SendCounters = std::array<std::atomic<qint64>, (int(MessageType::counter))
 
 //-------------------------------------------------------------------------------------------------
 
-class ConnectionBase:
-    public QnAbstractTransactionTransport,
-    public QnFromThisToShared<ConnectionBase>
+class ConnectionBase: public QObject, public QnFromThisToShared<ConnectionBase>
 {
     Q_OBJECT
 public:
@@ -79,7 +77,6 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         P2pTransportPtr p2pTransport,
-        const QUrlQuery& requestUrlQuery,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard);
 
@@ -96,10 +93,9 @@ public:
 
     const nx::network::http::HttpHeaders& responseHeaders() const { return m_responseHeaders; }
 
-    virtual const vms::api::PeerDataEx& localPeer() const override { return m_localPeer; }
-    virtual const vms::api::PeerDataEx& remotePeer() const override { return m_remotePeer; }
-    virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
-    virtual std::multimap<QString, QString> httpQueryParams() const override;
+    const vms::api::PeerDataEx& localPeer() const { return m_localPeer; }
+    const vms::api::PeerDataEx& remotePeer() const { return m_remotePeer; }
+    bool isIncoming() const { return m_direction == Direction::incoming;  }
     virtual void updateCredentials(nx::network::http::Credentials) {}
 
     virtual void setState(State state, const QString& reason);
@@ -150,7 +146,7 @@ public:
 
     QObject* opaqueObject();
 
-    virtual nx::utils::Url remoteAddr() const override;
+    nx::utils::Url remoteAddr() const;
     void pleaseStopSync();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
@@ -179,6 +175,43 @@ public:
     static std::chrono::milliseconds pingTimeout();
     static void setNoPingSupportClientHeader(bool value);
 
+    void setFilter(std::unique_ptr<TransactionFilter> transactionFilter)
+    {
+        m_filter = std::move(transactionFilter);
+    }
+
+    template<typename Transaction>
+    // requires std::is_base_of<QnAbstractTransaction, Transaction>
+    nx::p2p::FilterResult shouldTransactionBeSentToPeer(const Transaction& transaction)
+    {
+        if (remotePeer().peerType == nx::vms::api::PeerType::oldMobileClient &&
+            skipTransactionForMobileClient(transaction.command))
+        {
+            return nx::p2p::FilterResult::deny;
+        }
+        else if (remotePeer().peerType == nx::vms::api::PeerType::oldServer)
+        {
+            return nx::p2p::FilterResult::deny;
+        }
+        else if (transaction.isLocal() && !remotePeer().isClient())
+        {
+            return nx::p2p::FilterResult::deny;
+        }
+
+        if (transaction.command == ::ec2::ApiCommand::tranSyncRequest ||
+            transaction.command == ::ec2::ApiCommand::tranSyncResponse ||
+            transaction.command == ::ec2::ApiCommand::tranSyncDone)
+        {
+            // Always sending "special" transactions. E.g., connection handshake.
+            return nx::p2p::FilterResult::allow;
+        }
+
+        if (m_filter)
+            return m_filter->match(transaction);
+
+        return nx::p2p::FilterResult::allow;
+    }
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const nx::Buffer& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -201,6 +234,7 @@ private:
     int messageHeaderSize(bool isClient) const;
     MessageType getMessageType(const nx::Buffer& buffer, bool isClient) const;
     void transactionSkipped();
+    bool skipTransactionForMobileClient(ApiCommand::Value command);
 
 private:
     enum class CredentialsSource
@@ -265,7 +299,6 @@ private:
 
     nx::network::http::HttpHeaders m_additionalRequestHeaders;
     std::vector<std::pair<QString, QString>> m_requestQueryParams;
-    std::multimap<QString, QString> m_remoteQueryParams;
     nx::network::http::HttpHeaders m_responseHeaders;
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
@@ -274,6 +307,7 @@ private:
     size_t m_maxBufferSize = 0;
     nx::network::aio::Timer m_pongTimer;
     const bool m_isClient;
+    std::unique_ptr<TransactionFilter> m_filter;
 
     // For tests.
     static bool s_noPingSupportClientHeader;
