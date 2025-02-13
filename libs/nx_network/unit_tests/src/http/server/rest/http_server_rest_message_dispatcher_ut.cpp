@@ -42,6 +42,13 @@ TEST_F(
         {{"accountId", "akolesnikov"}, {"systemName", "la_office_test"}});
 }
 
+TEST_F(HttpServerRestMessageDispatcher, url_encoded_parameters_are_given_to_the_handler)
+{
+    givenRegisteredHandler("/account/{accountId}/system");
+    whenSentRequest("/account/andrei%2Fkolesnikov/system");
+    thenParametersHaveBeenPassedToTheHandler({{"accountId", "andrei/kolesnikov"}});
+}
+
 TEST_F(HttpServerRestMessageDispatcher, find_handler_by_url_with_query)
 {
     givenRegisteredHandler("/account/{accountId}/systems");

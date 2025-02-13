@@ -76,7 +76,9 @@ public:
                         break;
                     }
 
-                    params.emplace(matchContext.paramNames[i - 1], matchResult[i]);
+                    const auto& decodedStr =
+                        QUrl::fromPercentEncoding(QByteArray::fromStdString(matchResult[i]));
+                    params.emplace(matchContext.paramNames[i - 1], decodedStr.toStdString());
                 }
 
                 if (!matched)

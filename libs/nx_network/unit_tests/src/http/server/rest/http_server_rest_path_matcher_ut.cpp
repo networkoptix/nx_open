@@ -51,8 +51,16 @@ TEST_F(RestPathMatcher, find_handler)
     assertPathRegistered(users, 2);
 
     assertPathMatches("/account/vpupkin/systems", 1, {{"accountId", "vpupkin"}}, systems);
-    assertPathMatches("/account/vpu-pk.i_n/systems", 1, {{"accountId", "vpu-pk.i_n"}}, systems);
+    assertPathMatches("/account/vpu-p%2Fk.i_n/systems", 1, {{"accountId", "vpu-p/k.i_n"}}, systems);
     assertPathMatches("/systems/sys1/users", 2, {{"systemId", "sys1"}}, users);
+}
+
+TEST_F(RestPathMatcher, find_handler_url_encoded)
+{
+    const std::string systems{"/account/{accountId}/systems"};
+    assertPathRegistered(systems, 1);
+    assertPathMatches(
+        "/account/vasya%2Fpupkin/systems", 1, {{"accountId", "vasya/pupkin"}}, systems);
 }
 
 TEST_F(RestPathMatcher, find_handler_multiple_params)

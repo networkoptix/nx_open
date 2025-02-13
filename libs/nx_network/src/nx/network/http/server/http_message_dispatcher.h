@@ -110,7 +110,7 @@ public:
 
         auto handlerContext = getHandler(
             requestContext.request.requestLine.method,
-            requestContext.request.requestLine.url.path().toStdString());
+            requestContext.request.requestLine.url.path(QUrl::EncodeReserved).toStdString());
         if (!handlerContext)
         {
             recordDispatchFailure();
