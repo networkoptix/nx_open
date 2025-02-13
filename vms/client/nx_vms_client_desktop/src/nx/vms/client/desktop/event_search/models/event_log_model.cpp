@@ -253,7 +253,9 @@ QnResourceIconCache::Key resourceIconKey(ResourceType type, bool multiple)
         {ResourceType::server, {Key::Server, Key::Servers}},
         {ResourceType::device, {Key::Camera, Key::Cameras}},
         {ResourceType::layout, {Key::Layout, Key::Layouts}},
-        {ResourceType::user, {Key::User, Key::Users}}};
+        {ResourceType::user, {Key::User, Key::Users}},
+        {ResourceType::analyticsEngine, {Key::AnalyticsEngine, Key::AnalyticsEngines}},
+    };
 
     if (const auto it = iconMap.find(type); it != iconMap.end())
         return multiple ? it->second.second : it->second.first;
@@ -277,10 +279,9 @@ QnResourceIconCache::Key actionTargetIcon(SystemContext* context, const EventLog
     return resourceIconKey(resourceMap.begin()->first, multiple);
 }
 
-QnResourcePtr eventSource(SystemContext* context, const EventLogModelData& data)
+nx::Uuid eventSourceId(SystemContext* context, const EventLogModelData& data)
 {
-    return context->resourcePool()->getResourceById(
-        data.details(context).value(utils::kSourceIdDetailName).value<nx::Uuid>());
+    return data.details(context).value(utils::kSourceIdDetailName).value<nx::Uuid>();
 }
 
 ResourceType eventSourceType(SystemContext* context, const EventLogModelData& data)
@@ -308,7 +309,11 @@ QString eventSourceText(SystemContext* context, const EventLogModelData& data)
         return sourceName.toString();
     }
 
-    if (const auto resource = eventSource(context, data))
+    const auto sourceId = eventSourceId(context, data);
+    if (sourceId.isNull())
+        return {};
+
+    if (const auto resource = context->resourcePool()->getResourceById(sourceId))
         return resourceName(resource);
 
     // Resource was removed.
@@ -317,14 +322,6 @@ QString eventSourceText(SystemContext* context, const EventLogModelData& data)
 
     NX_ASSERT(false, "Unexpected resource type");
     return {};
-}
-
-QnResourceIconCache::Key eventSourceIcon(SystemContext* context, const EventLogModelData& data)
-{
-    if (data.details(context).value(utils::kSourceNameDetailName).isValid())
-        return QnResourceIconCache::Unknown;
-
-    return resourceIconKey(eventSourceType(context, data), /*multiple*/ false);
 }
 
 bool hasVideoLink(SystemContext* context, const EventLogModelData& data)
@@ -569,7 +566,7 @@ QVariant EventLogModel::mouseCursorData(
 QnResourcePtr EventLogModel::getResource(Column column, const EventLogModelData& data) const
 {
     if (column == EventLogModel::EventCameraColumn)
-        return eventSource(systemContext(), data);
+        return resourcePool()->getResourceById(eventSourceId(systemContext(), data));
 
     if (column == EventLogModel::ActionCameraColumn)
     {
@@ -590,10 +587,18 @@ QVariant EventLogModel::iconData(Column column, const EventLogModelData& data) c
 
     if (column == EventCameraColumn)
     {
-        if (const auto resource = eventSource(systemContext(), data))
+        if (data.details(systemContext()).value(utils::kSourceNameDetailName).isValid())
+            return {};
+
+        const auto sourceId = eventSourceId(systemContext(), data);
+        if (sourceId.isNull())
+            return {};
+
+        if (const auto resource = resourcePool()->getResourceById(sourceId))
             return qnResIconCache->icon(resource);
 
-        return resourceIcon(eventSourceIcon(systemContext(), data));
+        return resourceIcon(resourceIconKey(
+            eventSourceType(systemContext(), data), /*multiple*/ false));
     }
 
     return {};

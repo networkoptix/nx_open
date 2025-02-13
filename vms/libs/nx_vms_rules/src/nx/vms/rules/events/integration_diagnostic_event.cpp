@@ -57,6 +57,9 @@ QVariantMap IntegrationDiagnosticEvent::details(
 {
     auto result = AnalyticsEngineEvent::details(context, aggregatedInfo);
 
+    if (deviceId().isNull())
+        result[utils::kSourceIdDetailName] = QVariant::fromValue(engineId());
+
     if (!result.contains(utils::kCaptionDetailName))
         result.insert(utils::kCaptionDetailName, eventCaption());
 
