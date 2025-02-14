@@ -214,7 +214,7 @@ const QString kOnvifRemoteArchiveDisableFastDownload("onvifRemoteArchiveDisableF
 
 const QString kOnvifRemoteArchiveEnabled("onvifRemoteArchiveEnabled");
 
-const QString kGsoapAdditionalFlags("gsoapAdditionalFlags");
+const QString kOnvifConfigurationParameters("onvifConfigurationParameters");
 
 const QString kTimezoneConfiguration("timezoneConfiguration");
 
