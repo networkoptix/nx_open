@@ -75,7 +75,7 @@ class SystemContext;
 
 namespace rest {
 
-using MultiServerTimeData = RestResultWithData<nx::vms::api::ServerTimeReplyList>;
+using MultiServerTimeData = ResultWithData<nx::vms::api::ServerTimeReplyList>;
 
 /**
  * Class for HTTP requests to mediaServer.
@@ -526,11 +526,11 @@ public:
         std::optional<nx::Uuid> proxyToServer = {});
 
     Handle getModuleInformation(
-        Callback<RestResultWithData<nx::vms::api::ModuleInformation>> callback,
+        Callback<ResultWithData<nx::vms::api::ModuleInformation>> callback,
         QThread* targetThread = nullptr);
 
     Handle getModuleInformationAll(
-        Callback<RestResultWithData<QList<nx::vms::api::ModuleInformation>>> callback,
+        Callback<ResultWithData<QList<nx::vms::api::ModuleInformation>>> callback,
         QThread* targetThread = nullptr);
 
     /**
@@ -599,7 +599,7 @@ public:
      */
     Handle testEmailSettings(
         const nx::vms::api::EmailSettings& settings,
-        Callback<RestResultWithData<QnTestEmailSettingsReply>>&& callback,
+        Callback<ResultWithData<QnTestEmailSettingsReply>>&& callback,
         QThread* targetThread = nullptr,
         std::optional<nx::Uuid> proxyToServer = {});
 
@@ -608,7 +608,7 @@ public:
      * stored at server's system settings is successful.
      */
     Handle testEmailSettings(
-        Callback<RestResultWithData<QnTestEmailSettingsReply>>&& callback,
+        Callback<ResultWithData<QnTestEmailSettingsReply>>&& callback,
         QThread* targetThread = nullptr,
         std::optional<nx::Uuid> proxyToServer = {});
 
@@ -624,7 +624,7 @@ public:
     Handle getStorageStatus(
         const nx::Uuid& serverId,
         const QString& path,
-        Callback<RestResultWithData<StorageStatusReply>>&& callback,
+        Callback<ResultWithData<StorageStatusReply>>&& callback,
         QThread* targetThread = nullptr);
 
     Handle checkStoragePath(
@@ -672,7 +672,7 @@ public:
         const nx::Uuid& serverId,
         const nx::Uuid& cameraId,
         CameraDiagnostics::Step::Value previousStep,
-        Callback<RestResultWithData<QnCameraDiagnosticsReply>>&& callback,
+        Callback<ResultWithData<QnCameraDiagnosticsReply>>&& callback,
         QThread* targetThread = nullptr);
 
     using LdapAuthenticateCallback = nx::utils::MoveOnlyFunc<void(

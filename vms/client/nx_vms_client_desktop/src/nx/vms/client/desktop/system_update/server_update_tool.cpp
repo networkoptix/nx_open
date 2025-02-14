@@ -1157,7 +1157,7 @@ void ServerUpdateTool::requestModuleInformation()
     auto callback = nx::utils::guarded(this,
         [this](
             bool success, rest::Handle /*handle*/,
-            const rest::RestResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
+            const rest::ResultWithData<QList<nx::vms::api::ModuleInformation>>& response)
         {
             if (success)
                 emit moduleInformationReceived(response.data);

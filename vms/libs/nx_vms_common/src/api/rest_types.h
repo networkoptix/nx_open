@@ -18,20 +18,20 @@ template<typename Data>
 using ErrorOrData = nx::utils::expected<Data, nx::network::rest::Result>;
 
 template <typename T>
-struct RestResultWithData
+struct ResultWithData
 {
-    RestResultWithData() {}
-    RestResultWithData(const nx::network::rest::Result& restResult, T data):
+    ResultWithData() {}
+    ResultWithData(const nx::network::rest::Result& restResult, T data):
         error(restResult.errorId),
         errorString(restResult.errorString),
         data(std::move(data))
     {
     }
 
-    RestResultWithData(const RestResultWithData&) = delete;
-    RestResultWithData(RestResultWithData&&) = default;
-    RestResultWithData& operator=(const RestResultWithData&) = delete;
-    RestResultWithData& operator=(RestResultWithData&&) = default;
+    ResultWithData(const ResultWithData&) = delete;
+    ResultWithData(ResultWithData&&) = default;
+    ResultWithData& operator=(const ResultWithData&) = delete;
+    ResultWithData& operator=(ResultWithData&&) = default;
 
     nx::network::rest::ErrorId error = nx::network::rest::ErrorId::ok;
     QString errorString;

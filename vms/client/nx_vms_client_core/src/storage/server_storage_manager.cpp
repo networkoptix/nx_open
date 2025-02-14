@@ -583,7 +583,7 @@ int QnServerStorageManager::requestStorageStatus(
         [callback = std::move(callback)](
             bool success,
             rest::Handle /*requestId*/,
-            rest::RestResultWithData<StorageStatusReply> result)
+            rest::ResultWithData<StorageStatusReply> result)
         {
             if (!success || result.error != nx::network::rest::ErrorId::ok)
             {

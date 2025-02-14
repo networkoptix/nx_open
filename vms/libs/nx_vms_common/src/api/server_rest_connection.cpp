@@ -437,7 +437,7 @@ Handle ServerConnection::sendStatisticsUsingServer(
 }
 
 Handle ServerConnection::getModuleInformation(
-    Callback<RestResultWithData<nx::vms::api::ModuleInformation>> callback,
+    Callback<ResultWithData<nx::vms::api::ModuleInformation>> callback,
     QThread* targetThread)
 {
     nx::network::rest::Params params;
@@ -445,7 +445,7 @@ Handle ServerConnection::getModuleInformation(
 }
 
 Handle ServerConnection::getModuleInformationAll(
-    Callback<RestResultWithData<QList<nx::vms::api::ModuleInformation>>> callback,
+    Callback<ResultWithData<QList<nx::vms::api::ModuleInformation>>> callback,
     QThread* targetThread)
 {
     nx::network::rest::Params params;
@@ -1835,7 +1835,7 @@ Handle ServerConnection::getPluginInformation(
 
 Handle ServerConnection::testEmailSettings(
     const nx::vms::api::EmailSettings& settings,
-    Callback<RestResultWithData<QnTestEmailSettingsReply>>&& callback,
+    Callback<ResultWithData<QnTestEmailSettingsReply>>&& callback,
     QThread* targetThread,
     std::optional<nx::Uuid> proxyToServer)
 {
@@ -1848,7 +1848,7 @@ Handle ServerConnection::testEmailSettings(
 }
 
 Handle ServerConnection::testEmailSettings(
-    Callback<RestResultWithData<QnTestEmailSettingsReply>>&& callback,
+    Callback<ResultWithData<QnTestEmailSettingsReply>>&& callback,
     QThread* targetThread,
     std::optional<nx::Uuid> proxyToServer)
 {
@@ -1863,7 +1863,7 @@ Handle ServerConnection::testEmailSettings(
 Handle ServerConnection::getStorageStatus(
     const nx::Uuid& serverId,
     const QString& path,
-    Callback<RestResultWithData<StorageStatusReply>>&& callback,
+    Callback<ResultWithData<StorageStatusReply>>&& callback,
     QThread* targetThread)
 {
     nx::network::rest::Params params;
@@ -1939,7 +1939,7 @@ Handle ServerConnection::doCameraDiagnosticsStep(
     const nx::Uuid& serverId,
     const nx::Uuid& cameraId,
     CameraDiagnostics::Step::Value previousStep,
-    Callback<RestResultWithData<QnCameraDiagnosticsReply>>&& callback,
+    Callback<ResultWithData<QnCameraDiagnosticsReply>>&& callback,
     QThread* targetThread)
 {
     nx::network::rest::Params params;

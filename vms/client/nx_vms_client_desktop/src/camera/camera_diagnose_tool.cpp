@@ -149,7 +149,7 @@ void DiagnoseTool::doNextStep(Step::Value nextStep)
         m_camera->getId(),
         m_step,
         nx::utils::guarded(this,
-            [this](bool success, int handle, const rest::RestResultWithData<QnCameraDiagnosticsReply>& reply)
+            [this](bool success, int handle, const rest::ResultWithData<QnCameraDiagnosticsReply>& reply)
             {
                 onCameraDiagnosticsStepResponse(success, handle, reply.data);
             })) == -1 )

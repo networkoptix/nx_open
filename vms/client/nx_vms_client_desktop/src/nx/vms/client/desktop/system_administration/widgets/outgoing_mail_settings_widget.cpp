@@ -411,7 +411,7 @@ void OutgoingMailSettingsWidget::Private::testSmtpConfiguration()
 
     const bool testRemoteSettings = !smtpSettingsPasswordChanged() && !smtpSettingsChanged();
 
-    using EmailSettingsTestResult = rest::RestResultWithData<QnTestEmailSettingsReply>;
+    using EmailSettingsTestResult = rest::ResultWithData<QnTestEmailSettingsReply>;
     auto callback = nx::utils::guarded(q,
         [this, testRemoteSettings]
         (bool success, int /*handle*/, const EmailSettingsTestResult& result)

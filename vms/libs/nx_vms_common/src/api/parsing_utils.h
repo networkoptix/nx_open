@@ -22,16 +22,16 @@ bool isSessionExpiredError(const nx::json_rpc::Response& response);
 template <typename T>
 struct Type {};
 
-// Response deserialization for RestResultWithData objects.
+// Response deserialization for ResultWithData objects.
 template<typename T>
-rest::RestResultWithData<T> parseMessageBody(
-    Type<rest::RestResultWithData<T>>,
+rest::ResultWithData<T> parseMessageBody(
+    Type<rest::ResultWithData<T>>,
     Qn::SerializationFormat format,
     const QByteArray& msgBody,
     const nx::network::http::StatusLine& statusLine,
     bool* success)
 {
-    using Result = rest::RestResultWithData<T>;
+    using Result = rest::ResultWithData<T>;
 
     if constexpr (!std::is_same_v<T, rest::EmptyResponseType>)
     {
