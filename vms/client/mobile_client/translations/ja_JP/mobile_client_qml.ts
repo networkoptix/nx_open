@@ -46,7 +46,7 @@
     </message>
     <message>
       <source>Improve network performance</source>
-      <translation>ネットワークパフォーマンスの向上</translation>
+      <translation>ネットワークパフォーマンスを向上させます</translation>
     </message>
     <message>
       <source>Please restart the app to apply the changes.</source>
@@ -54,11 +54,11 @@
     </message>
     <message>
       <source>Maximum decoders count</source>
-      <translation>デコーダーの最大数</translation>
+      <translation>デコーダー数最大</translation>
     </message>
     <message>
       <source>Improve video decoding perfomance using maximum hardware decoders count</source>
-      <translation>ハードウェアデコーダーの最大数を使用してビデオデコードパフォーマンスを向上</translation>
+      <translation>ハードウェアデコーダーを最大限利用して、ビデオデコードパフォーマンスを向上させます</translation>
     </message>
   </context>
   <context>
@@ -652,7 +652,7 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>カメラリストにプレビューを表示</translation>
+      <translation>カメラリストにプレビューを表示します</translation>
     </message>
     <message>
       <source>Save passwords</source>
@@ -672,7 +672,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>サーバーに自動的にログイン</translation>
+      <translation>サーバーへ自動的にログインします</translation>
     </message>
     <message>
       <source>Security</source>
@@ -692,7 +692,7 @@
     </message>
     <message>
       <source>Increase performance and battery life</source>
-      <translation>パフォーマンスとバッテリー効率の向上</translation>
+      <translation>パフォーマンスとバッテリー効率を向上させます</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -708,11 +708,11 @@
     </message>
     <message>
       <source>Enable software decoder fallback</source>
-      <translation>ソフトウェアデコーダーへのフォールバックを有効にする</translation>
+      <translation>ソフトウェアデコーダーへのフォールバックを有効化</translation>
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation>一般的でない映像フォーマットのデコードに、ソフトウェアデコーダーを使用する</translation>
+      <translation>一般的でない映像フォーマットのデコードに、ソフトウェアデコーダーを使用します</translation>
     </message>
   </context>
   <context>
