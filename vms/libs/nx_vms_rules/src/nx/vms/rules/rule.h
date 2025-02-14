@@ -65,7 +65,7 @@ public:
     void setInternal(bool internal);
 
     void setSchedule(const QByteArray& schedule);
-    QByteArray schedule() const;
+    const QByteArray& schedule() const;
     bool timeInSchedule(QDateTime time) const;
 
     // Returns whether at least one filter and one builder are added.

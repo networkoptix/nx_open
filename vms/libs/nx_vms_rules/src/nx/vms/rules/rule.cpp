@@ -197,7 +197,7 @@ void Rule::setSchedule(const QByteArray& schedule)
     m_schedule = schedule;
 }
 
-QByteArray Rule::schedule() const
+const QByteArray& Rule::schedule() const
 {
     return m_schedule;
 }

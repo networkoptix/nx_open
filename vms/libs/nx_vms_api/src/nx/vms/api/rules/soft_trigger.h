@@ -6,6 +6,7 @@
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
+#include "../data/schedule_task_data.h"
 #include "common.h"
 #include "field_types.h"
 
@@ -43,11 +44,14 @@ struct SoftTriggerInfo
 
     /**%apidoc Icon of the software trigger. */
     QString icon;
+
+    /**%apidoc[opt] Schedule of the software trigger rule. */
+    nx::vms::api::ScheduleTaskDataList schedule;
 };
 
 using SoftTriggerInfoList = std::vector<SoftTriggerInfo>;
 
-#define SoftTriggerInfo_Fields (triggerId)(prolonged)(devices)(name)(icon)
+#define SoftTriggerInfo_Fields (triggerId)(prolonged)(devices)(name)(icon)(schedule)
 QN_FUSION_DECLARE_FUNCTIONS(SoftTriggerInfo, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SoftTriggerInfo, SoftTriggerInfo_Fields)
 
