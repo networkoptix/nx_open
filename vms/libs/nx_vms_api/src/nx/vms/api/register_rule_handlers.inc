@@ -108,7 +108,7 @@ void registerRuleHandlers(
     reg("rest/v{4-}/events/acknowledges/:id?", GlobalPermission::none,
         std::make_unique<AcknowledgeHandler>(serverModule, serverConnector));
 
-    /**%apidoc POST /rest/v{4-}/events/create
+    /**%apidoc POST /rest/v{4-}/events/generic
      * This method may trigger an event of the "Generic Event" type in the Site from a 3rd party.
      * Such Event will be handled and logged according to current VMS Rules.
      * Parameters of the generated Event, such as "source", "caption" and "description", are
@@ -131,45 +131,43 @@ void registerRuleHandlers(
      * terminal being watched by the two specified Devices.
      * %caption Create generic event
      * %ingroup Events
-     * %param[opt]:string type Type of the Event to be created. Omit the parameter for
-     *     Generic Event. See /rest/v{4-}/events/manifest/events for event manifests with possible
-     *     event types.
-     * %param[opt]:any timestamp Event date and time, as a number containing time in
-     *     microseconds since epoch, or an ISO timestamp string formatted like
-     *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> -
-     *     the format is auto-detected. If "timestamp" is absent or "now", the current Server
-     *     date and time are used.
-     * %param[opt]:string source Name of the Device which has triggered the Event. It can be used
-     *     in a filter in VMS Rules to assign different actions to different Devices. Also, the
-     *     user could see this name in the notification panel. Example: "POS terminal 5".
-     * %param[opt]:string caption Short Event description. It can be used in a filter in VMS
-     *     Rules to assign actions depending on this text.
-     * %param[opt]:string description Long Event description. It can be used as a filter in VMS
-     *     Rules to assign actions depending on this text.
-     * %param[opt]:array deviceIds Specifies the list of Devices which are linked to the Event (e.g.
-     *     the Event will appear on their timelines), in the form of a list of Device ids (can
-     *     be obtained from "id" field via /rest/v{1-}/devices).
-     * %param[opt]:enum state Generic Events can be used either with "prolonged" actions like
-     *     "do recording", or instant actions like "send email". This parameter should be specified
-     *     in case "prolonged" actions are going to be used with Generic Events. The Event is
-     *     considered instant in case of parameter absence.
-     *     %value started Generic Event is considered a "prolonged" Event. It transits to the
-     *         "active" state. "Prolonged" actions will continue executing until the Generic Event
-     *         transits to the "inactive" state.
-     *     %value stopped A "prolonged" action associated with this Generic Event in VMS Rules
-     *         will stop. Transition to the <code>stopped</code> state requires the state to be
-     *         <code>started</code>.
-     * %param[opt]:string deviceId Used for soft trigger.
-     * %param[opt]:string triggerId Used for soft trigger.
-     * %param[opt]:string triggerName Used for soft trigger.
-     * %param[opt]:string triggerIcon Used for soft trigger.
-     * %param[opt]:string serverId Used for testing.
-     * %param[opt]:string reason Used for testing.
+     * %struct GenericEventData
+     *     %param state
+     *         %value[unused] none
      * %param[ref] _strict,_ticket
-     * %permissions Event dependent permissions. Generate events in most cases.
+     * %permissions Generate events global permission.
      */
-    reg("rest/v{4-}/events/create", GlobalPermission::none,
-        std::make_unique<SendEventHandler>(serverModule->systemContext()));
+    reg("rest/v{4-}/events/generic", GlobalPermission::generateEvents,
+        std::make_unique<GenericEventHandler>(serverModule->systemContext()));
+
+    /**%apidoc GET /rest/v{4-}/events/triggers
+     * Retrieves software triggers available to the given user.
+     * %caption Software triggers
+     * %ingroup Events
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
+     * %permissions Any User.
+     * %return:{SoftTriggerInfoList} Software triggers
+     *
+     **%apidoc GET /rest/v{4-}/events/triggers/{id}
+     * Retrieves software trigger available to the given user.
+     * %caption Software trigger
+     * %ingroup Events
+     * %param:uuid id Trigger ID.
+     * %param[ref] _format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
+     * %permissions Any User.
+     * %return:{SoftTriggerInfo} Software trigger
+     *
+     **%apidoc POST /rest/v{4-}/events/triggers
+     * %caption Create soft trigger event
+     * %ingroup Events
+     * %struct SoftTriggerData
+     *     %param state
+     *         %value[unused] none
+     * %param[ref] _strict,_ticket,_local
+     * %permissions Software trigger permission for the given device.
+     */
+    reg("rest/v{4-}/events/triggers/:id?", GlobalPermission::none,
+        std::make_unique<SoftTriggerHandler>(serverModule->systemContext(), serverConnector));
 
     /**%apidoc POST /rest/v{4-}/events/rules
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.

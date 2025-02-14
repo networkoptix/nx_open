@@ -10,25 +10,13 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/rules/field_types.h>
 
 namespace nx::vms::rules {
 
 // TODO: #amalov Select a better place for field types. Consider API library.
 
-/** Common type for UUID selection field. Stores the result of camera/user selection dialog.*/
-struct UuidSelection
-{
-    /** Manually selected ids.*/
-    QSet<nx::Uuid> ids;
-
-    /** Accept/target all flag. */
-    bool all = false;
-
-    bool operator==(const UuidSelection&) const = default;
-};
-
-#define UuidSelection_Fields (ids)(all)
-QN_FUSION_DECLARE_FUNCTIONS(UuidSelection, (json), NX_VMS_RULES_API);
+using UuidSelection = nx::vms::api::rules::UuidSelection;
 
 NX_REFLECTION_ENUM_CLASS(TextLookupCheckType,
     containsKeywords,

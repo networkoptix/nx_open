@@ -16,9 +16,10 @@
 
 namespace nx::vms::common { class SystemContext; }
 
+namespace nx::vms::api::rules { struct UuidSelection; }
+
 namespace nx::vms::rules {
 
-struct UuidSelection;
 class Engine;
 
 class NX_VMS_RULES_API Strings
@@ -33,6 +34,7 @@ public:
     static QString timestampDate(std::chrono::microseconds eventTimestamp);
     static QString timestampTime(std::chrono::microseconds eventTimestamp);
     static QString plugin(common::SystemContext* context, nx::Uuid pluginId);
+    static QString softTriggerName(const QString& name);
 
     static QString resource(
         common::SystemContext* context,

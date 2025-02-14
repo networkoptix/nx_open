@@ -595,25 +595,6 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
     return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
 
-Handle ServerConnection::createGenericEvent(
-    const QString& source,
-    const QString& caption,
-    const QString& description,
-    const nx::vms::event::EventMetaData& metadata,
-    nx::vms::api::EventState toggleState,
-    GetCallback callback,
-    QThread* targetThread)
-{
-    nx::network::rest::Params params;
-    params.insert("source", source);
-    params.insert("caption", caption);
-    params.insert("description", description);
-    if (toggleState != nx::vms::api::EventState::undefined)
-        params.insert("state", nx::reflect::toString(toggleState));
-    params.insert("metadata", QString::fromUtf8(QJson::serialized(metadata)));
-    return executePost("/api/createEvent", params, callback, targetThread);
-}
-
 Handle ServerConnection::sendStatisticsUsingServer(
     const nx::Uuid& proxyServerId,
     const QnSendStatisticsRequestData& statisticsData,
@@ -1367,14 +1348,14 @@ Handle ServerConnection::eventLog(
         timeouts);
 }
 
-Handle ServerConnection::createEvent(
-    nx::vms::api::rules::PropertyMap info,
+Handle ServerConnection::createSoftTrigger(
+    const nx::vms::api::rules::SoftTriggerData& data,
     Result<ErrorOrEmpty>::type callback,
     QThread* targetThread)
 {
     return executePost(
-        "rest/v4/events/create",
-        nx::reflect::json::serialize(info),
+        "rest/v4/events/triggers",
+        nx::reflect::json::serialize(data),
         std::move(callback),
         targetThread);
 }

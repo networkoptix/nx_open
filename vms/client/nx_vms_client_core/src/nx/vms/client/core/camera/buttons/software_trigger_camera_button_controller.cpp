@@ -36,6 +36,7 @@
 #include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/events/soft_trigger_event.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils.h>
 #include <nx/vms/rules/utils/action.h>
 #include <nx/vms/rules/utils/api.h>
@@ -148,14 +149,6 @@ QString buttonHint(bool prolonged, HintStyle hintStyle)
         : SoftwareTriggerCameraButtonController::tr("press and hold");
 }
 
-QString getSoftwareTriggerName(const QString& name)
-{
-    const auto triggerId = name.trimmed();
-    return triggerId.isEmpty()
-        ? SoftwareTriggerCameraButtonController::tr("Soft Trigger")
-        : triggerId;
-}
-
 CameraButtonData::Type prolongedToType(bool prolonged)
 {
     return prolonged
@@ -172,7 +165,7 @@ CameraButtonData buttonFromRule(
     const bool prolonged = rule->isActionProlonged();
     return CameraButtonData {
         .id = rule->id(),
-        .name = getSoftwareTriggerName(params.caption),
+        .name = nx::vms::rules::Strings::softTriggerName(params.caption),
         .hint = buttonHint(prolonged, hintStyle),
         .iconName = params.description,
         .type = prolongedToType(prolonged),
@@ -199,7 +192,7 @@ CameraButtonData buttonFromRule(
     const bool prolonged = nx::vms::rules::isProlonged(engine, rule->actionBuilders()[0]);
     return CameraButtonData {
         .id = rule->id(),
-        .name = getSoftwareTriggerName(name->value()),
+        .name = nx::vms::rules::Strings::softTriggerName(name->value()),
         .hint = buttonHint(prolonged, hintStyle),
         .iconName = icon->value(),
         .type = prolongedToType(prolonged),
@@ -408,16 +401,13 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
     if (!NX_ASSERT(idField && nameField && iconField, "Invalid event manifest"))
         return false;
 
-    auto triggerEvent = QSharedPointer<nx::vms::rules::SoftTriggerEvent>::create(
-        qnSyncTime->currentTimePoint(),
-        nx::vms::rules::convertEventState(state),
-        idField->id(),
-        q->resource()->getId(),
-        q->systemContext()->accessController()->user()->getId(),
-        getSoftwareTriggerName(nameField->value()),
-        iconField->value());
+    auto triggerData = nx::vms::api::rules::SoftTriggerData{
+        .triggerId = idField->id(),
+        .deviceId = q->resource()->getId(),
+        .state = nx::vms::rules::convertEventState(state),
+    };
 
-    api->createEvent(nx::vms::rules::serialize(triggerEvent.get()).props,
+    api->createSoftTrigger(triggerData,
         [this, ruleId, state](bool success, auto /*handle*/, auto result)
         {
             if (!result)

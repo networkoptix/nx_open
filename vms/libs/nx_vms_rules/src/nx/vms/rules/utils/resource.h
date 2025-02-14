@@ -10,32 +10,37 @@
 
 namespace nx::vms::common { class SystemContext; }
 
+namespace nx::vms::api::rules { struct UuidSelection; }
+
 namespace nx::vms::rules {
 
 enum class ResourceType;
-struct UuidSelection;
 
 namespace utils {
 
 NX_VMS_RULES_API QnUserResourceSet users(
-    const UuidSelection& selection,
+    const nx::vms::api::rules::UuidSelection& selection,
     const common::SystemContext* context,
     bool activeOnly = false);
 
 NX_VMS_RULES_API UuidSet userIds(
-    const UuidSelection& selection, const common::SystemContext* context, bool activeOnly);
+    const nx::vms::api::rules::UuidSelection& selection,
+    const common::SystemContext* context, bool activeOnly);
 
 NX_VMS_RULES_API bool isUserSelected(
-    const UuidSelection& selection,
+    const nx::vms::api::rules::UuidSelection & selection,
     const common::SystemContext* context,
     nx::Uuid userId);
 
+NX_VMS_RULES_API bool isResourceSelected(
+    const nx::vms::api::rules::UuidSelection & selection, nx::Uuid resourceId);
+
 NX_VMS_RULES_API QnMediaServerResourceList servers(
-    const UuidSelection& selection,
+    const nx::vms::api::rules::UuidSelection& selection,
     const common::SystemContext* context);
 
 NX_VMS_RULES_API QnVirtualCameraResourceList cameras(
-    const UuidSelection& selection,
+    const nx::vms::api::rules::UuidSelection& selection,
     const common::SystemContext* context);
 
 template <class T>

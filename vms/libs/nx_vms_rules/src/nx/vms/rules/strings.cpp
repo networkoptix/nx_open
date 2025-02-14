@@ -99,6 +99,13 @@ QString Strings::plugin(common::SystemContext* context, nx::Uuid pluginId)
     return {};
 }
 
+QString Strings::softTriggerName(const QString& name)
+{
+    auto result = name.trimmed();
+
+    return result.isEmpty() ? tr("Soft Trigger") : result;
+}
+
 QString Strings::resource(
     common::SystemContext* context,
     nx::Uuid resourceId,

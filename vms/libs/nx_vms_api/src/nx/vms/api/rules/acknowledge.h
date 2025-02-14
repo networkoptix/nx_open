@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/vms/api/data/bookmark_models.h>
+#include <nx/vms/api/data/id_data.h>
 
 #include "event_log.h"
 

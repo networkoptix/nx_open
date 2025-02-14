@@ -61,6 +61,11 @@ bool isUserSelected(
     return false;
 }
 
+bool isResourceSelected(const nx::vms::api::rules::UuidSelection & selection, nx::Uuid resourceId)
+{
+    return selection.all || selection.ids.contains(resourceId);
+}
+
 QnMediaServerResourceList servers(
     const UuidSelection& selection,
     const common::SystemContext* context)

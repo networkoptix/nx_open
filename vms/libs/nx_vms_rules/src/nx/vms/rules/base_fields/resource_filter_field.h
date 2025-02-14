@@ -118,6 +118,8 @@ public:
     using ResourceFilterFieldBase<ResourceFilterEventField>::openApiDescriptor;
 
     virtual bool match(const QVariant& value) const override;
+
+    UuidSelection selection() const;
 };
 
 // TODO: #amalov Remove this base class, acceptAll flag used by users field only.

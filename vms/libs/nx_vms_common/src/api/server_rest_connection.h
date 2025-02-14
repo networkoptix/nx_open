@@ -60,6 +60,7 @@
 #include <nx/vms/api/data/user_group_model.h>
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/api/rules/acknowledge.h>
+#include <nx/vms/api/rules/soft_trigger.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
@@ -235,15 +236,6 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = 0);
 
-    Handle createGenericEvent(
-        const QString& source,
-        const QString& caption,
-        const QString& description,
-        const nx::vms::event::EventMetaData& metadata,
-        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined,
-        GetCallback callback = nullptr,
-        QThread* targetThread = nullptr);
-
     Handle sendStatisticsUsingServer(
         const nx::Uuid& proxyServerId,
         const QnSendStatisticsRequestData& statisticsData,
@@ -389,8 +381,8 @@ public:
         QThread* targetThread = nullptr,
         std::optional<Timeouts> timeouts = std::nullopt);
 
-    Handle createEvent(
-        nx::vms::api::rules::PropertyMap info,
+    Handle createSoftTrigger(
+        const nx::vms::api::rules::SoftTriggerData& data,
         Result<ErrorOrEmpty>::type callback,
         QThread* targetThread = nullptr);
 

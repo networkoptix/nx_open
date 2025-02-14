@@ -70,7 +70,7 @@ const ItemDescriptor& GenericEvent::manifest()
         .id = utils::type<GenericEvent>(),
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("Generic Event")),
         .description = "Triggered when the server receives a request "
-            "to <code>/rest/v4/events/create</code> from an external resource.",
+            "to <code>/rest/v4/events/generic</code> from an external resource.",
         .flags = {ItemFlag::instant, ItemFlag::prolonged},
         .fields = {
             utils::makeStateFieldDescriptor(

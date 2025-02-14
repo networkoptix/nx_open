@@ -4,12 +4,19 @@
 
 namespace nx::vms::rules {
 
+UuidSelection ResourceFilterEventField::selection() const
+{
+    return {ids(), acceptAll()};
+}
+
 bool ResourceFilterEventField::match(const QVariant& value) const
 {
     return acceptAll()
         ? true
         : ids().contains(value.value<nx::Uuid>());
 }
+
+//-------------------------------------------------------------------------------------------------
 
 QVariant ResourceFilterActionField::build(const AggregatedEventPtr& /*eventData*/) const
 {
