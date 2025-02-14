@@ -9,9 +9,7 @@
 #include <nx/fusion/serialization/ubjson_functions.h>
 #include <nx/p2p/p2p_fwd.h>
 #include <nx/p2p/p2p_serialization.h>
-#include <nx/utils/singleton.h>
 #include <transaction/transaction.h>
-#include <transaction/transaction_transport_header.h>
 
 namespace ec2
 {
@@ -71,12 +69,6 @@ namespace ec2
         }
 
         template<class T>
-        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header)
-        {
-            return serializedTransactionWithHeader(serializedTransaction(tran), header);
-        }
-
-        template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const nx::p2p::TransportHeader& header)
         {
             return serializedTransactionWithHeader(serializedTransaction(tran), header);
@@ -88,21 +80,10 @@ namespace ec2
             return serializedTransaction(tran);
         }
 
-        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header)
-        {
-            QByteArray result;
-            QnUbjsonWriter<QByteArray> stream(&result);
-            QnUbjson::serialize(header, &stream);
-            result.append(serializedTran);
-            return result;
-        }
-
         QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const nx::p2p::TransportHeader& header)
         {
             return nx::p2p::serializeTransportHeader(header).append(serializedTran);
         }
-
-        static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
 
     private:
         mutable nx::Mutex m_mutex;
