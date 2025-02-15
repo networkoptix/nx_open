@@ -6541,7 +6541,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
-      <translation>複数のユーザーが同じログイン名を共有すると、ログインに失敗します。この問題を解決するには、影響を受けるユーザーのログイン名を更新するか、重複ユーザーを無効化または削除します。</translation>
+      <translation>複数のユーザーが同じログイン名を持っているため、ログインに支障が出ます。この問題を解決するには、影響を受けるユーザーのログイン名を更新するか、重複ユーザーを無効化または削除してください。</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
@@ -7489,7 +7489,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to</source>
-      <translation>録画パラメーターを指定後、スケジュールグリッド上の領域を選択してください。</translation>
+      <translation>録画パラメーターを指定後、スケジュールグリッド上で適用対象の領域を選択してください。</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices</source>
@@ -7798,7 +7798,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation>更新ファイルをダウンロードするのに十分な空き容量がありません</translation>
+      <translation>更新ファイルのダウンロードに必要な空き領域が不足しています。</translation>
     </message>
   </context>
   <context>
@@ -9930,7 +9930,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation>クライアント用更新ファイルをダウンロードするのに十分な空き容量がありません。ハードドライブの空き容量を確保して、再度お試しください。</translation>
+      <translation>クライアント用更新ファイルのダウンロードに必要な空き領域が不足しています。ハードドライブの空き領域を確保して、再度お試しください。</translation>
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
@@ -12105,7 +12105,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>サーバーストレージには十分な空き容量がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
+        <numerusform>サーバーストレージには十分な空き領域がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
       </translation>
     </message>
     <message>

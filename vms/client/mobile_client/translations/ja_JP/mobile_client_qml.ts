@@ -902,7 +902,7 @@
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation>領域を選択するにはタップしてホールド</translation>
+      <translation>タップ &amp; ホールドで領域選択</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>

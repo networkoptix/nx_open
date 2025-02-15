@@ -1572,7 +1572,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation>選択したフォルダーにアクセスでき、十分なディスク容量があることを確認してください。</translation>
+      <translation>選択したフォルダーにアクセスでき、十分なディスク領域があることを確認してください。</translation>
     </message>
     <message>
       <source>Export failed</source>
