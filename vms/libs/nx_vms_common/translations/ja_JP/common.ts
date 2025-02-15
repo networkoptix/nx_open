@@ -1295,7 +1295,7 @@
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation>ファイル書き込みエラー。空き容量が足りません。</translation>
+      <translation>ファイル書き込みエラー。空き領域が不足しています。</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
@@ -2054,7 +2054,7 @@
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>システムディスク &quot;%1&quot; の空き容量が少なくなっています。</translation>
+      <translation>システムディスク &quot;%1&quot; の空き領域が少なくなっています。</translation>
     </message>
     <message>
       <source>start</source>
@@ -2149,7 +2149,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation>分析ストレージ &quot;%1&quot; の空き容量が少なくなっています。</translation>
+      <translation>分析ストレージ &quot;%1&quot; の空き領域が少なくなっています。</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
