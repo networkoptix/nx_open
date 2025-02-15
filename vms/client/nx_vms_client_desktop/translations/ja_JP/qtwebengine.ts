@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation>対象のドライブに十分な空き容量がありません</translation>
+      <translation>対象ドライブの空き領域が不足しています</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>

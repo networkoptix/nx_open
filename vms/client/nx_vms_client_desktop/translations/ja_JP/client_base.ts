@@ -6389,7 +6389,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>サーバーストレージには十分な空き容量がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
+        <numerusform>サーバーストレージには十分な空き領域がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
       </translation>
     </message>
     <message>
@@ -7596,7 +7596,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>録画パラメーターを指定した後、スケジュールグリッドの領域を選択することで録画スケジュールが設定されます。</translation>
+      <translation>録画パラメーターを指定後、スケジュールグリッド上で適用対象の領域を選択してください。</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
@@ -7929,7 +7929,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation>更新ファイルをダウンロードするのに十分な空き容量がありません</translation>
+      <translation>更新ファイルのダウンロードに必要な空き領域が不足しています。</translation>
     </message>
   </context>
   <context>
@@ -9516,7 +9516,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation>クライアント用更新ファイルをダウンロードするのに十分な空き容量がありません。ハードドライブの空き容量を確保して、再度お試しください。</translation>
+      <translation>クライアント用更新ファイルのダウンロードに必要な空き領域が不足しています。ハードドライブの空き領域を確保して、再度お試しください。</translation>
     </message>
   </context>
   <context>

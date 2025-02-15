@@ -767,7 +767,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>デバイスに空き容量がありません</translation>
+      <translation>デバイスに空き領域がありません</translation>
     </message>
     <message>
       <source>Unknown error</source>
