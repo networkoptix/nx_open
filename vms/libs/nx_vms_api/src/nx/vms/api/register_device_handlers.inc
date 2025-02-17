@@ -249,7 +249,10 @@ void registerDeviceBaseHandlers(
         std::make_unique<DeviceAdvancedParametersHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/devices/{deviceId}/io
-     * Returns current IO states from Device
+     * Returns current IO states from Device. This endpoint automatically initiates IO monitoring
+     * if not already active. The monitoring session will timeout after ioPortMonitoringTimeoutS
+     * seconds (defaults to 60) of inactivity. To maintain continuous monitoring, make periodic
+     * calls to this endpoint.
      * %jsonrpc subscribe
      * %caption Get IO States
      * %ingroup Devices
@@ -261,7 +264,10 @@ void registerDeviceBaseHandlers(
      * %return:{DeviceIoState} IO states from Device.
      *
      **%apidoc GET /rest/v{4-}/devices/%2A/io
-     * Returns current IO states from Devices
+     * Returns current IO states from Devices. This endpoint automatically initiates IO monitoring
+     * if not already active. The monitoring session will timeout after ioPortMonitoringTimeoutS
+     * seconds (defaults to 60) of inactivity. To maintain continuous monitoring, make periodic
+     * calls to this endpoint.
      * %jsonrpc subscribe
      * %caption Get IO States
      * %ingroup Devices

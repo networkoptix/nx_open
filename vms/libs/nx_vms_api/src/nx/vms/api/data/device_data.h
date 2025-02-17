@@ -56,6 +56,8 @@ struct NX_VMS_API DeviceIoState
 {
     nx::Uuid deviceId;
     std::map<QString, IoPortState> ports;
+
+    bool operator==(const DeviceIoState&) const = default;
 };
 #define DeviceIoState_Fields (deviceId)(ports)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST_EX(DeviceIoState, (json))

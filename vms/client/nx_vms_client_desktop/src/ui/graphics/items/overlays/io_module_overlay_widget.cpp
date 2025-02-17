@@ -277,7 +277,7 @@ void QnIoModuleOverlayWidgetPrivate::at_connectionClosed()
     for (auto& item: states)
     {
         item.state.isActive = false;
-        item.state.timestamp = -1;
+        item.state.timestampUs = -1;
         item.stateChangeTimer.invalidate();
         contents->stateChanged(item.config, item.state);
     }

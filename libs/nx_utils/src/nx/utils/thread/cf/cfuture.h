@@ -1023,7 +1023,8 @@ void apply_helper(const Context& context, FirstFuture&& f, Futures&&... fs) {
   detail::when_inner_helper<I>(context, std::forward<FirstFuture>(f));
   apply_helper<I+1>(context, std::forward<Futures>(fs)...);
 }
-}
+
+} // namespace detail
 
 template<typename... Futures>
 auto when_all(Futures&&... futures)

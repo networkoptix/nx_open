@@ -67,7 +67,7 @@ struct NX_VMS_COMMON_API QnIOStateData
 {
     QString id;
     bool isActive = false;
-    qint64 timestamp = 0;
+    qint64 timestampUs = 0;
 
     bool operator==(const QnIOStateData& other) const = default;
 };
@@ -80,11 +80,11 @@ inline bool operator<(const QnIOStateData& lhs, const QnIOStateData& rhs)
 inline QString toString(const QnIOStateData& ioStateData)
 {
     return QString("{id: %1, isActive: %2, timestamp: %3}")
-        .arg(ioStateData.id).arg(ioStateData.isActive).arg(ioStateData.timestamp);
+        .arg(ioStateData.id).arg(ioStateData.isActive).arg(ioStateData.timestampUs);
 }
 
 typedef std::vector<QnIOStateData> QnIOStateDataList;
-#define QnIOStateData_Fields (id)(isActive)(timestamp)
+#define QnIOStateData_Fields (id)(isActive)(timestampUs)
 
 struct NX_VMS_COMMON_API QnCameraIOStateData
 {

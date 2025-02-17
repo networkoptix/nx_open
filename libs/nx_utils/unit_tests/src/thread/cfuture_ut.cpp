@@ -1,9 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <exception>
 #include <thread>
+
+#include <gtest/gtest.h>
 
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/cf/sync_executor.h>
@@ -99,4 +99,25 @@ TEST(CFuture, CatchException)
             exec, [](const std::exception&) { return cf::make_ready_future(cf::unit{}); });
         EXPECT_NO_THROW(future.get());
     }
+}
+
+TEST(CFuture, WhenAll)
+{
+    cf::future<std::tuple<
+        cf::future<int>, cf::future<int>, cf::future<int>>> fut =
+            cf::when_all(returnAsync(1), returnAsync(2), returnAsync(3));
+
+    auto [fut1, fut2, fut3] = fut.get();
+
+    EXPECT_TRUE(fut1.is_ready());
+    EXPECT_TRUE(fut2.is_ready());
+    EXPECT_TRUE(fut3.is_ready());
+}
+
+TEST(CFuture, FutureBrokenPromise)
+{
+    auto promise = std::make_unique<cf::promise<int>>();
+    auto future = promise->get_future();
+    promise.reset();
+    ASSERT_THROW(future.get(), cf::future_error);
 }
