@@ -1990,7 +1990,7 @@ static void registerDeviceHandlers(
         std::make_unique<BookmarkStreamHandler>(authenticator, serverModule, serverConnector));
 
     constexpr std::string_view kHlsBookmarkRestRegex =
-        "rest/v[4-9]/devices/\\*/bookmarks/[a-zA-Z0-9\\-\\_]+/hls(\\.\\w+)?(/.*)?";
+        R"(rest/v[4-9]/devices/\*/bookmarks/[a-zA-Z0-9-_]+/hls(\.\w+)?(/.*)?)";
     /**%apidoc GET /rest/v{4-}/devices/%2A/bookmarks/{bookmarkId}/hls
      * Opens HTTP Live Streaming (HLS) video stream for provided bookmark. It is not an API function
      * but rather a URL format which may contain any bookmark Id. This protocol is supported by
