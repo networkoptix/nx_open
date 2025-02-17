@@ -69,6 +69,9 @@ public:
 
     FieldProperties properties() const;
 
+    /** Returns whether the field content matches the given pattern. */
+    virtual bool match(const QRegularExpression& pattern) const;
+
 private:
     const FieldDescriptor* m_descriptor = nullptr;
 };

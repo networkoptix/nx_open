@@ -9,7 +9,12 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/search_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/action_builder_field.h>
+#include <nx/vms/rules/event_filter.h>
+#include <nx/vms/rules/event_filter_field.h>
 #include <nx/vms/rules/ini.h>
+#include <nx/vms/rules/rule.h>
 
 #include "rules_table_model.h"
 
@@ -38,6 +43,21 @@ bool matches(const QString& pattern, const UuidSet& ids)
         });
 }
 
+bool matches(const QRegularExpression& pattern, const nx::vms::rules::Rule* rule)
+{
+    const auto eventFilter = rule->eventFilters().first();
+    const auto actionBuilder = rule->actionBuilders().first();
+
+    const auto predicate =
+        [&pattern](const nx::vms::rules::Field* field)
+        {
+            return field->match(pattern);
+        };
+
+    return std::ranges::any_of(eventFilter->fields().values(), predicate)
+        || std::ranges::any_of(actionBuilder->fields().values(), predicate);
+}
+
 } // namespace
 
 RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
@@ -51,10 +71,11 @@ RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
     setFilterKeyColumn(-1);
 }
 
-bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+bool RulesSortFilterProxyModel::filterAcceptsRow(
+    int sourceRow, const QModelIndex& sourceParent) const
 {
     const auto idColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::EventColumn, sourceParent);
+        m_rulesTableModel->index(sourceRow, RulesTableModel::EventColumn, sourceParent);
 
     const auto isSystem = idColumnIndex.data(RulesTableModel::IsSystemRuleRole).toBool();
     if (isSystem && !vms::rules::ini().showSystemRules)
@@ -65,15 +86,15 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
         return true;
 
     const auto eventColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::EventColumn, sourceParent);
+        m_rulesTableModel->index(sourceRow, RulesTableModel::EventColumn, sourceParent);
     const auto sourceColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::SourceColumn, sourceParent);
+        m_rulesTableModel->index(sourceRow, RulesTableModel::SourceColumn, sourceParent);
     const auto actionColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::ActionColumn, sourceParent);
+        m_rulesTableModel->index(sourceRow, RulesTableModel::ActionColumn, sourceParent);
     const auto targetColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::TargetColumn, sourceParent);
+        m_rulesTableModel->index(sourceRow, RulesTableModel::TargetColumn, sourceParent);
     const auto commentColumnIndex =
-        sourceModel()->index(sourceRow, RulesTableModel::CommentColumn, sourceParent);
+        m_rulesTableModel->index(sourceRow, RulesTableModel::CommentColumn, sourceParent);
 
     return actionColumnIndex.data().toString().contains(filterRegExp)
         || eventColumnIndex.data().toString().contains(filterRegExp)
@@ -83,7 +104,8 @@ bool RulesSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
         || matches(filterRegExp.pattern(),
             sourceColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>())
         || matches(filterRegExp.pattern(),
-            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>());
+            targetColumnIndex.data(RulesTableModel::ResourceIdsRole).value<UuidSet>())
+        || matches(filterRegExp, m_rulesTableModel->getRule(idColumnIndex).get());
 }
 
 UuidList RulesSortFilterProxyModel::getRuleIds(const QList<int>& rows) const
@@ -92,7 +114,7 @@ UuidList RulesSortFilterProxyModel::getRuleIds(const QList<int>& rows) const
     for (const auto row: rows)
     {
         const auto ruleId =
-           sourceModel()->data(mapToSource(index(row, 0)), RulesTableModel::RuleIdRole);
+            m_rulesTableModel->data(mapToSource(index(row, 0)), RulesTableModel::RuleIdRole);
 
         if (ruleId.isValid())
             result.push_back(ruleId.value<nx::Uuid>());
@@ -108,7 +130,7 @@ Qt::CheckState RulesSortFilterProxyModel::getRuleCheckStates(const QList<int>& r
 
     const auto getRuleState = [this](int row)
     {
-        const auto checkState = sourceModel()->data(
+        const auto checkState = m_rulesTableModel->data(
             mapToSource(index(row, RulesTableModel::StateColumn)), Qt::CheckStateRole);
         return checkState.value<Qt::CheckState>() == Qt::CheckState::Checked;
     };

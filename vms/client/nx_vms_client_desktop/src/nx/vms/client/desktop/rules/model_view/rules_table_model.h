@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include <QtCore/QAbstractTableModel>
@@ -19,6 +18,8 @@ class NX_VMS_CLIENT_DESKTOP_API RulesTableModel:
     Q_OBJECT
 
 public:
+    using ConstRulePtr = vms::rules::ConstRulePtr;
+
     enum Columns
     {
         StateColumn,
@@ -50,8 +51,7 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
-    /** Returns list of the rule ids for the given indexes. */
-    UuidList getRuleIds(const QModelIndexList& indexes) const;
+    ConstRulePtr getRule(const QModelIndex& index) const;
 
     static void registerQmlType();
 
@@ -62,8 +62,6 @@ public:
     static const Uuid kAnyDeviceUuid;
 
 private:
-    using ConstRulePtr = std::shared_ptr<const vms::rules::Rule>;
-
     vms::rules::Engine* m_engine{nullptr};
     std::vector<nx::Uuid> m_ruleIds;
 

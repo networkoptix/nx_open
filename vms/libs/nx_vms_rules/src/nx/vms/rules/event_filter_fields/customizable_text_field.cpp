@@ -14,4 +14,9 @@ bool CustomizableTextField::match(const QVariant& /*eventValue*/) const
     return true;
 }
 
+bool CustomizableTextField::match(const QRegularExpression& pattern) const
+{
+    return value().contains(pattern);
+}
+
 } // namespace nx::vms::rules

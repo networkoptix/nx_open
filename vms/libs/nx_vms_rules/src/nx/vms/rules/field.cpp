@@ -62,4 +62,9 @@ FieldProperties Field::properties() const
     return FieldProperties::fromVariantMap(descriptor()->properties);
 }
 
+bool Field::match(const QRegularExpression& /*pattern*/) const
+{
+    return false;
+}
+
 } // namespace nx::vms::rules

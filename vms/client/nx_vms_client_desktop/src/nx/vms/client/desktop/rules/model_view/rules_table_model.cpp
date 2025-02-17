@@ -64,7 +64,7 @@ QString iconPath(QnResourceIconCache::Key iconKey, bool enabled)
         .arg(enabled ? kEnabledForegroundColor : kDisabledForegroundColor);
 }
 
-bool isRuleValid(const vms::rules::ConstRulePtr& rule)
+bool isRuleValid(const RulesTableModel::ConstRulePtr& rule)
 {
     return rule->isCompatible()
         && vms::rules::utils::visibleFieldsValidity(
@@ -259,10 +259,10 @@ int RulesTableModel::columnCount(const QModelIndex& /*parent*/) const
 
 QVariant RulesTableModel::data(const QModelIndex& index, int role) const
 {
-    if (!isIndexValid(index))
+    const auto rule = getRule(index);
+    if (!rule)
         return {};
 
-    const auto rule = m_engine->rule(m_ruleIds[index.row()]);
     if (!canDisplayRule(rule))
         return {};
 
@@ -360,6 +360,14 @@ QHash<int, QByteArray> RulesTableModel::roleNames() const
     roles[SortDataRole] = "sortData";
 
     return roles;
+}
+
+RulesTableModel::ConstRulePtr RulesTableModel::getRule(const QModelIndex& index) const
+{
+    if (!isIndexValid(index))
+        return {};
+
+    return m_engine->rule(m_ruleIds[index.row()]);
 }
 
 void RulesTableModel::initialise()

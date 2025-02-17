@@ -18,6 +18,7 @@ public:
     using SimpleTypeEventField<QString, CustomizableTextField>::SimpleTypeEventField;
 
     virtual bool match(const QVariant& eventValue) const override;
+    virtual bool match(const QRegularExpression& pattern) const override;
 
 signals:
     void valueChanged();
