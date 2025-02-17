@@ -95,7 +95,8 @@ public:
         m_state.currentLayoutId = nx::Uuid(state.value(kCurrentLayoutId).toString());
         m_state.runningTourId = nx::Uuid(state.value(kRunningTourId).toString());
         m_state.unsavedLayouts = {};
-        QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids);
+        if (!QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids))
+            m_state.layoutUuids = {};
         return true;
     }
 
