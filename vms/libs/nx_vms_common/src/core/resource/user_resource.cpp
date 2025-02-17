@@ -671,9 +671,11 @@ std::optional<IntegrationRequestData> QnUserResource::integrationRequestData() c
 void QnUserResource::setIntegrationRequestData(
     std::optional<IntegrationRequestData> integrationRequestData)
 {
-    NX_MUTEX_LOCKER locker(&m_mutex);
     if (!integrationRequestData)
+    {
         setProperty(kIntegrationRequestDataProperty, QString());
+        return;
+    }
 
     const std::string serializedIntegrationRequestData =
         nx::reflect::json::serialize(*integrationRequestData);
