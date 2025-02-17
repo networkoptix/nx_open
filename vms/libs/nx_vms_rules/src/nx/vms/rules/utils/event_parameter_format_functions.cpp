@@ -78,6 +78,13 @@ nx::Uuid eventSourceId(const AggregatedEventPtr& eventAggregator)
     return eventAggregator ? sourceId(eventAggregator->initialEvent().get()) : nx::Uuid();
 }
 
+QnVirtualCameraResourcePtr eventDevice(
+    SubstitutionContext* substitution, common::SystemContext* context)
+{
+    return context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+        eventSourceId(substitution->event));
+}
+
 } // namespace
 
 QString eventType(SubstitutionContext* substitution, common::SystemContext* context)
@@ -208,39 +215,33 @@ QString eventSource(SubstitutionContext* substitution, common::SystemContext* co
 
 QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto resource = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-            eventSourceId(substitution->event)))
-    {
-        return QnResourceDisplayInfo(resource).host();
-    }
+    if (const auto device = eventDevice(substitution, context))
+        return QnResourceDisplayInfo(device).host();
+
     return {};
 }
 
 QString deviceId(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto resource =
-            context->resourcePool()->getResourceById(eventSourceId(substitution->event)))
-    {
-        return resource->getId().toString(QUuid::WithBraces);
-    }
+    if (const auto device = eventDevice(substitution, context))
+        return device->getId().toSimpleString();
+
     return {};
 }
 
 QString deviceMac(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    if (const auto resource = context->resourcePool()->getResourceById<QnVirtualCameraResource>(
-            eventSourceId(substitution->event)))
-    {
-        return resource->getMAC().toString();
-    }
+    if (const auto device = eventDevice(substitution, context))
+        return device->getMAC().toString();
+
     return {};
 }
 
 QString deviceName(SubstitutionContext* substitution, common::SystemContext* context)
 {
-    const auto sourceId = eventSourceId(substitution->event);
-    if (const auto resource = context->resourcePool()->getResourceById(sourceId))
-        return QnResourceDisplayInfo(resource).name();
+    if (const auto device = eventDevice(substitution, context))
+        return QnResourceDisplayInfo(device).name();
+
     return {};
 }
 
@@ -257,6 +258,14 @@ QString deviceType(SubstitutionContext* substitution, common::SystemContext* con
     {
         return "Server";
     }
+    return {};
+}
+
+QString deviceLogicalId(SubstitutionContext* substitution, common::SystemContext* context)
+{
+    if (const auto device = eventDevice(substitution, context))
+        return QString::number(device->logicalId());
+
     return {};
 }
 

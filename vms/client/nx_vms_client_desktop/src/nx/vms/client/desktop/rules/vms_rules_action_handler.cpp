@@ -48,7 +48,7 @@ struct VmsRulesActionHandler::Private
             return;
 
         rulesDialog->setFilter(
-            cameras.isEmpty() ? "" : cameras.front()->getId().toString(QUuid::WithBraces));
+            cameras.isEmpty() ? "" : cameras.front()->getId().toSimpleString());
     }
 
     void initialiseLookupLists()

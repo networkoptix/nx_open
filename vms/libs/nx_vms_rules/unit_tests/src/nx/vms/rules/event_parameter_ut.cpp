@@ -8,6 +8,7 @@
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/vms/common/test_support/analytics/taxonomy/test_resource_support_proxy.h>
 #include <nx/vms/common/test_support/analytics/taxonomy/utils.h>
+#include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/event_filter_fields/analytics_object_type_field.h>
 #include <nx/vms/rules/event_filter_fields/object_lookup_field.h>
@@ -58,7 +59,10 @@ class EventParameterTest: public EngineBasedTest, public TestPlugin
     using base_type = EngineBasedTest;
 
 public:
-    EventParameterTest(): TestPlugin(engine.get()) {}
+    EventParameterTest():
+        TestPlugin(engine.get()),
+        poolHelper(std::make_unique<QnResourcePoolTestHelper>(systemContext()))
+    {}
 
     virtual void SetUp() override
     {
@@ -69,6 +73,9 @@ public:
         ASSERT_TRUE(registerEventField<AnalyticsObjectTypeField>(systemContext()));
         ASSERT_TRUE(registerEventField<ObjectLookupField>(systemContext()));
         ASSERT_TRUE(registerEvent<AnalyticsObjectEvent>());
+
+        camera1 = poolHelper->addCamera();
+        camera1->setLogicalId(5);
     }
 
     void loadTaxonomy()
@@ -107,13 +114,17 @@ public:
     {
         auto event = TestEventPtr::create();
         event->m_text = "test";
-        event->m_deviceId = nx::Uuid::createUuid();
+        event->m_deviceId = camera1->getId();
         event->m_deviceIds = {nx::Uuid::createUuid(), nx::Uuid::createUuid()};
         event->m_intField = 42;
         event->level = nx::vms::event::Level::success;
 
         return event;
     }
+
+public:
+    std::unique_ptr<QnResourcePoolTestHelper> poolHelper;
+    nx::CameraResourceStubPtr camera1;
 };
 
 // FIXME: There are more parameter tests in ActionFieldTest. Consider moving them here.
@@ -206,6 +217,12 @@ TEST_F(EventParameterTest, details)
 
     // The field that has no conversion to string should display as quoted substitution.
     EXPECT_EQ("{event.details.stdString}", evaluate(event, "event.details.stdString"));
+}
+
+TEST_F(EventParameterTest, logicalId)
+{
+    auto event = testEvent();
+    EXPECT_EQ(QString::number(camera1->logicalId()), evaluate(event, "device.logicalId"));
 }
 
 } // nx::vms::rules::test

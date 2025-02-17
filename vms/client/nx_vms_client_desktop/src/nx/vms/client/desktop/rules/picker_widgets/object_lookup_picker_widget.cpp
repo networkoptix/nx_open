@@ -150,8 +150,8 @@ ObjectLookupPicker::ObjectLookupPicker(
         this,
         [this](int index)
         {
-            m_field->setValue(m_lookupListComboBox->itemData(index).value<nx::Uuid>().toString(
-                QUuid::WithBraces));
+            m_field->setValue(m_lookupListComboBox->itemData(index)
+                .value<nx::Uuid>().toSimpleString());
 
             setEdited();
         });

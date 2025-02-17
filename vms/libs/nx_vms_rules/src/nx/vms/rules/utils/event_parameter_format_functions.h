@@ -51,20 +51,21 @@ QString eventTimestamp(SubstitutionContext* substitution, common::SystemContext*
 }
 QString eventSource(SubstitutionContext* substitution, common::SystemContext* context);
 
+QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventAttributeName(SubstitutionContext* substitution);
+
+QString eventField(SubstitutionContext* substitution, common::SystemContext* context);
+QString eventDetail(SubstitutionContext* substitution, common::SystemContext* context);
+
 QString deviceIp(SubstitutionContext* substitution, common::SystemContext* context);
 QString deviceId(SubstitutionContext* substitution, common::SystemContext* context);
 QString deviceMac(SubstitutionContext* substitution, common::SystemContext* context);
 QString deviceType(SubstitutionContext* substitution, common::SystemContext* context);
-
+QString deviceLogicalId(SubstitutionContext* substitution, common::SystemContext* context);
 QString deviceName(SubstitutionContext* substitution, common::SystemContext* context);
 
 QString siteName(SubstitutionContext* substitution, common::SystemContext* context);
 QString userName(SubstitutionContext* substitution, common::SystemContext* context);
-QString eventAttribute(SubstitutionContext* substitution, common::SystemContext* context);
-QString eventAttributeName(SubstitutionContext* substitution);
 QString serverName(SubstitutionContext* substitution, common::SystemContext* context);
-
-QString eventField(SubstitutionContext* substitution, common::SystemContext* context);
-QString eventDetail(SubstitutionContext* substitution, common::SystemContext* context);
 
 } // namespace nx::vms::rules::utils

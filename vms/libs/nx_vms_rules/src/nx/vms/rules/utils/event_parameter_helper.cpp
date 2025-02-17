@@ -250,6 +250,17 @@ void EventParameterHelper::Private::initFormatFunctions()
             .documentation = kDefaultDeviceIdDoc
         });
 
+    registerFormatFunction("device.logicalId",
+        {
+            .formatFunction = &deviceLogicalId,
+            .filter = &deviceEvents,
+            .documentation = {
+                .text = "Logical id of the device which generated the event.",
+                .resultExample = "5",
+                .filterText = kDeviceFilterText
+            },
+        });
+
     registerFormatFunction("device.ip",
         {
             .formatFunction = &deviceIp,

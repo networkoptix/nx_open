@@ -40,6 +40,7 @@ QMap<QString, QJsonValue> serializeProperties(const QObject* object, const QSet<
 
         QJsonValue jsonValue;
         QnJsonContext ctx;
+        ctx.setSerializeUuidWithBraces(false);
 
         serializer->serialize(&ctx, prop.read(object), &jsonValue);
 
