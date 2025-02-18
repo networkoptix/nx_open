@@ -6803,21 +6803,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation>この Linux プラットフォームはサポートされなくなりました</translation>
+      <translation>この Linux プラットフォームへのサポートは終了しました。</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation>このOSバージョンはサポートされなくなりました</translation>
+      <translation>このOSバージョンへのサポートは終了しました。</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation>この %1 バージョンはサポートされなくなりました</translation>
+      <translation>この %1 バージョンはサポートが終了しました。</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation>%1 %2 はサポートされなくなりました</translation>
+      <translation>%1 %2 へのサポートは終了しました。</translation>
     </message>
   </context>
   <context>
@@ -9710,7 +9710,7 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation>このOSバージョンはサポートされなくなりました。</translation>
+      <translation>このOSバージョンへのサポートは終了しました。</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
