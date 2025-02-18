@@ -836,8 +836,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                         | Qn::WriteDigestPermission
                         | Qn::WriteNamePermission
                         | Qn::WriteEmailPermission
-                        // FIXME: #sivanov Temporary allow until implemented on the cloud side.
-                        // | Qn::WriteLocalePermission
+                        | Qn::WriteLocalePermission
                         | Qn::WriteFullNamePermission);
                 }
                 default:
@@ -1191,6 +1190,9 @@ bool QnResourceAccessManager::canModifyUser(
 
     if (userResource->fullName() != update.fullName)
         requiredPermissions |= Qn::WriteFullNamePermission;
+
+    if (userResource->rawLocaleValue() != update.locale)
+        requiredPermissions |= Qn::WriteLocalePermission;
 
     return hasPermission(subject, target, requiredPermissions);
 }

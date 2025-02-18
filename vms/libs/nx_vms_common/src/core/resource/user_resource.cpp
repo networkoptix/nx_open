@@ -697,6 +697,12 @@ QString QnUserResource::locale() const
     return nx::branding::defaultLocale();
 }
 
+QString QnUserResource::rawLocaleValue() const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    return m_locale;
+}
+
 void QnUserResource::setLocale(const QString& value)
 {
     {

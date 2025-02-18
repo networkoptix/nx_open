@@ -177,6 +177,11 @@ public:
      * %example en_US
      */
     QString locale() const;
+
+    /** Raw locale value stored in the database. Can differ from the locale() value if empty. */
+    QString rawLocaleValue() const;
+
+    /** Update user locale or reset it to the default if empty value is passed. */
     void setLocale(const QString& value);
 
     std::map<nx::Uuid, nx::vms::api::AccessRights> ownResourceAccessRights() const;
