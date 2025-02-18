@@ -235,6 +235,7 @@ menu::Parameters::ArgumentHash CameraHotspotItem::Private::layoutPlaybackParamet
 
     menu::Parameters::ArgumentHash result;
     StreamSynchronizationState state{
+        .isSyncOn = q->navigator()->syncEnabled(),
         .timeUs = mediaResourceWidget()->isPlayingLive()
             ? DATETIME_NOW
             : duration_cast<microseconds>(mediaResourceWidget()->position()).count(),
@@ -293,8 +294,7 @@ void CameraHotspotItem::Private::openItem()
 void CameraHotspotItem::Private::openInNewTab()
 {
     auto parameters = menu::Parameters(hotspotResource());
-    if (!q->navigator()->syncEnabled())
-        parameters.setArguments(layoutPlaybackParameters());
+    parameters.setArguments(layoutPlaybackParameters());
     q->menu()->trigger(menu::OpenInNewTabAction, parameters);
 }
 
