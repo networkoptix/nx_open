@@ -68,7 +68,8 @@
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation>LDAP リクエストのプロキシサーバー</translation>
+      <translation>LDAP リクエストの
+プロキシサーバー</translation>
     </message>
   </context>
   <context>
@@ -1271,7 +1272,7 @@
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation>検索ベースを追加</translation>
+      <translation>検索ベースの追加</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
