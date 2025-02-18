@@ -16,6 +16,8 @@
 
 class CloudStatusWatcherPrivate;
 
+namespace nx::vms::api { struct UserSettings; }
+
 namespace nx::vms::client::core {
 
 struct CloudAuthData;
@@ -111,6 +113,8 @@ public:
     QnCloudSystemList cloudSystems() const;
     QnCloudSystemList recentCloudSystems() const;
     void updateRefreshToken(const std::string& refreshToken);
+
+    void saveUserSettings(const nx::vms::api::UserSettings& settings);
 
     Q_INVOKABLE void resendActivationEmail(const QString& email);
 

@@ -3,6 +3,7 @@
 #include "user_notification_settings_manager.h"
 
 #include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/user.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -160,6 +161,11 @@ void UserNotificationSettingsManager::setSettings(
 
         userSettings.messageFilter = std::move(banListOfMessages);
     }
+
+    // Sync settings for all other sites, so cross-site layouts will show correct set of
+    // notifications.
+    if (m_currentUser->isCloud())
+        appContext()->cloudStatusWatcher()->saveUserSettings(userSettings);
 
     // settingsChanged signal will be emitted automatically if stored events/messages changed.
     m_currentUser->saveSettings(userSettings);

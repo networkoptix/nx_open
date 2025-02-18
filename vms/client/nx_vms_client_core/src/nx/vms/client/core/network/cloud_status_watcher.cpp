@@ -339,6 +339,26 @@ void CloudStatusWatcher::updateRefreshToken(const std::string& refreshToken)
     d->updateRefreshToken(refreshToken);
 }
 
+void CloudStatusWatcher::saveUserSettings(const nx::vms::api::UserSettings& settings)
+{
+    auto toVector =
+        [](const auto& s) { return std::vector<std::string>{s.cbegin(), s.cend()}; };
+
+    AccountNotificationFilterSettings value{
+        .eventFilter = toVector(settings.eventFilter),
+        .messageFilter = toVector(settings.messageFilter)};
+
+    d->ensureCloudConnection();
+    d->cloudConnection->accountManager()->updateAccountNotificationFilterSettings(
+        d->authData().credentials.username,
+        std::move(value),
+        [this](ResultCode errorCode)
+        {
+            if (errorCode != ResultCode::ok)
+                NX_WARNING(this, "Error %1 while saving notification filter settings", errorCode);
+        });
+}
+
 CloudStatusWatcher::Private::Private(CloudStatusWatcher* parent):
     QObject(parent),
     q(parent),
