@@ -180,8 +180,12 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
             m_buffer = client->fetchMessageBodyBuffer();
             m_socket = client->takeSocket();
 
-            if (!m_socket->setRecvTimeout(m_parent->m_disconnectTimeout))
-                return nx::utils::swapAndCall(m_handler, std::nullopt, SystemError::getLastOSErrorText().c_str());
+            if (!m_socket->setNonBlockingMode(true)
+                || !m_socket->setRecvTimeout(m_parent->m_disconnectTimeout))
+            {
+                return nx::utils::swapAndCall(
+                    m_handler, std::nullopt, SystemError::getLastOSErrorText().c_str());
+            }
 
             readUntilError();
         };
