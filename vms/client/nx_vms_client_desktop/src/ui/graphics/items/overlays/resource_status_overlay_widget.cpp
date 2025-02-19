@@ -78,12 +78,10 @@ QGraphicsProxyWidget* makeProxy(
     return result;
 }
 
-void setupButton(QPushButton& button)
+void setupButton(QPushButton& button, const QString& buttonName)
 {
-    button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    static const auto kButtonName = "itemStateActionButton";
-    button.setObjectName(kButtonName);
+    button.setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+    button.setObjectName(buttonName);
 
     static const auto kStyleSheetTemplateRaw = R"(
         QPushButton#%1
@@ -120,49 +118,8 @@ void setupButton(QPushButton& button)
     static const auto kPressed = toTransparent(kBaseColor, 0.05).name(QColor::HexArgb);
 
     static const QString kStyleSheetTemplate(QString::fromLatin1(kStyleSheetTemplateRaw));
-    const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName,
+    const auto kStyleSheet = kStyleSheetTemplate.arg(buttonName,
         kTextColor, kHoveredTextColor, kBackground, kHovered, kPressed);
-
-    button.setStyleSheet(kStyleSheet);
-}
-
-void setupCustomButton(QPushButton& button)
-{
-    button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    static const auto kButtonName = "itemStateExtraActionButton";
-    button.setObjectName(kButtonName);
-
-    static const auto kStyleSheetTemplateRaw = R"(
-        QPushButton#%1
-        {
-            color: %2;
-            background-color: transparent;
-            border-style: solid;
-            border-radius: 4px;
-            font: 500 13px;
-            padding-left: 16px;
-            padding-right: 16px;
-            min-height: 32px;
-            max-height: 32px;
-        }
-        QPushButton#%1:hover
-        {
-            color: %3;
-        }
-        QPushButton#%1:pressed
-        {
-            color: %2;
-        }
-        )";
-
-    static const auto kBaseColor = core::colorTheme()->color("light14");
-
-    static const auto kTextColor = toTransparent(kBaseColor, 0.6).name(QColor::HexArgb);
-    static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
-
-    static const QString kStyleSheetTemplate(QString::fromLatin1(kStyleSheetTemplateRaw));
-    const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName, kTextColor, kHoveredTextColor);
 
     button.setStyleSheet(kStyleSheet);
 }
@@ -503,7 +460,8 @@ void QnStatusOverlayWidget::setupPreloader()
 
 void QnStatusOverlayWidget::setupCentralControls()
 {
-    setupButton(*m_button);
+    static const auto kButtonName = "itemStateActionButton";
+    setupButton(*m_button, kButtonName);
     m_centralAreaImage->setVisible(false);
 
     setupLabel(m_caption, getCaptionStyle(m_useErrorStyle), m_errorStyle);
@@ -520,7 +478,15 @@ void QnStatusOverlayWidget::setupCentralControls()
     layout->addSpacerItem(m_postIconSpacer);
     layout->addWidget(m_caption, 0, Qt::AlignHCenter);
     layout->addSpacerItem(m_postCaptionSpacer);
-    layout->addWidget(m_button, 0, Qt::AlignHCenter);
+
+    const auto buttonLayout = new QHBoxLayout();
+    buttonLayout->setSpacing(8);
+    buttonLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+    buttonLayout->addWidget(m_button);
+    buttonLayout->addWidget(m_customButton);
+    buttonLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+    layout->addLayout(buttonLayout);
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
@@ -538,7 +504,8 @@ void QnStatusOverlayWidget::setupCentralControls()
 
 void QnStatusOverlayWidget::setupExtrasControls()
 {
-    setupCustomButton(*m_customButton);
+    static const auto kButtonName = "itemStateExtraActionButton";
+    setupButton(*m_customButton, kButtonName);
 
     /* Even though there's only one button in the extras holder,
      * a container widget with a layout must be created, otherwise
@@ -617,6 +584,7 @@ void QnStatusOverlayWidget::updateAreaSizes()
     m_caption->setVisible(showCaption);
     m_postCaptionSpacer->changeSize(1, showCaption ? kPostCaptionSpacing : 0);
     m_button->setVisible(showButton);
+    m_customButton->setVisible(showButton);
     m_centralContainer->layout()->update();
 
     m_preloaderHolder->setFixedSize(rect.size());

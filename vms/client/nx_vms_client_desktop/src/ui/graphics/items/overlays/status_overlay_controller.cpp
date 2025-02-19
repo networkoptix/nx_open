@@ -435,7 +435,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
     result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Activate License"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
-    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Setup"));
+    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set"));
     result.insert(toInt(Qn::ResourceOverlayButton::UnlockEncryptedArchive), tr("Unlock"));
     result.insert(toInt(Qn::ResourceOverlayButton::RequestInformation), tr("Provide"));
     result.insert(toInt(Qn::ResourceOverlayButton::Authorize), tr("Authorize"));
