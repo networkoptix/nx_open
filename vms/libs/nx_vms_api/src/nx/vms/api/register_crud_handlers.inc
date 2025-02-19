@@ -2745,9 +2745,9 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %struct ObjectTrackFilter
      * %param[unused] id
      * %param[unused] _orderBy
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
-     * %permissions Power User.
+     * %permissions View Archive on specified Device(s).
      * %return:{std::vector<ObjectTrackV4>} Object Tracks.
      *
      **%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}
@@ -2755,13 +2755,13 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Get Object Track
      * %ingroup Analytics
      * %param:uuid id Object Track id
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
-     * %permissions Power User.
+     * %permissions View Archive on the Device for the Object Track.
      * %return:{ObjectTrackV4} Object Track.
      */
     reg("rest/v{4-}/analytics/objectTracks/:id?",
-        GlobalPermission::powerUser,
+        GlobalPermission::none,
         std::make_unique<AnalyticsObjectTracksHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/objectMetadata
@@ -2772,11 +2772,12 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct AnalyticsObjectMetadataRequest
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
-     * %permissions Power User.
+     * %param[ref] _local
+     * %permissions View Archive on the Device for the Object Track.
      * %return:{std::vector<AnalyticsObjectMetadata>} Object Metadata.
      */
     reg("rest/v{4-}/analytics/objectTracks/:id/objectMetadata",
-        GlobalPermission::powerUser,
+        GlobalPermission::none,
         std::make_unique<AnalyticsObjectMetadataHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/bestShotImage
@@ -2790,7 +2791,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      * %param[ref] _language,_strict,_ticket,_local,
-     * %permissions Power User.
+     * %permissions View Archive on the Device for the Object Track.
      * %return Best Shot image.
      *
      **%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/bestShotImage.{format}
@@ -2808,11 +2809,11 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      *     %value jpg `image/jpeg`.
      *     %value tif `image/tiff`.
      * %param[ref] _language,_strict,_ticket,_local
-     * %permissions Power User.
+     * %permissions View Archive on the Device for the Object Track.
      * %return Best Shot image.
      */
-    reg("rest/v{4-}/analytics/objectTracks/:id?/^bestShotImage(\\.\\w+)?",
-        GlobalPermission::powerUser,
+    reg("rest/v{4-}/analytics/objectTracks/:id/^bestShotImage(\\.\\w+)?",
+        GlobalPermission::none,
         std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage
@@ -2826,7 +2827,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
      * %param[ref] _language,_strict,_ticket,_local
-     * %permissions Power User.
+     * %permissions View Archive on the Device for the Object Track.
      * %return Title image.
      *
      **%apidoc GET /rest/v{4-}/analytics/objectTracks/{id}/titleImage.{format}
@@ -2844,11 +2845,11 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      *     %value png `image/png`.
      *     %value jpg `image/jpeg`.
      *     %value tif `image/tiff`.
-     * %permissions Power User.
+     * %permissions View Archive on the Device for the Object Track.
      * %return Title image.
      */
-    reg("rest/v{4-}/analytics/objectTracks/:id?/^titleImage(\\.\\w+)?",
-        GlobalPermission::powerUser,
+    reg("rest/v{4-}/analytics/objectTracks/:id/^titleImage(\\.\\w+)?",
+        GlobalPermission::none,
         std::make_unique<AnalyticsObjectTracksImageHandler>(serverModule, serverConnector));
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/manifest
