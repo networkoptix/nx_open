@@ -51,6 +51,14 @@ void EventTile::Private::initLabelDescriptor(const QVariant& value, LabelDescrip
     descriptor.textByWidth.clear();
 }
 
+void EventTile::Private::closeRequested()
+{
+    if (onCloseAction)
+        onCloseAction->trigger();
+
+    emit q->closeRequested();
+}
+
 void EventTile::Private::setDescription(const QString& value)
 {
     if (descriptionLabelDescriptor.fullContent == value)

@@ -90,10 +90,17 @@ EventTile::EventTile(QWidget* parent):
     setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
     // Background colors are configured inside of Private::updatePalette().
 
-    QSizePolicy sizePolicy = ui->closeButton->sizePolicy();
-    sizePolicy.setRetainSizeWhenHidden(true);
-    ui->closeButton->setSizePolicy(sizePolicy);
-    ui->closeButton->setHidden(true);
+    auto setCloseButtonPolicy =
+        [](CloseButton* button)
+        {
+            QSizePolicy sizePolicy = button->sizePolicy();
+            sizePolicy.setRetainSizeWhenHidden(true);
+            button->setSizePolicy(sizePolicy);
+            button->setHidden(true);
+        };
+
+    setCloseButtonPolicy(ui->closeButton);
+    setCloseButtonPolicy(ui->progressCloseButton);
 
     ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
     ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
@@ -208,14 +215,8 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->ensurePolished();
     d->defaultTitlePalette = ui->nameLabel->palette();
 
-    connect(ui->closeButton, &QAbstractButton::clicked, this,
-        [this]
-        {
-            if (d->onCloseAction)
-                d->onCloseAction->trigger();
-
-            emit closeRequested();
-        });
+    connect(ui->closeButton, &QAbstractButton::clicked, d.get(), &Private::closeRequested);
+    connect(ui->progressCloseButton, &QAbstractButton::clicked, d.get(), &Private::closeRequested);
 
     const auto activateLink =
         [this](const QString& link)
@@ -281,13 +282,6 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
-
-    if (progressBarVisible())
-    {
-        QMargins parentMargins = ui->progressBar->parentWidget()->contentsMargins();
-        parentMargins.setRight(kMarginsWithHeader.right());
-        ui->progressBar->parentWidget()->setContentsMargins(parentMargins);
-    }
 
     d->handleStateChanged(underMouse() ? Private::State::hoverOn : Private::State::hoverOff);
 }
@@ -840,7 +834,7 @@ void EventTile::clear()
 
 CloseButton* EventTile::closeButton()
 {
-    return ui->closeButton;
+    return progressBarVisible() ? ui->progressCloseButton : ui->closeButton;
 }
 
 } // namespace nx::vms::client::desktop

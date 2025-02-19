@@ -70,6 +70,7 @@ public:
     void handleStateChanged(State state);
     void updatePalette();
     void updateIcon();
+    void closeRequested();
     qreal getWidthOfText(const QString& text, const QLabel* label) const;
     QString getElidedResourceText(const QStringList& list);
     QString getElidedResourceTextForInformers(const QStringList& list);
