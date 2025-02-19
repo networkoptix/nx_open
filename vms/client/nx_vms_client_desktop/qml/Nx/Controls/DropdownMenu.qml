@@ -18,11 +18,13 @@ Menu
 
         rightPadding: 28
 
+        textColor: action?.checked ? ColorTheme.colors.brand_contrast : ColorTheme.text
+
         background: Rectangle
         {
             color:
             {
-                if (action.checked)
+                if (action?.checked)
                     return ColorTheme.colors.brand_core
 
                 if (menuItem.pressed)

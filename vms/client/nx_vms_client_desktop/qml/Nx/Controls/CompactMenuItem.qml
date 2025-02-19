@@ -12,6 +12,8 @@ MenuItem
 {
     id: menuItem
 
+    property color textColor: highlighted ? ColorTheme.colors.brand_contrast : ColorTheme.text
+
     height: 24
 
     leftPadding: 8
@@ -21,7 +23,7 @@ MenuItem
     {
         id: label
 
-        color: menuItem.highlighted ? ColorTheme.colors.brand_contrast : ColorTheme.text
+        color: textColor
         opacity: menuItem.enabled ? 1.0 : 0.3
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: FontConfig.normal.pixelSize
