@@ -144,14 +144,15 @@ private:
 
     void onUpgradeHttpClient()
     {
-        if (httpClient->failed()
-            || httpClient->response()->statusLine.statusCode
-                != http::StatusCode::switchingProtocols)
+        const auto statusCode = httpClient->response()
+            ? httpClient->response()->statusLine.statusCode
+            : http::StatusCode::undefined;
+        if (httpClient->failed() || statusCode != http::StatusCode::switchingProtocols)
         {
             NX_DEBUG(this,
                 "Cloud connection error: %1, status code: %2",
                 httpClient->lastSysErrorCode(),
-                httpClient->response()->statusLine.statusCode);
+                statusCode);
             scheduleReconnect();
             return;
         }
