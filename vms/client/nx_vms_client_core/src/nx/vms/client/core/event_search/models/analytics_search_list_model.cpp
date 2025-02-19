@@ -211,6 +211,13 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
         q, &AnalyticsSearchListModel::combinedTextFilterChanged);
 
     connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
+
+    connect(q, &AbstractSearchListModel::liveChanged, this,
+        [this](bool live)
+        {
+            if (live && gapBeforeNewTracks)
+                this->q->clear();
+        });
 }
 
 void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
@@ -622,7 +629,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     }
 
     // Special handling if live mode is paused (analytics tab is hidden).
-    if (q->livePaused() && !data.empty())
+    if ((q->livePaused() || !q->isLive()) && !data.empty())
     {
         const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
         gapBeforeNewTracks = true;
@@ -775,6 +782,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     const int oldNewTrackCount = newTracks.size();
 
+    int hiddenAdded = 0;
+    int hiddenUpdated = 0;
+    int normalAdded = 0;
+    int normalUpdated = 0;
+    int hiddenMovedToNormal = 0;
+
     for (const auto& metadata: metadataPackets)
     {
         NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
@@ -830,10 +843,22 @@ void AnalyticsSearchListModel::Private::processMetadata()
             {
                 // If a best shot or a title is being added to a previously hidden track,
                 // convert the track into a displayed track.
-                if (found.storage == &hiddenTracks && (item.bestShot || item.title))
+                if (found.storage == &hiddenTracks)
                 {
-                    const int index = newTracks.insert(hiddenTracks.take(found.index));
-                    found = FoundObjectTrack{&newTracks, index};
+                    if (item.bestShot || item.title)
+                    {
+                        const int index = newTracks.insert(hiddenTracks.take(found.index));
+                        found = FoundObjectTrack{&newTracks, index};
+                        ++hiddenMovedToNormal;
+                    }
+                    else
+                    {
+                        ++hiddenUpdated;
+                    }
+                }
+                else if (found.storage == &data)
+                {
+                    ++normalUpdated;
                 }
 
                 auto& track = found.storage->items[found.index];
@@ -872,11 +897,26 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 continue;
 
             if (newTrack.bestShot.initialized() || newTrack.title)
+            {
                 newTracks.insert(std::move(newTrack));
+                ++normalAdded;
+            }
             else
+            {
                 hiddenTracks.insert(std::move(newTrack));
+                ++hiddenAdded;
+            }
         }
     }
+
+    if (normalAdded || normalUpdated || hiddenMovedToNormal)
+    {
+        NX_VERBOSE(q, "%1 tracks added, %2 moved from hidden, %3 positions updated",
+            normalAdded, hiddenMovedToNormal, normalUpdated);
+    }
+
+    if (hiddenAdded || hiddenUpdated)
+        NX_VERBOSE(q, "%1 hidden tracks added, %2 positions updated", hiddenAdded, hiddenUpdated);
 
     // Limit the size of the hidden track queue.
     if (hiddenTracks.size() > q->maximumCount())
@@ -885,6 +925,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         const auto cleanupFunction = itemCleanupFunction(hiddenTracks);
         std::for_each(removeBegin, hiddenTracks.items.end(), cleanupFunction);
         hiddenTracks.items.erase(removeBegin, hiddenTracks.items.end());
+        NX_VERBOSE(q, "Hidden track storage reached its capacity and was clipped.");
     }
 
     // Limit the size of the available new tracks queue.
@@ -901,8 +942,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     if (newTracks.size() == oldNewTrackCount && !newGap)
         return;
-
-    NX_VERBOSE(q, "Detected %1 new object tracks", newTracks.size() - oldNewTrackCount);
 
     if (liveProcessingMode == LiveProcessingMode::manualAdd)
         emit q->availableNewTracksChanged();

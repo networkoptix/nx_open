@@ -22,25 +22,24 @@ ManagedCameraSet::~ManagedCameraSet()
 
 void ManagedCameraSet::setResourcePool(QnResourcePool* resourcePool)
 {
-    NX_ASSERT(resourcePool);
-
-    const bool camerasSetIsChanged = !m_cameras.empty();
-
-    if (camerasSetIsChanged)
-        emit camerasAboutToBeChanged(QPrivateSignal());
+    if (m_resourcePool == resourcePool || !NX_ASSERT(resourcePool))
+        return;
 
     if (m_resourcePool)
         m_resourcePool->disconnect(this);
 
     m_resourcePool = resourcePool;
 
-    m_type = Type::multiple;
-    m_cameras.clear();
+    connect(m_resourcePool, &QnResourcePool::resourcesAdded, this,
+        &ManagedCameraSet::handleResourcesAdded);
 
-    if (camerasSetIsChanged)
-        emit camerasChanged(QPrivateSignal());
+    connect(m_resourcePool, &QnResourcePool::resourcesRemoved, this,
+        &ManagedCameraSet::handleResourcesRemoved);
 
-    invalidateFilter();
+    m_notFilteredCameras = nx::utils::toQSet(
+        m_resourcePool->getAllCameras(/*parentId*/ nx::Uuid(), /*ignoreDesktopCameras*/ true));
+
+    setCameras(m_type, filteredCameras());
 }
 
 ManagedCameraSet::Type ManagedCameraSet::type() const

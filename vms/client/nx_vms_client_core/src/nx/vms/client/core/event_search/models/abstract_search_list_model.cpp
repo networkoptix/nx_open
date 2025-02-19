@@ -127,16 +127,13 @@ void AbstractSearchListModel::setSystemContext(SystemContext* systemContext)
     clear();
 
     d->userWatcherChangedConnection.reset();
-
-    if (NX_ASSERT(systemContext))
-        d->cameraSet.setResourcePool(systemContext->resourcePool());
-
     base_type::setSystemContext(systemContext);
 
     if (NX_ASSERT(systemContext))
     {
-        const auto watcher = systemContext->userWatcher();
+        d->cameraSet.setResourcePool(systemContext->resourcePool());
 
+        const auto watcher = systemContext->userWatcher();
         d->userWatcherChangedConnection.reset(
             connect(watcher, &UserWatcher::userChanged, this,
                 [this](const QnUserResourcePtr& user)

@@ -45,6 +45,8 @@ public:
     Tab currentTab() const;
     bool setCurrentTab(Tab tab);
 
+    AbstractSearchWidget* currentSearchWidget() const;
+
 signals:
     void tooltipClicked();
 

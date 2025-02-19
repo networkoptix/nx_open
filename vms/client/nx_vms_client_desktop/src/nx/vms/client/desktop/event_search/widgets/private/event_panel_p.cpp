@@ -307,8 +307,8 @@ EventPanel::Private::Private(EventPanel* q):
             if (m_tabs->currentIndex() != index)
                 return;
 
-            if (auto tab = qobject_cast<AbstractSearchWidget*>(m_tabs->currentWidget()))
-                tab->goToLive();
+            if (auto searchWidget = currentSearchWidget())
+                searchWidget->goToLive();
         });
 
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
@@ -393,6 +393,17 @@ bool EventPanel::Private::setCurrentTab(Tab tab)
     m_tabs->setCurrentIndex(index);
 
     return true;
+}
+
+AbstractSearchWidget* EventPanel::Private::currentSearchWidget() const
+{
+    if (auto widget = qobject_cast<AbstractSearchWidget*>(m_tabs->currentWidget()))
+        return widget;
+
+    if (auto overlappable = qobject_cast<OverlappableSearchWidget*>(m_tabs->currentWidget()))
+        return overlappable->searchWidget();
+
+    return nullptr;
 }
 
 void EventPanel::Private::setTabCurrent(QWidget* tab, bool current)
