@@ -1122,6 +1122,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.userType = (UserSettingsGlobal::UserType) user->userType();
     state.isSelf = isSelf;
+    state.isOrgUser = !user->orgGroupIds().empty();
     state.userId = user->getId();
     state.login = user->getName();
     state.loginEditable = permissions.testFlag(Qn::WriteNamePermission);

@@ -33,6 +33,7 @@ DialogWithState
     // State properties.
     property alias userType: generalSettings.userType
     property alias isSelf: generalSettings.isSelf
+    property alias isOrgUser: generalSettings.isOrgUser
     property alias userId: membersModel.userId
     property alias deleteAvailable: generalSettings.deleteAvailable
     property alias auditAvailable: generalSettings.auditAvailable

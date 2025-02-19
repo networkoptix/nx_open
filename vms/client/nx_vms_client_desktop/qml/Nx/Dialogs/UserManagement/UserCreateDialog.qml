@@ -33,6 +33,7 @@ DialogWithState
     // State properties.
     property alias userType: generalSettings.userType
     property bool isSelf: false //< Not used by current dialog type.
+    property bool isOrgUser: false //< Not used by current dialog type.
     property alias userId: membersModel.userId
     property bool deleteAvailable: false
     property bool auditAvailable: false

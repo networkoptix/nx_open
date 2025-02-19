@@ -689,7 +689,9 @@ QVariant UserListModel::data(const QModelIndex& index, int role) const
                     switch (user->userType())
                     {
                         case nx::vms::api::UserType::cloud:
-                            return QString("20x20/Solid/user_cloud.svg");
+                            return user->orgGroupIds().empty()
+                                ? QString("20x20/Solid/user_cloud.svg")
+                                : QString("20x20/Solid/user_organization.svg");
 
                         case nx::vms::api::UserType::ldap:
                             return QString("20x20/Solid/user_ldap.svg");

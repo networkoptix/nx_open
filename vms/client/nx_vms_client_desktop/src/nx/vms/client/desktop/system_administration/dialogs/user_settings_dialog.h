@@ -25,6 +25,7 @@ struct UserSettingsDialogState
 
     Q_PROPERTY(nx::vms::client::desktop::UserSettingsGlobal::UserType userType MEMBER userType)
     Q_PROPERTY(bool isSelf MEMBER isSelf)
+    Q_PROPERTY(bool isOrgUser MEMBER isOrgUser)
 
     Q_PROPERTY(bool deleteAvailable MEMBER deleteAvailable)
     Q_PROPERTY(bool auditAvailable MEMBER auditAvailable)
@@ -59,6 +60,7 @@ public:
 
     UserSettingsGlobal::UserType userType = UserSettingsGlobal::LocalUser;
     bool isSelf = false;
+    bool isOrgUser = false;
     nx::Uuid userId;
 
     bool deleteAvailable = true;

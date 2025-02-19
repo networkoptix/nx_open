@@ -21,6 +21,7 @@ Item
     id: control
 
     property bool isSelf: false
+    property bool isOrgUser: false
     property var userId
 
     property bool deleteAvailable: true
@@ -120,7 +121,9 @@ Item
                         case UserSettingsGlobal.TemporaryUser:
                             return "image://skin/64x64/Solid/user_temp.svg"
                         case UserSettingsGlobal.CloudUser:
-                            return "image://skin/64x64/Solid/user_cloud.svg"
+                            return control.isOrgUser
+                                ? "image://skin/64x64/Solid/user_organization.svg"
+                                : "image://skin/64x64/Solid/user_cloud.svg"
                         case UserSettingsGlobal.LdapUser:
                             return "image://skin/64x64/Solid/user_ldap.svg"
                     }
