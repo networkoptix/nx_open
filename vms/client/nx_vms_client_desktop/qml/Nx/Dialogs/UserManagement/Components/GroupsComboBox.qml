@@ -40,8 +40,8 @@ MultiSelectionComboBox
     {
         id: groupSection
         height: 28
-        width: parent ? parent.width : headerText.width
-        baselineOffset: headerText.y + headerText.baselineOffset
+        width: parent ? parent.width : groupSectionText.width
+        baselineOffset: groupSectionText.y + groupSectionText.baselineOffset
 
         Text
         {
