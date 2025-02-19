@@ -4,6 +4,7 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/analytics/analytics_filter_model.h>
 #include <nx/vms/client/core/analytics/taxonomy/attribute.h>
 #include <nx/vms/client/core/analytics/taxonomy/attribute_set.h>
@@ -32,22 +33,17 @@ public:
             : &appContext()->localSettings()->analyticsSearchTableVisibleAttributes),
         mode(mode)
     {
-        displayNameByAttribute = {
-            {kDateTimeAttributeName, tr("Date/Time")},
-            {kTitleAttributeName, tr("Title")},
-            {kCameraAttributeName, tr("Camera")},
-            {kObjectTypeAttributeName, tr("Object Type")},
-        };
+        reset();
     }
 
     void load()
     {
         for (const LocalSettings::AnalyticsAttributeSettings& attribute: settingsProperty->value())
         {
-            allAttributes.insert(attribute.name);
-            orderedAttributes.append(attribute.name);
+            allAttributes.insert(attribute.id);
+            orderedAttributes.append(attribute.id);
             if (attribute.visible)
-                visibleAttributes.insert(attribute.name);
+                visibleAttributes.insert(attribute.id);
         }
 
         for (auto it = kBuiltInAttributes.rbegin(); it != kBuiltInAttributes.rend(); ++it)
@@ -92,7 +88,7 @@ public:
         for (const QString& attribute: orderedAttributes)
         {
             attributes.push_back(LocalSettings::AnalyticsAttributeSettings{
-                .name = attribute,
+                .id = attribute,
                 .visible = visibleAttributes.contains(attribute)});
         }
         settingsProperty->setValue(attributes);
@@ -100,28 +96,16 @@ public:
 
     QStringList attributesForObjectType(const core::analytics::taxonomy::ObjectType* objectType) const
     {
-        QStringList result;
-
-        for (const auto& attribute: objectType->attributes())
-        {
-            result.append(attribute->name);
-
-            if (attribute->attributeSet)
-            {
-                for (const auto& subAttribute: attribute->attributeSet->attributes())
-                    result.append(QString("%1 %2").arg(attribute->name, subAttribute->name));
-            }
-        }
-
-        return result;
+        return objectAttributes.value(objectType, {});
     }
 
     void handleObjectTypesChanged()
     {
+        reset();
         const auto oldCount = allAttributes.size();
-
         for (const auto& objectType: analyticsFilterModel->objectTypes())
         {
+            fetchAttributesFromObjectType(objectType);
             for (const auto& attribute: attributesForObjectType(objectType))
             {
                 if (!allAttributes.contains(attribute))
@@ -137,6 +121,43 @@ public:
             emit q->attributesChanged();
     }
 
+    void fetchAttributesFromObjectType(
+        const core::analytics::taxonomy::ObjectType* objectType)
+    {
+        QStringList idList;
+
+        auto fetch = nx::utils::y_combinator(
+            [this, &idList](auto fetch, auto attributes, const QStringList& parentIds)->void
+            {
+                for (const auto& attribute: attributes)
+                {
+                    const QString id = attribute->name;
+                    QStringList itemIds(parentIds);
+                    itemIds.append(id);
+                    const QString fullId = itemIds.join(".");
+                    idList.append(fullId);
+                    if (!parentIds.isEmpty())
+                        displayNameByAttribute.insert(fullId, itemIds.join(" "));
+                    if (attribute->attributeSet)
+                        fetch(attribute->attributeSet->attributes(), itemIds);
+                }
+            });
+
+        fetch(objectType->attributes(), QStringList());
+        objectAttributes.insert(objectType, idList);
+    }
+
+    void reset()
+    {
+        displayNameByAttribute = {
+            {kDateTimeAttributeName, tr("Date/Time")},
+            {kTitleAttributeName, tr("Title")},
+            {kCameraAttributeName, tr("Camera")},
+            {kObjectTypeAttributeName, tr("Object Type")},
+        };
+        objectAttributes.clear();
+    }
+
 public:
     decltype(LocalSettings::analyticsSearchTileVisibleAttributes)* const settingsProperty;
     core::analytics::taxonomy::AnalyticsFilterModel* analyticsFilterModel = nullptr;
@@ -146,6 +167,7 @@ public:
     QSet<QString> allAttributes;
     QStringList orderedAttributes;
     QMap<QString, QString> displayNameByAttribute;
+    QHash<const core::analytics::taxonomy::ObjectType*, QStringList> objectAttributes;
     mutable QHash<QString, int> attributeIndexes;
     mutable bool attributeIndexesDirty = false;
 };

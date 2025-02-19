@@ -169,7 +169,7 @@ public:
 
     struct AnalyticsAttributeSettings
     {
-        QString name;
+        QString id;
         bool visible = false;
         bool operator==(const AnalyticsAttributeSettings& other) const = default;
     };
@@ -197,6 +197,6 @@ private:
     void setDefaults();
 };
 
-NX_REFLECTION_INSTRUMENT(LocalSettings::AnalyticsAttributeSettings, (name)(visible))
+NX_REFLECTION_INSTRUMENT(LocalSettings::AnalyticsAttributeSettings, (id)(visible))
 
 } // namespace nx::vms::client::desktop

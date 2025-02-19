@@ -42,7 +42,7 @@ struct AttributeFilter::Private
         if (filter)
         {
             result.reserve(attributes.size());
-            for (const auto attribute: attributes)
+            for (const auto& attribute: attributes)
             {
                 if (manager->isVisible(attribute.id))
                     result.push_back(attribute);
