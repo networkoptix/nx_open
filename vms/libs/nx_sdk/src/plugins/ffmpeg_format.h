@@ -34,6 +34,8 @@ nxcip::AudioFormat::SampleType fromFfmpegSampleFormat(AVSampleFormat format)
             return nxcip::AudioFormat::stS64;
         case AV_SAMPLE_FMT_S64P:
             return nxcip::AudioFormat::stS64P;
+        case AV_SAMPLE_FMT_NONE:
+            return nxcip::AudioFormat::stNone;
     }
     return nxcip::AudioFormat::stNone;
 }
@@ -66,6 +68,8 @@ AVSampleFormat toFfmpegSampleFormat(nxcip::AudioFormat::SampleType format)
             return AV_SAMPLE_FMT_S64;
         case nxcip::AudioFormat::stS64P:
             return AV_SAMPLE_FMT_S64P;
+        case nxcip::AudioFormat::stNone:
+            return AV_SAMPLE_FMT_NONE;
     }
     return AV_SAMPLE_FMT_NONE;
 }
