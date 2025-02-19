@@ -10,6 +10,7 @@ extern "C" {
 
 #include <export/signer.h>
 #include <nx/media/media_data_packet.h>
+#include <nx/media/ffmpeg/io_context.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <transcoding/timestamp_corrector.h>
 
@@ -81,15 +82,7 @@ public:
     bool isCodecSupported(AVCodecID id) const;
     void setStartTimeOffset(int64_t value);
 
-public:
-    // For internal use only, move to protected!
-     // TODO replace by ffmpeg::IoContext
-    int writeBuffer(const char* data, int size);
-    void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
-    bool inMiddleOfStream() const { return m_inMiddleOfStream; }
-
 private:
-    AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
     bool muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket);
     void checkDiscontinuity(const QnConstAbstractMediaDataPtr& data, int streamIndex);
@@ -100,18 +93,18 @@ private:
     QVector<int> m_outputPacketSize;
 
     bool m_initialized = false;
-    bool m_initializedAudio = false;    // Incoming audio packets will be ignored.
-    bool m_initializedVideo = false;    // Incoming video packets will be ignored.
+    bool m_initializedAudio = false; //< Incoming audio packets will be ignored.
+    bool m_initializedVideo = false; //< Incoming video packets will be ignored.
     bool m_packetizedMode = false;
 
     MediaSigner m_mediaSigner;
     AVCodecParameters* m_videoCodecParameters = nullptr;
     AVCodecParameters* m_audioCodecParameters = nullptr;
     AVFormatContext* m_formatCtx = nullptr;
+    nx::media::ffmpeg::IoContextPtr m_ioContext;
 
     QString m_container;
     TimestampCorrector m_timestampCorrector;
     PacketTimestamp m_lastPacketTimestamp;
-    bool m_inMiddleOfStream = false;
     int m_rtpMtu = MTU_SIZE;
 };

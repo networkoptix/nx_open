@@ -13,8 +13,6 @@ extern "C" {
 #include <utils/common/util.h>
 #include <utils/media/ffmpeg_io_context.h>
 
-static const int IO_BLOCK_SIZE = 1024*16;
-
 namespace {
 
 static AVPixelFormat jpegPixelFormatToRtp(AVPixelFormat value)
@@ -28,12 +26,6 @@ static AVPixelFormat jpegPixelFormatToRtp(AVPixelFormat value)
     }
 }
 
-static qint32 ffmpegReadPacket(void* /*opaque*/, quint8* /*buf*/, int /*size*/)
-{
-    NX_ASSERT(false, "This class for streaming encoding! This function call MUST not exists!");
-    return 0;
-}
-
 static AVPixelFormat getPixelFormatJpeg(const std::string_view container, AVPixelFormat format)
 {
     if (container == "rtp")
@@ -42,23 +34,6 @@ static AVPixelFormat getPixelFormatJpeg(const std::string_view container, AVPixe
         return format;
 }
 
-}
-
-static qint32 ffmpegWritePacket(void* opaque, const quint8* buf, int size)
-{
-    FfmpegMuxer* transcoder = reinterpret_cast<FfmpegMuxer*> (opaque);
-    if (!transcoder || transcoder->inMiddleOfStream())
-        return size; // ignore write
-
-    return transcoder->writeBuffer((char*) buf, size);
-}
-
-static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
-{
-    //NX_ASSERT(false, "This class for streaming encoding! This function call MUST not exists!");
-    FfmpegMuxer* transcoder = reinterpret_cast<FfmpegMuxer*> (opaque);
-    transcoder->setInMiddleOfStream(!(pos == 0 && whence == SEEK_END));
-    return 0;
 }
 
 FfmpegMuxer::FfmpegMuxer(const Config& config):
@@ -96,14 +71,6 @@ bool FfmpegMuxer::process(const QnConstAbstractMediaDataPtr& media)
     return muxPacket(media);
 }
 
-int FfmpegMuxer::writeBuffer(const char* data, int size)
-{
-    m_internalBuffer.write(data,size);
-    if (m_packetizedMode)
-        m_outputPacketSize << size;
-    return size;
-}
-
 void FfmpegMuxer::setPacketizedMode(bool value)
 {
     m_packetizedMode = value;
@@ -114,24 +81,6 @@ const QVector<int>& FfmpegMuxer::getPacketsSize()
     return m_outputPacketSize;
 }
 
-AVIOContext* FfmpegMuxer::createFfmpegIOContext()
-{
-    quint8* ioBuffer;
-    AVIOContext* ffmpegIOContext;
-
-    ioBuffer = (quint8*) av_malloc(1024*32);
-    ffmpegIOContext = avio_alloc_context(
-        ioBuffer,
-        IO_BLOCK_SIZE,
-        1,
-        this,
-        &ffmpegReadPacket,
-        &ffmpegWritePacket,
-        &ffmpegSeek);
-    ffmpegIOContext->seekable = 0;
-    return ffmpegIOContext;
-}
-
 void FfmpegMuxer::closeFfmpegContext()
 {
     if (m_formatCtx)
@@ -139,9 +88,7 @@ void FfmpegMuxer::closeFfmpegContext()
         if (m_initialized)
             av_write_trailer(m_formatCtx);
         m_initialized = false;
-        if (m_formatCtx->pb)
-            m_formatCtx->pb->opaque = 0;
-        nx::utils::media::closeFfmpegIOContext(m_formatCtx->pb);
+        m_ioContext.reset();
         m_formatCtx->pb = nullptr;
         avformat_close_input(&m_formatCtx);
     }
@@ -231,7 +178,17 @@ bool FfmpegMuxer::open()
     if (m_formatCtx->nb_streams == 0)
         return false;
 
-    m_formatCtx->pb = createFfmpegIOContext();
+    m_ioContext = std::make_unique<nx::media::ffmpeg::IoContext>(
+        /*bufferSize*/ 1024 * 16, /*writable*/ true, /*seekable*/ false);
+    m_ioContext->writeHandler = [this](const uint8_t* data, int size)
+        {
+            m_internalBuffer.write((const char*)data, size);
+            if (m_packetizedMode)
+                m_outputPacketSize << size;
+            return size;
+        };
+
+    m_formatCtx->pb = m_ioContext->getAvioContext();
     int rez = avformat_write_header(m_formatCtx, 0);
     if (rez < 0)
     {
