@@ -8,9 +8,11 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -701,8 +703,8 @@ ItemResult TabApiBackend::addItem(
     const QUuid& resourceId,
     const ItemParams& params)
 {
-    const auto pool = d->context->resourcePool();
-    const auto resource = pool->getResourceById(resourceId);
+    const auto pool = appContext()->unifiedResourcePool();
+    const auto resource = pool->resource(resourceId);
     if (!resource)
     {
         return d->itemOperationResult(
