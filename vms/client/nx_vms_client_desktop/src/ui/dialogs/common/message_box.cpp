@@ -766,7 +766,7 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    if (event == QKeySequence::Copy)
+    if (event->matches(QKeySequence::Copy))
     {
         QString separator = "---------------------------\n";
         QString textToCopy = separator;
@@ -808,6 +808,17 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
     }
 
     base_type::keyPressEvent(event);
+}
+
+bool QnMessageBox::event(QEvent* event)
+{
+    if (event->type() == QEvent::ShortcutOverride)
+    {
+        event->accept();
+        return true;
+    }
+
+    return base_type::event(event);
 }
 
 void QnMessageBox::showEvent(QShowEvent* event)

@@ -187,6 +187,7 @@ signals:
     void linkActivated(const QString& link);
 
 protected:
+    virtual bool event(QEvent* event) override;
     virtual void showEvent(QShowEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void keyPressEvent(QKeyEvent* event) override;
