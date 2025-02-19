@@ -742,9 +742,11 @@ QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const 
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void ActionHandler::at_context_userChanged(const QnUserResourcePtr& /*user*/)
+void ActionHandler::at_context_userChanged(const QnUserResourcePtr& user)
 {
     m_serverRequests.clear();
+    if (!user && m_advancedSearchDialog)
+        m_advancedSearchDialog->deleteLater();
 }
 
 void ActionHandler::at_workbench_cellSpacingChanged()
