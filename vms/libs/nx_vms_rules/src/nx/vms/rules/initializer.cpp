@@ -88,6 +88,7 @@ void Initializer::registerActions() const
     registerAction<PushNotificationAction>();
     registerAction<RepeatSoundAction>();
     registerAction<SendEmailAction>();
+    registerAction<SiteHttpAction>();
     registerAction<ShowOnAlarmLayoutAction>();
     registerAction<SpeakAction>();
     registerAction<TextOverlayAction>();

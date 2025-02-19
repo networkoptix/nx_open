@@ -390,6 +390,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionRegistration<RepeatSoundAction>();
     testActionRegistration<SendEmailAction>();
     testActionRegistration<ShowOnAlarmLayoutAction>();
+    testActionRegistration<SiteHttpAction>();
     testActionRegistration<SpeakAction>();
     testActionRegistration<TextOverlayAction>();
     testActionRegistration<WriteToLogAction>();

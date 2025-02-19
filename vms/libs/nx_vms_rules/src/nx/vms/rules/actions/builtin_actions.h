@@ -19,6 +19,7 @@
 #include "send_email_action.h"
 #include "show_notification_action.h"
 #include "show_on_alarm_layout_action.h"
+#include "site_http_action.h"
 #include "speak_action.h"
 #include "text_overlay_action.h"
 #include "write_to_log_action.h"

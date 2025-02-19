@@ -10,6 +10,7 @@
 namespace nx::vms::rules {
 
 constexpr auto kUrlValidationPolicy = "url";
+constexpr auto kSiteEndpointValidationPolicy = "siteEndpoint";
 
 struct TextWithFieldsFieldProperties
 {
