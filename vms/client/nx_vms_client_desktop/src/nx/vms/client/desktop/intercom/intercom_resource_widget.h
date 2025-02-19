@@ -4,7 +4,6 @@
 
 #include <QtCore/QMap>
 
-#include <api/model/api_ioport_data.h>
 #include <nx/utils/uuid.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -27,16 +26,6 @@ public:
 
 protected:
     virtual int calculateButtonsVisibility() const override;
-
-private:
-    QString getOutputId(nx::vms::api::ExtendedCameraOutput outputType) const;
-
-    void setOutputPortState(
-        nx::vms::api::ExtendedCameraOutput outputType,
-        nx::vms::api::EventState newState) const;
-
-private:
-    QMap<QString, QString> m_outputNameToId;
 };
 
 } // namespace nx::vms::client::desktop

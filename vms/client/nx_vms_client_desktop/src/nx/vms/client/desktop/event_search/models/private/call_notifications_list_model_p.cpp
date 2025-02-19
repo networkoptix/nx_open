@@ -10,6 +10,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/camera/buttons/intercom_helper.h>
+#include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
@@ -30,6 +31,7 @@
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::client::core;
 using namespace nx::vms::common::system_health;
 
 namespace {
@@ -38,25 +40,6 @@ bool messageIsSupported(MessageType message)
 {
     return message == MessageType::showIntercomInformer
         || message == MessageType::showMissedCallInformer;
-}
-
-bool setRelayOutputId(const QnVirtualCameraResourcePtr camera,
-    api::ExtendedCameraOutput cameraOutput,
-    nx::vms::event::ActionParameters* actionParameters)
-{
-    const auto portDescriptions = camera->ioPortDescriptions();
-    const auto portIter =
-        std::find_if(portDescriptions.begin(), portDescriptions.end(),
-            [cameraOutput](const QnIOPortData& portData)
-            {
-                return portData.outputName == QString::fromStdString(
-                    nx::reflect::toString(cameraOutput));
-            });
-    if (portIter == portDescriptions.end())
-        return false;
-
-    actionParameters->relayOutputId = portIter->id;
-    return true;
 }
 
 void postRejectIntercomCall(
@@ -172,36 +155,15 @@ void CallNotificationsListModel::Private::addNotification(
             const auto openDoorActionHandler =
                 [this, action, camera]()
                 {
-                    nx::vms::event::ActionParameters actionParameters;
-
-                    if (!setRelayOutputId(
-                        camera, api::ExtendedCameraOutput::powerRelay, &actionParameters))
-                    {
-                        // Is possible when the camera is removed while the call is in progress.
+                    if (!system()->ioPortsInterface())
                         return;
-                    }
 
-                    actionParameters.durationMs =
-                        nx::vms::client::core::IntercomHelper::kOpenedDoorDuration.count();
-
-                    nx::vms::api::EventActionData actionData;
-                    actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;
-                    actionData.toggleState = nx::vms::api::EventState::active;
-                    actionData.resourceIds.push_back(camera->getId());
-                    actionData.params = QJson::serialized(actionParameters);
-
-                    auto callback = nx::utils::guarded(this,
-                        [this](
-                            bool success,
-                            rest::Handle /*requestId*/,
-                            nx::network::rest::JsonResult /*result*/)
-                        {
-                            if (!success)
-                                NX_WARNING(this, "Open door operation was unsuccessful.");
-                        });
-
-                    if (auto connection = q->system()->connectedServerApi())
-                        connection->executeEventAction(actionData, callback, thread());
+                    system()->ioPortsInterface()->setIoPortState(
+                        system()->getSessionTokenHelper(),
+                        camera,
+                        api::ExtendedCameraOutput::powerRelay,
+                        /*isActive*/ true,
+                        /*autoResetTimeout*/ IntercomHelper::kOpenedDoorDuration);
                 };
 
             connect(eventData.extraAction.data(), &CommandAction::triggered,

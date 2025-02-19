@@ -4,25 +4,20 @@
 
 #include <QtQml/QtQml>
 
-#include <camera/camera_bookmarks_manager.h>
 #include <client/client_message_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/rules/client_router.h>
-#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
-#include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
 #include <nx/vms/rules/engine_holder.h>
 #include <nx/vms/rules/initializer.h>
-#include <storage/server_storage_manager.h>
 
 #include "private/system_context_data_p.h"
 
@@ -64,7 +59,7 @@ private:
 
 SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     base_type(mode, peerId, parent),
-    d(new Private)
+    d(new Private{.q=this})
 {
     d->serverTimeWatcher = std::make_unique<ServerTimeWatcher>(this);
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
@@ -160,6 +155,9 @@ void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
         // Make sure existing session will be terminated outside of the mutex.
         std::swap(d->session, session);
     }
+
+    d->initializeIoPortsInterface();
+
     emit remoteIdChanged(currentServerId());
 }
 
@@ -168,6 +166,8 @@ void SystemContext::setConnection(RemoteConnectionPtr connection)
     NX_ASSERT(!d->connection);
     NX_ASSERT(!d->session);
     d->connection = connection;
+
+    d->initializeIoPortsInterface();
 }
 
 nx::Uuid SystemContext::currentServerId() const
@@ -331,6 +331,11 @@ VideoCache* SystemContext::videoCache() const
 AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilder() const
 {
     return d->analyticsEventsSearchTreeBuilder.get();
+}
+
+IoPortsCompatibilityInterface* SystemContext::ioPortsInterface() const
+{
+    return d->ioPortsInterface.get();
 }
 
 void SystemContext::resetAccessController(AccessController* accessController)

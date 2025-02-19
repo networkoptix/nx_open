@@ -2,13 +2,9 @@
 
 #include "intercom_resource_widget.h"
 
-#include <api/server_rest_connection.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/client_camera.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/intercom/utils.h>
-#include <nx/vms/event/action_parameters.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
@@ -22,9 +18,6 @@ IntercomResourceWidget::IntercomResourceWidget(
     :
     base_type(systemContext, windowContext, item, parent)
 {
-    for (const QnIOPortData& portData: camera()->ioPortDescriptions())
-        m_outputNameToId[portData.outputName] = portData.id;
-
     // TODO: #dfisenko Is this call really needed here?
     updateButtonsVisibility();
 
@@ -64,55 +57,6 @@ int IntercomResourceWidget::calculateButtonsVisibility() const
     }
 
     return result;
-}
-
-QString IntercomResourceWidget::getOutputId(nx::vms::api::ExtendedCameraOutput outputType) const
-{
-    const auto outputName = QString::fromStdString(nx::reflect::toString(outputType));
-
-    if (auto iter = m_outputNameToId.constFind(outputName); iter != m_outputNameToId.end())
-        return iter.value();
-
-    NX_WARNING(this, "Unexpected output type %1.", outputName);
-    return "";
-}
-
-void IntercomResourceWidget::setOutputPortState(
-    nx::vms::api::ExtendedCameraOutput outputType,
-    nx::vms::api::EventState newState) const
-{
-    nx::vms::event::ActionParameters actionParameters;
-
-    actionParameters.durationMs = 0;
-    actionParameters.relayOutputId = getOutputId(outputType);
-
-    if (actionParameters.relayOutputId.isEmpty())
-    {
-        NX_WARNING(this,
-            "Unexpected output type %1.",
-            QString::fromStdString(nx::reflect::toString(outputType)));
-        return;
-    }
-
-    const auto intecomResource = resource();
-
-    nx::vms::api::EventActionData actionData;
-    actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;
-    actionData.toggleState = newState;
-    actionData.resourceIds.push_back(intecomResource->getId());
-    actionData.params = QJson::serialized(actionParameters);
-
-    auto callback =
-        [](
-            bool /*success*/,
-            rest::Handle /*requestId*/,
-            nx::network::rest::JsonResult /*result*/)
-        {
-        };
-
-    auto systemContext = SystemContext::fromResource(intecomResource);
-    if (auto connection = systemContext->connectedServerApi())
-        connection->executeEventAction(actionData, callback, thread());
 }
 
 } // namespace nx::vms::client::desktop

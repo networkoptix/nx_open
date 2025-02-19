@@ -11,6 +11,7 @@
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/camera/buttons/intercom_helper.h>
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
+#include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 
@@ -255,38 +256,27 @@ bool ExtendedOutputCameraButtonController::setButtonActionState(
     if (!d->outputs.contains(outputType))
         return false;
 
-    nx::vms::event::ActionParameters actionParameters;
-
-    actionParameters.relayOutputId = d->outputId(outputType);
-    if (actionParameters.relayOutputId.isEmpty())
-        return false;
-
-    actionParameters.durationMs = outputType == ExtendedCameraOutput::powerRelay
-        ? IntercomHelper::kOpenedDoorDuration.count()
-        : 0;
-
-    nx::vms::api::EventActionData actionData;
-    actionData.actionType = nx::vms::api::ActionType::cameraOutputAction;
-    actionData.toggleState = outputType == ExtendedCameraOutput::autoTracking
-        ? nx::vms::api::EventState::inactive //< Disable auto tracking feature.
-        : nx::vms::api::EventState::active;
-    actionData.resourceIds.push_back(targetCamera->getId());
-    actionData.params = QJson::serialized(actionParameters);
+    const auto systemContext = camera()->systemContext()->as<SystemContext>();
 
     auto callback = nx::utils::guarded(this,
-        [this, buttonId = button.id](
-            bool success,
-            rest::Handle /*requestId*/,
-            nx::network::rest::JsonResult result)
+        [this, buttonId = button.id](bool success)
         {
-            success = success && result.errorId == nx::network::rest::ErrorId::ok;
             safeEmitActionStarted(buttonId, success);
         });
 
-    if (auto connection = systemContext()->connectedServerApi())
-        connection->executeEventAction(actionData, callback, thread());
+    if (!systemContext->ioPortsInterface())
+        return false;
 
-    return true;
+    return systemContext->ioPortsInterface()->setIoPortState(
+        systemContext->getSessionTokenHelper(),
+        camera(),
+        outputType,
+        /*isActive*/ outputType != ExtendedCameraOutput::autoTracking,
+        /*autoResetTimeout*/ outputType == ExtendedCameraOutput::powerRelay
+            ? IntercomHelper::kOpenedDoorDuration
+            : std::chrono::milliseconds{},
+        /*targetLockResolutionData*/ {},
+        callback);
 }
 
 } // namespace nx::vms::client::core

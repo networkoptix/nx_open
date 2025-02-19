@@ -33,10 +33,11 @@ namespace nx::vms::client::core {
 
 class AccessController;
 class AnalyticsEventsSearchTreeBuilder;
-class UserWatcher;
-class WatermarkWatcher;
+class IoPortsCompatibilityInterface;
 class ServerRuntimeEventConnector;
+class UserWatcher;
 class VideoCache;
+class WatermarkWatcher;
 
 namespace analytics {
 class AttributeHelper;
@@ -171,6 +172,8 @@ public:
     VideoCache* videoCache() const;
 
     AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
+
+    IoPortsCompatibilityInterface* ioPortsInterface() const;
 
 signals:
     void remoteIdChanged(const nx::Uuid& id);

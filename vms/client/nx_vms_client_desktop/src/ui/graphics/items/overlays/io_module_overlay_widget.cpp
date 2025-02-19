@@ -14,10 +14,10 @@
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
+#include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/event/action_parameters.h>
-#include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/common/palette.h>
@@ -29,7 +29,7 @@
 #include "io_module_grid_overlay_contents.h"
 
 using namespace nx::vms::client;
-using namespace nx::vms::client::core;
+using namespace nx::vms::client::desktop;
 
 namespace {
 
@@ -53,7 +53,7 @@ public:
     QScopedPointer<QnIoModuleOverlayContents> contents;
 
     QnVirtualCameraResourcePtr module;
-    const IOModuleMonitorPtr monitor;
+    const core::IOModuleMonitorPtr monitor;
     bool userInputEnabled = false;
 
     struct StateData
@@ -70,7 +70,7 @@ public:
     QnIoModuleOverlayWidget::Style overlayStyle = QnIoModuleOverlayWidget::Style();
 
     QnIoModuleOverlayWidgetPrivate(
-        const IOModuleMonitorPtr& monitor,
+        const core::IOModuleMonitorPtr& monitor,
         QnIoModuleOverlayWidget* widget);
 
     void setContents(QnIoModuleOverlayContents* newContents);
@@ -97,7 +97,7 @@ QnIoModuleOverlayWidgetPrivate
 */
 
 QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(
-    const IOModuleMonitorPtr& monitor,
+    const core::IOModuleMonitorPtr& monitor,
     QnIoModuleOverlayWidget* widget)
     :
     base_type(widget),
@@ -179,11 +179,11 @@ void QnIoModuleOverlayWidgetPrivate::initIOModule(const QnVirtualCameraResourceP
         return;
     }
 
-    connect(monitor.get(), &IOModuleMonitor::connectionOpened,
+    connect(monitor.get(), &core::IOModuleMonitor::connectionOpened,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionOpened);
-    connect(monitor.get(), &IOModuleMonitor::connectionClosed,
+    connect(monitor.get(), &core::IOModuleMonitor::connectionClosed,
         this, &QnIoModuleOverlayWidgetPrivate::at_connectionClosed);
-    connect(monitor.get(), &IOModuleMonitor::ioStateChanged,
+    connect(monitor.get(), &core::IOModuleMonitor::ioStateChanged,
         this, &QnIoModuleOverlayWidgetPrivate::at_stateChanged);
 
     connect(module.get(), &QnResource::propertyChanged,
@@ -315,49 +315,26 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     newState.isActive = !newState.isActive;
     contents->stateChanged(it->config, newState);
 
-    nx::vms::event::EventParameters eventParams;
-    eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-
-    nx::vms::event::ActionParameters params;
-    params.relayOutputId = it->config.id;
-    params.durationMs = it->config.autoResetTimeoutMs;
-
-    nx::vms::event::CameraOutputActionPtr action(
-        new nx::vms::event::CameraOutputAction(eventParams));
-    action->setParams(params);
-    action->setResources({ module->getId() });
-    action->setToggleState(it->state.isActive
-        ? nx::vms::api::EventState::inactive
-        : nx::vms::api::EventState::active);
-
-    auto systemContext = SystemContext::fromResource(module);
+    const auto systemContext = module->systemContext()->as<SystemContext>();
     if (!NX_ASSERT(systemContext))
-        return;
 
-    auto dstPeer = module->getParentId();
     if (!systemContext->connection() || !module->getParentServer())
     {
-        NX_WARNING(this, "Can't delivery event to the target server %1. Not found", dstPeer);
+        NX_WARNING(this,
+            "Can't delivery event to the target server %1. Not found", module->getParentId());
         return;
     }
 
-    auto callback = nx::utils::guarded(this,
-        [this, action, dstPeer](
-            bool success, rest::Handle requestId, nx::network::rest::JsonResult result)
-        {
-            if (!success)
-            {
-                NX_WARNING(this,
-                    "Delivery business action to the target server %1 is failed. Error: %2",
-                    dstPeer, result.errorString);
-            }
-        });
+    if (!systemContext->ioPortsInterface())
+        return;
 
-    nx::vms::api::EventActionData actionData;
-    ec2::fromResourceToApi(action, actionData);
-    // we are not interested in client->server transport error code because of real port checking by timer
-    systemContext->connectedServerApi()->executeEventAction(
-        actionData, callback, thread(), dstPeer);
+    systemContext->ioPortsInterface()->setIoPortState(
+        systemContext->getSessionTokenHelper(),
+        module,
+        it->config.id,
+        /*isActive*/ it->state.isActive,
+        /*autoResetTimeout*/ std::chrono::milliseconds(it->config.autoResetTimeoutMs));
+
     it->stateChangeTimer.restart();
 }
 
@@ -394,7 +371,7 @@ QnIoModuleOverlayWidget
 
 QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(
     const QnVirtualCameraResourcePtr& module,
-    const IOModuleMonitorPtr& monitor,
+    const core::IOModuleMonitorPtr& monitor,
     QGraphicsWidget* parent)
     :
     base_type(parent),
@@ -402,7 +379,7 @@ QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(
 {
     Q_D(QnIoModuleOverlayWidget);
     d->initIOModule(module);
-    setPaletteColor(this, QPalette::Window, colorTheme()->color("dark6"));
+    setPaletteColor(this, QPalette::Window, core::colorTheme()->color("dark6"));
 }
 
 QnIoModuleOverlayWidget::~QnIoModuleOverlayWidget()

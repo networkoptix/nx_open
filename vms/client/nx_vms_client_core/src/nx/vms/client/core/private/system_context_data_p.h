@@ -2,17 +2,23 @@
 
 #pragma once
 
+#include <camera/camera_bookmarks_manager.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
+#include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
 #include <nx/vms/rules/engine_holder.h>
+#include <storage/server_storage_manager.h>
 
 #include "../system_context.h"
 
@@ -20,6 +26,10 @@ namespace nx::vms::client::core {
 
 struct SystemContext::Private
 {
+    void initializeIoPortsInterface();
+
+    SystemContext* const q;
+
     std::unique_ptr<QnPtzControllerPool> ptzControllerPool;
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
@@ -42,6 +52,9 @@ struct SystemContext::Private
 
     /** Connection this context belongs to. Exclusive with session. */
     RemoteConnectionPtr connection;
+
+    // Should be destroyed before session/connection.
+    std::unique_ptr<IoPortsCompatibilityInterface> ioPortsInterface;
 };
 
 } // namespace nx::vms::client::core
