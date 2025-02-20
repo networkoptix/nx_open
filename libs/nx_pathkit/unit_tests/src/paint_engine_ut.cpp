@@ -347,6 +347,39 @@ TEST_F(PaintEngineTest, imageClipAndTransform)
         });
 }
 
+TEST_F(PaintEngineTest, pathWithHoleOnTop)
+{
+    // This test triggers a bug in float precision in Skia.
+    checkResult({1920, 1080}, 2, test_info_->name(),
+        [](QPaintDevice* pd)
+        {
+            QPainter p(pd);
+            p.setClipping(true);
+            p.setClipRect(0, 0, 1920, 1080);
+
+            p.setBrush(Qt::blue);
+
+            QRect hole(200, 0, 200, 200);
+
+            QPainterPath fullPath;
+            fullPath.addRect(QRectF(0, 0, 1920, 1080));
+
+            QPainterPath holePath;
+            holePath.addRect(hole);
+
+            p.setPen(Qt::NoPen);
+
+            QTransform t;
+            // Anything from (approximately) 16*FLT_EPSILON to 512*FLT_EPSILON will do.
+            t.translate(0, 0.000001);
+            p.setTransform(t);
+
+            auto result = fullPath.subtracted(holePath);
+
+            p.drawPath(result);
+        });
+}
+
 } // namespace test
 
 } // namespace namespace nx::pathkit
