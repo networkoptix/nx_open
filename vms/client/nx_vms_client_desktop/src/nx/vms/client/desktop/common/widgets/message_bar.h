@@ -78,6 +78,7 @@ public:
     QPushButton* addButton(const QString& text, const QString& iconPath);
     /** Adds existing button to layout of banner and set the style of button. */
     void addButton(QPushButton* button);
+    virtual QSize minimumSizeHint() const override;
 
 signals:
     void closeClicked();
@@ -102,6 +103,7 @@ public:
     explicit MessageBarBlock(QWidget* parent = nullptr);
     virtual ~MessageBarBlock() override;
     void setMessageBars(const std::vector<BarDescription>& descs);
+    virtual QSize minimumSizeHint() const override;
 
 private:
     struct Private;

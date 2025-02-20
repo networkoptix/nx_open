@@ -224,7 +224,6 @@ public:
     {
         auto result = base_type::sizeHint(option, index);
 
-
         if ((index.column() == QnStorageListModel::StoragePoolColumn
             || index.column() == QnStorageListModel::StorageArchiveModeColumn)
                 && index.flags().testFlag(Qt::ItemIsEditable))
