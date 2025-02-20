@@ -519,7 +519,8 @@ struct UserSettingsDialog::Private
                 user->setFullName(state.fullName);
                 user->setRawPermissions(state.globalPermissions);
                 user->setEnabled(state.userEnabled);
-                user->setLocale(state.locale);
+                if (state.localeEditable)
+                    user->setLocale(state.locale);
                 user->setSiteGroupIds(data->groupIds);
                 user->setOrgGroupIds(data->orgGroupIds.value_or(std::vector<nx::Uuid>{}));
             }
@@ -1239,6 +1240,9 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
                 : -1);
     }
 
+    if (!state.localeEditable)
+        userData.locale = d->user->rawLocaleValue();
+
     if (d->dialogType == CreateUser)
         appContext()->localSettings()->lastCreatedUserLocale = state.locale;
 
@@ -1274,7 +1278,7 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
     d->isSaving = true;
 
     d->currentRequest = connectedServerApi()->saveUserAsync(
-        d->dialogType == CreateUser,
+        /*newUser*/ d->dialogType == CreateUser,
         userData,
         sessionTokenHelper,
         nx::utils::guarded(this,
