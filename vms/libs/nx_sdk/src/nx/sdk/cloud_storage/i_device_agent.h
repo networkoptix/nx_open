@@ -61,6 +61,7 @@ public:
     }
 
     protected: virtual void doCreateStreamReader(
+        const char* bucketUrl,
         nxcip::MediaStreamQuality quality,
         int64_t startTimeUs,
         int64_t durationUs,
@@ -73,12 +74,13 @@ public:
     * by StreamReader::opaqueMetadata() for the corresponding chunk of media data.
     */
     public: Result<IStreamReader*> createStreamReader(
+        const char* bucketUrl,
         nxcip::MediaStreamQuality quality,
         int64_t startTimeMs,
         int64_t durationMs)
     {
         Result<IStreamReader*> result;
-        doCreateStreamReader(quality, startTimeMs, durationMs, &result);
+        doCreateStreamReader(bucketUrl, quality, startTimeMs, durationMs, &result);
         return result;
     }
 };

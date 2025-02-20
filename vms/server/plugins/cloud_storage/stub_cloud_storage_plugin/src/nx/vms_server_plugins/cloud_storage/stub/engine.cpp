@@ -6,7 +6,6 @@
 
 #include <nx/kit/debug.h>
 #include <nx/sdk/cloud_storage/helpers/device_archive.h>
-#include <nx/sdk/cloud_storage/helpers/time_periods.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 
@@ -16,6 +15,21 @@
 namespace nx::vms_server_plugins::cloud_storage::stub {
 
 using namespace std::chrono;
+
+std::optional<system_clock::time_point> getTimePointFromSeqId(const std::string& s)
+{
+    if (s.empty())
+        return std::nullopt;
+
+    try
+    {
+        return system_clock::time_point(milliseconds(std::stol(s)));
+    }
+    catch(...)
+    {
+        return std::nullopt;
+    }
+}
 
 static constexpr seconds kReportPeriod = 5s;
 
@@ -62,10 +76,10 @@ void Engine::stopAsyncTasks()
     NX_OUTPUT << __func__ << ": Worker thread stopped";
 }
 
-void Engine::startAsyncTasks()
+void Engine::startAsyncTasks(const char* lastSequenceId)
 {
     m_worker = std::thread(
-        [this]()
+        [this, lastSequenceId = std::string(lastSequenceId)]()
         {
             NX_OUTPUT << "Starting worker thread";
 
@@ -88,6 +102,10 @@ void Engine::startAsyncTasks()
 
                 using namespace nx::sdk::cloud_storage;
                 constexpr static auto kSafetyScanPeriod = 2min;
+                const auto lastPointFromArgument = getTimePointFromSeqId(lastSequenceId);
+                if (lastPointFromArgument)
+                    m_lastScanTimePoint = lastPointFromArgument;
+
                 std::optional<system_clock::time_point> scanStartTime = m_lastScanTimePoint
                     ? std::optional<system_clock::time_point>(std::max(
                         system_clock::time_point(0ms), *m_lastScanTimePoint - kSafetyScanPeriod))
@@ -107,16 +125,16 @@ void Engine::startAsyncTasks()
                         m_deviceAgents.push_back(nx::sdk::Ptr(deviceAgent));
                     }
 
-                    for (const auto& entry: deviceArchiveIndex.timePeriodsPerStream)
+                    for (const auto& entry: deviceArchiveIndex.chunksPerStream)
                     {
-                        NX_OUTPUT << "New time periods for device '" << *deviceId
-                                  << "': " << nx::kit::Json(entry.second).dump();
+                        NX_OUTPUT << "New chunks for device '"
+                            << *deviceId << "': " << toString(entry.second);
 
-                        if (!entry.second.empty()
-                            && system_clock::time_point(entry.second.back().startTimestamp) > scanStartTime)
+                        if (!entry.second.empty())
                         {
-                            scanStartTime =
-                                system_clock::time_point(entry.second.back().startTimestamp);
+                            const auto lastChunkStartTime = entry.second.back().startPoint;
+                            if (lastChunkStartTime > scanStartTime)
+                                scanStartTime = lastChunkStartTime;
                         }
 
                         const auto add = nx::sdk::cloud_storage::ChunkOperation::add;
@@ -133,10 +151,17 @@ void Engine::startAsyncTasks()
                         deviceAgent, deviceIdToDeviceData.second));
                 }
 
+                BucketDescriptionList bucketDescriptionList({BucketDescription{
+                    .url = m_dataManager->bucketUrlAndId().first,
+                    .bucketId = m_dataManager->bucketUrlAndId().second}});
+                m_handler->onBucketDescriptionUpdated(m_integrationId.data(), &bucketDescriptionList);
+
                 // Real-life implementation should manage its free space by itself and
                 // report data removal along with the newly added time periods here.
+                const auto currentSequenceId =
+                    std::to_string(duration_cast<milliseconds>(scanStartTime->time_since_epoch()).count());
                 m_handler->onArchiveUpdated(
-                    m_integrationId.data(), nx::sdk::ErrorCode::noError, &result);
+                    m_integrationId.data(), currentSequenceId.data(), nx::sdk::ErrorCode::noError, &result);
 
                 m_lastScanTimePoint = scanStartTime;
                 m_lastReportTimePoint = system_clock::now();

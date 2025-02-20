@@ -154,7 +154,7 @@ public:
     /**
      * No async handlers should be called by the plugin before this function has been called.
      */
-    public: virtual void startAsyncTasks() = 0;
+    public: virtual void startAsyncTasks(const char* lastSequenceId) = 0;
 
     /**
      * No async handlers should be called by the plugin after this function has been called.

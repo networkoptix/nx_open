@@ -21,6 +21,7 @@ class StreamReader: public nx::sdk::RefCountable<nx::sdk::cloud_storage::IStream
 public:
     StreamReader(
         const std::shared_ptr<DataManager>& dataManager,
+        const std::string& bucketUrl,
         const std::string& deviceId,
         int streamIndex,
         int64_t startTimeMs,

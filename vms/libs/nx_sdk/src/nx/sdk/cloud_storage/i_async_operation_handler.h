@@ -2,14 +2,43 @@
 
 #pragma once
 
-#include <nx/sdk/i_list.h>
 #include <nx/sdk/interface.h>
 
+#include "i_data_list.h"
 #include "i_device_agent.h"
-#include "i_time_periods.h"
 #include "i_engine.h"
 
 namespace nx::sdk::cloud_storage {
+
+/**
+ * Storage bucket description. Each media file might be stored on a separate bucket. Media files
+ * are reported with the bucket id index, this struct provides a way to resolve this index to
+ * the actual bucket url. This url must be used when fetching media files back using the
+ * IDeviceAgent::createStreamReader() function.
+ */
+class IBucketDescriptionList:
+    public Interface<IBucketDescriptionList>,
+    public IDataList
+{
+public:
+    /**
+     * Must be called before get() to obtain Url length. If there's no next element, this function
+     * will return -1;
+     */
+    virtual int urlLen() const = 0;
+    virtual bool get(char* url, int* bucketId) const = 0;
+};
+
+/**
+ * This struct describes previously recorded media file.
+ */
+class IMediaChunkList:
+    public Interface<IMediaChunkList>,
+    public IDataList
+{
+public:
+    virtual bool get(int64_t* outStartTimeMs, int64_t* outDurationMs, int* outBucketId) const = 0;
+};
 
 /**
  * Added and removed time period lists per one stream.
@@ -17,8 +46,8 @@ namespace nx::sdk::cloud_storage {
 class IIndexArchive: public Interface<IIndexArchive>
 {
 public:
-    virtual const ITimePeriods* addedTimePeriods() const = 0;
-    virtual const ITimePeriods* removedTimePeriods() const = 0;
+    virtual const IMediaChunkList* addedChunks() const = 0;
+    virtual const IMediaChunkList* removedChunks() const = 0;
     virtual int streamIndex() const = 0;
 };
 
@@ -28,7 +57,7 @@ public:
 class IDeviceArchive: public Interface<IDeviceArchive>
 {
 public:
-    virtual IList<IIndexArchive>* indexArchive() = 0;
+    virtual const IList<IIndexArchive>* indexArchive() = 0;
     virtual IDeviceAgent* deviceAgent() const = 0;
 };
 
@@ -51,8 +80,13 @@ public:
      */
     virtual void onArchiveUpdated(
         const char* engineId,
+        const char* lastSequenceId,
         nx::sdk::ErrorCode errorCode,
         const IList<IDeviceArchive>* deviceArchive) const = 0;
+
+    virtual void onBucketDescriptionUpdated(
+        const char* engineId,
+        const IBucketDescriptionList* bucketDescriptionList) const = 0;
 
     virtual void onSaveOperationCompleted(
         const char* engineId,

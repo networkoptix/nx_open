@@ -3,6 +3,7 @@
 #include "data_manager.h"
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <functional>
 #include <map>
@@ -564,14 +565,14 @@ struct MediaFileInfo: FileInfo
 
         const auto parts = split(baseName, '_');
         streamIndex = std::stol(parts[0]);
-        startTime = milliseconds(std::stoll(parts[1]));
+        startTime = system_clock::time_point(milliseconds(std::stoll(parts[1])));
         if (parts.size() == 3)
             duration = milliseconds(std::stol(parts[2]));
     }
 
     int streamIndex = -1;
     std::optional<milliseconds> duration;
-    milliseconds startTime{};
+    system_clock::time_point startTime{};
 };
 
 std::string normalizeSeparators(std::string s)
@@ -881,6 +882,8 @@ std::string toString(sdk::cloud_storage::MetadataType metadataType)
 DataManager::DataManager(const std::string& workDir):
     m_workDir(normalizeSeparators(workDir))
 {
+    const auto kStubBucketToId = std::make_pair("bucket_24", 24);
+    m_bucketUrlToId = kStubBucketToId;
     size_t last = m_workDir.size() - 1;
     while (last >= 0 && (m_workDir.at(last) == '/' || m_workDir.at(last) == '\\'))
         last--;
@@ -1246,12 +1249,12 @@ void ArchiveIndex::sort()
     {
         for (int i: {0, 1})
         {
-            auto& streamToTimePeriods = deviceArchiveIndex.timePeriodsPerStream;
-            auto timePeriodListIt = streamToTimePeriods.find(i);
-            if (timePeriodListIt != streamToTimePeriods.cend())
+            auto& streamChunks = deviceArchiveIndex.chunksPerStream;
+            auto streamChunksIt = streamChunks.find(i);
+            if (streamChunksIt != streamChunks.cend())
             {
-                auto& timePeriods = *timePeriodListIt;
-                std::sort(timePeriods.second.begin(), timePeriods.second.end());
+                auto& chunks = *streamChunksIt;
+                std::sort(chunks.second.begin(), chunks.second.end());
             }
         }
     }
@@ -1326,54 +1329,71 @@ std::string DataManager::queryAnalyticsPeriods(
 
 void DataManager::addDevice(const nx::sdk::cloud_storage::DeviceDescription& deviceDescription)
 {
-    const auto deviceDir = joinPath(m_workDir, *deviceDescription.deviceId());
+    const auto deviceDir = joinPath(
+        joinPath(m_workDir, m_bucketUrlToId.first), *deviceDescription.deviceId());
     ensureDir(deviceDir);
     saveObject(deviceDescription, joinPath(deviceDir, kDeviceDescriptionFileName));
 }
 
 std::string DataManager::devicePath(const std::string& deviceId) const
 {
-    return joinPath(m_workDir, deviceId);
+    return joinPath(joinPath(m_workDir, m_bucketUrlToId.first), deviceId);
 }
 
 ArchiveIndex DataManager::getArchive(
     std::optional<std::chrono::system_clock::time_point> startTime) const
 {
     ArchiveIndex result;
-    for (const auto& deviceDir: getFileInfoList(m_workDir))
+    for (const auto& bucketDir: getFileInfoList(m_workDir))
     {
-        if (!deviceDir.isDir)
+        if (!bucketDir.isDir)
             continue;
 
-        using namespace nx::sdk::cloud_storage;
-        DeviceArchiveIndex deviceArchiveIndex;
-        const auto maybeDescription =
-            oneObject<DeviceDescription>(joinPath(deviceDir.fullPath, kDeviceDescriptionFileName));
-
-        if (!maybeDescription)
+        if (bucketDir.baseName != m_bucketUrlToId.first)
             continue;
 
-        deviceArchiveIndex.deviceDescription = *maybeDescription;
-        TimePeriodList timePeriods;
-        std::lock_guard<std::mutex> lock(*m_mutex);
-        for (const auto& file: getFileInfoList(deviceDir.fullPath, kMediaFileExtenstion))
+        for (const auto& deviceDir: getFileInfoList(bucketDir.fullPath))
         {
-            auto mediaFileInfo = MediaFileInfo(file);
-            if (!mediaFileInfo.duration
-                || (startTime && mediaFileInfo.startTime <= startTime->time_since_epoch()))
-            {
+            if (!deviceDir.isDir)
                 continue;
+
+            using namespace nx::sdk::cloud_storage;
+            DeviceArchiveIndex deviceArchiveIndex;
+            const auto maybeDescription =
+                oneObject<DeviceDescription>(joinPath(deviceDir.fullPath, kDeviceDescriptionFileName));
+
+            if (!maybeDescription)
+                continue;
+
+            deviceArchiveIndex.deviceDescription = *maybeDescription;
+            TimePeriodList timePeriods;
+            std::lock_guard<std::mutex> lock(*m_mutex);
+            for (const auto& file: getFileInfoList(deviceDir.fullPath, kMediaFileExtenstion))
+            {
+                auto mediaFileInfo = MediaFileInfo(file);
+                if (!mediaFileInfo.duration
+                    || (startTime && mediaFileInfo.startTime <= startTime))
+                {
+                    continue;
+                }
+
+                deviceArchiveIndex.chunksPerStream[mediaFileInfo.streamIndex].push_back(MediaChunk{
+                    .startPoint = mediaFileInfo.startTime,
+                    .durationMs = *mediaFileInfo.duration,
+                    .bucketId = m_bucketUrlToId.second});
             }
 
-            deviceArchiveIndex.timePeriodsPerStream[mediaFileInfo.streamIndex].push_back(
-                {mediaFileInfo.startTime, *mediaFileInfo.duration});
+            result.deviceArchiveIndexList.push_back(deviceArchiveIndex);
         }
-
-        result.deviceArchiveIndexList.push_back(deviceArchiveIndex);
     }
 
     result.sort();
     return result;
+}
+
+std::pair<std::string, int> DataManager::bucketUrlAndId() const
+{
+    return m_bucketUrlToId;
 }
 
 std::unique_ptr<WritableMediaFile> DataManager::writableMediaFile(
@@ -1383,37 +1403,47 @@ std::unique_ptr<WritableMediaFile> DataManager::writableMediaFile(
     const nx::sdk::IList<nx::sdk::cloud_storage::ICodecInfo>* codecList,
     const char* opaqueMetadata) const
 {
-    ensureDir(joinPath(m_workDir, deviceId));
+    ensureDir(joinPath(joinPath(m_workDir, bucketUrlAndId().first), deviceId));
     return std::make_unique<WritableMediaFile>(
-        m_mutex, mediaFilePath(deviceId, streamIndex, timestamp), timestamp, codecList,
+        m_mutex, mediaFilePath(bucketUrlAndId().first, deviceId, streamIndex, timestamp), timestamp, codecList,
         opaqueMetadata);
 }
 
 std::unique_ptr<ReadableMediaFile> DataManager::readableMediaFile(
+    const std::string& bucketUrl,
     const std::string& deviceId,
     int streamIndex,
     int64_t startTimeMs,
     int64_t durationMs) const
 {
     return std::make_unique<ReadableMediaFile>(
-        mediaFilePath(deviceId, streamIndex, startTimeMs, durationMs));
+        mediaFilePath(bucketUrl, deviceId, streamIndex, startTimeMs, durationMs));
 }
 
 std::string DataManager::mediaFilePath(
-    const std::string& deviceId, int streamIndex, std::chrono::milliseconds timestamp) const
+    const std::string& bucketUrl,
+    const std::string& deviceId,
+    int streamIndex,
+    std::chrono::milliseconds timestamp) const
 {
-    return joinPath(
-        joinPath(m_workDir, deviceId), std::to_string(streamIndex)
-        + "_" + std::to_string(timestamp.count())) + kMediaFileExtenstion;
+    const auto fileName = std::to_string(streamIndex) + "_"
+        + std::to_string(timestamp.count()) + kMediaFileExtenstion;
+
+    return joinPath(m_workDir, joinPath(joinPath(bucketUrl, deviceId), fileName));
 }
 
 std::string DataManager::mediaFilePath(
-    const std::string& deviceId, int streamIndex, int64_t startTimeMs, int64_t durationMs) const
+    const std::string& bucketUrl,
+    const std::string& deviceId,
+    int streamIndex,
+    int64_t startTimeMs,
+    int64_t durationMs) const
 {
     const auto durationStr = durationMs > 0 ? "_" + std::to_string(durationMs) : "";
-    return joinPath(
-        joinPath(m_workDir, deviceId), std::to_string(streamIndex)
-        + "_" + std::to_string(startTimeMs) + durationStr) + kMediaFileExtenstion;
+    const auto fileName = std::to_string(streamIndex) + "_"
+        + std::to_string(startTimeMs) + durationStr + kMediaFileExtenstion;
+
+    return joinPath(m_workDir, joinPath(joinPath(bucketUrl, deviceId), fileName));
 }
 
 void DataManager::saveTrackImage(

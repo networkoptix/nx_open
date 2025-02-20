@@ -14,7 +14,7 @@ Engine::Engine(
 {
 }
 
-void Engine::startAsyncTasks()
+void Engine::startAsyncTasks(const char* /*lastSequenceId*/)
 {
 }
 

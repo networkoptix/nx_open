@@ -27,7 +27,7 @@ public:
         const std::string& integrationId);
 
     virtual ~Engine() override;
-    virtual void startAsyncTasks() override;
+    virtual void startAsyncTasks(const char* lastSequenceId) override;
     virtual void stopAsyncTasks() override;
     virtual nx::sdk::ErrorCode saveMetadata(
         const char* deviceId,

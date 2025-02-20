@@ -16,7 +16,7 @@ public:
         const nx::sdk::cloud_storage::IAsyncOperationHandler* asyncOperationHandler,
         const std::string& integrationId);
 
-    virtual void startAsyncTasks() override;
+    virtual void startAsyncTasks(const char* lastSequenceId) override;
     virtual void stopAsyncTasks() override;
 
     virtual void doQueryBookmarks(

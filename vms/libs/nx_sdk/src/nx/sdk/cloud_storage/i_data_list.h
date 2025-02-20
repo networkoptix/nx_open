@@ -6,17 +6,12 @@
 
 namespace nx::sdk::cloud_storage {
 
-/**
- * Abstract representation of time period list. Each time period is defined by its beginning and
- * end.
- */
-class ITimePeriods: public nx::sdk::Interface<ITimePeriods>
+class IDataList
 {
 public:
     virtual void goToBeginning() const = 0;
-    virtual bool next() const = 0;
+    virtual void next() const = 0;
     virtual bool atEnd() const = 0;
-    virtual bool get(int64_t* outStartUs, int64_t* outEndUs) const = 0;
 };
 
 } // namespace nx::sdk::cloud_storage

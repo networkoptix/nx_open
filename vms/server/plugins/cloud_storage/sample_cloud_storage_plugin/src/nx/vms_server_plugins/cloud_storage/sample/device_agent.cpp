@@ -34,7 +34,9 @@ void DeviceAgent::doCreateStreamWriter(
         nx::sdk::Error(nx::sdk::ErrorCode::notImplemented, new nx::sdk::String("Not implemented")));
 }
 
-void DeviceAgent::doCreateStreamReader(nxcip::MediaStreamQuality quality,
+void DeviceAgent::doCreateStreamReader(
+    const char* bucketUrl,
+    nxcip::MediaStreamQuality quality,
     int64_t startTimeMs,
     int64_t durationMs,
     nx::sdk::Result<nx::sdk::cloud_storage::IStreamReader*>* outResult)

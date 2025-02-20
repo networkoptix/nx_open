@@ -30,6 +30,7 @@ protected:
         nx::sdk::Result<nx::sdk::cloud_storage::IStreamWriter*>* outResult) override;
 
     virtual void doCreateStreamReader(
+        const char* bucketUrl,
         nxcip::MediaStreamQuality quality,
         int64_t startTimeMs,
         int64_t durationMs,

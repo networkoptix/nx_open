@@ -59,6 +59,7 @@ void DeviceAgent::doCreateStreamWriter(
 }
 
 void DeviceAgent::doCreateStreamReader(
+    const char* bucketUrl,
     nxcip::MediaStreamQuality quality,
     int64_t startTimeMs,
     int64_t durationMs,
@@ -69,7 +70,7 @@ void DeviceAgent::doCreateStreamReader(
     try
     {
         *outResult = nx::sdk::Result<nx::sdk::cloud_storage::IStreamReader*>(
-            new StreamReader(m_dataManager, deviceId, streamIndex, startTimeMs, durationMs));
+            new StreamReader(m_dataManager, bucketUrl, deviceId, streamIndex, startTimeMs, durationMs));
     }
     catch (const std::exception& e)
     {

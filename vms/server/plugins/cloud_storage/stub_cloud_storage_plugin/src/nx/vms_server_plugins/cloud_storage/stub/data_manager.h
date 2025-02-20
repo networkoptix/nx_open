@@ -15,6 +15,7 @@
 #include <camera/camera_plugin.h>
 #include <nx/kit/json.h>
 #include <nx/sdk/cloud_storage/helpers/data.h>
+#include <nx/sdk/cloud_storage/helpers/device_archive.h>
 #include <nx/sdk/cloud_storage/i_device_agent.h>
 #include <nx/sdk/cloud_storage/i_media_data_packet.h>
 #include <nx/sdk/i_device_info.h>
@@ -92,7 +93,7 @@ private:
 
 struct DeviceArchiveIndex
 {
-    std::map<int, std::vector<nx::sdk::cloud_storage::TimePeriod>> timePeriodsPerStream;
+    std::map<int, std::vector<nx::sdk::cloud_storage::MediaChunk>> chunksPerStream;
     nx::sdk::cloud_storage::DeviceDescription deviceDescription;
 };
 
@@ -133,6 +134,7 @@ public:
         const char* opaqueMetadata) const;
 
     std::unique_ptr<ReadableMediaFile> readableMediaFile(
+        const std::string& bucketUrl,
         const std::string& deviceId,
         int streamIndex,
         int64_t startTimeMs,
@@ -146,6 +148,8 @@ public:
 
     void run();
     void flushMetadata(nx::sdk::cloud_storage::MetadataType type);
+
+    std::pair<std::string, int> bucketUrlAndId() const;
 
 private:
     std::string m_workDir;
@@ -163,6 +167,7 @@ private:
     bool m_needToFlushBookmarks{false};
     bool m_needToFlushMotion{false};
     bool m_needToFlushAnalytics{false};
+    std::pair<std::string, int> m_bucketUrlToId;
 
 private:
     std::string devicePath(const std::string& deviceId) const;
@@ -206,10 +211,17 @@ private:
     std::vector<nx::kit::Json> loadListNoLock(const std::string& fileName) const;
 
     std::string mediaFilePath(
-        const std::string& deviceId, int streamIndex, std::chrono::milliseconds timestamp) const;
+        const std::string& bucketUrl,
+        const std::string& deviceId,
+        int streamIndex,
+        std::chrono::milliseconds timestamp) const;
 
     std::string mediaFilePath(
-        const std::string& deviceId, int streamIndex, int64_t startTimeMs, int64_t durationMs) const;
+        const std::string& bucketUrl,
+        const std::string& deviceId,
+        int streamIndex,
+        int64_t startTimeMs,
+        int64_t durationMs) const;
 };
 
 } //namespace nx::vms_server_plugins::cloud_storage::stub

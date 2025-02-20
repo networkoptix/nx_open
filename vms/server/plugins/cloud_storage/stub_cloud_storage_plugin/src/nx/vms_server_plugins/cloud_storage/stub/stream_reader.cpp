@@ -17,6 +17,7 @@ using namespace std::chrono;
 
 StreamReader::StreamReader(
     const std::shared_ptr<DataManager>& dataManager,
+    const std::string& bucketUrl,
     const std::string& deviceId,
     int streamIndex,
     int64_t startTimeMs,
@@ -28,7 +29,7 @@ StreamReader::StreamReader(
     m_timestampUs(startTimeMs * 1000),
     m_durationUs(durationMs * 1000)
 {
-    m_file = m_dataManager->readableMediaFile(deviceId, streamIndex, startTimeMs, durationMs);
+    m_file = m_dataManager->readableMediaFile(bucketUrl, deviceId, streamIndex, startTimeMs, durationMs);
     NX_OUTPUT << "Opening StreamReader for " << m_file->name();
     m_codecInfos = nx::sdk::makePtr<nx::sdk::List<nx::sdk::cloud_storage::ICodecInfo>>();
     m_opaqueMetadata = m_file->opaqueMetadata();
