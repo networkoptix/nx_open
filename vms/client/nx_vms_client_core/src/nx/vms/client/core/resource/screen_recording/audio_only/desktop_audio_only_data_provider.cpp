@@ -101,11 +101,10 @@ void DesktopAudioOnlyDataProvider::startInputs()
 
     auto primaryIODevice = m_audioSourcesInfo.at(0)->ioDevice;
 
-    Qn::directConnect(
+    directConnect(
         primaryIODevice,
         &QIODevice::readyRead,
-        this,
-        &DesktopAudioOnlyDataProvider::processData);
+        [this] { processData(); });
 }
 
 void DesktopAudioOnlyDataProvider::run()

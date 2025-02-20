@@ -61,12 +61,12 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_archiveReader(archiveReader.get()),
     m_queueSize(kDefaultDecodedVideoQueueSize)
 {
-    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
-        this, &PlayerDataConsumer::onBeforeJump);
-    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccurred,
-        this, &PlayerDataConsumer::onJumpOccurred);
-    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::prevFrameOccurred,
-        this, [this]() {clearUnprocessedData();});
+    directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
+        [this](qint64 timeUsec) { onBeforeJump(timeUsec); });
+    directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccurred,
+        [this](auto... args) { onJumpOccurred(args...); });
+    directConnect(archiveReader.get(), &QnArchiveStreamReader::prevFrameOccurred,
+        [this]() {clearUnprocessedData();});
 }
 
 PlayerDataConsumer::~PlayerDataConsumer()

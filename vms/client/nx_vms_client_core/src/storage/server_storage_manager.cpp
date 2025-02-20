@@ -11,6 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/rest/params.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/singleton.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_data.h>

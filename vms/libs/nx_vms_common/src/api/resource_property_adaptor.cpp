@@ -93,9 +93,9 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
 
         if(m_resource)
         {
-            Qn::directConnect(
+            directConnect(
                 resource.get(), &QnResource::propertyChanged,
-                this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
+                [this](auto...args){at_resource_propertyChanged(args...);});
         }
 
         changed = loadValueLocked(newSerializedValue);

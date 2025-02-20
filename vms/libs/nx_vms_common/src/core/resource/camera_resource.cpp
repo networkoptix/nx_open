@@ -481,34 +481,26 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     addFlags(Qn::network);
     addFlags(Qn::live_cam);
 
-    connect(this,
+    directConnect(
+        this,
         &QnResource::resourceChanged,
-        this,
-        &QnVirtualCameraResource::resetCachedValues,
-        Qt::DirectConnection);
-    connect(this,
+        [this](auto) { resetCachedValues(); });
+    directConnect(this,
         &QnResource::propertyChanged,
-        this,
-        &QnVirtualCameraResource::resetCachedValues,
-        Qt::DirectConnection);
-    connect(this,
+        [this](auto...) { resetCachedValues(); });
+    directConnect(this,
         &QnVirtualCameraResource::licenseTypeChanged,
-        this,
-        &QnVirtualCameraResource::resetCachedValues,
-        Qt::DirectConnection);
-    connect(this,
+        [this](auto) { resetCachedValues(); });
+    directConnect(this,
         &QnVirtualCameraResource::parentIdChanged,
-        this,
-        &QnVirtualCameraResource::resetCachedValues,
-        Qt::DirectConnection);
-    connect(this,
+        [this](auto...) { resetCachedValues(); });
+    directConnect(this,
         &QnVirtualCameraResource::motionRegionChanged,
-        this,
-        &QnVirtualCameraResource::at_motionRegionChanged,
-        Qt::DirectConnection);
+        [this](auto) { at_motionRegionChanged(); });
 
     // TODO: #sivanov Override emitPropertyChanged instead.
-    connect(this,
+    directConnect(
+        this,
         &QnResource::propertyChanged,
         [this](const QnResourcePtr& /*resource*/,
             const QString& key,
@@ -522,16 +514,19 @@ QnVirtualCameraResource::QnVirtualCameraResource():
             }
         });
 
-    connect(
+    directConnect(
         this,
         &QnVirtualCameraResource::audioEnabledChanged,
-        this,
-        [this]() { updateAudioRequired(); },
-        Qt::DirectConnection);
+        [this](auto) { updateAudioRequired(); });
 
-    connect(this,
+    directConnect(
+        this,
         &QnResource::propertyChanged,
-        [this](const QnResourcePtr& /*resource*/, const QString& key)
+        [this](
+            const QnResourcePtr& /*resource*/,
+            const QString& key,
+            const QString& /*oldValue*/,
+            const QString& /*newValue*/)
         {
             if (key == ResourcePropertyKey::kCameraCapabilities)
             {
@@ -579,6 +574,11 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     QnMediaResource::initMediaResource();
 }
 
+QnVirtualCameraResource::~QnVirtualCameraResource()
+{
+    directDisconnectAll();
+}
+
 bool QnVirtualCameraResource::MotionStreamIndex::operator==(const MotionStreamIndex& other) const
 {
     return index == other.index && isForced == other.isForced;
@@ -604,24 +604,24 @@ QString QnVirtualCameraResource::intercomSpecificPortName()
 
 void QnVirtualCameraResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
 {
-    if (auto context = this->systemContext())
+    if (this->systemContext())
     {
-        context->resourceDataPool()->disconnect(this);
-        context->saasServiceManager()->disconnect(this);
+        NX_ASSERT(false, "System context should be set only once");
+        return;
     }
 
     base_type::setSystemContext(systemContext);
 
     if (auto context = this->systemContext())
     {
-        connect(context->resourceDataPool(), &QnResourceDataPool::changed, this,
-            &QnVirtualCameraResource::resetCachedValues, Qt::DirectConnection);
-        connect(
+        directConnect(
+            context->resourceDataPool(),
+            &QnResourceDataPool::changed,
+            [this]() { resetCachedValues(); });
+        directConnect(
             context->saasServiceManager(),
             &nx::vms::common::saas::ServiceManager::dataChanged,
-            this,
-            &QnVirtualCameraResource::resetCachedValues,
-            Qt::DirectConnection);
+            [this]() { resetCachedValues(); });
         resetCachedValues();
     }
 }

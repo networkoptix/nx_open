@@ -65,7 +65,7 @@ Sound::Sound(ALCdevice *device, const nx::media::audio::Format& audioFormat):
 
     m_queuedDurationUs = 0;
 
-    Qn::directConnect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
+    directConnect(AudioDevice::instance(), &AudioDevice::volumeChanged, [this] (float value)
     {
         setVolumeLevel(value);
     });

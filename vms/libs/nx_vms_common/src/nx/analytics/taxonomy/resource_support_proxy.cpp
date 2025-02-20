@@ -81,12 +81,10 @@ struct ResourceSupportProxy::Private:
     {
         directConnect(resourcePropertyDictionary(),
             &QnResourcePropertyDictionary::propertyChanged,
-            this,
-            &ResourceSupportProxy::Private::manifestsMaybeUpdated);
+            [this](auto... args) { manifestsMaybeUpdated(args...); });
         directConnect(resourcePropertyDictionary(),
             &QnResourcePropertyDictionary::propertyRemoved,
-            this,
-            &ResourceSupportProxy::Private::manifestsMaybeUpdated);
+            [this](auto... args) { manifestsMaybeUpdated(args...); });
     }
 
     ~Private()

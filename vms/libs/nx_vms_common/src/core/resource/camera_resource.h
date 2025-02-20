@@ -21,6 +21,7 @@
 #include <nx/utils/mac_address.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/data/device_model.h>
@@ -42,7 +43,9 @@ namespace nx::core::resource { class AbstractRemoteArchiveManager; }
 namespace nx::media { enum class StreamEvent; }
 namespace nx::core::ptz { enum class PresetType; }
 
-class NX_VMS_COMMON_API QnVirtualCameraResource: public QnMediaResource
+class NX_VMS_COMMON_API QnVirtualCameraResource:
+    public QnMediaResource,
+    public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
     Q_FLAGS(Ptz::Capabilities)
@@ -98,6 +101,7 @@ public:
 
 public:
     QnVirtualCameraResource();
+    virtual ~QnVirtualCameraResource() override;
 
     QnMediaServerResourcePtr getParentServer() const;
 
