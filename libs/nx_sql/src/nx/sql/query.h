@@ -125,6 +125,8 @@ private:
 
     StatisticsCollector* m_statisticsCollector = nullptr;
 
+    RdbmsDriverType m_driverType = RdbmsDriverType::unknown;
+
 private:
     void exec(const std::optional<std::string_view>& query);
 

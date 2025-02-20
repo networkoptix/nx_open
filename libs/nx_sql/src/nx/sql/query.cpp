@@ -14,19 +14,23 @@
 namespace nx::sql {
 
 SqlQuery::SqlQuery(QSqlDatabase connection):
-    m_sqlQuery(connection)
+    m_sqlQuery(connection),
+    m_driverType(rdbmsDriverTypeFromString(connection.driverName().toStdString()))
 {
 }
 
 SqlQuery::SqlQuery(AbstractDbConnection* connection):
-    m_sqlQuery(*connection->qtSqlConnection())
+    m_sqlQuery(*connection->qtSqlConnection()),
+    m_driverType(
+        rdbmsDriverTypeFromString(connection->qtSqlConnection()->driverName().toStdString()))
 {
 }
 
 SqlQuery::SqlQuery(QSqlDatabase connection, StatisticsCollector* statisticsCollector)
     :
     m_sqlQuery(connection),
-    m_statisticsCollector(statisticsCollector)
+    m_statisticsCollector(statisticsCollector),
+    m_driverType(rdbmsDriverTypeFromString(connection.driverName().toStdString()))
 {
 }
 
@@ -211,6 +215,20 @@ DBResult SqlQuery::getLastError()
 
         default:
             res.code = DBResultCode::ioError;
+    }
+
+    // Trying to add more details to the result code.
+    if (m_driverType == RdbmsDriverType::sqlite)
+    {
+        const auto nativeErrorCode = m_sqlQuery.lastError().nativeErrorCode();
+        if (nativeErrorCode == "2067") //< SQLITE_CONSTRAINT_UNIQUE
+            res.code = DBResultCode::uniqueConstraintViolation;
+    }
+    else if (m_driverType == RdbmsDriverType::mysql)
+    {
+        const auto nativeErrorCode = m_sqlQuery.lastError().nativeErrorCode();
+        if (nativeErrorCode == "1062") //< ERROR 1062 (23000): Duplicate entry
+            res.code = DBResultCode::uniqueConstraintViolation;
     }
 
     res.text = m_sqlQuery.lastError().text().toStdString();

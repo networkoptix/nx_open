@@ -23,6 +23,10 @@ static constexpr char kAccountNotificationSettings[] =
 
 static constexpr char kAccountOrganizationAttrsPath[] =
     "/cdb/internal/v0/account/{accountEmail}/organization-attrs";
+static constexpr char kInternalAccountsPath[] =
+    "/cdb/internal/accounts";
+static constexpr char kInternalAccountPath[] =
+    "/cdb/internal/accounts/{accountEmail}";
 static constexpr char kInternalGetAccountsInfo[] =
     "/cdb/internal/accounts/info";
 static constexpr char kInternalInviteNewOrganizationUserPath[] =
