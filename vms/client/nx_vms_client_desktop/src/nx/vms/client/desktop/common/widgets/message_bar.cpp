@@ -83,6 +83,25 @@ void MessageBarBlock::setMessageBars(const std::vector<BarDescription>& descs)
     }
 
     d->barsDescriptions = descs;
+    update();
+}
+
+QSize CommonMessageBar::minimumSizeHint() const
+{
+    // Minimum size is counted as severity icon plus margins.
+    return {style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.left()
+            + style::Metrics::kMessageBarContentMargins.right(),
+        style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.top()
+            + style::Metrics::kMessageBarContentMargins.bottom()};
+}
+
+QSize MessageBarBlock::minimumSizeHint() const
+{
+    // Minimum size is counted as severity icon plus margins.
+    return {style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.left()
+            + style::Metrics::kMessageBarContentMargins.right(),
+        (style::Metrics::kDefaultIconSize + style::Metrics::kMessageBarContentMargins.top()
+            + style::Metrics::kMessageBarContentMargins.bottom()) * (int)d->bars.size()};
 }
 
 CommonMessageBar::CommonMessageBar(QWidget* parent, const BarDescription& description):
