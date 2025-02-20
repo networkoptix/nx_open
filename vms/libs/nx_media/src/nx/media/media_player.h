@@ -22,8 +22,7 @@ class QnArchiveStreamReader;
 
 namespace nx::vms::common { class SystemContext; }
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 struct NX_MEDIA_API PlayerStatistics
 {
@@ -369,5 +368,4 @@ private:
  */
 NX_MEDIA_API QString videoQualityToString(int videoQuality);
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media

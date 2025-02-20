@@ -47,8 +47,7 @@ static size_t qHash(const MetadataType& value)
     return size_t(value);
 }
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 namespace {
 
@@ -278,6 +277,7 @@ public:
     void presentNextFrameDelayed();
 
     void presentNextFrame();
+    bool hasDiscontinue(qint64 lastPtsMs, qint64 ptsMs) const;
     qint64 getDelayForNextFrameWithAudioMs(
         const VideoFramePtr& frame,
         const ConstAudioOutputPtr& audioOutput);
@@ -647,10 +647,17 @@ qint64 Player::Private::getDelayForNextFrameWithAudioMs(
     return delayToAudioMs;
 }
 
+bool Player::Private::hasDiscontinue(qint64 lastPtsMs, qint64 ptsMs) const
+{
+    if (speed >= 0)
+        return !qBetween(lastPtsMs, ptsMs, lastPtsMs + kMaxFrameDurationMs);
+    return !qBetween(lastPtsMs - kMaxFrameDurationMs, ptsMs, lastPtsMs);
+}
+
 qint64 Player::Private::getDelayForNextFrameWithoutAudioMs(const VideoFramePtr& frame)
 {
     const qint64 ptsMs = frame->startTime();
-    const qint64 ptsDeltaMs = ptsMs - ptsTimerBaseMs;
+    const qint64 ptsDeltaMs = (ptsMs - ptsTimerBaseMs) * speed;
     FrameMetadata metadata = FrameMetadata::deserialize(frame);
 
     // Calculate time to present next frame
@@ -687,9 +694,9 @@ qint64 Player::Private::getDelayForNextFrameWithoutAudioMs(const VideoFramePtr& 
     }
 
     if (!lastVideoPtsMs.has_value() || //< first time
-        !qBetween(*lastVideoPtsMs, ptsMs, *lastVideoPtsMs + kMaxFrameDurationMs) || //< pts discontinuity
+        hasDiscontinue(*lastVideoPtsMs, ptsMs) ||
         metadata.displayHint != DisplayHint::regular || //< jump occurred
-        frameDelayMs < -kMaxDelayForResyncMs * speed || //< Resync because the video frame is late for more than threshold.
+        frameDelayMs < -kMaxDelayForResyncMs * std::abs(speed) || //< Resync because the video frame is late for more than threshold.
         liveBufferUnderflow ||
         liveBufferOverflow //< live buffer overflow
         )
@@ -933,7 +940,7 @@ void Player::Private::updateAudio()
     if (dataConsumer)
     {
         dataConsumer->setAudioEnabled(isAudioEnabled
-            && speed <= 2
+            && speed <= 2 && speed > 0
             && state == State::Playing);
     }
 }
@@ -1026,7 +1033,9 @@ qint64 Player::position() const
 {
     // positionMs is the actual value from a video frame. It could contain a "coarse" timestamp
     // a bit less then the user requested position (inside of the current GOP).
-    return qMax(d->lastSeekTimeMs, d->positionMs);
+    if (d->speed >= 0)
+        return std::max(d->lastSeekTimeMs, d->positionMs);
+    return std::min(d->lastSeekTimeMs, d->positionMs);
 }
 
 Player::AutoJumpPolicy Player::autoJumpPolicy() const
@@ -1045,9 +1054,6 @@ void Player::setAutoJumpPolicy(AutoJumpPolicy policy)
 
 void Player::setPosition(qint64 value)
 {
-    if (value > QDateTime::currentMSecsSinceEpoch())
-        value = -1;
-
     NX_DEBUG(this, "setPosition(%1: %2)",
         value, QDateTime::fromMSecsSinceEpoch(value, QTimeZone::UTC));
 
@@ -1095,6 +1101,7 @@ void Player::setSpeed(double value)
     {
         d->dataConsumer->setPlaySpeed(value);
         d->updateAudio();
+        d->archiveReader->setSpeed(value);
     }
 
     emit speedChanged();
@@ -1642,5 +1649,4 @@ void Player::setAllowSoftwareDecoderFallback(bool value)
     emit allowSoftwareDecoderFallbackChanged();
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media

@@ -26,6 +26,7 @@ namespace media {
 namespace {
 
 static const nx::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
+static const int kHeavyVideoThreshold = 1'000'000 * 2;
 
 QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
 {
@@ -160,7 +161,8 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
         frame->context->toAvCodecContext(codecContext);
-    //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
+    if (frame && frame->width * frame->height >= kHeavyVideoThreshold)
+        codecContext->thread_count = 4;
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
         NX_DEBUG(kLogTag, nx::format("Can't open decoder for codec %1").arg(frame->compressionType));

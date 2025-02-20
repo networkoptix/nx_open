@@ -6,6 +6,8 @@
 #include <deque>
 #include <functional>
 
+#include "gop_reverser.h"
+
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/audio_output.h>
 #include <nx/media/media_fwd.h>
@@ -15,12 +17,12 @@
 
 class QnArchiveStreamReader;
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 class AbstractVideoDecoder;
 class SeamlessVideoDecoder;
 class SeamlessAudioDecoder;
+
 
 /**
  * Private class used in nx::media::Player.
@@ -210,7 +212,8 @@ private:
     nx::media::StreamEventPacket m_mediaEvent;
     RenderContextSynchronizerPtr m_renderContextSynchronizer;
     const QnArchiveStreamReader* m_archiveReader = nullptr;
+    std::unique_ptr<GopReverser> m_gopReverser;
+    int m_queueSize;
 };
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media

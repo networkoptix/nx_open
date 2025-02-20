@@ -17,16 +17,17 @@
 #include "seamless_audio_decoder.h"
 #include "seamless_video_decoder.h"
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 namespace {
+
+static const int kReorderBufferSizeBytes = 1024*1024 * 300;
 
 // Max queue length for compressed data (about 3 second).
 static const int kMaxMediaQueueLen = 90;
 
 // Max queue length for decoded video which is awaiting to be rendered.
-static const int kMaxDecodedVideoQueueSize = 2;
+static const int kDefaultDecodedVideoQueueSize = 2;
 
 /**
  * Player will emit EOF if and only if it gets several empty packets in a row
@@ -42,6 +43,8 @@ QSize qMax(const QSize& size1, const QSize& size2)
 
 } // namespace
 
+// ---------------------- PlayerDataConsumer ---------------------
+
 PlayerDataConsumer::PlayerDataConsumer(
     const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
     RenderContextSynchronizerPtr renderContextSynchronizer)
@@ -55,7 +58,8 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_needToResetAudio(true),
     m_speed(1),
     m_renderContextSynchronizer(renderContextSynchronizer),
-    m_archiveReader(archiveReader.get())
+    m_archiveReader(archiveReader.get()),
+    m_queueSize(kDefaultDecodedVideoQueueSize)
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
@@ -307,16 +311,26 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         NX_WARNING(this, nx::format("Cannot decode the video frame. The frame is skipped."));
         // False result means we want to repeat this frame later, thus, returning true.
     }
-    else
+    else if (decodedFrame)
     {
-        if (decodedFrame)
+        FrameMetadata metadata = FrameMetadata::deserialize(decodedFrame);
+        if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Reverse))
         {
-            //NX_VERBOSE(this, nx::format("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"));
-            enqueueVideoFrame(std::move(decodedFrame));
+            if (!m_gopReverser)
+                m_gopReverser = std::make_unique<GopReverser>(kReorderBufferSizeBytes);
+            m_gopReverser->push(std::move(decodedFrame));
+            std::vector<VideoFramePtr> frames;
+            while (auto frame = m_gopReverser->pop())
+                frames.emplace_back(std::move(frame));
+            m_queueSize = std::max(m_queueSize, (int) frames.size());
+            for (auto& frame: frames)
+                enqueueVideoFrame(std::move(frame));
         }
         else
         {
-            //NX_VERBOSE(this, nx::format("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"));
+            m_gopReverser.reset();
+            m_queueSize = kDefaultDecodedVideoQueueSize;
+            enqueueVideoFrame(std::move(decodedFrame));
         }
     }
 
@@ -338,7 +352,7 @@ void PlayerDataConsumer::enqueueVideoFrame(VideoFramePtr decodedFrame)
 {
     NX_ASSERT(decodedFrame);
     NX_MUTEX_LOCKER lock(&m_queueMutex);
-    while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
+    while (m_decodedVideo.size() >= m_queueSize && !needToStop())
         m_queueWaitCond.wait(&m_queueMutex);
     if (needToStop())
         return;
@@ -603,5 +617,4 @@ bool PlayerDataConsumer::allowSoftwareDecoderFallback() const
     return m_allowSoftwareDecoderFallback;
 }
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media
