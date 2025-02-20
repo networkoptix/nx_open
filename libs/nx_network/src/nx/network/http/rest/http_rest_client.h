@@ -63,4 +63,15 @@ std::string substituteParameters(
     return resultPath;
 }
 
+/**
+ * Convenience function to convert a REST HTTP path template, e.g.
+ * /accounts/{accountId}/systems/{systemId} to a regex string, replacing all occurences of
+ * {variable} in pathTemplate with ".*".
+ */
+inline std::string toRegex(std::string pathTemplate)
+{
+    while (substituteNextParameter(&pathTemplate, ".*")) {}
+    return pathTemplate;
+}
+
 } // namespace nx::network::http::rest
