@@ -300,7 +300,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
         [this, q]()
         {
-            if (!nx::vms::client::core::ini().cslObjectsTabVisible)
+            if (!nx::vms::client::core::ini().allowCslObjectSearch)
                 return;
 
             const auto selectedCamera = q->windowContext()->navigator()->currentResource()

@@ -18,6 +18,7 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/image_providers/camera_thumbnail_provider.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/widgets/animated_compact_tab_widget.h>
@@ -37,7 +38,6 @@
 #include <nx/vms/client/desktop/event_search/widgets/simple_motion_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/vms_event_search_widget.h>
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/layout_resource.h>
@@ -336,12 +336,12 @@ EventPanel::Private::Private(EventPanel* q):
                 : OverlappableSearchWidget::Appearance::searchWidget;
 
             m_bookmarksTab->setAppearance(
-                ini().allowCslBookmarkSearch
+                nx::vms::client::core::ini().allowCslBookmarkSearch
                     ? OverlappableSearchWidget::Appearance::searchWidget
                     : appearance);
 
             m_analyticsTab->setAppearance(
-                ini().allowCslObjectSearch
+                nx::vms::client::core::ini().allowCslObjectSearch
                     ? OverlappableSearchWidget::Appearance::searchWidget
                     : appearance);
 

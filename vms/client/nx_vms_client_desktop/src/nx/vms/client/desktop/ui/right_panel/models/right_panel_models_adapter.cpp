@@ -1066,7 +1066,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 analyticsModel, &AnalyticsSearchListModel::pluginActionRequested,
                 q, &RightPanelModelsAdapter::pluginActionRequested);
 
-            if (nx::vms::client::core::ini().cslObjectsTabVisible)
+            if (nx::vms::client::core::ini().allowCslObjectSearch)
             {
                 initCslSupport(analyticsModel, analyticsFilterModel);
                 emit q->crossSiteModeChanged();

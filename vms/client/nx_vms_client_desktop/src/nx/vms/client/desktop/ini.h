@@ -353,14 +353,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, objectPixelation,
         "[Feature] Enables Object Pixelation feature.");
 
-    // VMS-52885
-    NX_INI_FLAG(false, allowCslBookmarkSearch,
-        "[Feature] Enables Bookmarks search on Cross System Layouts.");
-
-    // VMS-52886, VMS-52888
-    NX_INI_FLAG(false, allowCslObjectSearch,
-        "[Feature] Enables Objects search on Cross System Layouts.");
-
     // VMS-41660
     NX_INI_FLAG(true, foldersForLayoutsInResourceTree,
         "[Feature] Enables folders for layouts in the Resource Tree.");

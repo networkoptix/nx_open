@@ -90,8 +90,13 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Support] Prohibits showing right panel live analytics before the corresponding frame\n"
         "appears on the camera if the camera is playing live");
 
-    // VMS-52886
-    NX_INI_FLAG(false, cslObjectsTabVisible, "[Feature] Show Objects tab for cross site layouts.");
+    // VMS-52885
+    NX_INI_FLAG(false, allowCslBookmarkSearch,
+        "[Feature] Enables Bookmarks search for Cross System Layouts.");
+
+    // VMS-52886, VMS-52888, VMS-56000
+    NX_INI_FLAG(false, allowCslObjectSearch,
+        "[Feature] Enables Objects tab and Objects search dialog for Cross System Layouts.");
 
     // VMS-55962
     NX_INI_FLAG(false, useShortLivedCloudTokens,
