@@ -125,39 +125,9 @@ APPLY(2, tranSyncResponse, nx::vms::api::TranStateResponse, \
     InvalidFilterFunc(), /*< filter read func */ \
     PowerUserAccessOut(), /*< check remote peer rights for outgoing transaction */ \
     RegularTransactionType()) /*< regular transaction type */ \
-APPLY(3, lockRequest, nx::vms::api::LockData, \
-    false, /*< isPersistent */ \
-    true, /*< isSystem */ \
-    false, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), /*< getHash */ \
-    InvalidTriggerNotificationHelper(), /*< trigger notification */ \
-    PowerUserAccess(), /*< save permission checker */ \
-    PowerUserAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    PowerUserAccessOut(), /*< check remote peer rights for outgoing transaction */ \
-    RegularTransactionType()) /*< regular transaction type */ \
-APPLY(4, lockResponse, nx::vms::api::LockData, \
-    false, /*< isPersistent */ \
-    true, /*< isSystem */ \
-    false, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), /*< getHash */ \
-    InvalidTriggerNotificationHelper(), /*< trigger notification */ \
-    PowerUserAccess(), /*< save permission checker */ \
-    PowerUserAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    PowerUserAccessOut(), /*< check remote peer rights for outgoing transaction */ \
-    RegularTransactionType()) /*< regular transaction type */ \
-APPLY(5, unlockRequest, nx::vms::api::LockData, \
-    false, /*< isPersistent */ \
-    true, /*< isSystem */ \
-    false, /*< isRemoveOperation */ \
-    InvalidGetHashHelper(), /*< getHash */ \
-    InvalidTriggerNotificationHelper(), /*< trigger notification */ \
-    PowerUserAccess(), /*< save permission checker */ \
-    PowerUserAccess(), /*< read permission checker */ \
-    InvalidFilterFunc(), /*< filter read func */ \
-    PowerUserAccessOut(), /*< check remote peer rights for outgoing transaction */ \
-    RegularTransactionType()) /*< regular transaction type */ \
+/* Transaction 3 (lockRequest) removed, the code is forbidden. */ \
+/* Transaction 4 (lockResponse) removed, the code is forbidden. */ \
+/* Transaction 5 (unlockRequest) removed, the code is forbidden. */ \
 APPLY(6, peerAliveInfo, nx::vms::api::PeerAliveData, \
     false, /*< isPersistent */ \
     true, /*< isSystem */ \

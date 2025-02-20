@@ -29,7 +29,6 @@
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/license_overflow_data.h>
-#include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/peer_sync_time_data.h>
 #include <nx/vms/api/data/resource_type_data.h>

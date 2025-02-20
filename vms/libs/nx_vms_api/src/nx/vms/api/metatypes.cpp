@@ -26,7 +26,6 @@
 #include "data/ldap.h"
 #include "data/license_data.h"
 #include "data/license_overflow_data.h"
-#include "data/lock_data.h"
 #include "data/media_server_data.h"
 #include "data/misc_data.h"
 #include "data/module_information.h"
@@ -103,7 +102,6 @@ void initializeMetatypesInternal()
     qRegisterMetaType<ShowreelData>();
     qRegisterMetaType<LicenseData>();
     qRegisterMetaType<GracePeriodExpirationData>();
-    qRegisterMetaType<LockData>();
     qRegisterMetaType<MediaServerData>();
     qRegisterMetaType<MediaServerDataList>();
     qRegisterMetaType<MediaServerDataEx>();
