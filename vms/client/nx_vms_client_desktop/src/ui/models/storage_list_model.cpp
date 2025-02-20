@@ -478,21 +478,6 @@ bool QnStorageListModel::setData(const QModelIndex& index, const QVariant& value
 
         storageData.isUsed = checked;
 
-        if (storageData.isUsed && isCloudBackupStorage(storageData))
-        {
-            for (auto& otherStorageData: m_storages)
-            {
-                if (otherStorageData.isBackup && !isCloudBackupStorage(otherStorageData))
-                    otherStorageData.isUsed = false;
-            }
-            emit dataChanged(
-                index.siblingAtRow(0),
-                index.siblingAtRow(rowCount() - 1),
-                {Qt::CheckStateRole});
-
-            return true;
-        }
-
         emit dataChanged(index, index, {Qt::CheckStateRole});
         return true;
     }

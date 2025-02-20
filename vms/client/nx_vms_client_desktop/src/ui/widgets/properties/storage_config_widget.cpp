@@ -1210,6 +1210,43 @@ void QnStorageConfigWidget::atStorageViewClicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn)
     {
+        if (record.isUsed && record.storageType == nx::reflect::toString(StorageType::cloud))
+        {
+            nx::vms::license::saas::CloudStorageServiceUsageHelper helper(
+                nx::vms::client::desktop::SystemContext::fromResource(m_server));
+            if (helper.isOverflow())
+            {
+                const auto errorText = tr("Cloud storage cannot be enabled.");
+                const auto bodyText = tr("To activate it add %1 more suitable services or reduce"
+                    " the number of cameras with backup enabled.")
+                    .arg(helper.overflowLicenseCount());
+                QnMessageBox::critical(this,
+                    tr("Insufficient services"),
+                    QString("%1\n\n%2").arg(errorText, bodyText));
+                record.isUsed = false;
+                m_model->updateStorage(record);
+            }
+            else
+            {
+                for (auto row = 0; row < m_model->rowCount(); row++)
+                {
+                    auto storageIndex = m_model->index(row, QnStorageListModel::CheckBoxColumn);
+                    if (!storageIndex.isValid())
+                        continue;
+
+                    auto storageInfo =
+                        storageIndex.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
+                    if (storageInfo.storageType != nx::reflect::toString(StorageType::cloud)
+                        && storageInfo.isBackup)
+                    {
+                        storageInfo.isUsed = false;
+                    }
+
+                    m_model->updateStorage(storageInfo);
+                }
+            }
+        }
+
         updateWarnings();
     }
     else if (index.column() == QnStorageListModel::StorageArchiveModeWarningIconColumn
