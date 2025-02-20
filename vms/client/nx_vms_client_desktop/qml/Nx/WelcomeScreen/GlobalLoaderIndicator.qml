@@ -39,7 +39,7 @@ Rectangle
         enabled: parent.visible
         hoverEnabled: enabled
         acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onWheel: wheel.accepted = true
-        onClicked: mouse.accepted = true
+        onWheel: (wheel) => wheel.accepted = true
+        onClicked: (mouse) => mouse.accepted = true
     }
 }
