@@ -8,6 +8,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+#include <core/resource/avi/avi_archive_metadata.h>
 #include <export/signer.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/media/ffmpeg/io_context.h>
@@ -24,7 +25,6 @@ public:
     struct Config
     {
         bool computeSignature = false;
-        bool useAbsoluteTimestamp = false;
     };
 
 public:
@@ -47,7 +47,7 @@ public:
     * Destination codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
     * @return Returns true if no error or false otherwise
     */
-    bool open();
+    bool open(std::optional<QnAviArchiveMetadata> metadata = std::nullopt);
     bool addVideo(const AVCodecParameters* codecParameters);
     bool addAudio(const AVCodecParameters* codecParameters);
 
@@ -81,6 +81,7 @@ public:
     const QVector<int>& getPacketsSize();
     bool isCodecSupported(AVCodecID id) const;
     void setStartTimeOffset(int64_t value);
+    const Config& config() const { return m_config; }
 
 private:
     void closeFfmpegContext();

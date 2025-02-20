@@ -301,7 +301,7 @@ QnAviArchiveMetadata::Format QnAviArchiveMetadata::formatFromExtension(const QSt
     if (extension == "avi")
         return QnAviArchiveMetadata::Format::avi;
 
-    if (extension == "mp4")
+    if (extension == "mp4" || extension == "ismv")
         return QnAviArchiveMetadata::Format::mp4;
 
     return QnAviArchiveMetadata::Format::custom;

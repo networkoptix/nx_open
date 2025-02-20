@@ -6,6 +6,7 @@ extern "C" {
 #include <libavutil/opt.h>
 }
 
+#include <core/resource/avi/avi_archive_metadata.h>
 #include <nx/codec/jpeg/jpeg_utils.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
@@ -208,7 +209,8 @@ static QAtomicInt QnFfmpegTranscoder_count = 0;
 
 QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metric::Storage* metrics):
     m_mediaTranscoder(config.mediaTranscoderConfig, metrics),
-    m_muxer(config.muxerConfig)
+    m_muxer(config.muxerConfig),
+    m_config(config)
 {
     NX_DEBUG(this, "Created new ffmpeg transcoder. Total transcoder count %1",
         QnFfmpegTranscoder_count.fetchAndAddOrdered(1) + 1);
@@ -360,7 +362,18 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
             return false;
     }
 
-    if (!m_muxer.open())
+    std::optional<QnAviArchiveMetadata> metadata;
+    if (m_config.utcTimestamps)
+    {
+        metadata = QnAviArchiveMetadata();
+        if (video)
+            metadata->startTimeMs = video->timestamp / 1000;
+        else if (audio)
+            metadata->startTimeMs = audio->timestamp / 1000;
+        metadata->version = QnAviArchiveMetadata::kMetadataStreamVersion_4;
+    }
+
+    if (!m_muxer.open(metadata))
         return false;
 
     m_initialized = true;

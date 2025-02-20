@@ -31,6 +31,7 @@ public:
     {
         MediaTranscoder::Config mediaTranscoderConfig;
         FfmpegMuxer::Config muxerConfig;
+        bool utcTimestamps = false;
     };
 
 public:
@@ -114,4 +115,5 @@ private:
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter = 0;
     BeforeOpenCallback m_beforeOpenCallback;
+    const Config m_config;
 };

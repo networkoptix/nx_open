@@ -173,7 +173,7 @@ bool FfmpegMuxer::addAudio(const AVCodecParameters* codecParameters)
     return true;
 }
 
-bool FfmpegMuxer::open()
+bool FfmpegMuxer::open(std::optional<QnAviArchiveMetadata> metadata)
 {
     if (m_formatCtx->nb_streams == 0)
         return false;
@@ -189,6 +189,8 @@ bool FfmpegMuxer::open()
         };
 
     m_formatCtx->pb = m_ioContext->getAvioContext();
+    if (metadata)
+        metadata->saveToFile(m_formatCtx, metadata->formatFromExtension(m_container));
     int rez = avformat_write_header(m_formatCtx, 0);
     if (rez < 0)
     {
@@ -228,9 +230,7 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
     auto packet = avPacket.get();
 
     bool allowEqualTimestamps = media->dataType == QnAbstractMediaData::GENERIC_METADATA;
-    auto timestamp = m_config.useAbsoluteTimestamp
-        ? media->timestamp
-        : m_timestampCorrector.process(std::chrono::microseconds(media->timestamp), streamIndex, allowEqualTimestamps).count();
+    auto timestamp = m_timestampCorrector.process(std::chrono::microseconds(media->timestamp), streamIndex, allowEqualTimestamps).count();
 
     packet->pts = av_rescale_q(timestamp, srcRate, stream->time_base);
     packet->data = (uint8_t*)media->data();
