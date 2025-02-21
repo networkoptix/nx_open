@@ -631,8 +631,44 @@ void AnalyticsSearchListModel::Private::processMetadata()
     }
 
     //---------------------------------------------------------------------------------------------
+    // Update live reception state: determine if there's a gap, determine if live should be paused.
+
+    // Special handling if live mode is paused (analytics tab is hidden).
+    if (!data.empty() && (q->livePaused() || (!q->isLive()
+        && liveProcessingMode == LiveProcessingMode::automaticAdd)))
+    {
+        const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
+        gapBeforeNewTracks = true;
+
+        if (liveProcessingMode == LiveProcessingMode::automaticAdd)
+        {
+            // Completely stop metadata processing in automatic mode.
+            q->setLive(false);
+        }
+        else
+        {
+            // Discard previously received tracks in manual mode.
+            subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
+                /*subtrahend*/ newTracks.idToTimestamp);
+            subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
+                /*subtrahend*/ hiddenTracks.idToTimestamp);
+            newTracks.clear();
+            hiddenTracks.clear();
+        }
+    }
+
+    setLiveReceptionActive(
+        (q->isLive() || liveProcessingMode == LiveProcessingMode::manualAdd)
+        && (!q->interestTimePeriod() || q->interestTimePeriod()->isInfinite()) //< For manualAdd mode.
+        && q->isOnline()
+        && !q->livePaused()
+        && (!q->isFilterDegenerate() || q->hasOnlyLiveCameras()));
+
+    if (!liveReceptionActive)
+        return;
+
+    //---------------------------------------------------------------------------------------------
     // Fetch all metadata packets from receiver buffers and deferred packets storage.
-    // It should be done early to determine a possible gap.
 
     std::vector<QnAbstractCompressedMetadataPtr> metadataPackets;
     int numSources = 0;
@@ -705,41 +741,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         ++numSources;
     }
 
-    //---------------------------------------------------------------------------------------------
-    // Update live reception state: determine if there's a gap, determine if live should be paused.
-
-    // Special handling if live mode is paused (analytics tab is hidden).
-    if (!data.empty() && (q->livePaused() || (!q->isLive()
-        && liveProcessingMode == LiveProcessingMode::automaticAdd)))
-    {
-        const auto availableNewTracksGuard = makeAvailableNewTracksGuard();
-        gapBeforeNewTracks = !metadataPackets.empty();
-
-        if (liveProcessingMode == LiveProcessingMode::automaticAdd)
-        {
-            // Completely stop metadata processing in automatic mode.
-            q->setLive(false);
-        }
-        else
-        {
-            // Discard previously received tracks in manual mode.
-            subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
-                /*subtrahend*/ newTracks.idToTimestamp);
-            subtractKeysFromSet(/*minuend*/ externalBestShotTracks,
-                /*subtrahend*/ hiddenTracks.idToTimestamp);
-            newTracks.clear();
-            hiddenTracks.clear();
-        }
-    }
-
-    setLiveReceptionActive(
-        (q->isLive() || liveProcessingMode == LiveProcessingMode::manualAdd)
-        && (!q->interestTimePeriod() || q->interestTimePeriod()->isInfinite()) //< For manualAdd mode.
-        && q->isOnline()
-        && !q->livePaused()
-        && (!q->isFilterDegenerate() || q->hasOnlyLiveCameras()));
-
-    if (!liveReceptionActive || metadataPackets.empty())
+    if (metadataPackets.empty())
         return;
 
     //---------------------------------------------------------------------------------------------
