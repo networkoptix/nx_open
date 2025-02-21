@@ -29,6 +29,7 @@
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/common/data/motion_selection.h>
 #include <nx/vms/client/core/common/helpers/texture_size_helper.h>
+#include <nx/vms/client/core/common/models/linearization_list_model.h>
 #include <nx/vms/client/core/common/utils/collator.h>
 #include <nx/vms/client/core/common/utils/encoded_credentials.h>
 #include <nx/vms/client/core/common/utils/path_util.h>
@@ -119,6 +120,7 @@ void registerQmlTypesInternal()
     qmlRegisterType<ResourceHelper>("Nx.Core", 1, 0, "ResourceHelper");
     qmlRegisterType<MediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
 
+    nx::vms::client::core::LinearizationListModel::registerQmlType();
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");

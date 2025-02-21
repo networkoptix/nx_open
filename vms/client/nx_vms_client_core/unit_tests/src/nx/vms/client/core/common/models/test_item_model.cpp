@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace test {
 
 QModelIndex TestItemModel::buildIndex(std::initializer_list<int> indices) const
@@ -20,4 +20,4 @@ QModelIndex TestItemModel::buildIndex(std::initializer_list<int> indices) const
 }
 
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

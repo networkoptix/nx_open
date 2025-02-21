@@ -6,7 +6,7 @@
 
 #include <nx/vms/client/core/common/models/standard_item_model.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace test {
 
 class TestItemModel: public nx::vms::client::core::StandardItemModel
@@ -16,7 +16,7 @@ public:
 };
 
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core
 
 // -----------------------------------------------------------------------------------------------
 // Some utility functions.

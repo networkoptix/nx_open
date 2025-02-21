@@ -102,7 +102,10 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, useShortLivedCloudTokens,
         "[Feature] Short-lived tokens improve security by reducing the time a token remains valid.\n"
         "It can be removed once the required functionality is available on all cloud instances.");
-};
+
+    NX_INI_FLAG(false, debugChecksEnabled,
+        "[Dev] Whether to enable extra debug checks in client core code.");
+    };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();
 

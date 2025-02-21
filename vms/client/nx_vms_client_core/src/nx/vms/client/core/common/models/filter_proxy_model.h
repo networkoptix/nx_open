@@ -9,7 +9,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
  * A replacement for QSortFilterProxyModel if only a filtering of rows is required.
@@ -29,7 +29,7 @@ namespace nx::vms::client::desktop {
  * changes after recomputation, the initial proxy row move, insertion or deletion is followed
  * by a proxy layout change of the destination parent.
  */
-class NX_VMS_CLIENT_DESKTOP_API FilterProxyModel:
+class NX_VMS_CLIENT_CORE_API FilterProxyModel:
     public ScopedModelOperations<QAbstractProxyModel>
 {
     Q_OBJECT
@@ -75,4 +75,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

@@ -10,7 +10,7 @@
 
 class QJSValue;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 /**
  * This mapping model allows to represent an expanded part of a tree model as a list model.
@@ -24,7 +24,7 @@ namespace nx::vms::client::desktop {
  * This model introduces new data roles: LevelRole, HasChildrenRole, ExpandedRole.
  * The first two are read-only, the last one can be used in setData to expand/collapse nodes.
  */
-class NX_VMS_CLIENT_DESKTOP_API LinearizationListModel:
+class NX_VMS_CLIENT_CORE_API LinearizationListModel:
     public ScopedModelOperations<core::AbstractMappingModel<QAbstractListModel>>
 {
     Q_OBJECT
@@ -96,4 +96,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

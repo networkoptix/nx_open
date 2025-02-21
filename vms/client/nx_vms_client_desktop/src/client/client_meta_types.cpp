@@ -28,7 +28,6 @@
 #include <nx/vms/client/desktop/analytics/attribute_visibility_settings_model.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/models/index_list_model.h>
-#include <nx/vms/client/desktop/common/models/linearization_list_model.h>
 #include <nx/vms/client/desktop/common/models/row_check_model.h>
 #include <nx/vms/client/desktop/common/models/sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
@@ -236,7 +235,6 @@ void registerQmlTypesInternal()
     SystemContext::registerQmlType();
     AccessRightsList::registerQmlTypes();
     LayoutModel::registerQmlType();
-    LinearizationListModel::registerQmlType();
     RowCheckModel::registerQmlType();
     IndexListModel::registerQmlType();
     QmlClientStateDelegate::registerQmlType();

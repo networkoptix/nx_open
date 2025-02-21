@@ -4,7 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
+#include <nx/vms/client/core/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/system_context.h>
 
@@ -14,11 +14,11 @@ class QnWorkbenchContext;
 namespace nx::vms::client::desktop {
 
 class NX_VMS_CLIENT_DESKTOP_API ResourceSelectionModelAdapter:
-    public ScopedModelOperations<FilterProxyModel>
+    public ScopedModelOperations<nx::vms::client::core::FilterProxyModel>
 {
     Q_OBJECT
     Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
-    using base_type = ScopedModelOperations<FilterProxyModel>;
+    using base_type = ScopedModelOperations<nx::vms::client::core::FilterProxyModel>;
 
 public:
     using IsIndexAccepted = std::function<bool(const QModelIndex& sourceIndex)>;

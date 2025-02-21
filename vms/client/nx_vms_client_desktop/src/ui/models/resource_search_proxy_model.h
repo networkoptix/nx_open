@@ -8,7 +8,7 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
+#include <nx/vms/client/core/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
 namespace nx::utils { class PendingOperation; }
@@ -51,10 +51,10 @@ struct QnResourceSearchQuery
 /**
  * A resource search filtering model.
  */
-class QnResourceSearchProxyModel: public nx::vms::client::desktop::FilterProxyModel
+class QnResourceSearchProxyModel: public nx::vms::client::core::FilterProxyModel
 {
     Q_OBJECT
-    using base_type = nx::vms::client::desktop::FilterProxyModel;
+    using base_type = nx::vms::client::core::FilterProxyModel;
     using NodeType = nx::vms::client::desktop::ResourceTree::NodeType;
 
 public:

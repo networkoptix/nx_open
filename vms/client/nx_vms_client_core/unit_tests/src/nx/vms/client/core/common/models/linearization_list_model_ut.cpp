@@ -13,11 +13,11 @@
 
 #include <QtCore/private/qabstractitemmodel_p.h>
 
-#include <nx/vms/client/desktop/common/models/linearization_list_model.h>
+#include <nx/vms/client/core/common/models/linearization_list_model.h>
 
 #include "test_item_model.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace test {
 
 // Storage to track dataChanged signals history.
@@ -934,4 +934,4 @@ TEST_F(LinearizationListModelTest, autoExpand)
 }
 
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

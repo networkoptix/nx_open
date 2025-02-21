@@ -12,9 +12,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/core/ini.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -61,7 +61,7 @@ public:
     IsRowAccepted isRowAccepted = noFilter;
 
     bool recalculateFilterAfterLongMove = true;
-    bool debugChecksEnabled = ini().developerMode;
+    bool debugChecksEnabled = ini().debugChecksEnabled;
 
 public:
     Private(FilterProxyModel* q): q(q) {}
@@ -1154,4 +1154,4 @@ void FilterProxyModel::Private::recalculateFilter(
     emit q->layoutChanged({parent});
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

@@ -11,11 +11,11 @@
 
 #include <nx/utils/log/format.h>
 #include <nx/utils/debug_helpers/model_transaction_checker.h>
-#include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
+#include <nx/vms/client/core/common/models/filter_proxy_model.h>
 
 #include "test_item_model.h"
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace test {
 
 class FilterProxyModelTest: public testing::Test
@@ -759,4 +759,4 @@ TEST_F(FilterProxyModelTest, invalidIndex)
 }
 
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

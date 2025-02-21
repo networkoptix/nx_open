@@ -18,8 +18,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/build_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/common/models/filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
@@ -377,7 +377,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
         if (nodeType == NodeType::customResourceGroup)
         {
             const auto getFilterModelAndIndex =
-                [](const QModelIndex& index) -> std::pair<const FilterProxyModel*, QModelIndex>
+                [](const QModelIndex& index) -> std::pair<const core::FilterProxyModel*, QModelIndex>
                 {
                     if (!index.isValid())
                         return {};
@@ -387,7 +387,7 @@ struct ResourceTreeInteractionHandler::Private: public QnWorkbenchContextAware
                     while (currentProxy)
                     {
                         if (const auto filterModel =
-                            qobject_cast<const FilterProxyModel*>(currentProxy))
+                            qobject_cast<const core::FilterProxyModel*>(currentProxy))
                         {
                             return {filterModel, currentIndex};
                         }

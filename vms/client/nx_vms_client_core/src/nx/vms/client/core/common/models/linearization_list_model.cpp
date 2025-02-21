@@ -16,7 +16,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/core/application_context.h>
 
 template<typename Container, typename ToString>
 QString itemsToString(const Container& items, ToString itemToString)
@@ -41,7 +41,7 @@ QString toString(const QModelIndex& index)
         : QString::number(index.row());
 }
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -402,7 +402,7 @@ QHash<int, QByteArray> LinearizationListModel::roleNames() const
 
 void LinearizationListModel::registerQmlType()
 {
-    qmlRegisterType<LinearizationListModel>("nx.vms.client.desktop", 1, 0, "LinearizationListModel");
+    qmlRegisterType<LinearizationListModel>("nx.vms.client.core", 1, 0, "LinearizationListModel");
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1805,4 +1805,4 @@ bool LinearizationListModel::Private::debugCheckTreeIntegrity(
     return true;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core
