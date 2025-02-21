@@ -139,9 +139,6 @@ using GetTransactionTypeFuncType = std::function<ec2::TransactionType(
 template<typename ParamType>
 using GetHashFuncType = std::function<nx::Uuid(ParamType const &)>;
 
-template<typename ParamType>
-using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction& tran)>;
-
 struct NotificationParams
 {
     AbstractECConnection* ecConnection;
