@@ -37,6 +37,7 @@ public:
     nx::Uuid currentLayoutId;
     nx::Uuid runningTourId;
     QList<nx::Uuid> layoutUuids;
+    QMap<nx::Uuid, nx::Uuid> activeItems;
     QList<UnsavedLayout> unsavedLayouts;
 
     bool isEmpty() const
@@ -51,7 +52,7 @@ public:
 #define WorkbenchStateUnsavedLayout_Fields (id)(parentId)(name)(cellSpacing)(cellAspectRatio) \
     (backgroundImageFilename)(backgroundOpacity)(backgroundSize)(items)(isCrossSystem)
 #define WorkbenchState_Fields \
-    (userId)(localSystemId)(currentLayoutId)(runningTourId)(layoutUuids)
+    (userId)(localSystemId)(currentLayoutId)(runningTourId)(layoutUuids)(activeItems)
 
 QN_FUSION_DECLARE_FUNCTIONS(WorkbenchState, (json))
 QN_FUSION_DECLARE_FUNCTIONS(WorkbenchState::UnsavedLayout, (json))

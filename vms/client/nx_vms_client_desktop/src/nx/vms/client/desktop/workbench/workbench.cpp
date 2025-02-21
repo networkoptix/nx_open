@@ -97,6 +97,8 @@ public:
         m_state.unsavedLayouts = {};
         if (!QJson::deserialize(state.value(kLayoutUuids), &m_state.layoutUuids))
             m_state.layoutUuids = {};
+        if (!QJson::deserialize(state.value(kActiveItems), &m_state.activeItems))
+            m_state.activeItems = {};
         return true;
     }
 
@@ -111,6 +113,7 @@ public:
             result[kCurrentLayoutId] = m_state.currentLayoutId.toString(QUuid::WithBraces);
             result[kRunningTourId] = m_state.runningTourId.toString(QUuid::WithBraces);
             QJson::serialize(m_state.layoutUuids, &result[kLayoutUuids]);
+            QJson::serialize(m_state.activeItems, &result[kActiveItems]);
             *state = result;
         }
     }
@@ -133,7 +136,7 @@ private:
     const QString kCurrentLayoutId = "currentLayoutId";
     const QString kRunningTourId = "runningTourId";
     const QString kLayoutUuids = "layoutUids";
-    const QString kUnsavedLayouts = "unsavedLayouts";
+    const QString kActiveItems = "activeItems";
 };
 
 class WorkbenchLayout: public QnWorkbenchLayout
@@ -716,10 +719,14 @@ void Workbench::update(const WorkbenchState& state)
     auto systemContext = system();
     auto resourcePool = systemContext->resourcePool();
 
+    const auto activeItems = state.activeItems;
     for (const auto& id: state.layoutUuids)
     {
+        const auto activeItemId = activeItems.value(id);
         if (const auto layout = resourcePool->getResourceById<LayoutResource>(id))
         {
+            if (!activeItemId.isNull())
+                layout->setData(Qn::LayoutActiveItemRole, QVariant::fromValue(activeItemId));
             addLayout(layout);
             continue;
         }
@@ -727,6 +734,8 @@ void Workbench::update(const WorkbenchState& state)
         if (const auto layout = appContext()->cloudLayoutsPool()->
             getResourceById<CrossSystemLayoutResource>(id))
         {
+            if (!activeItemId.isNull())
+                layout->setData(Qn::LayoutActiveItemRole, QVariant::fromValue(activeItemId));
             addLayout(layout);
             continue;
         }
@@ -884,6 +893,7 @@ void Workbench::submit(WorkbenchState& state)
             state.currentLayoutId = sourceId(currentResource);
     }
 
+    QMap<nx::Uuid, nx::Uuid> activeItems;
     for (const auto& layout: d->layouts)
     {
         auto resource = layout->resource();
@@ -910,8 +920,15 @@ void Workbench::submit(WorkbenchState& state)
                 state.unsavedLayouts << unsavedLayout;
             }
         }
-    }
 
+        const auto activeItemId = layout->data(Qn::LayoutActiveItemRole).value<nx::Uuid>();
+        if (!activeItemId.isNull())
+            activeItems.insert(layout->resourceId(), activeItemId);
+    }
+    const auto activeItem = d->itemByRole[Qn::ActiveRole];
+    if (activeItem)
+        activeItems.insert(d->currentLayout->resourceId(), activeItem->uuid());
+    state.activeItems = activeItems;
     state.runningTourId = windowContext()->showreelActionsHandler()->runningShowreel();
 }
 
