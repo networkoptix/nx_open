@@ -326,6 +326,7 @@ void ServiceManager::setData(
 
         stateChanged = m_data.state != data.state;
 
+        NX_VERBOSE(this, "Update saas data: %1", nx::reflect::json::serialize(m_data));
         m_data = data;
         updateLocalRecordingLicenseV1Unsafe();
     }
