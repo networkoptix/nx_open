@@ -2027,11 +2027,11 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>System has been shut down. To enable this integration usage for current device the System must be in active state. Contact your channel partner for details</source>
-      <translation>システムはシャットダウンされました。現在のデバイスに対してこのインテグレーションの使用を有効化するには、システムがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください</translation>
+      <translation>システムはシャットダウン状態です。現在のデバイスに対してこのインテグレーションの使用を有効化するには、システムがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください</translation>
     </message>
     <message>
       <source>System has been shut down. To activate this integration usage for some device the System must be in active state. Contact your channel partner for details</source>
-      <translation>システムはシャットダウンされました。一部のデバイスに対してこのインテグレーションの使用を有効化するには、システムがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください</translation>
+      <translation>システムはシャットダウン状態です。一部のデバイスに対してこのインテグレーションの使用を有効化するには、システムがアクティブな状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください</translation>
     </message>
   </context>
   <context>

@@ -2068,7 +2068,7 @@ License Key: %2</source>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>System shut down. To attach to a Video Wall, the System should be in active state. %1</source>
-      <translation>システムがシャットダウンしました。ビデオウォールに接続するには、システムがアクティブな状態である必要があります。 %1</translation>
+      <translation>システムはシャットダウン状態です。ビデオウォールに接続するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
   </context>
   <context>
@@ -7318,7 +7318,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System suspended. To make changes to backup configuration, the System should be in active state. %1</source>
-      <translation>システムがサスペンドされました。バックアップ設定を変更するには、システムがアクティブな状態である必要があります。 %1</translation>
+      <translation>システムはサスペンドしています。バックアップ設定を変更するには、システムがアクティブな状態である必要があります。 %1</translation>
     </message>
     <message>
       <source>Applies to all servers</source>
