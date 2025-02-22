@@ -1286,7 +1286,7 @@
     <name>StringsHelper</name>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation>Hãy liên hệ với đối tác của bạn để biết chi tiết.</translation>
+      <translation>Liên hệ với đối tác kênh của bạn để biết chi tiết.</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
@@ -1476,7 +1476,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation>Các mục cảnh tối đa (0 có nghĩa là mặc định)</translation>
+      <translation>Số lượng mục cảnh tối đa (0 nghĩa là mặc định)</translation>
     </message>
     <message>
       <source>Send plain-text emails</source>
@@ -1488,7 +1488,7 @@
     </message>
     <message>
       <source>Enable audit trail</source>
-      <translation>Kích hoạt tính năng dấu vết kiểm toán</translation>
+      <translation>Kích hoạt báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730)</source>
@@ -1656,11 +1656,11 @@
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure</source>
-      <translation>Trao quyền đối với điểm gắn kết lưu trữ của Cơ sở dữ liệu phân tích đề phòng trường hợp bị lỗi</translation>
+      <translation>Buộc cấp quyền điểm gắn lưu trữ DB phân tích trong trường hợp lỗi</translation>
     </message>
     <message>
       <source>Storage encryption enabled</source>
-      <translation>Mã hóa bộ nhớ đã được bật</translation>
+      <translation>Đã bật mã hóa lưu trữ</translation>
     </message>
     <message>
       <source>Current storage encryption key</source>
@@ -1704,7 +1704,7 @@
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device</source>
-      <translation>Luôn bật trạng thái cổng IO khi Máy chủ kết nối với Thiết bị</translation>
+      <translation>Giữ trạng thái cổng IO khi Máy chủ kết nối với thiết bị</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB)</source>
@@ -1724,11 +1724,11 @@
     </message>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation>Bản ghi nhật ký sự kiện tối đa có thể lưu vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.</translation>
+      <translation>Bản ghi nhật ký sự kiện tối đa cần lưu trong cơ sở dữ liệu. Số lượng bản ghi thực tế chưa xóa có thể cao hơn tới 20% so với giá trị đã chỉ định.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation>Có lưu vào bộ nhớ cache một số khung cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn được bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn bị tắt ngoại trừ khi yêu cầu phát lại (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
+      <translation>Có lưu trữ đệm một số khung hình cho luồng chính hay không. Giá trị: &apos;có&apos; - luôn bật (có thể sử dụng nhiều RAM), &apos;không&apos; - luôn tắt trừ khi phát lại yêu cầu (ví dụ: HLS), &apos;tự động&apos; - tương tự như &apos;không&apos;, nhưng bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics đang hoạt động trên Camera).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
@@ -1736,7 +1736,7 @@
     </message>
     <message>
       <source>Update releases.json file URL</source>
-      <translation>URL cập nhật tệp phát hành .json</translation>
+      <translation>Cập nhật URL tệp releases.json</translation>
     </message>
     <message>
       <source>LDAP settings</source>

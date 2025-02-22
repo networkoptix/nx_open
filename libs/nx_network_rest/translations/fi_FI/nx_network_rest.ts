@@ -5,18 +5,18 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Virheellinen JSON-sisältö.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Sisältötyyppiä ei tueta.</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Tätä käyttäjää ei ole olemassa tai hän ei voi kirjautua sisään.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -28,11 +28,11 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP palvelin ei ole käytettävissä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 ei ole vielä käytettävissä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Käyttäjä on lukittu useiden epäonnistuneiden yritysten vuoksi. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
@@ -48,19 +48,19 @@
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Istuntoavain on virheellinen tai vanhentunut.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Istuntoavain on virheellinen tai vanhentunut.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Useampi kuin yksi käyttäjä samalla kirjautumistunnuksella esitetään.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP-palvelimen SSL/TLS-varmennetta ei voitu todentaa.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>

@@ -99,7 +99,7 @@
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
+        <numerusform>Tavu(t)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
     </message>
@@ -107,7 +107,7 @@
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilotavu(t)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
     </message>
@@ -115,7 +115,7 @@
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megatavu(t)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
     </message>
@@ -123,7 +123,7 @@
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigatavu(t)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
     </message>
@@ -131,7 +131,7 @@
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Teratavu(t)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
     </message>
@@ -139,7 +139,7 @@
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petatavu(t)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
     </message>

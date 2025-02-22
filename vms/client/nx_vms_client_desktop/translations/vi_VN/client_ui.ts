@@ -2503,11 +2503,11 @@
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation>Liên hệ với Đối tác của bạn để thêm dịch vụ</translation>
+      <translation>Liên hệ với Đối tác kênh của bạn để thêm dịch vụ</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation>Liên hệ đối tác</translation>
+      <translation>Liên hệ đối tác kênh</translation>
     </message>
     <message>
       <source>Services Usage</source>
