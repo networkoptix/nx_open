@@ -9206,7 +9206,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>NGOẠI TUYẾN</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>

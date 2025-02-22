@@ -5,11 +5,11 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Virheellinen JSON-sisältö.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Sisältötyyppiä ei tueta.</translation>
     </message>
   </context>
   <context>
@@ -31,51 +31,51 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Salasana on vanhentunut. Ota yhteyttä järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP palvelin ei ole käytettävissä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 ei ole vielä käytettävissä. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Käyttäjä on lukittu useiden epäonnistuneiden yritysten vuoksi. Yritä myöhemmin uudelleen.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Tämä valtuutusmenetelmä on kielletty. Ota yhteyttä järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Istuntoavain on virheellinen tai vanhentunut.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>Sisäinen palvelinvirhe (%1). Ota yhteyttä järjestelmänvalvojaan.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Järjestelmänvalvoja on poistanut tämän käyttäjän käytöstä.</translation>
     </message>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Tätä käyttäjää ei ole olemassa tai hän ei voi kirjautua sisään.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Useampi kuin yksi käyttäjä samalla kirjautumistunnuksella esitetään.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>LDAP-palvelimen SSL/TLS-varmennetta ei voitu todentaa.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Istuntoavain on virheellinen tai vanhentunut.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -134,7 +134,7 @@
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation type="unfinished">
-        <numerusform>Byte(s)</numerusform>
+        <numerusform>Tavu(t)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
     </message>
@@ -142,7 +142,7 @@
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation type="unfinished">
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilotavu(t)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
     </message>
@@ -150,7 +150,7 @@
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation type="unfinished">
-        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megatavu(t)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
     </message>
@@ -158,7 +158,7 @@
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
       <translation type="unfinished">
-        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigatavu(t)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
     </message>
@@ -166,7 +166,7 @@
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
       <translation type="unfinished">
-        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Teratavu(t)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
     </message>
@@ -174,7 +174,7 @@
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation type="unfinished">
-        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petatavu(t)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
     </message>
