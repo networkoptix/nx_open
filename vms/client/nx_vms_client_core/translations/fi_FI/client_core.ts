@@ -168,7 +168,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Järjestelmänvalvoja on poistanut tämän käyttäjän käytöstä.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>

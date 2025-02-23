@@ -1308,7 +1308,7 @@
     </message>
     <message>
       <source>Contact your channel partner for details.</source>
-      <translation type="unfinished">Contact your channel partner for details.</translation>
+      <translation>Liên hệ với đối tác kênh của bạn để biết chi tiết.</translation>
     </message>
     <message>
       <source>Check internet connection between VMS and license server.</source>
