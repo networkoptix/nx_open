@@ -53,6 +53,7 @@
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/qml/items/multiline_text_item.h>
+#include <nx/vms/client/core/qml/items/values_text.h>
 #include <nx/vms/client/core/qml/name_value_table_calculator.h>
 #include <nx/vms/client/core/qml/nx_globals_object.h>
 #include <nx/vms/client/core/qml/positioners/grid_positioner.h>
@@ -199,6 +200,7 @@ void registerQmlTypesInternal()
     MultilineTextItem::registerQmlType();
     NameValueTableCalculator::registerQmlType();
     RecordingStatusHelper::registerQmlType();
+    ValuesText::registerQmlType();
 
     qRegisterMetaType<nx::vms::client::core::ThumbnailStatus>();
 

@@ -1,48 +1,37 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <QtCore/QVariant>
+#include <QtQml/QQmlParserStatus>
+
+#include <nx/utils/impl_ptr.h>
 
 class QQuickItem;
 
 namespace nx::vms::client::core {
 
-class NameValueTableCalculator: public QObject
+class NameValueTableCalculator: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
+
     using base_type = QObject;
 
 public:
     explicit NameValueTableCalculator(QObject* parent = nullptr);
+    virtual ~NameValueTableCalculator() override;
 
-    Q_INVOKABLE void calculateWidths(
-        QQuickItem* grid, const QVariantList& labels, const QVariantList& values);
+    Q_INVOKABLE void updateColumnWidths();
+
+    virtual void classBegin() override {}
+    virtual void componentComplete() override;
 
     static void registerQmlType();
 
 private:
-    struct RowAsset
-    {
-        int index;
-        qreal valueWidth;
-    };
+    void recalculate();
 
 private:
-    bool initialize(QQuickItem* grid, const QVariantList& labels, const QVariantList& values);
-    void setWidths(const QVariantList& container, qreal newWidth);
-    void reduceValuesCount(int index);
-
-private:
-    qreal m_columnSpacing;
-    qreal m_leftPadding;
-    qreal m_rightPadding;
-    qreal m_availableWidth;
-    qreal m_itemSpacing;
-    qreal m_labelFraction;
-    qreal m_maxLabelWidth;
-    QVariantList m_labels;
-    QVariantList m_values;
-    QList<RowAsset> m_rowWidths;
-    QList<int> m_valuesVisibleCount;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::core

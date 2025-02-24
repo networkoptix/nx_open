@@ -1,163 +1,224 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <QtCore/QVariant>
 #include <QtQuick/private/qquickrepeater_p.h>
+#include <QtQuick/private/qquicktext_p.h>
 
+#include <nx/utils/math/fuzzy.h>
+#include <nx/vms/client/core/qml/items/values_text.h>
 #include <nx/vms/client/core/utils/qml_property.h>
 
 #include "name_value_table_calculator.h"
 
 namespace nx::vms::client::core {
 
-NameValueTableCalculator::NameValueTableCalculator(QObject* parent):
-    base_type(parent)
+struct NameValueTableCalculator::Private
 {
-}
-
-void NameValueTableCalculator::calculateWidths(
-    QQuickItem* grid, const QVariantList& labels, const QVariantList& values)
-{
-    if (!initialize(grid, std::move(labels), std::move(values)))
-        return;
-
-    qreal preferredLabelWidth = m_availableWidth * m_labelFraction;
-    qreal preferredValueWidth = m_availableWidth - preferredLabelWidth;
-
-    // Iterative processing.
-    bool found = false;
-    do
+    struct RowAsset
     {
-        std::sort(m_rowWidths.begin(), m_rowWidths.end(), [](RowAsset a, RowAsset b)
-            {
-                return a.valueWidth > b.valueWidth;
-            });
+        int index;
+        qreal valueWidth;
+    };
 
-        qreal excessWidth = m_maxLabelWidth + m_rowWidths.first().valueWidth - m_availableWidth;
-        if (excessWidth <= 0)
+    NameValueTableCalculator* const q;
+    QmlProperty<qreal> columnSpacing;
+    QmlProperty<qreal> leftPadding;
+    QmlProperty<qreal> rightPadding;
+    QmlProperty<int> maxRowCount;
+    qreal availableWidth;
+    QmlProperty<qreal> labelFraction;
+    qreal maxLabelWidth;
+    QList<QQuickText*> labels;
+    QList<ValuesText*> values;
+    QList<RowAsset> rowWidths;
+    QQuickItem* grid = nullptr;
+
+    int visibleRowCount() const
+    {
+        return maxRowCount.value() > 0
+            ? qMin(maxRowCount.value(), labels.count())
+            : labels.count();
+    }
+
+    void initValueWidths()
+    {
+        rowWidths.clear();
+        rowWidths.reserve(values.count());
+        for (int i = 0; i < values.count(); ++i)
+            rowWidths.append({i, values[i]->implicitWidth()});
+    }
+
+    void initMaxLabelWidth()
+    {
+        maxLabelWidth = 0;
+        for (int i = 0; i < visibleRowCount(); ++i)
+            maxLabelWidth = qMax(maxLabelWidth, labels[i]->implicitWidth());
+    }
+
+    void updateAvailableWidth()
+    {
+        availableWidth = grid->width() -
+            columnSpacing.value() -
+            leftPadding.value() -
+            rightPadding.value();
+    }
+
+    void updateChildren()
+    {
+        labels.clear();
+        values.clear();
+        if (!grid)
             return;
 
-        if (m_maxLabelWidth - excessWidth >= preferredLabelWidth)
+        for (const auto child: grid->childItems())
         {
-            // It is enough to shrink the label column only.
-            if (preferredValueWidth > m_rowWidths[0].valueWidth)
+            if (child->objectName() == "cellLabel")
             {
-                preferredValueWidth = m_rowWidths[0].valueWidth;
-                preferredLabelWidth = m_availableWidth - preferredValueWidth;
+                if (auto label = qobject_cast<QQuickText*>(child))
+                    labels.append(label);
             }
-            found = true;
-            break;
-        }
-
-        for (int i = 0; i < m_rowWidths.count(); ++i)
-        {
-            const int index = m_rowWidths[i].index;
-            if (m_rowWidths[i].valueWidth < preferredValueWidth)
+            else if (child->objectName() == "cellValues")
             {
-                found = true;
-                break;
-            }
-
-            if (m_valuesVisibleCount[index] == 1)
-            {
-                if (m_rowWidths[i].valueWidth > preferredValueWidth)
-                    m_rowWidths[i].valueWidth = preferredValueWidth;
-            }
-            else if (m_rowWidths[i].valueWidth > preferredValueWidth)
-            {
-                reduceValuesCount(i);
-                break;
+                if (auto value = qobject_cast<ValuesText*>(child))
+                    values.append(value);
             }
         }
-    } while (!found);
-
-    setWidths(labels, preferredLabelWidth);
-    setWidths(values, preferredValueWidth);
-}
-
-bool NameValueTableCalculator::initialize(
-    QQuickItem* grid, const QVariantList& labels, const QVariantList& values)
-{
-    m_labels = std::move(labels);
-    m_values = std::move(values);
-    if (!grid
-        || grid->width() <= 8
-        || m_labels.count() == 0
-        || m_values.count() == 0
-        || m_labels.count() != m_values.count())
-        return false;
-
-    m_columnSpacing = QmlProperty<qreal>(grid, "columnSpacing").value();
-    m_leftPadding = QmlProperty<qreal>(grid, "leftPadding").value();
-    m_rightPadding = QmlProperty<qreal>(grid, "rightPadding").value();
-    m_availableWidth = grid->width() - m_columnSpacing - m_leftPadding - m_rightPadding;
-    m_labelFraction = QmlProperty<qreal>(grid->parentItem(), "labelFraction");
-
-    m_rowWidths.clear();
-    m_rowWidths.reserve(m_values.count());
-    m_valuesVisibleCount.clear();
-    m_valuesVisibleCount.reserve(m_values.count());
-    m_maxLabelWidth = 0;
-    for (int i = 0; i < m_values.count(); ++i)
-    {
-        auto labelItem = m_labels[i].value<QQuickItem*>();
-        labelItem->resetWidth();
-        labelItem->setWidth(labelItem->implicitWidth());
-        m_maxLabelWidth = qMax(m_maxLabelWidth, labelItem->width());
-
-        auto valueItem = m_values[i].value<QQuickItem*>();
-        m_itemSpacing = QmlProperty<qreal>(valueItem, "spacing").value();
-        const auto valueRowRepeater = valueItem->findChild<QQuickRepeater*>("valueRowRepeater");
-
-        const auto rowValuesCount = valueRowRepeater->count();
-        valueItem->setProperty("lastVisibleIndex", rowValuesCount - 1);
-        m_valuesVisibleCount.append(rowValuesCount);
-        qreal valueWidth = 0;
-        for (int j = 0; j < rowValuesCount; ++j)
-        {
-            if (valueWidth > 0)
-                valueWidth += m_itemSpacing;
-
-            auto valueSubItem = valueRowRepeater->itemAt(j);
-            valueSubItem->resetWidth();
-            valueWidth += valueSubItem->implicitWidth();
-        }
-        valueItem->resetWidth();
-        m_rowWidths.append({i, valueWidth});
+        initMaxLabelWidth();
     }
 
-    return true;
-}
-
-void NameValueTableCalculator::setWidths(const QVariantList& container, qreal newWidth)
-{
-    std::for_each(container.begin(), container.end(),
-        [newWidth](QVariant item){ item.value<QQuickItem*>()->setWidth(newWidth); });
-}
-
-void NameValueTableCalculator::reduceValuesCount(int index)
-{
-    auto& rowWidthElement = m_rowWidths[index];
-    auto valueItem = m_values[rowWidthElement.index].value<QQuickItem*>();
-    valueItem->setProperty(
-        "lastVisibleIndex", --m_valuesVisibleCount[rowWidthElement.index] - 1);
-    const auto valueRowRepeater =
-        valueItem->findChild<QQuickRepeater*>("valueRowRepeater");
-    const auto appendix = valueItem->findChild<QQuickItem*>("appendix");
-    qreal valueWidth = appendix->implicitWidth();
-    for (int j = 0; j < m_valuesVisibleCount[rowWidthElement.index]; ++j)
+    void sortWidths()
     {
-        valueWidth += m_itemSpacing;
-
-        auto valueSubItem = valueRowRepeater->itemAt(j);
-        valueWidth += valueSubItem->implicitWidth();
+        std::sort(rowWidths.begin(), rowWidths.end(), [](RowAsset a, RowAsset b)
+        {
+            return a.valueWidth > b.valueWidth;
+        });
     }
-    rowWidthElement.valueWidth = valueWidth;
+
+    void setWidths(qreal labelsWidth, qreal valuesWidth)
+    {
+        std::for_each(labels.begin(), labels.end(),
+            [labelsWidth](QQuickItem* item){ item->setWidth(labelsWidth); });
+        std::for_each(values.begin(), values.end(),
+            [valuesWidth](QQuickItem* item){ item->setWidth(valuesWidth); });
+    }
+};
+
+NameValueTableCalculator::NameValueTableCalculator(QObject* parent):
+    base_type(parent),
+    d(new Private{.q = this})
+{
+}
+
+NameValueTableCalculator::~NameValueTableCalculator()
+{
+}
+
+void NameValueTableCalculator::updateColumnWidths()
+{
+    if (d->labels.isEmpty() || d->values.isEmpty() || d->labels.count() != d->values.count())
+        return;
+
+    d->initValueWidths();
+    d->initMaxLabelWidth();
+    qreal preferredLabelWidth = d->maxLabelWidth;
+    qreal preferredValueWidth = d->availableWidth - preferredLabelWidth;
+
+    d->sortWidths();
+    if (d->maxLabelWidth + d->rowWidths.first().valueWidth <= d->availableWidth)
+    {
+        preferredValueWidth = d->availableWidth - preferredLabelWidth;
+        d->setWidths(preferredLabelWidth, preferredValueWidth);
+        return;
+    }
+
+    bool mayBeNarrowed = true;
+    qreal effectiveWidth = 0;
+    for (int i = 0; i < d->visibleRowCount(); ++i)
+    {
+        const int index = d->rowWidths[i].index;
+        auto value = d->values[index];
+        if (value->implicitWidth() > preferredValueWidth)
+            mayBeNarrowed = false;
+        effectiveWidth = qMax(effectiveWidth, value->implicitWidth());
+    }
+    if (mayBeNarrowed)
+    {
+        d->setWidths(preferredLabelWidth, preferredValueWidth);
+        return;
+    }
+
+    if (d->availableWidth * (1 - d->labelFraction) >= effectiveWidth)
+    {
+        preferredValueWidth = effectiveWidth;
+        preferredLabelWidth = d->availableWidth - preferredValueWidth;
+        d->setWidths(preferredLabelWidth, preferredValueWidth);
+        return;
+    }
+
+    preferredLabelWidth = qMin(d->maxLabelWidth, d->availableWidth * d->labelFraction);
+    preferredValueWidth = d->availableWidth - preferredLabelWidth;
+    effectiveWidth = 0;
+    for (int i = 0; i < d->visibleRowCount(); ++i)
+    {
+        auto value = d->values[i];
+        value->setWidth(preferredValueWidth);
+        effectiveWidth = qMax(effectiveWidth, value->effectiveWidth());
+    }
+    if (effectiveWidth < preferredValueWidth)
+    {
+        preferredValueWidth = effectiveWidth;
+        preferredLabelWidth = d->availableWidth - preferredValueWidth;
+    }
+    d->setWidths(preferredLabelWidth, preferredValueWidth);
+}
+
+void NameValueTableCalculator::componentComplete()
+{
+    if (auto grid = qobject_cast<QQuickItem*>(parent()))
+    {
+        d->grid = grid;
+        connect(d->grid, &QQuickItem::childrenChanged, this,
+            [this]()
+            {
+                d->updateChildren();
+            });
+
+        auto widthChanged = [this]()
+            {
+                d->updateAvailableWidth();
+                recalculate();
+            };
+
+        d->columnSpacing = QmlProperty<qreal>(d->grid, "columnSpacing");
+        d->columnSpacing.connectNotifySignal(this, widthChanged);
+
+        d->leftPadding = QmlProperty<qreal>(d->grid, "leftPadding");
+        d->leftPadding.connectNotifySignal(this, widthChanged);
+
+        d->rightPadding = QmlProperty<qreal>(d->grid, "rightPadding");
+        d->rightPadding.connectNotifySignal(this, widthChanged);
+
+        d->labelFraction = QmlProperty<qreal>(d->grid->parentItem(), "labelFraction");
+        d->labelFraction.connectNotifySignal(this, &NameValueTableCalculator::recalculate);
+
+        d->maxRowCount = QmlProperty<int>(d->grid, "maxRowCount");
+        d->maxRowCount.connectNotifySignal(this,&NameValueTableCalculator::recalculate);
+
+        connect(d->grid, &QQuickItem::widthChanged, this, widthChanged);
+
+        d->updateChildren();
+        recalculate();
+    }
+}
+
+void NameValueTableCalculator::recalculate()
+{
+    updateColumnWidths();
 }
 
 void NameValueTableCalculator::registerQmlType()
 {
-    qmlRegisterSingletonType<NameValueTableCalculator>(
-        "Nx.Core", 1, 0, "NameValueTableCalculator",
-        [](QQmlEngine*, QJSEngine*) { return new NameValueTableCalculator(); });
+    qmlRegisterType<NameValueTableCalculator>("Nx.Core", 1, 0, "NameValueTableCalculator");
 }
 
 } // namespace nx::vms::client::core

@@ -25,7 +25,7 @@ Item
     property string colorsRole: "colors"
 
     // If positive, only maxRowCount rows will be visible.
-    property int maxRowCount: 0
+    property alias maxRowCount: grid.maxRowCount
     property int maximumLineCount: 2
     property alias rowSpacing: grid.rowSpacing
 
@@ -62,11 +62,6 @@ Item
         grid.forceLayout()
     }
 
-    function update()
-    {
-        grid.updateColumnWidths()
-    }
-
     Rectangle
     {
         id: highlight
@@ -85,7 +80,7 @@ Item
         objectName: "dataTable"
 
         readonly property var sourceData: control.items ?? []
-
+        property int maxRowCount: 0
         readonly property var clippedData: control.maxRowCount > 0
             ? sourceData.slice(0, control.maxRowCount)
             : sourceData
@@ -99,9 +94,6 @@ Item
         verticalItemAlignment: Grid.AlignVCenter
         flow: Grid.TopToBottom
 
-        onWidthChanged:
-            updateColumnWidths()
-
         onClippedDataChanged:
         {
             if (control.contextMenu?.opened)
@@ -109,42 +101,40 @@ Item
 
             labelsRepeater.model = clippedData
             valuesRepeater.model = clippedData
-            updateColumnWidths()
         }
 
-        Component.onCompleted:
-            updateColumnWidths()
+        NameValueTableCalculator
+        {
+            id: widthCalculator
+        }
 
         Repeater
         {
             id: labelsRepeater
 
-            delegate: Component
+            delegate: Text
             {
-                Text
-                {
-                    id: cellLabel
+                id: cellLabel
 
-                    objectName: "cellLabel"
+                objectName: "cellLabel"
 
-                    readonly property int rowIndex: index
+                readonly property int rowIndex: index
 
-                    color: control.nameColor
-                    font: control.nameFont
+                color: control.nameColor
+                font: control.nameFont
 
-                    text: modelData[control.nameRole] || " "
-                    textFormat: Text.StyledText
+                text: modelData[control.nameRole] || " "
+                textFormat: Text.StyledText
 
-                    maximumLineCount: control.maximumLineCount
-                    wrapMode: Text.Wrap
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignLeft
+                maximumLineCount: control.maximumLineCount
+                wrapMode: Text.Wrap
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignLeft
 
-                    lineHeight: control.tableLineHeight
+                lineHeight: control.tableLineHeight
 
-                    topPadding: Math.round(control.attributeTableSpacing / 2)
-                    bottomPadding: (control.attributeTableSpacing - topPadding)
-                }
+                topPadding: Math.round(control.attributeTableSpacing / 2)
+                bottomPadding: (control.attributeTableSpacing - topPadding)
             }
         }
 
@@ -175,159 +165,21 @@ Item
         {
             id: valuesRepeater
 
-            delegate: Component
+            delegate: ValuesText
             {
-                RowLayout
-                {
-                    id: cellValues
+                id: combinedValueText
 
-                    objectName: "cellValues"
-                    spacing: 4
-
-                    property var values: modelData[control.valuesRole] ?? []
-                    property var colors: modelData[control.colorsRole] ?? []
-                    property int lastVisibleIndex: 0
-                    readonly property bool shrinked:
-                        lastVisibleIndex < values.length - 1 || valueRowRepeater.shrinked
-
-                    Repeater
-                    {
-                        id: valueRowRepeater
-
-                        objectName: "valueRowRepeater"
-                        model: cellValues.values
-                        readonly property bool shrinked: count === 1 && itemAt(0).shrinked
-
-                        RowLayout
-                        {
-                            id: valueItem
-
-                            objectName: "valueItem"
-                            spacing: 4
-                            visible: index <= cellValues.lastVisibleIndex
-                            readonly property bool shrinked:
-                                valueText.width < valueText.implicitWidth
-
-                            Rectangle
-                            {
-                                id: colorRectangle
-
-                                objectName: "colorRectangle"
-                                readonly property bool relevant: cellValues.colors[index] ?? false
-                                width: relevant ? 16 : 0
-                                height: 16
-                                visible: relevant
-                                color: cellValues.colors[index] ?? "transparent"
-                                border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
-                                radius: 1
-                            }
-
-                            Text
-                            {
-                                id: valueText
-
-                                objectName: "valueText"
-                                Layout.fillWidth: index === cellValues.lastVisibleIndex
-
-                                color: control.valueColor
-                                font: control.valueFont
-                                text: modelData +
-                                    (index < cellValues.lastVisibleIndex && !cellValues.colors[index]
-                                        ? ","
-                                        : " ")
-                                lineHeight: control.tableLineHeight
-                                wrapMode: Text.Wrap
-                                elide: index === 0 ? Text.ElideRight : Text.ElideNone
-                                maximumLineCount: control.maximumLineCount
-                            }
-                        }
-                    }
-
-                    Text
-                    {
-                        id: appendix
-
-                        objectName: "appendix"
-                        readonly property bool relevant:
-                            cellValues.lastVisibleIndex < valueRowRepeater.count - 1
-                        width: relevant ? undefined : 0
-                        visible: relevant
-                        text: `+ ${valueRowRepeater.count - cellValues.lastVisibleIndex - 1}`
-                        color: ColorTheme.darker(control.valueColor, 10)
-                        font: control.valueFont
-                    }
-
-                    onWidthChanged:
-                    {
-                        if (!valueRowRepeater.count)
-                            return
-
-                        var lastIndex = valueRowRepeater.count - 1
-                        var sumWidth = 0
-                        for (var i = 0; i < valueRowRepeater.count; ++i)
-                        {
-                            const item = valueRowRepeater.itemAt(i)
-                            if (sumWidth > 0)
-                                sumWidth += spacing
-                            sumWidth += item.implicitWidth
-                            if (sumWidth > width)
-                            {
-                                lastIndex = i - 1
-                                break
-                            }
-                        }
-
-                        // At least one elided value we should show.
-                        lastVisibleIndex = Math.max(0, lastIndex)
-                    }
-                }
+                objectName: "cellValues"
+                spacing: 4
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: control.valueColor
+                appendixColor: ColorTheme.darker(control.valueColor, 10)
+                font: control.valueFont
+                values: modelData[control.valuesRole] ?? []
+                colorValues: modelData[control.colorsRole] ?? []
+                maximumLineCount: control.maximumLineCount
             }
-        }
-
-        function updateColumnWidths()
-        {
-            if (grid.width <= 0)
-                return
-
-            const labels = children.filter(child => child.objectName === "cellLabel")
-            const values = children.filter(child => child.objectName === "cellValues")
-            const calculateImplicitWidth = (items) =>
-                items.reduce((prevMax, item) => Math.max(prevMax, item.implicitWidth), 0)
-
-            const implicitLabelWidth = calculateImplicitWidth(labels)
-            const implicitValuesWidth = calculateImplicitWidth(values)
-
-            const availableWidth =
-                grid.width - grid.columnSpacing - grid.leftPadding - grid.rightPadding
-            const preferredLabelWidth = availableWidth * control.labelFraction
-            const preferredValuesWidth = availableWidth - preferredLabelWidth
-
-            let labelWidth = 0
-            const availableLabelWidth = availableWidth - implicitValuesWidth
-
-            // If value is shorter than its preferred space...
-            if (implicitValuesWidth < preferredValuesWidth)
-            {
-                // Label may occupy not less than its preferred space
-                // and no more than its available space.
-                labelWidth = Math.max(preferredLabelWidth,
-                    Math.min(implicitLabelWidth, availableLabelWidth))
-            }
-            else // If value is longer than its preferred space...
-            {
-                // Label may occupy not less than its available space
-                // and no more than its preferred space.
-                labelWidth = Math.max(availableLabelWidth,
-                    Math.min(implicitLabelWidth, preferredLabelWidth))
-            }
-
-            const valuesWidth = availableWidth - labelWidth
-
-            for (const label of labels)
-                label.width = labelWidth
-
-            for (const value of values)
-                value.width = valuesWidth
         }
     }
 
@@ -354,7 +206,7 @@ Item
             highlight.rowIndex = row.rowIndex
 
             const cell = grid.childAt(mouse.x, mouse.y)
-            if (cell && cell.objectName === "cellValues" && cell.shrinked)
+            if (cell && cell.objectName === "cellValues")
             {
                 toolTip.dataItem = cell
                 toolTip.y = cell.y - toolTip.height

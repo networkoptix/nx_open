@@ -46,7 +46,7 @@ Dialog
 
                     text: `[\n` +
                         `  {"name": "Brand", "values": ["Lada with long name", "Lada", "Mercedes"]},\n` +
-                        `  {"name": "Color", "colors": ["#FF0000"], "values": ["Red"]},\n` +
+                        `  {"name": "Color", "colors": ["#FF0000", "#00FF00", "#0000FF"], "values": ["Red", "Green", "Blue"]},\n` +
                         `  {"name": "License Plate Country", "values": ["Russia", "Kazakhstan"]},\n` +
                         `  {"name": "License Plate Number", "values": ["A001AA", "KEN560"]},\n` +
                         `  {"name": "License Plate State/Province", "values": ["77", "05"]},\n` +
