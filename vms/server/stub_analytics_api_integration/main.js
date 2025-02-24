@@ -2,7 +2,7 @@
 
 "use strict"
 
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, session } = require("electron");
 const path = require("node:path");
 const fs = require('fs');
 const https = require("node:https");
@@ -21,20 +21,6 @@ const axiosInstance = axios.create({
     rejectUnauthorized: false
   })
 })
-
-const createWindow = () => {
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            preload: path.resolve(__dirname, "preload.js")
-        }
-    });
-
-    win.loadFile("index.html");
-    win.webContents.openDevTools();
-    return win;
-}
 
 class IntegrationContext {
     integration = null;
@@ -108,6 +94,54 @@ class AppContext  {
 };
 
 let appContext = null;
+
+app.on('ready', () => {
+    // Ignore SSL certificate errors
+    app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+        event.preventDefault();
+        callback(true); // Bypass the error
+    });
+});
+
+const initializeWebRtc = (appContext) => {;
+    if (appContext.config.cameraId === '')
+    {
+        console.log("initializeWebRtc: Camera ID is empty");
+        return;
+    }
+
+    if (appContext.adminSessionToken === null)
+    {
+        console.log("initializeWebRtc: Admin session token is null");
+        return;
+    }
+
+    let config = appContext.config;
+    config.adminSessionToken = appContext.adminSessionToken;
+
+    appContext.window.webContents.send("initialize-webrtc", config);
+}
+
+const createWindow = () => {
+    const window = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.resolve(__dirname, "preload.js"),
+            nodeIntegration: true,
+            contextIsolation: true,
+            enableRemoteModule: true,
+        }
+    });
+
+    window.once('ready-to-show', () => {
+        initializeWebRtc(appContext);
+    });
+
+    window.loadFile("index.html");
+    window.webContents.openDevTools();
+    return window;
+}
 
 function findOrCreateEngineContextById(engineId)
 {

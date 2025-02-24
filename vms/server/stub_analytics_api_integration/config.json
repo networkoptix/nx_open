@@ -1,6 +1,7 @@
 {
-    "vmsHost": "127.0.0.1",
+    "vmsHost": "localhost",
     "vmsPort": 7001,
     "vmsUser": "admin",
+    "cameraId": "",
     "vmsAdminPassword": ""
 }

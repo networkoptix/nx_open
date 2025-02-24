@@ -43,8 +43,6 @@ and messages back to the Server.
 - Edit the Stub Analytics API Integration config file `config.json`. It's located in the
     application root directory. Fill in the Server address, port, admin username and admin
     password.
-
-    application root directory. Fill in the Server address, port, admin username and admin
 ```
 electron .
 ```

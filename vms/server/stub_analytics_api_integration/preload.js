@@ -4,7 +4,6 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-// TODO: it's unsafe, fix it.
 contextBridge.exposeInMainWorld('mainProcess', {
     ipc: {
         send: (eventName, data) => {

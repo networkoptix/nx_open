@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="styles/style.css"/>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
     <script src="frontend.js"></script>
     <title>Analytics API stub integration</title>
 </head>
@@ -33,5 +34,20 @@
             </canvas>
         </div>
     </div>
+
+    <br />
+
+    <p>WebRTC video</p>
+    <video id="remoteVideo" autoplay muted style="width:100%;"></video>
+    <button id="muteButton" disabled onclick="muteToggle()">Mute/Unmute</button>
+    <button id="streamButton" onclick="streamToggle()">Hi/Low</button>
+    <button id="pauseButton" disabled onclick="pauseToggle()">||</button>
+    <button id="nextFrameButton" disabled onclick="nextFrame()">Next frame</button>
+    <label id="transcoding"></label>
+    <br><br>
+    <button id="seekButton" onclick="dataClickSeek()">Seek to position in milliseconds</button>
+    <input id="seekInput"/>
+    <p id="timestamp">timestamp</p>
+
 </body>
 </html>
