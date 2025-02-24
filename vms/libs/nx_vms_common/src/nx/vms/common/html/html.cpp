@@ -223,6 +223,9 @@ bool mightBeHtml(const QStringList& lines)
 
 QString toHtml(const QString& source, Qt::WhiteSpaceMode whitespaceMode)
 {
+    if (source.isEmpty())
+        return {};
+
     // Change <br> to <br/>, as they are not fully valid XML.
     // QDomDocument requires strict XML compliance and will reject such tags.
     return mightBeHtml(source)

@@ -7,19 +7,20 @@
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
-#include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
-#include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/utils/managed_camera_set.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/common/bookmark/bookmark_facade.h>
-#include <nx/vms/common/html/html.h>
 #include <nx/utils/algorithm/comparator.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/client_core_globals.h>
+#include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
+#include <nx/vms/client/core/event_search/utils/event_search_utils.h>
+#include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/managed_camera_set.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
+#include <nx/vms/common/bookmark/bookmark_facade.h>
+#include <nx/vms/common/html/html.h>
 
 #include "detail/multi_request_id_holder.h"
 
@@ -317,6 +318,9 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
 
         case DescriptionTextRole:
             return parseHyperlinks(nx::vms::common::html::toHtml(bookmark.description));
+
+        case TimestampTextRole:
+            return EventSearchUtils::timestampText(bookmark.startTimeMs, systemContext());
 
         case TimestampRole:
         case PreviewTimeRole:
