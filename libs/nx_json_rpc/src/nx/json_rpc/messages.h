@@ -54,7 +54,7 @@ struct NX_JSON_RPC_API Request
     std::optional<std::variant<QString, int>> id;
 
     /**%apidoc
-     * %example rest.v{1-}.servers.info.list
+     * %example rest.v{1-}.servers.info.all
      */
     std::string method;
 

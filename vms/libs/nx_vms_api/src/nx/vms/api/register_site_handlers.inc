@@ -160,7 +160,9 @@ void registerSiteSettingHandlers(
         std::make_unique<SystemSettingsHandler>(serverModule->systemContext(), cloudManagerGroup));
 
     /**%apidoc GET /rest/v{4-}/site/settings
-     * %jsonrpc subscribe
+     * %jsonrpc[result] all
+     * %jsonrpc subscribe Same result and `update` notifications over time where `params` is JSON
+     *     object with single field and actual setting value changed.
      * %caption Get Site settings
      * %ingroup Site
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -168,7 +170,8 @@ void registerSiteSettingHandlers(
      * %return:{SiteSettings} Site settings and their values.
      *
      **%apidoc GET /rest/v{4-}/site/settings/{name}
-     * %jsonrpc subscribe
+     * %jsonrpc subscribe Same result and `update` notifications over time where `params` is JSON
+     *     object with single field and actual setting value changed.
      * %caption Get Site setting
      * %ingroup Site
      * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket

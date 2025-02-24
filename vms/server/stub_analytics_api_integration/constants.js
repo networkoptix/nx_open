@@ -44,5 +44,5 @@ module.exports = {
         "rest.v4.analytics.engines.deviceAgents.integrationDiagnosticEvent.create",
 
     // JSON-RPC subscription methods.
-    GET_USER_METHOD: "rest.v4.users.get",
+    GET_USER_METHOD: "rest.v4.users.one",
 };

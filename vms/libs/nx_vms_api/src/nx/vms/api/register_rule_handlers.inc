@@ -31,6 +31,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/manifest/events
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * %jsonrpc[result] all
      * %caption Get Event manifest
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -42,6 +43,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/manifest/actions
      * <b>ATTENTION:</b> Works with new Event Rule Engine only.
+     * %jsonrpc[result] all
      * %caption Get Action manifest
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
@@ -53,7 +55,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/log
      * Read Event Log from all Servers.
-     * %jsonrpc subscribe
+     * %jsonrpc subscribe Same result and `update` notifications over time.
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
@@ -63,7 +65,7 @@ void registerRuleHandlers(
      *
      **%apidoc GET /rest/v{4-}/events/log/{serverId}
      * Read Event Log from single Server.
-     * %jsonrpc subscribe
+     * %jsonrpc subscribe Same result and `update` notifications over time.
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
@@ -79,7 +81,7 @@ void registerRuleHandlers(
 
     /**%apidoc GET /rest/v{4-}/events/acknowledges
      * Retrieves notifications to acknowledge for the given user.
-     * %jsonrpc subscribe
+     * %jsonrpc subscribe Same result and `update` notifications over time.
      * %caption Notifications to acknowledge
      * %ingroup Events
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_with,_strict,_ticket,_local
@@ -88,7 +90,7 @@ void registerRuleHandlers(
      *
      **%apidoc GET /rest/v{4-}/events/acknowledges/{id}
      * Retrieves notification with the given event ID.
-     * %jsonrpc subscribe
+     * %jsonrpc subscribe Same result and `update` notifications over time.
      * %caption Notification to acknowledge
      * %ingroup Events
      * %param:uuid id Event ID.

@@ -14,16 +14,20 @@ namespace nx::network::rest {
 
 static std::tuple<nx::network::http::Method, QString> methodAndPath(const std::string& method)
 {
-    static constexpr std::array<std::pair<std::string_view, std::string_view>, 8>
+    static constexpr std::array<std::pair<std::string_view, std::string_view>, 10>
         kValueTailToMethod = {
             std::make_pair(std::string_view(".create"), nx::network::http::Method::post),
-            std::make_pair(std::string_view(".list"), nx::network::http::Method::get),
-            std::make_pair(std::string_view(".get"), nx::network::http::Method::get),
+            std::make_pair(std::string_view(".all"), nx::network::http::Method::get),
+            std::make_pair(std::string_view(".one"), nx::network::http::Method::get),
             std::make_pair(std::string_view(".update"), nx::network::http::Method::patch),
             std::make_pair(std::string_view(".set"), nx::network::http::Method::put),
             std::make_pair(std::string_view(".delete"), nx::network::http::Method::delete_),
             std::make_pair(std::string_view(".subscribe"), nx::network::http::Method::get),
             std::make_pair(std::string_view(".unsubscribe"), nx::network::http::Method::get),
+
+            // 6.0 compatibility.
+            std::make_pair(std::string_view(".get"), nx::network::http::Method::get),
+            std::make_pair(std::string_view(".list"), nx::network::http::Method::get),
         };
 
     QString path;
@@ -32,6 +36,8 @@ static std::tuple<nx::network::http::Method, QString> methodAndPath(const std::s
         if (method.ends_with(valueTail))
         {
             path = QString::fromLatin1(method.data(), method.size() - valueTail.size());
+            if (path.endsWith(".one") || path.endsWith(".all"))
+                path = path.first(path.length() - 4);
             path.replace('.', '/');
             return {httpMethod, path};
         }

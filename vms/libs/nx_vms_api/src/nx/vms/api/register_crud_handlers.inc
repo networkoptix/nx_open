@@ -532,6 +532,7 @@ static void registerSystemRestHandlers(
      * Retrieves the status of the Cloud pulling that is initiated each Cloud polling interval or
      * using `POST /rest/v{4-}/cloud/sync` call. Cloud polling interval can be set up using
      * `cloudPollingIntervalS` setting that should be greater than zero.
+     * %jsonrpc[result] all
      * %caption Cloud pulling status
      * %ingroup Cloud
      * %struct CloudSyncRequest
@@ -774,6 +775,7 @@ static void registerServerRestHandlers(
      * %return:{ServerLogSettings} Server log settings.
      *
      * %apidoc GET /rest/v{2-}/servers/%2A/logSettings
+     * %jsonrpc[result] all
      * %caption Get all Servers' log settings
      * %ingroup Servers
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
@@ -1178,6 +1180,7 @@ static void registerServerRestHandlers(
      * %return:{StoredFilePath} Location on the Server of the created DB backup file.
      *
      **%apidoc GET /rest/v{1-}/servers/{id}/dbBackups
+     * %jsonrpc[result] one
      * %caption List Site DB Backups
      * %ingroup Server Data
      * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
@@ -1287,6 +1290,7 @@ static void registerServerRestHandlers(
 
     /**%apidoc GET /rest/v{2-}/servers/{id}/recordingStatistics
      * Retrieves the Server recording statistics.
+     * %jsonrpc[result] one
      * %caption Get Server recording stats
      * %ingroup Server Data
      * %struct RecordingStatisticsFilter
@@ -1297,6 +1301,7 @@ static void registerServerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/servers/%2A/recordingStatistics
      * Retrieves the recording statistics for all Servers.
+     * %jsonrpc[result] all
      * %caption Get Servers' recording stats
      * %ingroup Server Data
      * %struct RecordingStatisticsFilter
@@ -1354,6 +1359,7 @@ static void registerServerRestHandlers(
 
     /**%apidoc GET /rest/v{2-}/servers/{id}/storageForecast
      * Retrieves the Server Storage forecast.
+     * %jsonrpc[result] one
      * %caption Get Server Storage forecast
      * %ingroup Server Data
      * %struct StorageForecastData
@@ -1364,6 +1370,7 @@ static void registerServerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/servers/%2A/storageForecast
      * Retrieves all Storage forecasts for all Servers.
+     * %jsonrpc[result] all
      * %caption Get Servers' Storage forecasts
      * %ingroup Server Data
      * %struct StorageForecastData
@@ -1515,12 +1522,14 @@ static void registerServerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/servers/%2A/rebuildArchive
      * Retrieves the status of the "main" and "backup" Archive rebuilding from all Servers.
+     * %jsonrpc[result] all
      * %caption Get Archives rebuild statuses
      * %ingroup Server Data
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
-     * %return:{std::map<nx::Uuid, std::map<QString, StorageScanInfo>>} Storage rebuild process information object.
+     * %return:{std::map<nx::Uuid, std::map<QString, StorageScanInfo>>} Storage rebuild process
+     *     information object per Server.
      *
      **%apidoc GET /rest/v{2-}/servers/{id}/rebuildArchive/{location}
      * Retrieves the status of the Server "main" or "backup" Archive rebuilding.
@@ -1540,6 +1549,7 @@ static void registerServerRestHandlers(
      *
      **%apidoc GET /rest/v{2-}/servers/%2A/rebuildArchive/{location}
      * Retrieves the status of the "main" or "backup" Archive rebuilding from all Servers.
+     * %jsonrpc[result] all
      * %caption Get Archives rebuild status
      * %ingroup Server Data
      * %param:enum location
@@ -1548,7 +1558,8 @@ static void registerServerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
-     * %return:{std::map<nx::Uuid, std::map<QString, StorageScanInfo>>} Storage rebuild process information object.
+     * %return:{std::map<nx::Uuid, std::map<QString, StorageScanInfo>>} Storage rebuild process
+     *     information object per Server.
      *
      **%apidoc POST /rest/v{2-}/servers/{id}/rebuildArchive
      * Starts the Server "main" and "backup" Archive rebuilding.
@@ -1619,6 +1630,7 @@ static void registerServerRestHandlers(
 
     /**%apidoc GET /rest/v{3-}/servers/{id}/timeZones
      * Retrieves the complete list of time zones supported by the Server machine.
+     * %jsonrpc[result] one
      * %caption Get Time Zones
      * %ingroup Servers
      * %param:string id Server id. Can be obtained from "id" field via
@@ -1633,7 +1645,8 @@ static void registerServerRestHandlers(
         std::make_unique<TimeZonesHandler>(serverModule->peerId(), serverConnector));
 
     /**%apidoc GET /rest/v{3-}/servers/{id}/scripts
-     * Retrieves the complete list of scripts to available to execute by the Server machine.
+     * Retrieves the complete list of scripts available to execute by the Server machine.
+     * %jsonrpc[result] one
      * %caption Get scripts
      * %ingroup Servers
      * %param:string id Server id. Can be obtained from "id" field via
@@ -1643,7 +1656,7 @@ static void registerServerRestHandlers(
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power user.
-     * %return:{std::vector<std::string>} List of scripts available on server.
+     * %return:{std::vector<std::string>} List of scripts available on Server.
      */
     reg("rest/v{3-}/servers/:id/scripts", GlobalPermission::powerUser,
         std::make_unique<ScriptsHandler>(serverModule, serverConnector));
@@ -1739,6 +1752,7 @@ static void registerServerRestHandlers(
         std::make_unique<OverlappedIdsHandler>(serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{4-}/servers/{serverId}/audit
+     * %jsonrpc[result] one
      * %caption Get Audit log
      * %ingroup Servers
      * %struct AuditLogFilter
@@ -2570,6 +2584,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
     /**%apidoc GET /rest/v{4-}/analytics/engines/%2A/actions
      * Get Analytics Actions from all or a specified set of Analytics Plugins which are applicable
      * to the specified metadata Object type.
+     * %jsonrpc[result] all
      * %caption Get Analytics Actions
      * %ingroup Analytics
      * %struct RequestAvailableAnalyticsActions
@@ -2970,7 +2985,8 @@ static void registerMiscRestHandlers(
      * %ingroup Licenses
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
-     * %return:{std::map<QString, LicenseSummaryData>} License summary information.
+     * %return:{std::map<QString, LicenseSummaryData>} License summary information per license
+     *     class name.
      */
     reg("rest/v{3-}/licenses/*/summary", GlobalPermission::powerUser,
         std::make_unique<LicenseSummaryHandler>(serverModule));
@@ -3123,6 +3139,7 @@ static void registerUpdateHandlers(
 
     /**%apidoc GET /rest/v{4-}/update
      * Retrieves the current update processing Site-wide state.
+     * %jsonrpc[result] all
      * %caption Get Update Status
      * %ingroup Update
      * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with

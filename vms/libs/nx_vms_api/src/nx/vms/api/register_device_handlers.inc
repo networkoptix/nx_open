@@ -54,6 +54,7 @@ void registerDeviceBaseHandlers(
      *
      **%apidoc GET /rest/v{3-}/devices/{id}/footage
      * Retrieves the info for the recorded chunks for the Device specified by {id}.
+     * %jsonrpc[result] one
      * %caption Get Device footage
      * %ingroup Device Media
      * %struct DeviceFootageRequest
@@ -65,6 +66,7 @@ void registerDeviceBaseHandlers(
      *
      **%apidoc GET /rest/v{3-}/devices/%2A/footage
      * Retrieves the recorded chunks info for all Devices in the Site.
+     * %jsonrpc[result] all
      * %caption Get all Devices' footage
      * %ingroup Device Media
      * %struct DeviceFootageRequest
@@ -184,20 +186,12 @@ void registerDeviceBaseHandlers(
      * %permissions Read Device.
      * %return:{QnCameraAdvancedParams} Device Advanced Manifest.
      *
-     **%apidoc GET /rest/v{2-3}/devices/%2A/advanced/%2A/manifest
+     **%apidoc GET /rest/v{2-}/devices/%2A/advanced/%2A/manifest
      * Retrieves the Advanced Parameter manifests of all Devices.
+     * %jsonrpc[result] all
      * %caption Get Device Advanced manifests
      * %ingroup Devices
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
-     * %param[ref] _local,_strict
-     * %permissions Read Device.
-     * %return:{std::map<nx::Uuid, QnCameraAdvancedParams>} Map with an Advanced Parameter manifest per Device.
-     *
-     **%apidoc GET /rest/v{4-}/devices/%2A/advanced/%2A/manifest
-     * Retrieves the Advanced Parameter manifests of all Devices.
-     * %caption Get Device Advanced manifests
-     * %ingroup Devices
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
      * %param[ref] _local,_strict
      * %permissions Read Device.
      * %return:{std::map<nx::Uuid, QnCameraAdvancedParams>} Map with an Advanced Parameter manifest per Device.
@@ -213,16 +207,17 @@ void registerDeviceBaseHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
      * %param[ref] _local,_strict
      * %permissions Read Device.
-     * %return Device Advanced Parameter.
+     * %return:any Device Advanced Parameter.
      *
      **%apidoc GET /rest/v{2-}/devices/{deviceId}/advanced
+     * %jsonrpc[result] all
      * %caption Get Device Advanced Parameters
      * %ingroup Devices
      * %param:string deviceId Device id to get Advanced Parameters from.
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
      * %param[ref] _local,_strict
      * %permissions Read Device.
-     * %return Device Advanced Parameters and their values.
+     * %return:object Device Advanced Parameters and their values.
      *
      **%apidoc:object PATCH /rest/v{2-}/devices/{deviceId}/advanced
      * Modifies a bunch of Device Advanced Parameters by passing a JSON object with the parameter ids
@@ -253,7 +248,7 @@ void registerDeviceBaseHandlers(
      * if not already active. The monitoring session will timeout after ioPortMonitoringTimeoutS
      * seconds (defaults to 60) of inactivity. To maintain continuous monitoring, make periodic
      * calls to this endpoint.
-     * %jsonrpc subscribe
+     * %jsonrpc subscribe Same result and `update` notifications over time.
      * %caption Get IO States
      * %ingroup Devices
      * %struct DeviceIoFilter
@@ -268,7 +263,6 @@ void registerDeviceBaseHandlers(
      * if not already active. The monitoring session will timeout after ioPortMonitoringTimeoutS
      * seconds (defaults to 60) of inactivity. To maintain continuous monitoring, make periodic
      * calls to this endpoint.
-     * %jsonrpc subscribe
      * %caption Get IO States
      * %ingroup Devices
      * %struct DeviceIoFilter
