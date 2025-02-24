@@ -48,7 +48,8 @@ bool IoPortsCompatibilityInterface_latest::setIoPortState(
                     NX_WARNING(this, errorMessage, cameraOutputId);
             }
 
-            callback(success);
+            if (callback)
+                callback(success);
         };
 
     nx::vms::api::IoPortUpdateRequest portDescription{

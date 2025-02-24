@@ -78,7 +78,9 @@ bool IoPortsCompatibilityInterface_5_1::setIoPortState(
                 NX_WARNING(this, "Extended camera output %1 operation was unsuccessful: %2",
                     cameraOutputId, result.errorString);
             }
-            callback(success);
+
+            if (callback)
+                callback(success);
         };
 
     if (!systemContext()->connectedServerApi())
