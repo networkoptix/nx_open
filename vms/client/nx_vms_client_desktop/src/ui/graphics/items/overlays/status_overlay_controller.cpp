@@ -41,8 +41,8 @@ const OverlayInfoMap& overlayInfo()
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("OFFLINE"),
                 kErrorIconPath,
-                QnStatusOverlayWidget::tr(
-                    "This camera cannot be accessed. Perform camera diagnostics within the Desktop Client for additional information.")}},
+                QnStatusOverlayWidget::tr("This camera is not accessible. Run camera diagnostics "
+                    "in the Desktop Client for more information.")}},
         {Qn::ServerOfflineOverlay,
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("OFFLINE"),
@@ -52,7 +52,7 @@ const OverlayInfoMap& overlayInfo()
                 QnStatusOverlayWidget::tr("UNAUTHORIZED"),
                 kLockIconPath,
                 QnStatusOverlayWidget::tr(
-                    "This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.")}},
+                    "Access to this camera requires authorization credentials.")}},
         {Qn::ServerUnauthorizedOverlay,
             {QnStatusOverlayWidget::ErrorStyle::red,
                 QnStatusOverlayWidget::tr("UNAUTHORIZED"),
