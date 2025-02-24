@@ -42,7 +42,7 @@ TableView
     {
         DelegateChoice
         {
-            index: 0
+            column: 0
             CheckableHeaderButton
             {
                 model: rowCheckModel
@@ -54,10 +54,12 @@ TableView
         {
             HeaderButton
             {
-                model: root.model
+                text: model.display
                 width: root.columnWidthProvider(index)
                 leftPadding: 8
                 rightPadding: 8
+                sortOrder: root.model.sortColumn === index ? root.model.sortOrder : undefined
+                onClicked: root.model.sort(index, nextSortOrder())
             }
         }
     }

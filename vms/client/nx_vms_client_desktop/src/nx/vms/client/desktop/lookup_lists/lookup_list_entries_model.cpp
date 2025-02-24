@@ -61,7 +61,6 @@ int LookupListEntriesModel::rowCount(const QModelIndex& /*parent*/) const
 
 int LookupListEntriesModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    // Reserve one for checkbox column.
     return d->data ? (int) d->data->rawData().attributeNames.size() : 0;
 }
 

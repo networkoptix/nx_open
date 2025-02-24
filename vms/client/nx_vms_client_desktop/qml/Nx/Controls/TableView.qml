@@ -25,7 +25,7 @@ TableView
     property bool horizontalHeaderVisible: false
     property alias headerBackgroundColor: columnsHeader.color
     property bool horizontalHeaderEnabled: true
-    property alias headerDelegate: repeater.delegate
+    property alias headerDelegate: headerRow.delegate
 
     property alias deleteShortcut: deleteShortcut
     property alias enterShortcut: enterShortcut
@@ -42,11 +42,6 @@ TableView
         const cellUnderMouse = cellAtPosition(x, y, includeSpacing)
         const indexUnderCursor = modelIndex(cellUnderMouse)
         return rowAtIndex(indexUnderCursor)
-    }
-
-    function getButtonItem(columnIndex)
-    {
-        return repeater.itemAt(columnIndex)
     }
 
     flickableDirection: Flickable.VerticalFlick
@@ -92,8 +87,7 @@ TableView
             {
                 if (useDelegateWidthAsColumnWidth(column))
                 {
-                    columnWidthCache[column] =
-                        Math.max(getButtonItem(column).implicitWidth, minColumnWidth)
+                    columnWidthCache[column] = Math.max(headerRow.columnWidth(column), minColumnWidth)
                     assignedSpace += columnWidthCache[column]
                     ++assignedColumnCount
                     continue
@@ -144,14 +138,6 @@ TableView
 
     delegate: BasicSelectableTableCellDelegate {}
 
-    onLayoutChanged:
-    {
-        for (let columnIndex = 0; columnIndex < repeater.count; ++columnIndex)
-        {
-            let headerItem = repeater.itemAt(columnIndex)
-            headerItem.width = control.columnWidthProvider(columnIndex)
-        }
-    }
 
     model: SortFilterProxyModel
     {
@@ -166,11 +152,11 @@ TableView
         id: columnsHeader
 
         readonly property int buttonHeight: 32
-
+        x: control.contentX
         y: control.contentY
         z: 2 //< Is needed for hiding scrolled rows.
         // Have to use the width of the header since the width of the control can be smaller.
-        width: headerRow.width
+        width: control.contentItem.width
         height: buttonHeight + separator.height + 8
 
         color: ColorTheme.colors.dark7
@@ -178,24 +164,19 @@ TableView
         visible: control.horizontalHeaderVisible
         enabled: control.horizontalHeaderEnabled && !control.editing
 
-        Row
+        HorizontalHeaderView
         {
             id: headerRow
 
-            Repeater
+            syncView: control
+            delegate: HeaderButton
             {
-                id: repeater
-
-                model: control.columns > 0 ? control.columns : 1
-
-                delegate: HeaderButton
-                {
-                    id: headerButton
-                    model: control.model
-                    width: control.columnWidthProvider(index)
-                    height: columnsHeader.buttonHeight
-                    visible: width > 0
-                }
+                width: control.columnWidthProvider(index)
+                height: columnsHeader.buttonHeight
+                visible: width > 0
+                text: model.display
+                sortOrder: control.model.sortColumn === index ? control.model.sortOrder : undefined
+                onClicked: control.model.sort(index, nextSortOrder())
             }
         }
 
@@ -205,7 +186,7 @@ TableView
 
             y: columnsHeader.buttonHeight
 
-            width: headerRow.width
+            width: parent.width
             height: 1
 
             color: ColorTheme.colors.dark12

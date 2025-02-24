@@ -15,22 +15,13 @@ Button
 {
     id: control
 
-    property AbstractItemModel model //< The property is not marked as required intentionally, to prevent assignment from the wrong context.
+    property var sortOrder: undefined
 
-    property var headerDataAccessor: ModelDataAccessor
+    function nextSortOrder()
     {
-        model: control.model
-
-        onHeaderDataChanged: (orientation, first, last) =>
-        {
-            if (index < first || index > last)
-                return
-
-            if (orientation !== Qt.Horizontal)
-                return
-
-            control.text = model.headerData(index, Qt.Horizontal)
-        }
+        return sortOrder === Qt.AscendingOrder
+            ? Qt.DescendingOrder
+            : Qt.AscendingOrder
     }
 
     leftPadding: 8
@@ -46,18 +37,15 @@ Button
     font.pixelSize: 14
     font.weight: Font.Medium
 
-    text: !!model ? model.headerData(index, Qt.Horizontal) : ""
-
     icon.source:
     {
-        if (!!model && model.sortColumn === index)
-        {
-            if (model.sortOrder == Qt.AscendingOrder)
-                return "image://skin/16x16/Solid/sorting_ascending.svg"
 
-            if (model.sortOrder == Qt.DescendingOrder)
-                return "image://skin/16x16/Solid/sorting_descending.svg"
-        }
+        if (control.sortOrder === Qt.AscendingOrder)
+            return "image://skin/16x16/Solid/sorting_ascending.svg"
+
+        if (control.sortOrder === Qt.DescendingOrder)
+            return "image://skin/16x16/Solid/sorting_descending.svg"
+
 
         return ""
     }
@@ -100,22 +88,5 @@ Button
 
             primaryColor: control.textColor
         }
-    }
-
-    onClicked:
-    {
-        if (!model)
-            return
-
-        let sortOrder = Qt.AscendingOrder
-        if (model.sortColumn === index)
-        {
-            if (model.sortOrder === Qt.AscendingOrder)
-                sortOrder = Qt.DescendingOrder
-            else
-                sortOrder = Qt.AscendingOrder
-        }
-
-        control.model.sort(index, sortOrder)
     }
 }
