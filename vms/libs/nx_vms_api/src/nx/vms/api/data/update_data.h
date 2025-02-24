@@ -241,6 +241,7 @@ struct NX_VMS_API DownloadStatus
 NX_VMS_API_DECLARE_STRUCT_EX(DownloadStatus, (json))
 NX_REFLECTION_INSTRUMENT(DownloadStatus, DownloadStatus_Fields)
 
+/**%apidoc Update status information per Server. */
 struct NX_VMS_API UpdateStatusInfo
 {
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(State,
@@ -270,19 +271,16 @@ struct NX_VMS_API UpdateStatusInfo
         verificationError,
         installationError)
 
-    nx::Uuid serverId;
     State state{State::idle};
 
-    /**%apidoc Only significant if 'state' is 'error'
-     */
+    /**%apidoc Only significant if `state` is `error`. */
     Error error{Error::noError};
     std::string message;
     int progress{0};
     std::vector<DownloadStatus> downloads;
     std::string mainUpdatePackage;
 };
-#define UpdateStatusInfo_Fields (serverId)(state)(error)(message)(progress)(downloads)\
-    (mainUpdatePackage)
+#define UpdateStatusInfo_Fields (state)(error)(message)(progress)(downloads)(mainUpdatePackage)
 NX_VMS_API_DECLARE_STRUCT_EX(UpdateStatusInfo, (json))
 NX_REFLECTION_INSTRUMENT(UpdateStatusInfo, UpdateStatusInfo_Fields)
 
