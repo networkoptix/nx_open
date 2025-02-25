@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <optional>
 #include <utility>
 
 namespace nx::utils {
