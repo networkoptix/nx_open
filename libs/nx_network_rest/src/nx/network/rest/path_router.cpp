@@ -102,8 +102,7 @@ Handler* PathRouter::findHandlerOrThrow(Request* request, const QString& pathIgn
         request->setConcreteIdProvided(result.handler->isConcreteIdProvidedInPath(&result));
         result.handler->modifyPathRouteResultOrThrow(&result);
         if (!result.validationPath.isEmpty())
-            request->setDecodedPath(result.validationPath);
-        result.handler->clarifyApiVersionOrThrow(result, request);
+            request->setDecodedPathOrThrow(result.validationPath);
         request->setPathParams(std::move(result.pathParams));
         return result.handler;
     }

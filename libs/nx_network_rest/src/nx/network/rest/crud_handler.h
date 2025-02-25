@@ -139,28 +139,6 @@ protected:
         }
     }
 
-    // TODO:
-    //   Consider moving this logic into the `Request` class.
-    //   For example, Request's constructor can be injected with this validation logic.
-    //   Request object should have maximum immutability.
-    //   Handler should be agnostic of the actual URI path. It only expects particular parameters.
-    virtual void clarifyApiVersionOrThrow(const PathRouter::Result& result, Request* request) const override
-    {
-        if (result.validationPath.startsWith("/rest/"))
-        {
-            auto name = result.validationPath.split('/')[2];
-            if (!name.startsWith('v'))
-                throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
-
-            bool isOk = false;
-            const auto number = name.mid(1).toInt(&isOk);
-            if (!isOk || number <= 0)
-                throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
-
-            request->setApiVersion((size_t) number);
-        }
-    }
-
     virtual bool isConcreteIdProvidedInPath(PathRouter::Result* result) const override
     {
         auto it = result->pathParams.findValue(m_idParamName);

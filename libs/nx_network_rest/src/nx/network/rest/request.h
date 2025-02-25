@@ -80,7 +80,7 @@ public:
     }
 
     QString decodedPath() const;
-    void setDecodedPath(const QString& path) { m_decodedPath = path; }
+    void setDecodedPathOrThrow(QString path);
 
     /**
      * If HTTP method of request may not provide message body, uses URL params.
@@ -179,7 +179,7 @@ public:
 
     bool isLocal() const;
 
-    void setApiVersion(size_t version) { m_apiVersion = version; }
+    static std::optional<size_t> apiVersionOrThrow(const QString& path);
     std::optional<size_t> apiVersion() const { return m_apiVersion; }
     bool isApiVersionOlder(size_t version) const
     {

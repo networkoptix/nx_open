@@ -62,6 +62,7 @@ Request::Request(
     m_httpHeaders(httpRequest->headers),
     m_url(httpRequest->requestLine.url)
 {
+    setDecodedPathOrThrow(path());
 }
 
 Request::Request(
@@ -129,9 +130,16 @@ const http::Method& Request::method() const
 
 QString Request::decodedPath() const
 {
-    if (!m_decodedPath.isEmpty())
-        return m_decodedPath;
-    return m_decodedPath = path();
+    return m_decodedPath;
+}
+
+void Request::setDecodedPathOrThrow(QString path)
+{
+    if (path.isEmpty())
+        path = this->path();
+    if (!m_apiVersion)
+        m_apiVersion = apiVersionOrThrow(path);
+    m_decodedPath = path;
 }
 
 const Params& Request::params() const
@@ -208,6 +216,25 @@ std::vector<QString> Request::preferredResponseLocales() const
     // Use default locale if header is missing.
     locales.push_back(nx::branding::defaultLocale());
     return locales;
+}
+
+std::optional<size_t> Request::apiVersionOrThrow(const QString& path)
+{
+    if (path.startsWith("/rest/"))
+    {
+        auto name = path.split('/')[2];
+        if (!name.startsWith('v'))
+            throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
+
+        bool isOk = false;
+        const auto number = name.mid(1).toInt(&isOk);
+        if (!isOk || number <= 0)
+            throw Exception::notFound(NX_FMT("API version '%1' is not supported", name));
+
+        return (size_t) number;
+    }
+
+    return {};
 }
 
 http::Method Request::calculateMethod() const

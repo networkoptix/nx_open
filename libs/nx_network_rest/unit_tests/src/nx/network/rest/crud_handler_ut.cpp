@@ -111,16 +111,7 @@ TEST_P(CrudHandlerTest, BookmarkPatch)
                     return r;
                 }();
             Request result{&request, Content{nx::network::http::header::ContentType::kJson, body}};
-            if (GetParam() == *kRestApiV3)
-            {
-                result.setDecodedPath("/rest/v3/bookmarks");
-                result.setApiVersion(3);
-            }
-            else
-            {
-                result.setDecodedPath("/rest/v4/bookmarks");
-                result.setApiVersion(4);
-            }
+            result.setDecodedPathOrThrow(NX_FMT("/rest/%1/bookmarks", GetParam()));
             return result;
         };
 
@@ -208,8 +199,7 @@ TEST_P(CrudHandlerTest, ObjectTrackGet)
     http::Request httpRequest;
     httpRequest.requestLine.method = http::Method::get;
     Request request{&httpRequest, std::optional<Content>{}};
-    request.setDecodedPath("/rest/v4/analytics/objectTracks");
-    request.setApiVersion(4);
+    request.setDecodedPathOrThrow(NX_FMT("/rest/%1/analytics/objectTracks", GetParam()));
     auto response{handler.executeRequestOrThrow(&request)};
     ASSERT_EQ(nx::utils::formatJsonString(response.content->body), R"json([
     {

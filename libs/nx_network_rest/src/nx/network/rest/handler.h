@@ -95,8 +95,6 @@ public:
 
     virtual bool isConcreteIdProvidedInPath(PathRouter::Result*) const { return false; }
 
-    virtual void clarifyApiVersionOrThrow(const PathRouter::Result&, Request*) const {}
-
     virtual std::string_view corsMethodsAllowed(const nx::network::http::Method& method) const;
 
     virtual void pleaseStop() { m_needStop = true; }

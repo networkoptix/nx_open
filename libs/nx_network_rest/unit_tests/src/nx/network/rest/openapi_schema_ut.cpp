@@ -39,29 +39,11 @@ public:
         text.front().replace("/rest/{version}/", NX_FMT("/rest/%1/", GetParam()));
         http::Request httpRequest;
         httpRequest.parse(text.join("\r\n").toUtf8());
-        QString path = httpRequest.requestLine.url.path();
-
         m_requests.push_front(httpRequest);
         std::optional<rest::Content> content;
         if (!body.isEmpty())
             content = {http::header::ContentType::kJson, std::move(body)};
-        auto request = std::make_unique<Request>(&m_requests.front(), std::move(content));
-
-        if (path.startsWith("/rest/"))
-        {
-            const auto name = path.split('/')[2];
-            EXPECT_TRUE(name.startsWith('v'))
-                << NX_FMT("API version '%1' is not supported", name).toStdString();
-
-            bool isOk = false;
-            const auto number = name.mid(1).toInt(&isOk);
-            EXPECT_TRUE(isOk && number > 0)
-                << NX_FMT("API version '%1' is not supported", name).toStdString();
-
-            request->setApiVersion((size_t) number);
-        }
-
-        return request;
+        return std::make_unique<Request>(&m_requests.front(), std::move(content));
     }
 
     template<typename Model>
