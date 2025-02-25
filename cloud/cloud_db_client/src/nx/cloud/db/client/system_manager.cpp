@@ -72,11 +72,18 @@ void SystemManager::getSystem(
     const std::string& systemId,
     std::function<void(api::ResultCode, api::SystemDataEx)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<api::SystemDataEx>(
+   m_requestsExecutor->makeAsyncCall<api::SystemDataEx, HttpHeaderFetcher<Qn::MERGE_ID_HEADER_NAME>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemPath, {systemId}),
         {}, //query
-        std::move(completionHandler));
+        [handler = std::move(completionHandler)](
+            api::ResultCode result, api::SystemDataEx data, std::string mergeId)
+        {
+            nx::cloud::db::api::SystemSyncInfo syncInfo;
+            syncInfo.lastMergeId = mergeId;
+            data.syncInfo = syncInfo;
+            handler(result, data);
+        });
 }
 
 void SystemManager::getSystems(
@@ -121,16 +128,18 @@ void SystemManager::revokeUserAccess(
 
 void SystemManager::getCloudUsersOfSystem(
     const std::string& systemId,
-    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList, api::SystemSyncInfo)> completionHandler)
 {
-    m_requestsExecutor->makeAsyncCall<api::SystemSharingExList>(
+    m_requestsExecutor->makeAsyncCall<api::SystemSharingExList, HttpHeaderFetcher<Qn::MERGE_ID_HEADER_NAME>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(kSystemUsersPath, {systemId}),
         {}, //query
         [completionHandler = std::move(completionHandler)](
-            api::ResultCode resultCode, api::SystemSharingExList systems)
+            api::ResultCode resultCode, api::SystemSharingExList systems, std::string mergeId)
         {
-            completionHandler(resultCode, api::SystemSharingExList{std::move(systems)});
+            api::SystemSyncInfo syncInfo;
+            syncInfo.lastMergeId = std::move(mergeId);
+            completionHandler(resultCode, api::SystemSharingExList{std::move(systems)}, std::move(syncInfo));
         });
 }
 

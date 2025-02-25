@@ -71,4 +71,5 @@ static constexpr char kTicketUrlQueryName[] = "_ticket";
 
 static constexpr char VIDEOWALL_INSTANCE_HEADER_NAME[] = "videoWallInstanceGuid";
 
+static constexpr char MERGE_ID_HEADER_NAME[] = "Nx-Merge-Id";
 } // namespace Qn

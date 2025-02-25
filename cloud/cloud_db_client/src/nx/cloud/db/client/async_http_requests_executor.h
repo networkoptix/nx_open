@@ -57,4 +57,15 @@ public:
     using base_type::makeAsyncCall;
 };
 
+template<const char* name>
+class HttpHeaderFetcher
+{
+public:
+    using type = std::string;
+
+    type operator()(const nx::network::http::Response& response) const
+    {
+        return nx::network::http::getHeaderValue(response.headers, name);
+    }
+};
 } // namespace nx::cloud::db::client

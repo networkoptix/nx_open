@@ -52,18 +52,6 @@ void AuthProvider::getAuthenticationResponse(
         std::move(completionHandler));
 }
 
-template<const char* name>
-class HttpHeaderFetcher
-{
-public:
-    using type = std::string;
-
-    type operator()(const nx::network::http::Response& response) const
-    {
-        return nx::network::http::getHeaderValue(response.headers, name);
-    }
-};
-
 void AuthProvider::resolveUserCredentials(
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler)
