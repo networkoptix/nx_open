@@ -65,12 +65,16 @@ void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
     {
         const auto& propName = it.key();
         const auto& propValue = it.value();
-        auto propIndex = meta->indexOfProperty(propName.toUtf8());
-        if (!NX_ASSERT(propIndex >= 0, "Absent property: %1", propName))
+        const auto propIndex = meta->indexOfProperty(propName.toUtf8());
+        if (propIndex < 0)
+        {
+            NX_DEBUG(
+                NX_SCOPE_TAG, "Absent property: %1 in class: %2", propName, meta->className());
             continue;
+        }
 
         auto prop = meta->property(propIndex);
-        auto userType = prop.userType();
+        const auto userType = prop.userType();
         if (!NX_ASSERT(
             userType != QMetaType::UnknownType,
             "Unregistered prop type: %1",
@@ -79,7 +83,7 @@ void deserializeProperties(const QMap<QString, QJsonValue>& propMap, QObject* ob
             continue;
         }
 
-        auto serializer = QnJsonSerializer::serializer(userType);
+        const auto serializer = QnJsonSerializer::serializer(userType);
         if (!NX_ASSERT(serializer, "Unregistered serializer for prop type: %1", prop.typeName()))
             continue;
 
