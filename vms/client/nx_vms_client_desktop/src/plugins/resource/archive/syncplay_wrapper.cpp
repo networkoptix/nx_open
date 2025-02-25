@@ -708,11 +708,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReaderInternal(QnAbstractArchiveS
         {
             if (reader->isEnabled() && value)
             {
-                if (!reader->isSingleShotMode())
-                {
-                    if (d->readers[i].buffering)
-                        onBufferingFinished(d->readers[i].cam);
-                }
+                if (d->readers[i].buffering)
+                    onBufferingFinished(d->readers[i].cam);
             }
         }
     }
