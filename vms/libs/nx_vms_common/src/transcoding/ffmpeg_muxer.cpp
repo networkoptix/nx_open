@@ -124,9 +124,10 @@ void FfmpegMuxer::setFormatOption(const QString& option, const QString& value)
 
 bool FfmpegMuxer::addVideo(const AVCodecParameters* codecParameters)
 {
-    if (!m_formatCtx)
+    if (!m_formatCtx || !codecParameters)
         return false;
 
+    NX_DEBUG(this, "Add video %1.", codecParameters->codec_id);
     AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
     if (videoStream == 0)
     {
@@ -136,6 +137,7 @@ bool FfmpegMuxer::addVideo(const AVCodecParameters* codecParameters)
 
     m_videoCodecParameters = videoStream->codecpar;
     avcodec_parameters_copy(m_videoCodecParameters, codecParameters);
+    m_videoCodecParameters->codec_tag = 0; //< Zero tag since mp4 does not support tags.
 
     if (m_videoCodecParameters->codec_id == AV_CODEC_ID_MJPEG)
     {
@@ -156,9 +158,10 @@ bool FfmpegMuxer::addVideo(const AVCodecParameters* codecParameters)
 
 bool FfmpegMuxer::addAudio(const AVCodecParameters* codecParameters)
 {
-    if (!m_formatCtx)
+    if (!m_formatCtx || !codecParameters)
         return false;
 
+    NX_DEBUG(this, "Add audio %1.", codecParameters->codec_id);
     AVStream* audioStream = avformat_new_stream(m_formatCtx, nullptr);
     if (audioStream == 0)
     {
