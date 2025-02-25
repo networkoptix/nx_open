@@ -6,6 +6,7 @@
 #include <nx/build_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/site_information.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx_ec/ec_api_common.h>

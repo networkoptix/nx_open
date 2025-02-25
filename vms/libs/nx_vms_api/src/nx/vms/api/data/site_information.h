@@ -4,19 +4,32 @@
 
 #include <optional>
 
-#include <nx/reflect/enum_instrument.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
+#include <nx/utils/software_version.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/api/json/value_or_array.h>
 
-#include "module_information.h"
-#include "rest_api_versions.h"
-
 namespace nx::vms::api {
+
+struct ModuleInformation;
 
 NX_REFLECTION_ENUM_CLASS(SiteCompatibilityStatus,
     compatible,
     incompatible,
     inaccessible
 )
+
+struct NX_VMS_API RestApiVersions
+{
+    std::string min;
+    std::string max;
+
+    static RestApiVersions current();
+};
+#define RestApiVersions_Fields (min)(max)
+QN_FUSION_DECLARE_FUNCTIONS(RestApiVersions, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(RestApiVersions, RestApiVersions_Fields)
 
 struct NX_VMS_API SiteInformation
 {
@@ -76,7 +89,7 @@ struct NX_VMS_API SiteInformation
     (name)(customization)(version)(protoVersion)(restApiVersions)(cloudHost)(localId)(cloudId) \
     (cloudOwnerId)(organizationId)(endpoint)(servers)(edgeServerCount)(devices)(status)(ldapSyncId) \
     (synchronizedTimeMs)(pendingServerCount)
-NX_VMS_API_DECLARE_STRUCT_EX(SiteInformation, (json))
+QN_FUSION_DECLARE_FUNCTIONS(SiteInformation, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(SiteInformation, SiteInformation_Fields)
 
 struct NX_VMS_API OtherSiteRequest
@@ -88,7 +101,7 @@ struct NX_VMS_API OtherSiteRequest
     std::optional<nx::vms::api::json::ValueOrArray<QString>> endpoint;
 };
 #define OtherSiteRequest_Fields (showDiscovered)(endpoint)
-NX_VMS_API_DECLARE_STRUCT_EX(OtherSiteRequest, (json))
+QN_FUSION_DECLARE_FUNCTIONS(OtherSiteRequest, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(OtherSiteRequest, OtherSiteRequest_Fields)
 
 } // namespace nx::vms::api
