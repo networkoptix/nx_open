@@ -12,7 +12,6 @@ set(NX_GO_COMPILER "${CONAN_GO_ROOT}/bin/go")
 # execute_process(COMMAND ${CMAKE_COMMAND} -E env ${go_env} go test ./...
 function(cmake_go_env out_go_env)
     set(goenv GOTMPDIR=${CMAKE_CURRENT_BINARY_DIR})
-    list(APPEND goenv GOPROXY=direct)
     if(WIN32)
         list(APPEND goenv --modify PATH=path_list_append:${CONAN_MINGW-W64_ROOT}/bin)
     endif()
