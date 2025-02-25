@@ -21,12 +21,14 @@ std::string toString(const EventLogRecord& record)
 
 } // namespace nx::vms::rules
 
+// There is no point in parsing QJsonValue with nx::reflect & RapidJSON.
+
 void serialize_field(const nx::vms::api::rules::PropertyMap& data, QVariant* value)
 {
-    *value = QByteArray::fromStdString(nx::reflect::json::serialize(data));
+    *value = QJson::serialized(data);
 }
 
 void deserialize_field(const QVariant& value, nx::vms::api::rules::PropertyMap* data)
 {
-    nx::reflect::json::deserialize(nx::toBufferView(value.toByteArray()), data);
+    QJson::deserialize(value.toByteArray(), data);
 }

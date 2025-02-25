@@ -15,7 +15,6 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
@@ -490,7 +489,8 @@ void EventLogDialog::reset()
     setLoading(State::loaded);
 }
 
-void EventLogDialog::setLoading(EventLogDialog::State state)
+void EventLogDialog::setLoading(
+    EventLogDialog::State state, nx::network::rest::ErrorId error)
 {
     const bool loading = (state == State::loading);
     setCursor(loading ? Qt::BusyCursor : Qt::ArrowCursor);
@@ -506,6 +506,7 @@ void EventLogDialog::setLoading(EventLogDialog::State state)
             break;
 
         case State::error:
+            ui->warningLabel->setText(errorText(error));
             ui->stackedWidget->setCurrentWidget(ui->warnPage);
             break;
 
@@ -513,6 +514,19 @@ void EventLogDialog::setLoading(EventLogDialog::State state)
             NX_ASSERT("Unexpected dialog state: %1", (int) state);
             break;
     }
+}
+
+QString EventLogDialog::errorText(nx::network::rest::ErrorId error)
+{
+    using nx::network::rest::ErrorId;
+
+    switch (error)
+    {
+        case ErrorId::serviceUnavailable:
+            return tr("Server cannot answer in reasonable time. Consider narrowing period or filter.");
+    }
+
+    return tr("All Servers are offline. Logs are not available.");
 }
 
 void EventLogDialog::updateDataDelayed()
@@ -574,7 +588,7 @@ void EventLogDialog::updateData()
     }
     else
     {
-        requestFinished({}, /*success*/ false);
+        requestFinished(/*records*/ {},  nx::network::rest::ErrorId::badRequest);
     }
 
     m_updateDisabled = false;
@@ -608,7 +622,7 @@ void EventLogDialog::query(
             filter.eventResourceId->valueOrArray.push_back(camera->getId().toSimpleString());
     }
 
-    auto callback = nx::utils::guarded(this,
+    auto callback =
         [this](
             bool success,
             rest::Handle handle,
@@ -619,22 +633,22 @@ void EventLogDialog::query(
 
             if (records)
             {
-                requestFinished(std::move(*records), /*success*/ true);
+                requestFinished(std::move(*records), nx::network::rest::ErrorId::ok);
             }
             else
             {
                 NX_ERROR(this, "Can't read event log, success: %1, code: %2, error: %3",
                     success, records.error().errorId, records.error().errorString);
 
-                requestFinished({}, /*success*/ false);
+                requestFinished(/*records*/ {}, records.error().errorId);
             }
 
-        });
+        };
 
     rest::ServerConnection::Timeouts timeouts;
     timeouts.responseReadTimeout = kQueryTimeout;
 
-    m_request = serverApi->eventLog(filter, std::move(callback), this->thread(), timeouts);
+    m_request = serverApi->eventLog(filter, std::move(callback), this, timeouts);
 }
 
 void EventLogDialog::retranslateUi()
@@ -652,13 +666,13 @@ void EventLogDialog::retranslateUi()
 }
 
 void EventLogDialog::requestFinished(
-    nx::vms::api::rules::EventLogRecordList&& records, bool success)
+    nx::vms::api::rules::EventLogRecordList&& records, nx::network::rest::ErrorId error)
 {
     m_model->setEvents(std::move(records));
 
-    if (!success)
+    if (error != nx::network::rest::ErrorId::ok)
     {
-        setLoading(State::error);
+        setLoading(State::error, error);
         return;
     }
 

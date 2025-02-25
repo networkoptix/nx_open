@@ -70,7 +70,7 @@ public:
         // In brief mode we can skip empty structure fields.
         if (access(/*QnFusion::key*/ brief, /*defaultValue*/ false))
         {
-            const auto realValue = invoke(access(getter), value);
+            const auto& realValue = invoke(access(getter), value);
             if (BriefChecker()(realValue))
                 return true;
         }

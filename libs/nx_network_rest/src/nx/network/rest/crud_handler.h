@@ -34,11 +34,11 @@ auto front(Container&& c)
 {
     NX_ASSERT(c.size() != 0);
     if constexpr (nx::utils::IsKeyValueContainer<std::decay_t<Container>>::value)
-        return c.begin()->second;
+        return std::move(c.begin()->second);
     else if constexpr (DoesMemberExist_front<std::decay_t<Container>>::value)
-        return c.front();
+        return std::move(c.front());
     else
-        return *c.begin();
+        return std::move(*c.begin());
 }
 
 NX_NETWORK_REST_API nx::reflect::ArrayOrder orderFromParams(const Params& params);

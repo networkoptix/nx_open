@@ -29,6 +29,8 @@ struct PropertyDescriptor
     QString description;
 };
 
+const auto kUuidExample = QStringLiteral("89abcdef-0123-4567-89ab-cdef01234567");
+
 /**
  * Changes the input string to start with a capital letter and removes the last letter 's' if present.
  * Input examples: "events", "analyticsObject"
@@ -69,7 +71,7 @@ PropertyDescriptor mapMetaTypeToJsonTypeAndExample(const QMetaType& metaType)
             {.type = "integer", .example = 10, .description = "Length in seconds"}},
         {QMetaType::fromType<nx::Uuid>().id(),
             {.type = "string",
-                .example = "00000000-1234-5678-0000-0000000000AA",
+                .example = kUuidExample,
                 .format = "uuid"}},
     };
 
@@ -108,7 +110,7 @@ QJsonObject createUuidListDescriptor(bool isSet)
     result[kTypeProperty] = "array";
     result[kItemsProperty] = QJsonObject{{kTypeProperty, "string"}, {"format", "uuid"}};
     result["uniqueItems"] = isSet;
-    result[kExampleProperty] = QJsonArray({"00000000-1234-5678-0000-0000000000BB"});
+    result[kExampleProperty] = QJsonArray({kUuidExample});
     return result;
 }
 

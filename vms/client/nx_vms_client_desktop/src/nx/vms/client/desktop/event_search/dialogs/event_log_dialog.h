@@ -8,6 +8,7 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/network/rest/result.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/rules/event_log_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -58,7 +59,8 @@ private:
     void reset();
     void updateData();
     void updateDataDelayed();
-    void setLoading(State state);
+    void setLoading(State state, nx::network::rest::ErrorId error = nx::network::rest::ErrorId::ok);
+    QString errorText(nx::network::rest::ErrorId error);
 
     void at_eventsGrid_clicked(const QModelIndex& index);
     void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
@@ -78,7 +80,8 @@ private:
         const QString& eventType) const;
 
     bool isFilterExist() const;
-    void requestFinished(nx::vms::api::rules::EventLogRecordList&& records, bool success);
+    void requestFinished(
+        nx::vms::api::rules::EventLogRecordList&& records, nx::network::rest::ErrorId error);
     void updateActionList(bool instantOnly);
 
     void query(

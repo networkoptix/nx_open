@@ -40,9 +40,9 @@ class GenericVisitor
 {
 public:
     template<typename... Fields>
-    auto operator()(Fields... fields)
+    auto operator()(Fields&&... fields)
     {
-        (self().visitField(fields), ...);
+        (self().visitField(std::forward<Fields>(fields)), ...);
         return self().finish();
     }
 
