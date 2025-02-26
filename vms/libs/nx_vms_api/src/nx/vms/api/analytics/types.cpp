@@ -6,9 +6,6 @@
 
 namespace nx::vms::api::analytics {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Rect, (json),
-    nx_vms_api_analytics_Rect_Fields, (brief, true))
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PushEngineManifestData,
     (json),
     nx_vms_api_analytics_PushEngineManifestData_Fields, (brief, true))

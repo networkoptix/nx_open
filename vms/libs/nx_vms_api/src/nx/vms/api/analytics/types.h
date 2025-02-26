@@ -4,8 +4,6 @@
 
 #include <string>
 
-#include <QtCore/QRectF>
-
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/json_fwd.h>
@@ -18,28 +16,9 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/integration_manifest.h>
 #include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/vms/api/data/rect_as_string.h>
 
 namespace nx::vms::api::analytics {
-
-/**%apidoc
- * Bounding box rectangle.
- */
-struct NX_VMS_API Rect
-{
-    /**%apidoc[opt] X */
-    float x = 0;
-    /**%apidoc[opt] Y */
-    float y = 0;
-    /**%apidoc[opt] Width */
-    float width = 0;
-    /**%apidoc[opt] Height */
-    float height = 0;
-
-    bool operator==(const Rect& other) const = default;
-};
-#define nx_vms_api_analytics_Rect_Fields (x)(y)(width)(height)
-QN_FUSION_DECLARE_FUNCTIONS(Rect, (json), NX_VMS_API);
-NX_REFLECTION_INSTRUMENT(Rect, nx_vms_api_analytics_Rect_Fields);
 
 NX_REFLECTION_ENUM_CLASS(Flags,
     none,
@@ -51,10 +30,9 @@ NX_REFLECTION_ENUM_CLASS(Flags,
  */
 struct NX_VMS_API PushEngineManifestData
 {
-    /**%apidoc Engine id */
+    /**%apidoc Engine id. */
     nx::Uuid id;
 
-    /**%apidoc Engine Manifest */
     EngineManifest engineManifest;
 
     bool operator==(const PushEngineManifestData& other) const = default;
@@ -63,10 +41,10 @@ struct NX_VMS_API PushEngineManifestData
     (id) \
     (engineManifest)
 QN_FUSION_DECLARE_FUNCTIONS(
-    PushEngineManifestData, (json), NX_VMS_API);
+    PushEngineManifestData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(
     PushEngineManifestData,
-    nx_vms_api_analytics_PushEngineManifestData_Fields);
+    nx_vms_api_analytics_PushEngineManifestData_Fields)
 
 /**%apidoc
  * Data to update Device Agent manifest.
@@ -76,10 +54,12 @@ struct NX_VMS_API PushDeviceAgentManifestData
     /**%apidoc Engine id */
     nx::Uuid id;
 
-    /**%apidoc Device Agent flexible id */
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
     QString deviceId;
 
-    /**%apidoc Device Agent manifest */
     DeviceAgentManifest deviceAgentManifest;
 
     bool operator==(const PushDeviceAgentManifestData& other) const = default;
@@ -89,10 +69,10 @@ struct NX_VMS_API PushDeviceAgentManifestData
     (deviceId) \
     (deviceAgentManifest)
 QN_FUSION_DECLARE_FUNCTIONS(
-    PushDeviceAgentManifestData, (json), NX_VMS_API);
+    PushDeviceAgentManifestData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(
     PushDeviceAgentManifestData,
-    nx_vms_api_analytics_PushDeviceAgentManifestData_Fields);
+    nx_vms_api_analytics_PushDeviceAgentManifestData_Fields)
 
 NX_REFLECTION_ENUM_CLASS(IntegrationDiagnosticEventLevel,
     info,
@@ -107,10 +87,13 @@ struct NX_VMS_API EngineIntegrationDiagnosticEvent
 {
     /**%apidoc Engine id */
     nx::Uuid id;
+
     /**%apidoc Level */
     IntegrationDiagnosticEventLevel level;
+
     /**%apidoc Caption */
     std::string caption;
+
     /**%apidoc Description */
     std::string description;
 
@@ -119,9 +102,9 @@ struct NX_VMS_API EngineIntegrationDiagnosticEvent
 #define nx_vms_api_analytics_EngineIntegrationDiagnosticEvent_Fields \
     (id)(level)(caption)(description)
 
-QN_FUSION_DECLARE_FUNCTIONS(EngineIntegrationDiagnosticEvent, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(EngineIntegrationDiagnosticEvent, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(EngineIntegrationDiagnosticEvent,
-    nx_vms_api_analytics_EngineIntegrationDiagnosticEvent_Fields);
+    nx_vms_api_analytics_EngineIntegrationDiagnosticEvent_Fields)
 
 /**%apidoc
  *  Integration Diagnostic Event from Device Agent.
@@ -130,13 +113,14 @@ struct NX_VMS_API DeviceAgentIntegrationDiagnosticEvent
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent flexible id */
+
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
     QString deviceId;
-    /**%apidoc Level */
     IntegrationDiagnosticEventLevel level;
-    /**%apidoc Caption */
     std::string caption;
-    /**%apidoc Description */
     std::string description;
 
     bool operator==(const DeviceAgentIntegrationDiagnosticEvent& other) const = default;
@@ -144,57 +128,68 @@ struct NX_VMS_API DeviceAgentIntegrationDiagnosticEvent
 #define nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEvent_Fields \
     (id)(deviceId)(level)(caption)(description)
 
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentIntegrationDiagnosticEvent, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentIntegrationDiagnosticEvent, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceAgentIntegrationDiagnosticEvent,
-    nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEvent_Fields);
+    nx_vms_api_analytics_DeviceAgentIntegrationDiagnosticEvent_Fields)
 
 /**%apidoc
  * Metadata attribute.
  */
 struct NX_VMS_API ApiObjectMetadataAttribute
 {
-    /**%apidoc[opt] Type */
+    /**%apidoc[opt] */
     AttributeType type = AttributeType::undefined;
-    /**%apidoc[opt] Name */
+
+    /**%apidoc[opt] */
     std::string name;
-    /**%apidoc[opt] Value */
+
+    /**%apidoc[opt] */
     std::string value;
-    /**%apidoc[opt] Confidence */
+
+    /**%apidoc[opt] */
     float confidence = 1.0;
 
     bool operator==(const ApiObjectMetadataAttribute& other) const = default;
 };
 #define nx_vms_api_analytics_ApiObjectMetadataAttribute_Fields \
     (type)(name)(value)(confidence)
-QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadataAttribute, (json));
+QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadataAttribute, (json))
 NX_REFLECTION_INSTRUMENT(ApiObjectMetadataAttribute,
-    nx_vms_api_analytics_ApiObjectMetadataAttribute_Fields);
+    nx_vms_api_analytics_ApiObjectMetadataAttribute_Fields)
 
 /**%apidoc
  * Object Metadata.
  */
 struct NX_VMS_API ApiObjectMetadata
 {
-    /**%apidoc[opt] Track id */
+    /**%apidoc[opt] */
     Uuid trackId;
-    /**%apidoc[opt] Subtype */
+
+    /**%apidoc[opt] */
     std::string subtype;
-    /**%apidoc[opt] Bounding box */
-    Rect boundingBox = {0, 0, 0, 0};
-    /**%apidoc[opt] Type id */
+
+    /**%apidoc[opt]:string
+     * Coordinates of the bounding box on a video frame where an Object is shown; in range [0..1].
+     * The format is: `{x},{y},{width}x{height}`
+     */
+    RectAsString boundingBox = {0, 0, 0, 0};
+
+    /**%apidoc[opt]:string */
     std::string typeId;
-    /**%apidoc[opt] Confidence */
+
+    /**%apidoc[opt] */
     float confidence = 1.0;
-    /**%apidoc[opt] Attributes */
+
+    /**%apidoc[opt] */
     std::vector<ApiObjectMetadataAttribute> attributes;
 
     bool operator==(const ApiObjectMetadata& other) const = default;
 };
 #define nx_vms_api_analytics_ApiObjectMetadata_Fields \
     (trackId)(subtype)(boundingBox)(typeId)(confidence)(attributes)
-QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadata, (json));
+QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadata, (json))
 NX_REFLECTION_INSTRUMENT(ApiObjectMetadata,
-    nx_vms_api_analytics_ApiObjectMetadata_Fields);
+    nx_vms_api_analytics_ApiObjectMetadata_Fields)
 
 /**%apidoc
  * Object Metadata packet.
@@ -203,24 +198,32 @@ struct NX_VMS_API ApiObjectMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent flexible id */
+
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
     QString deviceId;
-    /**%apidoc[opt] Flags */
+
+    /**%apidoc[opt] */
     Flags flags = Flags::none;
-    /**%apidoc[opt] Timestamp */
+
+    /**%apidoc[opt] */
     std::chrono::microseconds timestampUs;
-    /**%apidoc[opt] Duration */
+
+    /**%apidoc[opt] */
     std::chrono::microseconds durationUs;
-    /**%apidoc[opt] Objects */
+
+    /**%apidoc[opt] */
     std::vector<ApiObjectMetadata> objects;
 
     bool operator==(const ApiObjectMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiObjectMetadataPacket_Fields \
     (id)(deviceId)(flags)(timestampUs)(durationUs)(objects)
-QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadataPacket, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(ApiObjectMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiObjectMetadataPacket,
-    nx_vms_api_analytics_ApiObjectMetadataPacket_Fields);
+    nx_vms_api_analytics_ApiObjectMetadataPacket_Fields)
 
 /**%apidoc
  * Best Shot metadata packet.
@@ -229,23 +232,37 @@ struct NX_VMS_API ApiBestShotMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent flexible id */
+
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
     QString deviceId;
-    /**%apidoc[opt] Track id */
-    Uuid trackId;
-    /**%apidoc[opt] Flags */
+
+    /**%apidoc[opt] */
+    nx::Uuid trackId;
+
+    /**%apidoc[opt] */
     Flags flags = Flags::none;
-    /**%apidoc[opt] Timestamp */
+
+    /**%apidoc[opt] */
     std::chrono::microseconds timestampUs;
-    /**%apidoc[opt] Bounding box */
-    Rect boundingBox = {0, 0, 0, 0};
-    /**%apidoc[opt] Image URL */
+    /**%apidoc:string
+     * Coordinates of the bounding box on a video frame where an Object is shown; in range [0..1].
+     * The format is: `{x},{y},{width}x{height}`
+     */
+    RectAsString boundingBox = {0, 0, 0, 0};
+
+    /**%apidoc[opt] */
     std::string imageUrl;
-    /**%apidoc[opt] Image data */
+
+    /**%apidoc[opt] */
     std::vector<char> imageData;
-    /**%apidoc[opt] Image data format */
+
+    /**%apidoc[opt] */
     std::string imageDataFormat;
-    /**%apidoc[opt] Attributes */
+
+    /**%apidoc[opt] */
     std::vector<ApiObjectMetadataAttribute> attributes;
 
     bool operator==(const ApiBestShotMetadataPacket& other) const = default;
@@ -253,9 +270,9 @@ struct NX_VMS_API ApiBestShotMetadataPacket
 #define nx_vms_api_analytics_ApiBestShotMetadataPacket_Fields \
     (id)(deviceId)(trackId)(flags)(timestampUs)(boundingBox) \
     (imageUrl)(imageData)(imageDataFormat)(attributes)
-QN_FUSION_DECLARE_FUNCTIONS(ApiBestShotMetadataPacket, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(ApiBestShotMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiBestShotMetadataPacket,
-    nx_vms_api_analytics_ApiBestShotMetadataPacket_Fields);
+    nx_vms_api_analytics_ApiBestShotMetadataPacket_Fields)
 
 /**%apidoc
  * Object Title metadata packet.
@@ -264,23 +281,38 @@ struct NX_VMS_API ApiObjectTitleMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent flexible id */
+
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
     QString deviceId;
-    /**%apidoc[opt] Track id */
-    Uuid trackId;
-    /**%apidoc[opt] Flags */
+
+    /**%apidoc[opt] */
+    nx::Uuid trackId;
+
+    /**%apidoc[opt] */
     Flags flags = Flags::none;
-    /**%apidoc[opt] Timestamp */
+
+    /**%apidoc[opt] */
     std::chrono::microseconds timestampUs;
-    /**%apidoc[opt] Bounding box */
-    Rect boundingBox = {0, 0, 0, 0};
-    /**%apidoc[opt] Text */
+
+    /**%apidoc:string
+     * Coordinates of the bounding box on a video frame where an Object is shown; in range [0..1].
+     * The format is: `{x},{y},{width}x{height}`
+     */
+    RectAsString boundingBox = {0, 0, 0, 0};
+
+    /**%apidoc[opt] */
     std::string text;
-    /**%apidoc[opt] Image URL */
+
+    /**%apidoc[opt] */
     std::string imageUrl;
-    /**%apidoc[opt] Image data */
+
+    /**%apidoc[opt] */
     std::vector<char> imageData;
-    /**%apidoc[opt] Image data format */
+
+    /**%apidoc[opt] */
     std::string imageDataFormat;
 
     bool operator==(const ApiObjectTitleMetadataPacket& other) const = default;
@@ -288,9 +320,9 @@ struct NX_VMS_API ApiObjectTitleMetadataPacket
 #define nx_vms_api_analytics_ApiObjectTitleMetadataPacket_Fields \
     (id)(deviceId)(trackId)(flags)(timestampUs)(boundingBox) \
     (text)(imageUrl)(imageData)(imageDataFormat)
-QN_FUSION_DECLARE_FUNCTIONS(ApiObjectTitleMetadataPacket, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(ApiObjectTitleMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiObjectTitleMetadataPacket,
-    nx_vms_api_analytics_ApiObjectTitleMetadataPacket_Fields);
+    nx_vms_api_analytics_ApiObjectTitleMetadataPacket_Fields)
 
 /**%apidoc
  * Event metadata.
@@ -299,14 +331,19 @@ struct NX_VMS_API ApiEventMetadata
 {
     /**%apidoc[opt] Type id */
     std::string typeId;
+
     /**%apidoc[opt] Caption */
     std::string caption;
+
     /**%apidoc[opt] Description */
     std::string description;
+
     /**%apidoc[opt] Is active */
     bool isActive = false;
+
     /**%apidoc[opt] Track id */
     Uuid trackId;
+
     /**%apidoc[opt] Key */
     std::string key;
 
@@ -314,9 +351,9 @@ struct NX_VMS_API ApiEventMetadata
 };
 #define nx_vms_api_analytics_ApiEventMetadata_Fields \
     (typeId)(caption)(description)(isActive)(trackId)(key)
-QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadata, (json));
+QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadata, (json))
 NX_REFLECTION_INSTRUMENT(ApiEventMetadata,
-    nx_vms_api_analytics_ApiEventMetadata_Fields);
+    nx_vms_api_analytics_ApiEventMetadata_Fields)
 
 /**%apidoc
  * Event metadata packet.
@@ -325,23 +362,31 @@ struct NX_VMS_API ApiEventMetadataPacket
 {
     /**%apidoc Engine id */
     nx::Uuid id;
-    /**%apidoc Device Agent flexible id */
+
+    /**%apidoc
+     * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
     QString deviceId;
-    /**%apidoc[opt] Flags */
+
+    /**%apidoc[opt] */
     Flags flags = Flags::none;
-    /**%apidoc[opt] Timestamp */
+
+    /**%apidoc[opt] */
     std::chrono::microseconds timestampUs;
-    /**%apidoc[opt] Duration */
+
+    /**%apidoc[opt] */
     std::chrono::microseconds durationUs;
-    /**%apidoc[opt] Events */
+
+    /**%apidoc[opt] */
     std::vector<ApiEventMetadata> events;
 
     bool operator==(const ApiEventMetadataPacket& other) const = default;
 };
 #define nx_vms_api_analytics_ApiEventMetadataPacket_Fields \
     (id)(deviceId)(flags)(timestampUs)(durationUs)(events)
-QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadataPacket, (json), NX_VMS_API);
+QN_FUSION_DECLARE_FUNCTIONS(ApiEventMetadataPacket, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ApiEventMetadataPacket,
-    nx_vms_api_analytics_ApiEventMetadataPacket_Fields);
+    nx_vms_api_analytics_ApiEventMetadataPacket_Fields)
 
 } // namespace nx::vms::api::analytics

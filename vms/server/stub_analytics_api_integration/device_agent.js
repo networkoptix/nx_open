@@ -3,7 +3,7 @@
 "use strict"
 
 const constants = require("./constants");
-const { mergeMaps } = require("./utils.js");
+const { mergeMaps, boundingBoxToString } = require("./utils.js");
 const { randomUUID } = require("node:crypto");
 
 const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetadata, timestampUs) => {
@@ -21,16 +21,22 @@ const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetad
       objectActionMetadata.boundingBox.x += 1.0 / 70;
     }
 
+    let mouseMovableObjectMetadataCopy = JSON.parse(JSON.stringify(mouseMovableObjectMetadata));
+    mouseMovableObjectMetadataCopy.boundingBox = boundingBoxToString(mouseMovableObjectMetadataCopy.boundingBox);
+
+    let objectActionMetadataCopy = JSON.parse(JSON.stringify(objectActionMetadata));
+    objectActionMetadataCopy.boundingBox = boundingBoxToString(objectActionMetadataCopy.boundingBox);
+
     return [
         {
             timestampUs: timestampUs,
             durationUs: 30000,
-            objects: [mouseMovableObjectMetadata]
+            objects: [mouseMovableObjectMetadataCopy]
         },
         {
             timestampUs: timestampUs,
             durationUs: 30000,
-            objects: [objectActionMetadata]
+            objects: [objectActionMetadataCopy]
         }
     ];
 };

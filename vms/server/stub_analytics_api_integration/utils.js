@@ -6,6 +6,11 @@ function mergeMaps(map1, map2) {
     return { ...map1, ...map2 };
 }
 
+function boundingBoxToString(boundingBox) {
+    return `${boundingBox.x},${boundingBox.y},${boundingBox.width}x${boundingBox.height}`;
+}
+
 module.exports = {
-    mergeMaps
+    mergeMaps,
+    boundingBoxToString
 };
