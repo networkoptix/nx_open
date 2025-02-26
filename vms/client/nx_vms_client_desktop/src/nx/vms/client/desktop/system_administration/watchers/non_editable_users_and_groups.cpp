@@ -178,8 +178,8 @@ bool NonEditableUsersAndGroups::canEditParents(const nx::Uuid& id) const
 
 bool NonEditableUsersAndGroups::canMassEdit(const QnUserResourcePtr& user) const
 {
-    // Do not allow mass editing to be used with Administrators.
-    if (user->isAdministrator())
+    // Do not allow mass editing to be used with Administrators or users from organizations.
+    if (user->isAdministrator() || user->isOrg())
         return false;
 
     if (user->attributes().testFlag(api::UserAttribute::readonly))

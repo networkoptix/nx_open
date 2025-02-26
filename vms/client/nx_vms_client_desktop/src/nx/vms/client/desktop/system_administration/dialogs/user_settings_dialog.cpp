@@ -1123,7 +1123,7 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
 
     state.userType = (UserSettingsGlobal::UserType) user->userType();
     state.isSelf = isSelf;
-    state.isOrgUser = !user->orgGroupIds().empty();
+    state.isOrgUser = user->isOrg();
     state.userId = user->getId();
     state.login = user->getName();
     state.loginEditable = permissions.testFlag(Qn::WriteNamePermission);
@@ -1135,12 +1135,13 @@ UserSettingsDialogState UserSettingsDialog::createState(const QnUserResourcePtr&
     state.localeEditable = permissions.testFlag(Qn::WriteLocalePermission);
     state.passwordEditable = permissions.testFlag(Qn::WritePasswordPermission);
     state.userEnabled = user->isEnabled();
-    state.userEnabledEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
+    state.userEnabledEditable =
+        permissions.testFlag(Qn::WriteAccessRightsPermission) && !user->isOrg();
     state.allowInsecure = user->shouldDigestAuthBeUsed();
     state.allowInsecureEditable = permissions.testFlag(Qn::WriteDigestPermission);
 
     state.auditAvailable = accessController()->hasPowerUserPermissions();
-    state.deleteAvailable = permissions.testFlag(Qn::RemovePermission);
+    state.deleteAvailable = permissions.testFlag(Qn::RemovePermission) && !user->isOrg();
 
     state.parentGroupsEditable = permissions.testFlag(Qn::WriteAccessRightsPermission);
 

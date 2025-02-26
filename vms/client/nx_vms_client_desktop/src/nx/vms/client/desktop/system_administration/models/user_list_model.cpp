@@ -71,6 +71,8 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             const auto rightType = userTypeSortOrder(rightUser->userType());
             if (leftType != rightType)
                 return leftType < rightType;
+            else if (leftUser->isOrg() != rightUser->isOrg())
+                return leftUser->isOrg();
 
             return userLessThan(left, right, UserListModel::LoginColumn);
         }
