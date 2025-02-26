@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <optional>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -295,10 +296,10 @@ struct AccountForSharing
 struct AccountNotificationFilterSettings
 {
     /**%apidoc List of disabled events. */
-    std::vector<std::string> eventFilter;
+    std::set<std::string> eventFilter;
 
     /**%apidoc List of disabled messages. */
-    std::vector<std::string> messageFilter;
+    std::set<std::string> messageFilter;
 };
 
 } // namespace nx::cloud::db::api

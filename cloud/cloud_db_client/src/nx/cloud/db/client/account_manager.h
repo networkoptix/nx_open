@@ -76,7 +76,6 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void updateAccountNotificationFilterSettings(
-        const std::string& accountEmail,
         api::AccountNotificationFilterSettings settings,
         std::function<void(api::ResultCode)> completionHandler) override;
 

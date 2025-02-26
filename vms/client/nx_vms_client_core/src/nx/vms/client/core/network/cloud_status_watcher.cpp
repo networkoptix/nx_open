@@ -341,16 +341,12 @@ void CloudStatusWatcher::updateRefreshToken(const std::string& refreshToken)
 
 void CloudStatusWatcher::saveUserSettings(const nx::vms::api::UserSettings& settings)
 {
-    auto toVector =
-        [](const auto& s) { return std::vector<std::string>{s.cbegin(), s.cend()}; };
-
     AccountNotificationFilterSettings value{
-        .eventFilter = toVector(settings.eventFilter),
-        .messageFilter = toVector(settings.messageFilter)};
+        .eventFilter = settings.eventFilter,
+        .messageFilter = settings.messageFilter};
 
     d->ensureCloudConnection();
     d->cloudConnection->accountManager()->updateAccountNotificationFilterSettings(
-        d->authData().credentials.username,
         std::move(value),
         [this](ResultCode errorCode)
         {

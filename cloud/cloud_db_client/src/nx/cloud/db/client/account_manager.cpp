@@ -176,14 +176,12 @@ void AccountManager::saveAccountOrganizationAttrs(
 }
 
 void AccountManager::updateAccountNotificationFilterSettings(
-    const std::string& accountEmail,
     api::AccountNotificationFilterSettings settings,
     std::function<void(api::ResultCode)> completionHandler)
 {
     m_requestsExecutor->makeAsyncCall</*Output*/ void>(
         nx::network::http::Method::post,
-        nx::network::http::rest::substituteParameters(
-            kAccountNotificationSettings, {accountEmail}),
+        kAccountNotificationSettings,
         {}, // query
         std::move(settings),
         std::move(completionHandler));
