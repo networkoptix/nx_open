@@ -132,7 +132,9 @@ class DeviceAgent {
 
         this.frameCounter = this.frameCounter + 1;
 
-        this.lastDataTimestampMs = data.timestampMs ?? this.lastDataTimestampMs;
+        let timestamp = data.timestampMs ?? this.lastDataTimestampMs;
+
+        this.lastDataTimestampMs = Math.max(this.lastDataTimestampMs, timestamp);
 
         // Send object metadata packets on every frame.
         let objectMetadataPackets = makeObjectMetadataPackets(this.mouseMovableObjectMetadata,

@@ -12,7 +12,6 @@ const JsonRpcClient = require("./json_rpc_client").JsonRpcClient;
 const Engine = require("./engine.js").Engine;
 const Integration = require("./integration.js").Integration;
 const constants = require("./constants.js");
-const errors = require("./error.js");
 const { readFileSync } = require("node:fs");
 const axios = require('axios');
 
@@ -25,6 +24,7 @@ const axiosInstance = axios.create({
 class IntegrationContext {
     integration = null;
     engineContextById = {};
+    deviceAgentPushDataContext = null;
 
     constructor(manifests, mouseMovableObjectMetadata, rpcClient) {
         this.integration = new Integration(manifests, mouseMovableObjectMetadata, rpcClient);
@@ -103,21 +103,16 @@ app.on('ready', () => {
     });
 });
 
-const initializeWebRtc = (appContext) => {;
-    if (appContext.config.cameraId === '')
-    {
-        console.log("initializeWebRtc: Camera ID is empty");
-        return;
-    }
-
+const initializeWebRtc = (appContext, deviceId) => {
     if (appContext.adminSessionToken === null)
     {
         console.log("initializeWebRtc: Admin session token is null");
         return;
     }
 
-    let config = appContext.config;
+    const config = JSON.parse(JSON.stringify(appContext.config));
     config.adminSessionToken = appContext.adminSessionToken;
+    config.deviceId = deviceId;
 
     appContext.window.webContents.send("initialize-webrtc", config);
 }
@@ -135,7 +130,6 @@ const createWindow = () => {
     });
 
     window.once('ready-to-show', () => {
-        initializeWebRtc(appContext);
     });
 
     window.loadFile("index.html");
@@ -282,7 +276,6 @@ const getSessionToken = async (user, password) => {
         console.error('Error:', error);
         return null;
     }
-
 }
 
 const authorizeIntegrationAndConnect = async () => {
@@ -328,12 +321,30 @@ const initializeRpcClient = async () => {
         const engineContext = findOrCreateEngineContextById(engineId);
         const deviceAgents = engineContext.deviceAgentsByDeviceId;
 
+        function initializePushData(engine, deviceAgent)
+        {
+            if (!appContext.integrationContext.deviceAgentPushDataContext)
+            {
+                appContext.integrationContext.deviceAgentPushDataContext =
+                {
+                    deviceAgent: deviceAgent,
+                    engine: engine,
+                    frameCount: 0,
+                    pdeFromEngine: true, //< True - from Engine, false - from DeviceAgent.
+                    pushDataInfo: { timestampMs: 1 },
+                };
+            }
+        }
+
         if (!deviceAgents.hasOwnProperty(deviceId))
         {
             const engine = engineContext.engine;
             const deviceAgent = engine.obtainDeviceAgent(deviceInfo);
             deviceAgents[deviceId] = deviceAgent;
         }
+
+        initializePushData(engineContext.engine, deviceAgents[deviceId]);
+        initializeWebRtc(appContext, deviceId);
 
         if (!fs.existsSync("integration_state.json"))
             fs.writeFileSync("integration_state.json", JSON.stringify({}));
@@ -355,36 +366,34 @@ const initializeRpcClient = async () => {
         };
     });
 
-    let frameCount = 0;
-    let pdeFromEngine = true; //< True - from Engine, false - from DeviceAgent.
-
-    rpcClient.on(constants.RECEIVE_DEVICE_AGENT_DATA_METHOD, async (data) => {
-        console.log("Got frame data", data);
+    rpcClient.on(constants.DELETE_DEVICE_AGENT_METHOD, async (data) => {
+        console.log("Delete Device Agent", data);
 
         const engineId = data.params.target.engineId;
         const deviceId = data.params.target.deviceId;
 
-        const engine = findOrCreateEngineById(engineId);
-        const deviceAgent = findDeviceAgentByIdOrThrow(engineId, deviceId);
+        let engineContext = findOrCreateEngineContextById(engineId);
+        let deviceAgents = engineContext.deviceAgentsByDeviceId;
 
-        deviceAgent.pushData(data.params.parameters);
-
-        if (frameCount > 100)
+        if (deviceAgents.hasOwnProperty(deviceId))
         {
-            if (!pdeFromEngine)
-                deviceAgent.pushPluginDiagnosticEvent("error", "Caption", "PDE from Device Agent");
+            if (fs.existsSync("integration_state.json"))
+            {
+                let integration_state = JSON.parse(readFileSync("integration_state.json"));
+                delete integration_state[deviceId];
+                fs.writeFileSync("integration_state.json", JSON.stringify(integration_state));
+            }
+
+            if (appContext.integrationContext.deviceAgentPushDataContext)
+            {
+                console.log("Stopping push data loop.");
+                appContext.integrationContext.deviceAgentPushDataContext = null;
+            }
             else
-                engine.pushPluginDiagnosticEvent("error", "Caption", "PDE from Engine");
-
-            pdeFromEngine = !pdeFromEngine;
-            frameCount = 0;
+            {
+                console.log("Push data loop is already stopped.");
+            }
         }
-
-        frameCount++;
-    });
-
-    rpcClient.on(constants.DELETE_DEVICE_AGENT_METHOD, async (data) => {
-        console.log("Delete Device Agent", data);
     });
 
     rpcClient.on(constants.SET_ENGINE_SETTINGS_METHOD, async (data) => {
@@ -836,6 +845,31 @@ const initializeNotifications = () => {
                 console.log('File deleted successfully');
             });
         });
+    });
+
+    ipcMain.on("update-timestamp", (event, timestampMs) => {
+        console.log("Update timestamp: ", timestampMs);
+
+        let pushDataContext = appContext.integrationContext.deviceAgentPushDataContext;
+        if (pushDataContext)
+        {
+            pushDataContext.pushDataInfo.timestampMs = timestampMs;
+
+            pushDataContext.deviceAgent.pushData(pushDataContext.pushDataInfo);
+
+            if (pushDataContext.frameCount > 50)
+            {
+                if (!pushDataContext.pdeFromEngine)
+                    pushDataContext.deviceAgent.pushPluginDiagnosticEvent("error", "Caption", "PDE from Device Agent");
+                else
+                    pushDataContext.engine.pushPluginDiagnosticEvent("error", "Caption", "PDE from Engine");
+
+                pushDataContext.pdeFromEngine = !pushDataContext.pdeFromEngine;
+                pushDataContext.frameCount = 0;
+            }
+
+            pushDataContext.frameCount++;
+        }
     });
 }
 

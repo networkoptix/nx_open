@@ -20,7 +20,6 @@ module.exports = {
 
     // Server to Integration notifications.
 
-    RECEIVE_DEVICE_AGENT_DATA_METHOD: "rest.v4.analytics.engines.deviceAgents.data.create",
     DELETE_DEVICE_AGENT_METHOD: "rest.v4.analytics.engines.deviceAgents.delete",
 
     // Integration to Server notifications.

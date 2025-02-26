@@ -136,7 +136,7 @@ function reconnect(position, config) {
           + ':'
           + config.vmsPort
           + '/rest/v3/devices/'
-          + config.cameraId
+          + config.deviceId
           + '/webrtc'
           + '?_ticket=' + r.token
           + '&stream='
@@ -154,7 +154,8 @@ function reconnect(position, config) {
           + (dewarpingFov != null ? ('&dewarpingFov=' + dewarpingFov) : '')
           + (dewarpingPanofactor != null ? ('&dewarpingPanofactor=' + dewarpingPanofactor) : '')
           + (zoom != null ? ('&zoom=' + zoom) : '')
-          + (panoramic != null ? ('&panoramic=' + panoramic) : '');
+          + (panoramic != null ? ('&panoramic=' + panoramic) : '')
+          + '&sendTimestampIntervalMs=0';
 
         console.log('Url: ' + url);
 
@@ -172,7 +173,7 @@ function reconnect(position, config) {
           + config.vmsPort
           + '/webrtc-tracker/'
           + '?_ticket=' + r.token
-          + '&camera_id='+ config.cameraId
+          + '&camera_id='+ config.deviceId
           + (position != null ? ('&position=' + position) : '')
           + '&speed=' + urlParams.get('speed')
           + '&stream=' + webrtc.streamValue
@@ -281,6 +282,7 @@ function start() {
       if (typeof(event.data) === 'string') {
         var message = JSON.parse(event.data);
         var timestampMs = parseInt(message.timestampMs);
+        window.mainProcess.ipc.send("update-timestamp", timestampMs);
         webrtc.lastTimestampMs = timestampMs;
         var currentTimestampMs = Math.floor(Date.now());
         var diff = currentTimestampMs - timestampMs;

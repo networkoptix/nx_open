@@ -30,13 +30,6 @@ npm install ws
 - Create the config file `analytics_api.ini` in the .ini directory (see the description of the
     IniConfig mechanism in the Nx Server Plugin SDK, `nx/kit/ini_config.h`). Add the following line
     to the file:
-```
-enableSendingFrameMetadataToIntegration=true
-```
-This will make the Server send the JSON-RPC notification for each frame (method
-`rest.v4.analytics.engines.deviceAgents.data.create`) containing the frame metadata(timestamp) to
-the Stub Analytics API Integration. In response, the Stub will send different kinds of metadata
-and messages back to the Server.
 
 - Launch VMS Server and the Client.
 
