@@ -63,7 +63,13 @@ const makeBestShotMetadataPacket = (trackId, timestampUs) => {
     return {
         timestampUs: timestampUs,
         trackId: trackId,
-        imageUrl: "https://picsum.photos/200/300"
+        imageUrl: "https://picsum.photos/200/300",
+        boundingBox: boundingBoxToString({
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        })
     };
 };
 
@@ -72,7 +78,13 @@ const makeObjectTitleMetadataPacket = (trackId, timestampUs) => {
         timestampUs: timestampUs,
         trackId: trackId,
         imageUrl: "https://picsum.photos/200/300",
-        text: "Analytics API Stub: Object Track title"
+        text: "Analytics API Stub: Object Track title",
+        boundingBox: boundingBoxToString({
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        })
     };
 };
 
@@ -146,6 +158,24 @@ class DeviceAgent {
             let method = constants.PUSH_DEVICE_AGENT_OBJECT_TITLE_METADATA_METHOD;
 
             let packet = makeObjectTitleMetadataPacket(this.objectActionMetadata.trackId,
+                this.lastDataTimestampUs);
+            let parameters = mergeMaps(this.target, packet);
+            this.appContext.rpcClient.notify(method, parameters);
+        }
+
+        {
+            let method = constants.PUSH_DEVICE_AGENT_EVENT_METADATA_METHOD;
+
+            let packet = makeEventMetadataPacket(this.objectActionMetadata.trackId,
+                this.lastDataTimestampUs);
+            let parameters = mergeMaps(this.target, packet);
+            this.appContext.rpcClient.notify(method, parameters);
+        }
+
+        {
+            let method = constants.PUSH_DEVICE_AGENT_BESTSHOT_METADATA_METHOD;
+
+            let packet = makeBestShotMetadataPacket(this.objectActionMetadata.trackId,
                 this.lastDataTimestampUs);
             let parameters = mergeMaps(this.target, packet);
             this.appContext.rpcClient.notify(method, parameters);
