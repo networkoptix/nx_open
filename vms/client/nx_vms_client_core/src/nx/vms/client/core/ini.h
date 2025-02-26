@@ -95,7 +95,7 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
         "[Feature] Enables Bookmarks search for Cross System Layouts.");
 
     // VMS-52886, VMS-52888, VMS-56000
-    NX_INI_FLAG(false, allowCslObjectSearch,
+    NX_INI_FLAG(true, allowCslObjectSearch,
         "[Feature] Enables Objects tab and Objects search dialog for Cross System Layouts.");
 
     // VMS-55962
