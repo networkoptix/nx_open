@@ -336,6 +336,17 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     auto applicationContext = std::make_unique<ApplicationContext>(applicationMode, startupParams);
 
+    /* Running updater after QApplication and logging are initialized. */
+    if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
+    {
+        /* All functionality is in the constructor. */
+        SelfUpdater updater(startupParams);
+    }
+
+    /* Immediately exit if run in self-update mode. */
+    if (startupParams.selfUpdateMode)
+        return kSuccessCode;
+
     // TODO: #sivanov Move QnClientModule contents to Application Context and System Context.
     QnClientModule client(applicationContext->currentSystemContext(), startupParams);
 
@@ -355,17 +366,6 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     if (startupParams.customUri.isValid())
         sendCloudPortalConfirmation(startupParams.customUri, application);
-
-    /* Running updater after QApplication and logging are initialized. */
-    if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
-    {
-        /* All functionality is in the constructor. */
-        SelfUpdater updater(startupParams);
-    }
-
-    /* Immediately exit if run in self-update mode. */
-    if (startupParams.selfUpdateMode)
-        return kSuccessCode;
 
     /* Initialize sound. */
     nx::audio::AudioDevice::instance()->setVolume(appContext()->localSettings()->audioVolume());

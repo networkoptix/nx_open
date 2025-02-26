@@ -95,10 +95,6 @@ QnClientModule::QnClientModule(
     else
         s_instance = this;
 
-    // Shortened initialization if run in self-update mode.
-    if (d->startupParameters.selfUpdateMode)
-        return;
-
     core::appContext()->knownServerConnectionsWatcher()->start();
 
     d->analyticsSettingsManager = core::AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
