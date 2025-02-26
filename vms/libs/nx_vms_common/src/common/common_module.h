@@ -19,8 +19,6 @@ class SystemContext;
 } // namespace nx::vms::common
 
 namespace nx::metric { struct Storage; }
-namespace nx::vms::discovery { class Manager; }
-namespace nx::vms::event { class RuleManager; }
 
 /**
  * Deprecated storage for the application singleton classes. Should not be used anymore. Use
@@ -55,7 +53,6 @@ public:
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnResourceStatusDictionary* resourceStatusDictionary() const;
     nx::vms::common::SystemSettings* globalSettings() const;
-    nx::vms::event::RuleManager* eventRuleManager() const;
     QnResourceDataPool* resourceDataPool() const;
     std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
     QnCommonMessageProcessor* messageProcessor() const;

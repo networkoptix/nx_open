@@ -95,13 +95,6 @@ SystemSettings* QnCommonModuleAware::globalSettings() const
     return NX_ASSERT(m_commonModule) ? m_commonModule->systemContext()->globalSettings() : nullptr;
 }
 
-nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
-{
-    return NX_ASSERT(m_commonModule)
-        ? m_commonModule->systemContext()->eventRuleManager()
-        : nullptr;
-}
-
 std::shared_ptr<ec2::AbstractECConnection> QnCommonModuleAware::messageBusConnection() const
 {
     return NX_ASSERT(m_commonModule) ? m_commonModule->messageBusConnection() : nullptr;

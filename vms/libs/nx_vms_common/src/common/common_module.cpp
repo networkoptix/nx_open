@@ -105,13 +105,6 @@ SystemSettings* QnCommonModule::globalSettings() const
         : nullptr;
 }
 
-nx::vms::event::RuleManager* QnCommonModule::eventRuleManager() const
-{
-    return NX_ASSERT(d->systemContext)
-        ? d->systemContext->eventRuleManager()
-        : nullptr;
-}
-
 QnResourceDataPool* QnCommonModule::resourceDataPool() const
 {
     return NX_ASSERT(d->systemContext)

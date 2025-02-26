@@ -104,7 +104,7 @@ bool isSuitableRule(
     const QnUserResourcePtr& currentUser,
     nx::Uuid resourceId)
 {
-    if (!rule->enabled())
+    if (!rule || !rule->enabled())
         return false;
 
     // TODO: #amalov support multiple event rule logic.
@@ -199,6 +199,13 @@ CameraButtonData buttonFromRule(
         .enabled = true};
 }
 
+bool isVmsRulesSupported(SystemContext* context)
+{
+    static constexpr auto kVmsRulesVersion = nx::utils::SoftwareVersion(6, 1);
+
+    return context->moduleInformation().version >= kVmsRulesVersion;
+}
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -247,11 +254,16 @@ void SoftwareTriggerCameraButtonController::Private::updateButtons()
             removedIds.remove(rule->id());
         };
 
-    for (const auto& rule: q->systemContext()->eventRuleManager()->rules())
-        handleRule(rule);
-
-    for (const auto& [_, rule]: q->systemContext()->vmsRulesEngine()->rules())
-        handleRule(rule.get());
+    if (isVmsRulesSupported(q->systemContext()))
+    {
+        for (const auto& [_, rule]: q->systemContext()->vmsRulesEngine()->rules())
+            handleRule(rule.get());
+    }
+    else
+    {
+        for (const auto& rule: q->systemContext()->eventRuleManager()->rules())
+            handleRule(rule);
+    }
 
     for (const auto& id: removedIds)
         tryRemoveButton(id);
@@ -475,28 +487,32 @@ void SoftwareTriggerCameraButtonController::setResourceInternal(const QnResource
     if (!NX_ASSERT(systemContext))
         return;
 
-    auto ruleManager = systemContext->eventRuleManager();
-
     const auto updateButtons = [this]() { d->updateButtons(); };
     const auto tryRemoveButton = [this](const nx::Uuid& id) { d->tryRemoveButton(id); };
     const auto updateButtonByRule = [this](auto rule) { d->updateButtonByRule(rule); };
 
-    d->connections << connect(
-        ruleManager, &vms::event::RuleManager::rulesReset, this, updateButtons);
-    d->connections << connect(
-        ruleManager, &vms::event::RuleManager::ruleRemoved, this, tryRemoveButton);
-    d->connections << connect(
-        ruleManager, &vms::event::RuleManager::ruleAddedOrUpdated, this, updateButtonByRule);
+    if (isVmsRulesSupported(systemContext))
+    {
+        auto engine = systemContext->vmsRulesEngine();
+        d->connections << connect(
+            engine, &nx::vms::rules::Engine::rulesReset, this, updateButtons);
+        d->connections << connect(
+            engine, &nx::vms::rules::Engine::ruleRemoved, this, tryRemoveButton);
+        d->connections << connect(
+            engine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
+            [engine, updateButtonByRule](auto id) { updateButtonByRule(engine->rule(id).get()); });
+    }
+    else
+    {
+        auto ruleManager = systemContext->eventRuleManager();
 
-    auto engine = systemContext->vmsRulesEngine();
-    d->connections << connect(
-        engine, &nx::vms::rules::Engine::rulesReset, this, updateButtons);
-    d->connections << connect(
-        engine, &nx::vms::rules::Engine::ruleRemoved, this, tryRemoveButton);
-    d->connections << connect(
-        engine, &nx::vms::rules::Engine::ruleAddedOrUpdated, this,
-        [engine, updateButtonByRule](auto id) { updateButtonByRule(engine->rule(id).get()); });
-
+        d->connections << connect(
+            ruleManager, &vms::event::RuleManager::rulesReset, this, updateButtons);
+        d->connections << connect(
+            ruleManager, &vms::event::RuleManager::ruleRemoved, this, tryRemoveButton);
+        d->connections << connect(
+            ruleManager, &vms::event::RuleManager::ruleAddedOrUpdated, this, updateButtonByRule);
+    }
 
     d->updateButtons();
 }

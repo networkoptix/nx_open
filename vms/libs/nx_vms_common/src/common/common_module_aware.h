@@ -26,8 +26,6 @@ class UserGroupManager;
 } // namespace nx::vms::common
 
 namespace nx::core::access { class ResourceAccessSubjectHierarchy; }
-namespace nx::vms::event { class RuleManager; }
-namespace nx::vms::rules { class Engine; }
 namespace ec2 { class AbstractECConnection; }
 
 /**
@@ -54,7 +52,6 @@ public:
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
     QnResourceStatusDictionary* statusDictionary() const;
     nx::vms::common::SystemSettings* globalSettings() const;
-    nx::vms::event::RuleManager* eventRuleManager() const;
 
     std::shared_ptr<ec2::AbstractECConnection> messageBusConnection() const;
     QnCommonMessageProcessor* messageProcessor() const;
