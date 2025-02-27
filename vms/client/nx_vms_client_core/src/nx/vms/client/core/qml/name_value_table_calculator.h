@@ -27,9 +27,6 @@ public:
     static void registerQmlType();
 
 private:
-    void recalculate();
-
-private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };

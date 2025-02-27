@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include "name_value_table_calculator.h"
+
 #include <QtCore/QVariant>
 #include <QtQuick/private/qquickrepeater_p.h>
 #include <QtQuick/private/qquicktext_p.h>
@@ -7,8 +9,6 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/qml/items/values_text.h>
 #include <nx/vms/client/core/utils/qml_property.h>
-
-#include "name_value_table_calculator.h"
 
 namespace nx::vms::client::core {
 
@@ -181,39 +181,35 @@ void NameValueTableCalculator::componentComplete()
             [this]()
             {
                 d->updateChildren();
+                updateColumnWidths();
             });
 
-        auto widthChanged = [this]()
+        auto updateWidths = [this]()
             {
                 d->updateAvailableWidth();
-                recalculate();
+                updateColumnWidths();
             };
 
         d->columnSpacing = QmlProperty<qreal>(d->grid, "columnSpacing");
-        d->columnSpacing.connectNotifySignal(this, widthChanged);
+        d->columnSpacing.connectNotifySignal(this, updateWidths);
 
         d->leftPadding = QmlProperty<qreal>(d->grid, "leftPadding");
-        d->leftPadding.connectNotifySignal(this, widthChanged);
+        d->leftPadding.connectNotifySignal(this, updateWidths);
 
         d->rightPadding = QmlProperty<qreal>(d->grid, "rightPadding");
-        d->rightPadding.connectNotifySignal(this, widthChanged);
+        d->rightPadding.connectNotifySignal(this, updateWidths);
 
         d->labelFraction = QmlProperty<qreal>(d->grid->parentItem(), "labelFraction");
-        d->labelFraction.connectNotifySignal(this, &NameValueTableCalculator::recalculate);
+        d->labelFraction.connectNotifySignal(this, &NameValueTableCalculator::updateColumnWidths);
 
         d->maxRowCount = QmlProperty<int>(d->grid, "maxRowCount");
-        d->maxRowCount.connectNotifySignal(this,&NameValueTableCalculator::recalculate);
+        d->maxRowCount.connectNotifySignal(this,&NameValueTableCalculator::updateColumnWidths);
 
-        connect(d->grid, &QQuickItem::widthChanged, this, widthChanged);
+        connect(d->grid, &QQuickItem::widthChanged, this, updateWidths);
 
         d->updateChildren();
-        recalculate();
+        updateWidths();
     }
-}
-
-void NameValueTableCalculator::recalculate()
-{
-    updateColumnWidths();
 }
 
 void NameValueTableCalculator::registerQmlType()
