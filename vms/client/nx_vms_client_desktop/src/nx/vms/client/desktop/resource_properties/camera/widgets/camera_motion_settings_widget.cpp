@@ -190,7 +190,14 @@ QQuickItem* CameraMotionSettingsWidget::motionItem() const
 void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& state)
 {
     if (!state.isSingleCamera())
+    {
+        // Explicitly reset to trigger the property and enforce updating resource pointers from a
+        // resource pool when Client disconnects and reconnects to the same Site.
+        if (auto motionItem = this->motionItem())
+            motionItem->setProperty("cameraResourceId", QVariant::fromValue(nx::Uuid{}));
+
         return;
+    }
 
     m_cameraId = state.singleCameraId();
     m_motionHelper->setMotionRegionList(state.motion.regionList());
