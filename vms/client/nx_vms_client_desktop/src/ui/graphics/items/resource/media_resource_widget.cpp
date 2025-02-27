@@ -698,7 +698,8 @@ void QnMediaResourceWidget::initIoModuleOverlay()
             ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
             : 0.0;
 
-        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget(d->camera, d->ioModuleMonitor);
+        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget(
+            d->camera, d->ioModuleMonitor, windowContext());
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
             ResourceAccessManager::hasPermissions(d->camera, Qn::DeviceInputPermission));

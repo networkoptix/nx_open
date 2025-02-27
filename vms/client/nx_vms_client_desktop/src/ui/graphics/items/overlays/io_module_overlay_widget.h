@@ -7,6 +7,7 @@
 #include <api/model/api_ioport_data.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/core/camera/iomodule/io_module_monitor.h>
+#include <nx/vms/client/desktop/window_context_aware.h>
 
 class QnIoModuleOverlayWidgetPrivate;
 class QnIoModuleOverlayContents;
@@ -14,7 +15,9 @@ class QnIoModuleOverlayContents;
 /*
 Resource overlay providing user interaction with I/O module
 */
-class QnIoModuleOverlayWidget: public GraphicsWidget
+class QnIoModuleOverlayWidget:
+    public GraphicsWidget,
+    public nx::vms::client::desktop::WindowContextAware
 {
     Q_OBJECT
     using base_type = GraphicsWidget;
@@ -23,6 +26,7 @@ public:
     QnIoModuleOverlayWidget(
         const QnVirtualCameraResourcePtr& module,
         const nx::vms::client::core::IOModuleMonitorPtr& monitor,
+        nx::vms::client::desktop::WindowContext* windowContext,
         QGraphicsWidget* parent = nullptr);
     virtual ~QnIoModuleOverlayWidget();
 

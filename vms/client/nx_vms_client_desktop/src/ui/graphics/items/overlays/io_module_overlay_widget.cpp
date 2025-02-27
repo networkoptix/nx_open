@@ -17,11 +17,12 @@
 #include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/common/palette.h>
-#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
@@ -35,7 +36,6 @@ namespace {
 
 constexpr int kReconnectDelayMs = 1000 * 5;
 constexpr int kCommandExecuteTimeoutMs = 1000 * 6;
-constexpr int kStateCheckIntervalMs = 1000;
 
 } // namespace
 
@@ -60,12 +60,11 @@ public:
     {
         QnIOPortData config;            //< port configuration
         QnIOStateData state;            //< current port state
-        QElapsedTimer stateChangeTimer; //< state change timout timer
+        bool requestIsInProgress = false;
     };
 
     QnIOPortDataList ports;
     QMap<QString, StateData> states;
-    QTimer* const timer = nullptr;
     QGraphicsLinearLayout* const layout = nullptr;
     QnIoModuleOverlayWidget::Style overlayStyle = QnIoModuleOverlayWidget::Style();
 
@@ -89,7 +88,6 @@ public:
     void at_connectionOpened();
     void at_connectionClosed();
     void at_stateChanged(const QnIOStateData& value);
-    void at_timerTimeout();
 };
 
 /*
@@ -103,13 +101,9 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(
     base_type(widget),
     q_ptr(widget),
     monitor(monitor),
-    timer(new QTimer(this)),
     layout(new QGraphicsLinearLayout(Qt::Vertical, widget))
 {
     widget->setAutoFillBackground(true);
-
-    connect(timer, &QTimer::timeout, this, &QnIoModuleOverlayWidgetPrivate::at_timerTimeout);
-    timer->setInterval(kStateCheckIntervalMs);
 
     updateOverlayStyle();
 }
@@ -158,7 +152,6 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
 void QnIoModuleOverlayWidgetPrivate::initIOModule(const QnVirtualCameraResourcePtr& newModule)
 {
     Q_Q(QnIoModuleOverlayWidget);
-    timer->stop();
 
     if (module)
         module->disconnect(this);
@@ -194,7 +187,6 @@ void QnIoModuleOverlayWidgetPrivate::initIOModule(const QnVirtualCameraResourceP
     updateOverlayStyle();
 
     setPorts(module->ioPortDescriptions());
-    timer->start();
 }
 
 void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
@@ -273,12 +265,14 @@ void QnIoModuleOverlayWidgetPrivate::at_connectionClosed()
 
     q->setEnabled(false);
 
+    NX_VERBOSE(this, "Connection closed, state is reset");
+
     // Resets states since server initially sends only active states after restart.
     for (auto& item: states)
     {
         item.state.isActive = false;
         item.state.timestampUs = -1;
-        item.stateChangeTimer.invalidate();
+        item.requestIsInProgress = false;
         contents->stateChanged(item.config, item.state);
     }
 
@@ -292,13 +286,16 @@ void QnIoModuleOverlayWidgetPrivate::at_stateChanged(const QnIOStateData& value)
         return;
 
     it->state = value;
-    it->stateChangeTimer.invalidate();
+    it->requestIsInProgress = false;
+    NX_VERBOSE(this, "I/O port %1 state changed: %2", value.id, value.isActive);
 
     contents->stateChanged(it->config, it->state);
 }
 
 void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
 {
+    Q_Q(QnIoModuleOverlayWidget);
+
     if (port.isEmpty() || !userInputEnabled)
         return;
 
@@ -307,7 +304,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
         return;
 
     /* Ignore if we didn't receive response from previous toggle yet: */
-    if (it->stateChangeTimer.isValid())
+    if (it->requestIsInProgress)
         return;
 
     /* Send fake early state change to make UI look more responsive: */
@@ -328,41 +325,47 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     if (!systemContext->ioPortsInterface())
         return;
 
-    systemContext->ioPortsInterface()->setIoPortState(
+    auto callback = [this, port, q](bool success)
+        {
+            auto it = states.find(port);
+            if (it == states.end())
+                return;
+
+            if (!it->requestIsInProgress)
+                return;
+
+            NX_VERBOSE(this, "I/O port %1 change request is successful: %2", port, success);
+
+            it->requestIsInProgress = false;
+
+            if (!success)
+            {
+                const auto portName = it->config.getName();
+                const auto message = it->state.isActive
+                    ? tr("Failed to turn off I/O port %1")
+                    : tr("Failed to turn on I/O port %1");
+
+                QnSessionAwareMessageBox::warning(
+                    q->windowContext()->mainWindowWidget(), message.arg(portName));
+            }
+        };
+
+    it->requestIsInProgress = true; //< Ensures setting it up before potential callback call.
+
+    bool success = systemContext->ioPortsInterface()->setIoPortState(
         systemContext->getSessionTokenHelper(),
         module,
         it->config.id,
         /*isActive*/ it->state.isActive,
-        /*autoResetTimeout*/ std::chrono::milliseconds(it->config.autoResetTimeoutMs));
+        /*autoResetTimeout*/ std::chrono::milliseconds(it->config.autoResetTimeoutMs),
+        /*targetLockResolutionData*/ {},
+        callback);
 
-    it->stateChangeTimer.restart();
-}
+    NX_VERBOSE(this, "I/O port %1 change request attempt, sending is successful: %2",
+        port, success);
 
-void QnIoModuleOverlayWidgetPrivate::at_timerTimeout()
-{
-    for (auto& item: states)
-    {
-        if (!item.stateChangeTimer.isValid())
-            continue;
-
-        // TODO: Probably rewrite this logic
-
-        /* If I/O port toggle is confirmed by the monitor, stateChangeTimer is invalidated. */
-        /* If stateChangeTimer is valid and expired, I/O port toggle was unsuccessful: */
-        if (item.stateChangeTimer.hasExpired(kCommandExecuteTimeoutMs))
-        {
-            contents->stateChanged(item.config, item.state);
-
-            item.stateChangeTimer.invalidate();
-
-            const auto portName = item.config.getName();
-            const auto message = item.state.isActive
-                ? tr("Failed to turn off I/O port %1")
-                : tr("Failed to turn on I/O port %1");
-
-            QnMessageBox::warning(nullptr, message.arg(portName));
-        }
-    }
+    if (!success)
+        it->requestIsInProgress = false;
 }
 
 /*
@@ -372,9 +375,11 @@ QnIoModuleOverlayWidget
 QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(
     const QnVirtualCameraResourcePtr& module,
     const core::IOModuleMonitorPtr& monitor,
+    WindowContext* windowContext,
     QGraphicsWidget* parent)
     :
     base_type(parent),
+    WindowContextAware(windowContext),
     d_ptr(new QnIoModuleOverlayWidgetPrivate(monitor, this))
 {
     Q_D(QnIoModuleOverlayWidget);
