@@ -67,6 +67,22 @@ void updateBody(
             return old.erase(begin, end);
         };
 
+    const auto getTimestamps =
+        [](const auto beginIt, const auto endIt)
+        {
+            QList<decltype(Accessor::startTime(*beginIt))> timestamps;
+            for (auto it = beginIt; it != endIt; ++it)
+                timestamps.push_back(Accessor::startTime(*it));
+            return timestamps;
+        };
+
+    NX_TRACE(model, "Update body\nOld data (%1): %2\nFetched data (%3): %4\n"
+        "Body offset: %5, length: %6\nTail offset: %7, length: %8",
+        old.size(), getTimestamps(old.cbegin(), old.cend()),
+        fetched.data.size(), getTimestamps(fetched.data.cbegin(), fetched.data.cend()),
+        fetched.ranges.body.offset, fetched.ranges.body.length,
+        fetched.ranges.tail.offset, fetched.ranges.tail.length);
+
     if (fetched.data.empty())
     {
         removeItems(old.begin(), old.end());
@@ -147,8 +163,16 @@ void updateBody(
         }
 
         // Process "same timestamp" bookmarks
-        if (!NX_ASSERT(Accessor::startTime(*itOld) == Accessor::startTime(*fetchedBegin)))
+        if (!NX_ASSERT(Accessor::startTime(*itOld) == Accessor::startTime(*fetchedBegin),
+            "Invalid situation in updateBody!\nOld data (%1): %2\nFetched data (%3): %4\n"
+            "Body offset: %5, length: %6\nTail offset: %7, length: %8",
+            old.size(), getTimestamps(old.cbegin(), old.cend()),
+            fetched.data.size(), getTimestamps(fetched.data.cbegin(), fetched.data.cend()),
+            fetched.ranges.body.offset, fetched.ranges.body.length,
+            fetched.ranges.tail.offset, fetched.ranges.tail.length))
+        {
             continue;
+        }
 
         const auto currentTimestamp = Accessor::startTime(*itOld);
         while (itOld != old.end() && fetchedBegin != fetchedEnd
