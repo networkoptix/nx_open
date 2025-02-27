@@ -2,6 +2,7 @@
 
 #include "advanced_update_settings_dialog.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
@@ -59,13 +60,21 @@ void AdvancedUpdateSettingsDialog::loadSettings()
 
 void AdvancedUpdateSettingsDialog::saveSettings()
 {
+    if (m_restoring)
+        return;
+
     auto callback =
-        [this](bool /*success*/,
+        [this](bool success,
             rest::Handle requestId,
             rest::ServerConnection::ErrorOrEmpty)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
             m_currentRequest = 0;
+            if (!success)
+            {
+                QScopedValueRollback<bool> rollback(m_restoring, true);
+                loadSettings();
+            }
         };
 
     m_currentRequest = connectedServerApi()->patchSystemSettings(

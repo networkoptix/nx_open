@@ -671,10 +671,12 @@ void ClientUpdateManager::Private::setGlobalClientUpdateSettings(
     const nx::vms::api::ClientUpdateSettings& settings)
 {
     auto callback =
-        [this](bool /*success*/, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
+        [this](bool success, rest::Handle requestId, rest::ServerConnection::ErrorOrEmpty)
         {
             NX_ASSERT(requestId == currentRequest || currentRequest == 0);
             currentRequest = 0;
+            if (!success)
+                handleClientUpdateSettingsChanged();
         };
 
     currentRequest = systemContext()->connectedServerApi()->patchSystemSettings(

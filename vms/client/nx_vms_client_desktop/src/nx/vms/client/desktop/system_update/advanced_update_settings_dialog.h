@@ -25,6 +25,7 @@ private:
 
 private:
     rest::Handle m_currentRequest = 0;
+    bool m_restoring = false;
 };
 
 } // namespace nx::vms::client::desktop
