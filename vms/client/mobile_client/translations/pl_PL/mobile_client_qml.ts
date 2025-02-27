@@ -715,7 +715,7 @@
     </message>
     <message>
       <source>Decode some rare video formats using software decoder</source>
-      <translation type="unfinished">Decode some rare video formats using software decoder</translation>
+      <translation>Dekodowanie niektórych rzadkich formatów wideo za pomocą dekodera programowego</translation>
     </message>
   </context>
   <context>
