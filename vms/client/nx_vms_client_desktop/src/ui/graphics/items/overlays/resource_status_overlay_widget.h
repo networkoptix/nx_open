@@ -66,7 +66,8 @@ signals:
     void tooltipUpdated(const QPoint& pos = {});
 
 protected:
-    bool eventFilter(QObject* obj, QEvent* ev) override;
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+    virtual bool eventFilter(QObject* obj, QEvent* ev) override;
 
     void resetPreloader();
 
@@ -76,6 +77,7 @@ private:
     void setupExtrasControls();
     void initializeHandlers();
     void updateAreaSizes();
+    void updateTooltip();
     QPixmap getBackgroundPixmap();
     QPixmap whiteGlowHorizontal();
     QPixmap whiteGlowVertical();
@@ -89,6 +91,7 @@ private:
     bool m_useErrorStyle = false;
     ErrorStyle m_errorStyle = ErrorStyle::red;
     bool m_showGlow = false;
+    bool m_hovered = false;
 
     QnViewportBoundWidget* const m_preloaderHolder;
     QnViewportBoundWidget* const m_centralHolder;

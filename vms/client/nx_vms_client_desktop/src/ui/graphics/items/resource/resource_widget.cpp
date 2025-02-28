@@ -1551,7 +1551,7 @@ void QnResourceWidget::atOverlayTooltipChanged(const QPoint& pos)
             auto tooltipSceneHeight = s_overlayTooltip->size().height() * scale;
 
             auto x = scenePos.x() - tooltipSceneWidth / 2;
-            auto y = std::max(0., scenePos.y() - tooltipSceneHeight);
+            auto y = scenePos.y() - tooltipSceneHeight;
             s_overlayTooltip->setPos(x, y);
             s_overlayTooltip->show();
             s_tooltipWidget = this;

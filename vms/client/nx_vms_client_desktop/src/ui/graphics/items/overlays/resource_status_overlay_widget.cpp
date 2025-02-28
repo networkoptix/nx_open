@@ -315,17 +315,12 @@ void QnStatusOverlayWidget::setCustomButtonText(const QString& text)
 
 void QnStatusOverlayWidget::setTooltip(const QString& tooltip)
 {
-    if (tooltip != m_tooltip)
-    {
-        m_tooltip = tooltip;
-        if (m_centralAreaImage->underMouse() || m_caption->underMouse())
-        {
-            // Fake enter event to re-send tooltip changed message.
-            QPoint nullPos;
-            QHoverEvent event(QEvent::HoverMove, nullPos, nullPos, nullPos);
-            eventFilter(m_centralContainer, &event);
-        }
-    }
+    if (tooltip == m_tooltip)
+        return;
+
+    m_tooltip = tooltip;
+    if (m_hovered)
+        updateTooltip();
 }
 
 void QnStatusOverlayWidget::setShowGlow(bool showGlow)
@@ -394,6 +389,14 @@ void QnStatusOverlayWidget::generateBackgrounds()
         });
 }
 
+QVariant QnStatusOverlayWidget::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+    if (m_hovered && change == QGraphicsItem::ItemScenePositionHasChanged)
+        updateTooltip();
+
+    return base_type::itemChange(change, value);
+}
+
 bool QnStatusOverlayWidget::eventFilter(QObject* obj, QEvent* event)
 {
     if (obj == m_centralContainer)
@@ -425,18 +428,16 @@ bool QnStatusOverlayWidget::eventFilter(QObject* obj, QEvent* event)
                 if (extendedImageArea.contains(hoverEvent->position().toPoint())
                     || textRect.contains(hoverEvent->position().toPoint()))
                 {
-                    constexpr int kTooltipOffset = 4;
-                    auto widget = m_centralAreaImage->isVisible() ? m_centralAreaImage : m_caption;
-                    QPoint aboveTop{widget->width() / 2, -kTooltipOffset};
-                    const auto& globalPos = widget->mapToGlobal(aboveTop);
-                    emit tooltipUpdated(globalPos);
+                    m_hovered = true;
+                    updateTooltip();
                     break;
                 }
                 [[fallthrough]];
             }
             case QEvent::HoverLeave:
             case QEvent::Leave:
-                emit tooltipUpdated();
+                m_hovered = false;
+                updateTooltip();
                 break;
         }
     }
@@ -649,6 +650,27 @@ void QnStatusOverlayWidget::updateAreaSizes()
     m_extrasHolder->updateScale();
     m_preloaderHolder->updateScale();
     m_centralHolder->updateScale();
+
+    if (m_hovered)
+        updateTooltip();
+}
+
+void QnStatusOverlayWidget::updateTooltip()
+{
+    if (m_hovered)
+    {
+        setFlag(QGraphicsItem::ItemSendsScenePositionChanges, !m_tooltip.isEmpty());
+        constexpr int kTooltipOffset = 4;
+        auto widget = m_centralAreaImage->isVisible() ? m_centralAreaImage : m_caption;
+        QPoint aboveTop{widget->width() / 2, -kTooltipOffset};
+        const auto& globalPos = widget->mapToGlobal(aboveTop);
+        emit tooltipUpdated(globalPos);
+    }
+    else
+    {
+        setFlag(QGraphicsItem::ItemSendsScenePositionChanges, false);
+        emit tooltipUpdated();
+    }
 }
 
 QPixmap QnStatusOverlayWidget::getBackgroundPixmap()
