@@ -252,45 +252,36 @@ int EncodedAudioInfo::audioPacketSize()
 
 bool EncodedAudioInfo::setupFormat(QString& errMessage)
 {
-    m_audioFormat = m_audioDevice.preferredFormat();
-    m_audioFormat.setSampleRate(AUDIO_CAPTURE_FREQUENCY);
-    m_audioFormat.setSampleFormat(QAudioFormat::Int16);
-    m_audioFormat.setChannelCount(2);
-
-    if (!m_audioDevice.isFormatSupported(m_audioFormat))
+    int deviceID = nameToWaveIndex();
+    WAVEINCAPS deviceCaps;
+    MMRESULT result = waveInGetDevCaps(deviceID, &deviceCaps, sizeof(WAVEINCAPS));
+    if (result != MMSYSERR_NOERROR)
     {
-        NX_DEBUG(this, "Input audio device doesn't support audio format %1. Try another one", m_audioFormat);
+        NX_WARNING(this, "Failed to get audio device capability, id: %1, error: %2",
+            deviceID, result);
+        return false;
+    }
+    m_audioFormat.setSampleFormat(QAudioFormat::Int16);
+    m_audioFormat.setChannelCount(deviceCaps.wChannels); //< Stereo or mono.
 
-        // Qt preferredFormat() often returns 'float' format because it uses WASAPI
-        // But this class capture audio with MME 'waveInOpen' old API,
-        // that supports integer formats only. So, that check is irrelevant.
-
-        //if (!m_audioDevice.supportedSampleFormats().contains(m_audioFormat.sampleFormat()))
-        //    m_audioFormat.setSampleFormat(m_audioDevice.preferredFormat().sampleFormat());
-
-        // Set the nearest supported values.
-
-        m_audioFormat.setChannelCount(std::clamp(
-            m_audioFormat.channelCount(),
-            m_audioDevice.minimumChannelCount(),
-            m_audioDevice.maximumChannelCount()));
-
-        m_audioFormat.setSampleRate(std::clamp(
-            m_audioFormat.sampleRate(),
-            m_audioDevice.minimumSampleRate(),
-            m_audioDevice.maximumSampleRate()));
-
-        if (!m_audioDevice.isFormatSupported(m_audioFormat))
-        {
-            NX_DEBUG(this, "Input audio device doesn't support alternative audio format %1.", m_audioFormat);
-
-            m_audioFormat = {};
-            errMessage = DesktopDataProvider::tr(
-                "The audio capturing device supports no suitable audio formats."
-                "Please select another audio device or \"none\" in the Screen Recording settings.");
-
-            return false;
-        }
+    // Check 16 bit formats only.
+    if (deviceCaps.dwFormats & WAVE_FORMAT_4S16 || deviceCaps.dwFormats & WAVE_FORMAT_4M16)
+    {
+        m_audioFormat.setSampleRate(44100);
+    }
+    else if (deviceCaps.dwFormats & WAVE_FORMAT_2S16 || deviceCaps.dwFormats & WAVE_FORMAT_2M16)
+    {
+        m_audioFormat.setSampleRate(22050);
+    }
+    else if (deviceCaps.dwFormats & WAVE_FORMAT_1S16 || deviceCaps.dwFormats & WAVE_FORMAT_1M16)
+    {
+        m_audioFormat.setSampleRate(11025);
+    }
+    else
+    {
+        m_audioFormat = {};
+        NX_DEBUG(this, "16 bit audio format not found: %1.", deviceCaps.dwFormats);
+        return false;
     }
 
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
