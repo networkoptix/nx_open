@@ -1157,7 +1157,9 @@ void Player::pause()
     NX_DEBUG(this, "pause()");
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
-    d->archiveReader->pauseMedia();
+    if (d->archiveReader)
+        d->archiveReader->pauseMedia();
+
     d->updateAudio();
 }
 
