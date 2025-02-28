@@ -31,6 +31,8 @@ Rectangle
 
         IconButton
         {
+            id: filtersButton
+
             anchors.verticalCenter: parent.verticalCenter
 
             width: 56
