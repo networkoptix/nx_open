@@ -130,7 +130,7 @@ void WatermarkPreviewDialog::drawPreview()
 
     QPainter painter(&image);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    painter.drawPixmap(dest, watermark, src);
+    painter.drawImage(dest, watermark, src);
     painter.end();
 
     ui->image->setPixmap(image);

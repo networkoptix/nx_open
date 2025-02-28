@@ -28,7 +28,7 @@ private:
     nx::core::Watermark m_watermark;
 
     QSize m_size;
-    QPixmap m_pixmap;
+    QImage m_image;
 };
 
 } // namespace nx::vms::client::desktop

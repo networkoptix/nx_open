@@ -189,6 +189,7 @@ class NxOpenConan(ConanFile):
             self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
             self.requires("libvpx/1.14.1" "#fb51b8d71add5751343a0d06ed3bb44e")
             self.requires("openh264/2.4.1" "#e7846aa3511316c230721ca13fc9a127")
+            self.requires("freetype/2.12.1" "#cd63b23b3aa630a38fa870a267e95782")
 
         if self.isWindows or self.isLinux:
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")

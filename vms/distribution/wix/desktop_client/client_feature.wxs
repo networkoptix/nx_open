@@ -45,14 +45,20 @@
                     <Merge
                         Id="client_help_module"
                         Language="0"
-                        SourceFile="${modules_output_path}/client_help.msm"
+                        SourceFile="${client_modules_output_path}/client_help.msm"
                         DiskId="3"/>
 
                     <Merge
                         Id="client_qml_module"
                         Language="0"
-                        SourceFile="${modules_output_path}/client_qml.msm"
+                        SourceFile="${client_modules_output_path}/client_qml.msm"
                         DiskId="3"/>
+
+                    <Merge
+                        Id="fonts_module"
+                        Language="0"
+                        SourceFile="${common_modules_output_path}/fonts.msm"
+                        DiskId="2"/>
 
                     <Component Id="MiniLauncherExecutable">
                         <File
@@ -219,7 +225,6 @@
             <ComponentGroupRef Id="AsanLibrariesComponentGroup"/>
             <ComponentGroupRef Id="WebEngineResourcesComponentGroup"/>
             <ComponentGroupRef Id="WebEngineLocalesComponentGroup"/>
-            <ComponentGroupRef Id="FontsComponentGroup"/>
             <ComponentGroupRef Id="BackgroundsComponentGroup"/>
 
             <ComponentRef Id="NovFileAssociation"/>
@@ -242,6 +247,7 @@
 
             <MergeRef Id="client_help_module"/>
             <MergeRef Id="client_qml_module"/>
+            <MergeRef Id="fonts_module"/>
         </Feature>
     </Fragment>
 </Wix>

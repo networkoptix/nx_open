@@ -743,6 +743,24 @@ distrib_copyMediaserverPlugins()
     fi
 }
 
+# [in] BIN_INSTALL_PATH
+# [in] BUILD_DIR
+# [in] STAGE
+distrib_copyFonts()
+{
+    echo "Copying fonts"
+
+    local targetDir="${STAGE}/${BIN_INSTALL_PATH}"
+
+    set +u
+    if [[ "${RESOURCE_INSTALL_PATH}" ]]; then
+        targetDir="${STAGE}/${RESOURCE_INSTALL_PATH}"
+    fi
+
+    cp -r "${BUILD_DIR}/bin/fonts" "${targetDir}"
+
+}
+
 distrib_createArchive() # archive dir command...
 {
     local -r archive="$1"; shift

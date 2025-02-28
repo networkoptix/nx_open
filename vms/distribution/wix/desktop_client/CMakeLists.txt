@@ -2,6 +2,8 @@
 
 include(wix_utils)
 
+set(client_modules_output_path ${CMAKE_CURRENT_BINARY_DIR}/msm)
+
 add_subdirectory(modules)
 
 set(common_wix_sources_path ${CMAKE_CURRENT_SOURCE_DIR}/../common)
@@ -35,11 +37,6 @@ nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_webengine_locales.wixobj
     TARGET_DIR_ALIAS WebEngineLocalesDirectoryReference
     COMPONENT_GROUP WebEngineLocalesComponentGroup)
 
-nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_fonts.wixobj
-    SOURCE_DIR ${CMAKE_BINARY_DIR}/bin/fonts
-    TARGET_DIR_ALIAS FontsDirectoryReference
-    COMPONENT_GROUP FontsComponentGroup)
-
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_backgrounds.wixobj
     SOURCE_DIR ${backgrounds_directory}
     TARGET_DIR_ALIAS BackgroundsDirectoryReference
@@ -61,7 +58,6 @@ nx_wix_light(${unsigned_msi_filename}
         ${CMAKE_CURRENT_BINARY_DIR}/client_artifacts.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/files_associations.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_backgrounds.wixobj
-        ${CMAKE_CURRENT_BINARY_DIR}/client_fonts.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_webengine_resources.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_webengine_locales.wixobj
         ${common_wixobjects_path}/common_nx_libraries.wixobj
@@ -78,13 +74,12 @@ nx_wix_light(${unsigned_msi_filename}
         WixUtilExtension
         WixFirewallExtension
     DEPENDS
-        ${modules_output_path}/client_help.msm
-        ${modules_output_path}/client_qml.msm
         desktop_client
         applauncher
         minilauncher
         wix_custom_actions
         distribution_wix_common_resources
+        distribution_wix_fonts_module
         distribution_wix_client_qml_module
         distribution_wix_client_help_module
 )

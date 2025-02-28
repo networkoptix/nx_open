@@ -13,8 +13,9 @@ WORK_DIR="client_build_distribution_tmp"
 LOG_FILE="$LOGS_DIR/client_build_distribution.log"
 
 STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
+BIN_INSTALL_PATH="opt/${CUSTOMIZATION}/client/${VERSION}/bin"
 STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/client/$VERSION"
-STAGE_BIN="$STAGE_MODULE/bin"
+STAGE_BIN="${STAGE}/${BIN_INSTALL_PATH}"
 STAGE_LIBEXEC="$STAGE_MODULE/libexec"
 STAGE_LIB="$STAGE_MODULE/lib"
 STAGE_ICONS="$STAGE/usr/share/icons"
@@ -75,14 +76,6 @@ copyHelpFiles()
         echo "Copying Mobile Help"
         cp "$MOBILE_HELP_FILE" "$STAGE_MODULE"
     fi
-}
-
-# [in] STAGE_BIN
-copyFonts()
-{
-    echo "Copying fonts"
-    cp -r "$BUILD_DIR/bin/fonts" "$STAGE_BIN/"
-
 }
 
 # [in] STAGE_MODULE
@@ -430,7 +423,7 @@ buildDistribution()
     copyBins
     copyIcons
     copyHelpFiles
-    copyFonts
+    distrib_copyFonts
     copyBackgrounds
     copyResources
     copyTranslations

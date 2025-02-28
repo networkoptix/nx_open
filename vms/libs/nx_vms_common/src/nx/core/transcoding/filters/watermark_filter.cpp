@@ -18,7 +18,7 @@ CLVideoDecoderOutputPtr WatermarkImageFilter::updateImage(
     const auto frameSize = QSize(frame->width, frame->height);
     if (frameSize != m_lastFrameSize)
     {
-        setImage(retrieveWatermarkImage(m_watermark, frameSize).scaled(frameSize).toImage());
+        setImage(retrieveWatermarkImage(m_watermark, frameSize).scaled(frameSize));
         m_lastFrameSize = frameSize;
     }
 

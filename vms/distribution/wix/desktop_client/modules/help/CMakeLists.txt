@@ -10,7 +10,7 @@ nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_help.wixobj
 nx_wix_candle(client_help_module)
 
 nx_wix_add_light_target(distribution_wix_client_help_module
-    ${modules_output_path}/client_help.msm
+    ${client_modules_output_path}/client_help.msm
     SOURCE_FILES
         ${CMAKE_CURRENT_BINARY_DIR}/client_help.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_help_module.wixobj)

@@ -2,6 +2,8 @@
 
 include(wix_utils)
 
+add_subdirectory(modules)
+
 nx_wix_candle(check_architecture
     EXTENSIONS
         WixUtilExtension

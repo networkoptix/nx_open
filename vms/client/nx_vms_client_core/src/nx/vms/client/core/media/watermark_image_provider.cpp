@@ -41,8 +41,7 @@ QImage WatermarkImageProvider::requestImage(
     const nx::core::Watermark watermark = QJson::deserialized<nx::core::Watermark>(
         query.queryItemValue(kWatermarkTag).toLatin1());
 
-    const auto pixmap = nx::core::retrieveWatermarkImage(watermark, sourceSize);
-    return pixmap.toImage();
+    return nx::core::retrieveWatermarkImage(watermark, sourceSize);
 }
 
 QString WatermarkImageProvider::name()

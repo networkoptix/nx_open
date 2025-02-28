@@ -11,10 +11,9 @@ set(client_launch_target
     "[ProgramFiles64Folder]/${windowsInstallPath}/${customization.vmsName}/Client/${full_release_version}/${minilauncher.binary.name}"
     CACHE INTERNAL "" FORCE)
 
-set(modules_output_path ${CMAKE_CURRENT_BINARY_DIR}/msm)
-
 set(wix_theme_file "${CMAKE_CURRENT_BINARY_DIR}/theme.xml" CACHE INTERNAL "" FORCE)
 set(common_wixobjects_path ${CMAKE_CURRENT_BINARY_DIR}/common CACHE INTERNAL "" FORCE)
+set(common_modules_output_path ${CMAKE_CURRENT_BINARY_DIR}/msm CACHE INTERNAL "" FORCE)
 
 add_subdirectory(custom_actions)
 

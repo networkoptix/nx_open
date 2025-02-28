@@ -10,15 +10,18 @@
 #include <QtCore/QSize>
 #include <QtCore/QString>
 #include <QtGui/QFont>
-#include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
 #include <nx/core/watermark/watermark.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/text_renderer.h>
 #include <utils/graphics/drop_shadow_filter.h>
 
 using nx::core::Watermark;
 
 namespace {
+
+static const QString kFontFamily = "Roboto-Regular";
 
 const QColor kWatermarkColor = QColor(Qt::white);
 const int kWatermarkFontSize = 84; //< Pure magic. It was 42 * 2 before. No more memes.
@@ -35,7 +38,7 @@ const std::array<std::pair<double, QSize>, 5> predefinedSizes = {{
     {9.0 / 16.0, QSize(1080, 1920)}}};
 
 Watermark cachedWatermark;
-QMap<double, QPixmap> watermarkImages;
+QMap<double, QImage> watermarkImages;
 
 void checkWatermarkChange(const Watermark& watermark)
 {
@@ -46,22 +49,22 @@ void checkWatermarkChange(const Watermark& watermark)
     }
 }
 
-QPixmap getCachedPixmapByAspectRatio(double aspectRatio)
+QImage getCachedimageByAspectRatio(double aspectRatio)
 {
     // Try to find any value in the interval
     // (aspectRatio / fuzzyEqualRatio, aspectRatio * fuzzyEqualRatio).
     const auto item = watermarkImages.lowerBound(aspectRatio / kFuzzyEqualRatio);
     if (item == watermarkImages.end())
-        return QPixmap();
+        return QImage();
 
     if (item.key() < aspectRatio * kFuzzyEqualRatio)
         return item.value();
 
-    return QPixmap();
+    return QImage();
 }
 
 
-QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
+QImage createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
 {
     double aspectRatio = ((double) size.width()) / size.height();
     //^ Ask Misha Sh. about this weird code style ^.
@@ -99,30 +102,48 @@ QPixmap createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
             : QSize(size.width() * minSize / size.height(), minSize);
     }
 
-    // Create new watermark pixmap.
-    auto pixmap = nx::core::createWatermarkImage(watermark, size);
+    // Create new watermark image.
+    auto image = nx::core::createWatermarkImage(watermark, size);
 
     // And push it into cache.
-    watermarkImages[aspectRatio] = pixmap;
+    watermarkImages[aspectRatio] = image;
 
-    return pixmap;
+    return image;
 }
 
-QPixmap createWatermarkTile(const Watermark& watermark, const QSize& size, const QFont& font)
+QSize getTextSize(const QFont& font, const QString& text)
+{
+    std::unique_ptr<nx::utils::AbstractTextRenderer> renderer =
+        nx::utils::TextRendererFactory::create();
+    if (!renderer)
+        return QSize();
+    renderer->fontFamily = kFontFamily;
+    renderer->fontPixelSize = font.pixelSize();
+    return renderer->textSize(text);
+}
+
+void drawTextToImage(QImage& image, const QSize& size, const QFont& font, const QString& text)
+{
+    std::unique_ptr<nx::utils::AbstractTextRenderer> renderer =
+        nx::utils::TextRendererFactory::create();
+    if (!renderer)
+        return;
+    renderer->fontFamily = kFontFamily;
+    renderer->fontPixelSize = font.pixelSize();
+    renderer->color = kWatermarkColor;
+    renderer->drawText(image, QRect(0, 0, size.width(), size.height()), text);
+}
+
+QImage createWatermarkTile(const Watermark& watermark, const QSize& size, const QFont& font)
 {
     QImage tile(size, QImage::Format_ARGB32_Premultiplied);
     tile.fill(Qt::transparent);
 
-    QPainter painter(&tile);
-    painter.setRenderHint(QPainter::TextAntialiasing);
-    painter.setPen(kWatermarkColor);
-    painter.setFont(font);
-    painter.drawText(0, 0, size.width(), size.height(), Qt::AlignCenter, watermark.text);
-    painter.end(); //< or we may crush in painter destructor later.
+    drawTextToImage(tile, size, font, watermark.text);
 
     nx::utils::graphics::DropShadowFilter().filterImage(tile); //< Add shadow.
 
-    QPixmap finalTile(tile.size());
+    QImage finalTile(tile.size(), QImage::Format_ARGB32_Premultiplied);
     finalTile.fill(Qt::transparent);
     QPainter painter1(&finalTile);
     painter1.setOpacity(watermark.settings.opacity); //< Use opacity to make watermark semi-transparent.
@@ -133,70 +154,69 @@ QPixmap createWatermarkTile(const Watermark& watermark, const QSize& size, const
 
 } // namespace
 
-QPixmap nx::core::createWatermarkImage(const Watermark& watermark, const QSize& size)
+QImage nx::core::createWatermarkImage(const Watermark& watermark, const QSize& size)
 {
-    QPixmap pixmap(size);
-    pixmap.fill(Qt::transparent);
+    QImage image(size, QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::transparent);
 
     if (watermark.text.isEmpty())
-        return pixmap;
+        return image;
 
     QFont font;
     int fontSize = kWatermarkFontSize;
     font.setPixelSize(fontSize);
-    QFontMetrics metrics(font);
-    int width = metrics.horizontalAdvance(watermark.text);
+    int width = getTextSize(font, watermark.text).width();
     if (width <= 0)
-        return pixmap; //< Just in case m_text is still non-printable.
+        return image; //< Just in case m_text is still non-printable.
 
     if ((width * 3) / 2 > size.width()) //< Decrease font if inscription is too wide.
     {
         fontSize = (kWatermarkFontSize * size.width() * 2) / (3 * width);
         if (fontSize < 5) //< Watermark will not be readable.
-            return pixmap;
+            return image;
 
         font.setPixelSize(fontSize);
     }
 
-    QSize inscriptionSize = QFontMetrics(font).size(0, watermark.text);
+    QSize inscriptionSize = getTextSize(font, watermark.text);
     const int minTileWidth = (3 * inscriptionSize.width()) / 2; //< Inscription takes max 2/3 tile width.
     const int minTileHeight = 2 * inscriptionSize.height(); //< Inscription takes max 1/2 tile height.
 
     int xCount = (int) (1 + watermark.settings.frequency * 9.99); //< xCount = 1..10 .
     int yCount = xCount;
-    xCount = std::max(1, std::min(pixmap.width() / minTileWidth, xCount));
-    yCount = std::max(1, std::min(pixmap.height() / minTileHeight, yCount));
+    xCount = std::max(1, std::min(image.width() / minTileWidth, xCount));
+    yCount = std::max(1, std::min(image.height() / minTileHeight, yCount));
 
-    width = pixmap.width() / xCount;
-    const int height = pixmap.height() / yCount;
+    width = image.width() / xCount;
+    const int height = image.height() / yCount;
 
-    QPixmap tile = createWatermarkTile(watermark, QSize(width, height), font);
+    QImage tile = createWatermarkTile(watermark, QSize(width, height), font);
 
-    QPainter painter(&pixmap);
+    QPainter painter(&image);
     for (int x = 0; x < xCount; x++)
     {
         for (int y = 0; y < yCount; y++)
         {
-            painter.drawPixmap((int)((x * pixmap.width()) / xCount),
-                (int)((y * pixmap.height()) / yCount), tile);
+            painter.drawImage((int)((x * image.width()) / xCount),
+                (int)((y * image.height()) / yCount), tile);
         }
     }
 
-    return pixmap;
+    return image;
 }
 
-QPixmap nx::core::retrieveWatermarkImage(const Watermark& watermark, const QSize& size)
+QImage nx::core::retrieveWatermarkImage(const Watermark& watermark, const QSize& size)
 {
     // Check to avoid future possible division by zero.
     if (size.isEmpty())
-        return QPixmap();
+        return QImage();
 
     checkWatermarkChange(watermark);
 
-    QPixmap pixmap = getCachedPixmapByAspectRatio(((double) size.width()) / size.height());
+    QImage image = getCachedimageByAspectRatio(((double) size.width()) / size.height());
 
-    if (!pixmap.isNull())
-        return pixmap; //< Retrieved from cache successfully.
+    if (!image.isNull())
+        return image; //< Retrieved from cache successfully.
 
     return createAndCacheWatermarkImage(watermark, size);
 }

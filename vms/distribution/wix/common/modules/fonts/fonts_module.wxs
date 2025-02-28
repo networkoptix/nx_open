@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Module
-        Id="client_qml_module"
+        Id="fonts_module"
         Language="0"
         Version="1.0.0">
 
         <Package
-            Id="AFB797C4-2D55-4906-9E67-C3919FB8D7C6"
+            Id="D2AFC33C-61C6-4005-B45B-CAACD059336D"
             InstallerVersion="405"
             Languages="1033"
             Manufacturer="${customization.companyName}"/>
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory
-                Name="qml"
-                Id="QmlDirectoryReference"
-                ComponentGuidGenerationSeed="8EFC1DDA-9125-4A89-A054-37D4E6EBBD52"/>
+                Name="fonts"
+                Id="FontsDirectoryReference"
+                ComponentGuidGenerationSeed="7EC641B3-A740-4BFB-98D2-509D630AB99A"/>
         </Directory>
 
-        <ComponentGroupRef Id="QmlComponentGroup"/>
+        <ComponentGroupRef Id="FontsComponentGroup"/>
     </Module>
 </Wix>

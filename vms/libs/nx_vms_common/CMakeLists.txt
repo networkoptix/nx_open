@@ -88,6 +88,12 @@ if(MACOSX)
         PUBLIC ${CoreFoundation_LIBRARY} ${IOKit_LIBRARY} ${AppKit_LIBRARY})
 endif()
 
+if(NOT ANDROID AND NOT IOS)
+    find_package(Freetype)
+    target_link_libraries(nx_vms_common PRIVATE Freetype::Freetype)
+endif()
+
+
 if(withTests)
     add_subdirectory(test_support)
     add_subdirectory(unit_tests)

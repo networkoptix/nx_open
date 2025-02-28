@@ -28,7 +28,7 @@ nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_qml.wixobj
 
 nx_wix_candle(client_qml_module)
 nx_wix_add_light_target(distribution_wix_client_qml_module
-    ${modules_output_path}/client_qml.msm
+    ${client_modules_output_path}/client_qml.msm
     SOURCE_FILES
         ${CMAKE_CURRENT_BINARY_DIR}/client_qml.wixobj
         ${CMAKE_CURRENT_BINARY_DIR}/client_qml_module.wixobj)
