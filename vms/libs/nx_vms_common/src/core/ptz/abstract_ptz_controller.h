@@ -95,7 +95,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Passing zero in speed should stop PTZ movement.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::ContinuousPtrzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::continuousPanTiltZoomRotation</tt>.
      *
      * @param speed Movement speed.
      * @param options Additional options (e.g. ptz type)
@@ -114,7 +114,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Passing zero should stop focus movement.
      *
      * This function is expected to be implemented if this controller has
-     * <tt>Ptz::ContinuousFocusCapability</tt>.
+     * <tt>Ptz::Capability::continuousFocus</tt>.
      *
      * @param speed Focus speed.
      * @param options Additional options (e.g. ptz type)
@@ -129,11 +129,11 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      *
      * Note that for the function to succeed, this controller must have a
      * capability corresponding to the provided coordinate space,
-     * that is <tt>Ptz::DevicePositioningPtzCapability</tt> or
-     * <tt>Ptz::LogicalPositioningPtzCapability</tt>.
+     * that is <tt>Ptz::Capability::devicePositioning</tt> or
+     * <tt>Ptz::Capability::logicalPositioning</tt>.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::AbsolutePtrzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::absolutePanTiltZoomRotation</tt>.
      *
      * @param space Coordinate space of the provided position.
      * @param position Position to move to.
@@ -153,7 +153,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::ViewportPtzCapability</tt>.
+     * <tt>Ptz::Capability::viewport</tt>.
      *
      * @param aspectRatio Actual aspect ratio of the current viewport.
      * @param viewport New viewport position.
@@ -171,7 +171,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Moves the camera relative to its current position.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::RelativePtrzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::relativePanTiltZoomRotation</tt>.
      *
      * @param direction Direction to move. Each component must be in range [-1, 1].
      * @param options Additional options (e.g. ptz type)
@@ -185,7 +185,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Changes the camera focus relatively to its current position.
      *
      * This function is expected to be implemented if this controller has
-     * <tt>Ptz::RelativeFocusCapability</tt>.
+     * <tt>Ptz::Capability::relativeFocus</tt>.
      *
      * @param direction. Direction to move, must be in range [-1, 1].
      * @param options Additional options (e.g. ptz type)
@@ -199,7 +199,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Gets PTZ position from camera in the given coordinate space.
      *
      * This function is expected to be implemented if this controller has
-     * at least one of the <tt>Ptz::AbsolutePtzCapabilities</tt>.
+     * at least one of the <tt>Ptz::Capability::absolutePanTiltZoom</tt>.
      *
      * @param space Coordinate space to get position in.
      * @param[out] position Current ptz position.
@@ -216,7 +216,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Gets PTZ limits of the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::LimitsPtzCapability<tt>.
+     * <tt>Ptz::Capability::limits<tt>.
      *
      * @param space Coordinate space to get limits in.
      * @param[out] limits Ptz limits.
@@ -233,7 +233,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * implementing emulated viewport movement.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::FlipPtzCapability</tt>.
+     * <tt>Ptz::Capability::flip</tt>.
      *
      * @param[out] flip Flipped state of the camera's video stream.
      * @param options Additional options (e.g. ptz type)
@@ -252,7 +252,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>nx::Uuid::createUuid().toString()</tt>.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::presets<tt>.
      *
      * @param preset Preset to create.
      * @returns Whether the operation was successful.
@@ -264,7 +264,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Currently this function can only be used to change preset name.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::presets<tt>.
      *
      * @param preset Preset to update.
      * @returns Whether the operation was successful.
@@ -275,7 +275,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Removes the given preset.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::presets<tt>.
      *
      * @param presetId Id of the preset to remove.
      * @returns Whether the operation was successful.
@@ -286,7 +286,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Activates the given preset.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::presets<tt>.
      *
      * @param presetId Id of the preset to activate.
      * @param speed Movement speed, in range [0, 1].
@@ -298,7 +298,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Gets a list of all PTZ presets for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::PresetsPtzCapability<tt>.
+     * <tt>Ptz::Capability::presets<tt>.
      *
      * @param[out] presets PTZ presets.
      * @param options Additional options (e.g. ptz type)
@@ -314,7 +314,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * <tt>nx::Uuid::createUuid().toString()</tt>.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::tours<tt>.
      *
      * @param tour Tour to create.
      * @param options Additional options (e.g. ptz type)
@@ -326,7 +326,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Removes the given tour.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::tours<tt>.
      *
      * @param tourId Id of the tour to remove.
      * @param options Additional options (e.g. ptz type)
@@ -341,7 +341,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * to the controller will stop that tour.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::tours<tt>.
      *
      * @param tourId Id of the tour to activate.
      * @param options Additional options (e.g. ptz type)
@@ -355,7 +355,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Gets a list of all PTZ tours for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::ToursPtzCapability<tt>.
+     * <tt>Ptz::Capability::tours<tt>.
      *
      * @param[out] tours PTZ tours.
      * @param options Additional options (e.g. ptz type)
@@ -369,7 +369,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Updates PTZ home position for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::HomePtzCapability<tt>.
+     * <tt>Ptz::Capability::home<tt>.
      *
      * @param homeObject PTZ home object.
      * @param options Additional options (e.g. ptz type)
@@ -381,7 +381,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * Gets PTZ home position that is currently assigned for the camera.
      *
      * This function is expected to be implemented only if this controller has
-     * <tt>Ptz::HomePtzCapability<tt>.
+     * <tt>Ptz::Capability::home<tt>.
      *
      * @param[out] homePosition PTZ home object.
      * @param options Additional options (e.g. ptz type)

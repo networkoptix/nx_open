@@ -22,7 +22,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
     m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::asynchronous));
 }
 
 QnPresetPtzController::~QnPresetPtzController()
@@ -32,24 +32,24 @@ QnPresetPtzController::~QnPresetPtzController()
 
 bool QnPresetPtzController::extends(Ptz::Capabilities capabilities, bool preferSystemPresets)
 {
-    if ((capabilities & Ptz::PresetsPtzCapability) && !preferSystemPresets)
+    if ((capabilities & Ptz::Capability::presets) && !preferSystemPresets)
         return false;
 
     // Check if emulation is possible.
-    return (capabilities & Ptz::AbsolutePtrzCapabilities)
-        && (capabilities & Ptz::PositioningPtzCapabilities);
+    return (capabilities & Ptz::Capability::absolutePanTiltZoomRotation)
+        && (capabilities & Ptz::Capability::positioningDeviceLogical);
 }
 
 Ptz::Capabilities QnPresetPtzController::getCapabilities(
     const Options& options) const
 {
-    // Note that this controller preserves both Ptz::AsynchronousPtzCapability
-    // and Ptz::SynchronizedPtzCapability.
+    // Note that this controller preserves both Ptz::Capability::asynchronous
+    // and Ptz::Capability::synchronized.
     Ptz::Capabilities capabilities = base_type::getCapabilities(options);
     if (options.type != Type::operational)
         return capabilities;
 
-    return extends(capabilities) ? (capabilities | Ptz::PresetsPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::Capability::presets) : capabilities;
 }
 
 bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
@@ -61,7 +61,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
         [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
         {
             QnPtzPresetData data;
-            data.space = hasCapabilities(Ptz::LogicalPositioningPtzCapability)
+            data.space = hasCapabilities(Ptz::Capability::logicalPositioning)
                 ? CoordinateSpace::logical
                 : CoordinateSpace::device;
 

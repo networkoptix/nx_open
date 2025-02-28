@@ -916,7 +916,7 @@ bool QnGLRenderer::isFisheyeEnabled() const
     NX_MUTEX_LOCKER lock( &m_mutex );
     return m_fisheyeController && isDewarpingAllowed()
         && m_fisheyeController->getCapabilities({nx::vms::common::ptz::Type::operational})
-            != Ptz::Capability::NoPtzCapabilities;
+            != Ptz::Capability::none;
 }
 
 bool QnGLRenderer::isDewarpingAllowed() const

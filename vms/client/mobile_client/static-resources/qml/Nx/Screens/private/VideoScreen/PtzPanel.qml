@@ -6,6 +6,8 @@ import Nx.Controls 1.0
 import Nx.Core 1.0
 import Nx.Mobile 1.0
 
+import nx.vms.api 1.0
+
 import "Ptz"
 import "Ptz/joystick_utils.js" as JoystickUtils
 
@@ -17,8 +19,8 @@ Item
 
     readonly property PtzController controller: PtzController
     {
-        property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
-        property bool supportsMoveOnTap: capabilities & Ptz.ViewportPtzCapability
+        property bool supportsPresets: capabilities & PtzAPI.Capability.presets
+        property bool supportsMoveOnTap: capabilities & PtzAPI.Capability.viewport
     }
 
     property alias customRotation: joystick.customRotation
@@ -101,7 +103,7 @@ Item
 
                     anchors.bottom: parent.bottom
                     visible: supportsFocusChanging || supportsAutoFocus
-                    supportsFocusChanging: controller.capabilities & Ptz.ContinuousFocusCapability
+                    supportsFocusChanging: controller.capabilities & PtzAPI.Capability.continuousFocus
                     supportsAutoFocus: controller.auxTraits & Ptz.ManualAutoFocusPtzTrait
                     onFocusInPressedChanged: moveFocus(focusInPressed, 1)
                     onFocusOutPressedChanged: moveFocus(focusOutPressed, -1)
@@ -119,7 +121,7 @@ Item
                     id: zoomControl
 
                     anchors.bottom: parent.bottom
-                    visible: controller.capabilities & Ptz.ContinuousZoomCapability
+                    visible: controller.capabilities & PtzAPI.Capability.continuousZoom
 
                     onZoomInPressedChanged: zoomMove(zoomInPressed, 0.5)
                     onZoomOutPressedChanged: zoomMove(zoomOutPressed, -0.5)
@@ -148,7 +150,7 @@ Item
                         return JoystickUtils.Type.Any
 
                     var caps = controller.capabilities
-                    if (caps & Ptz.ContinuousPanTiltCapabilities)
+                    if (caps & PtzAPI.Capability.continuousPanTilt)
                     {
                         if (caps & Ptz.EightWayPtzTrait)
                             return JoystickUtils.Type.EightWayPtz
@@ -158,10 +160,10 @@ Item
                         return JoystickUtils.Type.FreeWayPtz
                     }
 
-                    if (caps & Ptz.ContinuousPanCapability)
+                    if (caps & PtzAPI.Capability.continuousPan)
                         return JoystickUtils.Type.TwoWayHorizontal
 
-                    if (caps & Ptz.ContinuousTiltCapability)
+                    if (caps & PtzAPI.Capability.continuousTilt)
                         return JoystickUtils.Type.TwoWayVertical
 
                     return JoystickUtils.Type.Any
@@ -170,8 +172,8 @@ Item
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 visible: controller &&
-                    (controller.capabilities & Ptz.ContinuousPanCapability
-                    || controller.capabilities & Ptz.ContinuousTiltCapability)
+                    (controller.capabilities & PtzAPI.Capability.continuousPan
+                    || controller.capabilities & PtzAPI.Capability.continuousTilt)
 
                 Timer
                 {

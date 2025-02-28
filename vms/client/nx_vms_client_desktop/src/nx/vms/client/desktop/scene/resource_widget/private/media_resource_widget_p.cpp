@@ -273,7 +273,7 @@ MediaResourceWidgetPrivate::AccessController* MediaResourceWidgetPrivate::access
 
 bool MediaResourceWidgetPrivate::supportsBasicPtz() const
 {
-    return supportsPtzCapabilities(Ptz::ContinuousPtzCapabilities | Ptz::ViewportPtzCapability);
+    return supportsPtzCapabilities(Ptz::Capability::continuousPanTiltZoom | Ptz::Capability::viewport);
 }
 
 bool MediaResourceWidgetPrivate::supportsPtzCapabilities(Ptz::Capabilities capabilities) const
@@ -282,7 +282,7 @@ bool MediaResourceWidgetPrivate::supportsPtzCapabilities(Ptz::Capabilities capab
     if (!camera)
         return false;
 
-    if (camera->hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability))
+    if (camera->hasAnyOfPtzCapabilities(Ptz::Capability::virtual_))
         return false;
 
     // Ptz is forbidden in exported files or on search layouts.

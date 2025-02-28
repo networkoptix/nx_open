@@ -314,7 +314,22 @@ void registerDeviceBaseHandlers(
         GlobalPermission::none,
         std::make_unique<IntercomAcceptHandler>(serverModule, serverConnector));
 
-    /**%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/move
+    /**%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/move
+     * Starts a continuous PTZ move.
+     * Supported Device PTZ capabilities can be obtained from "ptz.capabilities" and "ptz.configCapabilities"
+     * fields via `GET /rest/v{4-}/devices`
+     * %caption Start PTZ move
+     * %ingroup Device PTZ
+     * %struct PtzMovement
+     *     %param[unused] type
+     *     %param[unused] speed
+     *     %param pan X-axis movement speed (-1.0 to 1.0).
+     *     %param tilt Y-axis movement speed (-1.0 to 1.0).
+     *     %param zoom Zoom in/out speed (-1.0 to 1.0).
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     *
+     **%apidoc POST /rest/v3/devices/{deviceId}/ptz/move
      * Starts a continuous PTZ move.
      * %caption Start PTZ move
      * %ingroup Device PTZ
@@ -355,7 +370,19 @@ void registerDeviceBaseHandlers(
      *     %param[unused] type
      *     %param[unused] speed
      *
-     **%apidoc POST /rest/v{3-}/devices/{deviceId}/ptz/position
+     **%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/position
+     * Moves the Device to an absolute position. When the Device reports its PTZ capabilities to
+     * the Server during initialization, the range of position parameters is sent to the Server.
+     * Supported Device PTZ capabilities can be obtained from "ptz.capabilities" and "ptz.configCapabilities"
+     * fields via `GET /rest/v{4-}/devices`
+     * %caption Move to absolute PTZ position
+     * %ingroup Device PTZ
+     * %struct PtzPosition
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     * %return:{PtzPosition} Device position
+     *
+     **%apidoc POST /rest/v3/devices/{deviceId}/ptz/position
      * Moves the Device to an absolute position. When the Device reports its PTZ capabilities to
      * the Server during initialization, the range of position parameters is sent to the Server.
      * PTZ capabilities can not be read via API.

@@ -56,7 +56,7 @@ QnThreadedPtzController::~QnThreadedPtzController()
 
 bool QnThreadedPtzController::extends(Ptz::Capabilities capabilities)
 {
-    return !capabilities.testFlag(Ptz::AsynchronousPtzCapability);
+    return !capabilities.testFlag(Ptz::Capability::asynchronous);
 }
 
 void QnThreadedPtzController::callThreaded(
@@ -127,7 +127,7 @@ Ptz::Capabilities QnThreadedPtzController::getCapabilities(
     const Options& options) const
 {
     const Ptz::Capabilities capabilities = base_type::getCapabilities(options);
-    return extends(capabilities) ? (capabilities | Ptz::AsynchronousPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::Capability::asynchronous) : capabilities;
 }
 
 bool QnThreadedPtzController::continuousMove(

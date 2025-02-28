@@ -283,12 +283,12 @@ void initialize(Manager* manager, Action* root)
     factory(PtzActivatePresetAction)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
+        .condition(new PtzCondition(Ptz::Capability::presets, false));
 
     factory(PtzActivateTourAction)
         .flags(SingleTarget | WidgetTarget)
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Ptz::ToursPtzCapability, false));
+        .condition(new PtzCondition(Ptz::Capability::tours, false));
 
     factory(PtzActivateObjectAction)
         .flags(SingleTarget | WidgetTarget)
@@ -1409,7 +1409,7 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new PtzPresetsToursFactory(manager))
         .text(ContextMenu::tr("PTZ"))
         .requiredTargetPermissions(Qn::WritePtzPermission)
-        .condition(new PtzCondition(Ptz::PresetsPtzCapability, false));
+        .condition(new PtzCondition(Ptz::Capability::presets, false));
 
     factory.beginSubMenu();
     {
@@ -1418,7 +1418,7 @@ void initialize(Manager* manager, Action* root)
             .flags(Scene | SingleTarget)
             .text(ContextMenu::tr("Save Current Position..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(ConditionWrapper(new PtzCondition(Ptz::PresetsPtzCapability, true))
+            .condition(ConditionWrapper(new PtzCondition(Ptz::Capability::presets, true))
                 && condition::canSavePtzPosition());
 
         factory(PtzManageAction)
@@ -1426,7 +1426,7 @@ void initialize(Manager* manager, Action* root)
             .flags(Scene | SingleTarget)
             .text(ContextMenu::tr("Manage..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(ConditionWrapper(new PtzCondition(Ptz::ToursPtzCapability, false))
+            .condition(ConditionWrapper(new PtzCondition(Ptz::Capability::tours, false))
                 && !condition::showreelIsRunning());
 
     } factory.endSubMenu();

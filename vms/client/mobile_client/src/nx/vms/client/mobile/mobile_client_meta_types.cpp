@@ -99,6 +99,8 @@ void registerQmlTypes()
         "Cannot create an instance of Ptz class");
     qmlRegisterType<nx::client::mobile::ResourcePtzController>("Nx.Mobile", 1, 0, "PtzController");
     qmlRegisterType<nx::client::mobile::PtzPresetModel>("Nx.Mobile", 1, 0, "PtzPresetModel");
+    qmlRegisterUncreatableMetaObject(nx::vms::api::ptz::staticMetaObject, "nx.vms.api", 1, 0,
+        "PtzAPI", "PtzAPI is a namespace");
 
     qmlRegisterType<NetworkInterfaceWatcher>(
         "nx.vms.client.mobile", 1, 0, "NetworkInterfaceWatcher");

@@ -99,7 +99,7 @@ Ptz::Traits ResourcePtzController::auxTraits() const
 
 int ResourcePtzController::presetsCount() const
 {
-    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability))
+    if (!operationalCapabilities().testFlag(Ptz::Capability::presets))
         return 0;
 
     QnPtzPresetList presets;
@@ -137,7 +137,7 @@ int ResourcePtzController::capabilities() const
 
 bool ResourcePtzController::setPresetByIndex(int index)
 {
-    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability)
+    if (!operationalCapabilities().testFlag(Ptz::Capability::presets)
         || !qBetween(0, index, presetsCount()))
     {
         return false;
@@ -151,7 +151,7 @@ bool ResourcePtzController::setPresetByIndex(int index)
 
 bool ResourcePtzController::setPresetById(const QString& id)
 {
-    if (!operationalCapabilities().testFlag(Ptz::PresetsPtzCapability))
+    if (!operationalCapabilities().testFlag(Ptz::Capability::presets))
         return false;
 
     QnPtzPresetList presets;

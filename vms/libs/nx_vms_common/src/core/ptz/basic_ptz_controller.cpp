@@ -10,7 +10,7 @@ QnBasicPtzController::QnBasicPtzController(const QnResourcePtr& resource):
 Ptz::Capabilities QnBasicPtzController::getCapabilities(
     const Options& /*options*/) const
 {
-    return Ptz::NoPtzCapabilities;
+    return Ptz::Capability::none;
 }
 
 bool QnBasicPtzController::continuousMove(

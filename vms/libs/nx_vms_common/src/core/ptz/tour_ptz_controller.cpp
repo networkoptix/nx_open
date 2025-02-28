@@ -33,10 +33,10 @@ QnTourPtzController::QnTourPtzController(
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(kTourPropertyName, QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::asynchronous));
 
     // TODO: #sivanov Implement it in a saner way.
-    if (!baseController->hasCapabilities(Ptz::VirtualPtzCapability))
+    if (!baseController->hasCapabilities(Ptz::Capability::virtual_))
         m_executor->moveToThread(executorThread);
 
     m_adaptor->setResource(baseController->resource());
@@ -51,8 +51,8 @@ QnTourPtzController::~QnTourPtzController()
 
 bool QnTourPtzController::extends(Ptz::Capabilities capabilities)
 {
-    return capabilities.testFlag(Ptz::PresetsPtzCapability)
-        && !capabilities.testFlag(Ptz::ToursPtzCapability);
+    return capabilities.testFlag(Ptz::Capability::presets)
+        && !capabilities.testFlag(Ptz::Capability::tours);
 }
 
 Ptz::Capabilities QnTourPtzController::getCapabilities(const Options& options) const
@@ -61,7 +61,7 @@ Ptz::Capabilities QnTourPtzController::getCapabilities(const Options& options) c
     if (options.type != Type::operational)
         return capabilities;
 
-    return extends(capabilities) ? (capabilities | Ptz::ToursPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::Capability::tours) : capabilities;
 }
 
 bool QnTourPtzController::continuousMove(

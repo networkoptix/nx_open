@@ -181,7 +181,7 @@ private:
         bool hasContinuousPanOrTilt() const;
         bool hasAdvancedPtz() const;
 
-        Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
+        Ptz::Capabilities capabilities = Ptz::Capability::none;
         QnPtzAuxiliaryTraitList traits;
         nx::vms::common::ptz::Vector currentSpeed;
         nx::vms::common::ptz::Vector requestedSpeed;

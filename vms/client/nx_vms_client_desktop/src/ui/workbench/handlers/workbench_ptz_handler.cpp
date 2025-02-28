@@ -98,7 +98,7 @@ private:
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, Vector* outPosition)
 {
-    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
+    if (!controller->hasCapabilities(Ptz::Capability::asynchronous))
     {
         return controller->getPosition(outPosition, CoordinateSpace::device);
     }
@@ -373,7 +373,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource();
 
-    if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
+    if (!widget->ptzController()->hasCapabilities(Ptz::Capability::presets))
     {
         // TODO: #sivanov Show appropriate error message?
         return;
@@ -712,7 +712,7 @@ void QnWorkbenchPtzHandler::ptzFocusMove(double speed)
     if (!NX_ASSERT(controller))
         return;
 
-    //if (!controller->hasCapabilities(Ptz::VirtualPtzCapability))
+    //if (!controller->hasCapabilities(Ptz::Capability::virtualPtz))
     //    return;
 
     controller->continuousFocus(speed);
@@ -738,7 +738,7 @@ void QnWorkbenchPtzHandler::at_ptzFocusAutoAction_triggered()
     if (!NX_ASSERT(controller))
         return;
 
-    //if (!controller->hasCapabilities(Ptz::VirtualPtzCapability))
+    //if (!controller->hasCapabilities(Ptz::Capability::virtualPtz))
     //    return;
 
     /* Set auto focus. */

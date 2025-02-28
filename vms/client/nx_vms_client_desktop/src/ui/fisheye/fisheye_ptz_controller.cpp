@@ -136,11 +136,11 @@ void QnFisheyePtzController::updateLimits()
 
 void QnFisheyePtzController::updateCapabilities()
 {
-    Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
+    Ptz::Capabilities capabilities = Ptz::Capability::none;
     if (m_mediaDewarpingParams.enabled)
     {
-        capabilities = Ptz::ContinuousPtzCapabilities | Ptz::AbsolutePtzCapabilities
-            | Ptz::LogicalPositioningPtzCapability | Ptz::VirtualPtzCapability;
+        capabilities = Ptz::Capability::continuousPanTiltZoom | Ptz::Capability::absolutePanTiltZoom
+            | Ptz::Capability::logicalPositioning | Ptz::Capability::virtual_;
     }
 
     if (capabilities == m_capabilities)
@@ -264,7 +264,7 @@ Ptz::Capabilities QnFisheyePtzController::getCapabilities(
     const Options& options) const
 {
     if (options.type != Type::operational)
-        return Ptz::NoPtzCapabilities;
+        return Ptz::Capability::none;
 
     return m_capabilities;
 }

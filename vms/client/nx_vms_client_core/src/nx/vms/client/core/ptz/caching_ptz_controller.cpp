@@ -28,8 +28,8 @@ CachingPtzController::~CachingPtzController()
 
 bool CachingPtzController::extends(Ptz::Capabilities capabilities)
 {
-    return capabilities.testFlag(Ptz::AsynchronousPtzCapability)
-        && !capabilities.testFlag(Ptz::SynchronizedPtzCapability);
+    return capabilities.testFlag(Ptz::Capability::asynchronous)
+        && !capabilities.testFlag(Ptz::Capability::synchronized);
 }
 
 Ptz::Capabilities CachingPtzController::getCapabilities(
@@ -37,7 +37,7 @@ Ptz::Capabilities CachingPtzController::getCapabilities(
 {
     const Ptz::Capabilities capabilities = base_type::getCapabilities(options);
     return extends(capabilities)
-        ? capabilities | Ptz::SynchronizedPtzCapability
+        ? capabilities | Ptz::Capability::synchronized
         : capabilities;
 }
 

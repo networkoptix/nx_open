@@ -39,13 +39,13 @@ Ptz::Capabilities RemotePtzController::getCapabilities(
 {
     Ptz::Capabilities result = m_camera->getPtzCapabilities(options.type);
     if (!result)
-        return Ptz::NoPtzCapabilities;
+        return Ptz::Capability::none;
 
-    if (result.testFlag(Ptz::VirtualPtzCapability))
-        return Ptz::NoPtzCapabilities; /* Can't have remote virtual PTZ. */
+    if (result.testFlag(Ptz::Capability::virtual_))
+        return Ptz::Capability::none; /* Can't have remote virtual PTZ. */
 
-    result |= Ptz::AsynchronousPtzCapability;
-    result &= ~(Ptz::FlipPtzCapability | Ptz::LimitsPtzCapability);
+    result |= Ptz::Capability::asynchronous;
+    result &= ~(Ptz::Capability::flip | Ptz::Capability::limits);
     return result;
 }
 

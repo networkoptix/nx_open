@@ -6,6 +6,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/instrument.h>
+#include <nx/vms/api/types/ptz_types.h>
 #include <nx/vms/common/ptz/coordinate_space.h>
 #include <nx/vms/common/ptz/vector.h>
 
@@ -16,11 +17,7 @@ static const QString kPtzPresetMappingPropertyName = "presetMapping";
 
 namespace nx::core::ptz {
 
-NX_REFLECTION_ENUM_CLASS(PresetType,
-    undefined,
-    system,
-    native
-)
+using PresetType = nx::vms::api::ptz::PresetType;
 
 } // namespace nx::core::ptz
 

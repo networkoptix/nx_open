@@ -140,7 +140,7 @@ bool inViewportPtzMode(QnResourceWidget* resourceWidget, Qt::KeyboardModifiers k
 
     return mediaResourceWidget->item()
         && mediaResourceWidget->item()->controlPtz()
-        && mediaResourceWidget->ptzController()->hasCapabilities(Ptz::ViewportPtzCapability)
+        && mediaResourceWidget->ptzController()->hasCapabilities(Ptz::Capability::viewport)
         && (appContext()->localSettings()->ptzAimOverlayEnabled()
             || keyboardModifiers.testFlag(Qt::ShiftModifier));
 }

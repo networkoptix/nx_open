@@ -37,4 +37,18 @@ const QString kUserSettings = "userSettings";
 
 } // namespace user_properties
 
+namespace device_properties {
+
+const QString kPtzCapabilities("ptzCapabilities");
+const QString kConfigurationalPtzCapabilities("configurationalPtzCapabilities");
+const QString kPtzCapabilitiesUserIsAllowedToModify("ptzCapabilitiesUserIsAllowedToModify");
+const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
+
+const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
+const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
+
+const QString kPtzPanTiltSensitivity("ptzPanTiltSensitivity");
+
+} // namespace device_properties
+
 } // namespace nx::vms::api

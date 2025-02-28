@@ -40,4 +40,18 @@ NX_VMS_API extern const QString kUserSettings;
 
 } // namespace user_properties
 
+namespace device_properties {
+
+NX_VMS_API extern const QString kPtzCapabilities;
+NX_VMS_API extern const QString kConfigurationalPtzCapabilities;
+NX_VMS_API extern const QString kPtzCapabilitiesUserIsAllowedToModify;
+NX_VMS_API extern const QString kPtzCapabilitiesAddedByUser;
+
+NX_VMS_API extern const QString kUserPreferredPtzPresetType;
+NX_VMS_API extern const QString kDefaultPreferredPtzPresetType;
+
+NX_VMS_API extern const QString kPtzPanTiltSensitivity;
+
+} // namespace device_properties
+
 } // namespace nx::vms::api

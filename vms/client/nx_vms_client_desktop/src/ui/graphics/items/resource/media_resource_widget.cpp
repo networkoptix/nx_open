@@ -151,7 +151,7 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::core::analytics;
 using namespace nx::vms::api;
 
-namespace ptz = nx::vms::common::ptz;
+namespace common_ptz = nx::vms::common::ptz;
 namespace html = nx::vms::common::html;
 
 using nx::vms::client::core::Geometry;
@@ -2073,19 +2073,19 @@ bool QnMediaResourceWidget::supportsBasicPtz() const
 bool QnMediaResourceWidget::canControlPtzMove() const
 {
     return d->supportsPtzCapabilities(
-        Ptz::ContinuousPanCapability
-        | Ptz::ContinuousTiltCapability
-        | Ptz::ContinuousRotationCapability);
+        Ptz::Capability::continuousPan
+        | Ptz::Capability::continuousTilt
+        | Ptz::Capability::continuousRotation);
 }
 
 bool QnMediaResourceWidget::canControlPtzFocus() const
 {
-    return d->supportsPtzCapabilities(Ptz::ContinuousFocusCapability);
+    return d->supportsPtzCapabilities(Ptz::Capability::continuousFocus);
 }
 
 bool QnMediaResourceWidget::canControlPtzZoom() const
 {
-    return d->supportsPtzCapabilities(Ptz::ContinuousZoomCapability);
+    return d->supportsPtzCapabilities(Ptz::Capability::continuousZoom);
 }
 
 nx::vms::api::dewarping::MediaData QnMediaResourceWidget::dewarpingParams() const
@@ -2968,17 +2968,17 @@ void QnMediaResourceWidget::updateZoomWindowDewarping()
         return;
 
     m_ptzController->absoluteMove(
-        ptz::CoordinateSpace::logical,
+        common_ptz::CoordinateSpace::logical,
         QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
         2.0);
 }
 
-void QnMediaResourceWidget::at_ptzController_changed(ptz::DataFields fields)
+void QnMediaResourceWidget::at_ptzController_changed(common_ptz::DataFields fields)
 {
-    if (fields.testFlag(ptz::DataField::capabilities))
+    if (fields.testFlag(common_ptz::DataField::capabilities))
         updateButtonsVisibility();
 
-    if (fields & (ptz::DataField::activeObject | ptz::DataField::tours))
+    if (fields & (common_ptz::DataField::activeObject | common_ptz::DataField::tours))
         updateTitleText();
 }
 

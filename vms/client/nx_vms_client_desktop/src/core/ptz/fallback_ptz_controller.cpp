@@ -45,10 +45,10 @@ void QnFallbackPtzController::baseChanged(DataFields fields)
     if (fields.testFlag(DataField::capabilities))
     {
         m_hasOperationalCapabilities = m_mainController
-            ->getCapabilities({Type::operational}) != Ptz::NoPtzCapabilities;
+            ->getCapabilities({Type::operational}) != Ptz::Capability::none;
 
         m_hasConfigurationalCapabilities = m_mainController
-            ->getCapabilities({Type::configurational}) != Ptz::NoPtzCapabilities;
+            ->getCapabilities({Type::configurational}) != Ptz::Capability::none;
     }
 
     emit changed(fields);

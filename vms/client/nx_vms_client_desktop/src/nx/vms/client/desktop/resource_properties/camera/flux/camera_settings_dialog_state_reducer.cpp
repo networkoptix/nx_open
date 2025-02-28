@@ -696,14 +696,14 @@ void updateRecordingAlerts(State& state)
 bool canForceZoomCapability(const Camera& camera)
 {
     return camera->ptzCapabilitiesUserIsAllowedToModify()
-        .testFlag(Ptz::Capability::ContinuousZoomCapability);
+        .testFlag(Ptz::Capability::continuousZoom);
 };
 
 bool hasStoppablePtz(const Camera& camera)
 {
     return camera->getPtzCapabilities().testAnyFlags({
-        Ptz::Capability::AbsolutePtzCapabilities,
-        Ptz::Capability::ContinuousPtzCapabilities});
+        Ptz::Capability::absolutePanTiltZoom,
+        Ptz::Capability::continuousPanTiltZoom});
 }
 
 bool canSwitchPtzPresetTypes(const Camera& camera)
@@ -714,7 +714,7 @@ bool canSwitchPtzPresetTypes(const Camera& camera)
 bool canForcePanTiltCapabilities(const Camera& camera)
 {
     return camera->ptzCapabilitiesUserIsAllowedToModify() &
-        Ptz::Capability::ContinuousPanTiltCapabilities;
+        Ptz::Capability::continuousPanTilt;
 };
 
 bool analyticsEngineIsPresentInList(const nx::Uuid& id, const State& state)
@@ -1105,7 +1105,7 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
             [](const Camera& camera)
             {
                 return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousPanTiltCapabilities);
+                    Ptz::Capability::continuousPanTilt);
             });
     }
 
@@ -1115,7 +1115,7 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
             [](const Camera& camera)
             {
                 return camera->ptzCapabilitiesAddedByUser().testFlag(
-                    Ptz::ContinuousZoomCapability);
+                    Ptz::Capability::continuousZoom);
             });
     }
 
@@ -1132,7 +1132,7 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
     const auto hasPtzSensitivity =
         [](const Camera& camera)
         {
-            return camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPanTiltCapabilities);
+            return camera->hasAnyOfPtzCapabilities(Ptz::Capability::continuousPanTilt);
         };
 
     state.devicesDescription.canAdjustPtzSensitivity = combinedValue(cameras, hasPtzSensitivity);

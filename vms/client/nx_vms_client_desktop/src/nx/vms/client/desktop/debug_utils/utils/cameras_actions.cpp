@@ -51,14 +51,14 @@ void CamerasActions::registerAction()
         [](QnWorkbenchContext* context)
         {
             QList<Ptz::Capabilities> presets;
-            presets.push_back(Ptz::NoPtzCapabilities);
-            presets.push_back(Ptz::ContinuousZoomCapability);
-            presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
-            presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
-                | Ptz::AuxiliaryPtzCapability);
-            presets.push_back(Ptz::ContinuousPanTiltCapabilities);
-            presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
-                | Ptz::AuxiliaryPtzCapability | Ptz::PresetsPtzCapability);
+            presets.push_back(Ptz::Capability::none);
+            presets.push_back(Ptz::Capability::continuousZoom);
+            presets.push_back(Ptz::Capability::continuousZoom | Ptz::Capability::continuousFocus);
+            presets.push_back(Ptz::Capability::continuousZoom | Ptz::Capability::continuousFocus
+                | Ptz::Capability::auxiliary);
+            presets.push_back(Ptz::Capability::continuousPanTilt);
+            presets.push_back(Ptz::Capability::continuousPanTiltZoom | Ptz::Capability::continuousFocus
+                | Ptz::Capability::auxiliary | Ptz::Capability::presets);
 
             for (const auto& camera: context->resourcePool()->getAllCameras(
                 QnResourcePtr(),

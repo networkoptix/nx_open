@@ -264,14 +264,14 @@ void setForcedPtzCapabilities(std::optional<bool> panTilt, std::optional<bool> z
 
     for (const auto& camera: cameras)
     {
-        if (camera->ptzCapabilitiesUserIsAllowedToModify() == Ptz::Capability::NoPtzCapabilities)
+        if (camera->ptzCapabilitiesUserIsAllowedToModify() == Ptz::Capability::none)
             continue;
 
         auto capabilities = camera->ptzCapabilitiesAddedByUser();
         if (panTilt)
-            capabilities.setFlag(Ptz::ContinuousPanTiltCapabilities, *panTilt);
+            capabilities.setFlag(Ptz::Capability::continuousPanTilt, *panTilt);
         if (zoom)
-            capabilities.setFlag(Ptz::ContinuousZoomCapability, *zoom);
+            capabilities.setFlag(Ptz::Capability::continuousZoom, *zoom);
 
         camera->setPtzCapabilitiesAddedByUser(capabilities);
     }
@@ -292,7 +292,7 @@ void setPtzSensitivities(const State::PtzSensitivity& value, const Cameras& came
 
     for (const auto& camera: cameras)
     {
-        if (!camera->hasAnyOfPtzCapabilities(Ptz::ContinuousPanTiltCapabilities))
+        if (!camera->hasAnyOfPtzCapabilities(Ptz::Capability::continuousPanTilt))
             continue;
 
         QPointF sensitivity = partial ? camera->ptzPanTiltSensitivity() : QPointF();

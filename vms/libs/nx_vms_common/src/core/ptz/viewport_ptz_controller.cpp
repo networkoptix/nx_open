@@ -23,24 +23,24 @@ QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseC
     // TODO: #sivanov Handle finished properly.
 
 #ifdef PTZ_DEBUG
-    if(!baseController->hasCapabilities(Ptz::FlipPtzCapability))
-        NX_WARNING(this, "Base controller doesn't have a Ptz::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
-    if(!baseController->hasCapabilities(Ptz::LimitsPtzCapability))
-        NX_WARNING(this, "Base controller doesn't have a Ptz::LimitsPtzCapability. Position caching may not work for advanced PTZ.");
+    if(!baseController->hasCapabilities(Ptz::Capability::flip))
+        NX_WARNING(this, "Base controller doesn't have a Ptz::Capability::flip. Flip will not be taken into account by advanced PTZ.");
+    if(!baseController->hasCapabilities(Ptz::Capability::limits))
+        NX_WARNING(this, "Base controller doesn't have a Ptz::Capability::limits. Position caching may not work for advanced PTZ.");
 #endif
 }
 
 bool QnViewportPtzController::extends(Ptz::Capabilities capabilities) {
-    return (capabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities
-        && capabilities.testFlag(Ptz::LogicalPositioningPtzCapability)
-        && !capabilities.testFlag(Ptz::ViewportPtzCapability);
+    return (capabilities & Ptz::Capability::absolutePanTiltZoom) == Ptz::Capability::absolutePanTiltZoom
+        && capabilities.testFlag(Ptz::Capability::logicalPositioning)
+        && !capabilities.testFlag(Ptz::Capability::viewport);
 }
 
 Ptz::Capabilities QnViewportPtzController::getCapabilities(
     const Options& options) const
 {
     Ptz::Capabilities capabilities = base_type::getCapabilities(options);
-    return extends(capabilities) ? (capabilities | Ptz::ViewportPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::Capability::viewport) : capabilities;
 }
 
 bool QnViewportPtzController::viewportMove(

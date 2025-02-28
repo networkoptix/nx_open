@@ -15,6 +15,7 @@
 #include <nx/vms/api/data/device_media_stream_info.h>
 #include <nx/vms/api/data/media_stream_capability.h>
 #include <nx/vms/api/types/device_type.h>
+#include <nx/vms/api/types/ptz_types.h>
 
 #include "camera_attributes_data.h"
 #include "camera_data.h"
@@ -287,6 +288,51 @@ NX_REFLECTION_ENUM_CLASS(DeviceCapability,
 )
 Q_DECLARE_FLAGS(DeviceCapabilities, DeviceCapability)
 
+struct NX_VMS_API PanTiltSensitivity
+{
+    /**%apidoc
+     * Ptz pan sensitivity, the value is between 0.1 and 1.0
+     * %example 1.0
+     */
+    qreal pan = nx::vms::api::ptz::kDefaultSensitivity;
+
+    /**%apidoc
+     * Ptz tilt sensitivity, the value is between 0.1 and 1.0
+     * %example 1.0
+     */
+    qreal tilt = nx::vms::api::ptz::kDefaultSensitivity;
+};
+#define PanTiltSensitivity_Fields (pan)(tilt)
+QN_FUSION_DECLARE_FUNCTIONS(PanTiltSensitivity, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PanTiltSensitivity, PanTiltSensitivity_Fields);
+
+struct NX_VMS_API DevicePtzOptions
+{
+    /**%apidoc
+     * Ptz uniform pan and tilt sensitivity or separate sensitivities. Values are between 0.1 and 1.0.
+     * %example 1.0
+     */
+    std::optional<std::variant<qreal, PanTiltSensitivity>> panTiltSensitivity;
+
+    /**apidoc Preffered preset type */
+    std::optional<nx::vms::api::ptz::PresetType> presetType;
+
+    /**%apidoc[readonly] Effective capabilities for use in `/rest/v{4-}/devices/{id}/ptz/`. */
+    nx::vms::api::ptz::Capabilities capabilities;
+
+    /**%apidoc[readonly] */
+    std::optional<nx::vms::api::ptz::Capabilities> configCapabilities;
+
+    /**%apidoc[readonly] Extra capabilities which can be added by `userAddedCapabilities`. */
+    std::optional<nx::vms::api::ptz::Capabilities> userModifiableCapabilities;
+
+    std::optional<nx::vms::api::ptz::Capabilities> userAddedCapabilities;
+};
+#define DevicePtzOptions_Fields (panTiltSensitivity)(presetType)(capabilities) \
+    (configCapabilities)(userModifiableCapabilities)(userAddedCapabilities)
+QN_FUSION_DECLARE_FUNCTIONS(DevicePtzOptions, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(DevicePtzOptions, DevicePtzOptions_Fields);
+
 struct NX_VMS_API DeviceModelDeprecated
 {
     /**%apidoc[opt] */
@@ -371,10 +417,12 @@ NX_REFLECTION_INSTRUMENT(DeviceModelV3, DeviceModelV3_Fields);
 
 struct NX_VMS_API DeviceModelV4: DeviceModelV3Base
 {
+    std::optional<DevicePtzOptions> ptz;
+
     DbUpdateTypes toDbTypes() &&;
     static std::vector<DeviceModelV4> fromDbTypes(DbListTypes data);
 };
-#define DeviceModelV4_Fields DeviceModelV3Base_Fields
+#define DeviceModelV4_Fields DeviceModelV3Base_Fields (ptz)
 QN_FUSION_DECLARE_FUNCTIONS(DeviceModelV4, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(DeviceModelV4, DeviceModelV4_Fields);
 

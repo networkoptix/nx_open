@@ -1344,18 +1344,22 @@ bool QnVirtualCameraResource::hasTwoWayAudio() const
 
 Ptz::Capabilities QnVirtualCameraResource::getPtzCapabilities(ptz::Type ptzType) const
 {
+    const auto capsFromProperty =
+        [this](const QString& propName)
+        {
+            return Ptz::Capabilities(getProperty(propName).toInt());
+        };
     switch (ptzType)
     {
         case ptz::Type::operational:
-            return Ptz::Capabilities(getProperty(
-                ResourcePropertyKey::kPtzCapabilities).toInt());
+            return capsFromProperty(ResourcePropertyKey::kPtzCapabilities);
 
         case ptz::Type::configurational:
-            return Ptz::Capabilities(getProperty(
-                ResourcePropertyKey::kConfigurationalPtzCapabilities).toInt());
+            return capsFromProperty(ResourcePropertyKey::kConfigurationalPtzCapabilities);
+
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");
-            return Ptz::NoPtzCapabilities;
+            return Ptz::Capability::none;
     }
 }
 
@@ -1370,24 +1374,21 @@ void QnVirtualCameraResource::setPtzCapabilities(
     Ptz::Capabilities capabilities,
     ptz::Type ptzType)
 {
+    // After discussions we decided to keep those properties as numbers
+    // to be backward compatible and reduce property size.
+    const auto capsToProperty =
+        [this, capabilities](const QString& propName)
+        {
+            setProperty(propName, QString::number(static_cast<int>(capabilities)));
+        };
     switch (ptzType)
     {
         case ptz::Type::operational:
-        {
-            // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
-            setProperty(
-                ResourcePropertyKey::kPtzCapabilities,
-                QString::number((int) capabilities));
+            capsToProperty(ResourcePropertyKey::kPtzCapabilities);
             return;
-        }
         case ptz::Type::configurational:
-        {
-            // TODO: #sivanov Change the storage type of PTZ capabilities to serialized lexical.
-            setProperty(
-                ResourcePropertyKey::kConfigurationalPtzCapabilities,
-                QString::number((int) capabilities));
+            capsToProperty(ResourcePropertyKey::kConfigurationalPtzCapabilities);
             return;
-        }
     }
     NX_ASSERT(false, "Wrong ptz type, we should never be here");
 }
@@ -1406,15 +1407,15 @@ void QnVirtualCameraResource::setPtzCapability(
 bool QnVirtualCameraResource::canSwitchPtzPresetTypes() const
 {
     const auto capabilities = getPtzCapabilities();
-    if (!(capabilities & Ptz::NativePresetsPtzCapability))
+    if (!(capabilities & Ptz::Capability::nativePresets))
         return false;
 
-    if (capabilities & Ptz::NoNxPresetsPtzCapability)
+    if (capabilities & Ptz::Capability::disabledNxPresets)
         return false;
 
     // Check if our server can emulate presets.
-    return (capabilities & Ptz::AbsolutePtrzCapabilities)
-        && (capabilities & Ptz::PositioningPtzCapabilities);
+    return (capabilities & Ptz::Capability::absolutePanTiltZoomRotation)
+        && (capabilities & Ptz::Capability::positioningDeviceLogical);
 }
 
 bool QnVirtualCameraResource::isAudioSupported() const
@@ -2410,38 +2411,38 @@ nx::vms::api::StreamIndex QnVirtualCameraResource::toStreamIndex(Qn::ConnectionR
            : nx::vms::api::StreamIndex::primary;
 }
 
-nx::core::ptz::PresetType QnVirtualCameraResource::preferredPtzPresetType() const
+nx::vms::api::ptz::PresetType QnVirtualCameraResource::preferredPtzPresetType() const
 {
     auto userPreference = userPreferredPtzPresetType();
-    if (userPreference != nx::core::ptz::PresetType::undefined)
+    if (userPreference != nx::vms::api::ptz::PresetType::undefined)
         return userPreference;
 
     return defaultPreferredPtzPresetType();
 }
 
-nx::core::ptz::PresetType QnVirtualCameraResource::userPreferredPtzPresetType() const
+nx::vms::api::ptz::PresetType QnVirtualCameraResource::userPreferredPtzPresetType() const
 {
     return nx::reflect::fromString(
         getProperty(ResourcePropertyKey::kUserPreferredPtzPresetType).toStdString(),
-        nx::core::ptz::PresetType::undefined);
+        nx::vms::api::ptz::PresetType::undefined);
 }
 
-void QnVirtualCameraResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+void QnVirtualCameraResource::setUserPreferredPtzPresetType(nx::vms::api::ptz::PresetType presetType)
 {
     setProperty(ResourcePropertyKey::kUserPreferredPtzPresetType,
-        presetType == nx::core::ptz::PresetType::undefined
+        presetType == nx::vms::api::ptz::PresetType::undefined
         ? QString()
         : QString::fromStdString(nx::reflect::toString(presetType)));
 }
 
-nx::core::ptz::PresetType QnVirtualCameraResource::defaultPreferredPtzPresetType() const
+nx::vms::api::ptz::PresetType QnVirtualCameraResource::defaultPreferredPtzPresetType() const
 {
     return nx::reflect::fromString(
         getProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType).toStdString(),
-        nx::core::ptz::PresetType::native);
+        nx::vms::api::ptz::PresetType::native);
 }
 
-void QnVirtualCameraResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+void QnVirtualCameraResource::setDefaultPreferredPtzPresetType(nx::vms::api::ptz::PresetType presetType)
 {
     setProperty(ResourcePropertyKey::kDefaultPreferredPtzPresetType,
         QString::fromStdString(nx::reflect::toString(presetType)));
@@ -2451,27 +2452,29 @@ Ptz::Capabilities QnVirtualCameraResource::ptzCapabilitiesUserIsAllowedToModify(
 {
     return nx::reflect::fromString(
         getProperty(ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify).toStdString(),
-        Ptz::Capabilities(Ptz::NoPtzCapabilities));
+        Ptz::Capabilities(Ptz::Capability::none));
 }
 
 void QnVirtualCameraResource::setPtzCapabilitesUserIsAllowedToModify(Ptz::Capabilities capabilities)
 {
+    // Property was moved to DeviceModelV4, and we switched database type from lexical to int.
     setProperty(
         ResourcePropertyKey::kPtzCapabilitiesUserIsAllowedToModify,
-        QString::fromStdString(nx::reflect::toString(capabilities)));
+        QString::number(static_cast<int>(capabilities)));
 }
 
 Ptz::Capabilities QnVirtualCameraResource::ptzCapabilitiesAddedByUser() const
 {
     return nx::reflect::fromString<Ptz::Capabilities>(
         getProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser).toStdString(),
-        Ptz::NoPtzCapabilities);
+        Ptz::Capability::none);
 }
 
 void QnVirtualCameraResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
 {
+    // Property was moved to DeviceModelV4, and we switched database type from lexical to int.
     setProperty(ResourcePropertyKey::kPtzCapabilitiesAddedByUser,
-        QString::fromStdString(nx::reflect::toString(capabilities)));
+        QString::number(static_cast<int>(capabilities)));
 }
 
 QPointF QnVirtualCameraResource::ptzPanTiltSensitivity() const

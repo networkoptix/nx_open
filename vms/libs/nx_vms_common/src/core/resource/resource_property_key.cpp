@@ -28,16 +28,9 @@ const QString kMediaStreams("mediaStreams");
 const QString kBitrateInfos("bitrateInfos");
 const QString kStreamUrls("streamUrls");
 const QString kAudioCodec("audioCodec");
-const QString kPtzCapabilities("ptzCapabilities");
 const QString kPtzTargetId("ptzTargetId");
-const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
-const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
 const QString kTemporaryUserFirstLoginTime("temporaryUserFirstLoginTimeS");
 
-const QString kPtzCapabilitiesUserIsAllowedToModify("ptzCapabilitiesUserIsAllowedToModify");
-const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
-const QString kConfigurationalPtzCapabilities("configurationalPtzCapabilities");
-const QString kPtzPanTiltSensitivity("ptzPanTiltSensitivity");
 const QString kForcedAudioStream("forcedAudioStream");
 
 const QString kAvailableProfiles("availableProfiles");

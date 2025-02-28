@@ -182,7 +182,6 @@ void initializeMetatypesInternal()
     qRegisterMetaType<nx::vms::common::ptz::Command>();
     qRegisterMetaType<nx::vms::common::ptz::DataFields>();
     qRegisterMetaType<Ptz::Traits>();
-    qRegisterMetaType<Ptz::Capabilities>();
     qRegisterMetaType<Qn::StatusChangeReason>();
 
     qRegisterMetaType<QnIOPortData>();

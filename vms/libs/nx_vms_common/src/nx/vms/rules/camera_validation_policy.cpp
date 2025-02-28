@@ -162,7 +162,7 @@ QString QnCameraOutputPolicy::getText(
 bool QnExecPtzPresetPolicy::isResourceValid(
     nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
-    return camera->hasAnyOfPtzCapabilities(Ptz::PresetsPtzCapability)
+    return camera->hasAnyOfPtzCapabilities(Ptz::Capability::presets)
         || camera->getDewarpingParams().enabled;
 }
 

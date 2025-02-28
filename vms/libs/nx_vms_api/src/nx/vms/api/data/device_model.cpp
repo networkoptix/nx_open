@@ -7,9 +7,11 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/compound_visitor.h>
 #include <nx/utils/crud_model.h>
 #include <nx/utils/member_detector.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/vms/api/data/resource_property_key.h>
 
 namespace nx::vms::api {
 
@@ -18,6 +20,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelGeneral, (json), DeviceModelGeneral_
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceOptions, (json), DeviceOptions_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceScheduleSettings, (json), DeviceScheduleSettings_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceMotionSettings, (json), DeviceMotionSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PanTiltSensitivity, (json), PanTiltSensitivity_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DevicePtzOptions, (json), DevicePtzOptions_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV1, (json), DeviceModelV1_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV3, (json), DeviceModelV3_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceModelV4, (json), DeviceModelV4_Fields)
@@ -137,6 +141,62 @@ void extractParametersToFields(DeviceModelV3Base* m)
     }
 }
 
+void extractParametersToFields(DeviceModelV4* m)
+{
+    extractParametersToFields(static_cast<DeviceModelV3Base*>(m));
+    m->ptz.emplace();
+    const auto capsFromProperty =
+        [](const QJsonValue& param) -> ptz::Capabilities
+        {
+            if (!param.isString())
+                return ptz::Capabilities(param.toInt());
+            if (auto value = param.toString(); !value.isEmpty())
+                return nx::reflect::fromString<ptz::Capabilities>(value.toStdString(), ptz::Capability::none);
+            return ptz::Capability::none;
+        };
+    const auto capsFromPropertyOpt =
+        [&](const QJsonValue& param)
+        {
+            auto value = capsFromProperty(param);
+            return value != ptz::Capability::none ? std::make_optional(value) : std::nullopt;
+        };
+    if (auto param = m->takeParameter(device_properties::kPtzCapabilities))
+        m->ptz->capabilities = capsFromProperty(*param);
+    if (auto param = m->takeParameter(device_properties::kConfigurationalPtzCapabilities))
+        m->ptz->configCapabilities = capsFromPropertyOpt(*param);
+    if (auto param = m->takeParameter(device_properties::kPtzCapabilitiesUserIsAllowedToModify))
+        m->ptz->userModifiableCapabilities = capsFromPropertyOpt(*param);
+    if (auto param = m->takeParameter(device_properties::kPtzCapabilitiesAddedByUser))
+        m->ptz->userAddedCapabilities = capsFromPropertyOpt(*param);
+
+    auto defaultPtzPresetType = ptz::PresetType::native;
+    // Remove property even when we don't use its value.
+    if (auto param = m->takeParameter(device_properties::kDefaultPreferredPtzPresetType))
+    {
+        if (auto value = param->toString(); !value.isEmpty())
+            defaultPtzPresetType = nx::reflect::fromString(value.toStdString(), ptz::PresetType::native);
+    }
+    if (auto param = m->takeParameter(device_properties::kUserPreferredPtzPresetType))
+    {
+        if (auto value = param->toString(); !value.isEmpty())
+            m->ptz->presetType = nx::reflect::fromString(value.toStdString(), ptz::PresetType::undefined);
+    }
+    if (m->ptz->presetType.value_or(ptz::PresetType::undefined) == ptz::PresetType::undefined)
+        m->ptz->presetType = defaultPtzPresetType;
+
+    if (auto param = m->takeParameter(device_properties::kPtzPanTiltSensitivity); param && param->isObject())
+    {
+        QPointF value;
+        QJson::deserialize(*param, &value);
+        if (value.y() > 0.0)
+            m->ptz->panTiltSensitivity = PanTiltSensitivity{.pan = value.x(), .tilt = value.y()};
+        else
+            m->ptz->panTiltSensitivity = value.x();
+    }
+    if (!m->ptz->panTiltSensitivity)
+        m->ptz->panTiltSensitivity = ptz::kDefaultSensitivity;
+}
+
 // Fields that marked as `readonly` for apidoc must not be included here, because they are ignored
 // by the Schema, hence are not initialized (empty). Having such fields in the `kExtractedOnRequest`
 // list will result in creating the corresponding `parameters["field_name"]` with default emtpy
@@ -161,6 +221,50 @@ void moveFieldsToParameters(DeviceModelV3Base* m)
         QJson::serialize(*m->userEnabledAnalyticsEngineIds,
             &m->parameters[kUserEnabledAnalyticsEnginesProperty]);
     }
+}
+
+void movePtzFieldsToParameters(DeviceModelV4* m)
+{
+    if (m->ptz->userAddedCapabilities)
+    {
+        m->parameters[device_properties::kPtzCapabilitiesAddedByUser] =
+            *m->ptz->userAddedCapabilities == ptz::Capability::none
+            ? QString()
+            : QString::number(static_cast<int>(*m->ptz->userAddedCapabilities));
+    }
+    if (m->ptz->presetType)
+    {
+        m->parameters[device_properties::kUserPreferredPtzPresetType] =
+            *m->ptz->presetType == ptz::PresetType::undefined
+            ? QString()
+            : QString::fromStdString(nx::reflect::toString(*m->ptz->presetType));
+    }
+    if (m->ptz->panTiltSensitivity)
+    {
+        const auto clampValue =
+            [](auto value) { return std::clamp(value, ptz::kMinimumSensitivity, ptz::kMaximumSensitivity); };
+        QPointF value = std::visit(
+            nx::utils::CompoundVisitor{
+                [&clampValue](const PanTiltSensitivity& value)
+                {
+                    return QPointF(clampValue(value.pan), clampValue(value.tilt));
+                },
+                [&clampValue](qreal value)
+                {
+                    return QPointF(clampValue(value), 0.0 /*uniformity flag*/);
+                },
+            },
+            *m->ptz->panTiltSensitivity);
+        QJson::serialize(value, &m->parameters[device_properties::kPtzPanTiltSensitivity]);
+    }
+}
+
+void moveFieldsToParameters(DeviceModelV4* m)
+{
+    moveFieldsToParameters(static_cast<DeviceModelV3Base*>(m));
+
+    if (m->ptz)
+        movePtzFieldsToParameters(m);
 }
 
 struct LessById

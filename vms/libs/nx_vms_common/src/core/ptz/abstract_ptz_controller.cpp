@@ -131,59 +131,59 @@ bool QnAbstractPtzController::supports(
     switch (command)
     {
         case Command::continuousMove:
-            return (capabilities & Ptz::ContinuousPtzCapabilities);
+            return (capabilities & Ptz::Capability::continuousPanTiltZoom);
 
         case Command::continuousFocus:
-            return capabilities.testFlag(Ptz::ContinuousFocusCapability);
+            return capabilities.testFlag(Ptz::Capability::continuousFocus);
 
         case Command::getDevicePosition:
         case Command::absoluteDeviceMove:
-            return (capabilities & Ptz::AbsolutePtzCapabilities)
-                && capabilities.testFlag(Ptz::DevicePositioningPtzCapability);
+            return (capabilities & Ptz::Capability::absolutePanTiltZoom)
+                && capabilities.testFlag(Ptz::Capability::devicePositioning);
 
         case Command::getLogicalPosition:
         case Command::absoluteLogicalMove:
-            return (capabilities & Ptz::AbsolutePtzCapabilities)
-                && capabilities.testFlag(Ptz::LogicalPositioningPtzCapability);
+            return (capabilities & Ptz::Capability::absolutePanTiltZoom)
+                && capabilities.testFlag(Ptz::Capability::logicalPositioning);
 
         case Command::viewportMove:
-            return capabilities.testFlag(Ptz::ViewportPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::viewport);
 
         case Command::getDeviceLimits:
-            return capabilities.testFlag(Ptz::LimitsPtzCapability)
-                && capabilities.testFlag(Ptz::DevicePositioningPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::limits)
+                && capabilities.testFlag(Ptz::Capability::devicePositioning);
 
         case Command::getLogicalLimits:
-            return capabilities.testFlag(Ptz::LimitsPtzCapability)
-                && capabilities.testFlag(Ptz::LogicalPositioningPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::limits)
+                && capabilities.testFlag(Ptz::Capability::logicalPositioning);
 
         case Command::getFlip:
-            return capabilities.testFlag(Ptz::FlipPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::flip);
 
         case Command::createPreset:
         case Command::updatePreset:
         case Command::removePreset:
         case Command::activatePreset:
         case Command::getPresets:
-            return capabilities.testFlag(Ptz::PresetsPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::presets);
 
         case Command::getActiveObject:
-            return capabilities.testFlag(Ptz::PresetsPtzCapability)
-                || capabilities.testFlag(Ptz::ToursPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::presets)
+                || capabilities.testFlag(Ptz::Capability::tours);
 
         case Command::createTour:
         case Command::removeTour:
         case Command::activateTour:
         case Command::getTours:
-            return capabilities.testFlag(Ptz::ToursPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::tours);
 
         case Command::updateHomeObject:
         case Command::getHomeObject:
-            return capabilities.testFlag(Ptz::HomePtzCapability);
+            return capabilities.testFlag(Ptz::Capability::home);
 
         case Command::getAuxiliaryTraits:
         case Command::runAuxiliaryCommand:
-            return capabilities.testFlag(Ptz::AuxiliaryPtzCapability);
+            return capabilities.testFlag(Ptz::Capability::auxiliary);
 
         case Command::getData:
             return true;

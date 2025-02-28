@@ -51,16 +51,19 @@ NX_VMS_COMMON_API extern const QString kMediaStreams;
 NX_VMS_COMMON_API extern const QString kBitrateInfos;
 NX_VMS_COMMON_API extern const QString kStreamUrls;
 NX_VMS_COMMON_API extern const QString kAudioCodec;
-NX_VMS_COMMON_API extern const QString kPtzCapabilities;
 NX_VMS_COMMON_API extern const QString kPtzTargetId;
-NX_VMS_COMMON_API extern const QString kUserPreferredPtzPresetType;
-NX_VMS_COMMON_API extern const QString kDefaultPreferredPtzPresetType;
 NX_VMS_COMMON_API extern const QString kTemporaryUserFirstLoginTime;
 
-NX_VMS_COMMON_API extern const QString kPtzCapabilitiesUserIsAllowedToModify;
-NX_VMS_COMMON_API extern const QString kPtzCapabilitiesAddedByUser;
-NX_VMS_COMMON_API extern const QString kConfigurationalPtzCapabilities;
-NX_VMS_COMMON_API extern const QString kPtzPanTiltSensitivity;
+using nx::vms::api::device_properties::kPtzCapabilities;
+using nx::vms::api::device_properties::kConfigurationalPtzCapabilities;
+using nx::vms::api::device_properties::kPtzCapabilitiesUserIsAllowedToModify;
+using nx::vms::api::device_properties::kPtzCapabilitiesAddedByUser;
+
+using nx::vms::api::device_properties::kUserPreferredPtzPresetType;
+using nx::vms::api::device_properties::kDefaultPreferredPtzPresetType;
+
+using nx::vms::api::device_properties::kPtzPanTiltSensitivity;
+
 NX_VMS_COMMON_API extern const QString kForcedAudioStream;
 
 NX_VMS_COMMON_API extern  const QString kAvailableProfiles;

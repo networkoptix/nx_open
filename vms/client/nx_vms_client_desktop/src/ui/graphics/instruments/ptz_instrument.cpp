@@ -84,14 +84,14 @@ Vector truncate(const Vector& value)
 Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
 {
     Qt::Orientations result;
-    bool isFisheye = capabilities.testFlag(Ptz::VirtualPtzCapability);
+    bool isFisheye = capabilities.testFlag(Ptz::Capability::virtual_);
     if (isFisheye)
         return result;
 
-    if (capabilities.testFlag(Ptz::ContinuousPanCapability))
+    if (capabilities.testFlag(Ptz::Capability::continuousPan))
         result |= Qt::Horizontal;
 
-    if (capabilities.testFlag(Ptz::ContinuousTiltCapability))
+    if (capabilities.testFlag(Ptz::Capability::continuousTilt))
         result |= Qt::Vertical;
 
     return result;
@@ -125,19 +125,19 @@ Ptz::Capability requiredCapability(PtzInstrument::DirectionFlag direction)
     {
         case PtzInstrument::DirectionFlag::panLeft:
         case PtzInstrument::DirectionFlag::panRight:
-            return Ptz::ContinuousPanCapability;
+            return Ptz::Capability::continuousPan;
 
         case PtzInstrument::DirectionFlag::tiltUp:
         case PtzInstrument::DirectionFlag::tiltDown:
-            return Ptz::ContinuousTiltCapability;
+            return Ptz::Capability::continuousTilt;
 
         case PtzInstrument::DirectionFlag::zoomIn:
         case PtzInstrument::DirectionFlag::zoomOut:
-            return Ptz::ContinuousZoomCapability;
+            return Ptz::Capability::continuousZoom;
     }
 
     NX_ASSERT(false);
-    return Ptz::NoPtzCapabilities;
+    return Ptz::Capability::none;
 }
 
 // TODO: Remove code duplication with QnWorkbenchPtzHandler.
@@ -630,9 +630,9 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
     }
     else
     {
-        if (data.hasCapabilities(Ptz::VirtualPtzCapability
-            | Ptz::AbsolutePtzCapabilities
-            | Ptz::LogicalPositioningPtzCapability))
+        if (data.hasCapabilities(Ptz::Capability::virtual_
+            | Ptz::Capability::absolutePanTiltZoom
+            | Ptz::Capability::logicalPositioning))
         {
             m_movement = VirtualMovement;
         }
@@ -673,9 +673,9 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
     if (m_movement == ContinuousMovement)
     {
         m_movementOrientations = {};
-        if (data.hasCapabilities(Ptz::ContinuousPanCapability))
+        if (data.hasCapabilities(Ptz::Capability::continuousPan))
             m_movementOrientations |= Qt::Horizontal;
-        if (data.hasCapabilities(Ptz::ContinuousTiltCapability))
+        if (data.hasCapabilities(Ptz::Capability::continuousTilt))
             m_movementOrientations |= Qt::Vertical;
     }
 
@@ -771,10 +771,10 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 
     const bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
-    const bool canMove = data.hasCapabilities(Ptz::ContinuousPanCapability)
-        || data.hasCapabilities(Ptz::ContinuousTiltCapability);
-    const bool hasZoom = data.hasCapabilities(Ptz::ContinuousZoomCapability);
-    const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
+    const bool canMove = data.hasCapabilities(Ptz::Capability::continuousPan)
+        || data.hasCapabilities(Ptz::Capability::continuousTilt);
+    const bool hasZoom = data.hasCapabilities(Ptz::Capability::continuousZoom);
+    const bool hasFocus = data.hasCapabilities(Ptz::Capability::continuousFocus);
     const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
     const bool showManipulator = canMove && appContext()->localSettings()->ptzAimOverlayEnabled();
 
@@ -842,7 +842,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget* widget)
     if (data.capabilities == capabilities)
         return;
 
-    if ((data.capabilities ^ capabilities) & Ptz::AuxiliaryPtzCapability)
+    if ((data.capabilities ^ capabilities) & Ptz::Capability::auxiliary)
         updateTraits(widget);
 
     data.capabilities = capabilities;
@@ -1559,18 +1559,18 @@ bool PtzInstrument::PtzData::hasCapabilities(Ptz::Capabilities value) const
 
 bool PtzInstrument::PtzData::isFisheye() const
 {
-    return hasCapabilities(Ptz::VirtualPtzCapability);
+    return hasCapabilities(Ptz::Capability::virtual_);
 }
 
 bool PtzInstrument::PtzData::hasContinuousPanOrTilt() const
 {
-    return hasCapabilities(Ptz::ContinuousPanCapability)
-        || hasCapabilities(Ptz::ContinuousTiltCapability);
+    return hasCapabilities(Ptz::Capability::continuousPan)
+        || hasCapabilities(Ptz::Capability::continuousTilt);
 }
 
 bool PtzInstrument::PtzData::hasAdvancedPtz() const
 {
-    return hasCapabilities(Ptz::ViewportPtzCapability);
+    return hasCapabilities(Ptz::Capability::viewport);
 }
 
 bool PtzInstrument::supportsContinuousPtz(

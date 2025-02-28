@@ -24,7 +24,7 @@ QnHomePtzController::QnHomePtzController(
         "ptzHomeObject", QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::Capability::asynchronous));
     m_adaptor->setResource(baseController->resource());
     m_executor->moveToThread(executorThread);
 
@@ -42,9 +42,9 @@ QnHomePtzController::~QnHomePtzController()
 
 bool QnHomePtzController::extends(Ptz::Capabilities capabilities)
 {
-    return (capabilities.testFlag(Ptz::PresetsPtzCapability)
-        || capabilities.testFlag(Ptz::ToursPtzCapability))
-        && !capabilities.testFlag(Ptz::HomePtzCapability);
+    return (capabilities.testFlag(Ptz::Capability::presets)
+        || capabilities.testFlag(Ptz::Capability::tours))
+        && !capabilities.testFlag(Ptz::Capability::home);
 }
 
 Ptz::Capabilities QnHomePtzController::getCapabilities(const Options& options) const
@@ -53,7 +53,7 @@ Ptz::Capabilities QnHomePtzController::getCapabilities(const Options& options) c
     if (options.type != Type::operational)
         return capabilities;
 
-    return extends(capabilities) ? (capabilities | Ptz::HomePtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::Capability::home) : capabilities;
 }
 
 bool QnHomePtzController::continuousMove(
@@ -114,10 +114,10 @@ bool QnHomePtzController::activateTour(const QString& tourId)
 bool QnHomePtzController::updateHomeObject(const QnPtzObject& homeObject)
 {
     const Ptz::Capabilities capabilities = getCapabilities({Type::operational});
-    if(homeObject.type == Qn::PresetPtzObject && !capabilities.testFlag(Ptz::PresetsPtzCapability))
+    if(homeObject.type == Qn::PresetPtzObject && !capabilities.testFlag(Ptz::Capability::presets))
         return false;
 
-    if(homeObject.type == Qn::TourPtzObject && !capabilities.testFlag(Ptz::ToursPtzCapability))
+    if(homeObject.type == Qn::TourPtzObject && !capabilities.testFlag(Ptz::Capability::tours))
         return false;
 
     m_adaptor->setValue(homeObject);

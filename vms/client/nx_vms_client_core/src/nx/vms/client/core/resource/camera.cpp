@@ -67,8 +67,8 @@ void Camera::setParentId(const nx::Uuid& parent)
 bool Camera::isPtzSupported() const
 {
     // Camera must have at least one ptz control capability but fisheye must be disabled.
-    return hasAnyOfPtzCapabilities(Ptz::ContinuousPtzCapabilities | Ptz::ViewportPtzCapability)
-        && !hasAnyOfPtzCapabilities(Ptz::VirtualPtzCapability);
+    return hasAnyOfPtzCapabilities(Ptz::Capability::continuousPanTiltZoom | Ptz::Capability::viewport)
+        && !hasAnyOfPtzCapabilities(Ptz::Capability::virtual_);
 }
 
 bool Camera::isPtzRedirected() const

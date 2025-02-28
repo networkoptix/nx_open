@@ -41,14 +41,12 @@ class QnMotionRegion;
 
 namespace nx::core::resource { class AbstractRemoteArchiveManager; }
 namespace nx::media { enum class StreamEvent; }
-namespace nx::core::ptz { enum class PresetType; }
 
 class NX_VMS_COMMON_API QnVirtualCameraResource:
     public QnMediaResource,
     public /*mixin*/ Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
-    Q_FLAGS(Ptz::Capabilities)
     Q_PROPERTY(nx::vms::api::DeviceCapabilities cameraCapabilities
         READ getCameraCapabilities WRITE setCameraCapabilities)
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities
@@ -654,13 +652,13 @@ public:
     static Qn::ConnectionRole toConnectionRole(nx::vms::api::StreamIndex index);
     static nx::vms::api::StreamIndex toStreamIndex(Qn::ConnectionRole role);
 
-    nx::core::ptz::PresetType preferredPtzPresetType() const;
+    nx::vms::api::ptz::PresetType preferredPtzPresetType() const;
 
-    nx::core::ptz::PresetType userPreferredPtzPresetType() const;
-    void setUserPreferredPtzPresetType(nx::core::ptz::PresetType);
+    nx::vms::api::ptz::PresetType userPreferredPtzPresetType() const;
+    void setUserPreferredPtzPresetType(nx::vms::api::ptz::PresetType);
 
-    nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
-    void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
+    nx::vms::api::ptz::PresetType defaultPreferredPtzPresetType() const;
+    void setDefaultPreferredPtzPresetType(nx::vms::api::ptz::PresetType);
 
     Ptz::Capabilities ptzCapabilitiesUserIsAllowedToModify() const;
 

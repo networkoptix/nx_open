@@ -41,9 +41,9 @@ QnActivityPtzController::~QnActivityPtzController()
 
 bool QnActivityPtzController::extends(Ptz::Capabilities capabilities)
 {
-    return (capabilities.testFlag(Ptz::PresetsPtzCapability)
-        || capabilities.testFlag(Ptz::ToursPtzCapability))
-        && !capabilities.testFlag(Ptz::ActivityPtzCapability);
+    return (capabilities.testFlag(Ptz::Capability::presets)
+        || capabilities.testFlag(Ptz::Capability::tours))
+        && !capabilities.testFlag(Ptz::Capability::activity);
 }
 
 Ptz::Capabilities QnActivityPtzController::getCapabilities(
@@ -53,7 +53,7 @@ Ptz::Capabilities QnActivityPtzController::getCapabilities(
     if (options.type != Type::operational)
         return capabilities;
 
-    return extends(capabilities) ? (capabilities | Ptz::ActivityPtzCapability) : capabilities;
+    return extends(capabilities) ? (capabilities | Ptz::Capability::activity) : capabilities;
 }
 
 bool QnActivityPtzController::continuousMove(
@@ -146,7 +146,7 @@ bool QnActivityPtzController::getData(
     DataFields query,
     const Options& options) const
 {
-    return baseController()->hasCapabilities(Ptz::AsynchronousPtzCapability, options)
+    return baseController()->hasCapabilities(Ptz::Capability::asynchronous, options)
         ? baseController()->getData(data, query, options)
         : base_type::getData(data, query, options);
 }

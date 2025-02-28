@@ -58,7 +58,7 @@ Ptz::Capabilities QnProxyPtzController::getCapabilities(const Options& options) 
 {
     return m_controller
         ? m_controller->getCapabilities(options)
-        : Ptz::NoPtzCapabilities;
+        : Ptz::Capability::none;
 }
 
 bool QnProxyPtzController::continuousMove(
