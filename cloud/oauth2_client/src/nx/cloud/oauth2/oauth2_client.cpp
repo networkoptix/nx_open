@@ -13,11 +13,12 @@ static constexpr auto kDefaultRequestTimeout = std::chrono::seconds(10);
 
 Oauth2Client::Oauth2Client(
     const nx::utils::Url& url,
-    const nx::network::http::Credentials& credentials):
+    const std::optional<nx::network::http::Credentials>& credentials):
     base_type(url, nx::network::ssl::kDefaultCertificateCheck)
 {
-    setHttpCredentials(credentials);
     setRequestTimeout(kDefaultRequestTimeout);
+    if (credentials)
+        setHttpCredentials(*credentials);
 }
 
 void Oauth2Client::issueToken(
@@ -119,6 +120,18 @@ void Oauth2Client::markSessionMfaVerified(
         std::move(handler));
 }
 
+void Oauth2Client::notifyAccountUpdated(
+    const db::api::AccountChangedEvent& event,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+{
+    base_type::template makeAsyncCall<void>(
+        nx::network::http::Method::post,
+        api::kAccountChangedEventHandler,
+        {}, // query
+        std::move(event),
+        std::move(completionHandler));
+}
+
 void Oauth2Client::internalLogout(
     const std::string&, nx::utils::MoveOnlyFunc<void(db::api::ResultCode)>)
 {
@@ -148,7 +161,8 @@ void Oauth2Client::internalGetSession(
 }
 
 Oauth2ClientFactory::Oauth2ClientFactory():
-    base_type([](const nx::utils::Url& url, const nx::network::http::Credentials& credentials)
+    base_type([](const nx::utils::Url& url,
+        const std::optional<nx::network::http::Credentials>& credentials)
         { return std::make_unique<Oauth2Client>(url, credentials); })
 {
 }

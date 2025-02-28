@@ -76,7 +76,7 @@ static constexpr char kOauthLogoutPath[] = "/cdb/oauth2/user/self";
 static constexpr char kOauthStunTokenPath[] = "/cdb/oauth2/stun-token";
 static constexpr char kOauthJwksPath[] = "/cdb/oauth2/jwks";
 static constexpr char kOauthJwkByIdPath[] = "/cdb/oauth2/jwks/{kid}";
-static constexpr char kAccSecuritySettingsChangedEvents[] = "/cdb/oauth2/account_events";
+static constexpr char kAccountChangedEvents[] = "/cdb/oauth2/account_events";
 static constexpr char kOauthTokenPathV1[] = "/cdb/oauth2/v1/token";
 
 // TODO: #anekrasov Move to a separate file, for oauth2 service

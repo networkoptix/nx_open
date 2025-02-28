@@ -148,17 +148,4 @@ void OauthManager::getJwtPublicKeyByKid(
         std::move(completionHandler));
 }
 
-void OauthManager::getAccSecuritySettingsChangedEvents(
-    const api::GetAccSecuritySettingsChangedEventsRequest& request,
-    nx::utils::MoveOnlyFunc<void(
-        api::ResultCode, api::GetAccSecuritySettingsChangedEventsResponse)> completionHandler)
-{
-    m_requestsExecutor->makeAsyncCall<api::GetAccSecuritySettingsChangedEventsResponse>(
-        nx::network::http::Method::post,
-        kAccSecuritySettingsChangedEvents,
-        {}, //query
-        request,
-        std::move(completionHandler));
-}
-
 } // namespace nx::cloud::db::client

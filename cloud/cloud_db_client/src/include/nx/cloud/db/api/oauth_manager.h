@@ -62,10 +62,6 @@ public:
     virtual void getJwtPublicKeyByKid(
         const std::string& kid,
         nx::utils::MoveOnlyFunc<void(ResultCode, nx::network::jwk::Key)> completionHandler) = 0;
-
-    virtual void getAccSecuritySettingsChangedEvents(
-        const GetAccSecuritySettingsChangedEventsRequest& request,
-        nx::utils::MoveOnlyFunc<void(ResultCode, GetAccSecuritySettingsChangedEventsResponse)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

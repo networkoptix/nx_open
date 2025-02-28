@@ -3,7 +3,7 @@
 #include <nx/network/http/rest/http_rest_client.h>
 
 #include "../api/request_paths.h"
-#include "oauth2_client.h"
+#include "oauth2_client_mock.h"
 
 namespace nx::cloud::oauth2::client::test {
 
@@ -103,6 +103,14 @@ void Oauth2ClientMock::markSessionMfaVerified(
         nx::network::http::Method::post};
     processRequest<std::string, void>(
         path, sessionId, std::move(handler));
+}
+
+void Oauth2ClientMock::notifyAccountUpdated(
+    const db::api::AccountChangedEvent& /*event*/,
+    nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+{
+    // We don't want to check this handler in most cdb tests
+    return completionHandler(db::api::ResultCode::ok);
 }
 
 

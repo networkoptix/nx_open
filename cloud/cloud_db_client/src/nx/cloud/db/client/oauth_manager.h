@@ -67,11 +67,6 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::jwk::Key)>
             completionHandler) override;
 
-    virtual void getAccSecuritySettingsChangedEvents(
-        const api::GetAccSecuritySettingsChangedEventsRequest& request,
-        nx::utils::MoveOnlyFunc<void(api::ResultCode,
-            api::GetAccSecuritySettingsChangedEventsResponse)> completionHandler) override;
-
 private:
     ApiRequestsExecutor* m_requestsExecutor = nullptr;
 };

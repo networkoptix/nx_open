@@ -67,6 +67,10 @@ public:
         const std::string& sessionId,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) = 0;
 
+    virtual void notifyAccountUpdated(
+        const db::api::AccountChangedEvent& event,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) = 0;
+
     // TODO: #anekrasov Do we need this?
     virtual void internalClientLogout(
         const std::string& email,
@@ -100,7 +104,7 @@ class Oauth2Client:
 public:
     Oauth2Client(
         const nx::utils::Url& url,
-        const nx::network::http::Credentials& credentials);
+        const std::optional<nx::network::http::Credentials>& credentials);
 
     void issueToken(
         const db::api::IssueTokenRequest& request,
@@ -160,10 +164,14 @@ public:
     void markSessionMfaVerified(
         const std::string& sessionId,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
+
+    void notifyAccountUpdated(
+        const db::api::AccountChangedEvent& event,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
 };
 
 using Oauth2ClientFactoryFunc = std::unique_ptr<AbstractOauth2Client>(
-    const nx::utils::Url&, const nx::network::http::Credentials&);
+    const nx::utils::Url&, const std::optional<nx::network::http::Credentials>&);
 
 class Oauth2ClientFactory: public nx::utils::BasicFactory<Oauth2ClientFactoryFunc>
 {

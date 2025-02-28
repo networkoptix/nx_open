@@ -103,7 +103,11 @@ public:
         const std::string& sessionId,
         nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> handler) override;
 
-private:
+    void notifyAccountUpdated(
+        const db::api::AccountChangedEvent& /*event*/,
+        nx::utils::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
+protected:
     template <class Request, class Response, class CompletionHandler>
     void processRequest(
         const Oauth2ClientMockManager::RequestPath& requestPath,
