@@ -63,6 +63,8 @@ void registerDeviceBaseHandlers(
      * %param[ref] _local,_strict
      * %permissions View Archive on selected Device.
      * %return:{ServerTimePeriodList} List of recorded chunks.
+     *     %param durationMs Duration in milliseconds. For the video chunk currently being
+     *         recorded is not presented or `0` is returned.
      *
      **%apidoc GET /rest/v{3-}/devices/%2A/footage
      * Retrieves the recorded chunks info for all Devices in the Site.
@@ -75,6 +77,8 @@ void registerDeviceBaseHandlers(
      * %param[ref] _local,_strict
      * %permissions View Archive on some Devices.
      * %return:{std::map<nx::Uuid, ServerTimePeriodList>} List of recorded chunks.
+     *     %param *[].durationMs Duration in milliseconds. For the video chunk currently being
+     *         recorded is not presented or `0` is returned.
      */
     reg("rest/v{1-}/devices/:id/footage", GlobalPermission::none,
         std::make_unique<DeviceFootageHandler>(serverModule, serverConnector));
