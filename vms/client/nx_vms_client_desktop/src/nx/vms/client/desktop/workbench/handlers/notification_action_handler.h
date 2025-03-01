@@ -24,14 +24,13 @@ public:
     NotificationActionHandler(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~NotificationActionHandler() override;
 
-    void setSystemHealthEventVisible(
-        MessageType message, const QnResourcePtr& resource, bool visible);
-
     void removeNotification(const vms::event::AbstractActionPtr& action);
 
 signals:
-    void systemHealthEventAdded(MessageType message, const QVariant& params);
-    void systemHealthEventRemoved(MessageType message, const QVariant& params);
+    void systemHealthEventAdded(
+        MessageType message, const nx::vms::event::AbstractActionPtr& action);
+    void systemHealthEventRemoved(
+        MessageType message, const nx::vms::event::AbstractActionPtr& action);
 
     void cleared();
 
@@ -43,16 +42,8 @@ private:
     void at_serviceDisabled(
         nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
 
-    void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
-
-    void addSystemHealthEvent(
-        MessageType message,
-        const nx::vms::event::AbstractActionPtr& action);
-
-    void setSystemHealthEventVisibleInternal(
-        MessageType message,
-        const QVariant& params,
-        bool visible);
+    void setSystemHealthEventVisible(
+        const nx::vms::event::AbstractActionPtr& action, bool visible);
 };
 
 } // namespace nx::vms::client::desktop

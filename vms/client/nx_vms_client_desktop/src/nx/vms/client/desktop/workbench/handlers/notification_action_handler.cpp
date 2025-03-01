@@ -270,8 +270,10 @@ NotificationActionHandler::NotificationActionHandler(
     connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, this,
         [this](const nx::Uuid& id)
         {
-            const auto resource = system()->resourcePool()->getResourceById(id);
-            setSystemHealthEventVisible(MessageType::replacedDeviceDiscovered, resource, false);
+            setSystemHealthEventVisible(
+                nx::vms::event::SystemHealthActionPtr::create(
+                    MessageType::replacedDeviceDiscovered, id),
+                false);
         });
 
     const auto eventConnector = systemContext->serverRuntimeEventConnector();
@@ -294,44 +296,19 @@ void NotificationActionHandler::clear()
     emit cleared();
 }
 
-void NotificationActionHandler::addNotification(const vms::event::AbstractActionPtr &action)
+void NotificationActionHandler::removeNotification(const vms::event::AbstractActionPtr& action)
 {
-    const auto healthMessage = action->eventType() - vms::api::EventType::siteHealthEvent;
-    addSystemHealthEvent((MessageType)healthMessage, action);
+    NX_VERBOSE(this, "Removing notification: %1", toString(action));
 
-    NX_VERBOSE(this, "A notification is added: %1", toString(action));
-}
-
-void NotificationActionHandler::addSystemHealthEvent(
-    MessageType message, const vms::event::AbstractActionPtr& action)
-{
-    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
+    if (const auto eventType = action->eventType(); isSiteHealth(eventType))
+        setSystemHealthEventVisible(action, false);
 }
 
 void NotificationActionHandler::setSystemHealthEventVisible(
-    MessageType message, const QnResourcePtr& resource, bool visible)
-{
-    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(resource), visible);
-}
-
-void NotificationActionHandler::removeNotification(const vms::event::AbstractActionPtr& action)
-{
-    if (const auto eventType = action->eventType(); isSiteHealth(eventType))
-    {
-        const int healthMessage = eventType - vms::api::EventType::siteHealthEvent;
-
-        setSystemHealthEventVisibleInternal(
-            MessageType(healthMessage), QVariant::fromValue(action), false);
-    }
-
-    NX_VERBOSE(this, "A notification is removed: %1", toString(action));
-}
-
-void NotificationActionHandler::setSystemHealthEventVisibleInternal(
-    MessageType message, const QVariant& params, bool visible)
+    const nx::vms::event::AbstractActionPtr& action, bool visible)
 {
     bool canShow = true;
-
+    const auto message = (MessageType)(action->eventType() - EventType::siteHealthEvent);
     const bool connected = !system()->user().isNull();
 
     if (!connected)
@@ -375,9 +352,9 @@ void NotificationActionHandler::setSystemHealthEventVisibleInternal(
         message);
 
     if (visible && canShow)
-        emit systemHealthEventAdded(message, params);
+        emit systemHealthEventAdded(message, action);
     else
-        emit systemHealthEventRemoved(message, params);
+        emit systemHealthEventRemoved(message, action);
 }
 
 void NotificationActionHandler::at_context_userChanged()
@@ -408,16 +385,16 @@ void NotificationActionHandler::at_serviceDisabled(
             return;
     }
 
-    auto resources = system()->resourcePool()->getResourcesByIds(deviceIds);
-    setSystemHealthEventVisibleInternal(messageType, QVariant::fromValue(resources), true);
+    auto action = nx::vms::event::SystemHealthActionPtr::create(messageType);
+    for (auto id: deviceIds)
+        action->getRuntimeParams().metadata.cameraRefs.push_back(id.toSimpleString());
+
+    setSystemHealthEventVisible(action, true);
 }
 
 void NotificationActionHandler::onSystemHealthMessage(
     const nx::vms::event::AbstractActionPtr& action)
 {
-    NX_ASSERT(action->actionType() == nx::vms::api::ActionType::showPopupAction,
-        "Old engine is disabled, so only system health events should get here.");
-
     NX_VERBOSE(this, "An action is received: %1", toString(action));
 
     const auto user = system()->user();
@@ -446,7 +423,8 @@ void NotificationActionHandler::onSystemHealthMessage(
     {
         case vms::api::EventState::undefined:
         case vms::api::EventState::active:
-            addNotification(action);
+            NX_VERBOSE(this, "Adding Site health message: %1", toString(action));
+            setSystemHealthEventVisible(action, true);
             break;
 
         case vms::api::EventState::inactive:

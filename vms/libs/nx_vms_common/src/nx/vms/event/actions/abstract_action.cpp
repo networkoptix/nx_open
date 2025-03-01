@@ -208,17 +208,6 @@ const QVector<nx::Uuid>& AbstractAction::getResources() const
     return m_resources;
 }
 
-QnResourceList AbstractAction::getSourceResources(const QnResourcePool* resourcePool) const
-{
-    NX_ASSERT(m_params.useSource, "Method should be called only when corresponding parameter is set.");
-
-    const auto sourceResources = event::sourceResources(m_runtimeParams, resourcePool);
-    if (!sourceResources)
-        return {};
-
-    return *sourceResources;
-}
-
 void AbstractAction::setParams(const ActionParameters& params)
 {
     m_params = params;

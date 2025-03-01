@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <nx/reflect/enum_instrument.h>
-#include <nx/vms/event/event_fwd.h>
 
 namespace nx::vms::common { class SystemContext; }
 
@@ -34,12 +33,8 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
 
     cloudPromo = 13, //< Promo message. Generated on the client side.
 
-    // TODO: Remove these in VMS-7724.
-    remoteArchiveSyncFinished = 15,
-    remoteArchiveSyncProgress = 16,
-    remoteArchiveSyncError = 17,
-
-    archiveIntegrityFailed = 18,
+    remoteArchiveSyncError = 17, //< Generated on the server side.
+    archiveIntegrityFailed = 18, //< Generated on the server side.
 
     defaultCameraPasswords = 19, //< Generated on the client side.
     noInternetForTimeSync = 20, //< Generated on the client side.
@@ -47,10 +42,6 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
 
     cameraRecordingScheduleIsInvalid = 22, //< Generated on the client side.
     replacedDeviceDiscovered = 23, //< Camera discovered is currently replaced by the given one.
-
-    remoteArchiveSyncAvailable = 24,
-    remoteArchiveSyncStopSchedule = 25,
-    remoteArchiveSyncStopAutoMode = 26,
 
     metadataStorageNotSet = 27, //< Generated on the client side.
     metadataOnSystemStorage = 28, //< Generated on the client side.
@@ -85,7 +76,7 @@ NX_REFLECTION_ENUM_CLASS(MessageType,
     notificationLanguageDiffers = 37,
 
     /**
-     * Show a warning that current Saas Tier is overused.
+     * Show a warning that current Saas Tier is overused. Generated on the client side.
      */
     saasTierIssue = 38,
 

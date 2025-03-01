@@ -55,15 +55,15 @@ struct CallAlarmManager::Private
             return;
 
         connections << connect(handler, &NotificationActionHandler::systemHealthEventAdded, q,
-            [this](system_health::MessageType message, const QVariant& params)
+            [this](system_health::MessageType message, const nx::vms::event::AbstractActionPtr& action)
             {
-                handleEventAddedOrRemoved(message, params, /*added*/ true);
+                handleEventAddedOrRemoved(message, action, /*added*/ true);
             });
 
         connections << connect(handler, &NotificationActionHandler::systemHealthEventRemoved, q,
-            [this](system_health::MessageType message, const QVariant& params)
+            [this](system_health::MessageType message, const nx::vms::event::AbstractActionPtr& action)
             {
-                handleEventAddedOrRemoved(message, params, /*added*/ false);
+                handleEventAddedOrRemoved(message, action, /*added*/ false);
             });
     }
 
@@ -80,13 +80,9 @@ struct CallAlarmManager::Private
     }
 
     void handleEventAddedOrRemoved(
-        system_health::MessageType message, const QVariant& params, bool added)
+        system_health::MessageType message, const nx::vms::event::AbstractActionPtr& action, bool added)
     {
-        if (!active || message != system_health::MessageType::showIntercomInformer)
-            return;
-
-        const auto action = params.value<nx::vms::event::AbstractActionPtr>();
-        if (!action)
+        if (!active || !action || message != system_health::MessageType::showIntercomInformer)
             return;
 
         const auto& runtimeParameters = action->getRuntimeParams();

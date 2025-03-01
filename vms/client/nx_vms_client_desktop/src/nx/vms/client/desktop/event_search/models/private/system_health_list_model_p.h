@@ -4,15 +4,14 @@
 
 #include <deque>
 
-#include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
-#include <QtGui/QAction>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/menu/action_fwd.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/common/system_health/message_type.h>
+#include <nx/vms/event/event_parameters.h>
 
 #include "../system_health_list_model.h"
 
@@ -56,9 +55,10 @@ public:
     void remove(int first, int count);
 
 private:
-    void doAddItem(MessageType message, const QVariant& params, bool initial);
-    void addItem(MessageType message, const QVariant& params);
-    void removeItem(MessageType message, const QVariant& params);
+    void doAddItem(
+        MessageType message, const nx::vms::event::AbstractActionPtr& action, bool initial);
+    void addItem(MessageType message, const nx::vms::event::AbstractActionPtr& action);
+    void removeItem(MessageType message, const nx::vms::event::AbstractActionPtr& action);
     void removeItemForResource(MessageType message, const QnResourcePtr& resource);
     void toggleItem(MessageType message, bool isOn);
     void updateItem(MessageType message);
@@ -74,8 +74,6 @@ private:
 private:
     struct Item
     {
-        Item() = default;
-        Item(MessageType message, const QnResourceList& resources);
         QnResourcePtr getResource() const;
 
         operator MessageType() const { return message; } //< Implicit by design.
@@ -85,7 +83,8 @@ private:
 
         MessageType message = MessageType::count;
         QnResourceList resources;
-        vms::event::AbstractActionPtr serverData;
+        nx::common::metadata::Attributes attributes;
+        std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
     };
 
 private:

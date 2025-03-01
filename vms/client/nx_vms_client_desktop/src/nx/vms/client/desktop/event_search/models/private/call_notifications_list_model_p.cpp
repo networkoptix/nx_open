@@ -105,17 +105,10 @@ CallNotificationsListModel::Private::~Private()
 
 void CallNotificationsListModel::Private::addNotification(
     MessageType message,
-    const QVariant& params)
+    const nx::vms::event::AbstractActionPtr& action)
 {
     if (!messageIsSupported(message))
         return; //< Message type is processed in a separate model.
-
-    vms::event::AbstractActionPtr action;
-    if (params.canConvert<vms::event::AbstractActionPtr>())
-        action = params.value<vms::event::AbstractActionPtr>();
-
-    if (!NX_ASSERT(action))
-        return;
 
     const auto& runtimeParameters = action->getRuntimeParams();
 
@@ -213,17 +206,10 @@ void CallNotificationsListModel::Private::addNotification(
 
 void CallNotificationsListModel::Private::removeNotification(
     MessageType message,
-    const QVariant& params)
+    const nx::vms::event::AbstractActionPtr& action)
 {
     if (!messageIsSupported(message))
         return; //< Message type is processed in a separate model.
-
-    vms::event::AbstractActionPtr action;
-    if (params.canConvert<vms::event::AbstractActionPtr>())
-        action = params.value<vms::event::AbstractActionPtr>();
-
-    if (!NX_ASSERT(action))
-        return;
 
     const auto id = action->getRuntimeParams().eventResourceId;
     if (id.isNull())

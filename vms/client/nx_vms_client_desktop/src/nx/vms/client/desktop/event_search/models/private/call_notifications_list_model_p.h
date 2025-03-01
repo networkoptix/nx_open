@@ -25,10 +25,10 @@ public:
 private:
     void addNotification(
         nx::vms::common::system_health::MessageType message,
-        const QVariant& params);
+        const nx::vms::event::AbstractActionPtr& action);
     void removeNotification(
         nx::vms::common::system_health::MessageType message,
-        const QVariant& params);
+        const nx::vms::event::AbstractActionPtr& action);
     QString tooltip(
         nx::vms::common::system_health::MessageType message,
         const QnVirtualCameraResourcePtr& camera) const;

@@ -93,14 +93,6 @@ namespace nx::vms::client::desktop {
 //-------------------------------------------------------------------------------------------------
 // SystemHealthListModel::Private::Item definition.
 
-SystemHealthListModel::Private::Item::Item(
-    MessageType message,
-    const QnResourceList& resources)
-    :
-    message(message),
-    resources(resources)
-{
-}
 
 QnResourcePtr SystemHealthListModel::Private::Item::getResource() const
 {
@@ -248,13 +240,11 @@ QString SystemHealthListModel::Private::title(int index) const
 
             static const auto kDeviceNameColor = core::ColorTheme::instance()->color("light10");
 
-            const auto attributes = item.serverData->getRuntimeParams().attributes;
-
             const auto caption = tr("Replaced camera discovered");
 
             auto result = html::paragraph(caption);
             if (const auto discoveredDeviceModel =
-                system_health::getDeviceModelFromAttributes(attributes))
+                system_health::getDeviceModelFromAttributes(item.attributes))
             {
                 result += html::paragraph(html::colored(*discoveredDeviceModel, kDeviceNameColor));
             }
@@ -279,7 +269,7 @@ QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) 
 
         case MessageType::remoteArchiveSyncError:
         case MessageType::archiveIntegrityFailed:
-            return m_items[index].serverData->getSourceResources(system()->resourcePool());
+            m_items[index].resources;
 
         case MessageType::defaultCameraPasswords:
         case MessageType::usersEmailIsEmpty:
@@ -308,7 +298,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         if (!NX_ASSERT(camera, "Invalid notification parameter"))
             return {};
 
-        const auto attributes = item.serverData->getRuntimeParams().attributes;
+        const auto& attributes = item.attributes;
         const auto discoveredDeviceUrl = system_health::getDeviceUrlFromAttributes(attributes);
         const auto discoveredDeviceModel = system_health::getDeviceModelFromAttributes(attributes);
 
@@ -452,8 +442,7 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
     switch (item.message)
     {
         case MessageType::remoteArchiveSyncError:
-            return QVariant::fromValue(std::chrono::microseconds(
-                item.serverData->getRuntimeParams().eventTimestampUsec));
+            return QVariant::fromValue(item.timestamp);
 
         default:
             return {};
@@ -674,9 +663,9 @@ common::system_health::MessageType SystemHealthListModel::Private::messageType(i
 }
 
 void SystemHealthListModel::Private::addItem(
-    MessageType message, const QVariant& params)
+    MessageType message, const nx::vms::event::AbstractActionPtr& action)
 {
-    doAddItem(message, params, false /*initial*/);
+    doAddItem(message, action, false /*initial*/);
 }
 
 QSet<QnResourcePtr> SystemHealthListModel::Private::getResourceSet(
@@ -709,7 +698,7 @@ QnResourceList SystemHealthListModel::Private::getSortedResourceList(
 }
 
 void SystemHealthListModel::Private::doAddItem(
-    MessageType message, const QVariant& params, bool initial)
+    MessageType message, const nx::vms::event::AbstractActionPtr& action, bool initial)
 {
     NX_VERBOSE(this, "Adding a system health message %1", message);
 
@@ -731,28 +720,18 @@ void SystemHealthListModel::Private::doAddItem(
         }
     }
 
-    QnResourceList resources;
-    if (params.canConvert<QnResourcePtr>())
-        resources << params.value<QnResourcePtr>();
-    else if (params.canConvert<QnResourceList>())
-        resources = params.value<QnResourceList>();
+    auto item = Item{message};
 
-    vms::event::AbstractActionPtr action;
-    if (params.canConvert<vms::event::AbstractActionPtr>())
+    if (action)
     {
-        action = params.value<vms::event::AbstractActionPtr>();
-        if (action)
-        {
-            const auto sourceResources = event::sourceResources(
-                action->getRuntimeParams(),
-                system()->resourcePool());
-            if (sourceResources)
-                resources = *sourceResources;
-        }
-    }
+        const auto& eventParams = action->getRuntimeParams();
 
-    Item item(message, resources);
-    item.serverData = action;
+        item.attributes = eventParams.attributes;
+        item.timestamp = std::chrono::microseconds(eventParams.eventTimestampUsec);
+
+        if (auto sourceResources = event::sourceResources(eventParams, system()->resourcePool()))
+            item.resources = std::move(*sourceResources);
+    }
 
     auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
     const auto index = std::distance(m_items.begin(), position);
@@ -768,19 +747,18 @@ void SystemHealthListModel::Private::doAddItem(
 }
 
 void SystemHealthListModel::Private::removeItem(
-    MessageType message,
-    const QVariant& params)
+    MessageType message, const nx::vms::event::AbstractActionPtr& action)
 {
     if (!messageIsSupported(message))
         return; //< Message type is processed in a separate model.
 
-    QnResourcePtr resource;
-    if (params.canConvert<QnResourcePtr>())
-        resource = params.value<QnResourcePtr>();
-
-    if (resource)
+    if (message == MessageType::replacedDeviceDiscovered)
     {
-        removeItemForResource(message, resource);
+        if (const auto resource = system()->resourcePool()->getResourceById(
+            action->getRuntimeParams().eventResourceId))
+        {
+            removeItemForResource(message, resource);
+        }
     }
     else
     {
@@ -799,7 +777,7 @@ void SystemHealthListModel::Private::removeItemForResource(
 {
     NX_VERBOSE(this, "Removing a system health message %1", toString(message));
 
-    const Item item(message, QnResourceList() << resource);
+    const auto item = Item{.message = message, .resources = {resource}};
     const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
     if (position != m_items.cend() && *position == item)
         q->removeRows(std::distance(m_items.cbegin(), position), 1);
@@ -815,7 +793,7 @@ void SystemHealthListModel::Private::toggleItem(MessageType message, bool isOn)
 
 void SystemHealthListModel::Private::updateItem(MessageType message)
 {
-    Item item(message, {});
+    const auto item = Item{.message = message};
     const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
 
     if (position == m_items.end() || *position != item)

@@ -87,15 +87,10 @@ bool isMessageVisibleInSettings(MessageType message)
     {
         case MessageType::cloudPromo:
         case MessageType::defaultCameraPasswords:
-        case MessageType::remoteArchiveSyncAvailable:
         case MessageType::notificationLanguageDiffers:
 
         // TODO: Remove in VMS-7724.
-        case MessageType::remoteArchiveSyncFinished:
-        case MessageType::remoteArchiveSyncProgress:
         case MessageType::remoteArchiveSyncError:
-        case MessageType::remoteArchiveSyncStopSchedule:
-        case MessageType::remoteArchiveSyncStopAutoMode:
         case MessageType::replacedDeviceDiscovered:
             return false;
 
