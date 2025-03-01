@@ -1018,7 +1018,7 @@
     </message>
     <message>
       <source>Omit Logging</source>
-      <translation>Pomiń logowanie</translation>
+      <translation>Pomiń logowanie w dzienniku</translation>
     </message>
   </context>
   <context>
