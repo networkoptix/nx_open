@@ -8,7 +8,6 @@
 #include <QtWidgets/QWidget>
 
 #include <nx/vms/common/system_health/message_type.h>
-#include <nx/vms/event/event_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -34,12 +33,12 @@ public:
     virtual bool hasChanges() const override;
 
 private:
-    QList<api::EventType> watchedEvents() const;
+    QStringList watchedEvents() const;
     QList<common::system_health::MessageType> watchedMessages() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
-    QMap<api::EventType, QCheckBox*> m_eventRulesCheckBoxes;
+    QMap<QString, QCheckBox*> m_eventRulesCheckBoxes;
     QMap<common::system_health::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     bool m_updating;
     UserNotificationSettingsManager* const m_userNotificationSettingsManager;

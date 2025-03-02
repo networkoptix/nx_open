@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <nx/vms/api/types/event_rule_types.h>
-
 #include "../basic_event.h"
 
 namespace nx::vms::api { struct UserSettings; }
@@ -52,9 +50,6 @@ NX_VMS_RULES_API QSet<State> getPossibleFilterStatesForEventDescriptor(
 
 NX_VMS_RULES_API QSet<State> getPossibleFilterStatesForEventFilter(
     const Engine* engine, const EventFilter* eventFilter);
-
-NX_VMS_RULES_API bool isEventWatched(const nx::vms::api::UserSettings& settings,
-    nx::vms::api::EventType eventType);
 
 NX_VMS_RULES_API bool isEventWatched(const nx::vms::api::UserSettings& settings,
     const QString& eventType);

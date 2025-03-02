@@ -2,6 +2,8 @@
 
 #include "user_notification_settings_manager.h"
 
+#include <ranges>
+
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/user.h>
@@ -9,48 +11,28 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
-#include <nx/vms/common/saas/saas_utils.h>
-#include <nx/vms/event/helpers.h>
-#include <nx/vms/event/migration_utils.h>
+#include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/utils/compatibility.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common::system_health;
+using namespace nx::vms::rules;
 
 namespace {
 
-using namespace event;
+using namespace nx::vms::rules::utils;
 
-static const std::set<EventType> kEventsNotSupportedBySoftwareLicenseMode{
-    EventType::saasIssueEvent
-};
+static const auto kAllEventFilters = ItemFilters{isItemActual, isItemExternal};
+static const auto kVisibleEventFilters = ItemFilters(kAllEventFilters) << isItemSupportedLicense;
 
-static const std::set<EventType> kEventsNotSupportedBySaas{
-    EventType::licenseIssueEvent
-};
-
-/**
- * @return Predicate that returns true for an event that is supported by the licensing model of
- *     the system described by the given system context.
- */
-EventTypePredicate isApplicableForLicensingMode(SystemContext* systemContext)
+QStringList filterEvents(SystemContext* context, const ItemFilters& filters)
 {
-    const auto isSaasSystem = common::saas::saasInitialized(systemContext);
-    return
-        [isSaasSystem](const EventType eventType)
-        {
-            return isSaasSystem
-                ? !kEventsNotSupportedBySaas.contains(eventType)
-                : !kEventsNotSupportedBySoftwareLicenseMode.contains(eventType);
-        };
-}
-
-QList<EventType> visibleInSettingsEvents(SystemContext* systemContext)
-{
-    return allEvents({isNonDeprecatedEvent, isApplicableForLicensingMode(systemContext)});
+    return nx::utils::toQList(
+        filterItems(context, filters, context->vmsRulesEngine()->events().values())
+            | std::views::transform([](const auto& desc) { return desc.id; }));
 }
 
 } // namespace
@@ -78,17 +60,17 @@ UserNotificationSettingsManager::UserNotificationSettingsManager(
     onCurrentUserChanged(systemContext->user());
 }
 
-QList<api::EventType> UserNotificationSettingsManager::allEvents() const
+QStringList UserNotificationSettingsManager::allEvents() const
 {
-    return nx::vms::event::allEvents();
+    return filterEvents(systemContext(), kAllEventFilters);
 }
 
-const QList<api::EventType>& UserNotificationSettingsManager::supportedEventTypes() const
+const QStringList& UserNotificationSettingsManager::supportedEventTypes() const
 {
     return m_supportedEventTypes;
 }
 
-const QList<api::EventType>& UserNotificationSettingsManager::watchedEvents() const
+const QStringList& UserNotificationSettingsManager::watchedEvents() const
 {
     return m_watchedEventTypes;
 }
@@ -109,7 +91,7 @@ const QList<common::system_health::MessageType>& UserNotificationSettingsManager
 }
 
 void UserNotificationSettingsManager::setSettings(
-    const QList<api::EventType>& events,
+    const QStringList& events,
     const QList<common::system_health::MessageType>& messages)
 {
     if (!m_currentUser || (messages == watchedMessages() && events == watchedEvents()))
@@ -124,13 +106,13 @@ void UserNotificationSettingsManager::setSettings(
         for (auto e: m_supportedEventTypes)
         {
             if (!events.contains(e))
-                banListOfEvents.insert(event::convertToNewEvent(e).toStdString());
+                banListOfEvents.insert(e.toStdString());
         }
 
         // Unsupported at the moment types must not be lost.
         for (const auto& e: userSettings.eventFilter)
         {
-            if (!m_supportedEventTypes.contains(event::convertToOldEvent(QString::fromStdString(e))))
+            if (!m_supportedEventTypes.contains(QString::fromStdString(e)))
                 banListOfEvents.insert(e);
         }
 
@@ -214,7 +196,7 @@ void UserNotificationSettingsManager::updateSupportedTypes()
     m_supportedMessageTypes = nx::utils::toQList(allMessageTypes(
         {isMessageVisibleInSettings, isMessageApplicableForLicensingMode(systemContext())}));
 
-    m_supportedEventTypes = visibleInSettingsEvents(systemContext());
+    m_supportedEventTypes = filterEvents(systemContext(), kVisibleEventFilters);
 }
 
 void UserNotificationSettingsManager::updateWatchedTypes()
@@ -232,8 +214,7 @@ void UserNotificationSettingsManager::updateWatchedTypes()
     m_watchedEventTypes = m_supportedEventTypes;
     for (const auto& blockedEventType: userSettings.eventFilter)
     {
-        m_watchedEventTypes.removeOne(
-            event::convertToOldEvent(QString::fromStdString(blockedEventType)));
+        m_watchedEventTypes.removeOne(QString::fromStdString(blockedEventType));
     }
 
     m_watchedMessageTypes = m_supportedMessageTypes;

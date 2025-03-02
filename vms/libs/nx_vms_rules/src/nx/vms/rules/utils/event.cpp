@@ -174,11 +174,6 @@ QSet<State> getPossibleFilterStatesForEventFilter(
     return getPossibleFilterStates(getEventDurationType(engine, eventFilter));
 }
 
-bool isEventWatched(const nx::vms::api::UserSettings& settings, nx::vms::api::EventType eventType)
-{
-    return isEventWatched(settings, event::convertToNewEvent(eventType));
-}
-
 bool isEventWatched(const nx::vms::api::UserSettings& settings, const QString& eventType)
 {
     return !settings.eventFilter.contains(eventType.toStdString());

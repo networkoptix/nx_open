@@ -29,9 +29,6 @@ NX_VMS_RULES_API bool isItemActual(
 NX_VMS_RULES_API bool isItemExternal(
     const nx::vms::common::SystemContext* context, const ItemDescriptor& manifest);
 
-NX_VMS_RULES_API bool isItemInternal(
-    const nx::vms::common::SystemContext* context, const ItemDescriptor& manifest);
-
 NX_VMS_RULES_API ItemFilters defaultItemFilters();
 
 /** Filter manifest with predicate list. */

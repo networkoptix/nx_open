@@ -380,8 +380,7 @@ void NotificationListWidget::Private::updateFilterNotificationsButtonAppearance(
         if (!watchedEvents.empty())
         {
             m_filterNotificationsButton->setText(rules::Strings::eventName(
-                system(),
-                event::convertToNewEvent(watchedEvents.first())));
+                system(), watchedEvents.first()));
         }
         else
         {

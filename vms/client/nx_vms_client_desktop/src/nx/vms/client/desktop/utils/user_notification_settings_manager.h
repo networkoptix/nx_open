@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/common/system_health/message_type.h>
@@ -19,15 +18,15 @@ public:
         SystemContext* systemContext, QObject* parent = nullptr);
 
     /** List of all events that may appear in settings. */
-    QList<api::EventType> allEvents() const;
+    QStringList allEvents() const;
 
     /** Returns event types supported by the system. */
-    const QList<api::EventType>& supportedEventTypes() const;
+    const QStringList& supportedEventTypes() const;
 
     /**
      * Returns event types watched by the current user or empty list if there is no current user.
      */
-    const QList<api::EventType>& watchedEvents() const;
+    const QStringList& watchedEvents() const;
 
     /** List of all events that may appear in settings. */
     const QList<common::system_health::MessageType> allMessages() const;
@@ -43,7 +42,7 @@ public:
      * nothing has been changed.
      */
     void setSettings(
-        const QList<api::EventType>& events,
+        const QStringList& events,
         const QList<common::system_health::MessageType>& messages);
 
 signals:
@@ -55,8 +54,10 @@ signals:
 
 private:
     core::UserResourcePtr m_currentUser;
-    QList<api::EventType> m_supportedEventTypes;
-    QList<api::EventType> m_watchedEventTypes;
+
+    QStringList m_supportedEventTypes;
+    QStringList m_watchedEventTypes;
+
     QList<common::system_health::MessageType> m_supportedMessageTypes;
     QList<common::system_health::MessageType> m_watchedMessageTypes;
 

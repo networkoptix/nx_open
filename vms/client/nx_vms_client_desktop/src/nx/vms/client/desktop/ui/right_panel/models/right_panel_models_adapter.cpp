@@ -1001,13 +1001,13 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
             using nx::vms::api::EventType;
             using namespace nx::vms::event;
             eventsModel->setDefaultEventTypes({
-                eventTypesMap[EventType::analyticsSdkEvent],
-                eventTypesMap[EventType::cameraDisconnectEvent],
-                eventTypesMap[EventType::cameraInputEvent],
-                eventTypesMap[EventType::cameraIpConflictEvent],
-                eventTypesMap[EventType::networkIssueEvent],
-                eventTypesMap[EventType::softwareTriggerEvent],
-                eventTypesMap[EventType::userDefinedEvent]
+                convertToNewEvent(EventType::analyticsSdkEvent),
+                convertToNewEvent(EventType::cameraDisconnectEvent),
+                convertToNewEvent(EventType::cameraInputEvent),
+                convertToNewEvent(EventType::cameraIpConflictEvent),
+                convertToNewEvent(EventType::networkIssueEvent),
+                convertToNewEvent(EventType::softwareTriggerEvent),
+                convertToNewEvent(EventType::userDefinedEvent)
             });
 
             m_analyticsEvents.reset(

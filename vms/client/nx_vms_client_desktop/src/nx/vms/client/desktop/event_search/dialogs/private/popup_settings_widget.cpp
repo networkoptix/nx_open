@@ -40,12 +40,10 @@ PopupSettingsWidget::PopupSettingsWidget(
 
     setHelpTopic(this, HelpTopic::Id::SystemSettings_Notifications);
 
-    for (auto eventType: m_userNotificationSettingsManager->allEvents())
+    for (const auto& eventType: m_userNotificationSettingsManager->allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(rules::Strings::eventName(
-            systemContext,
-            event::convertToNewEvent(eventType)));
+        checkbox->setText(rules::Strings::eventName(systemContext, eventType));
         ui->businessEventsLayout->addWidget(checkbox);
         m_eventRulesCheckBoxes[eventType] = checkbox;
 
@@ -148,13 +146,13 @@ bool PopupSettingsWidget::hasChanges() const
         || m_userNotificationSettingsManager->watchedEvents() != watchedEvents();
 }
 
-QList<api::EventType> PopupSettingsWidget::watchedEvents() const
+QStringList PopupSettingsWidget::watchedEvents() const
 {
     const auto& eventTypes = m_userNotificationSettingsManager->supportedEventTypes();
     if (ui->showAllCheckBox->isChecked())
         return eventTypes;
 
-    QList<api::EventType> result;
+    QStringList result;
     for (const auto eventType: eventTypes)
     {
         if (m_eventRulesCheckBoxes[eventType]->isChecked())
