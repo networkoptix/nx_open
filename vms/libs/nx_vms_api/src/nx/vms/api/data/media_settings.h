@@ -29,8 +29,8 @@ struct NX_VMS_API MediaSettings
     );
 
     /**%apidoc[opt]
-     *     %value undefined The Server auto-detects the preferred stream index based on the
-     *     destination resolution.
+     * If unspecified, Server auto-detects the preferred stream index based on the destination
+     * resolution.
      */
     StreamIndex stream = nx::vms::api::StreamIndex::undefined;
 

@@ -47,6 +47,7 @@ constexpr auto nxReflectVisitAllEnumItems(StreamIndex*, Visitor&& visitor)
     using Item = nx::reflect::enumeration::Item<StreamIndex>;
     return visitor(
         Item{StreamIndex::undefined, ""},
+        Item{StreamIndex::undefined, "undefined"},
         Item{StreamIndex::primary, "primary"},
         Item{StreamIndex::secondary, "secondary"}
     );
