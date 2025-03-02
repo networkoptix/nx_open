@@ -20,6 +20,39 @@ namespace nx::network::rest {
 
 namespace audit { struct Record; }
 
+namespace json_rpc {
+
+NX_REFLECTION_ENUM_CLASS(Crud,
+    all,
+    one,
+    create,
+    set,
+    update,
+    delete_,
+
+    // 6.0 compatibility.
+    get,
+    list
+);
+
+NX_REFLECTION_ENUM_CLASS(Subs,
+    subscribe,
+    unsubscribe
+);
+
+struct Context
+{
+    nx::json_rpc::Request request;
+    std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
+    bool subscribed = false;
+
+    // Next fields are filled by Request contructor.
+    std::optional<Crud> crud;
+    std::optional<Subs> subs;
+};
+
+} // namespace json_rpc
+
 // TODO: Either make it movable, or `enable_shared_from_this`.
 struct NX_NETWORK_REST_API Request
 {
@@ -43,14 +76,8 @@ public:
         bool isConnectionSecure = true,
         std::optional<Content> content = {});
 
-    struct JsonRpcContext
-    {
-        nx::json_rpc::Request request;
-        std::weak_ptr<nx::json_rpc::WebSocketConnection> connection;
-        bool isSubscription = false;
-    };
     Request(
-        JsonRpcContext jsonRpcContext,
+        json_rpc::Context jsonRpcContext,
         const UserSession& userSession,
         const nx::network::HostAddress& foreignAddress = nx::network::HostAddress(),
         int serverPort = 0);
@@ -65,7 +92,7 @@ public:
     const nx::network::http::Method& method() const;
 
     const std::optional<Content>& content() const { return m_content; }
-    const std::optional<JsonRpcContext>& jsonRpcContext() const { return m_jsonRpcContext; }
+    const std::optional<json_rpc::Context>& jsonRpcContext() const { return m_jsonRpcContext; }
     void updateContent(QJsonValue value);
     void resetParamsCache() { m_paramsCache.reset(); }
     const nx::network::http::Request* httpRequest() const { return m_httpRequest; };
@@ -221,7 +248,7 @@ private:
 
 private:
     const nx::network::http::Request* const m_httpRequest = nullptr;
-    std::optional<JsonRpcContext> m_jsonRpcContext;
+    std::optional<json_rpc::Context> m_jsonRpcContext;
     Params m_urlParams;
     Params m_pathParams;
     nx::network::http::Method m_method;

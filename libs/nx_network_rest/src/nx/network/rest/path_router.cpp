@@ -88,25 +88,56 @@ PathRouter::~PathRouter() {}
 Handler* PathRouter::findHandlerOrThrow(Request* request, const QString& pathIgnorePrefix) const
 {
     auto result = m_root->findHandler(*request, pathIgnorePrefix);
-    if (result.handler)
+    if (!result.handler)
+        return nullptr;
+
+    bool needModify = true;
+    if (auto context = request->jsonRpcContext())
     {
-        if (request->jsonRpcContext())
+        if (context->subs && result.handler->subscriptionId(*request).isEmpty())
+            return nullptr;
+
+        const bool isOne = context->crud == json_rpc::Crud::one;
+        const bool isAll = context->crud == json_rpc::Crud::all;
+        if (isOne || isAll)
         {
-            const auto& method = request->jsonRpcContext()->request.method;
-            if ((method.ends_with(".subscribe") || method.ends_with(".unsubscribe"))
-                && result.handler->subscriptionId(*request).isEmpty())
+            auto idName = result.handler->idParamName();
+            if (!idName.isEmpty())
             {
-                return nullptr;
+                auto originId = request->param(idName);
+                if (isOne && !originId)
+                    throw Exception::missingParameter(idName);
+
+                request->setConcreteIdProvided(result.handler->isConcreteIdProvidedInPath(&result));
+                result.handler->modifyPathRouteResultOrThrow(&result);
+                needModify = false;
+                auto id = result.pathParams.findValue(idName);
+                if (!id || id->isEmpty() || *id == "*"
+                    || *id == nx::Uuid().toString() || *id == nx::Uuid().toSimpleString())
+                {
+                    if (isOne)
+                        throw Exception::invalidParameter(idName, *originId);
+                }
+                else if (isAll)
+                {
+                    result.validationPath.replace("/{" + idName + '}', "/*");
+                    if (result.validationPath.endsWith("/*"))
+                        result.validationPath.resize(result.validationPath.size() - 2);
+                    result.pathParams.remove(idName);
+                    request->setConcreteIdProvided(false);
+                }
             }
         }
+    }
+    if (needModify)
+    {
         request->setConcreteIdProvided(result.handler->isConcreteIdProvidedInPath(&result));
         result.handler->modifyPathRouteResultOrThrow(&result);
-        if (!result.validationPath.isEmpty())
-            request->setDecodedPathOrThrow(result.validationPath);
-        request->setPathParams(std::move(result.pathParams));
-        return result.handler;
     }
-    return nullptr;
+    if (!result.validationPath.isEmpty())
+        request->setDecodedPathOrThrow(result.validationPath);
+    request->setPathParams(std::move(result.pathParams));
+    return result.handler;
 }
 
 std::vector<std::pair<QString, QString>> PathRouter::findOverlaps(const Request& request) const

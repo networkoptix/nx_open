@@ -12,41 +12,75 @@
 
 namespace nx::network::rest {
 
-static std::tuple<nx::network::http::Method, QString> methodAndPath(const std::string& method)
-{
-    static constexpr std::array<std::pair<std::string_view, std::string_view>, 10>
-        kValueTailToMethod = {
-            std::make_pair(std::string_view(".create"), nx::network::http::Method::post),
-            std::make_pair(std::string_view(".all"), nx::network::http::Method::get),
-            std::make_pair(std::string_view(".one"), nx::network::http::Method::get),
-            std::make_pair(std::string_view(".update"), nx::network::http::Method::patch),
-            std::make_pair(std::string_view(".set"), nx::network::http::Method::put),
-            std::make_pair(std::string_view(".delete"), nx::network::http::Method::delete_),
-            std::make_pair(std::string_view(".subscribe"), nx::network::http::Method::get),
-            std::make_pair(std::string_view(".unsubscribe"), nx::network::http::Method::get),
+namespace {
 
-            // 6.0 compatibility.
-            std::make_pair(std::string_view(".get"), nx::network::http::Method::get),
-            std::make_pair(std::string_view(".list"), nx::network::http::Method::get),
-        };
+using Crud = json_rpc::Crud;
+using Subs = json_rpc::Subs;
+
+static std::string crudTail(Crud crud)
+{
+    return '.' + nx::reflect::enumeration::toString(crud);
+}
+
+static std::string subsTail(Subs subs)
+{
+    return '.' + nx::reflect::enumeration::toString(subs);
+}
+
+static std::tuple<http::Method, QString> methodAndPath(json_rpc::Context* context)
+{
+    static const auto kCrudTailToMethod = nx::reflect::enumeration::visitAllItems<Crud>(
+        [](auto&&... items)
+        {
+            static constexpr auto kMethods = std::array{
+                /*Crud::all*/ http::Method::get,
+                /*Crud::one*/ http::Method::get,
+                /*Crud::create*/ http::Method::post,
+                /*Crud::set*/ http::Method::put,
+                /*Crud::update*/ http::Method::patch,
+                /*Crud::delete_*/ http::Method::delete_,
+
+                // 6.0 compatibility.
+                /*Crud::get*/ http::Method::get,
+                /*Crud::list*/ http::Method::get,
+            };
+
+            return std::array{std::make_tuple(
+                crudTail(items.value), kMethods.at((size_t) items.value), items.value)...};
+        });
+
+    static const auto kSubsTails = nx::reflect::enumeration::visitAllItems<Subs>(
+        [](auto&&... e) { return std::array{std::make_pair(subsTail(e.value), e.value)...}; });
+
+    std::string_view method = context->request.method;
+    for (const auto& [tail, subs]: kSubsTails)
+    {
+        if (method.ends_with(tail))
+        {
+            context->subs = subs;
+            method.remove_suffix(tail.size());
+            break;
+        }
+    }
 
     QString path;
-    for (const auto& [valueTail, httpMethod]: kValueTailToMethod)
+    for (const auto& [crudTail, httpMethod, crud]: kCrudTailToMethod)
     {
-        if (method.ends_with(valueTail))
+        if (method.ends_with(crudTail))
         {
-            path = QString::fromLatin1(method.data(), method.size() - valueTail.size());
-            if (path.endsWith(".one") || path.endsWith(".all"))
-                path = path.first(path.length() - 4);
+            context->crud = crud;
+            path = QString::fromUtf8(method.data(), method.size() - crudTail.size());
             path.replace('.', '/');
             return {httpMethod, path};
         }
     }
 
-    path = QString::fromStdString(method);
+    path = QString::fromUtf8(method.data(), method.size());
     path.replace('.', '/');
-    return {nx::network::http::Method::post, path};
+    return {context->subs ? http::Method::get : http::Method::post, path};
 }
+
+} // namespace
 
 Request::Request(
     const http::Request* httpRequest,
@@ -72,7 +106,7 @@ Request::Request(
 }
 
 Request::Request(
-    JsonRpcContext jsonRpcContext,
+    json_rpc::Context jsonRpcContext,
     const UserSession& userSession,
     const nx::network::HostAddress& foreignAddress,
     int serverPort)
@@ -84,10 +118,15 @@ Request::Request(
     m_jsonRpcContext(std::move(jsonRpcContext)),
     m_responseFormat(Qn::SerializationFormat::json)
 {
-    std::tie(m_method, m_decodedPath) = methodAndPath(m_jsonRpcContext->request.method);
+    std::tie(m_method, m_decodedPath) = methodAndPath(&m_jsonRpcContext.value());
 
     if (m_jsonRpcContext->request.method.starts_with("rest."))
+    {
+        m_decodedPath = '/' + m_decodedPath;
+        if (!m_apiVersion)
+            m_apiVersion = apiVersionOrThrow(m_decodedPath);
         return;
+    }
 
     // Fill m_content for legacy and deprecated api.
     if (!m_jsonRpcContext->request.params)

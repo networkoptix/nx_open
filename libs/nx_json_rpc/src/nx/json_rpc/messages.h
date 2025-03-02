@@ -203,7 +203,9 @@ struct NX_JSON_RPC_API Error
     int code = systemError;
     std::string message;
 
-    /**%apidoc[opt]:{QJsonValue} Must be allocated on Response::document. */
+    /**%apidoc[opt]:any
+     * %// Must be allocated on Response::document.
+     */
     rapidjson::Value* data = nullptr;
 
     nx::reflect::DeserializationResult deserialize(rapidjson::Value& json)

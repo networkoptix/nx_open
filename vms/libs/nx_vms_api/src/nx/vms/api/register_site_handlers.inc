@@ -165,7 +165,7 @@ void registerSiteSettingHandlers(
      *     object with single field and actual setting value changed.
      * %caption Get Site settings
      * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket
      * %permissions Any User.
      * %return:{SiteSettings} Site settings and their values.
      *

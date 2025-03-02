@@ -59,6 +59,7 @@ void registerRuleHandlers(
      * %caption Get Event Log
      * %ingroup Events
      * %struct EventLogFilter
+     * %param[unused] serverId
      * %param[ref] _format,_stripDefault,_language,_local,_pretty,_strict,_ticket,_with
      * %permissions Event log and audit trail view.
      * %return:{EventLogRecordList} Server event log.

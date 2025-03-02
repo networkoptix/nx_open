@@ -180,7 +180,7 @@ TEST_F(PathRouterTest, Route)
                 if (type == jsonRpc)
                 {
                     request = std::make_unique<Request>(
-                        Request::JsonRpcContext{nx::json_rpc::Request::create(
+                        json_rpc::Context{nx::json_rpc::Request::create(
                             /*id*/ {}, data.testPath[type].toStdString(), data.params.toJson())},
                         kSystemSession);
                 }

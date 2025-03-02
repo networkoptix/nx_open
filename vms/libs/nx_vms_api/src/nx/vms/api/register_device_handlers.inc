@@ -257,7 +257,7 @@ void registerDeviceBaseHandlers(
      * %ingroup Devices
      * %struct DeviceIoFilter
      * %param:string deviceId
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_ticket,_with
      * %param[ref] _local,_strict
      * %permissions Depends on Resource access rights.
      * %return:{DeviceIoState} IO states from Device.

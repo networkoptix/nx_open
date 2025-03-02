@@ -203,17 +203,35 @@ public:
 
     QString getSubscriptionId(const nx::network::rest::Request& request)
     {
-        using nx::utils::model::getId;
+        using namespace nx::network::rest;
 
-        if (request.method() == nx::network::http::Method::get)
+        const auto it = request.param(this->m_idParamName);
+        if (!it || *it == "*")
+            return QString("*");
+
+        if (it->isEmpty())
+            throw Exception::invalidParameter(this->m_idParamName, *it);
+
+        if (auto c = request.jsonRpcContext(); c && c->crud == json_rpc::Crud::all)
+            return QString("*");
+
+        if (nx::Uuid::isUuidString(*it))
         {
-            return request.params().hasNonRefParameter()
-                ? nx::toString(getId(request.parseContentOrThrow<Filter>()))
-                : QString("*");
+            const auto id = nx::Uuid::fromStringSafe(*it);
+            return id.isNull() ? QString("*") : nx::toString(id);
         }
 
-        NX_ASSERT(false, "Use `get` to `subscribe` or `delete` to `unsubscribe`");
-        return {};
+        if constexpr (requires(Derived* d) { d->flexibleIdToId(*it); })
+        {
+            if (const auto id = static_cast<Derived*>(this)->flexibleIdToId(*it); id.isNull())
+                throw Exception::notFound(NX_FMT("Resource '%1' is not found", *it));
+            else
+                return nx::toString(id);
+        }
+        else
+        {
+            return *it;
+        }
     }
 
 protected:
