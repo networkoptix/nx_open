@@ -204,8 +204,7 @@ bool Request::isExtraFormattingRequired() const
 
 bool Request::isLocal() const
 {
-    static const QString kLocal("_local");
-    return (bool) param(kLocal);
+    return param("_local").value_or("false").toLower() != "false";
 }
 
 Qn::SerializationFormat Request::responseFormatOrThrow() const
