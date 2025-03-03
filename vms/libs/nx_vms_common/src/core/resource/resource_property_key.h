@@ -80,6 +80,7 @@ NX_VMS_COMMON_API extern const QString kNoRecordingParams;
 NX_VMS_COMMON_API extern const QString kCanConfigureRemoteRecording;
 
 NX_VMS_COMMON_API extern const QString kFirmware;
+NX_VMS_COMMON_API extern const QString kCameraSerialNumber;
 NX_VMS_COMMON_API extern const QString kDeviceType;
 NX_VMS_COMMON_API extern const QString kIoConfigCapability;
 

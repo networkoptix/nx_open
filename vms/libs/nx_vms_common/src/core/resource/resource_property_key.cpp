@@ -43,6 +43,7 @@ const QString kNoRecordingParams("noRecordingParams");
 const QString kCanConfigureRemoteRecording("canConfigureRemoteRecording");
 
 const QString kFirmware("firmware");
+const QString kCameraSerialNumber("serialNumber");
 const QString kDeviceType("deviceType");
 const QString kIoConfigCapability("ioConfigCapability");
 

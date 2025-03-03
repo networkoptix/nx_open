@@ -475,6 +475,9 @@ public:
     QString getFirmware() const;
     void setFirmware(const QString &firmware);
 
+    QString getSerialNumber() const;
+    void setSerialNumber(const QString& serialNumber);
+
     bool trustCameraTime() const;
     void setTrustCameraTime(bool value);
 

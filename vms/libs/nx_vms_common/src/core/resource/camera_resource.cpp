@@ -1670,6 +1670,16 @@ void QnVirtualCameraResource::setFirmware(const QString &firmware)
     setProperty(ResourcePropertyKey::kFirmware, fixedFirmware);
 }
 
+QString QnVirtualCameraResource::getSerialNumber() const
+{
+    return getProperty(ResourcePropertyKey::kCameraSerialNumber);
+}
+
+void QnVirtualCameraResource::setSerialNumber(const QString& serialNumber)
+{
+    setProperty(ResourcePropertyKey::kCameraSerialNumber, serialNumber);
+}
+
 bool QnVirtualCameraResource::trustCameraTime() const
 {
     return QnLexical::deserialized<bool>(getProperty(ResourcePropertyKey::kTrustCameraTime));
