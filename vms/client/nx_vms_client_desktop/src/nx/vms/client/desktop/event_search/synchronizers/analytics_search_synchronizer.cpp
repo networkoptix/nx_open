@@ -238,7 +238,11 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         });
 
     connect(commonSetup, &CommonObjectSearchSetup::cameraSelectionChanged, this,
-        &AnalyticsSearchSynchronizer::updateAction);
+        [this]()
+        {
+            const QScopedValueRollback updateGuard(m_updating, true);
+            updateAction();
+        });
 
     connect(system()->userSettings(), &UserSpecificSettings::loaded, this,
         [this]()
