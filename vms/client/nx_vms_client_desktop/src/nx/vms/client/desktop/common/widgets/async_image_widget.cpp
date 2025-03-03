@@ -552,7 +552,6 @@ void AsyncImageWidget::updateThumbnailStatus(core::ThumbnailStatus status)
 
             case core::ThumbnailStatus::NoData:
                 setLoadingIndicationVisible(false);
-                m_placeholder->show();
                 break;
         }
     }
