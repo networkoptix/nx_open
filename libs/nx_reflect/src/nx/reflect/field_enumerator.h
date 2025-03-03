@@ -7,28 +7,14 @@
 
 namespace nx::reflect {
 
-namespace detail {
-
-struct Enumerator
-{
-    template<typename... Fields>
-    constexpr auto operator()(Fields... fields) -> std::array<std::string_view, sizeof...(Fields)>
-    {
-        return std::array<std::string_view, sizeof...(Fields)>{fields.name()...};
-    }
-};
-
-} // namespace detail
-
-//-------------------------------------------------------------------------------------------------
-
 /**
  * @return list of type's fields' names.
  */
 template<typename T>
 static constexpr auto listFieldNames()
 {
-    return nx::reflect::visitAllFields<T>(detail::Enumerator());
+    return nx::reflect::visitAllFields<T>(
+        [](auto&&... fields) { return std::array{std::string_view{fields.name()}...}; });
 }
 
 } // namespace nx::reflect

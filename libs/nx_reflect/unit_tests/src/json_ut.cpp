@@ -629,6 +629,50 @@ TEST_F(Json, std_variable_valueless)
     assertSerializedTo(R"({"v":null})", val);
 }
 
+struct VariantAB
+{
+    int a = 0;
+    int b = 0;
+
+    bool operator==(const VariantAB&) const = default;
+};
+NX_REFLECTION_INSTRUMENT(VariantAB, (a)(b))
+
+struct VariantAC
+{
+    int a = 0;
+    int c = 0;
+
+    bool operator==(const VariantAC&) const = default;
+};
+NX_REFLECTION_INSTRUMENT(VariantAC, (a)(c))
+
+TEST_F(Json, deserialize_variant)
+{
+    using Variant = std::variant<VariantAB, VariantAC>;
+    #define ASSERT_VARIANT(JSON, VALUE) \
+        { \
+            auto [data, r] = nx::reflect::json::deserialize<Variant>(JSON); \
+            ASSERT_TRUE(r); \
+            const Variant expected = VALUE; \
+            ASSERT_EQ(data, expected); \
+        }
+    ASSERT_VARIANT(R"json({"a": 1, "b": 2})json", (VariantAB{1, 2}))
+    ASSERT_VARIANT(R"json({"a": 1, "c": 3})json", (VariantAC{1, 3}))
+    ASSERT_VARIANT(R"json({"c": 3, "a": 1})json", (VariantAC{1, 3}))
+    ASSERT_VARIANT(R"json({"b": 2})json", (VariantAB{0, 2}))
+    ASSERT_VARIANT(R"json({"c": 3})json", (VariantAC{0, 3}))
+
+    #define ASSERT_ERROR(JSON, ERROR) \
+        { \
+            auto [_, r] = nx::reflect::json::deserialize<Variant>(JSON); \
+            ASSERT_FALSE(r); \
+            ASSERT_EQ(r.errorDescription, ERROR); \
+        }
+    ASSERT_ERROR(R"json({"a": 1, "b": 2, "c": 3})json", "`b` is unexpected")
+    ASSERT_ERROR(R"json({"d": 4})json", "`d` is unexpected")
+}
+
 //-------------------------------------------------------------------------------------------------
 
 struct MillisAndInt { std::chrono::milliseconds ms; int n; };

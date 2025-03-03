@@ -12,12 +12,13 @@
 #include <rapidjson/document.h>
 
 #include <nx/reflect/enum_string_conversion.h>
+#include <nx/reflect/field_enumerator.h>
 #include <nx/reflect/from_string.h>
 #include <nx/reflect/generic_visitor.h>
 #include <nx/reflect/instrument.h>
+#include <nx/reflect/tags.h>
 #include <nx/reflect/type_utils.h>
 
-#include "../tags.h"
 #include "utils.h"
 
 namespace nx::reflect {
@@ -96,10 +97,28 @@ template<typename T, typename... Args>
 DeserializationResult deserializeVariantType(
     const DeserializationContext& ctx, std::variant<Args...>* data)
 {
+    using namespace std::string_literals;
+
     T typedData;
     auto r = deserializeValue(ctx, &typedData);
     if (r)
+    {
+        if constexpr (IsInstrumentedV<T>)
+        {
+            constexpr auto names{listFieldNames<T>()};
+            for (auto it = ctx.value.MemberBegin(); it != ctx.value.MemberEnd(); ++it)
+            {
+                const char* name = it->name.GetString();
+                if (std::ranges::none_of(names, [&name](const auto& n) { return n == name; }))
+                {
+                    r.success = false;
+                    r.errorDescription = "`"s + std::string{name} + "` is unexpected"s;
+                    return r;
+                }
+            }
+        }
         *data = typedData;
+    }
 
     return r;
 }
@@ -108,7 +127,10 @@ template<typename... Args>
 DeserializationResult deserialize(const DeserializationContext& ctx, std::variant<Args...>* data)
 {
     DeserializationResult r;
-    return (... || (r = deserializeVariantType<Args>(ctx, data))), r;
+    const DeserializationContext& c = ctx.flags == (int) json::DeserializationFlag::fields
+        ? ctx
+        : DeserializationContext{ctx.value, (int) json::DeserializationFlag::fields};
+    return (... || (r = deserializeVariantType<Args>(c, data))), r;
 }
 
 template<typename... Args>
