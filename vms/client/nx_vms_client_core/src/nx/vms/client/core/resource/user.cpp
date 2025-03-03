@@ -17,11 +17,25 @@ UserResource::UserResource(nx::vms::api::UserType userType, nx::vms::api::UserEx
     connect(this, &QnUserResource::userGroupsChanged, this,
         [this]()
         {
+            std::unordered_set<nx::Uuid> externalOrgGroupIds;
             for (const auto& id: orgGroupIds())
             {
+                externalOrgGroupIds.insert(id);
                 if(!m_externalToLocalOrgGroupIds.contains(id))
                     m_externalToLocalOrgGroupIds[id] = nx::Uuid::createUuid();
             }
+
+            std::erase_if(
+                m_externalToLocalOrgGroupIds,
+                [&externalOrgGroupIds](const auto& pair)
+                {
+                    return !externalOrgGroupIds.contains(pair.first);
+                });
+
+            m_localOrgGroupIds.clear();
+            m_localOrgGroupIds.reserve(m_externalToLocalOrgGroupIds.size());
+            for (const auto& [external, local]: m_externalToLocalOrgGroupIds)
+                m_localOrgGroupIds.push_back(local);
         });
 }
 
@@ -144,6 +158,14 @@ bool UserResource::shouldMaskUser() const
 std::map<nx::Uuid, nx::Uuid> UserResource::mappedOrgGroupIds() const
 {
     return m_externalToLocalOrgGroupIds;
+}
+
+std::vector<nx::Uuid> UserResource::siteAndMappedOrgGroupIds() const
+{
+    auto groups = siteGroupIds();
+    groups.reserve(groups.size() + m_localOrgGroupIds.size());
+    groups.insert(groups.end(), m_localOrgGroupIds.cbegin(), m_localOrgGroupIds.cend());
+    return groups;
 }
 
 } // namespace nx::vms::client::core

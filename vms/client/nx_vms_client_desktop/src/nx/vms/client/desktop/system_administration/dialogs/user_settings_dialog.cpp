@@ -355,8 +355,28 @@ struct UserSettingsDialog::Private
         if (userData.type != nx::vms::api::UserType::cloud)
             userData.isHttpDigestEnabled = state.allowInsecure;
 
+        const auto mappedOrgGroupIds =
+            user ? user->mappedOrgGroupIds() : std::map<nx::Uuid, nx::Uuid>();
+
+        std::map<nx::Uuid, nx::Uuid> reverseMappedOrgGroupIds;
+        for (const auto& [orgId, groupId] : mappedOrgGroupIds)
+            reverseMappedOrgGroupIds[groupId] = orgId;
+
         for (const auto& group: state.parentGroups)
-            userData.groupIds.emplace_back(group.id);
+        {
+            if (const auto it = reverseMappedOrgGroupIds.find(group.id);
+                it != reverseMappedOrgGroupIds.end())
+            {
+                if (!userData.orgGroupIds)
+                    userData.orgGroupIds.emplace();
+
+                userData.orgGroupIds->push_back(it->second);
+            }
+            else
+            {
+                userData.groupIds.emplace_back(group.id);
+            }
+        }
 
         const auto sharedResources = state.sharedResources.asKeyValueRange();
         userData.resourceAccessRights = {sharedResources.begin(), sharedResources.end()};

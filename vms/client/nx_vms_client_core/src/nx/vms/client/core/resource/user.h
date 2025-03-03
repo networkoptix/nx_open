@@ -35,6 +35,7 @@ public:
     virtual bool shouldMaskUser() const override;
 
     virtual std::map<nx::Uuid, nx::Uuid> mappedOrgGroupIds() const override;
+    virtual std::vector<nx::Uuid> siteAndMappedOrgGroupIds() const override;
 
 protected:
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
@@ -47,6 +48,7 @@ private:
      * they need to be mapped to temporary values for distinction.
      */
     std::map<nx::Uuid, nx::Uuid> m_externalToLocalOrgGroupIds;
+    std::vector<nx::Uuid> m_localOrgGroupIds;
 };
 
 using UserResourcePtr = QnSharedResourcePointer<UserResource>;

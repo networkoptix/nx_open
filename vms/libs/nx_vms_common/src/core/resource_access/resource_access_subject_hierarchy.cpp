@@ -45,7 +45,7 @@ public:
         const auto updateUser =
             [this](const QnUserResourcePtr& user)
             {
-                q->addOrUpdate(user->getId(), nx::utils::toQSet(user->allGroupIds()));
+                q->addOrUpdate(user->getId(), nx::utils::toQSet(user->siteAndMappedOrgGroupIds()));
             };
 
         for (const auto& resource: resources)
