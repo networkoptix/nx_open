@@ -451,7 +451,7 @@ void ResourceTreeDragDropDecoratorModel::moveResources(
     {
         if (!cameras.empty())
         {
-            if(!dropParentServer.isNull()
+            if (dropParentServer
                 && cameras.first()->getParentId() != dropParentServer->getId())
             {
                 m_actionHandler->moveResourcesToServer(
@@ -466,8 +466,11 @@ void ResourceTreeDragDropDecoratorModel::moveResources(
         }
 
         // Web pages can only be moved within a server.
-        if (!webPages.empty() && webPages.first()->getParentId() == dropParentServer->getId())
+        if (dropParentServer && !webPages.empty()
+            && webPages.first()->getParentId() == dropParentServer->getId())
+        {
             moveResourcesToGroup(webPages);
+        }
     }
     else
     {
