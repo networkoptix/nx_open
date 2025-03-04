@@ -178,6 +178,9 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::engineChanged,
         this, &AnalyticsSearchSynchronizer::updateWorkbench);
 
+    connect(m_analyticsSetup, &core::AnalyticsSearchSetup::objectTypesChanged,
+            this, &AnalyticsSearchSynchronizer::updateWorkbench);
+
     connect(m_analyticsSetup, &core::AnalyticsSearchSetup::areaChanged, this,
         [this]()
         {
