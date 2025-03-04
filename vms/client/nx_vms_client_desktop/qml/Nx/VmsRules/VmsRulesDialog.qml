@@ -183,12 +183,30 @@ Dialog
             columnSpacing: 0
             rowSpacing: 0
             horizontalHeaderVisible: true
+            horizontalHeaderView.resizableColumns: false
             selectionBehavior: TableView.SelectRows
             sourceModel: RulesSortFilterProxyModel
             {
                 id: rulesSortFilterModel
             }
             visible: rows !== 0
+            columnWidthProvider: function(column)
+            {
+                if (!isColumnLoaded(column))
+                    return -1
+
+                const checkableColumnWidth = Math.max(
+                    implicitColumnWidth(0), horizontalHeaderView.implicitColumnWidth(0))
+                if (column === 0)
+                    return checkableColumnWidth
+
+                const stateColumnWidth = Math.max(
+                    implicitColumnWidth(0), horizontalHeaderView.implicitColumnWidth(0))
+                if (column === 1)
+                    return stateColumnWidth
+
+                return (width - checkableColumnWidth - stateColumnWidth) / (columns - 2)
+            }
 
             delegate: DelegateChooser
             {
@@ -222,6 +240,11 @@ Dialog
                 root.dialog.editRule(tableView.model.data(
                     tableView.selectionModel.selectedIndexes[0], RulesTableModel.RuleIdRole))
                 tableView.editing = false
+            }
+
+            Component.onCompleted:
+            {
+                forceLayout()
             }
         }
     }

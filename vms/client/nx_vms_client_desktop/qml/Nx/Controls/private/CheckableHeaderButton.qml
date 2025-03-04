@@ -104,6 +104,7 @@ Button
 
             font: control.font
             anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
             onToggled:
             {

@@ -21,9 +21,17 @@ TableView
     readonly property bool hasCheckedRows: checkedRows.length > 0
     property alias checkedRows: rowCheckModel.checkedRows
 
-    useDelegateWidthAsColumnWidth: function (column)
+    columnWidthProvider: function(column)
     {
-        return column === 0
+        if (!isColumnLoaded(column))
+            return -1
+
+        const checkableColumnWidth = Math.max(
+            implicitColumnWidth(0), horizontalHeaderView.implicitColumnWidth(0))
+        if (column === 0)
+            return checkableColumnWidth
+
+        return (width - checkableColumnWidth) / (columns - 1)
     }
 
     model: SortFilterProxyModel
@@ -38,7 +46,7 @@ TableView
         sortCaseSensitivity: Qt.CaseInsensitive
     }
 
-    headerDelegate: DelegateChooser
+    horizontalHeaderView.delegate: DelegateChooser
     {
         DelegateChoice
         {

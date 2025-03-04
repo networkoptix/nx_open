@@ -25,7 +25,7 @@ TableView
     property bool horizontalHeaderVisible: false
     property alias headerBackgroundColor: columnsHeader.color
     property bool horizontalHeaderEnabled: true
-    property alias headerDelegate: headerRow.delegate
+    property alias horizontalHeaderView: headerRow
 
     property alias deleteShortcut: deleteShortcut
     property alias enterShortcut: enterShortcut
@@ -47,88 +47,23 @@ TableView
     flickableDirection: Flickable.VerticalFlick
     boundsBehavior: Flickable.StopAtBounds
     clip: true
+    topMargin: control.horizontalHeaderVisible ? columnsHeader.height : 0
 
-    topMargin: impl.reservedHeight
-
-    onWidthChanged:
+    columnWidthProvider: function(column)
     {
-        impl.updateColumnWidths()
+        if (!isColumnLoaded(column))
+            return -1
+
+        return width / columns
     }
-
-    onColumnsChanged:
-    {
-        impl.updateColumnWidths()
-    }
-
-    QtObject
-    {
-        id: impl
-
-        readonly property int minColumnWidth: 28
-        property var columnWidthCache: []
-
-        readonly property real reservedHeight:
-            control.horizontalHeaderVisible ? columnsHeader.height : 0
-
-        function updateColumnWidths()
-        {
-            if (columns < 0)
-                return
-
-            columnWidthCache = new Array(columns)
-
-            if (!control.model)
-                return
-
-            let assignedColumnCount = 0
-            let assignedSpace = 0
-            // First, assign width for the columns with the fixed width.
-            for (let column = 0; column < columns; ++column)
-            {
-                if (useDelegateWidthAsColumnWidth(column))
-                {
-                    columnWidthCache[column] = Math.max(headerRow.columnWidth(column), minColumnWidth)
-                    assignedSpace += columnWidthCache[column]
-                    ++assignedColumnCount
-                    continue
-                }
-
-                const sizeHintValue = control.model.headerData(column, Qt.Horizontal, Qt.SizeHintRole)
-                if (sizeHintValue != null)
-                {
-                    columnWidthCache[column] = Math.max(sizeHintValue.width, minColumnWidth)
-                    assignedSpace += columnWidthCache[column]
-                    ++assignedColumnCount
-                    continue
-                }
-
-                columnWidthCache[column] = 0
-            }
-
-            // Assign all the rest space between the rest columns equally.
-            const defaultColumnWidth = Math.max(
-                (control.width - assignedSpace) / ((control.columns - assignedColumnCount) || 1),
-                minColumnWidth)
-            for (let i = 0; i < columns; ++i)
-            {
-                if (columnWidthCache[i] === 0)
-                    columnWidthCache[i] = defaultColumnWidth
-            }
-
-            // By some reasons delegates might not be resized, call forceLayout fix the problem.
-            Qt.callLater(control.forceLayout)
-        }
-    }
-
-    columnWidthProvider: (column) => impl.columnWidthCache[column]
 
     ScrollBar.vertical: ScrollBar
     {
         parent: control.parent //< The only way to shift ScrollBar yCoord and change height.
 
         x: control.x + control.width - width
-        y: control.y + impl.reservedHeight
-        height: control.height - impl.reservedHeight
+        y: control.y + control.topMargin
+        height: control.height - control.topMargin
     }
 
     ScrollBar.horizontal: ScrollBar
@@ -137,7 +72,6 @@ TableView
     }
 
     delegate: BasicSelectableTableCellDelegate {}
-
 
     model: SortFilterProxyModel
     {
@@ -178,6 +112,7 @@ TableView
                 sortOrder: control.model.sortColumn === index ? control.model.sortOrder : undefined
                 onClicked: control.model.sort(index, nextSortOrder())
             }
+            boundsBehavior: control.boundsBehavior
         }
 
         Rectangle
