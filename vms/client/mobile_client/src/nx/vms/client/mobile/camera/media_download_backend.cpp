@@ -119,9 +119,8 @@ void MediaDownloadBackend::Private::gatherProxyServerId(VideoDownloadContext&& c
     request.method = nx::network::http::Method::get;
     request.url = relayUrlBuilder(context.cloudSystemId, "/api/moduleInformation");
 
-    ClientPool::ContextPtr requestContext(new ClientPool::Context(
-        kAdapterFuncId,
-        nx::network::ssl::kAcceptAnyCertificate));
+    auto requestContext = clientPool->createContext(
+        kAdapterFuncId, nx::network::ssl::kAcceptAnyCertificate);
     requestContext->request = request;
     requestContext->completionFunc = nx::utils::AsyncHandlerExecutor(q).bind(
         [this, context = std::move(context), callback = std::move(callback)]

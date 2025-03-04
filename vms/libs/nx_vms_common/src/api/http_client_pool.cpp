@@ -5,9 +5,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx/network/http/buffer_source.h>
-
 #include <nx/utils/thread/mutex.h>
-#include <nx/network/nx_network_ini.h>
 
 using namespace std::chrono;
 
@@ -114,8 +112,8 @@ void ClientPool::Context::sendRequest(AsyncClient* httpClient)
         else
             httpClient->setCredentials({});
         httpClient->setAuthType(request.authType);
-        if (timeouts)
-            httpClient->setTimeouts(*timeouts);
+
+        httpClient->setTimeouts(timeouts);
 
         stampSent = Clock::now();
         state = Context::State::waitingResponse;

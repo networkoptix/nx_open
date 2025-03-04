@@ -81,13 +81,15 @@ public:
      */
     class NX_VMS_COMMON_API Context
     {
+    private:
+        friend class ClientPool;
+
+        Context(nx::Uuid adapterFuncId, ssl::AdapterFunc adapterFunc):
+            adapterFuncId(adapterFuncId), adapterFunc(std::move(adapterFunc))
+        {}
+
     public:
         using milliseconds = std::chrono::milliseconds;
-
-        Context(const nx::Uuid& adapterFuncId, ssl::AdapterFunc adapterFunc):
-            adapterFuncId(adapterFuncId), adapterFunc(std::move(adapterFunc))
-        {
-        }
 
         virtual ~Context() = default;
 
@@ -118,7 +120,7 @@ public:
         SystemError::ErrorCode systemError = SystemError::noError;
 
         /** Custom request timeouts. */
-        std::optional<AsyncClient::Timeouts> timeouts;
+        AsyncClient::Timeouts timeouts;
 
         /** Handle of request being served by this connection right now. */
         int handle = 0;
@@ -199,6 +201,15 @@ public:
     virtual ~ClientPool();
 
 public:
+    ContextPtr createContext(nx::Uuid adapterFuncId, ssl::AdapterFunc adapterFunc)
+    {
+        // Setting pool timeouts to avoid reusing previous connection with custom timeouts.
+        auto result = ContextPtr(new Context(adapterFuncId, std::move(adapterFunc)));
+        result->timeouts = defaultTimeouts();
+
+        return result;
+    }
+
     /**
      * It is used to run all the requests from rest::ServerConnection.
      */

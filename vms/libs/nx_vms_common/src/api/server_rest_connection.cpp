@@ -2977,13 +2977,14 @@ nx::network::http::ClientPool::ContextPtr ServerConnection::prepareContext(
     if (!NX_ASSERT(certificateVerifier))
         return {};
 
-    ContextPtr context(new nx::network::http::ClientPool::Context(
+    auto context = d->httpClientPool->createContext(
         d->certificateFuncId,
         certificateVerifier->makeAdapterFunc(
-            request.gatewayId.value_or(d->serverId), request.url)));
+            request.gatewayId.value_or(d->serverId), request.url));
     context->request = request;
     context->completionFunc = std::move(callback);
-    context->timeouts = timeouts;
+    if (timeouts)
+        context->timeouts = *timeouts;
     context->setTargetThread(nullptr); //< Callback runs in target thread via AsyncHandlerExecutor.
 
     return context;

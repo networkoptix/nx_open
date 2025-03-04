@@ -1,30 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
 
-#include <QtCore/QElapsedTimer>
-#include <QtCore/QEventLoop>
-#include <QtCore/QTimer>
-
 #include <gtest/gtest.h>
 
-#include <common/common_globals.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/byte_stream/custom_output_stream.h>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QEventLoop>
+
+#include <api/http_client_pool.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_client.h>
-#include <nx/network/http/multipart_content_parser.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
-#include <api/http_client_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
-#include <utils/common/sleep.h>
 
 namespace {
 
@@ -59,7 +52,7 @@ public:
         const nx::utils::Url& url,
         std::function<void (QSharedPointer<ClientPool::Context> context)> completionFunc)
     {
-        ClientPool::ContextPtr context(new ClientPool::Context(nx::Uuid(), nullptr));
+        auto context = clientPool->createContext(nx::Uuid(), nullptr);
         context->request.method = Method::get;
         context->request.url = url;
         context->completionFunc = completionFunc;

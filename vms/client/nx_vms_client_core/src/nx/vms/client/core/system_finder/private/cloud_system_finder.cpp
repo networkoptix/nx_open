@@ -119,9 +119,8 @@ struct CloudSystemFinder::Private
         request.method = nx::network::http::Method::get;
         request.url = makeCloudModuleInformationUrl(cloudSystemId);
 
-        ClientPool::ContextPtr context(new ClientPool::Context(
-            kAdapterFuncId,
-            nx::network::ssl::kAcceptAnyCertificate));
+        auto context = clientPool->createContext(
+            kAdapterFuncId, nx::network::ssl::kAcceptAnyCertificate);
         context->request = request;
         context->completionFunc = nx::utils::AsyncHandlerExecutor(q).bind(
             [this, cloudSystemId](ClientPool::ContextPtr context)
