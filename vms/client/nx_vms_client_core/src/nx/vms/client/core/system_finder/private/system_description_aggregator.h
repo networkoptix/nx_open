@@ -90,6 +90,8 @@ public:
 
     virtual bool isPending() const override;
 
+    virtual nx::Uuid organizationId() const override;
+
 private:
     void emitSystemChanged();
 

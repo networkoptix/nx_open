@@ -815,6 +815,12 @@ void CloudCrossSystemContext::cloudAuthorize()
     d->issueAccessToken();
 }
 
+nx::Uuid  CloudCrossSystemContext::organizationId() const
+{
+    const auto organizationId = d->systemContext->globalSettings()->organizationId();
+    return !organizationId.isNull() ? organizationId : d->systemDescription->organizationId();
+}
+
 QString toString(CloudCrossSystemContext::Status status)
 {
     switch (status)

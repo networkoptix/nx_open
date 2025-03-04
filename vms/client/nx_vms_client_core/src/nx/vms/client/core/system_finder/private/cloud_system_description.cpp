@@ -118,4 +118,9 @@ nx::utils::SoftwareVersion QnCloudSystemDescription::version() const
     return std::max(m_lastKnownVersion, base_type::version());
 }
 
+nx::Uuid QnCloudSystemDescription::organizationId() const
+{
+    return nx::Uuid(m_organizationId);
+}
+
 } // namespace nx::vms::client::core

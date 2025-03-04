@@ -44,6 +44,8 @@ public: // Overrides
     /** The VMS version reported by the last connected VMS server. */
     virtual nx::utils::SoftwareVersion version() const override;
 
+    virtual nx::Uuid organizationId() const override;
+
 private:
     QnCloudSystemDescription(
         const QString& systemId,

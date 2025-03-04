@@ -506,4 +506,9 @@ QString SystemDescriptionAggregator::idForToStringFromPtr() const
     return result;
 }
 
+nx::Uuid SystemDescriptionAggregator::organizationId() const
+{
+    return isEmptyAggregator() ? nx::Uuid{} : m_systems.first()->organizationId();
+}
+
 } // namespace nx::vms::client::core

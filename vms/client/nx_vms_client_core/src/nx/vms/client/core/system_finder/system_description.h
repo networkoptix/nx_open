@@ -115,6 +115,8 @@ public:
      */
     virtual bool isPending() const = 0;
 
+    virtual nx::Uuid organizationId() const = 0;
+
 signals:
     void serverAdded(const Uuid& serverId);
     void serverChanged(const Uuid& serverId, QnServerFields flags);

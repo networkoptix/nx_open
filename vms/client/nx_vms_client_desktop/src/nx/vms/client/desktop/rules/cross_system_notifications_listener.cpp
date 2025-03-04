@@ -200,9 +200,8 @@ private:
             return false;
 
         const auto currentSystemSettings = appContext()->currentSystemContext()->globalSettings();
-        const auto crossSystemSettings = cloudCrossSystemContext->systemContext()->globalSettings();
         if (const auto organizationId = currentSystemSettings->organizationId();
-            organizationId.isNull() || organizationId != crossSystemSettings->organizationId())
+            organizationId.isNull() || organizationId != cloudCrossSystemContext->organizationId())
         {
             return false;
         }

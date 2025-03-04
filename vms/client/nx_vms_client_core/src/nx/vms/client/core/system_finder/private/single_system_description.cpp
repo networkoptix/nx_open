@@ -435,4 +435,9 @@ bool SingleSystemDescription::isPending() const
     return m_isPending;
 }
 
+nx::Uuid SingleSystemDescription::organizationId() const
+{
+    return {};
+}
+
 } // namespace nx::vms::client::core

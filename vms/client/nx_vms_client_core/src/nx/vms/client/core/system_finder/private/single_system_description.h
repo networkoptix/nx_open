@@ -64,6 +64,8 @@ public:
 
     static QString extractSystemName(const QString& systemName);
 
+    nx::Uuid organizationId() const override;
+
 public:
     void addServer(
         const nx::vms::api::ModuleInformationWithAddresses& serverInfo,

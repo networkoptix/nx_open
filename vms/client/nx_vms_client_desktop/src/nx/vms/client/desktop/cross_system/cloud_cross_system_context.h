@@ -75,6 +75,8 @@ public:
     bool needsCloudAuthorization();
     void cloudAuthorize();
 
+    nx::Uuid organizationId() const;
+
 signals:
     void statusChanged(Status oldStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
