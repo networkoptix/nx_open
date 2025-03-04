@@ -40,7 +40,9 @@ struct IssueTokenRequest
     ResponseType response_type = ResponseType::token;
     std::string client_id;
 
-    /**%apidoc The desired scope for new token. If grant_type is <i>refresh_token</i> or <i>code</i> */
+    /**%apidoc The desired scope for new token. If grant_type is <i>refresh_token</i>, <i>code</i>
+     * or <i>sso_tokens</i>.
+     */
     std::optional<std::string> scope;
 
     /**%apidoc Refresh token life time in seconds. It may be used to decrease the life time only.
@@ -51,7 +53,9 @@ struct IssueTokenRequest
     /**%apidoc User password. Valid with <pre>grant_type=password</pre> */
     std::optional<std::string> password;
 
-    /**%apidoc Username. Valid with <pre>grant_type=password</pre> */
+    /**%apidoc Username. Valid with <pre>grant_type=password</pre> or
+     * <pre>grant_type=sso_tokens</pre>
+     */
     std::optional<std::string> username;
 
     /**%apidoc Valid refresh token. Valid with <pre>grant_type=refresh_token</pre> or

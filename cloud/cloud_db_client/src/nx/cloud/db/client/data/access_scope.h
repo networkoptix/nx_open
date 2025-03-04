@@ -27,6 +27,7 @@ public:
 
     static constexpr char kCloudSystemId[] = "cloudSystemId";
     static constexpr char kAnySystemId[] = "*";
+    static constexpr char kSsoOrganizationId[] = "ssoOrganizationId";
 
     AccessScope() = default;
     AccessScope(std::vector<std::string> urls, Attributes attributes);
