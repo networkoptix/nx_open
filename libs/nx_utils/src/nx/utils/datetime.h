@@ -61,9 +61,9 @@ NX_UTILS_API std::string formatDateTime(std::chrono::steady_clock::time_point tp
  * - negative value. In this case value returned "as is"
  * @return msec since epoch
 */
-NX_UTILS_API qint64 parseDateTimeMsec(const QString& dateTimeStr);
+NX_UTILS_API std::chrono::milliseconds parseDateTimeMsec(const QString& dateTimeStr);
 
 /** Same as parseDateTimeMsec(), but return usec. */
-NX_UTILS_API qint64 parseDateTimeUsec(const QString& dateTimeStr);
+NX_UTILS_API std::chrono::microseconds parseDateTimeUsec(const QString& dateTimeStr);
 
 } // namespace nx::utils

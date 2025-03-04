@@ -14,8 +14,6 @@ using namespace std::chrono;
 
 namespace {
 
-constexpr qint64 kUsPerMs = 1000;
-
 QDateTime parseRfc1123Date(const std::string_view& str)
 {
     static constexpr char kRfc1123Template[] = "ddd, dd MMM yyyy hh:mm:ss";
@@ -198,33 +196,33 @@ std::string formatDateTime(std::chrono::steady_clock::time_point tp)
         std::chrono::duration_cast<system_clock::duration>(tp - baseTimePoints.second));
 }
 
-qint64 parseDateTimeUsec(const QString& dateTimeStr)
+microseconds parseDateTimeUsec(const QString& dateTimeStr)
 {
     if (dateTimeStr.toLower().trimmed() == "now")
-        return DATETIME_NOW;
+        return microseconds{DATETIME_NOW};
 
     if (!dateTimeStr.startsWith('-')
         && (dateTimeStr.contains('T') || dateTimeStr.contains('-')))
     {
         const auto dt = QDateTime::fromString(trimAndUnquote(dateTimeStr), Qt::ISODateWithMs);
         if (dt.isValid())
-            return dt.toMSecsSinceEpoch() * kUsPerMs;
+            return duration_cast<microseconds>(milliseconds{dt.toMSecsSinceEpoch()});
     }
 
     const auto timestampMsec = dateTimeStr.toLongLong();
     if (timestampMsec == DATETIME_NOW)
-        return DATETIME_NOW;
+        return microseconds{DATETIME_NOW};
 
-    return timestampMsec * kUsPerMs;
+    return duration_cast<microseconds>(milliseconds{timestampMsec});
 }
 
-qint64 parseDateTimeMsec(const QString& dateTimeStr)
+milliseconds parseDateTimeMsec(const QString& dateTimeStr)
 {
     const auto usecSinceEpoch = parseDateTimeUsec(dateTimeStr);
-    if (usecSinceEpoch < 0 || usecSinceEpoch == DATETIME_NOW)
-        return usecSinceEpoch; // special values are returned "as is"
+    if (usecSinceEpoch.count() < 0 || usecSinceEpoch == microseconds{DATETIME_NOW})
+        return milliseconds{usecSinceEpoch.count()}; //< Special values are returned "as is".
 
-    return usecSinceEpoch / kUsPerMs;
+    return duration_cast<milliseconds>(microseconds{usecSinceEpoch});
 }
 
 } // namespace nx::utils

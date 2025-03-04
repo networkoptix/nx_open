@@ -114,8 +114,8 @@ nx::network::rest::Params QnChunksRequestData::toParams() const
 {
     nx::network::rest::Params result;
 
-    result.insert(kStartTimeParam, QString::number(startTimeMs));
-    result.insert(kEndTimeParam, QString::number(endTimeMs));
+    result.insert(kStartTimeParam, QString::number(startTimeMs.count()));
+    result.insert(kEndTimeParam, QString::number(endTimeMs.count()));
     result.insert(kDetailParam, QString::number(detailLevel.count()));
     if (keepSmallChunks)
         result.insert(kKeepSmallChunksParam, QString());

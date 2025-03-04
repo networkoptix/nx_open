@@ -2261,8 +2261,8 @@ bool QnVirtualCameraResource::needCheckIpConflicts() const {
 
 QnTimePeriodList QnVirtualCameraResource::getDtsTimePeriodsByMotionRegion(
     const QList<QRegion>& /*regions*/,
-    qint64 /*msStartTime*/,
-    qint64 /*msEndTime*/,
+    std::chrono::milliseconds /*msStartTime*/,
+    std::chrono::milliseconds /*msEndTime*/,
     int /*detailLevel*/,
     bool /*keepSmalChunks*/,
     int /*limit*/,

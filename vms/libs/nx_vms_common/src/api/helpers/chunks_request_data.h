@@ -24,8 +24,6 @@ struct NX_VMS_COMMON_API QnChunksRequestData
         serverId
     )
 
-    QnChunksRequestData() = default;
-
     static QnChunksRequestData fromParams(
         QnResourcePool* resourcePool, const nx::network::rest::Params& params);
     nx::network::rest::Params toParams() const;
@@ -34,8 +32,8 @@ struct NX_VMS_COMMON_API QnChunksRequestData
 
     Qn::TimePeriodContent periodsType = Qn::RecordingContent;
     QnVirtualCameraResourceList resList;
-    qint64 startTimeMs = 0;
-    qint64 endTimeMs = DATETIME_NOW;
+    std::chrono::milliseconds startTimeMs{0};
+    std::chrono::milliseconds endTimeMs{DATETIME_NOW};
     std::chrono::milliseconds detailLevel{1};
     bool keepSmallChunks = false;
     bool preciseBounds = false;

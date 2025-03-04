@@ -137,14 +137,14 @@ rest::Handle FlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolu
         return 0;   //< TODO: #sivanov #bookmarks make sure invalid value is handled.
     }
 
-    QnChunksRequestData requestData;
-    requestData.resList << m_resource.dynamicCast<QnVirtualCameraResource>();
-    requestData.startTimeMs = startTimeMs;
-    requestData.endTimeMs = DATETIME_NOW,   /* Always load data to the end. */
-    requestData.filter = m_filter;
-    requestData.periodsType = m_dataType;
-    requestData.detailLevel = std::chrono::milliseconds(resolutionMs);
-    requestData.storageLocation = m_storageLocation;
+    QnChunksRequestData requestData{
+        .periodsType = m_dataType,
+        .resList = {m_resource.dynamicCast<QnVirtualCameraResource>()},
+        .startTimeMs = std::chrono::milliseconds{startTimeMs},
+        .detailLevel = std::chrono::milliseconds{resolutionMs},
+        .filter = m_filter,
+        .storageLocation = m_storageLocation
+    };
 
     return connection->recordedTimePeriods(requestData,
         nx::utils::guarded(this,
