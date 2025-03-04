@@ -260,7 +260,12 @@ void AbstractSearchWidget::Private::setupModels()
         this, &Private::requestFetchIfNeeded);
 
     connect(m_mainModel.data(), &QAbstractItemModel::modelReset,
-        this, &Private::handleItemCountChanged);
+        this,
+        [this]()
+        {
+            m_dataFetched = false;
+            handleItemCountChanged();
+        });
 
     connect(m_mainModel.data(), &QAbstractItemModel::rowsRemoved,
         this, &Private::handleItemCountChanged);
@@ -284,10 +289,12 @@ void AbstractSearchWidget::Private::setupModels()
         });
 
     connect(m_mainModel.data(), &core::AbstractSearchListModel::fetchFinished, this,
-        [this](core::EventSearch::FetchResult /*result*/,
+        [this](core::EventSearch::FetchResult fetchResult,
             int /*centralItemIndex*/,
             const FetchRequest& request)
         {
+            m_dataFetched = fetchResult != core::EventSearch::FetchResult::failed
+                && fetchResult != core::EventSearch::FetchResult::cancelled;
             ui->ribbon->setInsertionMode(UpdateMode::animated, false);
             setIndicatorVisible(request.direction, false);
             handleItemCountChanged();
@@ -948,9 +955,7 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
 
 void AbstractSearchWidget::Private::updatePlaceholderVisibility()
 {
-    m_placeholderVisible = m_visualModel->rowCount() == 0
-        && !m_mainModel->canFetchData(FetchDirection::older)
-        && !m_mainModel->canFetchData(FetchDirection::newer);
+    m_placeholderVisible = m_visualModel->rowCount() == 0 && m_dataFetched;
 
     if (m_placeholderVisible)
         m_placeholderWidget->setText(q->placeholderText(m_mainModel->isConstrained()));

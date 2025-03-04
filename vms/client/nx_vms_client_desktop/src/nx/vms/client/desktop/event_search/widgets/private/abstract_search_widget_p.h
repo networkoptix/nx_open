@@ -134,6 +134,7 @@ private:
     QMetaObject::Connection m_currentCameraConnection;
     QHash<core::EventSearch::CameraSelection, QAction*> m_cameraSelectionActions;
 
+    bool m_dataFetched = false;
     bool m_placeholderVisible = false;
     QPointer<QPropertyAnimation> m_placeholderOpacityAnimation;
 

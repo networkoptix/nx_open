@@ -241,6 +241,7 @@ private:
     int calculateItemCount() const;
     void updateItemCount();
     void updateIsConstrained();
+    void updateDataIsFetched(core::EventSearch::FetchResult fetchResult);
     void updateIsPlaceholderRequired();
     void updateSynchronizer();
     void createDeadlines(int first, int count);
@@ -264,6 +265,7 @@ private:
 
     bool m_constrained = false;
     bool m_isPlaceholderRequired = false;
+    bool m_dataFetched = false;
     int m_itemCount = 0;
 
     struct Deadline
@@ -807,7 +809,7 @@ RightPanelModelsAdapter::Private::Private(RightPanelModelsAdapter* q):
         });
 
     connect(q, &RightPanelModelsAdapter::fetchFinished,
-        this, &Private::updateIsPlaceholderRequired);
+        this, &Private::updateDataIsFetched);
 
     connect(q, &RightPanelModelsAdapter::isOnlineChanged, q,
         [q]()
@@ -1082,6 +1084,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
         m_modelConnections << connect(model, &QAbstractItemModel::modelReset, this,
             [this]()
             {
+                m_dataFetched = false;
                 updateIsConstrained();
                 updateItemCount();
             });
@@ -1347,16 +1350,18 @@ void RightPanelModelsAdapter::Private::updateItemCount()
     updateIsPlaceholderRequired();
 }
 
+void RightPanelModelsAdapter::Private::updateDataIsFetched(
+    core::EventSearch::FetchResult fetchResult)
+{
+    m_dataFetched = fetchResult != core::EventSearch::FetchResult::failed
+        && fetchResult != core::EventSearch::FetchResult::cancelled;
+
+    updateIsPlaceholderRequired();
+}
+
 void RightPanelModelsAdapter::Private::updateIsPlaceholderRequired()
 {
-    const bool canFetch =
-        [this]()
-        {
-            const auto model = searchModel();
-            return model && (model->canFetchData(core::EventSearch::FetchDirection::newer)
-                || model->canFetchData(core::EventSearch::FetchDirection::older));
-        }();
-    const bool placeholderRequired = m_itemCount == 0 && !canFetch;
+    const bool placeholderRequired = m_itemCount == 0 && m_dataFetched;
     if (m_isPlaceholderRequired == placeholderRequired)
         return;
 
