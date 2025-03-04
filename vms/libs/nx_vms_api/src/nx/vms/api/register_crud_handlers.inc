@@ -958,7 +958,7 @@ static void registerServerRestHandlers(
      *     %example this
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
      * %return:{BackupPositionExV1} Backup Position for the given Device.
@@ -1039,7 +1039,7 @@ static void registerServerRestHandlers(
      *     %example this
      * %param:string deviceId Device id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
      * %return:{BackupPositionExV4} Backup Position for the given Device.
@@ -1100,7 +1100,7 @@ static void registerServerRestHandlers(
      * %caption Server Deployment code
      * %ingroup Server Data
      * %struct DeploymentCodeRequestData
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
      * %return:{DeploymentCodeData} Deployment Code data
@@ -1306,7 +1306,7 @@ static void registerServerRestHandlers(
      * %ingroup Server Data
      * %struct RecordingStatisticsFilter
      * %param[ref] _local
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{std::map<nx::Uuid, RecordingStatisticsDataList>} Recording statistics for all Servers.
      */
@@ -1363,7 +1363,7 @@ static void registerServerRestHandlers(
      * %caption Get Server Storage forecast
      * %ingroup Server Data
      * %struct StorageForecastData
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
      * %return:{StorageForecastList} Storage forecast for the Server.
@@ -1375,7 +1375,7 @@ static void registerServerRestHandlers(
      * %ingroup Server Data
      * %struct StorageForecastData
      * %param[ref] _local
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{std::map<nx::Uuid, StorageForecastList>} Storage forecast for all Servers.
      */
@@ -1406,7 +1406,7 @@ static void registerServerRestHandlers(
      * %param:enum pool
      *     %value main
      *     %value backup
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
      * %return:{StoragePurgeStatusData} Storage purge status.
@@ -1653,7 +1653,7 @@ static void registerServerRestHandlers(
      *     `GET /rest/v{1-}/servers` or be `this` to refer to the current Server, or be "*" to
      *     involve all Servers.
      *     %example this
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power user.
      * %return:{std::vector<std::string>} List of scripts available on Server.
@@ -1733,7 +1733,7 @@ static void registerServerRestHandlers(
      * %ingroup Servers
      * %struct OverlappedIdsRequest
      * %param[unused] overlappedId
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket
      * %param[ref] _with,_local
      * %permissions Any User.
      * %return:{OverlappedIdResponse} Overlapped Id Settings.
@@ -1943,7 +1943,7 @@ static void registerDeviceHandlers(
      * %caption Get Bookmark tags
      * %ingroup Device Media
      * %struct BookmarkTagFilter
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket
      * %param[ref] _local
      * %permissions View bookmarks.
      * %return:{std::map<QString, int>} All tags with Bookmark counters.
@@ -2599,7 +2599,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %ingroup Analytics
      * %struct RequestAvailableAnalyticsActions
      * %param:string engineId
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{AvailableAnalyticsActions} Available Actions
      */
@@ -2635,7 +2635,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Analytics Engine's Settings
      * %ingroup Analytics
      * %struct AnalyticsEngineSettings
-     * %param[ref] _format,_language,_strict,_ticket
+     * %param[ref] _strict,_ticket
      * %permissions Power User.
      * %return:{AnalyticsEngineSettings}
      */
@@ -2648,7 +2648,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Device Agent current states
      * %ingroup Analytics
      * %param:uuid engineId
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{std::vector<DeviceAgentState>}
      *
@@ -2657,7 +2657,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Device Agent current state
      * %ingroup Analytics
      * %struct DeviceAgentId
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
      * %return:{DeviceAgentState}
      *
@@ -2689,7 +2689,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Device Agent settings
      * %ingroup Analytics
      * %struct AnalyticsDeviceSettings
-     * %param[ref] _format,_language,_strict,_ticket
+     * %param[ref] _strict,_ticket
      * %param[ref] _local
      * %permissions Power User.
      * %return:{AnalyticsDeviceSettings}
@@ -2760,7 +2760,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %struct ObjectTrackFilter
      * %param[unused] id
      * %param[unused] _orderBy
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions View Archive on specified Device(s).
      * %return:{std::vector<ObjectTrackV4>} Object Tracks.
@@ -2770,7 +2770,7 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
      * %caption Get Object Track
      * %ingroup Analytics
      * %param:uuid id Object Track id
-     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions View Archive on the Device for the Object Track.
      * %return:{ObjectTrackV4} Object Track.

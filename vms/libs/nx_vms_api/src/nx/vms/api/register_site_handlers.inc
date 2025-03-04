@@ -118,7 +118,7 @@ void registerSiteSettingHandlers(
     /**%apidoc GET /rest/v{1-3}/system/settings
      * %caption Get Site settings
      * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Any User.
      * %return Site settings and their values.
      *

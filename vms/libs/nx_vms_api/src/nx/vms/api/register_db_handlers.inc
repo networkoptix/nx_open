@@ -1639,7 +1639,7 @@ void registerRestHandlers(
      *
      * %caption Inspect Site database
      * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Any User.
      * %return:{FullInfoData}
      */
@@ -1659,7 +1659,7 @@ void registerRestHandlers(
      *
      * %caption Inspect Site database
      * %ingroup Site
-     * %param[ref] _filter,_format,_stripDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _format,_stripDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Any User.
      * %return:{FullInfoData}
      */
