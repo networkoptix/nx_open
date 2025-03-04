@@ -7,7 +7,7 @@ from __future__ import print_function
 from glob import iglob
 from fnmatch import fnmatch
 from os.path import join
-import itertools
+from itertools import repeat, chain
 from pathlib import Path
 import logging
 import os
@@ -117,17 +117,25 @@ def archiveFiles(archiver, target_dir, source_dir, file_list, category=None) -> 
     return archived_files_count
 
 
-def archiveByGlob(archiver, category, target_dir, source_dir, pattern, recursive=False):
+def archiveByGlob(archiver, category, target_dir, source_dir, pattern, recursive=False,
+    exclude=None):
+
     if recursive:
         files = []
         for root, _, dir_files in os.walk(source_dir):
             relative_root = os.path.relpath(root, source_dir)
             for f in dir_files:
-                if fnmatch(f, pattern):
+                if fnmatch(f, pattern) and (
+                        exclude is None or not any(map(fnmatch, repeat(f), exclude))
+                ):
                     files.append(os.path.normpath(join(relative_root, f)))
     else:
         full_pattern = join(source_dir, pattern)
-        files = [os.path.relpath(f, source_dir) for f in iglob(full_pattern, recursive=recursive)]
+        files = [
+            os.path.relpath(f, source_dir)
+            for f in iglob(full_pattern, recursive=recursive)
+            if exclude is None or not any(map(fnmatch, repeat(f), exclude))
+        ]
 
     archiveFiles(archiver, target_dir, source_dir, files, category=category)
 
@@ -140,7 +148,7 @@ def archiveSdkUnitTests(archiver, conf, src_bin_dir):
     }[conf.CMAKE_SYSTEM_NAME]
     source_dir = Path(conf.NX_SERVER_PLUGIN_SDK_DIR)
     file_list = list(
-        itertools.chain.from_iterable(source_dir.glob(f"**/{p}") for p in ut_file_patterns))
+        chain.from_iterable(source_dir.glob(f"**/{p}") for p in ut_file_patterns))
     if not file_list:
         logging.info("No SDK unit test executables found")
         return
@@ -216,7 +224,7 @@ def main():
 
         for lib_glob in lib_globs:
             archiveByGlob(a, "libraries", lib_dir, join(conf.BUILD_DIR, lib_dir), lib_glob,
-                recursive=True)
+                recursive=True, exclude=["*cudnn*", "*cublas*"])
             archiveByGlob(a, "mediaserver plugins", target_plugins_dir,
                 join(conf.BUILD_DIR, plugins_dir), lib_glob)
             archiveByGlob(a, "mediaserver optional plugins", target_plugins_optional_dir,
