@@ -161,6 +161,7 @@ def find_extra_files(build_dir: Path, known_files: set) -> list:
         ".conan",
         ".conan_short",
         ".cmake",
+        "cargo",
     }
 
     exclusion_extensions = {

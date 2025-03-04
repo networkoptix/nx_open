@@ -368,6 +368,10 @@ class NxOpenConan(ConanFile):
         return self.settings.os == "Linux"
 
     @property
+    def isX64(self):
+        return self.settings.arch == "x86_64"
+
+    @property
     def isArm32(self):
         return self.settings.arch in ("armv7", "armv7hf")
 
