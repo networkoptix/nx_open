@@ -45,7 +45,10 @@ Item
     {
         id: listView
 
-        width: Math.min(contentItem.childrenRect.width, sceneBanners.maximumWidth)
+        width: contentItem.childrenRect.width
+            ? Math.min(contentItem.childrenRect.width, sceneBanners.maximumWidth)
+            : 1 //< May not be zero or ListView won't populate.
+
         height: contentItem.childrenRect.height
         anchors.centerIn: sceneBanners
 
