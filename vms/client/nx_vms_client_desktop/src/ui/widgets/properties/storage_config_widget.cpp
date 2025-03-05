@@ -914,19 +914,6 @@ void QnStorageConfigWidget::updateWarnings()
                 .isEnabledProperty = &messageBarSettings()->storageConfigCloudStorageWarning
             });
     }
-    if (flags.testFlag(notEnoughLicensesForCloudStorage))
-    {
-        nx::vms::license::saas::CloudStorageServiceUsageHelper helper(systemContext());
-        messages.push_back({
-            .text = tr(
-                "%1 storage cannot be enabled due to insufficient services. Add %n more suitable "
-                "services or reduce the number of cameras with backup enabled.",
-                /*comment*/ "%1 is the short cloud name (like Cloud)",
-                helper.overflowLicenseCount()).arg(nx::branding::shortCloudName()),
-            .level = BarDescription::BarLevel::Error,
-            .isEnabledProperty =
-                &messageBarSettings()->notEnoughLicensesForCloudStorageClientError});
-    }
     ui->messageBarBlock->setMessageBars(messages);
 }
 
