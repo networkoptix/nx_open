@@ -314,6 +314,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
 
     const auto systemContext = module->systemContext()->as<SystemContext>();
     if (!NX_ASSERT(systemContext))
+        return;
 
     if (!systemContext->connection() || !module->getParentServer())
     {
