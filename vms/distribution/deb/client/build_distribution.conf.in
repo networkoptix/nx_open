@@ -6,7 +6,7 @@ CUSTOMIZATION_NAME="@customization@" #< E.g. for "networkoptix", the value is "d
 CUSTOMIZATION_VMS_NAME="@customization.vmsName@"
 CUSTOMIZATION_MOBILE_CLIENT_ENABLED="@customization.mobile.enabled@"
 VERSION="@releaseVersion@.@buildNumber@"
-RELEASE_VERSION="@releaseVersion@"
+RELEASE_VERSION="@releaseVersion.full@"
 
 CURRENT_BUILD_DIR="@CMAKE_CURRENT_BINARY_DIR@"
 BUILD_DIR="@CMAKE_BINARY_DIR@"
