@@ -73,6 +73,12 @@ NX_REFLECTION_ENUM_CLASS(QrCodeImageType,
     png
 );
 
+/**%apidoc Deployment code type. */
+NX_REFLECTION_ENUM_CLASS(DeploymentCodeLength,
+    eight = 8,
+    thirtyTwo = 32
+);
+
 /**%apidoc Qr Code request data. */
 struct NX_VMS_API DeploymentCodeRequestData
 {
@@ -107,9 +113,17 @@ struct NX_VMS_API DeploymentCodeRequestData
      * %example 10
      */
     int pixelSize = 10;
+
+    /**%apidoc
+     * Deployment code length.
+     * %example thirtyTwo
+     */
+    DeploymentCodeLength codeLength = DeploymentCodeLength::thirtyTwo;
 };
 
-#define DeploymentCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType)(pixelSize)
+#define DeploymentCodeRequestData_Fields (serverId)(version)(correctionLevel)(imageType) \
+    (pixelSize)(codeLength)
+
 NX_REFLECTION_INSTRUMENT(DeploymentCodeRequestData, DeploymentCodeRequestData_Fields)
 
 /**%apidoc QR Code response. */
@@ -117,8 +131,8 @@ struct NX_VMS_API DeploymentCodeData
 {
     nx::Uuid serverId;
 
-    /**%apidoc Short code usable for adding Server during the Deployment Code Site set-up. */
-    std::string shortCode;
+    /**%apidoc Deployment code usable for adding Server during the Deployment Code Site set-up. */
+    std::string code;
 
     /**%apidoc Hardware code which can be optionally used when adding Server during the
      * Deployment Code Site set-up.
@@ -132,7 +146,7 @@ struct NX_VMS_API DeploymentCodeData
     std::string imageBase64;
 };
 
-#define DeploymentCodeData_Fields (serverId)(shortCode)(hardwareCode)(url)(imageBase64)
+#define DeploymentCodeData_Fields (serverId)(code)(hardwareCode)(url)(imageBase64)
 NX_REFLECTION_INSTRUMENT(DeploymentCodeData, DeploymentCodeData_Fields)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeploymentCodeRequestData, (json), NX_VMS_API)
