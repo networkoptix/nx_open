@@ -11,6 +11,11 @@
 
 namespace nx::vms::api {
 
+/**%apidoc
+ * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
+ *     or be `this` to refer to the current Server.
+ *     %example this
+ */
 struct NX_VMS_API StorageForecastData: IdData
 {
     /**%apidoc[opt] */
@@ -23,7 +28,7 @@ struct NX_VMS_API StorageForecastData: IdData
 QN_FUSION_DECLARE_FUNCTIONS(StorageForecastData, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(StorageForecastData, StorageForecastData_Fields)
 
-struct NX_VMS_API StorageForecast
+struct NX_VMS_API StorageForecastBase
 {
     /**%apidoc:string
      * Device id (can be obtained from "id", "physicalId" or "logicalId" field via
@@ -31,13 +36,17 @@ struct NX_VMS_API StorageForecast
      */
     nx::Uuid deviceId;
 
-    /**%apidoc:integer Size of the recorded archive in bytes. */
-    double recordedBytes = 0.0;
-
     /**%apidoc Recorded archive in seconds (total). */
     std::chrono::seconds recordedS = std::chrono::seconds(0);
+};
+#define StorageForecastBase_Fields (deviceId)(recordedS)
 
-    /**%apidoc Archive calendar duration in seconds. */
+struct NX_VMS_API StorageForecastV2: StorageForecastBase
+{
+    /**%apidoc:integer Forecast for the size of the recorded archive in bytes. */
+    double recordedBytes = 0.0;
+
+    /**%apidoc Forecast for the archive calendar duration in seconds. */
     std::chrono::seconds archiveDurationForecastS = std::chrono::seconds(0);
 
     /**%apidoc:integer Average bitrate (bytes / sum-of-chunk-duration-in-seconds). */
@@ -48,20 +57,44 @@ struct NX_VMS_API StorageForecast
 
     /**%apidoc Additional details about the recorded bytes. */
     std::map<nx::Uuid, qint64> recordedBytesPerStorage;
-
-    void operator+=(const StorageForecast& other)
-    {
-        recordedBytes += other.recordedBytes;
-        recordedS += other.recordedS;
-        archiveDurationForecastS += other.archiveDurationForecastS;
-    }
 };
-#define StorageForecast_Fields \
-    (deviceId)(recordedBytes) \
-    (recordedS)(archiveDurationForecastS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
-QN_FUSION_DECLARE_FUNCTIONS(StorageForecast, (json), NX_VMS_API)
-NX_REFLECTION_INSTRUMENT(StorageForecast, StorageForecast_Fields)
+#define StorageForecastV2_Fields \
+    StorageForecastBase_Fields(recordedBytes) \
+    (archiveDurationForecastS)(averageBitrate)(averageDensity)(recordedBytesPerStorage)
+QN_FUSION_DECLARE_FUNCTIONS(StorageForecastV2, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageForecastV2, StorageForecastV2_Fields)
 
-using StorageForecastValues = std::map<nx::Uuid /*id*/, std::vector<api::StorageForecast> /*forecast*/>;
+using StorageForecastValuesV2 = std::map<nx::Uuid /*id*/, std::vector<api::StorageForecastV2> /*forecast*/>;
+
+struct NX_VMS_API StorageForecastV4: StorageForecastBase
+{
+    /**%apidoc:integer Recorded archive in bytes (total). */
+    double recordedB = 0.0;
+
+    /**%apidoc:integer Forecast for the size of the recorded archive in bytes. */
+    double forecastB = 0.0;
+
+    /**%apidoc Forecast for the archive calendar duration in seconds. */
+    std::chrono::seconds forecastS = std::chrono::seconds(0);
+
+    /**%apidoc:integer Average bitrate (bytes / sum-of-chunk-duration-in-seconds). */
+    double averageBps = 0.0;
+
+    /**%apidoc:integer Average density (bytes / requested-period-in-seconds). */
+    double averageDensityBps = 0.0;
+
+    /**%apidoc:{std::map<nx::Uuid, int>} */
+    std::map<nx::Uuid, double> recordedBytesPerStorage;
+};
+#define StorageForecastV4_Fields \
+    StorageForecastBase_Fields(recordedB)(forecastB) \
+    (forecastS)(averageBps)(averageDensityBps)(recordedBytesPerStorage)
+QN_FUSION_DECLARE_FUNCTIONS(StorageForecastV4, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageForecastV4, StorageForecastV4_Fields)
+
+using StorageForecastValuesV4 = std::map<nx::Uuid /*id*/, std::vector<api::StorageForecastV4> /*forecast*/>;
+
+using StorageForecast = StorageForecastV4;
+using StorageForecastValues = StorageForecastValuesV4;
 
 } // namespace nx::vms::api

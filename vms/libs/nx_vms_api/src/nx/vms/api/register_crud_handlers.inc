@@ -1357,7 +1357,7 @@ static void registerServerRestHandlers(
     reg("rest/v{4-}/servers/:id/settings", GlobalPermission::none,
         std::make_unique<SettingsHandler>(serverModule, serverConnector));
 
-    /**%apidoc GET /rest/v{2-}/servers/{id}/storageForecast
+    /**%apidoc GET /rest/v{2-3}/servers/{id}/storageForecast
      * Retrieves the Server Storage forecast.
      * %jsonrpc[result] one
      * %caption Get Server Storage forecast
@@ -1366,21 +1366,48 @@ static void registerServerRestHandlers(
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Power User.
-     * %return:{StorageForecastList} Storage forecast for the Server.
+     * %return:{StorageForecastV2List} Storage forecast for the Server.
      *
-     **%apidoc GET /rest/v{2-}/servers/%2A/storageForecast
+     **%apidoc GET /rest/v{2-3}/servers/%2A/storageForecast
      * Retrieves all Storage forecasts for all Servers.
      * %jsonrpc[result] all
      * %caption Get Servers' Storage forecasts
      * %ingroup Server Data
      * %struct StorageForecastData
+     * %param[unused] id
      * %param[ref] _local
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
-     * %return:{std::map<nx::Uuid, StorageForecastList>} Storage forecast for all Servers.
+     * %return:{std::map<nx::Uuid, StorageForecastV2List>} Storage forecast for all Servers.
      */
-    reg("rest/v{2-}/servers/:id/storageForecast", GlobalPermission::powerUser,
-        std::make_unique<StorageForecastHandler>(serverModule, serverConnector));
+    reg("rest/v{2-3}/servers/:id/storageForecast", GlobalPermission::powerUser,
+        std::make_unique<StorageForecastHandler<nx::vms::api::StorageForecastV2>>(serverModule, serverConnector));
+
+    /**%apidoc GET /rest/v{4-}/servers/{id}/storageForecast
+     * Retrieves the Server Storage forecast.
+     * %jsonrpc[result] one
+     * %caption Get Server Storage forecast
+     * %ingroup Server Data
+     * %struct StorageForecastData
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %param[ref] _local
+     * %permissions Power User.
+     * %return:{StorageForecastV4List} Storage forecast for the Server.
+     *
+     **%apidoc GET /rest/v{4-}/servers/%2A/storageForecast
+     * Retrieves all Storage forecasts for all Servers.
+     * %jsonrpc[result] all
+     * %caption Get Servers' Storage forecasts
+     * %ingroup Server Data
+     * %struct StorageForecastData
+     * %param[unused] id
+     * %param[ref] _local
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
+     * %permissions Power User.
+     * %return:{std::map<nx::Uuid, StorageForecastV4List>} Storage forecast for all Servers.
+     */
+    reg("rest/v{4-}/servers/:id/storageForecast", GlobalPermission::powerUser,
+        std::make_unique<StorageForecastHandler<nx::vms::api::StorageForecastV4>>(serverModule, serverConnector));
 
     /**%apidoc POST /rest/v{1-}/servers/{id}/storages/%2A/purge
      * Starts Storage purge for the Server specified by {id}.
