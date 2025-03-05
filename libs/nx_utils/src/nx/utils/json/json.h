@@ -27,7 +27,16 @@ public:
     virtual void endObject(int members) override { m_value.EndObject(members); }
     virtual void writeBool(bool value) override { m_value.Bool(value); }
     virtual void writeInt(const std::int64_t& value) override { m_value.Int64(value); }
-    virtual void writeFloat(const double& value) override { m_value.Double(value); }
+
+    virtual void writeFloat(const double& value) override
+    {
+        const auto intValue = static_cast<std::int64_t>(value);
+        if (static_cast<double>(intValue) == value)
+            m_value.Int64(intValue);
+        else
+            m_value.Double(value);
+    }
+
     virtual void writeNull() override { m_value.Null(); }
     virtual void writeString(const std::string_view& value) override
     {

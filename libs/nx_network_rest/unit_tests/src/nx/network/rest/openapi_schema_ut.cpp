@@ -801,7 +801,7 @@ TEST_P(OpenApiSchemaTest, PrettyResponse)
         "id": "00000000-0000-0000-0000-000000000000",
         "parentId": "00000000-0000-0000-0000-000000000000",
         "name": ")json" "\u0414\u043e\u043c" R"json(",
-        "cellAspectRatio": 0.0,
+        "cellAspectRatio": 0,
         "cellSpacing": 0.05000000074505806,
         "items": [],
         "locked": false,

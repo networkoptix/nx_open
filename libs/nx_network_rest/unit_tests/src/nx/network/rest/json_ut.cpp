@@ -300,6 +300,20 @@ TEST(Json, ReflectStripDefault)
         "[{\"parameters\":{\"parameter1\":{\"key\":\"value\"},\"parameter2\":{\"key\":\"value\"}}}]");
 }
 
+struct MockWithDouble
+{
+    double value = 100.0;
+};
+NX_REFLECTION_INSTRUMENT(MockWithDouble, (value))
+
+TEST(Json, ReflectDoubleAsInt)
+{
+    ASSERT_EQ(
+        nx::reflect::json_detail::getStringRepresentation(serialize(
+            MockWithDouble{}, Params{}, DefaultValueAction::appendMissing)),
+        "{\"value\":100}");
+}
+
 struct ValueOrArrayModel
 {
     std::optional<nx::vms::api::json::ValueOrArray<QString>> value;
