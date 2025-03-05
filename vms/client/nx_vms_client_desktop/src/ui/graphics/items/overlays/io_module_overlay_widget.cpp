@@ -357,7 +357,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
         systemContext->getSessionTokenHelper(),
         module,
         it->config.id,
-        /*isActive*/ it->state.isActive,
+        /*isActive*/ newState.isActive,
         /*autoResetTimeout*/ std::chrono::milliseconds(it->config.autoResetTimeoutMs),
         /*targetLockResolutionData*/ {},
         callback);
