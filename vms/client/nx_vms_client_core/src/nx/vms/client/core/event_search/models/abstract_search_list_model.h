@@ -90,6 +90,9 @@ public:
     FetchRequest requestForDirection(
         EventSearch::FetchDirection direction) const;
 
+    /** Checks whether filter is degenerate and fetch will never return any results. */
+    virtual bool isFilterDegenerate() const;
+
 signals:
     /** This signal is emitted immediately before a fetched data is appended to the model. */
     void fetchCommitStarted(const FetchRequest& request);
@@ -132,9 +135,6 @@ protected:
 
     /** Sets whether underlying data store can be populated with new items in live mode. */
     void setLiveSupported(bool value);
-
-    /** Checks whether filter is degenerate and fetch will never return any results. */
-    virtual bool isFilterDegenerate() const;
 
     void onOnlineChanged(bool online);
 

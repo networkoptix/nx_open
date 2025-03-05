@@ -955,7 +955,8 @@ void AbstractSearchWidget::Private::handleItemCountChanged()
 
 void AbstractSearchWidget::Private::updatePlaceholderVisibility()
 {
-    m_placeholderVisible = m_visualModel->rowCount() == 0 && m_dataFetched;
+    m_placeholderVisible =
+        (m_visualModel->rowCount() == 0 && m_dataFetched) || m_mainModel->isFilterDegenerate();
 
     if (m_placeholderVisible)
         m_placeholderWidget->setText(q->placeholderText(m_mainModel->isConstrained()));

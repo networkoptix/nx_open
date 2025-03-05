@@ -1361,7 +1361,9 @@ void RightPanelModelsAdapter::Private::updateDataIsFetched(
 
 void RightPanelModelsAdapter::Private::updateIsPlaceholderRequired()
 {
-    const bool placeholderRequired = m_itemCount == 0 && m_dataFetched;
+    const auto model = searchModel();
+    const bool placeholderRequired =
+        (m_itemCount == 0 && m_dataFetched) || (model && model->isFilterDegenerate());
     if (m_isPlaceholderRequired == placeholderRequired)
         return;
 
