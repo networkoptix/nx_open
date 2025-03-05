@@ -181,6 +181,13 @@ bool BookmarkSearchListModel::Private::requestFetch(
         return false; //< Corresponding request is in progress.
 
     const auto sortOrder = EventSearch::sortOrderFromDirection(request.direction);
+
+    if (q->isFilterDegenerate())
+    {
+        bookmarks.clear();
+        return true;
+    }
+
     auto filter = QnCameraBookmarkSearchFilter{
         .centralTimePointMs = duration_cast<milliseconds>(request.centralPointUs),
         .text = textFilter->text().trimmed(),
