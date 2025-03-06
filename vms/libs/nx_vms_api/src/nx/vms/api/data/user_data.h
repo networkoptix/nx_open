@@ -36,7 +36,10 @@ NX_REFLECTION_ENUM_CLASS(UserAttribute,
     readonly = 1 << 0,
 
     /**%apidoc This User should not be shown in user management by default. */
-    hidden = 1 << 1
+    hidden = 1 << 1,
+
+    /**%apidoc[unused] The only possible action for such user is to recreate it. */
+    removed = 1 << 30
 )
 
 Q_DECLARE_FLAGS(UserAttributes, UserAttribute)
