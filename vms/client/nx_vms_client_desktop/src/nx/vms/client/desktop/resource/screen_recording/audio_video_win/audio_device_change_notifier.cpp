@@ -6,7 +6,7 @@
 
 #include <mmdeviceapi.h>
 #include <Functiondiscoverykeys_devpkey.h>
-#include <atlbase.h>
+#include <wrl/client.h>
 
 #include <nx/utils/log/assert.h>
 
@@ -14,18 +14,20 @@ namespace {
 
 QString deviceName(IMMDeviceEnumerator* deviceEnumerator, LPCWSTR deviceId)
 {
+    using namespace Microsoft::WRL;
+
     if (deviceEnumerator == nullptr || deviceId == nullptr)
     {
         NX_ASSERT(false, "Unexpected null parameter");
         return {};
     }
 
-    CComPtr<IMMDevice> device;
+    ComPtr<IMMDevice> device;
     auto hres = deviceEnumerator->GetDevice(deviceId, &device);
     if (hres != S_OK)
         return {};
 
-    CComPtr<IPropertyStore> deviceProperties;
+    ComPtr<IPropertyStore> deviceProperties;
     hres = device->OpenPropertyStore(STGM_READ, &deviceProperties);
     if (hres != S_OK)
         return {};

@@ -178,7 +178,7 @@ bool DeviceHandle::createDevice(int width, int height, mfxU32 adapterNumber)
         return false;
     }
 
-    hr = m_deviceManager->ResetDevice(m_device, resetToken);
+    hr = m_deviceManager->ResetDevice(m_device.Get(), resetToken);
     if (FAILED(hr))
     {
         NX_DEBUG(this, "Failed to reset device manager, error code: %1",
@@ -186,7 +186,7 @@ bool DeviceHandle::createDevice(int width, int height, mfxU32 adapterNumber)
         return false;
     }
 
-    if (!m_renderer.init(m_hWnd, m_device, m_d3d))
+    if (!m_renderer.init(m_hWnd, m_device.Get(), m_d3d.Get()))
        return false;
 
     return true;

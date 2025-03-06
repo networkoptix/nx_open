@@ -19,14 +19,11 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #ifdef _WIN32
 
-#include <objbase.h>
 #include <initguid.h>
-#include <assert.h>
-#include <d3d9.h>
-
-#include <nx/utils/log/log.h>
 
 #include "d3d_allocator.h"
+
+#include <nx/utils/log/log.h>
 
 #define D3DFMT_NV12 (D3DFORMAT)MAKEFOURCC('N','V','1','2')
 #define D3DFMT_YV12 (D3DFORMAT)MAKEFOURCC('Y','V','1','2')
@@ -118,14 +115,14 @@ mfxStatus D3DFrameAllocator::Close()
     if (m_manager && m_hDecoder)
     {
         m_manager->CloseDeviceHandle(m_hDecoder);
-        m_manager = 0;
+        m_manager.Reset();
         m_hDecoder = 0;
     }
 
     if (m_manager && m_hProcessor)
     {
         m_manager->CloseDeviceHandle(m_hProcessor);
-        m_manager = 0;
+        m_manager.Reset();
         m_hProcessor = 0;
     }
 
@@ -391,7 +388,7 @@ mfxStatus D3DFrameAllocator::AllocImpl(mfxFrameAllocRequest *request, mfxFrameAl
             if (FAILED(hr))
                 return MFX_ERR_MEMORY_ALLOC;
         }
-        videoService = m_processorService;
+        videoService = m_processorService.Get();
     }
     else {
         if (!m_hDecoder)
@@ -404,7 +401,7 @@ mfxStatus D3DFrameAllocator::AllocImpl(mfxFrameAllocRequest *request, mfxFrameAl
             if (FAILED(hr))
                 return MFX_ERR_MEMORY_ALLOC;
         }
-        videoService = m_decoderService;
+        videoService = m_decoderService.Get();
     }
 
     mfxHDLPair **dxMidPtrs = (mfxHDLPair**)calloc(request->NumFrameSuggested, sizeof(mfxHDLPair*));

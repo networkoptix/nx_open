@@ -4,9 +4,9 @@
 
 #ifdef _WIN32
 
-#include <atlbase.h>
 #include <d3d9.h>
 #include <dxva2api.h>
+#include <wrl/client.h>
 
 #include <vpl/mfx.h>
 
@@ -20,13 +20,13 @@ public:
     ~DeviceHandle();
     bool createDevice(int width, int height, mfxU32 adapterNumber);
 
-    IDirect3DDeviceManager9* getDeviceManager() { return m_deviceManager; }
+    IDirect3DDeviceManager9* getDeviceManager() const { return m_deviceManager.Get(); }
     Renderer& getRenderer() { return m_renderer; }
 
 private:
-    CComPtr<IDirect3DDeviceManager9> m_deviceManager;
-    CComPtr<IDirect3D9Ex> m_d3d;
-    CComPtr<IDirect3DDevice9Ex> m_device;
+    Microsoft::WRL::ComPtr<IDirect3DDeviceManager9> m_deviceManager;
+    Microsoft::WRL::ComPtr<IDirect3D9Ex> m_d3d;
+    Microsoft::WRL::ComPtr<IDirect3DDevice9Ex> m_device;
 
     HWND m_hWnd = 0;
     Renderer m_renderer;

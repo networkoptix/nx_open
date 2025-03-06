@@ -21,9 +21,10 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #ifdef _WIN32
 
-#include <atlbase.h>
 #include <d3d9.h>
 #include <dxva2api.h>
+#include <wrl/client.h>
+
 #include <vector>
 
 #include "base_allocator.h"
@@ -42,7 +43,7 @@ public:
     D3DFrameAllocator(IDirect3DDeviceManager9* pManager);
     virtual ~D3DFrameAllocator();
     virtual mfxStatus Close();
-    virtual IDirect3DDeviceManager9* GetDeviceManager() { return m_manager; };
+    virtual IDirect3DDeviceManager9* GetDeviceManager() const { return m_manager.Get(); };
 
     virtual mfxStatus LockFrame(mfxMemId mid, mfxFrameData *ptr);
     virtual mfxStatus UnlockFrame(mfxMemId mid, mfxFrameData *ptr);
@@ -58,9 +59,9 @@ protected:
 
     std::vector<mfxHDLPair**> m_midsAllocated;
 
-    CComPtr<IDirect3DDeviceManager9> m_manager;
-    CComPtr<IDirectXVideoDecoderService> m_decoderService;
-    CComPtr<IDirectXVideoProcessorService> m_processorService;
+    Microsoft::WRL::ComPtr<IDirect3DDeviceManager9> m_manager;
+    Microsoft::WRL::ComPtr<IDirectXVideoDecoderService> m_decoderService;
+    Microsoft::WRL::ComPtr<IDirectXVideoProcessorService> m_processorService;
     HANDLE m_hDecoder;
     HANDLE m_hProcessor;
     DWORD m_surfaceUsage;

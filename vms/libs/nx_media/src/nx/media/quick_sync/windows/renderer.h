@@ -4,14 +4,12 @@
 
 #ifdef _WIN32
 
-#include <atlbase.h>
 #include <d3d9.h>
-#include <dxva.h>
-#include <dxva2api.h>
 #include <windows.h>
+#include <wrl/client.h>
 
-#include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
+#include <QtCore/QSize>
 
 #include <vpl/mfx.h>
 
@@ -35,8 +33,8 @@ private:
 
 private:
     IDirect3DDevice9Ex* m_device = nullptr;
-    CComPtr<IDirect3DSurface9> m_renderTargetSurface;
-    CComPtr<IDirect3DSurface9> m_sharedSurface;
+    Microsoft::WRL::ComPtr<IDirect3DSurface9> m_renderTargetSurface;
+    Microsoft::WRL::ComPtr<IDirect3DSurface9> m_sharedSurface;
     HANDLE m_sharedSurfaceHandle = 0;
 
     HANDLE m_textureHandle = 0;

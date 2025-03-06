@@ -200,10 +200,15 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
         return false;
     }
     // This registers a resource that was created as shared in DX with its shared handle
-    BOOL success = wglDXSetResourceShareHandleNV(m_sharedSurface, m_sharedSurfaceHandle);
+    BOOL success = wglDXSetResourceShareHandleNV(m_sharedSurface.Get(), m_sharedSurfaceHandle);
 
     m_textureHandle = wglDXRegisterObjectNV(
-        m_renderDeviceHandle, m_sharedSurface, textureId, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV);
+        m_renderDeviceHandle,
+        m_sharedSurface.Get(),
+        textureId,
+        GL_TEXTURE_2D,
+        WGL_ACCESS_READ_ONLY_NV);
+
     if (m_textureHandle == NULL)
     {
         NX_WARNING(this, "Failed to register object NV, error code: %1", GetLastError());
@@ -217,7 +222,7 @@ bool Renderer::createSharedSurface(QSize size)
     D3DSURFACE_DESC rtDesc;
     m_renderTargetSurface->GetDesc(&rtDesc);
 
-    m_sharedSurface.Release();
+    m_sharedSurface.Reset();
     m_sharedSurfaceHandle = 0;
     auto hr = m_device->CreateOffscreenPlainSurface(
         size.width(),
@@ -257,7 +262,7 @@ bool Renderer::render(
         if (!registerTexture(textureId, context))
             return false;
     }
-    if (!convertToRgb(m_device, mfxSurface, m_sharedSurface))
+    if (!convertToRgb(m_device, mfxSurface, m_sharedSurface.Get()))
         return false;
 
     auto wglDXLockObjectsNV = (PFNWGLDXLOCKOBJECTSNVPROC)wglGetProcAddress("wglDXLockObjectsNV");
