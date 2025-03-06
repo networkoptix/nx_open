@@ -216,6 +216,7 @@ void TextWithFieldsPicker::updateUi()
     m_field->parseText();
 
     base::updateUi();
+    setValidity(fieldValidity());
 }
 
 void TextWithFieldsPicker::setValidity(const vms::rules::ValidationResult& validationResult)
