@@ -566,6 +566,7 @@ signals:
     void masterCloudSyncChanged();
     void securityForPowerUsersChanged();
     void cloudPollingIntervalChanged();
+    void lastMergeIdChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
