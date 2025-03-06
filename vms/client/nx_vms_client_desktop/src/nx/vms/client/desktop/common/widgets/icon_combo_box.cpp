@@ -6,11 +6,10 @@
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QListView>
 
-#include <ui/common/indents.h>
 #include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/desktop/style/helper.h>
-
 #include <nx/vms/client/desktop/common/delegates/styled_combo_box_delegate.h>
+#include <nx/vms/client/desktop/style/helper.h>
+#include <ui/common/indents.h>
 
 namespace {
 
@@ -23,6 +22,8 @@ namespace nx::vms::client::desktop {
 class IconComboBox::Delegate: public StyledComboBoxDelegate
 {
 public:
+    QSize m_itemSize;
+
     using StyledComboBoxDelegate::StyledComboBoxDelegate; //< Forward constructors.
 
     virtual QSize sizeHint(const QStyleOptionViewItem& option,
@@ -36,7 +37,14 @@ public:
         return qnSkin->maximumSize(opt.icon);
     }
 
-    QSize m_itemSize;
+protected:
+    void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override
+    {
+        StyledComboBoxDelegate::initStyleOption(option, index);
+
+        // For the proper icon center alignment only `HasDecoration` feature must be set.
+        option->features = QStyleOptionViewItem::HasDecoration;
+    }
 };
 
 IconComboBox::IconComboBox(QWidget* parent) :
