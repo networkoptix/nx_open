@@ -44,18 +44,18 @@ protected:
 
     void whenDeviceAgentEnabled(const AnalyticsEngineResourcePtr& engine, bool value = true)
     {
-        UuidSet enabledEngines = m_camera->enabledAnalyticsEngines();
+        std::set<nx::Uuid> enabledEngines = m_camera->enabledAnalyticsEngines();
         if (value)
             enabledEngines.insert(engine->getId());
         else
-            enabledEngines.remove(engine->getId());
+            enabledEngines.erase(engine->getId());
         m_camera->setUserEnabledAnalyticsEngines(enabledEngines);
     }
 
     AnalyticsEngineResourcePtr givenCompatibleEngine()
     {
         auto engine = addEngine();
-        UuidSet compatibleEngines = m_camera->compatibleAnalyticsEngines();
+        std::set<nx::Uuid> compatibleEngines = m_camera->compatibleAnalyticsEngines();
         compatibleEngines.insert(engine->getId());
         m_camera->setCompatibleAnalyticsEngines(compatibleEngines);
         return engine;

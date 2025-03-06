@@ -285,7 +285,7 @@ protected:
 
         ASSERT_TRUE(enabledAnalyticsenginesResult.success);
 
-        UuidSet enabledAnalyticsEngineIds;
+        std::set<nx::Uuid> enabledAnalyticsEngineIds;
         for (const QString& stringId: enabledAnalyticsEngineStringIds)
             enabledAnalyticsEngineIds.insert(toUuid(stringId));
 

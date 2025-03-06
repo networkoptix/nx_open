@@ -737,7 +737,7 @@ QVariantList CameraSettingsDialogStore::userEnabledAnalyticsEngines() const
     return nx::utils::toQVariantList(d->state.analytics.userEnabledEngines.get());
 }
 
-void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& value)
+void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const std::set<nx::Uuid>& value)
 {
     d->executeAction(
         [&](State state)
@@ -767,7 +767,7 @@ bool CameraSettingsDialogStore::analyticsSettingsLoading() const
 
 void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QVariantList& value)
 {
-    setUserEnabledAnalyticsEngines(nx::utils::toQSet(nx::utils::toTypedQList<nx::Uuid>(value)));
+    setUserEnabledAnalyticsEngines(nx::utils::toStdSet(nx::utils::toTypedQList<nx::Uuid>(value)));
 }
 
 int CameraSettingsDialogStore::analyticsStreamIndex(const nx::Uuid& engineId) const
@@ -817,7 +817,7 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
                 std::move(state), engineId, activeElement, values, paramValues);
         });
 }
-void CameraSettingsDialogStore::handleOverusedEngines(const QSet<nx::Uuid>& overusedEngines)
+void CameraSettingsDialogStore::handleOverusedEngines(const std::set<nx::Uuid>& overusedEngines)
 {
     d->executeAction(
         [&](State state)

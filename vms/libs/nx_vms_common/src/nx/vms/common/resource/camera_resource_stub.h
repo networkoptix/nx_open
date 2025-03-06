@@ -46,8 +46,8 @@ public:
     virtual AnalyticsEntitiesByEngine supportedEventTypes() const override;
     void setSupportedEventTypes(const QMap<nx::Uuid, std::set<QString>>& eventTypesByEngine);
 
-    virtual UuidSet enabledAnalyticsEngines() const override;
-    void setEnabledAnalyticsEngines(UuidSet engines);
+    virtual std::set<nx::Uuid> enabledAnalyticsEngines() const override;
+    void setEnabledAnalyticsEngines(std::set<nx::Uuid> engines);
 
     virtual nx::vms::common::AnalyticsEngineResourceList
         compatibleAnalyticsEngineResources() const override;

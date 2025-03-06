@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/qt_helpers.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx {
 
@@ -19,7 +20,7 @@ struct CameraResourceStub::Private
     QMap<nx::Uuid, std::set<QString>> supportedObjectTypes;
     QMap<nx::Uuid, std::set<QString>> supportedEventTypes;
 
-    std::optional<UuidSet> enabledAnalyticsEngines;
+    std::optional<std::set<nx::Uuid>> enabledAnalyticsEngines;
     std::optional<nx::vms::common::AnalyticsEngineResourceList> compatibleAnalyticsEngineResources;
 };
 
@@ -144,15 +145,18 @@ void CameraResourceStub::setAnalyticsObjectsEnabled(bool value, const nx::Uuid& 
         setSupportedObjectTypes({});
 }
 
-QSet<nx::Uuid> CameraResourceStub::enabledAnalyticsEngines() const
+std::set<nx::Uuid> CameraResourceStub::enabledAnalyticsEngines() const
 {
     if (d->enabledAnalyticsEngines)
         return *d->enabledAnalyticsEngines;
 
-    return !d->supportedObjectTypes.empty() || !d->supportedEventTypes.empty()
-        ? nx::utils::toQSet(d->supportedObjectTypes.keys())
-              .unite(nx::utils::toQSet(d->supportedEventTypes.keys()))
-        : base_type::enabledAnalyticsEngines();
+    if (!d->supportedObjectTypes.empty() || !d->supportedEventTypes.empty())
+    {
+        return nx::utils::set_union(
+            nx::utils::toStdSet(d->supportedObjectTypes.keys()),
+            nx::utils::toStdSet(d->supportedEventTypes.keys()));
+    }
+    return base_type::enabledAnalyticsEngines();
 }
 
 nx::vms::common::AnalyticsEngineResourceList
@@ -193,7 +197,7 @@ void CameraResourceStub::setSupportedEventTypes(
     emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
 }
 
-void CameraResourceStub::setEnabledAnalyticsEngines(UuidSet engines)
+void CameraResourceStub::setEnabledAnalyticsEngines(std::set<nx::Uuid> engines)
 {
     d->enabledAnalyticsEngines = std::move(engines);
     emit compatibleEventTypesMaybeChanged(toSharedPointer(this));

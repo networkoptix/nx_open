@@ -593,7 +593,7 @@ State fixupRecordingBrush(State state)
  * Utility function to filter only those entities, which are supported by the provided engines.
  */
 std::map<nx::Uuid, std::set<QString>> filterByEngineIds(
-    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const QSet<nx::Uuid>& engineIds)
+    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const std::set<nx::Uuid>& engineIds)
 {
     std::erase_if(entitiesByEngine,
         [&engineIds](const auto& i) { return !engineIds.contains(i.first); });
@@ -2746,7 +2746,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
 }
 
 State CameraSettingsDialogStateReducer::handleOverusedEngines(
-    State state, const QSet<nx::Uuid>& overusedEngines)
+    State state, const std::set<nx::Uuid>& overusedEngines)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 for %2", __func__, overusedEngines);
 
@@ -2789,14 +2789,14 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
 }
 
 State CameraSettingsDialogStateReducer::setUserEnabledAnalyticsEngines(
-    State state, const QSet<nx::Uuid>& value)
+    State state, const std::set<nx::Uuid>& value)
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
     NX_ASSERT(state.isSingleCamera());
 
     // Filter out engines which are not available anymore.
-    QSet<nx::Uuid> actualValue;
+    std::set<nx::Uuid> actualValue;
     for (const auto& id: value)
     {
         if (analyticsEngineIsPresentInList(id, state))

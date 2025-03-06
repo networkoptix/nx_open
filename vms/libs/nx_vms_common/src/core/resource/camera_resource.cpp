@@ -133,7 +133,7 @@ QPointF storedPtzPanTiltSensitivity(const QnVirtualCameraResource& camera)
  * Utility function to filter only those entities, which are supported by the provided engines.
  */
 std::map<nx::Uuid, std::set<QString>> filterByEngineIds(
-    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const QSet<nx::Uuid>& engineIds)
+    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const std::set<nx::Uuid>& engineIds)
 {
     std::erase_if(entitiesByEngine,
         [&engineIds](const auto& i) { return !engineIds.contains(i.first); });
@@ -380,13 +380,13 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_cachedUserEnabledAnalyticsEngines(
         [this]
         {
-            return QJson::deserialized<QSet<nx::Uuid>>(
+            return QJson::deserialized<std::set<nx::Uuid>>(
                 getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
         }),
     m_cachedCompatibleAnalyticsEngines(
         [this]
         {
-            return QJson::deserialized<QSet<nx::Uuid>>(
+            return QJson::deserialized<std::set<nx::Uuid>>(
                 getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
         }),
     m_cachedDeviceAgentManifests([this] { return deviceAgentManifests(); }),
@@ -2893,9 +2893,9 @@ void QnVirtualCameraResource::emitPropertyChanged(
     base_type::emitPropertyChanged(key, prevValue, newValue);
 }
 
-QSet<nx::Uuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
+std::set<nx::Uuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
-    return nx::utils::toQSet(enabledAnalyticsEngineResources().ids());
+    return nx::utils::toStdSet(enabledAnalyticsEngineResources().ids());
 }
 
 const nx::vms::common::AnalyticsEngineResourceList
@@ -2910,19 +2910,19 @@ const nx::vms::common::AnalyticsEngineResourceList
         });
 }
 
-QSet<nx::Uuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
+std::set<nx::Uuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
 {
     return m_cachedUserEnabledAnalyticsEngines.get();
 }
 
-void QnVirtualCameraResource::setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& engines)
+void QnVirtualCameraResource::setUserEnabledAnalyticsEngines(const std::set<nx::Uuid>& engines)
 {
     const auto p = serializeUserEnabledAnalyticsEngines(engines);
     setProperty(p.name, p.value);
 }
 
 nx::vms::api::ResourceParamData QnVirtualCameraResource::serializeUserEnabledAnalyticsEngines(
-    const QSet<nx::Uuid>& engines)
+    const std::set<nx::Uuid>& engines)
 {
     return nx::vms::api::ResourceParamData(
         kUserEnabledAnalyticsEnginesProperty,
@@ -2930,7 +2930,7 @@ nx::vms::api::ResourceParamData QnVirtualCameraResource::serializeUserEnabledAna
     );
 }
 
-const QSet<nx::Uuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const
+const std::set<nx::Uuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const
 {
     return m_cachedCompatibleAnalyticsEngines.get();
 }
@@ -2946,7 +2946,7 @@ nx::vms::common::AnalyticsEngineResourceList
         compatibleAnalyticsEngines());
 }
 
-void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const QSet<nx::Uuid>& engines)
+void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const std::set<nx::Uuid>& engines)
 {
     setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
 }
@@ -3004,12 +3004,13 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     const nx::Uuid& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
+    NX_MUTEX_LOCKER lock(&m_cachedValueMutex);
     auto manifests = m_cachedDeviceAgentManifests.get();
     manifests[engineId] = manifest;
-
     setProperty(
         kDeviceAgentManifestsProperty,
         QString::fromUtf8(nx::reflect::json::serialize(manifests)));
+    saveProperties();
 }
 
 nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(nx::Uuid engineId) const

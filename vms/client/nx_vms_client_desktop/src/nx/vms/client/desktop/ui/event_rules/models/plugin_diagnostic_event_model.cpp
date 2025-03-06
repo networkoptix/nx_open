@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::client::desktop::ui {
 
@@ -15,9 +16,12 @@ void PluginDiagnosticEventModel::filterByCameras(
 
     if (!cameras.isEmpty())
     {
-        QSet<nx::Uuid> compatibleEngineIds = cameras[0]->compatibleAnalyticsEngines();
+        std::set<nx::Uuid> compatibleEngineIds = cameras[0]->compatibleAnalyticsEngines();
         for (int i = 1; i < cameras.size(); ++i)
-            compatibleEngineIds.intersect(cameras[i]->compatibleAnalyticsEngines());
+        {
+            compatibleEngineIds = nx::utils::set_intersection(
+                compatibleEngineIds, cameras[i]->compatibleAnalyticsEngines());
+        }
 
         engines = engines.filtered<AnalyticsEngineResource>(
             [&compatibleEngineIds](const AnalyticsEngineResourcePtr& engine)

@@ -407,12 +407,12 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         QList<core::AnalyticsEngineInfo> engines;
 
         // Engines, which are enabled by the user.
-        UserEditable<QSet<nx::Uuid>> userEnabledEngines;
+        UserEditable<std::set<nx::Uuid>> userEnabledEngines;
 
         // All Engines which are actually enabled for the Camera. Includes device-dependent Engines.
-        QSet<nx::Uuid> enabledEngines() const
+        std::set<nx::Uuid> enabledEngines() const
         {
-            QSet<nx::Uuid> result;
+            std::set<nx::Uuid> result;
             for (const auto& engine: engines)
             {
                 if (engine.isDeviceDependent || userEnabledEngines().contains(engine.id))

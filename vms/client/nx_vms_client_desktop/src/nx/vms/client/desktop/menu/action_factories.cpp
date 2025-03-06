@@ -435,7 +435,7 @@ QAction* ShowOnItemsFactory::initRoiAction(const Parameters& parameters, QObject
             return nullptr;
 
         const auto camera = w->resource().dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->enabledAnalyticsEngines().isEmpty())
+        if (!camera || camera->enabledAnalyticsEngines().empty())
             return nullptr;
         actualWidgets.append(w);
     }

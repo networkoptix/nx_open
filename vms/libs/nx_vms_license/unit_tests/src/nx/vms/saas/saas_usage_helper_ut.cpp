@@ -312,7 +312,7 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingServiceUsage)
     m_cloudeStorageHelper->proposeChange(devicesToAdd, devicesToRemove);
     ASSERT_FALSE(m_cloudeStorageHelper->isOverflow());
 
-    QSet<nx::Uuid> devices;
+    std::set<nx::Uuid> devices;
     for (const auto& camera: cameras1)
         devices.insert(camera->getId());
     m_cloudeStorageHelper->setUsedDevices(devices);
@@ -563,7 +563,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceLoaded)
 TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
 {
     auto cameras = addCameras(/*size*/ 50);
-    QSet<nx::Uuid> engines;
+    std::set<nx::Uuid> engines;
     engines.insert(testPluginData[0].engineId);
 
     cameras[0]->setUserEnabledAnalyticsEngines(engines);
@@ -580,13 +580,13 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
     ASSERT_EQ(50, info.begin()->second.inUse);
 
     std::vector<IntegrationServiceUsageHelper::Propose> propose;
-    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[0]->getId(), QSet<nx::Uuid>()});
+    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[0]->getId(), std::set<nx::Uuid>()});
 
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
     ASSERT_EQ(49, info.begin()->second.inUse);
 
-    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[1]->getId(), QSet<nx::Uuid>()});
+    propose.push_back(IntegrationServiceUsageHelper::Propose{cameras[1]->getId(), std::set<nx::Uuid>()});
     m_integrationsHelper->proposeChange(propose);
     info = m_integrationsHelper->allInfo();
     ASSERT_EQ(48, info.begin()->second.inUse);
@@ -595,7 +595,7 @@ TEST_F(SaasServiceUsageHelperTest, IntegrationServiceUsage)
 TEST_F(SaasServiceUsageHelperTest, IntegrationCamerasByService)
 {
     auto cameras = addCameras(/*size*/ 50);
-    QSet<nx::Uuid> engines;
+    std::set<nx::Uuid> engines;
     for (const auto& data: testPluginData)
         engines.insert(data.engineId);
 

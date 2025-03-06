@@ -1772,7 +1772,7 @@ struct ModifyResourceParamAccess
         const nx::network::rest::UserAccessData&,
         const nx::vms::api::ResourceParamWithRefData& param)
     {
-        auto newEngines = QJson::deserialized<QSet<nx::Uuid>>(param.value.toUtf8());
+        auto newEngines = QJson::deserialized<std::set<nx::Uuid>>(param.value.toUtf8());
         nx::vms::license::saas::IntegrationServiceUsageHelper helper(systemContext);
         helper.proposeChange(param.resourceId, newEngines);
         if (helper.isOverflow())

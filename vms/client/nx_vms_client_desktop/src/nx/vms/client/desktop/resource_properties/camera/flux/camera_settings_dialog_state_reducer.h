@@ -166,10 +166,10 @@ public:
     static State resetExpertSettings(State state);
     static std::pair<bool, State> setAnalyticsEngines(
         State state, const QList<core::AnalyticsEngineInfo>& value);
-    static State handleOverusedEngines(State state, const QSet<nx::Uuid>& overusedEngines);
+    static State handleOverusedEngines(State state, const std::set<nx::Uuid>& overusedEngines);
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const nx::Uuid& value);
 
-    static State setUserEnabledAnalyticsEngines(State state, const QSet<nx::Uuid>& value);
+    static State setUserEnabledAnalyticsEngines(State state, const std::set<nx::Uuid>& value);
     static State setAnalyticsStreamIndex(
         State state, const nx::Uuid& engineId, State::StreamIndex value, ModificationSource source);
 

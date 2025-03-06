@@ -736,7 +736,7 @@ public:
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
      *     the user and active (running on the current server). Includes device-dependent Engines.
      */
-    virtual QSet<nx::Uuid> enabledAnalyticsEngines() const;
+    virtual std::set<nx::Uuid> enabledAnalyticsEngines() const;
 
     /**
      * @return Analytics Engines which are actually compatible with the Device, enabled by the user
@@ -748,13 +748,13 @@ public:
      * @return Ids of Analytics Engines which are explicitly enabled by the user. Not validated for
      *     compatibility with the Device or if the engine is active (running on the current server).
      */
-    QSet<nx::Uuid> userEnabledAnalyticsEngines() const;
+    std::set<nx::Uuid> userEnabledAnalyticsEngines() const;
 
     /**
      * Set ids of Analytics Engines which are explicitly enabled by the user. Not validated for
      * compatibility with the Device or if the Engine is active (running on the current server).
      */
-    void setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& engines);
+    void setUserEnabledAnalyticsEngines(const std::set<nx::Uuid>& engines);
 
     /**
      * Set ids of Analytics Engines which are explicitly enabled by the user.
@@ -762,13 +762,13 @@ public:
      * it to the resource properties.
      */
     nx::vms::api::ResourceParamData serializeUserEnabledAnalyticsEngines(
-        const QSet<nx::Uuid>& engines);
+        const std::set<nx::Uuid>& engines);
 
     /**
      * @return Ids of Analytics Engines which can be potentially used with the Device. Only active
      *     (running on the current server) Engines are included.
      */
-    virtual const QSet<nx::Uuid> compatibleAnalyticsEngines() const;
+    virtual const std::set<nx::Uuid> compatibleAnalyticsEngines() const;
 
     /**
      * @return Analytics Engines which can be potentially used with the Device. Only active
@@ -780,7 +780,7 @@ public:
      * Set ids of Analytics Engines which can be potentially used with the Device. Only active
      * (running on the current server) Engines must be included.
      */
-    void setCompatibleAnalyticsEngines(const QSet<nx::Uuid>& engines);
+    void setCompatibleAnalyticsEngines(const std::set<nx::Uuid>& engines);
 
     using AnalyticsEntitiesByEngine = std::map<nx::Uuid, std::set<QString>>;
 
@@ -972,8 +972,8 @@ private:
     nx::utils::CachedValue<bool> m_cachedHasVideo;
     nx::utils::CachedValue<bool> m_isIntercom;
 
-    nx::utils::CachedValue<QSet<nx::Uuid>> m_cachedUserEnabledAnalyticsEngines;
-    nx::utils::CachedValue<QSet<nx::Uuid>> m_cachedCompatibleAnalyticsEngines;
+    nx::utils::CachedValue<std::set<nx::Uuid>> m_cachedUserEnabledAnalyticsEngines;
+    nx::utils::CachedValue<std::set<nx::Uuid>> m_cachedCompatibleAnalyticsEngines;
     nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
     nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedEventTypes;
     nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedObjectTypes;
@@ -982,6 +982,8 @@ private:
     nx::utils::CachedValue<int> m_cachedBackupMegapixels;
     nx::utils::CachedValue<QnLiveStreamParams> m_primaryStreamConfiguration;
     nx::utils::CachedValue<QnLiveStreamParams> m_secondaryStreamConfiguration;
+
+    mutable nx::Mutex m_cachedValueMutex;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);

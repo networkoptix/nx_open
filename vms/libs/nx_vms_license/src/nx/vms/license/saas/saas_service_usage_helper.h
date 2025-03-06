@@ -66,14 +66,14 @@ public:
     struct Propose
     {
         nx::Uuid resourceId;
-        QSet<nx::Uuid> integrations;
+        std::set<nx::Uuid> integrations;
     };
 
     /* Propose change in integration usage for some resource.
      *  @param resourceId Resource Id.
      *  @param integrations Set of used integration.
      */
-    void proposeChange(const nx::Uuid& resourceId, const QSet<nx::Uuid>& integrations);
+    void proposeChange(const nx::Uuid& resourceId, const std::set<nx::Uuid>& integrations);
 
     void proposeChange(const std::vector<Propose>& data);
 
@@ -135,7 +135,7 @@ public:
     /* Propose change that resources are used for cloud storage.
      *  @param devices New full set of resources that is going to be used.
      */
-    void setUsedDevices(const QSet<nx::Uuid>& devices);
+    void setUsedDevices(const std::set<nx::Uuid>& devices);
 
     /* Propose change that resources are used for cloud storage. Contains delta only.
      *  @param devicesToAdd New devices to  add to the list.

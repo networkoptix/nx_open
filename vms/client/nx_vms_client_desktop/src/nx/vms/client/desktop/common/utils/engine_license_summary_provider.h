@@ -5,6 +5,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 
+#include <set>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
@@ -31,9 +33,9 @@ public:
         QnResource* camera,
         const QVariantList& proposedEngines) const;
 
-    QSet<nx::Uuid> overusedEngines(
+    std::set<nx::Uuid> overusedEngines(
         QnResource* camera,
-        const QSet<nx::Uuid>& proposedEngines) const;
+        const std::set<nx::Uuid>& proposedEngines) const;
 };
 
 } // namespace nx::vms::client::desktop

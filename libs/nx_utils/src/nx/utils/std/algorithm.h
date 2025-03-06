@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <set>
 
 namespace nx {
 namespace utils {
@@ -345,6 +346,39 @@ template <typename T>
 [[nodiscard]] bool any_of(const std::initializer_list<T>& list, const T& v)
 {
     return std::any_of(list.begin(), list.end(), [&v](const T& e) { return v == e; });
+}
+
+template <typename T>
+std::set<T> set_intersection(const std::set<T>& a, const std::set<T>& b)
+{
+    std::set<T> result;
+    std::set_intersection(
+        a.begin(), a.end(),
+        b.begin(), b.end(),
+        std::inserter(result, result.begin()));
+    return result;
+}
+
+template <typename T>
+std::set<T> set_union(const std::set<T>& a, const std::set<T>& b)
+{
+    std::set<T> result;
+    std::set_union(
+        a.begin(), a.end(),
+        b.begin(), b.end(),
+        std::inserter(result, result.begin()));
+    return result;
+}
+
+template <typename T>
+std::set<T> set_difference(const std::set<T>& a, const std::set<T>& b)
+{
+    std::set<T> result;
+    std::set_difference(
+        a.begin(), a.end(),
+        b.begin(), b.end(),
+        std::inserter(result, result.begin()));
+    return result;
 }
 
 } // namespace utils

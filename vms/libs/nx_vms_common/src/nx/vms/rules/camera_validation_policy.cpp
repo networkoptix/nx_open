@@ -244,7 +244,7 @@ QString QnCameraRecordingPolicy::getText(
 bool QnCameraAnalyticsPolicy::isResourceValid(
     nx::vms::common::SystemContext* /*context*/, const QnVirtualCameraResourcePtr& camera)
 {
-    return !camera->compatibleAnalyticsEngines().isEmpty();
+    return !camera->compatibleAnalyticsEngines().empty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(

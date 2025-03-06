@@ -21,8 +21,8 @@ public:
     nx::Uuid deviceId;
     QnVirtualCameraResourcePtr camera;
     QHash<nx::Uuid, AnalyticsSettingsListenerPtr> listeners;
-    QSet<nx::Uuid> compatibleEngines;
-    QSet<nx::Uuid> enabledEngines;
+    std::set<nx::Uuid> compatibleEngines;
+    std::set<nx::Uuid> enabledEngines;
 
 public:
     Private(

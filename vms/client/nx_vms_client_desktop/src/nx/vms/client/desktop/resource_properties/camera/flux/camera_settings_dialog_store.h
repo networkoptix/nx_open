@@ -189,7 +189,7 @@ public:
     Q_INVOKABLE QVariantList analyticsEngines() const;
     void setAnalyticsEngines(const QList<core::AnalyticsEngineInfo>& value);
     Q_INVOKABLE QVariantList userEnabledAnalyticsEngines() const;
-    void setUserEnabledAnalyticsEngines(const QSet<nx::Uuid>& value);
+    void setUserEnabledAnalyticsEngines(const std::set<nx::Uuid>& value);
     Q_INVOKABLE nx::Uuid currentAnalyticsEngineId() const;
     Q_INVOKABLE void setCurrentAnalyticsEngineId(const nx::Uuid& engineId);
     Q_INVOKABLE bool analyticsSettingsLoading() const;
@@ -207,7 +207,7 @@ public:
         const QString& activeElement,
         const QJsonObject& paramsModel,
         const QJsonObject& values);
-    void handleOverusedEngines(const QSet<nx::Uuid>& overusedEngines);
+    void handleOverusedEngines(const std::set<nx::Uuid>& overusedEngines);
 
     Q_INVOKABLE void refreshDeviceAgentSettings(const nx::Uuid& engineId);
     void resetDeviceAgentData(

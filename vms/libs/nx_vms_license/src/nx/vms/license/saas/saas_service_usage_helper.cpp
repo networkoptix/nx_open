@@ -137,7 +137,7 @@ std::map<QString, LicenseSummaryDataEx> IntegrationServiceUsageHelper::allInfo()
 }
 
 void IntegrationServiceUsageHelper::proposeChange(
-    const nx::Uuid& resourceId, const QSet<nx::Uuid>& integrations)
+    const nx::Uuid& resourceId, const std::set<nx::Uuid>& integrations)
 {
     std::vector<Propose> data;
     data.push_back(Propose{resourceId, integrations});
@@ -320,7 +320,7 @@ void CloudStorageServiceUsageHelper::countCameraAsUsedUnsafe(
     ++it->second.inUse;
 }
 
-void CloudStorageServiceUsageHelper::setUsedDevices(const QSet<nx::Uuid>& devices)
+void CloudStorageServiceUsageHelper::setUsedDevices(const std::set<nx::Uuid>& devices)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
