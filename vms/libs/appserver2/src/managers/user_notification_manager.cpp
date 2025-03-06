@@ -9,7 +9,10 @@ void QnUserNotificationManager::triggerNotification(
     NotificationSource source)
 {
     NX_ASSERT(tran.command == ApiCommand::saveUser);
-    emit addedOrUpdated(tran.params, source);
+    if (tran.params.attributes.testFlag(nx::vms::api::UserAttribute::removed))
+        emit removed(tran.params.id, source);
+    else
+        emit addedOrUpdated(tran.params, source);
 }
 
 void QnUserNotificationManager::triggerNotification(
@@ -18,7 +21,12 @@ void QnUserNotificationManager::triggerNotification(
 {
     NX_ASSERT(tran.command == ApiCommand::saveUsers);
     for (const auto& user: tran.params)
-    emit addedOrUpdated(user, source);
+    {
+        if (user.attributes.testFlag(nx::vms::api::UserAttribute::removed))
+            emit removed(user.id, source);
+        else
+            emit addedOrUpdated(user, source);
+    }
 }
 
 void QnUserNotificationManager::triggerNotification(

@@ -83,4 +83,29 @@ bool amendOutputDataIfNeeded(
     return result;
 }
 
+template<>
+inline bool amendOutputDataIfNeeded(
+    const Qn::UserAccessData& accessData,
+    QnResourceAccessManager* accessManager,
+    std::vector<nx::vms::api::UserData>* dataList)
+{
+    if (accessData == Qn::kSystemAccess)
+        return false;
+
+    bool result = false;
+    std::erase_if(*dataList,
+        [&](auto& data)
+        {
+            if (data.attributes.testFlag(nx::vms::api::UserAttribute::removed))
+            {
+                result = true;
+                return true;
+            }
+
+            result |= amendOutputDataIfNeeded(accessData, accessManager, &data);
+            return false;
+        });
+    return result;
+}
+
 } // namespace ec2

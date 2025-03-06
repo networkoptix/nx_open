@@ -555,9 +555,13 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
 
     d->lastMergeMasterIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::lastMergeMasterId, QString(), this, [] { return tr("Last master System merge ID"); });
+    connect(d->lastMergeMasterIdAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, [this] { emit lastMergeIdChanged(); });
 
     d->lastMergeSlaveIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::lastMergeSlaveId, QString(), this, [] { return tr("Last slave System merge ID"); });
+    connect(d->lastMergeSlaveIdAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, [this] { emit lastMergeIdChanged(); });
 
     d->disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         Names::disabledVendors, QString(), this, [] { return tr("Disable Device vendors"); });
