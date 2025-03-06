@@ -182,6 +182,9 @@ const QnBaseSystemDescription* CloudCrossSystemManager::systemDescription(
     if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
         return nullptr;
 
+    if (!d->availableCloudSystems.contains(systemId))
+        return nullptr;
+
     return d->availableCloudSystems.at(systemId).get();
 }
 
