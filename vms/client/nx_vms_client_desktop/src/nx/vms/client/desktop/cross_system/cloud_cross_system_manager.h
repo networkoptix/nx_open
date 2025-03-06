@@ -26,6 +26,7 @@ public:
 
 signals:
     void systemFound(const QString& systemId);
+    void systemAboutToBeLost(const QString& systemId);
     void systemLost(const QString& systemId);
 
 private:

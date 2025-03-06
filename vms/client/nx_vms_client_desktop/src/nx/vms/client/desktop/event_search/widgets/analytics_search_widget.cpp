@@ -50,10 +50,12 @@
 #include <nx/vms/client/core/skin/icon.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
@@ -297,32 +299,33 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             }
         });
 
-    connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
-        [this, q]()
+    auto setSystemContextToModels =
+        [this, q](SystemContext* cameraContext)
         {
             if (!nx::vms::client::core::ini().allowCslObjectSearch)
                 return;
 
-            const auto selectedCamera = q->windowContext()->navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>();
-            if (!selectedCamera)
-                return;
+            // TODO: #dfisenko Remade models and everything connected to work with possible
+            // null system context.
+            if (!cameraContext)
+                cameraContext = appContext()->currentSystemContext();
 
-            const auto cameraContext = selectedCamera->systemContext()->as<SystemContext>();
+            NX_CRITICAL(cameraContext);
 
-            taxonomyManager = cameraContext->taxonomyManager();
-            if (!NX_ASSERT(taxonomyManager))
-                return;
-
-            if (!cameraContext->messageProcessor())
+            m_currentTaxonomyChangedConnection.reset();
+            if (taxonomyManager = cameraContext->taxonomyManager())
             {
-                // It is cross-system context case.
-                cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(taxonomyManager);
-            }
+                if (!cameraContext->messageProcessor())
+                {
+                    // It is cross-system context case.
+                    cameraContext->createMessageProcessor<QnDesktopClientMessageProcessor>(
+                        taxonomyManager);
+                }
 
-            m_currentTaxonomyChangedConnection.reset(
-                connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
-                    this, &AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy));
+                m_currentTaxonomyChangedConnection.reset(
+                    connect(taxonomyManager, &TaxonomyManager::currentTaxonomyChanged,
+                        this, &AnalyticsSearchWidget::Private::updateAllowanceAndTaxonomy));
+            }
 
             m_filterModel->setTaxonomyManager(taxonomyManager);
 
@@ -330,6 +333,30 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
             q->commonSetup()->setSystemContext(cameraContext);
 
             updateAllowanceAndTaxonomy();
+        };
+
+     connect(
+        appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemAboutToBeLost,
+        this,
+        [this, q, setSystemContextToModels](const QString& systemId)
+        {
+            CloudCrossSystemContext* crossSystemContext =
+                appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            if (crossSystemContext->systemContext() != q->commonSetup()->systemContext())
+                return;
+
+            // We should clean any links to the lost system context from the models before it is
+            // destroyed.
+            setSystemContextToModels(nullptr);
+        });
+
+    connect(q->windowContext()->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,
+        [this, q, setSystemContextToModels]()
+        {
+            const auto selectedCamera = q->windowContext()->navigator()->currentResource()
+                .dynamicCast<QnVirtualCameraResource>();
+            setSystemContextToModels(SystemContext::fromResource(selectedCamera));
         });
 }
 

@@ -63,7 +63,7 @@ private:
     QPointer<AbstractSearchListModel> m_model;
     nx::utils::ScopedConnections m_modelConnections;
 
-    SystemContext* m_systemContext = nullptr;
+    QPointer<SystemContext> m_systemContext;
 
     EventSearch::TimeSelection m_timeSelection = EventSearch::TimeSelection::anytime;
     EventSearch::TimeSelection m_previousTimeSelection = EventSearch::TimeSelection::anytime;

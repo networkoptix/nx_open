@@ -56,6 +56,7 @@ CloudCrossSystemManager::CloudCrossSystemManager(QObject* parent):
             for (const auto& systemId: removedCloudIds)
             {
                 NX_VERBOSE(this, "Cloud system %1 is lost", d->cloudSystems[systemId].get());
+                emit systemAboutToBeLost(systemId);
                 d->cloudSystems.erase(systemId);
                 emit systemLost(systemId);
             }

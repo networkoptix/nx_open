@@ -130,6 +130,7 @@ void AnalyticsFilterModel::setTaxonomyManager(TaxonomyManager* taxonomyManager)
     if (m_taxonomyManager == taxonomyManager)
         return;
 
+    m_manifestsUpdatedConnection.reset();
     m_currentTaxonomyChangedConnection.reset();
     m_taxonomyManager = taxonomyManager;
     if (!taxonomyManager)

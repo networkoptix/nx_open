@@ -33,7 +33,6 @@
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/visible_item_data_decorator_model.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
@@ -47,6 +46,8 @@
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/desktop/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
@@ -1161,9 +1162,16 @@ void RightPanelModelsAdapter::Private::initCslSupport(
     AnalyticsSearchListModel* analyticsModel,
     AnalyticsFilterModel*analyticsFilterModel)
 {
-    auto updateModels =
+    auto setSystemContextToModels =
         [this, analyticsModel, analyticsFilterModel](SystemContext* cameraContext)
         {
+            // TODO: #dfisenko Remade models and everything connected to work with possible
+            // null system context.
+            if (!cameraContext)
+                cameraContext = appContext()->currentSystemContext();
+
+            NX_CRITICAL(cameraContext);
+
             if (cameraContext == q->commonSetup()->systemContext())
                 return;
 
@@ -1182,16 +1190,32 @@ void RightPanelModelsAdapter::Private::initCslSupport(
         };
 
     m_modelConnections << connect(
-        m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        appContext()->cloudCrossSystemManager(), &CloudCrossSystemManager::systemAboutToBeLost,
         this,
-        [this, updateModels]
+        [this, setSystemContextToModels](const QString& systemId)
         {
-            const auto selectedCamera = m_context->navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>();
-            if (!selectedCamera)
+            CloudCrossSystemContext* crossSystemContext =
+                appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            if (crossSystemContext->systemContext() != q->commonSetup()->systemContext())
                 return;
 
-            updateModels(selectedCamera->systemContext()->as<SystemContext>());
+            // We should clean any links to the lost system context from the models before it is
+            // destroyed.
+            setSystemContextToModels(nullptr);
+
+            emit q->crossSiteModeChanged();
+        });
+
+    m_modelConnections << connect(
+        m_context->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this,
+        [this, setSystemContextToModels]
+        {
+            const auto selectedCamera =
+                m_context->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
+
+            setSystemContextToModels(SystemContext::fromResource(selectedCamera));
 
             emit q->crossSiteModeChanged();
         });
@@ -1200,14 +1224,14 @@ void RightPanelModelsAdapter::Private::initCslSupport(
         m_context->workbench(),
         &Workbench::currentLayoutChanged,
         this,
-        [this, updateModels]
+        [this, setSystemContextToModels]
         {
             const auto selectedCamera = m_context->navigator()->currentResource()
                 .dynamicCast<QnVirtualCameraResource>();
             if (!selectedCamera)
                 return;
 
-            updateModels(selectedCamera->systemContext()->as<SystemContext>());
+            setSystemContextToModels(selectedCamera->systemContext()->as<SystemContext>());
 
             emit q->crossSiteModeChanged();
         });
@@ -1215,7 +1239,7 @@ void RightPanelModelsAdapter::Private::initCslSupport(
     if (const auto selectedCamera = m_context->navigator()->currentResource()
         .dynamicCast<QnVirtualCameraResource>())
     {
-        updateModels(selectedCamera->systemContext()->as<SystemContext>());
+        setSystemContextToModels(selectedCamera->systemContext()->as<SystemContext>());
     }
 }
 
