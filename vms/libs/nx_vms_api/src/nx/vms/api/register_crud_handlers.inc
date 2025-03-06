@@ -821,6 +821,7 @@ static void registerServerRestHandlers(
      * %caption Modify Servers' log settings
      * %ingroup Servers
      * %struct[opt] ServerLogSettings
+     * %param[unused] id
      * %param[ref] _local,_strict,_ticket
      * %permissions Power User with a fresh session.
      * %return:{std::map<nx::Uuid, ServerLogSettings>} Log settings for every Server in the Site.
@@ -1294,6 +1295,9 @@ static void registerServerRestHandlers(
      * %caption Get Server recording stats
      * %ingroup Server Data
      * %struct RecordingStatisticsFilter
+     * %param:string id Server id. Can be obtained from "id" field via `GET /rest/v{1-}/servers`,
+     *     or be `this` to refer to the current Server.
+     *     %example this
      * %param[ref] _local
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
@@ -1305,6 +1309,7 @@ static void registerServerRestHandlers(
      * %caption Get Servers' recording stats
      * %ingroup Server Data
      * %struct RecordingStatisticsFilter
+     * %param[unused] id
      * %param[ref] _local
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %permissions Power User.
