@@ -48,7 +48,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
 {
     ui->setupUi(this);
 
-    ui->alertBar->init({.level=BarDescription::BarLevel::Error});
+    ui->alertBar->init({.level=BarDescription::BarLevel::Warning});
     ui->additionalInfoLabel->setHidden(true);
 
     ui->localTreeView->setIgnoreWheelEvents(true);

@@ -72,7 +72,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
-    ui->alertBar->init({.level = BarDescription::BarLevel::Error});
+    ui->alertBar->init({.level = BarDescription::BarLevel::Warning});
     ui->nothingFoundLabel->setHidden(true);
 
     ui->groupsTreeView->setIgnoreWheelEvents(true);
