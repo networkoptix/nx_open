@@ -51,6 +51,7 @@
 #include <nx/vms/client/core/motion/helpers/camera_motion_helper.h>
 #include <nx/vms/client/core/motion/helpers/media_player_motion_provider.h>
 #include <nx/vms/client/core/motion/items/motion_mask_item.h>
+#include <nx/vms/client/core/network/cloud_user_profile_watcher.h>
 #include <nx/vms/client/core/network/oauth_client.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/qml/items/multiline_text_item.h>
@@ -124,6 +125,8 @@ void registerQmlTypesInternal()
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
+
+    qmlRegisterType<CloudUserProfileWatcher>("Nx.Core", 1, 0, "CloudUserProfileWatcher");
 
     qmlRegisterType<positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
 
