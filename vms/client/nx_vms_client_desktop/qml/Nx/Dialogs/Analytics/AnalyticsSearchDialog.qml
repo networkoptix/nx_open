@@ -291,8 +291,6 @@ Window
                 Layout.rightMargin: 8
                 spacing: 8
 
-                visible: !eventModel.placeholderRequired
-
                 CounterBlock
                 {
                     id: counterBlock
@@ -303,7 +301,7 @@ Window
                         ? eventModel.analyticsSetup.availableNewTracks : 0
 
                     displayedItemsText: eventModel.itemCountText
-                    visible: !!displayedItemsText
+                    visible: !!displayedItemsText && !eventModel.placeholderRequired
 
                     availableItemsText:
                     {
@@ -341,7 +339,7 @@ Window
 
                     Layout.alignment: Qt.AlignVCenter
                     text: qsTr("Settings")
-                    visible: d.objectTypeSelected
+                    visible: d.objectTypeSelected && !eventModel.placeholderRequired
                     icon.source: "image://skin/20x20/Outline/settings.svg"
 
                     onClicked:
