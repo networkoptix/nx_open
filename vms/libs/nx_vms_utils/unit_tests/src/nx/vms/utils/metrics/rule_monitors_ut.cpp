@@ -29,6 +29,7 @@ public:
     }
 
 protected:
+    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     TestResource resource;
     ValueMonitors monitors;
 
@@ -165,7 +166,6 @@ TEST_F(MetricsGenerators, ValueBinary)
 
 TEST_F(MetricsGenerators, ValueCounts)
 {
-    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto count = parseFormulaOrThrow("count %a 30m", monitors).generator;
     const auto count7 = parseFormulaOrThrow("countValues %a 40m 7", monitors).generator;
     const auto countHello = parseFormulaOrThrow("countValues %a 50m Hello", monitors).generator;
@@ -227,7 +227,6 @@ TEST_F(MetricsGenerators, ValueCounts)
 
 TEST_F(MetricsGenerators, ValueFloat)
 {
-    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 40s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
@@ -289,7 +288,6 @@ TEST_F(MetricsGenerators, ValueFloat)
 
 TEST_F(MetricsGenerators, ValueSpike)
 {
-    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 10s", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 10s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 10s", monitors).generator;
@@ -360,7 +358,6 @@ TEST_F(MetricsGenerators, ValueSpike)
 
 TEST_F(MetricsGenerators, ValueBlanks)
 {
-    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 10s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
