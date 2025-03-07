@@ -17,6 +17,7 @@
 class CloudStatusWatcherPrivate;
 
 namespace nx::vms::api { struct UserSettings; }
+namespace nx::cloud::db::client { class Connection; }
 
 namespace nx::vms::client::core {
 
@@ -117,6 +118,8 @@ public:
     void saveUserSettings(const nx::vms::api::UserSettings& settings);
 
     Q_INVOKABLE void resendActivationEmail(const QString& email);
+
+    nx::cloud::db::client::Connection* cloudConnection() const;
 
 signals:
     void activationEmailResent(bool success);

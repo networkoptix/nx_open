@@ -10,6 +10,7 @@
 
 #include <network/cloud_system_data.h>
 #include <nx/branding.h>
+#include <nx/cloud/db/client/cdb_connection.h>
 #include <nx/cloud/db/client/oauth_manager.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
@@ -708,6 +709,10 @@ void CloudStatusWatcher::Private::ensureCloudConnection()
     NX_ASSERT(cloudConnection);
 }
 
+nx::cloud::db::client::Connection* CloudStatusWatcher::cloudConnection() const
+{
+    return dynamic_cast<nx::cloud::db::client::Connection*>(d->cloudConnection.get());
+}
 
 void CloudStatusWatcher::Private::setStatus(
     CloudStatusWatcher::Status newStatus, CloudStatusWatcher::ErrorCode newErrorCode)
