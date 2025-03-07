@@ -249,7 +249,11 @@ protected:
 
         if (!msgBody.empty())
         {
-            if (!SerializationLibWrapper::deserializeFromJson(msgBody, &outputData))
+            if constexpr (std::is_same_v<OutputData, QByteArray>)
+            {
+                outputData = msgBody.toByteArray();
+            }
+            else if (!SerializationLibWrapper::deserializeFromJson(msgBody, &outputData))
             {
                 handler(SystemError::invalidData, response, OutputData());
                 return;
