@@ -59,6 +59,8 @@ public:
      */
     void setCacheEnabled(bool enabled);
 
+    ApiRequestsExecutor* requestsExecutor() { return &m_requestExecutor; }
+
 private:
     ApiRequestsExecutor m_requestExecutor;
     AccountManager m_accountManager;
