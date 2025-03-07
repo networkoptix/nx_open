@@ -324,6 +324,8 @@ public:
 
     void setDoSendOptions(bool value);
 
+    void setConnectionTimeout(std::chrono::milliseconds timeout);
+
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
@@ -419,6 +421,7 @@ private:
     bool m_ignoreQopInDigest = false;
     nx::network::NatTraversalSupport m_natTraversal{nx::network::NatTraversalSupport::enabled};
     bool m_keepAliveSupported = true;
+    std::chrono::milliseconds m_tcpConnectionTimeout{};
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

@@ -1096,6 +1096,12 @@ void RtspStreamProvider::setOnSocketReadTimeoutCallback(
 void RtspStreamProvider::setRtpFrameTimeoutMs(int value)
 {
     m_rtpFrameTimeoutMs = value;
+    m_RtpSession.setTCPTimeout(std::chrono::milliseconds(m_rtpFrameTimeoutMs));
+}
+
+void RtspStreamProvider::setConnectionTimeout(std::chrono::milliseconds timeout)
+{
+    m_RtpSession.setConnectionTimeout(timeout);
 }
 
 // ------------------------------------- RtspResourceStreamProvider -----------------------------------

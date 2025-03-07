@@ -26,7 +26,7 @@
 #define DEFAULT_RTP_PORT 554
 
 static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
-static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
+static const std::chrono::seconds kDefaultTcpConnectionTimeout(5);
 static const int SDP_TRACK_STEP = 2;
 
 using namespace std::chrono;
@@ -340,6 +340,7 @@ QnRtspClient::QnRtspClient(
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
+    m_tcpConnectionTimeout = kDefaultTcpConnectionTimeout;
 }
 
 QnRtspClient::~QnRtspClient()
@@ -459,7 +460,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         else
             targetAddress = nx::network::url::getEndpoint(m_url, DEFAULT_RTP_PORT);
 
-        if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
+        if (!m_tcpSock->connect(targetAddress, m_tcpConnectionTimeout))
             return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
     }
 
@@ -1846,4 +1847,9 @@ bool QnRtspClient::ignoreQopInDigest() const
 void QnRtspClient::setDoSendOptions(bool value)
 {
     m_doSendOptions = value;
+}
+
+void QnRtspClient::setConnectionTimeout(std::chrono::milliseconds timeout)
+{
+    m_tcpConnectionTimeout = timeout;
 }

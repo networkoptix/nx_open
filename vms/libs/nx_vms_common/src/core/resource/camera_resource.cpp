@@ -59,6 +59,7 @@ namespace {
 using namespace nx::vms::common;
 
 using StreamFpsSharingMethod = QnVirtualCameraResource::StreamFpsSharingMethod;
+static const QString kRelayHost("relay.vmsproxy.com");
 
 const QString kPowerRelayPortName =
     QString::fromStdString(nx::reflect::toString(nx::vms::api::ExtendedCameraOutput::powerRelay));
@@ -3296,11 +3297,16 @@ nx::utils::Url QnVirtualCameraResource::vmsCloudUrl() const
         return result;
 
     result.setScheme("rtsp");
-    result.setHost(nx::format("%1.relay.vmsproxy.com", systemId));
+    result.setHost(nx::format("%1.%2", systemId, kRelayHost));
 
     result.setPath("/" + getId().toSimpleString());
     result.setPort(443);
     result.setQuery(QUrlQuery("stream=primary"));
 
     return result;
+}
+
+bool QnVirtualCameraResource::isVmsCloudUrl() const
+{
+    return nx::utils::Url(getUrl()).host().endsWith(kRelayHost);
 }

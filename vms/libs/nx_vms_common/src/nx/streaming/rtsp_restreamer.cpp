@@ -334,4 +334,9 @@ void RtspRestreamer::pleaseStop()
     m_reader.pleaseStop();
 }
 
+void RtspRestreamer::setConnectionTimeout(std::chrono::milliseconds timeout)
+{
+    m_reader.setConnectionTimeout(timeout);
+}
+
 } // namespace nx::vms::server

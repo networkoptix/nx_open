@@ -117,6 +117,7 @@ public:
     QnRtspClient& rtspClient();
     void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
     void setRtpFrameTimeoutMs(int value);
+    void setConnectionTimeout(std::chrono::milliseconds timeout);
 
     /**
      * This callback is called every time socket read timeout happens.

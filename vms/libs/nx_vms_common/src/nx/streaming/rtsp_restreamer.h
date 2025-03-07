@@ -58,6 +58,8 @@ public:
 
     static const std::string& cloudAddressTemplate();
 
+    void setConnectionTimeout(std::chrono::milliseconds timeout);
+
 private:
     static bool tryRewriteRequest(nx::utils::Url& url, bool force);
     static CameraDiagnostics::Result requestToken(
