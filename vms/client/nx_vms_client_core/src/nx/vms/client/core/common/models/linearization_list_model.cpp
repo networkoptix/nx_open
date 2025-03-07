@@ -424,12 +424,21 @@ void LinearizationListModel::Private::setSourceModel(QAbstractItemModel* value)
     if (m_sourceModel)
         m_sourceModel->disconnect(this);
 
-    m_sourceRoot = QModelIndex();
+    bool updateSourceRoot = false;
+    if (m_sourceRoot.isValid())
+    {
+        m_sourceRoot = QModelIndex();
+        updateSourceRoot = true;
+    }
+
     m_sourceModel = value;
     m_autoExpandRole = calculateAutoExpandRole();
 
     reset();
     m_operationInProgress = false;
+
+    if (updateSourceRoot)
+        emit q->sourceRootChanged();
 
     if (!m_sourceModel)
         return;
@@ -509,6 +518,7 @@ void LinearizationListModel::Private::setSourceRoot(const QModelIndex& sourceInd
     QScopedValueRollback progressRollback(m_operationInProgress, true);
     m_sourceRoot = newSourceRoot;
     reset();
+    emit q->sourceRootChanged();
 }
 
 bool LinearizationListModel::Private::autoExpandAll() const

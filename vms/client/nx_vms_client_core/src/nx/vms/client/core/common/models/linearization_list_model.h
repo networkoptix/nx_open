@@ -30,7 +30,7 @@ class NX_VMS_CLIENT_CORE_API LinearizationListModel:
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* sourceModel READ sourceModel WRITE setSourceModel
         NOTIFY sourceModelChanged)
-    Q_PROPERTY(QModelIndex sourceRoot READ sourceRoot WRITE setSourceRoot)
+    Q_PROPERTY(QModelIndex sourceRoot READ sourceRoot WRITE setSourceRoot NOTIFY sourceRootChanged)
     Q_PROPERTY(bool autoExpandAll READ autoExpandAll WRITE setAutoExpandAll
         NOTIFY autoExpandChanged)
     Q_PROPERTY(QString autoExpandRoleName READ autoExpandRoleName WRITE setAutoExpandRoleName
@@ -90,6 +90,7 @@ public:
 signals:
     void sourceModelChanged(QPrivateSignal);
     void autoExpandChanged(QPrivateSignal);
+    void sourceRootChanged();
 
 private:
     class Private;
