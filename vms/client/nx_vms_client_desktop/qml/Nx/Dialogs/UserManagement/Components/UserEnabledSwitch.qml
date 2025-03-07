@@ -14,26 +14,28 @@ Item
     implicitWidth: control.enabled ? clickableSwitch.implicitWidth : readonlyText.implicitWidth
     implicitHeight: clickableSwitch.implicitHeight
 
-    Switch
+    Row
     {
-        id: clickableSwitch
+        Switch
+        {
+            id: clickableSwitch
 
-        visible: control.enabled
-        text: control.checked ? qsTr("Enabled user") : qsTr("Disabled user")
+            visible: control.enabled
+            text: control.checked ? qsTr("Enabled user") : qsTr("Disabled user")
 
-        color: control.checked
-            ? ColorTheme.colors.green_core
-            : ColorTheme.colors.light16
-    }
+            color: control.checked
+                ? ColorTheme.colors.green_core
+                : ColorTheme.colors.light16
+        }
 
-    Text
-    {
-        id: readonlyText
+        Text
+        {
+            id: readonlyText
 
-        visible: !control.enabled
-        font: clickableSwitch.font
-        text: clickableSwitch.text
-        color: clickableSwitch.color
-        anchors.baseline: clickableSwitch.baseline
+            visible: !control.enabled
+            font: clickableSwitch.font
+            text: clickableSwitch.text
+            color: clickableSwitch.color
+        }
     }
 }
