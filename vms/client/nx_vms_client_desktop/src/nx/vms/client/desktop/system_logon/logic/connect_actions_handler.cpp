@@ -1580,32 +1580,17 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
         if (auto welcomeScreen = mainWindow()->welcomeScreen())
             emit welcomeScreen->dropConnectingState();
     }
-    clearConnection();
-    return true;
-}
-
-void ConnectActionsHandler::showLoginDialog()
-{
-    if (workbenchContext()->closingDown())
-        return;
-
-    auto dialog = std::make_unique<LoginDialog>(mainWindowWidget());
-    dialog->exec();
-}
-
-void ConnectActionsHandler::clearConnection()
-{
-    NX_DEBUG(this, "Clear connection");
 
     emit windowContext()->beforeSystemChanged();
 
     hideReconnectDialog();
+
+    NX_DEBUG(this, "Clearing local state");
+
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
     qnClientCoreModule->networkModule()->setSession({});
     system()->setSession({});
-
-    windowContext()->workbenchStateManager()->tryClose(/*force*/ true);
 
     // Get ready for the next connection.
     d->warnMessagesDisplayed = false;
@@ -1656,7 +1641,18 @@ void ConnectActionsHandler::clearConnection()
 
     emit windowContext()->systemChanged();
 
-    NX_DEBUG(this, "Clear connection finished");
+    NX_DEBUG(this, "Disconnect finished");
+
+    return true;
+}
+
+void ConnectActionsHandler::showLoginDialog()
+{
+    if (workbenchContext()->closingDown())
+        return;
+
+    auto dialog = std::make_unique<LoginDialog>(mainWindowWidget());
+    dialog->exec();
 }
 
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)

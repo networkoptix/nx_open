@@ -80,9 +80,6 @@ private:
 
     void showLoginDialog();
 
-    /** Clear all local data structures. */
-    void clearConnection();
-
     /**
      * Establish Server connection and stores connection data in case of success
      */

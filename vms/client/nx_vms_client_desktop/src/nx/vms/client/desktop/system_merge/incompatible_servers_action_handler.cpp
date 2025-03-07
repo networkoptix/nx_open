@@ -13,10 +13,10 @@
 #include <nx/build_info.h>
 #include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
-#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
+#include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/statistics/context_statistics_module.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
@@ -121,21 +121,25 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
         return;
     }
 
-    std::shared_ptr<QnStatisticsScenarioGuard> mergeScenario =
-        statisticsModule()->certificates()->beginScenario(
+    auto mergeScenario = statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::mergeFromDialog);
 
     auto delegate = createConnectionUserInteractionDelegate(
         [this]() { return mainWindowWidget(); });
     m_mergeDialog = new MergeSystemsDialog(mainWindowWidget(), std::move(delegate));
+
     connect(m_mergeDialog.data(), &QDialog::finished, this,
-        [this, mergeScenario]()
+        [this, scenario = std::move(mergeScenario)]()
         {
-            m_mergeDialog->deleteLater();
-            m_mergeDialog.clear();
+            if (m_mergeDialog)
+            {
+                m_mergeDialog->deleteLater();
+                m_mergeDialog.clear();
+            }
         });
 
-    m_mergeDialog->exec();
+    m_mergeDialog->setWindowModality(Qt::ApplicationModal);
+    m_mergeDialog->open();
 }
 
 void IncompatibleServersActionHandler::at_connectTool_canceled()
