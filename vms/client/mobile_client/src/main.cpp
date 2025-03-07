@@ -377,6 +377,10 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
 
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
+    // Prevent Qt from using "webengine" on macOS by default, make it closer to iOS.
+    if (nx::build_info::isMacOsX())
+        qputenv("QT_WEBVIEW_PLUGIN", "native");
+
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
