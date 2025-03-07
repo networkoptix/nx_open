@@ -84,12 +84,3 @@ QWindow *getMainWindow()
     }
 
 #endif // !defined(Q_OS_ANDROID)
-
-#if !defined(Q_OS_IOS)
-
-QString webkitUrl()
-{
-    return {};
-}
-
-#endif

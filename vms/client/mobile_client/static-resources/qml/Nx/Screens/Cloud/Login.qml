@@ -94,20 +94,26 @@ Page
             if (!code)
                 return
 
-            iosRedirectUrlWorkaround.stop()
+            redirectUrlWorkaround.stop()
 
             screen.gotResult("success")
             d.oauthClient.setCode(code)
         }
 
+        // Actual page url is not updated via onUrlChanged on some platforms.
         Timer
         {
-            id: iosRedirectUrlWorkaround
+            id: redirectUrlWorkaround
 
-            running: Qt.platform.os === "ios"
+            running: true
             repeat: true
             interval: 1000
-            onTriggered: d.handleUrlChanged(getWebkitUrl())
+            onTriggered:
+            {
+                webView.runJavaScript(
+                    "window.location.href",
+                    (result) => d.handleUrlChanged(result))
+            }
         }
     }
 }

@@ -531,11 +531,6 @@ OauthClient* QnContext::createOauthClient(
     return result;
 }
 
-QString QnContext::getWebkitUrl() const
-{
-    return ::webkitUrl();
-}
-
 int QnContext::androidKeyboardHeight() const
 {
     return m_androidKeyboardHeight;

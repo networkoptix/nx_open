@@ -103,28 +103,3 @@ void makeShortVibration()
     static constexpr int kShortVibrationId = 1519;
     AudioServicesPlaySystemSound(kShortVibrationId);
 }
-
-WKWebView* findWKWebView(UIView* view)
-{
-    if (!view)
-        return nullptr;
-
-    if ([view isKindOfClass:[WKWebView class]])
-        return (WKWebView*) view;
-
-    for (UIView* child in [view subviews])
-    {
-        if (const auto result = findWKWebView(child))
-            return (WKWebView*) result;
-    }
-    return nullptr;
-}
-
-QString webkitUrl()
-{
-    UIWindow* window = [[UIApplication sharedApplication] keyWindow];
-    if (WKWebView* webView = findWKWebView(window.rootViewController.view))
-        return QString::fromNSString(webView.URL.absoluteString);
-
-    return {};
-}

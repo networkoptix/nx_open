@@ -202,9 +202,6 @@ public:
         const QString& token,
         const QString& user) const;
 
-    /** Return current url of the Web Kit window. Used in workaround for iOS platform. */
-    Q_INVOKABLE QString getWebkitUrl() const;
-
     int androidKeyboardHeight() const;
 
     /** Show 2FA validation screen and validate specified token. */
