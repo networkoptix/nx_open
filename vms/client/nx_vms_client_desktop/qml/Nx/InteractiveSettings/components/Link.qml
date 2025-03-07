@@ -23,6 +23,8 @@ LabeledItem
             ? ColorTheme.colors.brand_core
             : ColorTheme.colors.brand_d2
 
+        wrapMode: Text.WrapAnywhere
+
         onLinkActivated: Qt.openUrlExternally(url)
 
         MouseArea
