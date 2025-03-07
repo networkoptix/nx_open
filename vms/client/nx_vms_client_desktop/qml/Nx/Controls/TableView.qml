@@ -26,6 +26,7 @@ TableView
     property alias headerBackgroundColor: columnsHeader.color
     property bool horizontalHeaderEnabled: true
     property alias horizontalHeaderView: headerRow
+    property bool sortEnabled: true
 
     property alias deleteShortcut: deleteShortcut
     property alias enterShortcut: enterShortcut
@@ -109,8 +110,16 @@ TableView
                 height: columnsHeader.buttonHeight
                 visible: width > 0
                 text: model.display
-                sortOrder: control.model.sortColumn === index ? control.model.sortOrder : undefined
-                onClicked: control.model.sort(index, nextSortOrder())
+
+                sortOrder: control.sortEnabled && control.model.sortColumn === index
+                    ? control.model.sortOrder
+                    : undefined
+
+                onClicked:
+                {
+                    if (control.sortEnabled)
+                        control.model.sort(index, nextSortOrder())
+                }
             }
             boundsBehavior: control.boundsBehavior
         }

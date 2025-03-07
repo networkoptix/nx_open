@@ -661,6 +661,7 @@ Window
                         clip: true
                         selectionBehavior: TableView.SelectRows
                         headerBackgroundColor: ColorTheme.colors.dark2
+                        sortEnabled: false
 
                         sourceModel: AnalyticsDialogTableModel
                         {
