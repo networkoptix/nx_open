@@ -88,6 +88,7 @@
 #include <nx/vms/rules/metatypes.h>
 #include <ui/models/authentication_data_model.h>
 #include <ui/models/model_data_accessor.h>
+#include <ui/models/section_column_model.h>
 #include <ui/models/system_hosts_model.h>
 
 namespace nx::vms::client::core {
@@ -125,6 +126,7 @@ void registerQmlTypesInternal()
     qmlRegisterType<AuthenticationDataModel>("Nx.Models", 1, 0, "AuthenticationDataModel");
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
+    qmlRegisterType<SectionColumnModel>("Nx.Models", 1, 0, "SectionColumnModel");
 
     qmlRegisterType<CloudUserProfileWatcher>("Nx.Core", 1, 0, "CloudUserProfileWatcher");
 
