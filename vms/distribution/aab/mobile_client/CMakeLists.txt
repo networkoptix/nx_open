@@ -23,6 +23,7 @@ macro(build_client_for_abi abi)
         useProdNotificationSettings
         pushNotificationProvider
         enablePrecompiledHeaders
+        customMobileClientVersion
     )
 
     # If CMake configuration of the root project was cleared, we need to clear the child
