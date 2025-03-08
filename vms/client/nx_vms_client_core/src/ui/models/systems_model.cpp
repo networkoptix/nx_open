@@ -22,34 +22,31 @@ using namespace nx::vms::common;
 
 using namespace nx::vms::client::core;
 
-namespace
-{
-    typedef QHash<int, QByteArray> RoleNames;
-    const QHash<int, QByteArray> kRoleNames{
-        {QnSystemsModel::SystemNameRoleId, "systemName"},
-        {QnSystemsModel::SystemIdRoleId, "systemId"},
-        {QnSystemsModel::LocalIdRoleId, "localId"},
-        {QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription"},
+const QHash<int, QByteArray> QnSystemsModel::kRoleNames{
+    {QnSystemsModel::SystemNameRoleId, "systemName"},
+    {QnSystemsModel::SystemIdRoleId, "systemId"},
+    {QnSystemsModel::LocalIdRoleId, "localId"},
+    {QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription"},
 
-        {QnSystemsModel::IsFactorySystemRoleId, "isFactorySystem"},
+    {QnSystemsModel::IsFactorySystemRoleId, "isFactorySystem"},
 
-        {QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem"},
-        {QnSystemsModel::IsOnlineRoleId, "isOnline"},
-        {QnSystemsModel::IsReachableRoleId, "isReachable"},
-        {QnSystemsModel::IsCompatibleToMobileClient, "isCompatibleToMobileClient"},
-        {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
+    {QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem"},
+    {QnSystemsModel::IsOnlineRoleId, "isOnline"},
+    {QnSystemsModel::IsReachableRoleId, "isReachable"},
+    {QnSystemsModel::IsCompatibleToMobileClient, "isCompatibleToMobileClient"},
+    {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
 
-        {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
-        {QnSystemsModel::WrongCustomizationRoleId, "wrongCustomization"},
-        {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"},
-        {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"},
-        {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"},
-        {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"},
-        {QnSystemsModel::IsSaasSuspended, "isSaasSuspended"},
-        {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"},
-        {QnSystemsModel::IsPending, "isPending"}
-    };
-}
+    {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
+    {QnSystemsModel::WrongCustomizationRoleId, "wrongCustomization"},
+    {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"},
+    {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"},
+    {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"},
+    {QnSystemsModel::Is2FaEnabledForSystem, "is2FaEnabledForSystem"},
+    {QnSystemsModel::IsSaasSuspended, "isSaasSuspended"},
+    {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"},
+    {QnSystemsModel::IsSaasUninitialized, "isSaasUninitialized"},
+    {QnSystemsModel::IsPending, "isPending"}
+};
 
 class QnSystemsModelPrivate: public QObject
 {
@@ -99,6 +96,7 @@ public:
     AbstractSystemsController* controller;
     nx::utils::ScopedConnections connections;
     InternalList internalData;
+    QHash<nx::Uuid, int> systemIdToRow;
     mutable QHash<QString, QString> searchServerNamesHostsCache;
 };
 
@@ -129,17 +127,11 @@ QnSystemsModel::~QnSystemsModel()
 {
 }
 
-int QnSystemsModel::getRowIndex(const QString& systemId) const
+int QnSystemsModel::getRowIndex(const nx::Uuid& systemId) const
 {
     Q_D(const QnSystemsModel);
 
-    const auto it = std::find_if(d->internalData.begin(), d->internalData.end(),
-        [systemId](const QnSystemsModelPrivate::InternalSystemDataPtr& data)
-        {
-            return systemId == data->system->id();
-        });
-
-    return (it == d->internalData.end() ? -1 : it - d->internalData.begin());
+    return d->systemIdToRow.value(systemId, -1);
 }
 
 int QnSystemsModel::rowCount(const QModelIndex &parent) const
@@ -277,7 +269,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case IsSaasShutDown:
             return system->saasState() == nx::vms::api::SaasState::shutdown
                 || system->saasState() == nx::vms::api::SaasState::autoShutdown;
-
+        case IsSaasUninitialized:
+            return system->saasState() == nx::vms::api::SaasState::uninitialized;
         case IsPending:
             return system->isPending();
 
@@ -322,11 +315,6 @@ bool QnSystemsModel::setData(const QModelIndex& index, const QVariant& value, in
     }
 
     return base_type::setData(index, value, role);
-}
-
-RoleNames QnSystemsModel::roleNames() const
-{
-    return kRoleNames;
 }
 
 QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent):
@@ -459,7 +447,10 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
                 {QnSystemsModel::IsSaasSuspended, QnSystemsModel::IsSaasShutDown});
             });
 
+    const auto systemId = nx::Uuid::fromStringSafe(systemDescription->id());
+
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
+    systemIdToRow[systemId] = internalData.size();
     internalData.append(data);
     q->endInsertRows();
 }
@@ -482,6 +473,17 @@ void QnSystemsModelPrivate::removeSystem(const QString &systemId, const nx::Uuid
 
     q->beginRemoveRows(QModelIndex(), position, position);
     internalData.erase(removeIt);
+    // Adjust row numbers in systemId -> row mapping.
+    const auto systemUuid = nx::Uuid::fromStringSafe(systemId);
+    for (auto it = systemIdToRow.begin(); it != systemIdToRow.end();)
+    {
+        if (it.value() > position)
+            it.value()--;
+        if (it.key() == systemUuid)
+            it = systemIdToRow.erase(it);
+        else
+            ++it;
+    }
     q->endRemoveRows();
 
     searchServerNamesHostsCache.remove(systemId);
@@ -497,18 +499,11 @@ void QnSystemsModelPrivate::emitDataChanged(
 void QnSystemsModelPrivate::emitDataChanged(const SystemDescriptionPtr& systemDescription
     , QVector<int> roles)
 {
-    const auto dataIt = std::find_if(internalData.begin(), internalData.end(),
-        [id = systemDescription->id()](const InternalSystemDataPtr &value)
-    {
-        return (value->system->id() == id);
-    });
-
-    if (dataIt == internalData.end())
-        return;
-
     Q_Q(QnSystemsModel);
 
-    const int row = (dataIt - internalData.begin());
+    const int row = q->getRowIndex(nx::Uuid::fromStringSafe(systemDescription->id()));
+    if (row == -1)
+        return;
     const auto modelIndex = q->index(row);
 
     q->dataChanged(modelIndex, modelIndex, roles);
@@ -523,16 +518,9 @@ void QnSystemsModelPrivate::at_serverChanged(
 
     Q_Q(QnSystemsModel);
 
-    const auto dataIt = std::find_if(internalData.begin(), internalData.end(),
-        [id = systemDescription->id()](const InternalSystemDataPtr& data)
-        {
-            return id == data->system->id();
-        });
-
-    if (dataIt == internalData.end())
+    const int row = q->getRowIndex(nx::Uuid::fromStringSafe(systemDescription->id()));
+    if (row == -1)
         return;
-
-    const int row = (dataIt - internalData.begin());
 
     const auto modelIndex = q->index(row);
     const auto testFlag = [q, modelIndex, fields](QnServerField field, int role)
@@ -553,6 +541,7 @@ void QnSystemsModelPrivate::resetModel()
 
     q->beginResetModel();
     internalData.clear();
+    systemIdToRow.clear();
     q->endResetModel();
 
     for (const auto& system: controller->systemsList())

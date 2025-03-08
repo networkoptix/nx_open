@@ -4,6 +4,8 @@
 
 #include <QtCore/QStringListModel>
 
+#include <nx/utils/uuid.h>
+
 class AbstractSystemsController;
 class QnSystemsModelPrivate;
 
@@ -44,11 +46,14 @@ public:
 
         IsSaasSuspended,
         IsSaasShutDown,
+        IsSaasUninitialized,
 
         IsPending,
 
         RolesCount
     };
+
+    static const QHash<int, QByteArray> kRoleNames;
 
 public:
     QnSystemsModel(AbstractSystemsController* controller, QObject* parent = nullptr);
@@ -58,9 +63,9 @@ public: // overrides
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
-    QHash<int, QByteArray> roleNames() const override;
+    QHash<int, QByteArray> roleNames() const override { return kRoleNames; }
 
-    int getRowIndex(const QString& systemId) const;
+    int getRowIndex(const nx::Uuid& systemId) const;
 
 private:
     QScopedPointer<QnSystemsModelPrivate> d_ptr;
