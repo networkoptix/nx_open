@@ -7758,7 +7758,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>This update is already installed.</source>
-      <translation>この更新プログラムは既にインストールされています。</translation>
+      <translation>この更新プログラムはすでにインストールされています。</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
