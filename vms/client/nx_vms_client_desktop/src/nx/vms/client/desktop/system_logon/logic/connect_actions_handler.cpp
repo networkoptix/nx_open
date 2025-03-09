@@ -1293,24 +1293,10 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
     if (force)
         menu()->trigger(ui::action::RemoveSystemFromTabBarAction);
 
-    clearConnection();
-    return true;
-}
-
-void ConnectActionsHandler::showLoginDialog()
-{
-    if (context()->closingDown())
-        return;
-
-    auto dialog = std::make_unique<LoginDialog>(mainWindowWidget());
-    dialog->exec();
-}
-
-void ConnectActionsHandler::clearConnection()
-{
-    NX_DEBUG(this, "Clear connection");
-
     hideReconnectDialog();
+
+    NX_DEBUG(this, "Clearing local state");
+
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
     qnClientCoreModule->networkModule()->setSession({});
@@ -1364,7 +1350,18 @@ void ConnectActionsHandler::clearConnection()
     systemContext()->lookupListManager()->deinitialize();
     systemContext()->httpClientPool()->stop(/*invokeCallbacks*/ true);
 
-    NX_DEBUG(this, "Clear connection finished");
+    NX_DEBUG(this, "Disconnect finished");
+
+    return true;
+}
+
+void ConnectActionsHandler::showLoginDialog()
+{
+    if (context()->closingDown())
+        return;
+
+    auto dialog = std::make_unique<LoginDialog>(mainWindowWidget());
+    dialog->exec();
 }
 
 void ConnectActionsHandler::connectToServer(LogonData logonData, ConnectionOptions options)

@@ -135,20 +135,24 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
         return;
     }
 
-    std::shared_ptr<QnStatisticsScenarioGuard> mergeScenario =
-        statisticsModule()->certificates()->beginScenario(
+    auto mergeScenario = statisticsModule()->certificates()->beginScenario(
             QnCertificateStatisticsModule::Scenario::mergeFromDialog);
 
     auto delegate = createConnectionUserInteractionDelegate(mainWindowWidget());
     m_mergeDialog = new MergeSystemsDialog(mainWindowWidget(), std::move(delegate));
+
     connect(m_mergeDialog.data(), &QDialog::finished, this,
-        [this, mergeScenario]()
+        [this, scenario = std::move(mergeScenario)]()
         {
-            m_mergeDialog->deleteLater();
-            m_mergeDialog.clear();
+            if (m_mergeDialog)
+            {
+                m_mergeDialog->deleteLater();
+                m_mergeDialog.clear();
+            }
         });
 
-    m_mergeDialog->exec();
+    m_mergeDialog->setWindowModality(Qt::ApplicationModal);
+    m_mergeDialog->open();
 }
 
 void IncompatibleServersActionHandler::at_connectTool_canceled()
