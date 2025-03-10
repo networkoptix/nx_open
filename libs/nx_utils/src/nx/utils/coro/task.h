@@ -271,4 +271,41 @@ public:
     FireAndForget(typename base_type::coroutine_handle_t) {}
 };
 
+static inline bool isCancelRequested(std::coroutine_handle<> h)
+{
+    const auto request = std::coroutine_handle<TaskBase<>::PromiseBase>::from_address(
+        h.address()).promise().m_cancelOnResume;
+    return request && request();
+}
+
+[[nodiscard]] static inline auto cancelIf(std::function<bool()> condition)
+{
+    struct AddConditionAwaiter
+    {
+        AddConditionAwaiter(std::function<bool()> condition): m_condition(std::move(condition))
+        {
+        }
+
+        bool await_ready() const { return false; }
+
+        std::coroutine_handle<> await_suspend(std::coroutine_handle<> h)
+        {
+            auto& promise = std::coroutine_handle<TaskBase<>::PromiseBase>::from_address(
+                h.address()).promise();
+            promise.addCancelCondition(m_condition);
+            return h;
+        }
+
+        void await_resume() const
+        {
+            if (m_condition())
+                throw TaskCancelException();
+        }
+
+        std::function<bool()> m_condition;
+    };
+
+    return AddConditionAwaiter{std::move(condition)};
+}
+
 } // namespace nx::coro

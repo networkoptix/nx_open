@@ -2,56 +2,85 @@
 
 #pragma once
 
-#include <QtCore/QAbstractEventDispatcher>
 #include <QtCore/QPointer>
-#include <QtCore/QThread>
+#include <QtCore/QTimer>
+#include <QtCore/QVariant>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/scope_guard.h>
 
 #include "task.h"
 
 namespace nx::coro {
 
-static inline bool isCancelRequested(std::coroutine_handle<> h)
-{
-    const auto request = std::coroutine_handle<TaskBase<>::PromiseBase>::from_address(
-        h.address()).promise().m_cancelOnResume;
-    return request && request();
-}
+namespace detail {
 
-[[nodiscard]] static inline auto cancelIf(std::function<bool()> condition)
+class ListenHelper: public QObject
 {
-    struct suspend_always
+    Q_OBJECT
+
+    using base_type = QObject;
+
+public:
+    explicit ListenHelper(QObject* parent = nullptr): base_type(parent) {}
+
+    void setCallback(nx::utils::MoveOnlyFunc<void()> callback)
     {
-        suspend_always(std::function<bool()> condition): m_condition(std::move(condition))
-        {
-        }
+        m_callback = std::move(callback);
+    }
 
-        bool await_ready() const { return false; }
+public slots:
+    void execute() { m_callback(); }
 
-        std::coroutine_handle<> await_suspend(std::coroutine_handle<> h)
-        {
-            auto& promise = std::coroutine_handle<TaskBase<>::PromiseBase>::from_address(
-                h.address()).promise();
-            promise.addCancelCondition(m_condition);
-            return h;
-        }
+private:
+    nx::utils::MoveOnlyFunc<void()> m_callback;
+};
 
-        void await_resume() const
-        {
-            if (m_condition())
-                throw TaskCancelException();
-        }
+} // namespace detail
 
-        std::function<bool()> m_condition;
-    };
-
-    return suspend_always{std::move(condition)};
-}
+NX_UTILS_API nx::coro::Task<QVariant> whenProperty(
+    QObject* object,
+    const char* propertyName,
+    std::function<bool(const QVariant&)> condition);
 
 [[nodiscard]] static inline auto guard(QPointer<QObject> object)
 {
     return cancelIf([object]() { return !object; });
+}
+
+template<typename Duration>
+[[nodiscard]] auto qtTimer(Duration duration)
+{
+    struct Awaiter
+    {
+        Awaiter(Duration duration): m_duration(duration) {}
+
+        bool await_ready() const { return m_duration.count() <= 0; }
+
+        void await_suspend(std::coroutine_handle<> h)
+        {
+            auto g = nx::utils::ScopeGuard([this, h] { m_cancelled = true; h.resume(); });
+            QTimer::singleShot(
+                m_duration,
+                [this, h, g = std::move(g)]() mutable
+                {
+                    m_cancelled = isCancelRequested(h);
+                    g.disarm();
+                    h.resume();
+                });
+        }
+
+        void await_resume()
+        {
+            if (m_cancelled)
+                throw nx::coro::TaskCancelException();
+        }
+
+        bool m_cancelled = false;
+        Duration m_duration;
+    };
+
+    return Awaiter(duration);
 }
 
 } // namespace nx::coro

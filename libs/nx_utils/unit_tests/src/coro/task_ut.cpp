@@ -6,6 +6,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#include <QtCore/QThread>
 
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/coro/task_utils.h>
