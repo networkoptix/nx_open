@@ -162,8 +162,8 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     m_motionWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     ui->motionContainerWidget->layout()->addWidget(m_motionWidget);
 
-    connect(ui->motionDetectionCheckBox, &QCheckBox::stateChanged, store,
-        [store](int state)
+    connect(ui->motionDetectionCheckBox, &QCheckBox::checkStateChanged, store,
+        [store](Qt::CheckState state)
         {
             store->setMotionDetectionEnabled(state == Qt::Checked);
         });

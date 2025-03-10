@@ -238,10 +238,10 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
 
     connect(ui->nameLineEdit, &QLineEdit::textChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->webCamerasDiscoveryCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->webCamerasDiscoveryCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->serverHardwareDecodingCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->serverHardwareDecodingCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     ui->contentLayout->addWidget(d->remoteAccessWidget);

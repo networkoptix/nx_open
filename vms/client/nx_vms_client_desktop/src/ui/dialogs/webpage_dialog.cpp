@@ -158,10 +158,10 @@ QnWebpageDialog::QnWebpageDialog(SystemContext* systemContext, QWidget* parent, 
     connect(&m_serversWatcher, &CurrentSystemServers::serversCountChanged,
         this, updateSelectServerMenuButtonVisibility);
 
-    connect(ui->proxyViaServerCheckBox, &QCheckBox::stateChanged,
+    connect(ui->proxyViaServerCheckBox, &QCheckBox::checkStateChanged,
         this, updateSelectServerMenuButtonVisibility);
 
-    connect(ui->proxyAllContentsCheckBox, &QCheckBox::stateChanged,
+    connect(ui->proxyAllContentsCheckBox, &QCheckBox::checkStateChanged,
         this, &QnWebpageDialog::updateWarningLabel);
 
     ui->clientApiCheckBox->setVisible(!ini().webPagesAndIntegrations);
@@ -190,11 +190,11 @@ QnWebpageDialog::QnWebpageDialog(SystemContext* systemContext, QWidget* parent, 
         };
 
     connect(ui->spinBoxRefreshPeriod, &QSpinBox::valueChanged, updateSuffix);
-    connect(ui->refreshCheckBox, &QCheckBox::stateChanged, this,
-        [this, updateSuffix]()
+    connect(ui->refreshCheckBox, &QCheckBox::checkStateChanged, this,
+        [this, updateSuffix](Qt::CheckState state)
         {
             updateSuffix();
-            ui->refreshParametersWidget->setVisible(ui->refreshCheckBox->isChecked());
+            ui->refreshParametersWidget->setVisible(state == Qt::Checked);
         });
 
     static const auto addDurationUnitComboBoxItem =

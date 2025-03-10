@@ -127,7 +127,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     setupCheckboxes();
 
-    connect(ui->selectAllCheckBox, &QCheckBox::stateChanged,    this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
+    connect(ui->selectAllCheckBox, &QCheckBox::checkStateChanged,
+        this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
 
     connect(ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this, &QnAuditLogDialog::updateData);
 
@@ -414,7 +415,7 @@ void QnAuditLogDialog::setupFilterCheckbox(
     checkbox->setProperty(checkBoxFilterProperty, static_cast<int>(filteredTypes));
     m_filterCheckboxes << checkbox;
     checkbox->disconnect(this);
-    connect(checkbox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_typeCheckboxChanged);
+    connect(checkbox, &QCheckBox::checkStateChanged, this, &QnAuditLogDialog::at_typeCheckboxChanged);
 }
 
 void QnAuditLogDialog::at_typeCheckboxChanged()
@@ -445,9 +446,8 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     at_filterChanged();
 };
 
-void QnAuditLogDialog::at_selectAllCheckboxChanged()
+void QnAuditLogDialog::at_selectAllCheckboxChanged(Qt::CheckState state)
 {
-    Qt::CheckState state = ui->selectAllCheckBox->checkState();
     if (state == Qt::PartiallyChecked)
     {
         ui->selectAllCheckBox->setChecked(true);

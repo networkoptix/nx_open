@@ -130,12 +130,12 @@ SecuritySettingsWidget::SecuritySettingsWidget(
 
     // This should go before connecting to hasChangesChanged!
     auto updateWatermarkState =
-        [this](int state)
+        [this](Qt::CheckState state)
         {
             m_watermarkSettings.useWatermark = (state == Qt::Checked);
             ui->watermarkSettingsButton->setEnabled(state == Qt::Checked);
         };
-    connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged,
+    connect(ui->displayWatermarkCheckBox, &QCheckBox::checkStateChanged,
         this, updateWatermarkState);
     // Need to sync checkbox to button, loadDataToUi() will do the rest.
     updateWatermarkState(ui->displayWatermarkCheckBox->checkState());
@@ -183,7 +183,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
             emit hasChangesChanged();
         });
 
-    connect(ui->powerUsersCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->powerUsersCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(system()->accessController(),
@@ -244,14 +244,14 @@ SecuritySettingsWidget::SecuritySettingsWidget(
         this, &SecuritySettingsWidget::manageUsers);
 
     // All hasChangesChanged connections should go after initial control updates.
-    connect(ui->auditTrailCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->auditTrailCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->forceTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->forceTrafficEncryptionCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->useHttpsOnlyCamerasCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->useHttpsOnlyCamerasCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     ui->forceVideoEncryptionWarning->setText(tr("Encrypting video traffic may significantly increase CPU usage"));
@@ -261,7 +261,7 @@ SecuritySettingsWidget::SecuritySettingsWidget(
     connect(ui->useHttpsOnlyCamerasCheckBox, &QCheckBox::toggled,
         ui->useHttpsOnlyCamerasWarning, &QWidget::setVisible);
 
-    connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->displayWatermarkCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->limitSessionLengthCheckBox, &QCheckBox::toggled, this,
@@ -270,13 +270,13 @@ SecuritySettingsWidget::SecuritySettingsWidget(
         &SecuritySettingsWidget::updateLimitSessionControls);
     connect(ui->limitSessionUnitsComboBox, QnComboboxCurrentIndexChanged, this,
         &SecuritySettingsWidget::updateLimitSessionControls);
-    connect(ui->useSessionLimitForCloudComboBox, &QCheckBox::stateChanged, this,
+    connect(ui->useSessionLimitForCloudComboBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->archiveEncryptionGroupBox, &QGroupBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->showServersInTreeCheckBox, &QCheckBox::stateChanged, this,
+    connect(ui->showServersInTreeCheckBox, &QCheckBox::checkStateChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
     // Let's assume these options are changed so rare, that we can safely drop unsaved changes.

@@ -45,15 +45,15 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(
         [this] { ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked()); });
 
     connect(ui->autoDiscoveryCheckBox,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->statisticsReportCheckBox,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->autoSettingsCheckBox,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 

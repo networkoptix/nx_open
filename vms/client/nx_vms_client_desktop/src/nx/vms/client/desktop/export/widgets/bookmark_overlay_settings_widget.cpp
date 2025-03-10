@@ -53,10 +53,10 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
         kMaximumFontSize);
     updateControls();
 
-    connect(ui->descriptionCheckBox, &QCheckBox::stateChanged,
-        [this]()
+    connect(ui->descriptionCheckBox, &QCheckBox::checkStateChanged,
+        [this](Qt::CheckState state)
         {
-            m_data.includeDescription = ui->descriptionCheckBox->isChecked();
+            m_data.includeDescription = (state == Qt::Checked);
             emit dataChanged(m_data);
         });
 

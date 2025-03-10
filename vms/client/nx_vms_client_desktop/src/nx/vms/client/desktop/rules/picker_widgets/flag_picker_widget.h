@@ -39,7 +39,7 @@ public:
 
         connect(
             m_checkBox,
-            &QCheckBox::stateChanged,
+            &QCheckBox::checkStateChanged,
             this,
             &FlagPicker<F>::onStateChanged);
     }
@@ -56,7 +56,7 @@ private:
 
     QCheckBox* m_checkBox{nullptr};
 
-    void onStateChanged(int state)
+    void onStateChanged(Qt::CheckState state)
     {
         m_field->setValue(state == Qt::Checked);
 

@@ -60,17 +60,17 @@ InfoOverlaySettingsWidget::InfoOverlaySettingsWidget(QWidget* parent):
             emit dataChanged(m_data);
         });
 
-    connect(ui->exportCameraNameCheckBox, &QCheckBox::stateChanged,
-        [this](int state)
+    connect(ui->exportCameraNameCheckBox, &QCheckBox::checkStateChanged,
+        [this](Qt::CheckState state)
         {
-            m_data.exportCameraName = state;
+            m_data.exportCameraName = (state == Qt::Checked);
             emit dataChanged(m_data);
         });
 
-    connect(ui->exportDateCheckBox, &QCheckBox::stateChanged,
-        [this](int state)
+    connect(ui->exportDateCheckBox, &QCheckBox::checkStateChanged,
+        [this](Qt::CheckState state)
         {
-            m_data.exportDate = state;
+            m_data.exportDate = (state == Qt::Checked);
             emit dataChanged(m_data);
         });
 

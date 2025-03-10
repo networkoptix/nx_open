@@ -73,7 +73,7 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
 {
     ui->setupUi(this);
     ui->autoRestart->setChecked(m_autoInstall);
-    connect(ui->autoRestart, &QCheckBox::stateChanged,
+    connect(ui->autoRestart, &QCheckBox::checkStateChanged,
         this, &CompatibilityVersionInstallationDialog::atAutoRestartChanged);
 
     m_private->logonData = logonData;
@@ -89,7 +89,7 @@ CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog(
 {
 }
 
-void CompatibilityVersionInstallationDialog::atAutoRestartChanged(int state)
+void CompatibilityVersionInstallationDialog::atAutoRestartChanged(Qt::CheckState state)
 {
     m_autoInstall = (state == Qt::Checked);
 }

@@ -63,8 +63,8 @@ BackupSettingsPickerWidget::BackupSettingsPickerWidget(
     selectionDescriptionLabelFont.setWeight(QFont::Medium);
     ui->selectionDescriptionLabel->setFont(selectionDescriptionLabelFont);
 
-    connect(ui->enableSwitch, &QCheckBox::stateChanged, this,
-        [this](int state)
+    connect(ui->enableSwitch, &QCheckBox::checkStateChanged, this,
+        [this](Qt::CheckState state)
         {
             if (state == Qt::PartiallyChecked)
                 return;

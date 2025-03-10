@@ -58,7 +58,7 @@ private:
     void atUpdateStateChanged(nx::vms::client::desktop::ClientUpdateTool::State state,
         int progress,
         const nx::vms::client::desktop::ClientUpdateTool::Error& error);
-    void atAutoRestartChanged(int state);
+    void atAutoRestartChanged(Qt::CheckState state);
 
 private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> ui;

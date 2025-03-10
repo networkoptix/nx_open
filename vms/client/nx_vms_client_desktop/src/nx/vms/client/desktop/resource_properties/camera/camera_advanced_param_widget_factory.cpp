@@ -69,7 +69,7 @@ public:
 
         m_layout->insertStretch(0);
         m_layout->insertWidget(0, m_checkBox);
-        connect(m_checkBox, &QCheckBox::stateChanged, this,
+        connect(m_checkBox, &QCheckBox::checkStateChanged, this,
             [this] { emit valueChanged(m_id, value()); });
     }
 
