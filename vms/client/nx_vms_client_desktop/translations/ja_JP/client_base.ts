@@ -4789,7 +4789,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera requires authorized credentials to be set in the device settings in Cloud portal or Desktop client.</source>
-      <translation>このカメラでは、クラウドポータルまたはデスクトップクライアントのデバイス設定で、十分な権限を持つ資格情報を入力する必要があります。</translation>
+      <translation>このカメラでは、クラウドポータルまたはデスクトップクライアントのデバイス設定で、十分な権限を持つ認証情報を入力する必要があります。</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
