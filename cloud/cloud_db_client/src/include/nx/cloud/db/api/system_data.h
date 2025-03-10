@@ -480,8 +480,7 @@ struct SystemSharingEx: SystemSharing
     }
 };
 
-NX_REFLECTION_INSTRUMENT(SystemSharingEx, (systemId)(accountId)(accountFullName)(usageFrequency) \
-    (lastLoginTime)(type)(readonly)(hidden)(account2faEnabled)(httpDigestAuthEnabled)(accountNotificationFilterSettings))
+NX_REFLECTION_INSTRUMENT(SystemSharingEx, (account2faEnabled)(httpDigestAuthEnabled)(accountNotificationFilterSettings))
 
 
 using SystemSharingExList = std::vector<SystemSharingEx>;
