@@ -27,6 +27,7 @@ private:
     std::optional<Callback> m_callback;
 };
 
+// Awaiter for a tuple of tasks.
 template<typename... Tasks>
 struct AllTasksAwaiter
 {
@@ -87,6 +88,90 @@ struct AllTasksAwaiter
     std::atomic<std::size_t> m_waiting;
 };
 
+// Awaiter for a vector of tasks, with a limit on the number of concurrent tasks.
+// If limit is 0, all tasks are started concurrently.
+template<typename T>
+struct TaskListAwaiter
+{
+    TaskListAwaiter(std::vector<Task<T>> tasks, size_t limit):
+        m_tasks(std::move(tasks)),
+        m_limit(std::min(limit, m_tasks.size())),
+        m_results(m_tasks.size(), std::nullopt)
+    {
+        m_waiting = m_tasks.size();
+
+        if (m_limit == 0)
+            m_limit = m_tasks.size();
+        m_next = m_limit;
+    }
+
+    bool await_ready() const { return m_tasks.empty(); }
+
+    // Get next task index to start, avoiding integer overflow.
+    std::optional<size_t> getNextIndex()
+    {
+        size_t newNext = 0;
+        size_t next = 0;
+
+        do
+        {
+            next = m_next;
+            if (next == std::numeric_limits<size_t>::max() || next >= m_tasks.size())
+                return {};
+            newNext = next + 1;
+        } while(!m_next.compare_exchange_weak(next, newNext));
+
+        return next;
+    }
+
+    nx::coro::FireAndForget startAt(size_t i, std::coroutine_handle<> h)
+    {
+        OnScopeExit defer(
+            [this, h]() mutable
+            {
+                if (auto next = getNextIndex())
+                    startAt(*next, h);
+
+                // Last finished task resumes the awaiting coroutine.
+                if (m_waiting.fetch_sub(1, std::memory_order::acq_rel) == 1)
+                    h();
+            });
+
+        m_results[i] = co_await m_tasks[i];
+    }
+
+    void await_suspend(std::coroutine_handle<> h)
+    {
+        // startAt() may destroy `this` when resuming the coroutine, but `m_limit` have to be used
+        // in the loop condition, so save `limit` on stack.
+        auto limit = m_limit;
+        for (size_t i = 0; i < limit; ++i)
+            startAt(i, h);
+    }
+
+    auto await_resume()
+    {
+        for (const auto& result: m_results)
+        {
+            if (!result)
+                throw TaskCancelException();
+        }
+
+        std::vector<T> results;
+        results.reserve(m_tasks.size());
+        for (auto& result: m_results)
+            results.emplace_back(std::move(*result));
+
+        return results;
+    }
+
+    std::vector<Task<T>> m_tasks;
+    size_t m_limit;
+    std::vector<std::optional<T>> m_results;
+    std::atomic<std::size_t> m_waiting;
+    std::atomic<std::size_t> m_next;
+};
+
 } // namespace detail
 
 template<typename... Tasks>
@@ -94,6 +179,12 @@ Task<std::tuple<typename Tasks::result_t...>> whenAll(Tasks... tasks)
 {
     // Works like co_return std::make_tuple(co_await std::move(tasks)...) but concurrently.
     co_return co_await detail::AllTasksAwaiter{std::make_tuple(std::move(tasks)...)};
+}
+
+template<typename T>
+Task<std::vector<T>> runAll(std::vector<Task<T>> tasks, size_t limit = 0)
+{
+    co_return co_await detail::TaskListAwaiter(std::move(tasks), limit);
 }
 
 } // namespace nx::coro

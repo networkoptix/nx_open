@@ -667,6 +667,101 @@ TEST_F(TaskTest, WhenAll)
     ASSERT_EQ(kGotBothResults, m_messages);
 }
 
+TEST_F(TaskTest, RunAll)
+{
+    std::vector<Task<std::string>> tasks;
+
+    for (const auto& arg: {"a", "b", "c"})
+    {
+        tasks.push_back(
+            [](auto self, std::string arg) -> Task<std::string>
+            {
+                co_await self->wrapAsyncCall(arg);
+                co_return arg + " result";
+            }(this, arg));
+    }
+
+    const auto test =
+        [&]() -> FireAndForget
+        {
+            Scope s{"test", this};
+
+            auto results = co_await runAll(std::move(tasks), /*limit*/ 2);
+
+            for (const auto& result: results)
+                m_messages.push_back(result);
+        };
+
+    test();
+
+    static const Messages kFirst2Suspended{
+        "scope begin test",
+        "wrap constructed with a",
+        "suspend a",
+        "wrap constructed with b",
+        "suspend b",
+    };
+    ASSERT_EQ(kFirst2Suspended, m_messages);
+
+    triggerAsyncCall(); //< Run a.
+
+    static const Messages kResumedA{
+        "scope begin test",
+        "wrap constructed with a",
+        "suspend a",
+        "wrap constructed with b",
+        "suspend b",
+
+        "callback a",
+        "wrap destroyed with a",
+        "wrap constructed with c", //< c is started after a has finished
+        "suspend c",
+    };
+    ASSERT_EQ(kResumedA, m_messages);
+
+    triggerAsyncCall(); //< Run b.
+
+    static const Messages kResumedB{
+        "scope begin test",
+        "wrap constructed with a",
+        "suspend a",
+        "wrap constructed with b",
+        "suspend b",
+        "callback a",
+        "wrap destroyed with a",
+        "wrap constructed with c",
+        "suspend c",
+
+        "callback b",
+        "wrap destroyed with b",
+    };
+    ASSERT_EQ(kResumedB, m_messages);
+
+    triggerAsyncCall(); //< Run c, which runs test() to completion.
+
+    static const Messages kFinal{
+        "scope begin test",
+        "wrap constructed with a",
+        "suspend a",
+        "wrap constructed with b",
+        "suspend b",
+        "callback a",
+        "wrap destroyed with a",
+        "wrap constructed with c",
+        "suspend c",
+        "callback b",
+        "wrap destroyed with b",
+
+        "callback c",
+        "wrap destroyed with c",
+        "a result",
+        "b result",
+        "c result",
+        "scope end test",
+    };
+    ASSERT_EQ(kFinal, m_messages);
+}
+
 TEST_F(TaskTest, InheritCancelCondition)
 {
     auto nested = [this]() -> Task<>
