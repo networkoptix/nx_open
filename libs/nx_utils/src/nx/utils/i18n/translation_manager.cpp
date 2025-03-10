@@ -49,6 +49,12 @@ struct TranslationManager::Private
         return *iter;
     }
 
+    QSharedPointer<TranslationOverlay> getOverlay(const QString& locale) const
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+        return overlays.value(locale);
+    }
+
 private:
     Translation loadTranslation(const QString &locale)
     {
@@ -265,7 +271,6 @@ bool TranslationManager::setCurrentThreadTranslationLocale(
     const QString& locale,
     std::chrono::milliseconds maxWaitTime)
 {
-    NX_MUTEX_LOCKER lock(&d->mutex);
     const auto curLocale = getCurrentThreadLocale();
 
     if (locale == curLocale)
@@ -275,15 +280,15 @@ bool TranslationManager::setCurrentThreadTranslationLocale(
     if (!curLocale.isEmpty())
     {
         // We have overlayed locale for the given thread already. Disable the existing translators.
-        d->overlays[curLocale]->removeThreadContext(id);
+        if (auto overlay = d->getOverlay(curLocale))
+            overlay->removeThreadContext(id);
     }
 
     if (!locale.isEmpty())
     {
-        if (NX_ASSERT(d->overlays.contains(locale), "Locale '%1' has not been loaded", locale))
+        auto overlay = d->getOverlay(locale);
+        if (NX_ASSERT(overlay, "Locale '%1' has not been loaded", locale))
         {
-            auto& overlay = d->overlays[locale];
-
             if (maxWaitTime.count() > 0)
                 overlay->waitForInstallation(maxWaitTime);
 
