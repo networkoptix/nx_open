@@ -6,6 +6,7 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/saas/saas_utils.h>
+#include <nx/vms/common/system_settings.h>
 
 #include "../flux/camera_settings_dialog_store.h"
 
@@ -30,6 +31,9 @@ CameraSettingsSaasStateWatcher::CameraSettingsSaasStateWatcher(
         };
 
     connect(systemContext->saasServiceManager(), &saas::ServiceManager::dataChanged,
+        this, setSaasInitializedStateToStore);
+
+    connect(systemContext->globalSettings(), &SystemSettings::cloudSettingsChanged,
         this, setSaasInitializedStateToStore);
 
     setSaasInitializedStateToStore();
