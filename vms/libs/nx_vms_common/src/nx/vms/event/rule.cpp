@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/vms/api/data/user_group_data.h>
-#include <nx/vms/event/action_factory.h>
 
 namespace nx {
 namespace vms {

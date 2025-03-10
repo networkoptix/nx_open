@@ -53,7 +53,6 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/event/actions/system_health_action.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
@@ -1218,11 +1217,10 @@ void LayoutActionHandler::at_openIntercomLayoutAction_triggered()
     at_openInNewTabAction_triggered();
 
     const menu::Parameters parameters = menu()->currentParameters(sender());
+    const auto intercomId = parameters.argument<nx::Uuid>(nx::vms::client::core::UuidRole);
+    NX_ASSERT(!intercomId.isNull());
 
-    const auto businessAction =
-        parameters.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
-
-    postAcceptIntercomCall(system(), businessAction->getRuntimeParams().eventResourceId, thread());
+    postAcceptIntercomCall(system(), intercomId, thread());
 }
 
 void LayoutActionHandler::at_openMissedCallIntercomLayoutAction_triggered()
@@ -1230,15 +1228,19 @@ void LayoutActionHandler::at_openMissedCallIntercomLayoutAction_triggered()
     at_openInNewTabAction_triggered();
 
     const menu::Parameters parameters = menu()->currentParameters(sender());
+    const auto notificationId = parameters.argument<nx::Uuid>(Qn::ItemUuidRole);
+    NX_ASSERT(!notificationId.isNull());
 
-    const vms::event::AbstractActionPtr action(new vms::event::SystemHealthAction(
-        MessageType::showMissedCallInformer,
-        parameters.argument(menu::OtherType).value<nx::Uuid>()));
+    auto message = nx::vms::api::SiteHealthMessage{
+        .type = MessageType::showMissedCallInformer,
+        .active = false,
+        .resourceIds = {notificationId},
+    };
 
     executeDelayedParented(
-        [this, action]
+        [this, message = std::move(message)]
         {
-            windowContext()->notificationActionHandler()->removeNotification(action);
+            windowContext()->notificationActionHandler()->removeNotification(message);
         },
         this);
 }

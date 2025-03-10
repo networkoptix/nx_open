@@ -51,11 +51,6 @@ bool isNonDeprecatedEvent(EventType eventType)
     return !kDeprecatedEvents.contains(eventType);
 }
 
-bool isSiteHealth(EventType eventType)
-{
-    return eventType >= EventType::siteHealthEvent && eventType <= EventType::maxSiteHealthEvent;
-}
-
 QList<EventType> allEvents(const EventTypePredicateList& predicates)
 {
     QList<EventType> result;
@@ -172,6 +167,47 @@ bool checkForKeywords(const QString& value, const QStringList& keywords)
     return keywords.isEmpty()
         || (!value.isEmpty()
             && nx::utils::find_if(keywords, [&](const auto& k) { return value.contains(k); }));
+}
+
+QList<ActionType> userAvailableActions()
+{
+    static QList<ActionType> result
+    {
+        ActionType::cameraOutputAction,
+        ActionType::bookmarkAction,
+        ActionType::cameraRecordingAction,
+        ActionType::panicRecordingAction,
+        ActionType::sendMailAction,
+        ActionType::diagnosticsAction,
+        ActionType::showPopupAction,
+        ActionType::pushNotificationAction,
+        ActionType::playSoundAction,
+        ActionType::playSoundOnceAction,
+        ActionType::sayTextAction,
+        ActionType::executePtzPresetAction,
+        ActionType::showTextOverlayAction,
+        ActionType::showOnAlarmLayoutAction,
+        ActionType::execHttpRequestAction,
+        ActionType::openLayoutAction,
+        ActionType::fullscreenCameraAction,
+        ActionType::exitFullscreenAction,
+        ActionType::buzzerAction,
+    };
+
+    return result;
+}
+
+QList<ActionType> allActions()
+{
+    static QList<ActionType> result =
+        []()
+        {
+            QList<ActionType> result = userAvailableActions();
+            result.append(ActionType::acknowledgeAction);
+            return result;
+        }();
+
+    return result;
 }
 
 } // namespace nx::vms::event

@@ -41,13 +41,6 @@ NX_VMS_COMMON_API void fromResourceListToApi(
     const nx::vms::event::RuleList& src,
     nx::vms::api::EventRuleDataList& dst);
 
-NX_VMS_COMMON_API void fromResourceToApi(
-    const nx::vms::event::AbstractActionPtr& src,
-    nx::vms::api::EventActionData& dst);
-NX_VMS_COMMON_API void fromApiToResource(
-    const nx::vms::api::EventActionData& src,
-    nx::vms::event::AbstractActionPtr& dst);
-
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::CameraData& src,
     QnVirtualCameraResourcePtr& dst);

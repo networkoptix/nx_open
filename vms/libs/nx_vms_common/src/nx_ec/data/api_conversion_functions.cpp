@@ -37,10 +37,7 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/event/action_factory.h>
-#include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/rule.h>
-#include <utils/email/email.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -120,35 +117,6 @@ void fromResourceListToApi(const vms::event::RuleList& src, EventRuleDataList& d
         dst.push_back(EventRuleData());
         fromResourceToApi(srcRule, dst.back());
     }
-}
-
-void fromResourceToApi(const vms::event::AbstractActionPtr& src, EventActionData& dst)
-{
-    dst.actionType = src->actionType();
-    dst.toggleState = src->getToggleState();
-    dst.receivedFromRemoteHost = src->isReceivedFromRemoteHost();
-    dst.resourceIds = nx::toStdVector(src->getResources());
-
-    dst.params = QJson::serialized(src->getParams());
-    dst.runtimeParams = QJson::serialized(src->getRuntimeParams());
-
-    dst.ruleId = src->getRuleId();
-    dst.aggregationCount = src->getAggregationCount();
-}
-
-void fromApiToResource(const EventActionData& src, vms::event::AbstractActionPtr& dst)
-{
-    dst = vms::event::ActionFactory::createAction(src.actionType, QJson::deserialized<vms::event::EventParameters>(src.runtimeParams));
-
-    dst->setToggleState(src.toggleState);
-    dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
-
-    dst->setResources(fromStdVector(src.resourceIds));
-
-    dst->setParams(QJson::deserialized<vms::event::ActionParameters>(src.params));
-
-    dst->setRuleId(src.ruleId);
-    dst->setAggregationCount(src.aggregationCount);
 }
 
 ////////////////////////////////////////////////////////////

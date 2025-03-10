@@ -51,9 +51,11 @@
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 
-namespace {
+namespace nx::vms::client::desktop {
 
 using namespace nx::vms::common::system_health;
+
+namespace {
 
 bool isServiceDisabledMessage(MessageType message)
 {
@@ -82,13 +84,10 @@ std::optional<QString> overusedSaasServiceType(MessageType messageType)
 
 bool messageIsSupported(MessageType message)
 {
-    return message != MessageType::showIntercomInformer
-        && message != MessageType::showMissedCallInformer;
+    return !isMessageIntercom(message);
 }
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 //-------------------------------------------------------------------------------------------------
 // SystemHealthListModel::Private::Item definition.
@@ -101,7 +100,7 @@ QnResourcePtr SystemHealthListModel::Private::Item::getResource() const
 
 bool SystemHealthListModel::Private::Item::operator==(const Item& other) const
 {
-    return message == other.message && resources == other.resources;
+    return type == other.type && resources == other.resources;
 }
 
 bool SystemHealthListModel::Private::Item::operator!=(const Item& other) const
@@ -111,8 +110,8 @@ bool SystemHealthListModel::Private::Item::operator!=(const Item& other) const
 
 bool SystemHealthListModel::Private::Item::operator<(const Item& other) const
 {
-    return message != other.message
-        ? message < other.message
+    return type != other.type
+        ? type < other.type
         : resources < other.resources;
 }
 
@@ -135,7 +134,7 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
         common::system_health::isMessageVisibleInSettings}))
     {
         if (systemHealthState->state(index))
-            doAddItem(index, {}, true /*initial*/);
+            doAddItem(Message{.type = index}, true /*initial*/);
     }
 
     auto usernameChangesListener = new core::SessionResourcesSignalListener<QnUserResource>(
@@ -210,7 +209,7 @@ int SystemHealthListModel::Private::count() const
 
 common::system_health::MessageType SystemHealthListModel::Private::message(int index) const
 {
-    return m_items[index].message;
+    return m_items[index].type;
 }
 
 QnResourcePtr SystemHealthListModel::Private::resource(int index) const
@@ -225,14 +224,14 @@ QnResourcePtr SystemHealthListModel::Private::resource(int index) const
 
 QString SystemHealthListModel::Private::description(int index) const
 {
-    return QnSystemHealthStringsHelper::messageDescription(m_items[index].message);
+    return QnSystemHealthStringsHelper::messageDescription(m_items[index].type);
 }
 
 QString SystemHealthListModel::Private::title(int index) const
 {
     const auto& item = m_items[index];
 
-    switch (item.message)
+    switch (item.type)
     {
         case MessageType::replacedDeviceDiscovered:
         {
@@ -254,7 +253,7 @@ QString SystemHealthListModel::Private::title(int index) const
 
         default:
             return QnSystemHealthStringsHelper::messageNotificationTitle(
-                system(), item.message, getResourceSet(item.message));
+                system(), item.type, getResourceSet(item.type));
     }
 }
 
@@ -290,7 +289,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
     const auto& item = m_items[index];
 
     // TODO: move all text values to QnSystemHealthStringsHelper::messageTooltip.
-    if (item.message == MessageType::replacedDeviceDiscovered)
+    if (item.type == MessageType::replacedDeviceDiscovered)
     {
         using namespace nx::vms::common;
 
@@ -326,7 +325,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return tooltipLines.join("<br>");
     }
 
-    if (const auto serviceType = overusedSaasServiceType(item.message))
+    if (const auto serviceType = overusedSaasServiceType(item.type))
     {
         const auto serviceManager = system()->saasServiceManager();
         const auto issueExpirationDate =
@@ -344,8 +343,8 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return tooltipLines.join("<br>");
     }
 
-    if (item.message == MessageType::saasInSuspendedState
-        || item.message == MessageType::saasInShutdownState)
+    if (item.type == MessageType::saasInSuspendedState
+        || item.type == MessageType::saasInShutdownState)
     {
         using namespace nx::vms::common;
 
@@ -359,17 +358,17 @@ QString SystemHealthListModel::Private::toolTip(int index) const
         return tooltipLines.join("<br>");
     }
 
-    if (item.message == MessageType::saasTierIssue)
+    if (item.type == MessageType::saasTierIssue)
     {
         return (tr("The Site exceeds its Organization's limits and may become "
             "non-functional soon. Please adjust your usage to avoid service disruption."));
     }
 
-    if (isServiceDisabledMessage(item.message))
+    if (isServiceDisabledMessage(item.type))
     {
         using namespace nx::vms::api;
         EventReason eventReason;
-        switch (item.message)
+        switch (item.type)
         {
             case MessageType::recordingServiceDisabled:
                 eventReason = EventReason::notEnoughLocalRecordingServices;
@@ -381,7 +380,7 @@ QString SystemHealthListModel::Private::toolTip(int index) const
                 eventReason = EventReason::notEnoughIntegrationServices;
                 break;
             default:
-                NX_ASSERT(false, "Unexpected message type %1", item.message);
+                NX_ASSERT(false, "Unexpected message type %1", item.type);
                 return QString();
         }
 
@@ -395,12 +394,12 @@ QString SystemHealthListModel::Private::toolTip(int index) const
     }
 
     return QnSystemHealthStringsHelper::messageTooltip(
-        system(), item.message, getResourceSet(item.message));
+        system(), item.type, getResourceSet(item.type));
 }
 
 QString SystemHealthListModel::Private::decorationPath(int index) const
 {
-    return decorationPath(system(), m_items[index].message);
+    return decorationPath(system(), m_items[index].type);
 }
 
 QString SystemHealthListModel::Private::servicesDisabledReason(
@@ -433,16 +432,16 @@ QString SystemHealthListModel::Private::servicesDisabledReason(
 QColor SystemHealthListModel::Private::color(int index) const
 {
     return QnNotificationLevel::notificationTextColor(
-        QnNotificationLevel::valueOf(system(), m_items[index].message));
+        QnNotificationLevel::valueOf(system(), m_items[index].type));
 }
 
 QVariant SystemHealthListModel::Private::timestamp(int index) const
 {
     const auto& item = m_items[index];
-    switch (item.message)
+    switch (item.type)
     {
         case MessageType::remoteArchiveSyncError:
-            return QVariant::fromValue(item.timestamp);
+            return QVariant::fromValue(item.timestampUs);
 
         default:
             return {};
@@ -451,29 +450,29 @@ QVariant SystemHealthListModel::Private::timestamp(int index) const
 
 int SystemHealthListModel::Private::helpId(int index) const
 {
-    return rules::healthHelpId(m_items[index].message);
+    return rules::healthHelpId(m_items[index].type);
 }
 
 int SystemHealthListModel::Private::priority(int index) const
 {
-    return priority(system(), m_items[index].message);
+    return priority(system(), m_items[index].type);
 }
 
 bool SystemHealthListModel::Private::locked(int index) const
 {
-    return common::system_health::isMessageLocked(m_items[index].message);
+    return common::system_health::isMessageLocked(m_items[index].type);
 }
 
 bool SystemHealthListModel::Private::isCloseable(int index) const
 {
-    return m_items[index].message != MessageType::defaultCameraPasswords;
+    return m_items[index].type != MessageType::defaultCameraPasswords;
 }
 
 CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
 {
     const auto& item = m_items[index];
 
-    switch (item.message)
+    switch (item.type)
     {
         case MessageType::defaultCameraPasswords:
         {
@@ -658,14 +657,12 @@ menu::Parameters SystemHealthListModel::Private::parameters(int index) const
 
 common::system_health::MessageType SystemHealthListModel::Private::messageType(int index) const
 {
-    const auto& item = m_items[index];
-    return item.message;
+    return m_items[index].type;
 }
 
-void SystemHealthListModel::Private::addItem(
-    MessageType message, const nx::vms::event::AbstractActionPtr& action)
+void SystemHealthListModel::Private::addItem(const Message& message)
 {
-    doAddItem(message, action, false /*initial*/);
+    doAddItem(message, /*initial*/ false);
 }
 
 QSet<QnResourcePtr> SystemHealthListModel::Private::getResourceSet(
@@ -697,41 +694,30 @@ QnResourceList SystemHealthListModel::Private::getSortedResourceList(
     return result;
 }
 
-void SystemHealthListModel::Private::doAddItem(
-    MessageType message, const nx::vms::event::AbstractActionPtr& action, bool initial)
+void SystemHealthListModel::Private::doAddItem(const Message& message, bool initial)
 {
-    NX_VERBOSE(this, "Adding a system health message %1", message);
+    NX_VERBOSE(this, "Adding a system health message %1", message.type);
 
-    if (!messageIsSupported(message))
+    if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
 
-    if (!common::system_health::isMessageVisible(message))
+    if (!common::system_health::isMessageVisible(message.type))
     {
-        NX_VERBOSE(this, "The message %1 is not visible", message);
+        NX_VERBOSE(this, "The message %1 is not visible", message.type);
         return;
     }
 
-    if (common::system_health::isMessageVisibleInSettings(message))
+    if (common::system_health::isMessageVisibleInSettings(message.type))
     {
-        if (!system()->userNotificationSettingsManager()->watchedMessages().contains(message))
+        if (!system()->userNotificationSettingsManager()->watchedMessages().contains(message.type))
         {
-            NX_VERBOSE(this, "The message %1 is not allowed by the filter", message);
+            NX_VERBOSE(this, "The message %1 is not allowed by the filter", message.type);
             return; //< Not allowed by filter.
         }
     }
 
     auto item = Item{message};
-
-    if (action)
-    {
-        const auto& eventParams = action->getRuntimeParams();
-
-        item.attributes = eventParams.attributes;
-        item.timestamp = std::chrono::microseconds(eventParams.eventTimestampUsec);
-
-        if (auto sourceResources = event::sourceResources(eventParams, system()->resourcePool()))
-            item.resources = std::move(*sourceResources);
-    }
+    item.resources = system()->resourcePool()->getResourcesByIds(message.resourceIds);
 
     auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
     const auto index = std::distance(m_items.begin(), position);
@@ -746,25 +732,21 @@ void SystemHealthListModel::Private::doAddItem(
     }
 }
 
-void SystemHealthListModel::Private::removeItem(
-    MessageType message, const nx::vms::event::AbstractActionPtr& action)
+void SystemHealthListModel::Private::removeItem(const Message& message)
 {
-    if (!messageIsSupported(message))
+    if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
 
-    if (message == MessageType::replacedDeviceDiscovered)
+    if (message.type == MessageType::replacedDeviceDiscovered)
     {
-        if (const auto resource = system()->resourcePool()->getResourceById(
-            action->getRuntimeParams().eventResourceId))
-        {
-            removeItemForResource(message, resource);
-        }
+        if (const auto resource = system()->resourcePool()->getResourceById(message.resourceId()))
+            removeItemForResource(message.type, resource);
     }
     else
     {
-        NX_VERBOSE(this, "Removing a system health message %1", toString(message));
+        NX_VERBOSE(this, "Removing a system health message %1", toString(message.type));
 
-        const auto range = std::equal_range(m_items.cbegin(), m_items.cend(), message);
+        const auto range = std::equal_range(m_items.cbegin(), m_items.cend(), message.type);
         const auto count = std::distance(range.first, range.second);
         if (count > 0)
             q->removeRows(std::distance(m_items.cbegin(), range.first), count);
@@ -777,23 +759,29 @@ void SystemHealthListModel::Private::removeItemForResource(
 {
     NX_VERBOSE(this, "Removing a system health message %1", toString(message));
 
-    const auto item = Item{.message = message, .resources = {resource}};
+    Item item;
+    item.resources = {resource};
+    static_cast<Message&>(item) = Message{.type = message, .resourceIds = {resource->getId()}};
+
     const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
     if (position != m_items.cend() && *position == item)
         q->removeRows(std::distance(m_items.cbegin(), position), 1);
 }
 
-void SystemHealthListModel::Private::toggleItem(MessageType message, bool isOn)
+void SystemHealthListModel::Private::toggleItem(MessageType type, bool isOn)
 {
+    auto message = Message{.type = type, .active = isOn};
+
     if (isOn)
-        addItem(message, {});
+        addItem(message);
     else
-        removeItem(message, {});
+        removeItem(message);
 }
 
 void SystemHealthListModel::Private::updateItem(MessageType message)
 {
-    const auto item = Item{.message = message};
+    Item item;
+    item.type = message;
     const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
 
     if (position == m_items.end() || *position != item)

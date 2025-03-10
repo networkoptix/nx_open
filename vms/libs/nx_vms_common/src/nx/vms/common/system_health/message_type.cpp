@@ -111,6 +111,12 @@ MessageTypePredicate isMessageApplicableForLicensingMode(SystemContext* systemCo
     };
 }
 
+bool isMessageIntercom(MessageType message)
+{
+    return message == MessageType::showIntercomInformer
+        || message == MessageType::showMissedCallInformer;
+}
+
 std::set<MessageType> allMessageTypes(const MessageTypePredicateList& predicates)
 {
     std::set<MessageType> result;

@@ -31,7 +31,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
-#include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/helpers.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/utils/event.h>
@@ -52,194 +51,50 @@
 namespace nx::vms::client::desktop {
 
 using namespace std::chrono;
-
-using namespace nx::vms::event;
+using namespace nx::vms::api;
+using namespace nx::vms::common::system_health;
 
 namespace {
 
-bool actionAllowedForUser(
-    const nx::vms::event::AbstractActionPtr& action,
-    const QnUserResourcePtr& user)
+bool messageAllowedForUser(const SiteHealthMessage& message, const QnUserResourcePtr& user)
 {
     if (!user)
         return false;
 
-    const auto healthMessage = nx::vms::common::system_health::MessageType(
-        action->eventType() - nx::vms::api::EventType::siteHealthEvent);
+    const auto systemContext = user->systemContext()->as<SystemContext>();
+    if (!NX_ASSERT(systemContext))
+        return false;
 
-    if (healthMessage == nx::vms::common::system_health::MessageType::showIntercomInformer
-        || healthMessage == nx::vms::common::system_health::MessageType::showMissedCallInformer)
-    {
-        const auto& runtimeParameters = action->getRuntimeParams();
-
-        const auto systemContext =
-            qobject_cast<nx::vms::client::desktop::SystemContext*>(user->systemContext());
-        if (!NX_ASSERT(systemContext))
-            return false;
-
-        const QnResourcePtr cameraResource =
-            systemContext->resourcePool()->getResourceById(runtimeParameters.eventResourceId);
-
-        const bool hasViewPermission = cameraResource &&
-            systemContext->accessController()->hasPermissions(
-                cameraResource,
-                Qn::ViewContentPermission);
-
-        if (hasViewPermission)
-            return true;
-    }
-
-    const auto params = action->getParams();
-    if (params.allUsers)
+    if (isMessageIntercom(message.type))
         return true;
 
-    const auto userId = user->getId();
-    const auto& subjects = params.additionalResources;
-
-    if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
-        return true;
-
-    const auto userGroups = nx::vms::common::userGroupsWithParents(user);
-    for (const auto& groupId: userGroups)
-    {
-        if (std::find(subjects.cbegin(), subjects.cend(), groupId) != subjects.cend())
-            return true;
-    }
-
-    return false;
+    return systemContext->accessController()->hasPowerUserPermissions();
 }
 
-QString toString(AbstractActionPtr action)
+std::string toString(const SiteHealthMessage& message)
 {
-    return nx::format(
-        "{actionType: %1, toggleState: %2, receivedFromRemoteHost: %3, resources: %4, params: %5, "
-            "runtimeParams: %6, ruleId: %7, aggregationCount: %8}",
-        action->actionType(),
-        action->getToggleState(),
-        action->isReceivedFromRemoteHost(),
-        action->getResources(),
-        nx::reflect::json::serialize(action->getParams()),
-        nx::reflect::json::serialize(action->getRuntimeParams()),
-        action->getRuleId().toSimpleString(),
-        action->getAggregationCount());
-}
-
-bool isMessageWatched(const nx::vms::api::UserSettings& settings, const QString& messageType)
-{
-    return !settings.messageFilter.contains(messageType.toStdString());
+    return nx::reflect::json::serialize(message);
 }
 
 bool isMessageWatched(const nx::vms::api::UserSettings& settings,
     nx::vms::common::system_health::MessageType messageType)
 {
-    return isMessageWatched(settings, QString::fromStdString(reflect::toString(messageType)));
-}
-
-// Check if server required for this event to OCCUR.
-bool isSourceServerRequired(EventType eventType)
-{
-    switch (eventType)
-    {
-        case EventType::storageFailureEvent:
-        case EventType::backupFinishedEvent:
-        case EventType::serverFailureEvent:
-        case EventType::serverConflictEvent:
-        case EventType::serverStartEvent:
-        case EventType::serverCertificateError:
-            return true;
-
-        default:
-            return requiresServerResource(eventType);
-    }
-}
-
-// Check if camera required for this event to OCCUR.
-bool isSourceCameraRequired(EventType eventType)
-{
-    switch (eventType)
-    {
-        case EventType::networkIssueEvent:
-            return true;
-
-        case EventType::pluginDiagnosticEvent:
-            return false;
-
-        default:
-            return requiresCameraResource(eventType);
-    }
+    return !settings.messageFilter.contains(reflect::toString(messageType));
 }
 
 /** Check whether the user has an access to this event. */
-bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user)
+bool hasAccessToSource(const SiteHealthMessage& message, const QnUserResourcePtr& user)
 {
-    if (!user || !user->systemContext())
-        return false;
+    if (message.resourceIds.empty())
+        return true;
 
     const auto context = user->systemContext();
+    const auto resources = context->resourcePool()->getResourcesByIds(message.resourceIds);
 
-    if (params.eventType == EventType::cameraIpConflictEvent)
+    for (const auto& resource: resources)
     {
-        const auto permission = Qn::WritePermission;
-        for (const auto& ref: params.metadata.cameraRefs)
-        {
-            auto camera = camera_id_helper::findCameraByFlexibleId(context->resourcePool(), ref);
-            if (!camera)
-            {
-                NX_DEBUG(NX_SCOPE_TAG,
-                    "Unable to find event %1 resource ref %2", params.eventType, ref);
-                continue;
-            }
-            if (context->resourceAccessManager()->hasPermission(user, camera, permission))
-                return true;
-        }
-
-        NX_VERBOSE(NX_SCOPE_TAG,
-            "User %1 has no permission %2 for the event %3", user, permission, params.eventType);
-        return false;
-    }
-
-    if (isSourceCameraRequired(params.eventType))
-    {
-        const auto camera = context->resourcePool()->getResourceById(params.eventResourceId)
-            .dynamicCast<QnVirtualCameraResource>();
-        // The camera could be removed by user manually.
-        if (!camera)
-            return false;
-
-        const auto hasPermission = context->resourceAccessManager()->hasPermission(
-            user, camera, Qn::ViewContentPermission);
-        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the camera %3",
-            user, hasPermission ? "has" : "has not", camera);
-        return hasPermission;
-    }
-
-    if (isSourceServerRequired(params.eventType))
-    {
-        const auto server = context->resourcePool()->getResourceById(params.eventResourceId)
-            .dynamicCast<QnMediaServerResource>();
-        if (!server)
-        {
-            NX_WARNING(NX_SCOPE_TAG, "Event has occurred without its server %1", params.eventResourceId);
-            return false;
-        }
-
-        // Only admins should see notifications with servers.
-        const auto hasPermission = context->resourceAccessManager()->hasPowerUserPermissions(user);
-        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the server %3",
-            user, hasPermission ? "has" : "has not", server);
-        return hasPermission;
-    }
-
-    const auto resources = sourceResources(params, context->resourcePool());
-    if (!resources)
-    {
-        NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source", user);
-        return true;
-    }
-
-    for (const auto& resource: *resources)
-    {
-        if (context->resourceAccessManager()->hasPermission(user, resource, Qn::ViewContentPermission))
+        if (context->resourceAccessManager()->hasPermission(
+            user, resource, Qn::ViewContentPermission))
         {
             NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, resource);
             return true;
@@ -247,7 +102,7 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
     }
 
     NX_VERBOSE(NX_SCOPE_TAG, "%1 has not permission for the event from %2",
-        user, containerString(*resources));
+        user, containerString(resources));
     return false;
 }
 
@@ -268,12 +123,13 @@ NotificationActionHandler::NotificationActionHandler(
 
     const auto messageProcessor = systemContext->clientMessageProcessor();
     connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, this,
-        [this](const nx::Uuid& id)
+        [this](nx::Uuid id)
         {
-            setSystemHealthEventVisible(
-                nx::vms::event::SystemHealthActionPtr::create(
-                    MessageType::replacedDeviceDiscovered, id),
-                false);
+            onSystemHealthMessage(SiteHealthMessage{
+                .type = SiteHealthMessageType::replacedDeviceDiscovered,
+                .active = false,
+                .resourceIds = {id}
+            });
         });
 
     const auto eventConnector = systemContext->serverRuntimeEventConnector();
@@ -282,7 +138,7 @@ NotificationActionHandler::NotificationActionHandler(
         this,
         &NotificationActionHandler::at_serviceDisabled);
     connect(eventConnector,
-        &nx::vms::client::core::ServerRuntimeEventConnector::systemHealthMessage,
+        &nx::vms::client::core::ServerRuntimeEventConnector::siteHealthMessage,
         this,
         &NotificationActionHandler::onSystemHealthMessage);
 }
@@ -296,65 +152,12 @@ void NotificationActionHandler::clear()
     emit cleared();
 }
 
-void NotificationActionHandler::removeNotification(const vms::event::AbstractActionPtr& action)
+void NotificationActionHandler::removeNotification(const SiteHealthMessage& message)
 {
-    NX_VERBOSE(this, "Removing notification: %1", toString(action));
+    NX_VERBOSE(this, "Removing notification: %1", toString(message));
+    NX_ASSERT(!message.active);
 
-    if (const auto eventType = action->eventType(); isSiteHealth(eventType))
-        setSystemHealthEventVisible(action, false);
-}
-
-void NotificationActionHandler::setSystemHealthEventVisible(
-    const nx::vms::event::AbstractActionPtr& action, bool visible)
-{
-    bool canShow = true;
-    const auto message = (MessageType)(action->eventType() - EventType::siteHealthEvent);
-    const bool connected = !system()->user().isNull();
-
-    if (!connected)
-    {
-        canShow = false;
-        if (visible)
-        {
-            /* In unit tests there can be users when we are disconnected. */
-            QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
-            if (guiApp)
-                NX_ASSERT(false, "No events should be displayed if we are disconnected");
-        }
-    }
-    else
-    {
-        // Only admins can see system health events, except intercom call-related.
-        if (message != MessageType::showIntercomInformer
-            && message != MessageType::showMissedCallInformer
-            && !system()->accessController()->hasPowerUserPermissions())
-        {
-            canShow = false;
-        }
-    }
-
-    /* Some messages are not to be displayed to users. */
-    canShow &= (nx::vms::common::system_health::isMessageVisible(message));
-
-    // Checking that user wants to see this message (if he is able to hide it).
-    if (isMessageVisibleInSettings(message))
-    {
-        bool isAllowedByFilter = false;
-        if (auto user = system()->user())
-            isAllowedByFilter = isMessageWatched(user->settings(), message);
-
-        canShow &= isAllowedByFilter;
-    }
-
-    NX_VERBOSE(this,
-        "A system health event is %1: %2",
-        (visible && canShow) ? "added" : "removed",
-        message);
-
-    if (visible && canShow)
-        emit systemHealthEventAdded(message, action);
-    else
-        emit systemHealthEventRemoved(message, action);
+    emit systemHealthEventRemoved(message);
 }
 
 void NotificationActionHandler::at_context_userChanged()
@@ -367,35 +170,31 @@ void NotificationActionHandler::at_serviceDisabled(
     nx::vms::api::EventReason reason,
     const std::set<nx::Uuid>& deviceIds)
 {
-    using namespace nx::vms::api;
-    MessageType messageType;
+    SiteHealthMessage message;
     switch (reason)
     {
         case EventReason::notEnoughLocalRecordingServices:
-            messageType = MessageType::recordingServiceDisabled;
+            message.type = SiteHealthMessageType::recordingServiceDisabled;
             break;
         case EventReason::notEnoughCloudRecordingServices:
-            messageType = MessageType::cloudServiceDisabled;
+            message.type = SiteHealthMessageType::cloudServiceDisabled;
             break;
         case EventReason::notEnoughIntegrationServices:
-            messageType = MessageType::integrationServiceDisabled;
+            message.type = SiteHealthMessageType::integrationServiceDisabled;
             break;
         default:
             NX_ASSERT(false, "Unexpected event reason %1", reason);
             return;
     }
 
-    auto action = nx::vms::event::SystemHealthActionPtr::create(messageType);
-    for (auto id: deviceIds)
-        action->getRuntimeParams().metadata.cameraRefs.push_back(id.toSimpleString());
+    message.resourceIds.assign(deviceIds.cbegin(), deviceIds.cend());
 
-    setSystemHealthEventVisible(action, true);
+    onSystemHealthMessage(message);
 }
 
-void NotificationActionHandler::onSystemHealthMessage(
-    const nx::vms::event::AbstractActionPtr& action)
+void NotificationActionHandler::onSystemHealthMessage(const SiteHealthMessage& message)
 {
-    NX_VERBOSE(this, "An action is received: %1", toString(action));
+    NX_VERBOSE(this, "Site health message received: %1", toString(message));
 
     const auto user = system()->user();
     if (!user)
@@ -404,35 +203,41 @@ void NotificationActionHandler::onSystemHealthMessage(
         return;
     }
 
-    if (!actionAllowedForUser(action, user))
+    if (!isMessageVisible(message.type))
     {
-        NX_VERBOSE(this, "The action is not allowed for the user %1", user->getName());
+        NX_VERBOSE(this, "The message is not visible: %1", message.type);
+        return;
+    }
+
+    if (!messageAllowedForUser(message, user))
+    {
+        NX_VERBOSE(this, "The message is not allowed for the user %1", user->getName());
 
         return;
     }
 
-    if (!hasAccessToSource(action->getRuntimeParams(), user))
+    if (!hasAccessToSource(message, user))
     {
         NX_VERBOSE(
-            this, "User %1 has no access to the action's source", user->getName());
+            this, "User %1 has no access to the message source", user->getName());
 
         return;
     }
 
-    switch (action->getToggleState())
+    if (!isMessageWatched(user->settings(), message.type))
     {
-        case vms::api::EventState::undefined:
-        case vms::api::EventState::active:
-            NX_VERBOSE(this, "Adding Site health message: %1", toString(action));
-            setSystemHealthEventVisible(action, true);
-            break;
+        NX_VERBOSE(this, "The message is not watched by the user: %1", message.type);
+        return;
+    }
 
-        case vms::api::EventState::inactive:
-            removeNotification(action);
-            break;
-
-        default:
-            break;
+    if (message.active)
+    {
+        NX_VERBOSE(this, "Adding Site health message: %1", toString(message));
+        emit systemHealthEventAdded(message);
+    }
+    else
+    {
+        removeNotification(message);
     }
 }
 

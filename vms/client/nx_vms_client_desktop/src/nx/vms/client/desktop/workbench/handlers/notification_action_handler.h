@@ -2,12 +2,19 @@
 
 #pragma once
 
+#include <set>
+
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/window_context_aware.h>
-#include <nx/vms/common/system_health/message_type.h>
-#include <nx/vms/event/event_fwd.h>
+
+namespace nx::vms::api {
+
+enum class EventReason;
+struct SiteHealthMessage;
+
+} // namespace nx::vms::api
 
 namespace nx::vms::client::desktop {
 
@@ -19,18 +26,14 @@ class NotificationActionHandler:
     using base_type = QObject;
 
 public:
-    using MessageType = nx::vms::common::system_health::MessageType;
-
     NotificationActionHandler(WindowContext* windowContext, QObject* parent = nullptr);
     virtual ~NotificationActionHandler() override;
 
-    void removeNotification(const vms::event::AbstractActionPtr& action);
+    void removeNotification(const nx::vms::api::SiteHealthMessage& message);
 
 signals:
-    void systemHealthEventAdded(
-        MessageType message, const nx::vms::event::AbstractActionPtr& action);
-    void systemHealthEventRemoved(
-        MessageType message, const nx::vms::event::AbstractActionPtr& action);
+    void systemHealthEventAdded(const nx::vms::api::SiteHealthMessage& message);
+    void systemHealthEventRemoved(const nx::vms::api::SiteHealthMessage& message);
 
     void cleared();
 
@@ -38,12 +41,9 @@ private:
     void clear();
 
     void at_context_userChanged();
-    void onSystemHealthMessage(const nx::vms::event::AbstractActionPtr& action);
+    void onSystemHealthMessage(const nx::vms::api::SiteHealthMessage& message);
     void at_serviceDisabled(
         nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
-
-    void setSystemHealthEventVisible(
-        const nx::vms::event::AbstractActionPtr& action, bool visible);
 };
 
 } // namespace nx::vms::client::desktop

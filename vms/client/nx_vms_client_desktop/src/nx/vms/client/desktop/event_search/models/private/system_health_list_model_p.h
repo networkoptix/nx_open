@@ -7,11 +7,12 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/data/site_health_message.h>
+#include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/menu/action_fwd.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/common/system_health/message_type.h>
-#include <nx/vms/event/event_parameters.h>
 
 #include "../system_health_list_model.h"
 
@@ -26,6 +27,7 @@ class SystemHealthListModel::Private:
 
 public:
     using MessageType = common::system_health::MessageType;
+    using Message = nx::vms::api::SiteHealthMessage;
 
     explicit Private(SystemHealthListModel* q);
     virtual ~Private() override;
@@ -55,10 +57,9 @@ public:
     void remove(int first, int count);
 
 private:
-    void doAddItem(
-        MessageType message, const nx::vms::event::AbstractActionPtr& action, bool initial);
-    void addItem(MessageType message, const nx::vms::event::AbstractActionPtr& action);
-    void removeItem(MessageType message, const nx::vms::event::AbstractActionPtr& action);
+    void doAddItem(const Message& message, bool initial);
+    void addItem(const Message& message);
+    void removeItem(const Message& message);
     void removeItemForResource(MessageType message, const QnResourcePtr& resource);
     void toggleItem(MessageType message, bool isOn);
     void updateItem(MessageType message);
@@ -72,19 +73,16 @@ private:
     static QString servicesDisabledReason(nx::vms::api::EventReason reasonCode, int channelCount);
 
 private:
-    struct Item
+    struct Item: public nx::vms::api::SiteHealthMessage
     {
         QnResourcePtr getResource() const;
 
-        operator MessageType() const { return message; } //< Implicit by design.
+        operator MessageType() const { return type; } //< Implicit by design.
         bool operator==(const Item& other) const;
         bool operator!=(const Item& other) const;
         bool operator<(const Item& other) const;
 
-        MessageType message = MessageType::count;
         QnResourceList resources;
-        nx::common::metadata::Attributes attributes;
-        std::chrono::microseconds timestamp = std::chrono::microseconds::zero();
     };
 
 private:

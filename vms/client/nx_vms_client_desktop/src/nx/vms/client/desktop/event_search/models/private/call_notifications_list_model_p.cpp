@@ -8,11 +8,13 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/vms/api/data/site_health_message.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/camera/buttons/intercom_helper.h>
 #include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -22,24 +24,18 @@
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/intercom/utils.h>
-#include <nx/vms/event/actions/system_health_action.h>
-#include <nx/vms/event/aggregation_info.h>
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/managers/abstract_event_rules_manager.h>
-#include <transaction/message_bus_adapter.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms::client::core;
-using namespace nx::vms::common::system_health;
+using namespace nx::vms::api;
 
 namespace {
 
-bool messageIsSupported(MessageType message)
+bool messageIsSupported(SiteHealthMessageType message)
 {
-    return message == MessageType::showIntercomInformer
-        || message == MessageType::showMissedCallInformer;
+    return nx::vms::common::system_health::isMessageIntercom(message);
 }
 
 void postRejectIntercomCall(
@@ -104,38 +100,34 @@ CallNotificationsListModel::Private::~Private()
 }
 
 void CallNotificationsListModel::Private::addNotification(
-    MessageType message,
-    const nx::vms::event::AbstractActionPtr& action)
+    const nx::vms::api::SiteHealthMessage& message)
 {
-    if (!messageIsSupported(message))
+    if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
 
-    const auto& runtimeParameters = action->getRuntimeParams();
-
-    const QnResourcePtr cameraResource = system()->resourcePool()->getResourceById(
-        runtimeParameters.eventResourceId);
-    const auto camera = cameraResource.dynamicCast<QnVirtualCameraResource>();
+    const auto camera = system()->resourcePool()->getResourceById<QnVirtualCameraResource>(message.resourceId());
 
     EventData eventData;
     eventData.toolTip = tooltip(message, camera);
-    eventData.helpId = rules::eventHelpId(runtimeParameters.eventType);
-    eventData.level = QnNotificationLevel::valueOf(system(), message);
+    eventData.helpId = HelpTopic::EventsActions_ShowIntercomInformer;
+    eventData.level = QnNotificationLevel::valueOf(system(), message.type);
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
-    eventData.timestamp = (std::chrono::microseconds) runtimeParameters.eventTimestampUsec;
-    eventData.ruleId = runtimeParameters.eventResourceId;
+    eventData.timestamp = message.timestampUs;
+    eventData.ruleId = message.resourceId();
     eventData.source = camera;
     eventData.previewCamera = camera;
+    // Using layout as main resource for standard layout handlers to work properly.
     eventData.actionParameters = system()->resourcePool()->getResourceById(
         nx::vms::common::calculateIntercomLayoutId(camera));
     eventData.removable = true;
 
-    switch (message)
+    switch (message.type)
     {
-        case MessageType::showIntercomInformer:
+        case SiteHealthMessageType::showIntercomInformer:
         {
             // Id is fixed and equal to intercom id, so this informer will be removed
             // on every client instance via changing toggle state.
-            eventData.id = runtimeParameters.eventResourceId;
+            eventData.id = message.resourceId();
 
             eventData.actionId = menu::OpenIntercomLayoutAction;
             eventData.title = tr("Calling...");
@@ -146,7 +138,7 @@ void CallNotificationsListModel::Private::addNotification(
             eventData.extraAction->setText(tr("Open"));
 
             const auto openDoorActionHandler =
-                [this, action, camera]()
+                [this, camera]()
                 {
                     if (!system()->ioPortsInterface())
                         return;
@@ -177,27 +169,27 @@ void CallNotificationsListModel::Private::addNotification(
 
             break;
         }
-        case MessageType::showMissedCallInformer:
+        case SiteHealthMessageType::showMissedCallInformer:
         {
             eventData.id = nx::Uuid::createUuid(); //< We have to show every missed call separately.
             eventData.actionId = menu::OpenMissedCallIntercomLayoutAction;
             eventData.title = tr("Missed call");
             eventData.iconPath = "20x20/Outline/missed_call.svg";
             eventData.level = QnNotificationLevel::Value::CriticalNotification;
-            eventData.actionParameters.setArgument(menu::OtherType, eventData.id);
+            eventData.actionParameters.setArgument(Qn::ItemUuidRole, eventData.id);
 
             break;
         }
         default:
         {
-            NX_ASSERT(false, "Unexpected message type: %1", message);
+            NX_ASSERT(false, "Unexpected message type: %1", message.type);
         }
     }
 
-    eventData.actionParameters.setArgument(Qn::ActionDataRole, action);
+    eventData.actionParameters.setArgument(nx::vms::client::core::UuidRole, message.resourceId());
 
     // Recreate informer on the top in case of several calls in a short period.
-    if (message == MessageType::showIntercomInformer)
+    if (message.type == SiteHealthMessageType::showIntercomInformer)
         q->removeEvent(eventData.id);
 
     if (!q->addEvent(eventData))
@@ -205,13 +197,12 @@ void CallNotificationsListModel::Private::addNotification(
 }
 
 void CallNotificationsListModel::Private::removeNotification(
-    MessageType message,
-    const nx::vms::event::AbstractActionPtr& action)
+    const SiteHealthMessage& message)
 {
-    if (!messageIsSupported(message))
+    if (!messageIsSupported(message.type))
         return; //< Message type is processed in a separate model.
 
-    const auto id = action->getRuntimeParams().eventResourceId;
+    const auto id = message.resourceId();
     if (id.isNull())
         return;
 
@@ -219,13 +210,13 @@ void CallNotificationsListModel::Private::removeNotification(
 }
 
 QString CallNotificationsListModel::Private::tooltip(
-    MessageType message,
+    const SiteHealthMessage& message,
     const QnVirtualCameraResourcePtr& camera) const
 {
     QStringList tooltip;
-    if (message == MessageType::showIntercomInformer)
+    if (message.type == SiteHealthMessageType::showIntercomInformer)
         tooltip << tr("Call Request");
-    else if (message == MessageType::showMissedCallInformer)
+    else if (message.type == SiteHealthMessageType::showMissedCallInformer)
         tooltip << tr("Call Request Missed");
 
     if (camera)

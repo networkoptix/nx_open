@@ -4,10 +4,10 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <nx/vms/common/system_health/message_type.h>
-
 #include "../call_notifications_list_model.h"
 #include "sound_controller.h"
+
+namespace nx::vms::api { struct SiteHealthMessage; }
 
 namespace nx::vms::client::desktop {
 
@@ -23,14 +23,10 @@ public:
     virtual ~Private() override;
 
 private:
-    void addNotification(
-        nx::vms::common::system_health::MessageType message,
-        const nx::vms::event::AbstractActionPtr& action);
-    void removeNotification(
-        nx::vms::common::system_health::MessageType message,
-        const nx::vms::event::AbstractActionPtr& action);
+    void addNotification(const nx::vms::api::SiteHealthMessage& message);
+    void removeNotification(const nx::vms::api::SiteHealthMessage& message);
     QString tooltip(
-        nx::vms::common::system_health::MessageType message,
+        const nx::vms::api::SiteHealthMessage& message,
         const QnVirtualCameraResourcePtr& camera) const;
 
 private:

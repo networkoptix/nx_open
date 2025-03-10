@@ -11,10 +11,11 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
-#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/common/system_health/message_type.h>
 
 namespace nx::vms::client::desktop {
 
+using namespace nx::vms::api;
 using namespace nx::vms::common;
 
 struct CallAlarmManager::Private
@@ -55,15 +56,15 @@ struct CallAlarmManager::Private
             return;
 
         connections << connect(handler, &NotificationActionHandler::systemHealthEventAdded, q,
-            [this](system_health::MessageType message, const nx::vms::event::AbstractActionPtr& action)
+            [this](const SiteHealthMessage& message)
             {
-                handleEventAddedOrRemoved(message, action, /*added*/ true);
+                handleEventAddedOrRemoved(message, /*added*/ true);
             });
 
         connections << connect(handler, &NotificationActionHandler::systemHealthEventRemoved, q,
-            [this](system_health::MessageType message, const nx::vms::event::AbstractActionPtr& action)
+            [this](const SiteHealthMessage& message)
             {
-                handleEventAddedOrRemoved(message, action, /*added*/ false);
+                handleEventAddedOrRemoved(message, /*added*/ false);
             });
     }
 
@@ -79,14 +80,12 @@ struct CallAlarmManager::Private
         emit q->activeChanged();
     }
 
-    void handleEventAddedOrRemoved(
-        system_health::MessageType message, const nx::vms::event::AbstractActionPtr& action, bool added)
+    void handleEventAddedOrRemoved(const SiteHealthMessage& message, bool added)
     {
-        if (!active || !action || message != system_health::MessageType::showIntercomInformer)
+        if (!active || message.type != system_health::MessageType::showIntercomInformer)
             return;
 
-        const auto& runtimeParameters = action->getRuntimeParams();
-        const nx::Uuid intercomId = runtimeParameters.eventResourceId;
+        const nx::Uuid intercomId = message.resourceId();
 
         NX_ASSERT(!intercomId.isNull());
 

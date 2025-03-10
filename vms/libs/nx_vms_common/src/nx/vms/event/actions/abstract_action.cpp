@@ -132,47 +132,6 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
     return hasToggleState(actionType);
 }
 
-QList<ActionType> userAvailableActions()
-{
-    static QList<ActionType> result
-    {
-        ActionType::cameraOutputAction,
-        ActionType::bookmarkAction,
-        ActionType::cameraRecordingAction,
-        ActionType::panicRecordingAction,
-        ActionType::sendMailAction,
-        ActionType::diagnosticsAction,
-        ActionType::showPopupAction,
-        ActionType::pushNotificationAction,
-        ActionType::playSoundAction,
-        ActionType::playSoundOnceAction,
-        ActionType::sayTextAction,
-        ActionType::executePtzPresetAction,
-        ActionType::showTextOverlayAction,
-        ActionType::showOnAlarmLayoutAction,
-        ActionType::execHttpRequestAction,
-        ActionType::openLayoutAction,
-        ActionType::fullscreenCameraAction,
-        ActionType::exitFullscreenAction,
-        ActionType::buzzerAction,
-    };
-
-    return result;
-}
-
-QList<ActionType> allActions()
-{
-    static QList<ActionType> result =
-        []()
-        {
-            QList<ActionType> result = userAvailableActions();
-            result.append(ActionType::acknowledgeAction);
-            return result;
-        }();
-
-    return result;
-}
-
 //-------------------------------------------------------------------------------------------------
 
 AbstractAction::AbstractAction(const ActionType actionType, const EventParameters& runtimeParams):

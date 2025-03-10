@@ -2,14 +2,21 @@
 
 #pragma once
 
+#include <set>
 #include <vector>
 
 #include <nx/utils/uuid.h>
-#include <nx/vms/event/event_fwd.h>
 
 class QnCommonMessageProcessor;
 
-namespace nx::vms::api { struct ServerRuntimeEventData; }
+namespace nx::vms::api {
+
+enum class EventReason;
+
+struct ServerRuntimeEventData;
+struct SiteHealthMessage;
+
+} // namespace nx::vms::api
 
 namespace nx::vms::client::core {
 
@@ -26,7 +33,7 @@ signals:
     void analyticsStorageParametersChanged(nx::Uuid serverId);
     void deviceAdvancedSettingsManifestChanged(const std::set<nx::Uuid>& deviceIds);
     void serviceDisabled(nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);
-    void systemHealthMessage(const nx::vms::event::AbstractActionPtr& action);
+    void siteHealthMessage(const nx::vms::api::SiteHealthMessage& message);
 
 private:
     void at_serverRuntimeEventOccurred(const nx::vms::api::ServerRuntimeEventData& eventData);

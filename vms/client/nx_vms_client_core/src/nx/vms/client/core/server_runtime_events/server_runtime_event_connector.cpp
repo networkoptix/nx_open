@@ -8,7 +8,7 @@
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
-#include <nx/vms/event/actions/system_health_action.h>
+#include <nx/vms/api/data/site_health_message.h>
 
 namespace nx::vms::client::core {
 
@@ -87,12 +87,14 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
 
             return;
         }
-        case ServerRuntimeEventType::systemHealthMessage:
+        case ServerRuntimeEventType::siteHealthMessage:
         {
-            if (const auto action =
-                nx::vms::event::SystemHealthAction::fromServerRuntimeEvent(eventData))
+            nx::vms::api::SiteHealthMessage message;
+
+            if (NX_ASSERT(nx::reflect::json::deserialize(
+                nx::toBufferView(eventData.eventData), &message)))
             {
-                emit(systemHealthMessage(action));
+                emit(siteHealthMessage(message));
             }
 
             return;

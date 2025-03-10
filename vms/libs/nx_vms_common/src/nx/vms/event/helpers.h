@@ -20,8 +20,6 @@ using EventTypePredicateList = QList<EventTypePredicate>;
  */
 NX_VMS_COMMON_API bool isNonDeprecatedEvent(EventType eventType);
 
-NX_VMS_COMMON_API bool isSiteHealth(EventType eventType);
-
 /**
  * @return Sorted list of event types for which each of the passed predicates returns true or list
  *     of all known event types if no predicate passed as a parameter.
@@ -51,5 +49,8 @@ NX_VMS_COMMON_API std::optional<QnResourceList> sourceResources(
 
 NX_VMS_COMMON_API QStringList splitOnPureKeywords(const QString& keywords);
 NX_VMS_COMMON_API bool checkForKeywords(const QString& value, const QStringList& keywords);
+
+NX_VMS_COMMON_API QList<ActionType> userAvailableActions();
+NX_VMS_COMMON_API QList<ActionType> allActions();
 
 } // namespace nx::vms::event

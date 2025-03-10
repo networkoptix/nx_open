@@ -11,30 +11,30 @@ static const auto kDeviceModelAttributeName = "deviceModelAttribute";
 
 namespace nx::vms::common::system_health {
 
-nx::common::metadata::Attributes storeDiscoveredDeviceDataToAttributes(
+std::map<std::string, std::string> storeDiscoveredDeviceDataToAttributes(
     const nx::utils::Url& deviceUrl,
     const QString& deviceModel)
 {
     return {
-        {kDeviceUrlAttributeName, deviceUrl.toString()},
-        {kDeviceModelAttributeName, deviceModel}};
+        {kDeviceUrlAttributeName, deviceUrl.toStdString()},
+        {kDeviceModelAttributeName, deviceModel.toStdString()}};
 }
 
 std::optional<nx::utils::Url> getDeviceUrlFromAttributes(
-    const nx::common::metadata::Attributes& attributes)
+    const std::map<std::string, std::string>& attributes)
 {
-    const auto itr = findFirstAttributeByName(&attributes, kDeviceUrlAttributeName);
+    const auto itr = attributes.find(kDeviceUrlAttributeName);
     return itr != attributes.cend()
-        ? std::make_optional(nx::utils::Url(itr->value))
+        ? std::make_optional(nx::utils::Url(itr->second))
         : std::nullopt;
 }
 
 std::optional<QString> getDeviceModelFromAttributes(
-    const nx::common::metadata::Attributes& attributes)
+    const std::map<std::string, std::string>& attributes)
 {
-    const auto itr = findFirstAttributeByName(&attributes, kDeviceModelAttributeName);
+    const auto itr = attributes.find(kDeviceModelAttributeName);
     return itr != attributes.cend()
-        ? std::make_optional(itr->value)
+        ? std::make_optional(QString::fromStdString(itr->second))
         : std::nullopt;
 }
 

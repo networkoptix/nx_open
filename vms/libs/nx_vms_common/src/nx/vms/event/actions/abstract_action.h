@@ -27,9 +27,6 @@ NX_VMS_COMMON_API bool allowsAggregation(ActionType actionType);
 
 NX_VMS_COMMON_API bool isActionProlonged(ActionType actionType, const ActionParameters &parameters);
 
-NX_VMS_COMMON_API QList<ActionType> userAvailableActions();
-NX_VMS_COMMON_API QList<ActionType> allActions();
-
 /**
  * Base class for business actions
  */

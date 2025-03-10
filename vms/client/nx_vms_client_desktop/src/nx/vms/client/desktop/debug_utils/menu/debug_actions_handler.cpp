@@ -21,7 +21,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/common/system_settings.h>
-#include <nx/vms/event/actions/common_action.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
