@@ -122,6 +122,10 @@ Dialog
     {
         buttonLayout: DialogButtonBox.KdeLayout
         standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
+        onClicked:
+        {
+            headersTableView.closeEditor()
+        }
     }
 
     ModalDialog
