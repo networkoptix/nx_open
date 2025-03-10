@@ -2504,7 +2504,7 @@ Alt + クリックを使用してください。</translation>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation>このユーザーはまだ%1にサインアップしていません</translation>
+      <translation>このユーザーはまだ %1 に登録されていません。</translation>
     </message>
   </context>
   <context>
